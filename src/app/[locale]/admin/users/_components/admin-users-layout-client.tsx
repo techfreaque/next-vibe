@@ -7,12 +7,10 @@
 
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Div } from "next-vibe-ui/ui/div";
-import { H1 } from "next-vibe-ui/ui/typography";
 import type React from "react";
 import type { ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { UsersNavigation } from "./users-navigation";
 
@@ -32,7 +30,6 @@ export function AdminUsersLayoutClient({
   locale,
 }: AdminUsersLayoutClientProps): React.JSX.Element {
   const pathname = usePathname();
-  const { t } = simpleT(locale);
 
   // Determine current page from pathname
   const getCurrentPage = (): CurrentPageType => {
@@ -51,12 +48,6 @@ export function AdminUsersLayoutClient({
     <Div className="flex flex-col gap-6">
       {/* Header with Navigation */}
       <Div className="flex flex-col gap-4">
-        <Div>
-          <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("app.admin.users.overview.title")}
-          </H1>
-        </Div>
-
         <UsersNavigation locale={locale} currentPage={currentPage} />
       </Div>
 

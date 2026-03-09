@@ -145,7 +145,7 @@ export const translations: typeof enTranslations = {
       adminTitle: "Ausgabenlimit",
       description: "Nutzen Sie Ihre Credits bei {{modelCount}} KI-Modellen",
       adminDescription:
-        "Credits wirken als Ausgabenlimit — kontrollieren Sie die erlaubte KI-Nutzung. Verwenden Sie eigene API-Schlüssel, um Limits vollständig aufzuheben.",
+        "Credits wirken als Ausgabenlimit — kontrollieren Sie die erlaubte KI-Nutzung aller Benutzer.",
       credit: "{{count}} Credit",
       credits: "{{count}} Credits",
       expiring: {
@@ -170,8 +170,9 @@ export const translations: typeof enTranslations = {
           "Durch Empfehlungen verdient – klicken Sie, um Freunde einzuladen",
       },
       spending: {
-        title: "Verdiente Credits",
-        adminDescription: "Durch Empfehlungen verdiente Credits",
+        title: "Eigene verdiente Credits",
+        adminDescription:
+          "Ihre persönlichen Empfehlungsverdienste (nicht instanzweit)",
       },
     },
     total: {
@@ -364,7 +365,10 @@ export const translations: typeof enTranslations = {
       tag: "admin",
       container: {
         title: "Guthaben zum Benutzer hinzufügen",
-        description: "Guthabenpakete an einen bestimmten Benutzer vergeben",
+        description:
+          "Bonusguthaben einem bestimmten Benutzerkonto gutschreiben",
+        selfTitle: "Guthaben zum eigenen Konto hinzufügen",
+        selfDescription: "Sich selbst Bonusguthaben gutschreiben",
       },
       targetUserId: {
         label: "Zielbenutzer-ID",

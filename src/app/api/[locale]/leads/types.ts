@@ -43,6 +43,7 @@ export interface LeadUpdateType {
   country?: string;
   language?: string;
   subscriptionConfirmedAt?: Date | null;
+  convertedUserId?: string | null;
   metadata?: Record<string, string | number | boolean | null>;
 }
 

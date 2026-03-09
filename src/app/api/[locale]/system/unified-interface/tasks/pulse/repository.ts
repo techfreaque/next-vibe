@@ -691,6 +691,7 @@ export class PulseHealthRepository {
                       favoriteId: undefined,
                       headless: undefined,
                       waitingForRemoteResult: undefined,
+                      abortSignal: undefined,
                     },
                   }),
                   new Promise<never>((...[, reject]) => {

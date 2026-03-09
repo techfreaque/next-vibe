@@ -43,7 +43,6 @@ import type {
   EmailCampaignStageValues,
   EngagementTypesValues,
   LeadSortFieldValues,
-  LeadSource,
   LeadSourceFilterValues,
   LeadSourceValues,
   LeadStatusFilterValues,
@@ -336,62 +335,17 @@ export class LeadsRepository {
    */
   static async updateLead(
     id: string,
-    data: {
-      updates: {
-        basicInfo: {
-          email?: string;
-          businessName?: string;
-          contactName?: string | null;
-          status?: (typeof LeadStatus)[keyof typeof LeadStatus];
-        };
-        contactDetails: {
-          phone?: string | null;
-          website?: string | null;
-          country?: string;
-          language?: string;
-        };
-        campaignManagement: {
-          currentCampaignStage?: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage];
-          source?: (typeof LeadSource)[keyof typeof LeadSource];
-        };
-        additionalDetails: {
-          notes?: string;
-          subscriptionConfirmedAt?: Date | null;
-          metadata?: Record<string, string | number | boolean | null>;
-        };
-      };
-    },
+    data: Partial<LeadUpdateType>,
     logger: EndpointLogger,
     t: ModuleT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Updating lead", {
         id,
-        updates: Object.keys(data.updates),
+        updates: Object.keys(data),
       });
 
-      // Flatten nested update structure to match internal repository format
-      const {
-        basicInfo,
-        contactDetails,
-        campaignManagement,
-        additionalDetails,
-      } = data.updates;
-      const flattenedData: Partial<LeadUpdateType> = {
-        email: basicInfo.email,
-        businessName: basicInfo.businessName,
-        contactName: basicInfo.contactName,
-        status: basicInfo.status,
-        phone: contactDetails.phone,
-        website: contactDetails.website,
-        country: contactDetails.country,
-        language: contactDetails.language,
-        currentCampaignStage: campaignManagement.currentCampaignStage,
-        source: campaignManagement.source,
-        notes: additionalDetails.notes,
-        subscriptionConfirmedAt: additionalDetails.subscriptionConfirmedAt,
-        metadata: additionalDetails.metadata,
-      };
+      const flattenedData: Partial<LeadUpdateType> = data;
 
       // If status is being updated, validate the transition
       if (flattenedData.status) {
@@ -433,12 +387,25 @@ export class LeadsRepository {
       }
 
       // Delegate to internal method
-      return await LeadsRepository.updateLeadInternal(
+      const result = await LeadsRepository.updateLeadInternal(
         id,
         flattenedData,
         logger,
         t,
       );
+
+      // After a successful status change, trigger campaign lifecycle transitions
+      if (result.success && flattenedData.status) {
+        const { campaignSchedulerService } =
+          await import("./campaigns/emails/services/scheduler");
+        await campaignSchedulerService.haltCampaignsForStatusChange(
+          id,
+          flattenedData.status,
+          logger,
+        );
+      }
+
+      return result;
     } catch (error) {
       logger.error("Error updating lead", parseError(error));
       return fail({
@@ -1827,6 +1794,17 @@ export class LeadsRepository {
 
             await tx.update(leads).set(updateData).where(eq(leads.id, lead.id));
             totalUpdated++;
+
+            // Trigger campaign lifecycle transitions for status changes (fire-and-forget, outside tx)
+            if (updates.status && updates.status !== lead.status) {
+              const { campaignSchedulerService } =
+                await import("./campaigns/emails/services/scheduler");
+              await campaignSchedulerService.haltCampaignsForStatusChange(
+                lead.id,
+                updates.status,
+                logger,
+              );
+            }
           } catch (error) {
             logger.error(
               "Error updating lead in batch",

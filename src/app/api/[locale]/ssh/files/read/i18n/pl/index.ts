@@ -6,6 +6,14 @@ export const translations = {
       "Nieprawidłowa ścieżka: musi być bezwzględna bez segmentów '..'",
     fileNotFound: "Plik nie znaleziony",
     permissionDenied: "Odmowa dostępu",
+    connectionNotFound: "Połączenie nie znalezione",
+    encryptionFailed:
+      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
+    connectTimeout: "Przekroczono limit czasu połączenia",
+    sshAuthFailed: "Uwierzytelnianie SSH nieudane",
+    sshConnectionFailed: "Połączenie SSH nieudane",
+    fingerprintMismatch:
+      "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Ustaw acknowledgeNewFingerprint=true.",
     notImplemented: {
       fileRead: "Backend SSH jeszcze nie zaimplementowany dla czytania plików",
     },

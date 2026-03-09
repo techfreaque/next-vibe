@@ -2,6 +2,7 @@ export const translations = {
   navigation: {
     dashboard: "Dashboard",
     leadManagement: "Lead Management",
+    emailCampaigns: "Email Campaigns",
     users: "Users",
     emails: "Emails",
     cronTasks: "Cron Tasks",

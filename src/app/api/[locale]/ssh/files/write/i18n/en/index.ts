@@ -6,6 +6,13 @@ export const translations = {
     parentDirNotFound:
       "Parent directory not found. Set createDirs=true to create it.",
     permissionDenied: "Permission denied",
+    connectionNotFound: "Connection not found",
+    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    connectTimeout: "Connection timed out",
+    sshAuthFailed: "SSH authentication failed",
+    sshConnectionFailed: "SSH connection failed",
+    fingerprintMismatch:
+      "Host fingerprint has changed. Potential MITM attack. Use acknowledgeNewFingerprint=true to proceed.",
     notImplemented: {
       fileWrite: "SSH backend not yet implemented for file writing",
     },

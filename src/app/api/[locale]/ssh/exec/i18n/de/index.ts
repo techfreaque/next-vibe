@@ -5,6 +5,14 @@ export const translations = {
     invalidWorkingDir:
       "Ungültiges Arbeitsverzeichnis: Muss absoluter Pfad ohne '..' sein",
     commandTimedOut: "Befehl hat das Zeitlimit überschritten",
+    connectionNotFound: "Verbindung nicht gefunden",
+    encryptionFailed:
+      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
+    connectTimeout: "Verbindung hat Zeitlimit überschritten",
+    sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
+    sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",
+    fingerprintMismatch:
+      "Host-Fingerabdruck hat sich geändert. Möglicher MITM-Angriff. acknowledgeNewFingerprint=true setzen.",
     notImplemented: {
       local:
         "SSH-Backend noch nicht implementiert. Lassen Sie connectionId leer für lokale Ausführung.",

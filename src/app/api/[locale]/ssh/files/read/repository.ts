@@ -17,7 +17,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import {
+  getConnectionCredentials,
+  openSshClient,
+  sftpReadFile,
+} from "../../client";
 import type {
   FilesReadRequestOutput,
   FilesReadResponseOutput,
@@ -67,13 +73,11 @@ export class FilesReadRepository {
   static async read(
     data: FilesReadRequestOutput,
     logger: EndpointLogger,
+    user: JwtPayloadType,
     t: ModuleT,
   ): Promise<ResponseType<FilesReadResponseOutput>> {
     if (data.connectionId) {
-      return fail({
-        message: t("errors.notImplemented.fileRead"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
+      return FilesReadRepository.readSftp(data, user, logger, t);
     }
 
     const filePath = resolvePath(data.path);
@@ -159,6 +163,69 @@ export class FilesReadRepository {
         message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+  }
+
+  private static async readSftp(
+    data: FilesReadRequestOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<FilesReadResponseOutput>> {
+    const credsResult = await getConnectionCredentials(
+      data.connectionId!,
+      user.id!,
+      t,
+    );
+    if (!credsResult.success) {
+      return fail({
+        message: credsResult.message,
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    const clientResult = await openSshClient(credsResult.data, t);
+    if (!clientResult.success) {
+      return fail({
+        message: clientResult.message,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const { client } = clientResult.data;
+    const maxBytes = Math.min(
+      data.maxBytes ?? DEFAULT_MAX_BYTES,
+      MAX_ALLOWED_BYTES,
+    );
+    const offset = data.offset ?? 0;
+
+    try {
+      logger.debug(
+        `SFTP reading: ${data.path} on ${credsResult.data.host} (offset=${offset}, maxBytes=${maxBytes})`,
+      );
+      const result = await sftpReadFile(client, data.path, offset, maxBytes);
+      return success({ ...result, encoding: "utf8" });
+    } catch (error) {
+      const err = error as NodeJS.ErrnoException & { code?: string };
+      if (err.code === "ENOENT" || err.code === "ERR_SFTP_FAILURE") {
+        return fail({
+          message: t("errors.fileNotFound"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      if (err.code === "EACCES" || err.code === "ERR_SFTP_PERMISSION_DENIED") {
+        return fail({
+          message: t("errors.permissionDenied"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+      logger.error("SFTP read failed", parseError(error));
+      return fail({
+        message: t("get.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    } finally {
+      client.end();
     }
   }
 }

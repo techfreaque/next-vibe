@@ -190,10 +190,38 @@ export const translations = {
     tabs: {
       overview: "Overview",
       buy: "Buy Credits",
+      adminBuy: "Manage Credits",
       billing: "Billing",
       history: "History",
       plans: "Plans",
       remote: "Cloud Sync",
+    },
+    admin: {
+      title: "Credits & Limits",
+      description: "Manage credit allocations and usage caps for this instance",
+      allocate: {
+        title: "Allocate Credits",
+        description:
+          "Add credits to any user account. Credits act as a spending cap — they control how much AI usage is allowed. For self-hosted instances, set this to the budget you want to allow.",
+        howItWorks: {
+          title: "How Credit Limits Work",
+          freePool: {
+            title: "Free Pool (Shared)",
+            description:
+              "All users share a pool of free credits that resets monthly. Configure the pool size in your environment settings.",
+          },
+          bonus: {
+            title: "Bonus Credits (Per User)",
+            description:
+              "Bonus credits are permanent — they never expire and stack on top of free pool credits. Use these to grant individual users extra capacity.",
+          },
+          apiKeys: {
+            title: "Remove All Limits",
+            description:
+              "Configure your own LLM API keys in settings to bypass credits entirely. Each user can also bring their own API key.",
+          },
+        },
+      },
     },
     payment: {
       success: {

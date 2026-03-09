@@ -66,9 +66,13 @@ export class CronHistoryRepository {
       const conditions = [];
 
       // Filter executions to only those belonging to the user's tasks (unless admin)
+      // Use correlated subqueries to avoid referencing the joined table in WHERE,
+      // which causes Drizzle to drop the LEFT JOIN from count/stats queries.
       if (!isAdmin) {
         if (userId) {
-          conditions.push(eq(cronTasks.userId, userId));
+          conditions.push(
+            sql`EXISTS (SELECT 1 FROM ${cronTasks} WHERE ${cronTasks.id} = ${cronTaskExecutions.taskId} AND ${cronTasks.userId} = ${userId})`,
+          );
         } else {
           // Public users see nothing
           conditions.push(
@@ -78,9 +82,11 @@ export class CronHistoryRepository {
       }
 
       // Hidden tasks are excluded from history, UNLESS they failed (so errors are never silently hidden)
+      // Use a correlated subquery to avoid referencing the joined table in WHERE,
+      // which causes Drizzle to drop the LEFT JOIN from count/stats queries.
       conditions.push(
         or(
-          eq(cronTasks.hidden, false),
+          sql`EXISTS (SELECT 1 FROM ${cronTasks} WHERE ${cronTasks.id} = ${cronTaskExecutions.taskId} AND ${cronTasks.hidden} = false)`,
           inArray(cronTaskExecutions.status, [
             CronTaskStatus.FAILED,
             CronTaskStatus.TIMEOUT,

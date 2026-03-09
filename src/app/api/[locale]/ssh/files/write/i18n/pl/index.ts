@@ -7,6 +7,14 @@ export const translations = {
     parentDirNotFound:
       "Katalog nadrzędny nie znaleziony. Ustaw createDirs=true aby go utworzyć.",
     permissionDenied: "Odmowa dostępu",
+    connectionNotFound: "Połączenie nie znalezione",
+    encryptionFailed:
+      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
+    connectTimeout: "Przekroczono limit czasu połączenia",
+    sshAuthFailed: "Uwierzytelnianie SSH nieudane",
+    sshConnectionFailed: "Połączenie SSH nieudane",
+    fingerprintMismatch:
+      "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Ustaw acknowledgeNewFingerprint=true.",
     notImplemented: {
       fileWrite: "Backend SSH jeszcze nie zaimplementowany dla zapisu plików",
     },

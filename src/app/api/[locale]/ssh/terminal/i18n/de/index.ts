@@ -52,5 +52,6 @@ export const translations = {
       "Klicken Sie auf Verbinden, um eine Terminalsitzung zu starten.\n",
     prompt: "$ ",
     inputPlaceholder: "Befehl eingeben und Enter drücken...",
+    sendButton: "Senden",
   },
 };

@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
@@ -21,6 +20,7 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Users } from "next-vibe-ui/ui/icons/Users";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
   SelectContent,
@@ -44,7 +44,6 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -308,7 +307,6 @@ export function LeadsListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const isTouch = useTouchDevice();
-  const router = useRouter();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.GET>();
@@ -317,6 +315,7 @@ export function LeadsListContainer({
 
   const activeStatuses: string[] = form?.watch("statusFilters.status") ?? [];
   const activeSources: string[] = form?.watch("statusFilters.source") ?? [];
+  const searchValue: string = form?.watch("statusFilters.search") ?? "";
   const sortBy: string =
     form?.watch("sortingOptions.sortBy") ?? LeadSortField.CREATED_AT;
   const sortOrder: string =
@@ -402,16 +401,30 @@ export function LeadsListContainer({
 
   const handleView = useCallback(
     (lead: Lead): void => {
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigation.push(leadDef.default.GET, {
+          urlPathParams: { id: lead.id },
+        });
+      })();
     },
-    [router, locale],
+    [navigation],
   );
 
   const handleEdit = useCallback(
     (lead: Lead): void => {
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigation.push(leadDef.default.PATCH, {
+          urlPathParams: { id: lead.id },
+          prefillFromGet: true,
+          getEndpoint: leadDef.default.GET,
+        });
+      })();
     },
-    [router, locale],
+    [navigation],
   );
 
   const handleDelete = useCallback(
@@ -430,8 +443,12 @@ export function LeadsListContainer({
   );
 
   const handleCreate = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/create`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const createDef =
+        await import("@/app/api/[locale]/leads/create/definition");
+      navigation.push(createDef.default.POST);
+    })();
+  }, [navigation]);
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
@@ -452,8 +469,12 @@ export function LeadsListContainer({
   }, [navigation, form]);
 
   const handleImport = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/import`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const importDef =
+        await import("@/app/api/[locale]/leads/import/definition");
+      navigation.push(importDef.default.POST);
+    })();
+  }, [navigation]);
 
   const handleBatchUpdate = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -477,12 +498,30 @@ export function LeadsListContainer({
   }, [navigation, form]);
 
   const handleStats = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const statsDef =
+        await import("@/app/api/[locale]/leads/stats/definition");
+      navigation.push(statsDef.default.GET);
+    })();
+  }, [navigation]);
 
   const handleSearch = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const searchDef =
+        await import("@/app/api/[locale]/leads/search/definition");
+      navigation.push(searchDef.default.GET);
+    })();
+  }, [navigation]);
+
+  const handleSearchChange = useCallback(
+    (text: string): void => {
+      form?.setValue("statusFilters.search", text);
+      if (onSubmit) {
+        onSubmit();
+      }
+    },
+    [form, onSubmit],
+  );
 
   // Pagination
   const currentPage: number = form?.watch("paginationInfo.page") ?? 1;
@@ -654,9 +693,12 @@ export function LeadsListContainer({
       <Div className="px-4 pt-2 pb-2 flex items-center gap-2 flex-wrap">
         {/* Text search */}
         <Div className="relative flex-1 min-w-[160px]">
-          <TextFieldWidget
-            fieldName="statusFilters.search"
-            field={children.statusFilters.children.search}
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            className="h-9 pl-8"
+            placeholder={t("widget.search")}
+            value={searchValue}
+            onChangeText={handleSearchChange}
           />
         </Div>
 

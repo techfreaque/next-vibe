@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
@@ -32,6 +31,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -201,7 +201,7 @@ export function EmailsListContainer({
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const messagesT = messagesScopedTranslation.scopedT(locale).t;
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
@@ -225,11 +225,15 @@ export function EmailsListContainer({
 
   const handleView = useCallback(
     (email: EmailItem): void => {
-      router.push(
-        `/${locale}/admin/emails/imap/messages/${email.emailCore.id}`,
-      );
+      void (async (): Promise<void> => {
+        const msgDef =
+          await import("../../imap-client/messages/[id]/definition");
+        navigate(msgDef.default.GET, {
+          urlPathParams: { id: email.emailCore.id },
+        });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleRefresh = useCallback((): void => {
@@ -237,8 +241,11 @@ export function EmailsListContainer({
   }, [endpointMutations]);
 
   const handleStats = useCallback((): void => {
-    router.push(`/${locale}/admin/emails/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const statsDef = await import("../stats/definition");
+      navigate(statsDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleStatusTab = useCallback(
     (

@@ -324,6 +324,17 @@ export const translations: typeof enTranslations = {
       country: "Land",
       language: "Sprache",
     },
+    countries: {
+      de: "Deutschland",
+      pl: "Polen",
+      us: "Vereinigte Staaten",
+      global: "Global",
+    },
+    languages: {
+      en: "Englisch",
+      de: "Deutsch",
+      pl: "Polnisch",
+    },
     accessibility: {
       srOnly: {
         enableLightMode: "Hellen Modus aktivieren",

@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -26,6 +25,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -123,7 +123,7 @@ export function EmailStatsContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const messagesT = messagesScopedTranslation.scopedT(locale).t;
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -217,7 +217,10 @@ export function EmailStatsContainer({
   }, [form, onSubmit, includeComparison]);
 
   const handleViewList = (): void => {
-    router.push(`/${locale}/admin/emails/list`);
+    void (async (): Promise<void> => {
+      const listDef = await import("../list/definition");
+      navigate(listDef.default.GET);
+    })();
   };
 
   const handleRefresh = useCallback((): void => {

@@ -327,6 +327,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
           favoriteId: undefined,
           headless: undefined,
           waitingForRemoteResult: undefined,
+          abortSignal: undefined,
         },
       });
 

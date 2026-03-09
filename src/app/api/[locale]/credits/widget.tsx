@@ -25,12 +25,10 @@ import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
-import adminAddDefinitions from "@/app/api/[locale]/credits/admin-add/definition";
 import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetTranslation,
   useWidgetUser,
@@ -209,27 +207,6 @@ export function CreditsBalanceContainer({
               </Link>
             )}
           </Div>
-
-          {/* Admin: Add Credits Form */}
-          {isAdmin && (
-            <Div className="border-t border-border pt-4">
-              <EndpointsPage
-                endpoint={adminAddDefinitions}
-                user={user}
-                locale={locale}
-                endpointOptions={{
-                  create: {
-                    formOptions: {
-                      defaultValues: {
-                        targetUserId: user.id ?? "",
-                        amount: 100,
-                      },
-                    },
-                  },
-                }}
-              />
-            </Div>
-          )}
         </CardContent>
       </Card>
     </MotionDiv>

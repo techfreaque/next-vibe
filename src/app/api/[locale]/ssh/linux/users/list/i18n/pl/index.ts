@@ -5,11 +5,26 @@ export const translations = {
     localModeOnly: {
       title: "Tylko w trybie lokalnym",
     },
+    connectionNotFound: "Połączenie nie znalezione",
+    encryptionFailed:
+      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
+    connectTimeout: "Przekroczono limit czasu połączenia",
+    sshAuthFailed: "Uwierzytelnianie SSH nieudane",
+    sshConnectionFailed: "Połączenie SSH nieudane",
+    fingerprintMismatch:
+      "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Ustaw acknowledgeNewFingerprint=true.",
   },
 
   get: {
     title: "Wylistuj użytkowników Linux",
     description: "Wylistuj konta użytkowników OS na hoście (uid >= 1000)",
+    fields: {
+      connectionId: {
+        label: "Połączenie",
+        description: "Połączenie SSH (puste = lokalne)",
+        placeholder: "uuid",
+      },
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

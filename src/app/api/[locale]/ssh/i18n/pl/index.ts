@@ -1,6 +1,23 @@
 export const translations = {
   category: "SSH",
   type: "SSH",
+
+  enums: {
+    authType: {
+      password: "Hasło",
+      privateKey: "Klucz prywatny (PEM)",
+      keyAgent: "Agent SSH",
+    },
+    shell: {
+      bash: "/bin/bash",
+      zsh: "/usr/bin/zsh",
+      sh: "/bin/sh",
+      fish: "/usr/bin/fish",
+      dash: "/bin/dash",
+      nologin: "/usr/sbin/nologin (brak logowania)",
+    },
+  },
+
   errors: {
     localModeOnly: {
       title: "Tylko tryb lokalny",
@@ -27,6 +44,13 @@ export const translations = {
       fileWrite: "Backend SSH dla zapisu plików nie jest zaimplementowany",
       session: "Sesje SSH PTY nie są jeszcze zaimplementowane.",
     },
+    fingerprintMismatch:
+      "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Ustaw acknowledgeNewFingerprint=true.",
+    noDefaultConnection:
+      "Brak domyślnego połączenia SSH. Utwórz połączenie i ustaw je jako domyślne.",
+    sshConnectionFailed: "Połączenie SSH nieudane",
+    sshAuthFailed: "Uwierzytelnianie SSH nieudane",
+    connectTimeout: "Przekroczono limit czasu połączenia",
     invalidWorkingDir:
       "Nieprawidłowy katalog roboczy: musi być ścieżką bezwzględną bez '..'",
     invalidPath: "Nieprawidłowa ścieżka: musi być bezwzględna bez '..'",

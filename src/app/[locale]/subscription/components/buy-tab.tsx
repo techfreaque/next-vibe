@@ -4,6 +4,7 @@ import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
 import adminAddDefinitions from "@/app/api/[locale]/credits/admin-add/definition";
+import publicCapDefinitions from "@/app/api/[locale]/credits/public-cap/definition";
 import purchaseDefinitions from "@/app/api/[locale]/credits/purchase/definition";
 import createSubscriptionDefinition from "@/app/api/[locale]/subscription/create/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -23,6 +24,45 @@ export function BuyTab({
   hasPaymentProvider,
   isAdmin,
 }: BuyTabProps): JSX.Element {
+  if (isAdmin) {
+    return (
+      <MotionDiv
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex flex-col gap-6"
+      >
+        <EndpointsPage
+          endpoint={adminAddDefinitions}
+          user={user}
+          locale={locale}
+          endpointOptions={{
+            create: {
+              formOptions: {
+                defaultValues: {
+                  targetUserId: "id" in user && user.id ? user.id : "",
+                  amount: 100,
+                },
+              },
+            },
+          }}
+        />
+        <EndpointsPage
+          endpoint={publicCapDefinitions}
+          user={user}
+          locale={locale}
+          forceMethod="GET"
+        />
+        <EndpointsPage
+          endpoint={publicCapDefinitions}
+          user={user}
+          locale={locale}
+          forceMethod="POST"
+        />
+      </MotionDiv>
+    );
+  }
+
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}
@@ -30,7 +70,6 @@ export function BuyTab({
       transition={{ delay: 0.1 }}
       className="grid grid-cols-1 md:grid-cols-2 gap-6"
     >
-      {/* Subscription Option - only when payment provider configured */}
       {hasPaymentProvider && (
         <EndpointsPage
           endpoint={createSubscriptionDefinition}
@@ -39,19 +78,9 @@ export function BuyTab({
         />
       )}
 
-      {/* Credit Pack Purchase - only when payment provider configured */}
       {hasPaymentProvider && (
         <EndpointsPage
           endpoint={purchaseDefinitions}
-          user={user}
-          locale={locale}
-        />
-      )}
-
-      {/* Admin Add Credits - only for admin users */}
-      {isAdmin && (
-        <EndpointsPage
-          endpoint={adminAddDefinitions}
           user={user}
           locale={locale}
         />

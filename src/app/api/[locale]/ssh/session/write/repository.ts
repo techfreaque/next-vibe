@@ -33,12 +33,16 @@ export class SessionWriteRepository {
     }
     try {
       const input = data.raw ? data.input : `${data.input}\n`;
-      entry.proc.stdin?.write(input);
+      if (entry.kind === "local") {
+        entry.proc.stdin?.write(input);
+      } else {
+        entry.channel.write(input);
+      }
       logger.debug(`Wrote ${input.length} bytes to session ${data.sessionId}`);
       return success({ ok: true });
-    } catch (error) {
+    } catch {
       return fail({
-        message: t("errors.notImplemented.session"),
+        message: t("session.write.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -252,6 +252,7 @@ export async function setupAiStream(params: {
         favoriteId: undefined,
         headless: undefined,
         waitingForRemoteResult: undefined,
+        abortSignal: undefined,
       },
     });
 
@@ -690,6 +691,8 @@ export async function setupAiStream(params: {
     favoriteId: params.favoriteIdOverride,
     currentToolMessageId: undefined,
     waitingForRemoteResult: undefined,
+    // abortSignal is set after streamAbortController is created (below)
+    abortSignal: undefined,
   };
 
   logger.debug("Generated AI message ID", {
@@ -769,6 +772,11 @@ export async function setupAiStream(params: {
   const streamAbortController = AbortControllerSetup.setupAbortController({
     maxDuration: params.maxDuration,
   });
+
+  // Wire abort signal into streamContext now that the controller exists.
+  // streamContext was built before the controller (it's needed for tool setup),
+  // so we assign the signal here after registration.
+  streamContext.abortSignal = streamAbortController.signal;
 
   // Register in stream registry so the cancel endpoint can find and abort it
   StreamRegistry.register(

@@ -21,6 +21,7 @@ import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/e
 import { SmtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sending/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -219,8 +220,8 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
               companyName: "",
               companyEmail: "",
               campaignId: campaign.id,
-              unsubscribeUrl: "",
-              trackingUrl: "",
+              unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/${leadLocale}/newsletter/unsubscribe?email=${encodeURIComponent(fullLead.email ?? "")}`,
+              trackingUrl: env.NEXT_PUBLIC_APP_URL,
             },
             logger,
           );
@@ -265,17 +266,28 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
           );
 
           if (!sendResult.success) {
+            const errorMsg = sendResult.message ?? "Unknown send error";
+            const retried = await campaignSchedulerService.scheduleRetry(
+              campaign.id,
+              campaign.retryCount,
+              errorMsg,
+              logger,
+            );
             result.emailsFailed++;
             result.errors.push({
               leadId: campaign.leadId,
               email: campaign.lead.email,
               stage: campaign.stage,
-              error: sendResult.message,
+              error: retried
+                ? `Send failed, retry ${campaign.retryCount + 1} scheduled: ${errorMsg}`
+                : `Send failed, max retries exceeded: ${errorMsg}`,
             });
             logger.error("Failed to send campaign email", {
               campaignId: campaign.id,
               leadId: campaign.leadId,
-              error: sendResult.message,
+              retryCount: campaign.retryCount,
+              retried,
+              error: errorMsg,
             });
             continue;
           }
@@ -294,17 +306,25 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
           result.stageTransitions[campaign.stage] =
             (result.stageTransitions[campaign.stage] ?? 0) + 1;
         } catch (error) {
+          const errorMsg = parseError(error).message;
+          await campaignSchedulerService.scheduleRetry(
+            campaign.id,
+            campaign.retryCount,
+            errorMsg,
+            logger,
+          );
           result.emailsFailed++;
           result.errors.push({
             leadId: campaign.leadId,
             email: campaign.lead.email,
             stage: campaign.stage,
-            error: parseError(error).message,
+            error: errorMsg,
           });
           logger.error("Failed to process campaign email", {
             campaignId: campaign.id,
             leadId: campaign.leadId,
-            error: parseError(error).message,
+            retryCount: campaign.retryCount,
+            error: errorMsg,
           });
         }
       }

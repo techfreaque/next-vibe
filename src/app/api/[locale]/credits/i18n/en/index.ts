@@ -139,7 +139,7 @@ export const translations = {
       adminTitle: "Spending Limit",
       description: "Use your credits across {{modelCount}} AI models",
       adminDescription:
-        "Credits act as a spending cap — control how much AI usage is allowed. Use your own API keys to remove limits entirely.",
+        "Credits act as a spending cap — control how much AI usage is allowed across all users.",
       credit: "{{count}} credit",
       credits: "{{count}} credits",
       expiring: {
@@ -163,8 +163,8 @@ export const translations = {
         description: "Earned via referrals — click to invite friends",
       },
       spending: {
-        title: "Earned Credits",
-        adminDescription: "Credits earned via referrals",
+        title: "Your Earned Credits",
+        adminDescription: "Your personal referral earnings (not instance-wide)",
       },
     },
     total: {
@@ -432,7 +432,9 @@ export const translations = {
       tag: "admin",
       container: {
         title: "Add Credits to User",
-        description: "Grant credit packs to a specific user",
+        description: "Grant bonus credits to a specific user account",
+        selfTitle: "Add Credits to Your Account",
+        selfDescription: "Grant yourself bonus credits",
       },
       targetUserId: {
         label: "Target User ID",

@@ -67,6 +67,11 @@ export interface ToolExecutionContext {
    * Stream layer checks this after tool-result to pause and wait for /report.
    */
   waitingForRemoteResult: boolean | undefined;
+  /**
+   * The stream's abort signal — set when streaming, undefined for non-stream contexts.
+   * Tool executions check this before starting to bail out if the stream was cancelled.
+   */
+  abortSignal: AbortSignal | undefined;
 }
 
 /**

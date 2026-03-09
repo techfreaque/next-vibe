@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   navigation: {
     dashboard: "Dashboard",
     leadManagement: "Lead-Management",
+    emailCampaigns: "E-Mail-Kampagnen",
     users: "Benutzer",
     emails: "E-Mails",
     cronTasks: "Cron-Aufgaben",

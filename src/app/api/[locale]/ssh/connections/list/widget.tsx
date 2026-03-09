@@ -11,10 +11,11 @@ import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React from "react";
+import React, { useCallback } from "react";
 
 import {
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
@@ -33,10 +34,21 @@ export function ConnectionsListContainer({
 }: WidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
+  const navigation = useWidgetNavigation();
   const router = useRouter();
 
   const value = field.value;
   const connections = value?.connections ?? [];
+
+  const handleCreate = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const createDef = await import("../create/definition");
+      navigation.push(createDef.POST, {
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  }, [navigation]);
 
   return (
     <Div className="flex flex-col gap-0 h-full min-h-[400px]">
@@ -46,11 +58,7 @@ export function ConnectionsListContainer({
         <Span className="font-semibold text-sm mr-auto">
           {t("widget.title")}
         </Span>
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => router.push(`/${locale}/admin/ssh/connections/create`)}
-        >
+        <Button type="button" size="sm" onClick={handleCreate}>
           <Plus className="h-3.5 w-3.5 mr-1" />
           {t("widget.addButton")}
         </Button>

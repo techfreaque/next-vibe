@@ -5,11 +5,25 @@ export const translations = {
     localModeOnly: {
       title: "Local Mode Only",
     },
+    connectionNotFound: "Connection not found",
+    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    connectTimeout: "Connection timed out",
+    sshAuthFailed: "SSH authentication failed",
+    sshConnectionFailed: "SSH connection failed",
+    fingerprintMismatch:
+      "Host fingerprint has changed. Potential MITM attack. Use acknowledgeNewFingerprint=true to proceed.",
   },
 
   get: {
     title: "List Linux Users",
     description: "List OS user accounts on the host (uid >= 1000)",
+    fields: {
+      connectionId: {
+        label: "Connection",
+        description: "SSH connection to use (leave empty for local)",
+        placeholder: "uuid",
+      },
+    },
     errors: {
       validation: {
         title: "Validation Error",

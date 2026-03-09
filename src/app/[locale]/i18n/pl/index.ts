@@ -324,6 +324,17 @@ export const translations: typeof enTranslations = {
       country: "Kraj",
       language: "Język",
     },
+    countries: {
+      de: "Niemcy",
+      pl: "Polska",
+      us: "Stany Zjednoczone",
+      global: "Globalny",
+    },
+    languages: {
+      en: "Angielski",
+      de: "Niemiecki",
+      pl: "Polski",
+    },
     accessibility: {
       srOnly: {
         enableLightMode: "Włącz tryb jasny",

@@ -212,7 +212,15 @@ export async function upsertRemoteTasks(params: {
           .where(eq(cronTasks.id, existing.id));
         synced++;
       } else {
-        // New task — use remote's id directly
+        // New task — use remote's id directly.
+        // Cross-instance delegated tasks (targetInstance set) are always treated as
+        // run-once: the remote re-creates them if it wants another execution.
+        // This prevents a task created with runOnce:false from looping indefinitely
+        // on the local instance.
+        const effectiveRunOnce =
+          remoteTask.targetInstance !== null
+            ? true
+            : (definitionFields.runOnce ?? remoteTask.runOnce);
         await db.insert(cronTasks).values({
           id: remoteTask.id,
           routeId: remoteTask.routeId,
@@ -222,6 +230,7 @@ export async function upsertRemoteTasks(params: {
           priority: definitionFields.priority ?? remoteTask.priority,
           enabled: remoteTask.enabled,
           ...definitionFields,
+          runOnce: effectiveRunOnce,
         });
         synced++;
       }

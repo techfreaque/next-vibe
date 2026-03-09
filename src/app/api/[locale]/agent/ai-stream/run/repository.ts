@@ -162,6 +162,7 @@ export class AiStreamRunRepository {
               favoriteId: undefined,
               headless: undefined,
               waitingForRemoteResult: undefined,
+              abortSignal: undefined,
             },
           );
           preCallResults.push({

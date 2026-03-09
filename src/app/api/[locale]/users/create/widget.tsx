@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
@@ -24,6 +23,7 @@ import React, { useState } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -57,21 +57,30 @@ export function UserCreateContainer({
   const children = field.children;
   const data = field.value;
   const t = useWidgetTranslation<typeof definition.POST>();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
 
   const [idCopied, setIdCopied] = useState(false);
 
   const handleViewUser = (userId: string): void => {
-    router.push(`/${locale}/admin/users/${userId}/edit`);
+    void (async (): Promise<void> => {
+      const userDef = await import("../user/[id]/definition");
+      navigate(userDef.default.GET, { urlPathParams: { id: userId } });
+    })();
   };
 
   const handleFullProfile = (userId: string): void => {
-    router.push(`/${locale}/admin/users/${userId}/edit`);
+    void (async (): Promise<void> => {
+      const userDef = await import("../user/[id]/definition");
+      navigate(userDef.default.GET, { urlPathParams: { id: userId } });
+    })();
   };
 
   const handleCreditHistory = (userId: string): void => {
-    router.push(`/${locale}/admin/users/${userId}/edit`);
+    void (async (): Promise<void> => {
+      const userDef = await import("../user/[id]/definition");
+      navigate(userDef.default.GET, { urlPathParams: { id: userId } });
+    })();
   };
 
   const handleCopyId = (userId: string): void => {

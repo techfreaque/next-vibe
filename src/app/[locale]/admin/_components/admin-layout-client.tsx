@@ -15,6 +15,8 @@ import { Home } from "next-vibe-ui/ui/icons/Home";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Menu } from "next-vibe-ui/ui/icons/Menu";
+import { PanelLeft } from "next-vibe-ui/ui/icons/PanelLeft";
+import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { Users } from "next-vibe-ui/ui/icons/Users";
@@ -58,6 +60,7 @@ export function AdminLayoutClient({
 }: AdminLayoutClientProps): React.JSX.Element {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const { t } = useTranslation();
 
   const allNavigation = [
@@ -73,6 +76,13 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/leads` as const,
       icon: Users,
       current: pathname.startsWith(`/${locale}/admin/leads`),
+      hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
+    },
+    {
+      name: t("app.admin.components.navigation.emailCampaigns"),
+      href: `/${locale}/admin/email-campaigns` as const,
+      icon: Send,
+      current: pathname.startsWith(`/${locale}/admin/email-campaigns`),
       hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
     },
     {
@@ -130,152 +140,196 @@ export function AdminLayoutClient({
     (item) => !item.hidden,
   ) satisfies readonly NavigationItem[];
 
+  const sidebarW = collapsed ? "w-14" : "w-64";
+
+  const sidebarContent = (isMobile: boolean): React.JSX.Element => {
+    const isCollapsed = !isMobile && collapsed;
+    return (
+      <>
+        <Div
+          className={cn(
+            "flex h-16 items-center border-b border-border shrink-0",
+            isCollapsed ? "justify-center px-0" : "justify-between px-4",
+          )}
+        >
+          {isCollapsed ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(): void => setCollapsed(false)}
+              aria-label="Expand sidebar"
+              className="text-foreground/60 hover:text-foreground hover:bg-accent"
+            >
+              <PanelLeft className="h-5 w-5" />
+            </Button>
+          ) : (
+            <>
+              <Div className="flex items-center gap-2">
+                <Shield className="h-7 w-7 text-primary shrink-0" />
+                <Span className="text-lg font-bold text-foreground">
+                  {isMobile
+                    ? t("app.admin.components.navigation.admin")
+                    : t("app.admin.components.navigation.adminPanel")}
+                </Span>
+              </Div>
+              {isMobile ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(): void => setSidebarOpen(false)}
+                  aria-label="Close sidebar"
+                  className="text-foreground/60 hover:text-foreground hover:bg-accent"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(): void => setCollapsed(true)}
+                  aria-label="Collapse sidebar"
+                  className="text-foreground/60 hover:text-foreground hover:bg-accent"
+                >
+                  <PanelLeft className="h-5 w-5" />
+                </Button>
+              )}
+            </>
+          )}
+        </Div>
+
+        <Div
+          className={cn(
+            "flex-1 flex flex-col gap-0.5 py-3 overflow-y-auto overflow-x-hidden",
+            isCollapsed ? "px-1 items-center" : "px-2",
+          )}
+        >
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              title={isCollapsed ? item.name : undefined}
+              className={cn(
+                "group flex items-center gap-3 py-2 text-sm font-medium rounded-md transition-colors",
+                isCollapsed ? "w-10 justify-center px-0" : "px-3",
+                item.current
+                  ? "bg-accent text-foreground"
+                  : "text-foreground/60 hover:bg-accent/60 hover:text-foreground",
+              )}
+              onClick={isMobile ? (): void => setSidebarOpen(false) : undefined}
+            >
+              <item.icon
+                className={cn(
+                  "h-4 w-4 shrink-0",
+                  item.current
+                    ? "text-primary"
+                    : "text-foreground/40 group-hover:text-foreground/70",
+                )}
+              />
+              {!isCollapsed && item.name}
+            </Link>
+          ))}
+        </Div>
+
+        <Div
+          className={cn(
+            "shrink-0 border-t border-border",
+            isCollapsed ? "p-2 flex justify-center" : "p-4",
+          )}
+        >
+          <Div
+            className={cn(
+              "flex items-center",
+              isCollapsed ? "justify-center" : "gap-3",
+            )}
+          >
+            <Div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <Span className="text-sm font-semibold text-primary-foreground">
+                {userData.privateName.charAt(0).toUpperCase()}
+              </Span>
+            </Div>
+            {!isCollapsed && (
+              <Div className="flex flex-col min-w-0">
+                <Span className="text-sm font-medium text-foreground truncate">
+                  {userData.privateName}
+                </Span>
+                <Span className="text-xs text-foreground/50 truncate">
+                  {t("app.admin.components.navigation.administrator")}
+                </Span>
+              </Div>
+            )}
+          </Div>
+        </Div>
+      </>
+    );
+  };
+
   return (
-    <Div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Mobile sidebar */}
-      <Div
-        className={cn(
-          "fixed inset-0 z-50 lg:hidden",
-          sidebarOpen ? "block" : "hidden",
-        )}
-      >
+    <Div className="min-h-screen bg-background">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
         <Button
           variant="ghost"
           size="unset"
           type="button"
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 border-0 p-0 cursor-pointer"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-foreground/20 border-0 p-0 cursor-pointer lg:hidden"
+          onClick={(): void => setSidebarOpen(false)}
           aria-label="Close sidebar"
         />
-        <Div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800 shadow-xl">
-          <Div className="flex h-16 items-center justify-between px-4">
-            <Div className="flex items-center">
-              <Shield className="h-8 w-8 text-blue-600" />
-              <Span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-                {t("app.admin.components.navigation.admin")}
-              </Span>
-            </Div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="h-6 w-6" />
-            </Button>
-          </Div>
-          <Div className="flex-1 flex flex-col gap-1 px-2 py-4">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                  item.current
-                    ? "bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white",
-                )}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <item.icon
-                  className={cn(
-                    "mr-3 h-5 w-5",
-                    item.current
-                      ? "text-blue-500"
-                      : "text-gray-400 group-hover:text-gray-500",
-                  )}
-                />
-                {item.name}
-              </Link>
-            ))}
-          </Div>
-        </Div>
+      )}
+
+      {/* Mobile sidebar drawer */}
+      <Div
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-background border-r border-border transition-transform duration-200 ease-in-out lg:hidden",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        {sidebarContent(true)}
       </Div>
 
       {/* Desktop sidebar */}
-      <Div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <Div className="flex flex-col grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-          <Div className="flex h-16 items-center px-4">
-            <Shield className="h-8 w-8 text-blue-600" />
-            <Span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-              {t("app.admin.components.navigation.adminPanel")}
-            </Span>
-          </Div>
-          <Div className="flex-1 flex flex-col gap-1 px-2 py-4">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "group flex items-center px-2 py-2 text-sm font-medium rounded-md",
-                  item.current
-                    ? "bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white",
-                )}
-              >
-                <item.icon
-                  className={cn(
-                    "mr-3 h-5 w-5",
-                    item.current
-                      ? "text-blue-500"
-                      : "text-gray-400 group-hover:text-gray-500",
-                  )}
-                />
-                {item.name}
-              </Link>
-            ))}
-          </Div>
-
-          {/* User info */}
-          <Div className="shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
-            <Div className="flex items-center">
-              <Div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                <Span className="text-sm font-medium text-white">
-                  {userData.privateName.charAt(0)}
-                </Span>
-              </Div>
-              <Div className="ml-3">
-                <Span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {userData.privateName}
-                </Span>
-                <Span className="text-xs text-gray-500 dark:text-gray-400">
-                  {t("app.admin.components.navigation.administrator")}
-                </Span>
-              </Div>
-            </Div>
-          </Div>
+      <Div
+        className={cn(
+          "hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-200 ease-in-out",
+          sidebarW,
+        )}
+      >
+        <Div className="flex flex-col grow bg-background border-r border-border overflow-hidden">
+          {sidebarContent(false)}
         </Div>
       </Div>
 
       {/* Main content */}
-      <Div className="lg:pl-64">
+      <Div
+        className={cn(
+          "transition-all duration-200 ease-in-out",
+          collapsed ? "lg:pl-14" : "lg:pl-64",
+        )}
+      >
         {/* Top bar */}
-        <Div className="sticky top-0 z-40 flex h-16 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <Div className="sticky top-0 z-40 flex h-16 items-center bg-background border-b border-border shadow-sm">
           <Button
             variant="ghost"
             size="sm"
-            className="lg:hidden ml-4"
-            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden ml-2 shrink-0"
+            onClick={(): void => setSidebarOpen(true)}
+            aria-label="Open sidebar"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5" />
           </Button>
 
-          <Div className="flex flex-1 justify-between px-4 lg:px-6">
-            <Div className="flex items-center">
-              <H1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t("app.admin.components.navigation.adminDashboard")}
-              </H1>
-            </Div>
+          <Div className="flex flex-1 items-center justify-between px-4 lg:px-6 gap-4">
+            <H1 className="text-base font-semibold text-foreground truncate">
+              {navigation.find((item) => item.current)?.name ??
+                t("app.admin.components.navigation.adminDashboard")}
+            </H1>
 
-            <Div className="items-center flex flex-row gap-4">
-              {/* Theme toggle */}
+            <Div className="flex items-center gap-2 shrink-0">
               <ThemeToggle locale={locale} />
-
-              {/* Locale selector */}
               <CountrySelector isNavBar locale={locale} user={user} />
-
               <Link
                 href={`/${locale}/`}
-                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
               >
                 {t("app.admin.components.navigation.backToApp")}
               </Link>

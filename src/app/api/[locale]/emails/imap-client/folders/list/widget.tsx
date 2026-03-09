@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Archive } from "next-vibe-ui/ui/icons/Archive";
@@ -26,7 +25,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
@@ -123,9 +122,8 @@ export function ImapFoldersListContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
-  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
 
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
@@ -159,12 +157,12 @@ export function ImapFoldersListContainer({
   const handleSelectFolder = useCallback(
     (folder: ImapFolder): void => {
       setActiveFolderId(folder.id);
-      // Navigate to messages filtered by this folder
-      router.push(
-        `/${locale}/admin/emails/imap/messages?folderId=${folder.id}`,
-      );
+      void (async (): Promise<void> => {
+        const listDef = await import("../../messages/list/definition");
+        navigate(listDef.default.GET, { data: { folderId: folder.id } });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleRefresh = useCallback((): void => {
@@ -172,8 +170,11 @@ export function ImapFoldersListContainer({
   }, [endpointMutations]);
 
   const handleSync = useCallback((): void => {
-    router.push(`/${locale}/admin/emails/imap/sync`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const syncDef = await import("../../sync/definition");
+      navigate(syncDef.default.POST);
+    })();
+  }, [navigate]);
 
   return (
     <Div className="flex flex-col gap-0">

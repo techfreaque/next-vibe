@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
@@ -24,6 +23,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -135,10 +135,10 @@ export function MessagingAccountsListContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
+  const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const messagingT = messagingScopedTranslation.scopedT(locale).t;
-  const router = useRouter();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
@@ -159,16 +159,20 @@ export function MessagingAccountsListContainer({
 
   const handleEdit = useCallback(
     (account: MessagingAccount): void => {
-      router.push(
-        `/${locale}/admin/emails/messaging/accounts/${account.id}/edit`,
-      );
+      void (async (): Promise<void> => {
+        const editDef = await import("../edit/[id]/definition");
+        navigate(editDef.default.PUT, { urlPathParams: { id: account.id } });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleCreate = useCallback((): void => {
-    router.push(`/${locale}/admin/emails/messaging/accounts/create`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const createDef = await import("../create/definition");
+      navigate(createDef.default.POST);
+    })();
+  }, [navigate]);
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();

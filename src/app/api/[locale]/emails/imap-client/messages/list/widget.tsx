@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
@@ -46,7 +45,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -255,8 +254,7 @@ export function ImapMessagesListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations, locale, logger, user } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const widgetLocale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
@@ -371,9 +369,12 @@ export function ImapMessagesListContainer({
 
   const handleView = useCallback(
     (message: ImapMessage): void => {
-      router.push(`/${widgetLocale}/admin/emails/imap/messages/${message.id}`);
+      void (async (): Promise<void> => {
+        const msgDef = await import("../[id]/definition");
+        navigate(msgDef.default.GET, { urlPathParams: { id: message.id } });
+      })();
     },
-    [router, widgetLocale],
+    [navigate],
   );
 
   const handleRefresh = useCallback((): void => {

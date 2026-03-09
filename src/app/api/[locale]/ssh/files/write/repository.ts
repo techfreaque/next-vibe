@@ -17,7 +17,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import {
+  getConnectionCredentials,
+  openSshClient,
+  sftpWriteFile,
+} from "../../client";
 import type {
   FilesWriteRequestOutput,
   FilesWriteResponseOutput,
@@ -60,13 +66,11 @@ export class FilesWriteRepository {
   static async write(
     data: FilesWriteRequestOutput,
     logger: EndpointLogger,
+    user: JwtPayloadType,
     t: ModuleT,
   ): Promise<ResponseType<FilesWriteResponseOutput>> {
     if (data.connectionId) {
-      return fail({
-        message: t("errors.notImplemented.fileWrite"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
+      return FilesWriteRepository.writeSftp(data, user, logger, t);
     }
 
     const filePath = resolvePath(data.path);
@@ -147,6 +151,67 @@ export class FilesWriteRepository {
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+  }
+
+  private static async writeSftp(
+    data: FilesWriteRequestOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<FilesWriteResponseOutput>> {
+    const credsResult = await getConnectionCredentials(
+      data.connectionId!,
+      user.id!,
+      t,
+    );
+    if (!credsResult.success) {
+      return fail({
+        message: credsResult.message,
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    const clientResult = await openSshClient(credsResult.data, t);
+    if (!clientResult.success) {
+      return fail({
+        message: clientResult.message,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const { client } = clientResult.data;
+
+    try {
+      logger.info(`SFTP writing: ${data.path} on ${credsResult.data.host}`);
+      const result = await sftpWriteFile(
+        client,
+        data.path,
+        data.content,
+        data.createDirs ?? false,
+      );
+      return success({ ok: true, bytesWritten: result.bytesWritten });
+    } catch (error) {
+      const err = error as NodeJS.ErrnoException & { code?: string };
+      if (err.code === "ENOENT" || err.code === "ERR_SFTP_NO_SUCH_FILE") {
+        return fail({
+          message: t("errors.parentDirNotFound"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      if (err.code === "EACCES" || err.code === "ERR_SFTP_PERMISSION_DENIED") {
+        return fail({
+          message: t("errors.permissionDenied"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+      logger.error("SFTP write failed", parseError(error));
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    } finally {
+      client.end();
     }
   }
 }

@@ -4,45 +4,67 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
-import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
+import type { JSX } from "react";
+import { useMemo } from "react";
 
-import {
-  useWidgetContext,
-  useWidgetOnSubmit,
-  useWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import { TextArrayFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-array-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type endpoints from "./definition";
+import type { LinuxUserCreateResponseOutput } from "./definition";
 
-export function LinuxUserCreateContainer(): React.JSX.Element {
-  const t = useWidgetTranslation<typeof endpoints.POST>();
-  const onSubmit = useWidgetOnSubmit();
-  const { endpointMutations } = useWidgetContext();
-  const isLoading = endpointMutations?.read?.isLoading ?? false;
+interface CustomWidgetProps {
+  field: {
+    value: LinuxUserCreateResponseOutput | null | undefined;
+  } & (typeof endpoints.POST)["fields"];
+  fieldName: string;
+}
 
-  const handleCreate = useCallback((): void => {
-    onSubmit?.();
-  }, [onSubmit]);
+export function LinuxUserCreateContainer({
+  field,
+}: CustomWidgetProps): JSX.Element {
+  const children = field.children;
+  useWidgetForm<typeof endpoints.POST>();
+  const emptyField = useMemo(() => ({}), []);
 
   return (
-    <Div className="flex flex-col gap-0 h-full min-h-[200px]">
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
-        <UserPlus className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {t("widget.title")}
-        </Span>
-        <Button
-          type="button"
-          size="sm"
-          onClick={handleCreate}
-          disabled={isLoading}
-        >
-          {isLoading ? t("widget.creating") : t("widget.createButton")}
-        </Button>
+    <Div className="flex flex-col gap-0">
+      {/* Actions */}
+      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
+        <NavigateButtonWidget
+          field={{ icon: "arrow-left", variant: "outline" }}
+        />
+        <SubmitButtonWidget<typeof endpoints.POST>
+          field={{
+            text: "post.submitButton.text",
+            loadingText: "widget.creating",
+            icon: "user-plus",
+            variant: "primary",
+            className: "ml-auto",
+          }}
+        />
+      </Div>
+
+      {/* Scrollable form */}
+      <Div className="overflow-y-auto max-h-[min(500px,calc(100dvh-220px))] px-4 pb-4">
+        <FormAlertWidget field={emptyField} />
+
+        <Div className="flex flex-col gap-4">
+          <TextFieldWidget fieldName="username" field={children.username} />
+          <TextArrayFieldWidget fieldName="groups" field={children.groups} />
+          <TextFieldWidget fieldName="loginShell" field={children.loginShell} />
+          <TextFieldWidget fieldName="homeDir" field={children.homeDir} />
+          <BooleanFieldWidget
+            fieldName="sudoAccess"
+            field={children.sudoAccess}
+          />
+        </Div>
       </Div>
     </Div>
   );

@@ -1,0 +1,73 @@
+export const translations = {
+  title: "Campaign Stats",
+  description: "Email campaign performance statistics",
+  get: {
+    title: "Campaign Stats",
+    description: "Retrieve email campaign performance statistics",
+    container: {
+      title: "Filters",
+      description: "Filter campaign statistics",
+    },
+    fields: {
+      journeyVariant: {
+        label: "Journey Variant",
+        description: "Filter by email journey variant",
+      },
+    },
+    response: {
+      total: "Total campaigns",
+      pending: "Pending",
+      sent: "Sent",
+      delivered: "Delivered",
+      opened: "Opened",
+      clicked: "Clicked",
+      failed: "Failed",
+      openRate: "Open rate",
+      clickRate: "Click-through rate",
+      deliveryRate: "Delivery rate",
+      failureRate: "Failure rate",
+      byStage: "By stage",
+      byJourneyVariant: "By journey variant",
+      byStatus: "By status",
+      pendingLeadsCount: "Active leads in campaigns",
+      emailsScheduledToday: "Emails scheduled today",
+    },
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You must be logged in to view campaign stats",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "You do not have permission to view campaign stats",
+      },
+      server: {
+        title: "Server Error",
+        description: "An error occurred while fetching campaign stats",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid input parameters",
+      },
+    },
+    success: {
+      title: "Stats Retrieved",
+      description: "Campaign statistics retrieved successfully",
+    },
+  },
+  widget: {
+    title: "Campaign Performance",
+    refresh: "Refresh",
+    noData: "No campaign data yet",
+    openRateSuffix: "% open",
+    clickRateSuffix: "% CTR",
+    stageLabel: "Stage funnel",
+    statusLabel: "Send status",
+    variantLabel: "By journey",
+    emDash: "—",
+  },
+};

@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
@@ -29,7 +28,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -150,9 +149,8 @@ export function SmtpAccountsListContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
-  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
@@ -180,14 +178,20 @@ export function SmtpAccountsListContainer({
 
   const handleEdit = useCallback(
     (account: SmtpAccount): void => {
-      router.push(`/${locale}/admin/emails/smtp/edit/${account.id}`);
+      void (async (): Promise<void> => {
+        const editDef = await import("../edit/[id]/definition");
+        navigate(editDef.default.PUT, { urlPathParams: { id: account.id } });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleCreate = useCallback((): void => {
-    router.push(`/${locale}/admin/emails/smtp/create`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const createDef = await import("../create/definition");
+      navigate(createDef.default.POST);
+    })();
+  }, [navigate]);
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();

@@ -1,6 +1,23 @@
 export const translations = {
   category: "SSH",
   type: "SSH",
+
+  enums: {
+    authType: {
+      password: "Password",
+      privateKey: "Private Key (PEM)",
+      keyAgent: "SSH Agent",
+    },
+    shell: {
+      bash: "/bin/bash",
+      zsh: "/usr/bin/zsh",
+      sh: "/bin/sh",
+      fish: "/usr/bin/fish",
+      dash: "/bin/dash",
+      nologin: "/usr/sbin/nologin",
+    },
+  },
+
   errors: {
     localModeOnly: {
       title: "Local Mode Only",
@@ -29,6 +46,13 @@ export const translations = {
       session:
         "SSH PTY sessions not yet implemented. Use ssh_exec_POST for remote commands.",
     },
+    fingerprintMismatch:
+      "Host fingerprint has changed. Potential MITM attack. Use acknowledgeNewFingerprint=true to proceed.",
+    noDefaultConnection:
+      "No default SSH connection configured. Create a connection and set it as default.",
+    sshConnectionFailed: "SSH connection failed",
+    sshAuthFailed: "SSH authentication failed",
+    connectTimeout: "Connection timed out",
     invalidWorkingDir:
       "Invalid working directory: must be absolute path without '..' segments",
     invalidPath: "Invalid path: must be absolute without '..' segments",

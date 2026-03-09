@@ -227,12 +227,18 @@ export const translations = {
       uncensoredConvert: "Uncensored Convert",
       sideHustle: "Side Hustle",
       quietRecommendation: "Quiet Recommendation",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
     },
     emailJourneyVariantFilter: {
       all: "All",
       uncensoredConvert: "Uncensored Convert",
       sideHustle: "Side Hustle",
       quietRecommendation: "Quiet Recommendation",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
     },
     sortOrder: {
       asc: "Ascending",

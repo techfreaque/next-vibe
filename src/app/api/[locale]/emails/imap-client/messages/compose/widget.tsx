@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -17,7 +16,7 @@ import React, { useCallback, useState } from "react";
 
 import {
   useWidgetForm,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -40,8 +39,7 @@ export function ComposeEmailContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
-  const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate, canGoBack, pop } = useWidgetNavigation();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
@@ -68,8 +66,15 @@ export function ComposeEmailContainer({
   }, [isSending, onSubmit]);
 
   const handleCancel = useCallback((): void => {
-    router.push(`/${locale}/admin/emails/imap/messages`);
-  }, [router, locale]);
+    if (canGoBack) {
+      pop();
+    } else {
+      void (async (): Promise<void> => {
+        const listDef = await import("../list/definition");
+        navigate(listDef.default.GET);
+      })();
+    }
+  }, [navigate, canGoBack, pop]);
 
   if (sent) {
     return (

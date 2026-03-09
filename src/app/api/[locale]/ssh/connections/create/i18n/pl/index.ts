@@ -3,7 +3,7 @@ export const translations = {
 
   errors: {
     sshSecretKeyNotSet:
-      "SSH_SECRET_KEY nie jest ustawiony. Dodaj 32-bajtową wartość hex.",
+      "Zmienna SSH_SECRET_KEY nie jest ustawiona. Dodaj 32-bajtową wartość hex.",
     encryptionFailed:
       "Szyfrowanie nie powiodło się — SSH_SECRET_KEY może być nieprawidłowy",
     noRowReturned: "Brak wiersza zwróconego z wstawienia",
@@ -11,80 +11,106 @@ export const translations = {
 
   post: {
     title: "Utwórz połączenie SSH",
-    description: "Zapisz nową konfigurację połączenia SSH",
+    description:
+      "Zapisz nowe połączenie SSH. Dane uwierzytelniające są szyfrowane przez AES-256-GCM.",
     fields: {
       label: {
         label: "Nazwa",
-        description: "Przyjazna nazwa połączenia",
+        description: "Przyjazna nazwa do identyfikacji tego połączenia",
         placeholder: "prod-web-01",
       },
       host: {
-        label: "Host",
-        description: "Hostname lub IP serwera SSH",
+        label: "Hostname / IP",
+        description: "Hostname lub adres IP serwera SSH",
         placeholder: "192.168.1.1",
       },
-      port: { label: "Port", description: "Port SSH", placeholder: "22" },
+      port: {
+        label: "Port",
+        description: "Port serwera SSH (domyślnie: 22)",
+        placeholder: "22",
+      },
       username: {
         label: "Nazwa użytkownika",
-        description: "Użytkownik SSH",
+        description: "Użytkownik SSH do uwierzytelnienia",
         placeholder: "deploy",
       },
       authType: {
-        label: "Typ uwierzytelniania",
-        description: "Metoda uwierzytelniania",
-        placeholder: "",
+        label: "Metoda uwierzytelniania",
+        description:
+          "Hasło: zwykłe logowanie hasłem. Klucz prywatny: plik klucza PEM. Agent SSH: użyj agenta systemowego (SSH_AUTH_SOCK).",
       },
       secret: {
-        label: "Sekret",
-        description: "Hasło lub klucz prywatny PEM",
+        label: "Hasło / Klucz prywatny",
+        description:
+          "Dla hasła: podaj hasło. Dla klucza prywatnego: wklej cały klucz PEM. Dla agenta SSH: zostaw puste.",
         placeholder: "",
       },
       passphrase: {
         label: "Hasło klucza",
-        description: "Hasło klucza PEM (jeśli zaszyfrowany)",
+        description:
+          "Jeśli klucz prywatny jest chroniony hasłem, wpisz je tutaj. Zostaw puste jeśli klucz jest nieszyfrowany.",
         placeholder: "",
       },
       isDefault: {
-        label: "Domyślne połączenie",
-        description: "Używaj jako domyślne dla sesji AI",
-        placeholder: "",
+        label: "Ustaw jako domyślne połączenie",
+        description:
+          "Używaj tego połączenia domyślnie dla sesji AI, terminala i poleceń.",
       },
       notes: {
         label: "Notatki",
-        description: "Opcjonalne notatki o połączeniu",
-        placeholder: "",
+        description: "Opcjonalne wewnętrzne notatki o tym połączeniu",
+        placeholder: "VPS za NAT, wymagany host pośredni",
       },
+    },
+    response: {
+      id: { title: "ID połączenia" },
     },
     errors: {
       validation: {
         title: "Błąd walidacji",
-        description: "Nieprawidłowe parametry",
+        description: "Sprawdź pola formularza i spróbuj ponownie",
       },
       unauthorized: {
         title: "Brak autoryzacji",
         description: "Wymagany dostęp administratora",
       },
-      forbidden: { title: "Zabronione", description: "Brak uprawnień" },
+      forbidden: {
+        title: "Zabronione",
+        description: "Brak uprawnień do tworzenia połączeń",
+      },
       server: {
         title: "Błąd serwera",
-        description: "Nie udało się utworzyć połączenia",
+        description: "Nie udało się zapisać połączenia",
       },
-      notFound: { title: "Nie znaleziono", description: "Nie znaleziono" },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Zasób nie znaleziony",
+      },
       unknown: {
         title: "Nieznany błąd",
         description: "Wystąpił nieoczekiwany błąd",
       },
-      unsavedChanges: { title: "Niezapisane zmiany" },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
       conflict: {
-        title: "Konflikt",
+        title: "Nazwa już zajęta",
         description: "Połączenie o tej nazwie już istnieje",
       },
-      network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+      network: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć z serwerem",
+      },
       timeout: { title: "Timeout", description: "Przekroczono limit czasu" },
     },
     success: {
-      title: "Połączenie utworzone",
+      title: "Połączenie zapisane",
       description: "Połączenie SSH zapisane pomyślnie",
+    },
+    submitButton: {
+      text: "Zapisz połączenie",
+      loadingText: "Zapisywanie...",
     },
   },
   widget: {

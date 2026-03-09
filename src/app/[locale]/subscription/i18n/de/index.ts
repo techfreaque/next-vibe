@@ -194,10 +194,39 @@ export const translations: typeof enTranslations = {
     tabs: {
       overview: "Übersicht",
       buy: "Credits kaufen",
+      adminBuy: "Credits verwalten",
       billing: "Abrechnung",
       history: "Verlauf",
       plans: "Pläne",
       remote: "Cloud-Sync",
+    },
+    admin: {
+      title: "Credits & Limits",
+      description:
+        "Kreditkontingente und Nutzungslimits für diese Instanz verwalten",
+      allocate: {
+        title: "Credits zuweisen",
+        description:
+          "Fügen Sie einem Benutzerkonto Credits hinzu. Credits wirken als Ausgabenlimit — sie steuern, wie viel KI-Nutzung erlaubt ist.",
+        howItWorks: {
+          title: "Wie Credit-Limits funktionieren",
+          freePool: {
+            title: "Freier Pool (Geteilt)",
+            description:
+              "Alle Benutzer teilen sich einen Pool kostenloser Credits, der monatlich zurückgesetzt wird.",
+          },
+          bonus: {
+            title: "Bonus-Credits (Pro Benutzer)",
+            description:
+              "Bonus-Credits sind dauerhaft — sie laufen nie ab und stapeln sich auf den freien Pool-Credits.",
+          },
+          apiKeys: {
+            title: "Alle Limits entfernen",
+            description:
+              "Konfigurieren Sie eigene LLM-API-Schlüssel in den Einstellungen, um Credits vollständig zu umgehen.",
+          },
+        },
+      },
     },
     payment: {
       success: {

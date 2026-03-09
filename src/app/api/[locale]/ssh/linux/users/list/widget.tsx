@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
@@ -19,10 +18,10 @@ import {
   TableRow,
 } from "next-vibe-ui/ui/table";
 import { P } from "next-vibe-ui/ui/typography";
-import React from "react";
+import React, { useCallback } from "react";
 
 import {
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
@@ -40,10 +39,19 @@ export function LinuxUsersListContainer({
   field,
 }: WidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
-  const locale = useWidgetLocale();
-  const router = useRouter();
+  const navigation = useWidgetNavigation();
   const value = field.value;
   const users = value?.users ?? [];
+
+  const handleCreate = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const createDef = await import("../create/definition");
+      navigation.push(createDef.POST, {
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  }, [navigation]);
 
   return (
     <Div className="flex flex-col gap-0 h-full min-h-[400px]">
@@ -52,11 +60,7 @@ export function LinuxUsersListContainer({
         <Span className="font-semibold text-sm mr-auto">
           {t("widget.title")}
         </Span>
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => router.push(`/${locale}/admin/ssh/users/create`)}
-        >
+        <Button type="button" size="sm" onClick={handleCreate}>
           <Plus className="h-3.5 w-3.5 mr-1" />
           {t("widget.createButton")}
         </Button>

@@ -219,6 +219,7 @@ export class MCPRegistry {
           currentToolMessageId: undefined,
           waitingForRemoteResult: undefined,
           favoriteId: undefined,
+          abortSignal: undefined,
         },
       });
 

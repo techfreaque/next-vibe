@@ -3,7 +3,16 @@
  * Handles email campaign scheduling and automation
  */
 
-import { and, count, eq, isNotNull, isNull, lt, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  eq,
+  isNotNull,
+  isNull,
+  lt,
+  notInArray,
+  sql,
+} from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
@@ -20,7 +29,11 @@ import type {
   EmailJourneyVariantValues,
   EmailProviderValues,
 } from "../../../enum";
-import { EmailCampaignStage, LeadStatus } from "../../../enum";
+import {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+  LeadStatus,
+} from "../../../enum";
 import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
 
@@ -153,9 +166,22 @@ export class CampaignSchedulerService {
         return null;
       }
 
-      // Assign journey variant using A/B testing (only meaningful for COLD campaigns)
+      // Assign journey variant:
+      // - Cold campaigns (LEAD_CAMPAIGN, NEWSLETTER): use A/B testing
+      // - Post-conversion campaigns: use their dedicated fixed variant
+      const fixedVariantForCampaignType: Partial<
+        Record<
+          typeof CampaignTypeValue,
+          (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
+        >
+      > = {
+        [CampaignType.SIGNUP_NURTURE]: EmailJourneyVariant.SIGNUP_NURTURE,
+        [CampaignType.RETENTION]: EmailJourneyVariant.RETENTION,
+        [CampaignType.WINBACK]: EmailJourneyVariant.WINBACK,
+      };
       const journeyVariant =
         options.journeyVariant ||
+        fixedVariantForCampaignType[campaignType] ||
         abTestingService.assignJourneyVariant(leadId, logger, {
           country: lead.country || undefined,
           source: lead.source || undefined,
@@ -334,6 +360,7 @@ export class CampaignSchedulerService {
       stage: typeof EmailCampaignStageValues;
       journeyVariant: typeof EmailJourneyVariantValues;
       scheduledAt: Date;
+      retryCount: number;
       lead: {
         id: string;
         email: string;
@@ -353,6 +380,7 @@ export class CampaignSchedulerService {
           stage: emailCampaigns.stage,
           journeyVariant: emailCampaigns.journeyVariant,
           scheduledAt: emailCampaigns.scheduledAt,
+          retryCount: emailCampaigns.retryCount,
           lead: leads,
         })
         .from(emailCampaigns)
@@ -366,6 +394,12 @@ export class CampaignSchedulerService {
             isNotNull(leads.email),
             // Exclude converted leads
             isNull(leads.convertedAt),
+            // Suppress bounced, unsubscribed, and invalid leads
+            notInArray(leads.status, [
+              LeadStatus.BOUNCED,
+              LeadStatus.UNSUBSCRIBED,
+              LeadStatus.INVALID,
+            ]),
           ),
         )
         .orderBy(emailCampaigns.scheduledAt)
@@ -380,6 +414,7 @@ export class CampaignSchedulerService {
         stage: campaign.stage,
         journeyVariant: campaign.journeyVariant,
         scheduledAt: campaign.scheduledAt,
+        retryCount: campaign.retryCount,
         lead: {
           id: campaign.lead.id,
           email: campaign.lead.email!,
@@ -575,6 +610,74 @@ export class CampaignSchedulerService {
         { campaignType: nextCampaignType },
         logger,
       );
+    }
+  }
+
+  /**
+   * Schedule a retry for a failed email send with exponential backoff.
+   * Retry delays: retry 1 = 1h, retry 2 = 4h, retry 3 = 24h.
+   * After 3 retries, marks the campaign as permanently FAILED.
+   * Returns true if retry was scheduled, false if max retries exceeded.
+   */
+  async scheduleRetry(
+    campaignId: string,
+    currentRetryCount: number,
+    errorMessage: string,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    const MAX_RETRIES = 3;
+    const RETRY_DELAYS_MS = [
+      1 * 60 * 60 * 1000, // 1 hour
+      4 * 60 * 60 * 1000, // 4 hours
+      24 * 60 * 60 * 1000, // 24 hours
+    ];
+
+    try {
+      if (currentRetryCount >= MAX_RETRIES) {
+        // Mark as permanently failed
+        await db
+          .update(emailCampaigns)
+          .set({
+            status: EmailStatus.FAILED,
+            error: `Max retries exceeded. Last error: ${errorMessage}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(emailCampaigns.id, campaignId));
+
+        logger.warn("campaign.retry.max_retries_exceeded", {
+          campaignId,
+          retryCount: currentRetryCount,
+        });
+        return false;
+      }
+
+      const delayMs =
+        RETRY_DELAYS_MS[currentRetryCount] ??
+        RETRY_DELAYS_MS[RETRY_DELAYS_MS.length - 1]!;
+      const nextScheduledAt = new Date(Date.now() + delayMs);
+      const nextRetryCount = currentRetryCount + 1;
+
+      await db
+        .update(emailCampaigns)
+        .set({
+          scheduledAt: nextScheduledAt,
+          retryCount: nextRetryCount,
+          error: errorMessage,
+          updatedAt: new Date(),
+        })
+        .where(eq(emailCampaigns.id, campaignId));
+
+      logger.info("campaign.retry.scheduled", {
+        campaignId,
+        retryCount: nextRetryCount,
+        nextScheduledAt: nextScheduledAt.toISOString(),
+      });
+      return true;
+    } catch (error) {
+      logger.error("campaign.retry.schedule.error", parseError(error), {
+        campaignId,
+      });
+      return false;
     }
   }
 

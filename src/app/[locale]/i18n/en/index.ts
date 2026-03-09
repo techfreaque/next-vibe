@@ -318,6 +318,17 @@ export const translations = {
       country: "Country",
       language: "Language",
     },
+    countries: {
+      de: "Germany",
+      pl: "Poland",
+      us: "United States",
+      global: "Global",
+    },
+    languages: {
+      en: "English",
+      de: "German",
+      pl: "Polish",
+    },
 
     accessibility: {
       srOnly: {

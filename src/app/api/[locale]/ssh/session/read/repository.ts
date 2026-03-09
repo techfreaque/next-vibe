@@ -49,7 +49,12 @@ export class SessionReadRepository {
     const raw = entry.drainOutput();
     const output =
       raw.length > maxBytes ? raw.slice(raw.length - maxBytes) : raw;
-    const eof = entry.proc.exitCode !== null;
+
+    // Detect EOF: local → proc.exitCode; SSH → session deleted on channel close
+    const eof =
+      entry.kind === "local"
+        ? entry.proc.exitCode !== null
+        : !sessionPool.has(data.sessionId);
 
     if (eof) {
       sessionPool.delete(data.sessionId);

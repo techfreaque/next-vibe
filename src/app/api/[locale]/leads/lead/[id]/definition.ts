@@ -42,7 +42,7 @@ import {
   LeadStatusOptions,
 } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import { LeadDetailContainer } from "./widget";
+import { LeadDetailContainer, LeadEditContainer } from "./widget";
 
 /**
  * Delete Lead Endpoint (DELETE)
@@ -151,7 +151,7 @@ const { DELETE } = createEndpoint({
 
 /**
  * Update Lead Endpoint (PATCH)
- * Updates an existing lead
+ * Updates an existing lead — flat request fields for simpler pre-fill
  */
 const { PATCH } = createEndpoint({
   scopedTranslation,
@@ -164,14 +164,9 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   icon: "user",
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "patch.form.title",
-    description: "patch.form.description",
-    layoutType: LayoutType.STACKED,
-    paddingTop: "6",
-    noCard: true,
-    usage: { request: "data&urlPathParams", response: true },
+  fields: customWidgetObject({
+    render: LeadEditContainer,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // Navigation - back to previous screen
       backButton: backButton({
@@ -197,221 +192,152 @@ const { PATCH } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      // === UPDATE FIELDS ===
-      updates: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "patch.updates.title",
-        description: "patch.updates.description",
-        layoutType: LayoutType.STACKED,
-        usage: { request: "data" },
-        children: {
-          // Basic Information
-          basicInfo: scopedObjectFieldNew(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "patch.basicInfo.title",
-            description: "patch.basicInfo.description",
-            layoutType: LayoutType.GRID,
-            columns: 2,
-            usage: { request: "data" },
-            children: {
-              email: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.EMAIL,
-                label: "patch.email.label",
-                description: "patch.email.description",
-                placeholder: "patch.email.placeholder",
-                columns: 6,
-
-                schema: z.string().email().optional(),
-              }),
-              businessName: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label: "patch.businessName.label",
-                description: "patch.businessName.description",
-                placeholder: "patch.businessName.placeholder",
-                columns: 6,
-
-                schema: z
-                  .union([z.string().min(1).max(255), z.literal("")])
-                  .optional()
-                  .transform((v) => (v === "" ? undefined : v)),
-              }),
-              contactName: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXT,
-                label: "patch.contactName.label",
-                description: "patch.contactName.description",
-                placeholder: "patch.contactName.placeholder",
-                columns: 6,
-
-                schema: z.string().optional().nullable(),
-              }),
-              status: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label: "patch.status.label",
-                description: "patch.status.description",
-                placeholder: "patch.status.placeholder",
-                columns: 6,
-                options: LeadStatusOptions,
-
-                schema: z.enum(LeadStatus).optional(),
-              }),
-            },
-          }),
-
-          // Contact Details
-          contactDetails: scopedObjectFieldNew(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "patch.contactDetails.title",
-            description: "patch.contactDetails.description",
-            layoutType: LayoutType.GRID,
-            columns: 2,
-            usage: { request: "data" },
-            children: {
-              phone: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEL,
-                label: "patch.phone.label",
-                description: "patch.phone.description",
-                placeholder: "patch.phone.placeholder",
-                columns: 6,
-                schema: z
-                  .string()
-                  .regex(/^\+?[1-9]\d{1,14}$/)
-                  .optional(),
-              }),
-              website: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.URL,
-                label: "patch.website.label",
-                description: "patch.website.description",
-                placeholder: "patch.website.placeholder",
-                columns: 6,
-
-                schema: z.string().url().optional().or(z.literal("")),
-              }),
-              country: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label: "patch.country.label",
-                description: "patch.country.description",
-                placeholder: "patch.country.placeholder",
-                columns: 6,
-                options: CountriesOptions,
-
-                schema: z.enum(Countries).optional(),
-              }),
-              language: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label: "patch.language.label",
-                description: "patch.language.description",
-                placeholder: "patch.language.placeholder",
-                columns: 6,
-                options: LanguagesOptions,
-
-                schema: z.enum(Languages).optional(),
-              }),
-            },
-          }),
-
-          // Campaign Management
-          campaignManagement: scopedObjectFieldNew(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "patch.campaignManagement.title",
-            description: "patch.campaignManagement.description",
-            layoutType: LayoutType.STACKED,
-            usage: { request: "data" },
-            children: {
-              source: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label: "patch.source.label",
-                description: "patch.source.description",
-                placeholder: "patch.source.placeholder",
-                columns: 12,
-                options: LeadSourceOptions,
-
-                schema: z.enum(LeadSource).optional(),
-              }),
-              currentCampaignStage: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.SELECT,
-                label: "patch.currentCampaignStage.label",
-                description: "patch.currentCampaignStage.description",
-                placeholder: "patch.currentCampaignStage.placeholder",
-                columns: 12,
-                options: EmailCampaignStageOptions,
-
-                schema: z.enum(EmailCampaignStage).optional(),
-              }),
-            },
-          }),
-
-          // Additional Details
-          additionalDetails: scopedObjectFieldNew(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "patch.additionalDetails.title",
-            description: "patch.additionalDetails.description",
-            layoutType: LayoutType.STACKED,
-            usage: { request: "data" },
-            children: {
-              notes: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.TEXTAREA,
-                label: "patch.notes.label",
-                description: "patch.notes.description",
-                placeholder: "patch.notes.placeholder",
-                columns: 12,
-
-                schema: z.string().optional(),
-              }),
-              metadata: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.JSON,
-                label: "patch.metadata.label",
-                description: "patch.metadata.description",
-                placeholder: "patch.metadata.placeholder",
-                columns: 12,
-                schema: z
-                  .record(
-                    z.string(),
-                    z.string().or(z.coerce.number()).or(z.boolean()),
-                  )
-                  .optional(),
-              }),
-              convertedUserId: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.UUID,
-                label: "patch.convertedUserId.label",
-                description: "patch.convertedUserId.description",
-                placeholder: "patch.convertedUserId.placeholder",
-                columns: 12,
-
-                schema: z
-                  .union([z.uuid(), z.literal("")])
-                  .nullable()
-                  .optional()
-                  .transform((v) => (v === "" ? undefined : v)),
-              }),
-              subscriptionConfirmedAt: scopedRequestField(scopedTranslation, {
-                type: WidgetType.FORM_FIELD,
-                fieldType: FieldDataType.DATETIME,
-                label: "patch.subscriptionConfirmedAt.label",
-                description: "patch.subscriptionConfirmedAt.description",
-                placeholder: "patch.subscriptionConfirmedAt.placeholder",
-                columns: 12,
-
-                schema: z.coerce.date().nullable().optional(),
-              }),
-            },
-          }),
-        },
+      // === FLAT REQUEST FIELDS ===
+      email: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "patch.email.label",
+        description: "patch.email.description",
+        placeholder: "patch.email.placeholder",
+        columns: 6,
+        schema: z.string().email().optional(),
+      }),
+      businessName: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.businessName.label",
+        description: "patch.businessName.description",
+        placeholder: "patch.businessName.placeholder",
+        columns: 6,
+        schema: z
+          .union([z.string().min(1).max(255), z.literal("")])
+          .optional()
+          .transform((v) => (v === "" ? undefined : v)),
+      }),
+      contactName: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.contactName.label",
+        description: "patch.contactName.description",
+        placeholder: "patch.contactName.placeholder",
+        columns: 6,
+        schema: z.string().optional().nullable(),
+      }),
+      status: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.status.label",
+        description: "patch.status.description",
+        placeholder: "patch.status.placeholder",
+        columns: 6,
+        options: LeadStatusOptions,
+        schema: z.enum(LeadStatus).optional(),
+      }),
+      phone: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEL,
+        label: "patch.phone.label",
+        description: "patch.phone.description",
+        placeholder: "patch.phone.placeholder",
+        columns: 6,
+        schema: z
+          .string()
+          .regex(/^\+?[1-9]\d{1,14}$/)
+          .optional(),
+      }),
+      website: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.URL,
+        label: "patch.website.label",
+        description: "patch.website.description",
+        placeholder: "patch.website.placeholder",
+        columns: 6,
+        schema: z.string().url().optional().or(z.literal("")),
+      }),
+      country: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.country.label",
+        description: "patch.country.description",
+        placeholder: "patch.country.placeholder",
+        columns: 6,
+        options: CountriesOptions,
+        schema: z.enum(Countries).optional(),
+      }),
+      language: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.language.label",
+        description: "patch.language.description",
+        placeholder: "patch.language.placeholder",
+        columns: 6,
+        options: LanguagesOptions,
+        schema: z.enum(Languages).optional(),
+      }),
+      source: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.source.label",
+        description: "patch.source.description",
+        placeholder: "patch.source.placeholder",
+        columns: 6,
+        options: LeadSourceOptions,
+        schema: z.enum(LeadSource).optional(),
+      }),
+      currentCampaignStage: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.currentCampaignStage.label",
+        description: "patch.currentCampaignStage.description",
+        placeholder: "patch.currentCampaignStage.placeholder",
+        columns: 6,
+        options: EmailCampaignStageOptions,
+        schema: z.enum(EmailCampaignStage).optional(),
+      }),
+      notes: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "patch.notes.label",
+        description: "patch.notes.description",
+        placeholder: "patch.notes.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      metadata: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "patch.metadata.label",
+        description: "patch.metadata.description",
+        placeholder: "patch.metadata.placeholder",
+        columns: 12,
+        schema: z
+          .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
+          .optional(),
+      }),
+      convertedUserId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "patch.convertedUserId.label",
+        description: "patch.convertedUserId.description",
+        placeholder: "patch.convertedUserId.placeholder",
+        columns: 12,
+        schema: z
+          .union([z.uuid(), z.literal("")])
+          .nullable()
+          .optional()
+          .transform((v) => (v === "" ? undefined : v)),
+      }),
+      subscriptionConfirmedAt: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATETIME,
+        label: "patch.subscriptionConfirmedAt.label",
+        description: "patch.subscriptionConfirmedAt.description",
+        placeholder: "patch.subscriptionConfirmedAt.placeholder",
+        columns: 12,
+        schema: z.coerce.date().nullable().optional(),
       }),
 
-      // === RESPONSE FIELDS (same structure as GET) ===
+      // === RESPONSE FIELDS ===
       lead: scopedObjectFieldNew(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "patch.response.title",
@@ -419,7 +345,6 @@ const { PATCH } = createEndpoint({
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          // Using same nested response structure as GET endpoint
           basicInfo: scopedObjectFieldNew(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "patch.response.basicInfo.title",
@@ -436,29 +361,24 @@ const { PATCH } = createEndpoint({
                 hidden: true,
                 schema: z.uuid(),
               }),
-
               email: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.email.content",
-
                 schema: z.string().email().nullable(),
               }),
               businessName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.businessName.content",
-
                 schema: z.string(),
               }),
               contactName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.contactName.content",
-
                 schema: z.string().nullable(),
               }),
               status: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 text: "patch.response.status.content",
-
                 schema: z.enum(LeadStatus),
               }),
             },
@@ -475,25 +395,21 @@ const { PATCH } = createEndpoint({
               phone: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.phone.content",
-
                 schema: z.string().nullable(),
               }),
               website: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.website.content",
-
                 schema: z.string().nullable(),
               }),
               country: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.country.content",
-
                 schema: z.enum(Countries),
               }),
               language: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.language.content",
-
                 schema: z.enum(Languages),
               }),
             },
@@ -510,25 +426,21 @@ const { PATCH } = createEndpoint({
               source: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 text: "patch.response.source.content",
-
                 schema: z.enum(LeadSource).nullable(),
               }),
               currentCampaignStage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 text: "patch.response.currentCampaignStage.content",
-
                 schema: z.enum(EmailCampaignStage).nullable(),
               }),
               emailJourneyVariant: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.emailJourneyVariant.content",
-
                 schema: z.enum(EmailJourneyVariant).nullable(),
               }),
               emailsSent: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.emailsSent.content",
-
                 schema: z.coerce.number(),
               }),
               lastEmailSentAt: scopedResponseField(scopedTranslation, {
@@ -550,13 +462,11 @@ const { PATCH } = createEndpoint({
               emailsOpened: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.emailsOpened.content",
-
                 schema: z.coerce.number(),
               }),
               emailsClicked: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.emailsClicked.content",
-
                 schema: z.coerce.number(),
               }),
               lastEngagementAt: scopedResponseField(scopedTranslation, {
@@ -583,7 +493,6 @@ const { PATCH } = createEndpoint({
               convertedUserId: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.convertedUserId.content",
-
                 schema: z.string().nullable(),
               }),
               convertedAt: scopedResponseField(scopedTranslation, {
@@ -615,13 +524,11 @@ const { PATCH } = createEndpoint({
               notes: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.notes.content",
-
                 schema: z.string().nullable(),
               }),
               metadata: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 label: "patch.response.metadata.content",
-
                 schema: z.record(z.string(), z.any()),
               }),
               createdAt: scopedResponseField(scopedTranslation, {
@@ -691,30 +598,20 @@ const { PATCH } = createEndpoint({
     },
     requests: {
       default: {
-        updates: {
-          basicInfo: {
-            email: "newemail@example.com",
-            businessName: "Updated Business Name",
-            contactName: "Jane Smith",
-            status: LeadStatus.SIGNED_UP,
-          },
-          contactDetails: {
-            phone: "+9876543210",
-            website: "https://newwebsite.com",
-            country: Countries.PL,
-            language: Languages.EN,
-          },
-          campaignManagement: {
-            source: LeadSource.REFERRAL,
-            currentCampaignStage: EmailCampaignStage.FOLLOWUP_1,
-          },
-          additionalDetails: {
-            notes: "Updated notes after meeting",
-            metadata: { priority: "high", lastContact: "2024-01-20" },
-            convertedUserId: "660e8400-e29b-41d4-a716-446655440000",
-            subscriptionConfirmedAt: null,
-          },
-        },
+        email: "newemail@example.com",
+        businessName: "Updated Business Name",
+        contactName: "Jane Smith",
+        status: LeadStatus.SIGNED_UP,
+        phone: "+9876543210",
+        website: "https://newwebsite.com",
+        country: Countries.PL,
+        language: Languages.EN,
+        source: LeadSource.REFERRAL,
+        currentCampaignStage: EmailCampaignStage.FOLLOWUP_1,
+        notes: "Updated notes after meeting",
+        metadata: { priority: "high", lastContact: "2024-01-20" },
+        convertedUserId: "660e8400-e29b-41d4-a716-446655440000",
+        subscriptionConfirmedAt: null,
       },
     },
     responses: {

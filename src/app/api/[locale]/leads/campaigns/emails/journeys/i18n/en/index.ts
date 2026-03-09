@@ -289,6 +289,203 @@ export const translations = {
             signature: " -  Sam",
           },
         },
+        signupNurture: {
+          initial: {
+            subject: "Welcome to unbottled.ai — here's how to get started",
+            previewText: "you're in, let's make the most of it",
+            greeting: "Hey,",
+            welcome:
+              "Welcome aboard. You've signed up for unbottled.ai, and we want to make sure you get the most out of it from day one.",
+            firstSteps:
+              "Start by trying a task you've been avoiding because other AI tools kept refusing it. No guardrails, no lectures — just results.",
+            modelChoice:
+              "You have access to 42+ models. If you're not sure where to start, try the default model. You can switch anytime.",
+            signature: "— The unbottled.ai team",
+          },
+          followup1: {
+            subject: "3 things worth exploring in unbottled.ai",
+            previewText: "quick tips from our most active users",
+            greeting: "Hey,",
+            checkIn:
+              "Just checking in. Hope you've had a chance to explore. Here are 3 things our most active users do in their first week:",
+            exploreModels:
+              "Switch models for different tasks. Some are faster, some are better for long-form, some excel at code. Explore the model selector.",
+            tip: "If a response isn't quite right, add 'be more direct' or 'no disclaimers' to your prompt. It makes a noticeable difference.",
+            signature: "— The unbottled.ai team",
+          },
+          followup2: {
+            subject: "your censorship filter settings",
+            previewText: "you control what the AI can and can't do",
+            greeting: "Hey,",
+            preferences:
+              "One feature we want to make sure you know about: censorship controls. You decide what the AI will and won't engage with.",
+            filterControl:
+              "Head to Settings → Filters to customize your experience. You can allow or restrict specific content categories based on your needs.",
+            signature: "— The unbottled.ai team",
+          },
+          followup3: {
+            subject: "how are you finding it so far?",
+            previewText: "genuinely curious",
+            greeting: "Hey,",
+            community:
+              "We'd love to know what you think so far. What's working? What isn't? You can reply directly to this email.",
+            upgrade:
+              "If you're on the free plan and hitting limits, our paid plans unlock higher usage caps and priority model access.",
+            signature: "— The unbottled.ai team",
+          },
+          nurture: {
+            subject: "new models available",
+            previewText: "we added some worth trying",
+            greeting: "Hey,",
+            newModels:
+              "We've added several new models since you signed up, including options that are particularly strong for long-form writing and coding tasks.",
+            advancedTip:
+              "Try the model comparison feature: run the same prompt on two different models and compare outputs side by side.",
+            signature: "— The unbottled.ai team",
+          },
+          reactivation: {
+            subject: "still here if you need us",
+            previewText: "checking in",
+            greeting: "Hey,",
+            stillHere:
+              "It's been a while since you've been active on unbottled.ai. We're still here whenever you need a capable AI that works without restrictions.",
+            whatChanged:
+              "A lot has improved since you last visited — faster responses, more models, better long-form output. Worth another look.",
+            signature: "— The unbottled.ai team",
+          },
+        },
+        retention: {
+          initial: {
+            subject: "thanks for subscribing — you're in good company",
+            previewText: "a quick note from the team",
+            greeting: "Hey,",
+            thankYou:
+              "Thank you for subscribing to unbottled.ai. Your support directly funds development and keeps us independent.",
+            valueSummary:
+              "As a subscriber, you have priority access to all 42+ models, higher usage limits, and first access to new features.",
+            whatIsNext:
+              "We'll check in from time to time with tips, new feature highlights, and updates. Nothing excessive — just the stuff that's actually worth your time.",
+            signature: "— The unbottled.ai team",
+          },
+          followup1: {
+            subject: "new feature you might have missed",
+            previewText: "just added last week",
+            greeting: "Hey,",
+            newFeature:
+              "We just shipped a feature we've been working on for a while: model comparison mode. Run the same prompt on multiple models simultaneously and compare outputs.",
+            howToUse:
+              "You'll find it in the model selector — click 'Compare' instead of choosing a single model. Works best for creative tasks where you want to see different approaches.",
+            encouragement:
+              "Keep exploring. You're using one of the few AI platforms that actually trusts you to decide what you need.",
+            signature: "— The unbottled.ai team",
+          },
+          followup2: {
+            subject: "you're getting more out of this than most users",
+            previewText: "quick tip to go further",
+            greeting: "Hey,",
+            milestone:
+              "Subscribers like you use unbottled.ai significantly more than free users. That tells us you've found real value in it.",
+            insiderTip:
+              "Power user tip: save your most-used system prompts as presets. Go to Settings → Prompt Presets and you'll save significant time on recurring tasks.",
+            signature: "— The unbottled.ai team",
+          },
+          followup3: {
+            subject: "what should we build next?",
+            previewText: "we actually read these",
+            greeting: "Hey,",
+            roadmap:
+              "We're planning our next quarter of development and want to know what matters most to subscribers. What feature would make unbottled.ai 10x more useful for you?",
+            feedback:
+              "Reply to this email with your answer. We read every response and it directly influences what we prioritize.",
+            signature: "— The unbottled.ai team",
+          },
+          nurture: {
+            subject: "a year of no lectures",
+            previewText: "thank you for sticking around",
+            greeting: "Hey,",
+            appreciation:
+              "We appreciate you staying with unbottled.ai. Every subscriber who sticks around tells us we're building something worth building.",
+            exclusiveContent:
+              "Coming soon for long-term subscribers: early access to our API and a dedicated model fine-tuning feature. We'll let you know first.",
+            signature: "— The unbottled.ai team",
+          },
+          reactivation: {
+            subject: "big update worth knowing about",
+            previewText: "we've been busy",
+            greeting: "Hey,",
+            loyalty:
+              "You've been with us for a while and we want to make sure you know about what we've shipped recently.",
+            bigUpdate:
+              "Major updates: new uncensored model tier, 3x faster response times, and a redesigned interface that significantly improves workflow. Log in to see it.",
+            signature: "— The unbottled.ai team",
+          },
+        },
+        winback: {
+          initial: {
+            subject: "we noticed you left",
+            previewText: "no hard feelings — just wanted to check in",
+            greeting: "Hey,",
+            noticed:
+              "We noticed your subscription ended. No hard sell here — we just wanted to reach out once and see if there's anything we could have done better.",
+            whatChanged:
+              "If you left because of something specific, we'd genuinely like to know. Reply to this email.",
+            noHardFeelings:
+              "If it just wasn't the right fit, that's fine too. We'll only send a few more messages and then leave you alone.",
+            signature: "— The unbottled.ai team",
+          },
+          followup1: {
+            subject: "here's what's changed since you left",
+            previewText: "a few things worth knowing",
+            greeting: "Hey,",
+            improvements:
+              "Since you canceled, we've shipped several significant improvements that may address what wasn't working for you.",
+            specificChange:
+              "Response times are now 3x faster. We added 12 new models. And we redesigned the interface based on subscriber feedback.",
+            openDoor:
+              "If any of that sounds relevant, we have a 14-day free trial for returning subscribers. No strings.",
+            signature: "— The unbottled.ai team",
+          },
+          followup2: {
+            subject: "returning subscriber offer",
+            previewText: "30% off your first month back",
+            greeting: "Hey,",
+            specialOffer:
+              "We want to make it easy to come back and try what we've built. For the next 7 days, we're offering 30% off your first month for returning subscribers.",
+            offerDetails:
+              "Use code COMEBACK30 at checkout. No commitment — cancel anytime, same as before.",
+            signature: "— The unbottled.ai team",
+          },
+          followup3: {
+            subject: "last message from us",
+            previewText: "we'll leave you alone after this",
+            greeting: "Hey,",
+            lastAttempt:
+              "This is the last email we'll send about coming back to unbottled.ai. We don't want to be annoying about it.",
+            honesty:
+              "If you ever want uncensored AI access again — for content work, research, creative writing, or anything else — we'll be here. The offer below is always available.",
+            signature: "— The unbottled.ai team",
+          },
+          nurture: {
+            subject: "major update from unbottled.ai",
+            previewText: "we've come a long way",
+            greeting: "Hey,",
+            majorUpdate:
+              "It's been a while since you were a subscriber. We've made major improvements: new models, faster performance, redesigned interface, and API access for power users.",
+            gentleInvite:
+              "If you've been looking for a capable AI without restrictions, we'd love to have you back. Free trial still available.",
+            signature: "— The unbottled.ai team",
+          },
+          reactivation: {
+            subject: "still here if you need us",
+            previewText: "one last note",
+            greeting: "Hey,",
+            longTime:
+              "It's been a long time since you were subscribed to unbottled.ai. We're still building the same thing: an AI platform that respects your intelligence and your time.",
+            finalOffer:
+              "If you ever decide you want unrestricted AI access again, we'll be here. No pressure, no more emails after this.",
+            signature: "— The unbottled.ai team",
+          },
+        },
       },
     },
   },

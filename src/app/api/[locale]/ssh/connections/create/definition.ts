@@ -18,7 +18,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { SshAuthType, SshAuthTypeDB } from "../../enum";
+import { SshAuthType, SshAuthTypeDB, SshAuthTypeOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
 import { ConnectionCreateContainer } from "./widget";
 
@@ -71,9 +71,10 @@ export const { POST } = createEndpoint({
       }),
       authType: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "post.fields.authType.label",
         description: "post.fields.authType.description",
+        options: SshAuthTypeOptions,
         schema: z.enum(SshAuthTypeDB),
       }),
       secret: scopedRequestField(scopedTranslation, {

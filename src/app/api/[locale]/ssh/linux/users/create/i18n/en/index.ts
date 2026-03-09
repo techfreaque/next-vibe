@@ -6,61 +6,100 @@ export const translations = {
       title: "Local Mode Only",
     },
     invalidUsername:
-      "Invalid username: must be lowercase alphanumeric + hyphen, starting with a letter",
-    userAlreadyExists: "User already exists",
+      "Invalid username: must start with a letter, then lowercase letters, digits, or hyphens (max 32 chars)",
+    userAlreadyExists: "A user with that username already exists",
+    connectionNotFound: "SSH connection not found",
+    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    connectTimeout: "Connection timed out",
+    sshAuthFailed: "SSH authentication failed",
+    sshConnectionFailed: "SSH connection failed",
+    fingerprintMismatch:
+      "Host fingerprint has changed. Potential MITM attack. Acknowledge to proceed.",
   },
 
   post: {
     title: "Create Linux User",
-    description: "Create a new OS user account on the host",
+    description:
+      "Create a new OS user account. Runs useradd on the target host. Admin only.",
     fields: {
+      connectionId: {
+        label: "SSH Connection",
+        description:
+          "Which server to create the user on. Leave empty to use the default connection or local mode.",
+        placeholder: "Select a connection…",
+      },
       username: {
         label: "Username",
-        description: "Lowercase alphanumeric + hyphen, 1-32 chars",
+        description:
+          "Must start with a letter, then lowercase letters, digits, or hyphens. Max 32 characters.",
         placeholder: "alice",
       },
       groups: {
-        label: "Groups",
-        description: "Extra groups to add the user to",
+        label: "Additional Groups",
+        description:
+          "Optional extra groups to add the user to (comma-separated). Example: docker, www-data.",
         placeholder: "docker,www-data",
       },
       shell: {
-        label: "Shell",
-        description: "Login shell",
-        placeholder: "/bin/bash",
+        label: "Login Shell",
+        description:
+          "The shell that opens when this user logs in interactively.",
       },
       homeDir: {
         label: "Home Directory",
-        description: "Home directory path (default: /home/username)",
+        description:
+          "Path for the user's home directory. Defaults to /home/<username> if left empty.",
         placeholder: "/home/alice",
       },
       sudoAccess: {
-        label: "Sudo Access",
-        description: "Add to sudo group (not recommended)",
-        placeholder: "",
+        label: "Grant Sudo Access",
+        description:
+          "Add the user to the sudo group so they can run commands as root. Use with caution.",
       },
+    },
+    response: {
+      ok: { title: "Success" },
+      uid: { title: "UID" },
+      gid: { title: "GID" },
+      homeDirectory: { title: "Home Directory" },
+      shell: { title: "Shell" },
     },
     errors: {
       validation: {
         title: "Validation Error",
-        description: "Invalid parameters",
+        description: "Check the form fields and try again",
       },
       unauthorized: {
         title: "Unauthorized",
         description: "Admin access required",
       },
-      forbidden: { title: "Forbidden", description: "LOCAL_MODE required" },
-      server: { title: "Server Error", description: "Failed to create user" },
-      notFound: { title: "Not Found", description: "Not found" },
+      forbidden: {
+        title: "Forbidden",
+        description: "Local mode is not enabled on this server",
+      },
+      server: {
+        title: "Server Error",
+        description: "Failed to create the user account",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "SSH connection not found",
+      },
       unknown: {
         title: "Unknown Error",
         description: "An unexpected error occurred",
       },
-      unsavedChanges: { title: "Unsaved Changes" },
-      conflict: { title: "Conflict", description: "Username already exists" },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Username Already Exists",
+        description: "A user with this username already exists on the server",
+      },
       network: {
         title: "Network Error",
-        description: "Network error occurred",
+        description: "Could not reach the server",
       },
       timeout: { title: "Timeout", description: "Request timed out" },
     },
@@ -68,11 +107,16 @@ export const translations = {
       title: "User Created",
       description: "OS user account created successfully",
     },
+    submitButton: {
+      text: "Create User",
+      loadingText: "Creating…",
+    },
   },
   widget: {
     title: "Create Linux User",
     createButton: "Create User",
-    creating: "Creating...",
-    sudoWarning: "Granting sudo access is a security risk. Use with caution.",
+    creating: "Creating…",
+    sudoWarning:
+      "Granting sudo access gives the user root-level privileges. Only do this if you trust this user completely.",
   },
 };

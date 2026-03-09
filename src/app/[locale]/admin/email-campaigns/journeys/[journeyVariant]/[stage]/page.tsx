@@ -14,7 +14,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import { EmailPreviewClient } from "@/app/[locale]/admin/leads/emails/_components/email-preview-client";
+import { EmailPreviewClient } from "@/app/[locale]/admin/email-campaigns/journeys/_components/email-preview-client";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import type {
@@ -48,7 +48,7 @@ export default async function EmailPreviewPage({
   // Require admin user authentication
   const user = await requireAdminUser(
     locale,
-    `/${locale}/admin/leads/emails/${journeyVariant}/${stage}`,
+    `/${locale}/admin/email-campaigns/journeys/${journeyVariant}/${stage}`,
   );
 
   // Validate journey variant
@@ -102,7 +102,7 @@ export default async function EmailPreviewPage({
         <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Div className="flex items-center justify-between">
             <Div className="flex items-center flex flex-row gap-4">
-              <Link href={`/${locale}/admin/leads/emails`}>
+              <Link href={`/${locale}/admin/email-campaigns/journeys`}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -138,7 +138,7 @@ export default async function EmailPreviewPage({
             <Div className="flex items-center flex flex-row gap-2">
               {previousStage ? (
                 <Link
-                  href={`/${locale}/admin/leads/emails/${journeyVariant}/${previousStage}`}
+                  href={`/${locale}/admin/email-campaigns/journeys/${journeyVariant}/${previousStage}`}
                 >
                   <Button
                     variant="outline"
@@ -174,7 +174,7 @@ export default async function EmailPreviewPage({
             <Div className="flex items-center flex flex-row gap-2">
               {nextStage ? (
                 <Link
-                  href={`/${locale}/admin/leads/emails/${journeyVariant}/${nextStage}`}
+                  href={`/${locale}/admin/email-campaigns/journeys/${journeyVariant}/${nextStage}`}
                 >
                   <Button
                     variant="outline"
@@ -221,7 +221,7 @@ export default async function EmailPreviewPage({
                 return (
                   <Link
                     key={journey}
-                    href={`/${locale}/admin/leads/emails/${journey}/${firstStage}`}
+                    href={`/${locale}/admin/email-campaigns/journeys/${journey}/${firstStage}`}
                   >
                     <Button
                       variant={isCurrentJourney ? "default" : "outline"}

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { count, desc, eq, sql, sum } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql, sum } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -206,18 +206,24 @@ export class UserViewRepository {
         db
           .select({ count: count() })
           .from(chatMessages)
-          .where(sql`${chatMessages.threadId} = ANY(${threadIds})`),
+          .where(inArray(chatMessages.threadId, threadIds)),
         db
           .select({ count: count() })
           .from(chatMessages)
           .where(
-            sql`${chatMessages.threadId} = ANY(${threadIds}) AND ${chatMessages.role} = ${ChatMessageRoleDB[1]}`,
+            and(
+              inArray(chatMessages.threadId, threadIds),
+              eq(chatMessages.role, ChatMessageRoleDB[1]),
+            ),
           ),
         db
           .select({ count: count() })
           .from(chatMessages)
           .where(
-            sql`${chatMessages.threadId} = ANY(${threadIds}) AND ${chatMessages.role} = ${ChatMessageRoleDB[0]}`,
+            and(
+              inArray(chatMessages.threadId, threadIds),
+              eq(chatMessages.role, ChatMessageRoleDB[0]),
+            ),
           ),
       ]);
 
@@ -225,7 +231,7 @@ export class UserViewRepository {
     const [lastActivity] = await db
       .select({ lastActivityAt: chatMessages.createdAt })
       .from(chatMessages)
-      .where(sql`${chatMessages.threadId} = ANY(${threadIds})`)
+      .where(inArray(chatMessages.threadId, threadIds))
       .orderBy(desc(chatMessages.createdAt))
       .limit(1);
 
@@ -578,7 +584,10 @@ export class UserViewRepository {
             .select({ createdAt: chatMessages.createdAt })
             .from(chatMessages)
             .where(
-              sql`${chatMessages.threadId} = ANY(${threadIds}) AND ${chatMessages.role} = ${ChatMessageRoleDB[1]}`,
+              and(
+                inArray(chatMessages.threadId, threadIds),
+                eq(chatMessages.role, ChatMessageRoleDB[1]),
+              ),
             )
             .orderBy(desc(chatMessages.createdAt))
             .limit(1)

@@ -11,6 +11,7 @@ import { FilesListRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, logger, t }) => FilesListRepository.list(data, logger, t),
+    handler: ({ data, logger, user, t }) =>
+      FilesListRepository.list(data, logger, user, t),
   },
 });

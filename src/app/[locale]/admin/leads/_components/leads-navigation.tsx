@@ -9,9 +9,6 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
 import { List } from "next-vibe-ui/ui/icons/List";
-import { Mail } from "next-vibe-ui/ui/icons/Mail";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
-import { TestTube } from "next-vibe-ui/ui/icons/TestTube";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Link } from "next-vibe-ui/ui/link";
 import { Nav } from "next-vibe-ui/ui/nav";
@@ -48,27 +45,6 @@ export function LeadsNavigation({
       icon: List,
       label: t("admin.tabs.leads"),
       description: t("admin.tabs.leads_description"),
-    },
-    {
-      key: CurrentPageType.emails,
-      href: `/${locale}/admin/leads/emails` as const,
-      icon: Mail,
-      label: t("admin.tabs.emails"),
-      description: t("admin.tabs.emails_description"),
-    },
-    {
-      key: CurrentPageType.abTesting,
-      href: `/${locale}/admin/leads/ab-testing` as const,
-      icon: TestTube,
-      label: t("admin.tabs.abTesting"),
-      description: t("admin.tabs.abTesting_description"),
-    },
-    {
-      key: CurrentPageType.campaignStarter,
-      href: `/${locale}/admin/leads/campaign-starter` as const,
-      icon: Settings,
-      label: t("admin.tabs.campaignStarter"),
-      description: t("admin.tabs.campaignStarter_description"),
     },
     {
       key: CurrentPageType.import,

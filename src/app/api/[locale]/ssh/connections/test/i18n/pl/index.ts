@@ -3,6 +3,13 @@ export const translations = {
 
   errors: {
     connectionNotFound: "Połączenie nie znalezione",
+    encryptionFailed:
+      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
+    connectTimeout: "Przekroczono limit czasu połączenia",
+    sshAuthFailed: "Uwierzytelnianie SSH nieudane",
+    sshConnectionFailed: "Połączenie SSH nieudane",
+    fingerprintMismatch:
+      "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Ustaw acknowledgeNewFingerprint=true.",
     notImplemented: {
       test: "Backend SSH jeszcze nie zaimplementowany. Nie można testować połączeń zdalnych.",
     },

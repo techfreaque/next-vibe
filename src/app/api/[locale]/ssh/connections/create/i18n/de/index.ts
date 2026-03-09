@@ -3,7 +3,7 @@ export const translations = {
 
   errors: {
     sshSecretKeyNotSet:
-      "SSH_SECRET_KEY nicht gesetzt. Fügen Sie einen 32-Byte-Hex-Wert hinzu.",
+      "SSH_SECRET_KEY Umgebungsvariable nicht gesetzt. Fügen Sie einen 32-Byte-Hex-Wert hinzu.",
     encryptionFailed:
       "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
     noRowReturned: "Kein Datensatz von der Einfügung zurückgegeben",
@@ -11,83 +11,107 @@ export const translations = {
 
   post: {
     title: "SSH-Verbindung erstellen",
-    description: "Neue SSH-Verbindungskonfiguration speichern",
+    description:
+      "Neue SSH-Verbindung speichern. Zugangsdaten werden mit AES-256-GCM verschlüsselt.",
     fields: {
       label: {
         label: "Name",
-        description: "Freundlicher Name für diese Verbindung",
+        description:
+          "Ein freundlicher Name zur Identifikation dieser Verbindung",
         placeholder: "prod-web-01",
       },
       host: {
-        label: "Host",
-        description: "SSH-Server-Hostname oder IP",
+        label: "Hostname / IP",
+        description: "SSH-Server-Hostname oder IP-Adresse",
         placeholder: "192.168.1.1",
       },
-      port: { label: "Port", description: "SSH-Port", placeholder: "22" },
+      port: {
+        label: "Port",
+        description: "SSH-Server-Port (Standard: 22)",
+        placeholder: "22",
+      },
       username: {
         label: "Benutzername",
-        description: "SSH-Benutzername",
+        description: "SSH-Benutzer für die Authentifizierung",
         placeholder: "deploy",
       },
       authType: {
-        label: "Authentifizierungstyp",
-        description: "Authentifizierungsmethode",
-        placeholder: "",
+        label: "Authentifizierungsmethode",
+        description:
+          "Passwort: einfaches Passwort-Login. Privater Schlüssel: PEM-Schlüsseldatei. SSH-Agent: Systemagent (SSH_AUTH_SOCK) verwenden.",
       },
       secret: {
-        label: "Geheimnis",
-        description: "Passwort oder PEM-Privatschlüssel",
+        label: "Passwort / Privater Schlüssel",
+        description:
+          "Für Passwort-Auth: das Passwort. Für Privaten Schlüssel: den vollständigen PEM-Schlüssel einfügen. Für SSH-Agent: leer lassen.",
         placeholder: "",
       },
       passphrase: {
-        label: "Passphrase",
-        description: "Passphrase für PEM-Schlüssel (falls verschlüsselt)",
+        label: "Schlüssel-Passphrase",
+        description:
+          "Falls der private Schlüssel mit einer Passphrase geschützt ist, hier eingeben. Leer lassen wenn unverschlüsselt.",
         placeholder: "",
       },
       isDefault: {
-        label: "Standardverbindung",
-        description: "Als Standard für KI-Sitzungen verwenden",
-        placeholder: "",
+        label: "Als Standardverbindung setzen",
+        description:
+          "Diese Verbindung standardmäßig für KI-Sitzungen, Terminal und Befehle verwenden.",
       },
       notes: {
         label: "Notizen",
-        description: "Optionale Notizen zu dieser Verbindung",
-        placeholder: "",
+        description: "Optionale interne Notizen zu dieser Verbindung",
+        placeholder: "VPS hinter NAT, Jump-Host erforderlich",
       },
+    },
+    response: {
+      id: { title: "Verbindungs-ID" },
     },
     errors: {
       validation: {
         title: "Validierungsfehler",
-        description: "Ungültige Parameter",
+        description: "Felder prüfen und erneut versuchen",
       },
       unauthorized: {
         title: "Nicht autorisiert",
         description: "Admin-Zugang erforderlich",
       },
-      forbidden: { title: "Verboten", description: "Keine Berechtigung" },
+      forbidden: {
+        title: "Verboten",
+        description: "Keine Berechtigung zum Erstellen von Verbindungen",
+      },
       server: {
         title: "Serverfehler",
-        description: "Verbindung konnte nicht erstellt werden",
+        description: "Verbindung konnte nicht gespeichert werden",
       },
-      notFound: { title: "Nicht gefunden", description: "Nicht gefunden" },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Ressource nicht gefunden",
+      },
       unknown: {
         title: "Unbekannter Fehler",
-        description: "Unerwarteter Fehler",
+        description: "Unerwarteter Fehler aufgetreten",
       },
-      unsavedChanges: { title: "Nicht gespeicherte Änderungen" },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
       conflict: {
-        title: "Konflikt",
-        description: "Verbindung mit diesem Namen existiert bereits",
+        title: "Name bereits vergeben",
+        description: "Eine Verbindung mit diesem Namen existiert bereits",
       },
       network: {
         title: "Netzwerkfehler",
-        description: "Netzwerkfehler aufgetreten",
+        description: "Server konnte nicht erreicht werden",
       },
       timeout: { title: "Timeout", description: "Zeitlimit überschritten" },
     },
     success: {
-      title: "Verbindung erstellt",
+      title: "Verbindung gespeichert",
       description: "SSH-Verbindung erfolgreich gespeichert",
+    },
+    submitButton: {
+      text: "Verbindung speichern",
+      loadingText: "Speichert...",
     },
   },
   widget: {

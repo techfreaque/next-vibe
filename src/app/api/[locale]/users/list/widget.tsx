@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
@@ -192,7 +191,6 @@ export function UsersListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const isTouch = useTouchDevice();
-  const router = useRouter();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const usersT = usersScopedTranslation.scopedT(locale).t;
@@ -322,16 +320,22 @@ export function UsersListContainer({
   );
 
   const handleCreate = useCallback((): void => {
-    router.push(`/${locale}/admin/users/create`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const createDef = await import("../create/definition");
+      navigate(createDef.default.POST);
+    })();
+  }, [navigate]);
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
   }, [endpointMutations]);
 
   const handleViewStats = useCallback((): void => {
-    router.push(`/${locale}/admin/users/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const statsDef = await import("../stats/definition");
+      navigate(statsDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleCreditHistory = useCallback(
     async (userId: string): Promise<void> => {

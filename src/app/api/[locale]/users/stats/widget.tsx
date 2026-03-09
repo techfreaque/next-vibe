@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
@@ -20,7 +19,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import {
   useWidgetContext,
   useWidgetForm,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -144,8 +143,7 @@ export function UsersStatsContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
-  const locale = useWidgetLocale();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
@@ -158,12 +156,18 @@ export function UsersStatsContainer({
   }, [endpointMutations]);
 
   const handleViewUsers = useCallback((): void => {
-    router.push(`/${locale}/admin/users/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("../list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleCreateUser = useCallback((): void => {
-    router.push(`/${locale}/admin/users/create`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const createDef = await import("../create/definition");
+      navigate(createDef.default.POST);
+    })();
+  }, [navigate]);
 
   const handleApplyFilters = useCallback((): void => {
     if (onSubmit) {

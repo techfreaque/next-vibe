@@ -3,6 +3,12 @@ export const translations = {
 
   errors: {
     connectionNotFound: "Connection not found",
+    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    connectTimeout: "Connection timed out",
+    sshAuthFailed: "SSH authentication failed",
+    sshConnectionFailed: "SSH connection failed",
+    fingerprintMismatch:
+      "Host fingerprint has changed. Potential MITM attack. Use acknowledgeNewFingerprint=true to proceed.",
     notImplemented: {
       test: "SSH backend not yet implemented. Cannot test remote connections yet.",
     },

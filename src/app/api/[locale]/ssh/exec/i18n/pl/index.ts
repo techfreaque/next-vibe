@@ -5,6 +5,14 @@ export const translations = {
     invalidWorkingDir:
       "Nieprawidłowy katalog roboczy: musi być ścieżką bezwzględną bez segmentów '..'",
     commandTimedOut: "Polecenie przekroczyło limit czasu",
+    connectionNotFound: "Połączenie nie znalezione",
+    encryptionFailed:
+      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
+    connectTimeout: "Przekroczono limit czasu połączenia",
+    sshAuthFailed: "Uwierzytelnianie SSH nieudane",
+    sshConnectionFailed: "Połączenie SSH nieudane",
+    fingerprintMismatch:
+      "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Ustaw acknowledgeNewFingerprint=true.",
     notImplemented: {
       local:
         "Backend SSH jeszcze nie zaimplementowany. Zostaw connectionId puste aby uruchomić lokalnie.",

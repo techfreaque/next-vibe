@@ -7,21 +7,20 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
+  customWidgetObject,
   scopedRequestField,
   scopedResponseField,
-  scopedSubmitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
+import { AdminAddCreditsContainer } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -34,14 +33,10 @@ const { POST } = createEndpoint({
   tags: ["adminAdd.post.tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "adminAdd.post.container.title" as const,
-    description: "adminAdd.post.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: AdminAddCreditsContainer,
+    usage: { request: "data", response: true } as const,
     children: {
-      // === REQUEST BODY ===
       targetUserId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
@@ -51,7 +46,6 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().uuid(),
       }),
-
       amount: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -61,14 +55,6 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.coerce.number().int().positive(),
       }),
-
-      submitButton: scopedSubmitButton(scopedTranslation, {
-        label: "adminAdd.post.title" as const,
-        inline: true,
-        usage: { request: "data" },
-      }),
-
-      // === RESPONSE ===
       message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "adminAdd.post.response.message.content" as const,

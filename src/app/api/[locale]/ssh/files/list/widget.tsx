@@ -6,9 +6,11 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Folder } from "next-vibe-ui/ui/icons/Folder";
+import { Home } from "next-vibe-ui/ui/icons/Home";
 import { Link } from "next-vibe-ui/ui/icons/Link";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
@@ -72,46 +74,84 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
     [currentPath, form, onSubmit],
   );
 
+  const handleGoUp = useCallback((): void => {
+    if (currentPath === "~" || currentPath === "/") {
+      return;
+    }
+    const parent = currentPath.includes("/")
+      ? currentPath.slice(0, currentPath.lastIndexOf("/")) || "/"
+      : "~";
+    form?.setValue("path", parent);
+    onSubmit?.();
+  }, [currentPath, form, onSubmit]);
+
+  const handleGoHome = useCallback((): void => {
+    form?.setValue("path", "~");
+    onSubmit?.();
+  }, [form, onSubmit]);
+
   const handleRefresh = useCallback((): void => {
     onSubmit?.();
   }, [onSubmit]);
 
+  const canGoUp = currentPath !== "~" && currentPath !== "/";
   const pathParts = currentPath.replace(/^~/, "~").split("/").filter(Boolean);
 
   return (
     <Div className="flex flex-col gap-0 h-full min-h-[400px]">
       {/* Header */}
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
-        <Folder className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {t("widget.title")}
-        </Span>
+      <Div className="flex items-center gap-1 px-3 py-2 border-b">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleGoUp}
+          disabled={!canGoUp || isLoading}
+          title="Go up"
+          className="h-7 w-7 p-0"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleGoHome}
+          disabled={isLoading}
+          title="Home"
+          className="h-7 w-7 p-0"
+        >
+          <Home className="h-3.5 w-3.5" />
+        </Button>
+        {/* Breadcrumb */}
+        <Div className="flex items-center gap-1 flex-1 overflow-x-auto text-xs px-1">
+          {pathParts.map((part, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && (
+                <ChevronRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+              )}
+              <Span className="font-mono whitespace-nowrap">{part}</Span>
+            </React.Fragment>
+          ))}
+          {pathParts.length === 0 && (
+            <Span className="font-mono text-muted-foreground">
+              {t("widget.home")}
+            </Span>
+          )}
+        </Div>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
           disabled={isLoading}
+          title="Refresh"
+          className="h-7 w-7 p-0 flex-shrink-0"
         >
-          <RefreshCw className="h-3.5 w-3.5" />
+          <RefreshCw
+            className={`h-3.5 w-3.5${isLoading ? " animate-spin" : ""}`}
+          />
         </Button>
-      </Div>
-
-      {/* Breadcrumb */}
-      <Div className="flex items-center gap-1 px-4 py-2 border-b bg-muted/20 text-xs flex-wrap">
-        {pathParts.map((part, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && (
-              <ChevronRight className="h-3 w-3 text-muted-foreground" />
-            )}
-            <Span className="font-mono">{part}</Span>
-          </React.Fragment>
-        ))}
-        {pathParts.length === 0 && (
-          <Span className="font-mono text-muted-foreground">
-            {t("widget.home")}
-          </Span>
-        )}
       </Div>
 
       {/* File list */}

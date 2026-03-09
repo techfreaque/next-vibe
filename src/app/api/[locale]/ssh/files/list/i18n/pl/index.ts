@@ -5,6 +5,14 @@ export const translations = {
     invalidPath:
       "Nieprawidłowa ścieżka: musi być bezwzględna bez segmentów '..'",
     directoryNotFound: "Katalog nie znaleziony",
+    connectionNotFound: "Połączenie nie znalezione",
+    encryptionFailed:
+      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
+    connectTimeout: "Przekroczono limit czasu połączenia",
+    sshAuthFailed: "Uwierzytelnianie SSH nieudane",
+    sshConnectionFailed: "Połączenie SSH nieudane",
+    fingerprintMismatch:
+      "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Ustaw acknowledgeNewFingerprint=true.",
     notImplemented: {
       fileList:
         "Backend SSH jeszcze nie zaimplementowany dla listowania plików",

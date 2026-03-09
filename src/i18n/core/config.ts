@@ -2,6 +2,7 @@
 // TYPES
 
 import { allTranslations, languageConfig, languageDefaults } from "../../i18n";
+import type { TranslationKey } from "./static-types";
 
 // ----------------
 export type Countries = keyof typeof languageConfig.countries;
@@ -37,28 +38,24 @@ export const LanguagesArr = ["de", "pl", "en"] as const;
  * Countries Options for select fields
  * Maps country codes to translation keys for UI display
  */
-export const CountriesOptions = [
-  {
-    value: Countries.GLOBAL,
-    label: "app.common.countries.global" as const,
-  },
-  { value: Countries.DE, label: "app.common.countries.de" as const },
-  { value: Countries.PL, label: "app.common.countries.pl" as const },
-  { value: Countries.US, label: "app.common.countries.us" as const },
-];
+export const CountriesOptions: Array<{ value: string; label: TranslationKey }> =
+  [
+    { value: Countries.GLOBAL, label: "app.common.countries.global" },
+    { value: Countries.DE, label: "app.common.countries.de" },
+    { value: Countries.PL, label: "app.common.countries.pl" },
+    { value: Countries.US, label: "app.common.countries.us" },
+  ];
 
 /**
  * Languages Options for select fields
  * Maps language codes to translation keys for UI display
  */
-export const LanguagesOptions = [
-  {
-    value: Languages.EN,
-    label: "app.common.languages.en" as const,
-  },
-  { value: Languages.DE, label: "app.common.languages.de" as const },
-  { value: Languages.PL, label: "app.common.languages.pl" as const },
-];
+export const LanguagesOptions: Array<{ value: string; label: TranslationKey }> =
+  [
+    { value: Languages.EN, label: "app.common.languages.en" },
+    { value: Languages.DE, label: "app.common.languages.de" },
+    { value: Languages.PL, label: "app.common.languages.pl" },
+  ];
 
 /**
  * Country Filter Enum

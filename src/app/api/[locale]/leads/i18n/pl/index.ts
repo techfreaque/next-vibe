@@ -228,12 +228,18 @@ export const translations: typeof enTranslations = {
       uncensoredConvert: "Niecenzurowana konwersja",
       sideHustle: "Dodatkowy zarobek",
       quietRecommendation: "Cicha rekomendacja",
+      signupNurture: "Pielęgnacja po rejestracji",
+      retention: "Utrzymanie klienta",
+      winback: "Odzyskanie klienta",
     },
     emailJourneyVariantFilter: {
       all: "Wszystkie",
       uncensoredConvert: "Niecenzurowana konwersja",
       sideHustle: "Dodatkowy zarobek",
       quietRecommendation: "Cicha rekomendacja",
+      signupNurture: "Pielęgnacja po rejestracji",
+      retention: "Utrzymanie klienta",
+      winback: "Odzyskanie klienta",
     },
     sortOrder: {
       asc: "Rosnąco",

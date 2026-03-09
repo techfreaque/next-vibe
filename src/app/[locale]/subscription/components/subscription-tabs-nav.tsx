@@ -17,11 +17,13 @@ import { simpleT } from "@/i18n/core/shared";
 interface SubscriptionTabsNavProps {
   locale: CountryLanguage;
   activeTab: string;
+  isAdmin: boolean;
 }
 
 export function SubscriptionTabsNav({
   locale,
   activeTab,
+  isAdmin,
 }: SubscriptionTabsNavProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -41,7 +43,9 @@ export function SubscriptionTabsNav({
       value: "buy",
       href: `/${locale}/subscription/buy`,
       icon: ShoppingCart,
-      label: t("app.subscription.subscription.tabs.buy"),
+      label: isAdmin
+        ? t("app.subscription.subscription.tabs.adminBuy")
+        : t("app.subscription.subscription.tabs.buy"),
     },
     {
       value: "history",

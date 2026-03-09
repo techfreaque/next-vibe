@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
@@ -28,6 +27,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import {
   useWidgetContext,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -273,7 +273,7 @@ function ThreadPanel({
   widgetLocale: string;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element | null {
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const [threadMessages, setThreadMessages] = useState<ThreadMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -331,10 +331,13 @@ function ThreadPanel({
   const handleNavigate = useCallback(
     (id: string): void => {
       if (id !== email.id) {
-        router.push(`/${widgetLocale}/admin/emails/imap/messages/${id}`);
+        void (async (): Promise<void> => {
+          const def = await import("./definition");
+          navigate(def.default.GET, { urlPathParams: { id } });
+        })();
       }
     },
-    [router, widgetLocale, email.id],
+    [navigate, email.id],
   );
 
   // Only show if there's a thread with multiple messages
@@ -403,7 +406,6 @@ export function ImapMessageDetailContainer({
   const email = field.value?.message;
   const t = useWidgetTranslation<typeof definition.GET>();
   const { locale, logger, user } = useWidgetContext();
-  const widgetLocale = useWidgetLocale();
   const isLoading = field.value === null || field.value === undefined;
 
   const [isRead, setIsRead] = useState<boolean>(false);
@@ -500,10 +502,17 @@ export function ImapMessageDetailContainer({
     })();
   }, [email, isFlagged, isUpdating, locale, logger, user]);
 
-  const router = useRouter();
+  const { push: navigate, canGoBack, pop } = useWidgetNavigation();
   const handleBack = useCallback((): void => {
-    router.push(`/${widgetLocale}/admin/emails/imap/messages`);
-  }, [router, widgetLocale]);
+    if (canGoBack) {
+      pop();
+    } else {
+      void (async (): Promise<void> => {
+        const listDef = await import("../list/definition");
+        navigate(listDef.default.GET);
+      })();
+    }
+  }, [navigate, canGoBack, pop]);
 
   return (
     <Div className="flex flex-col gap-0 min-h-0">

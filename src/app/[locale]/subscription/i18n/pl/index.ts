@@ -196,10 +196,39 @@ export const translations: typeof enTranslations = {
     tabs: {
       overview: "Przegląd",
       buy: "Kup kredyty",
+      adminBuy: "Zarządzaj kredytami",
       billing: "Rozliczenia",
       history: "Historia",
       plans: "Plany",
       remote: "Synchronizacja",
+    },
+    admin: {
+      title: "Kredyty i Limity",
+      description:
+        "Zarządzaj przydziałami kredytów i limitami użycia tej instancji",
+      allocate: {
+        title: "Przydziel kredyty",
+        description:
+          "Dodaj kredyty do dowolnego konta użytkownika. Kredyty działają jako limit wydatków — kontrolują, ile użycia AI jest dozwolone.",
+        howItWorks: {
+          title: "Jak działają limity kredytów",
+          freePool: {
+            title: "Darmowa pula (współdzielona)",
+            description:
+              "Wszyscy użytkownicy współdzielą pulę darmowych kredytów, która jest odnawiana miesięcznie.",
+          },
+          bonus: {
+            title: "Kredyty bonusowe (na użytkownika)",
+            description:
+              "Kredyty bonusowe są stałe — nigdy nie wygasają i sumują się z kredytami z puli.",
+          },
+          apiKeys: {
+            title: "Usuń wszystkie limity",
+            description:
+              "Skonfiguruj własne klucze API LLM w ustawieniach, aby całkowicie ominąć kredyty.",
+          },
+        },
+      },
     },
     payment: {
       success: {

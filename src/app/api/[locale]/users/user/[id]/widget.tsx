@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
@@ -85,7 +84,6 @@ export function UserDetailContainer({
   const data = field.value;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const router = useRouter();
   const { push: navigate } = useWidgetNavigation();
   const isLoading = !data;
   const [copiedId, setCopiedId] = useState(false);
@@ -136,30 +134,52 @@ export function UserDetailContainer({
     if (!userId) {
       return;
     }
-    router.push(`/${locale}/admin/users/${userId}/credits`);
-  }, [router, locale, userId]);
+    void (async (): Promise<void> => {
+      const defs = await import("./definition");
+      navigate(defs.default.GET, { urlPathParams: { id: userId } });
+    })();
+  }, [navigate, userId]);
 
   const handleViewLead = useCallback((): void => {
     if (!leadId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/${leadId}/edit`);
-  }, [router, locale, leadId]);
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
+    })();
+  }, [navigate, leadId]);
 
   const handleFullProfile = useCallback((): void => {
     if (!userId) {
       return;
     }
-    router.push(`/${locale}/admin/users/${userId}/profile`);
-  }, [router, locale, userId]);
+    void (async (): Promise<void> => {
+      const defs = await import("./definition");
+      navigate(defs.default.GET, { urlPathParams: { id: userId } });
+    })();
+  }, [navigate, userId]);
 
   const handleReferralStats = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/referrals`);
-  }, [router, locale, userId]);
+    if (!userId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const defs = await import("./definition");
+      navigate(defs.default.GET, { urlPathParams: { id: userId } });
+    })();
+  }, [navigate, userId]);
 
   const handleSubscription = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/subscription`);
-  }, [router, locale, userId]);
+    if (!userId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const defs = await import("./definition");
+      navigate(defs.default.GET, { urlPathParams: { id: userId } });
+    })();
+  }, [navigate, userId]);
 
   const handleCopyUserId = useCallback((): void => {
     if (!userId) {
@@ -437,7 +457,7 @@ export function UserEditContainer({
   const data = field.value;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const isLoading = data === null || data === undefined;
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLeadId, setCopiedLeadId] = useState(false);
@@ -485,8 +505,12 @@ export function UserEditContainer({
     if (!leadId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/${leadId}/edit`);
-  }, [router, locale, leadId]);
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
+    })();
+  }, [navigate, leadId]);
 
   return (
     <Div className="flex flex-col gap-0">

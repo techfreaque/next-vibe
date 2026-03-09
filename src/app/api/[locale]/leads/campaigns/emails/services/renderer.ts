@@ -21,8 +21,11 @@ import {
 import type { LeadWithEmailType } from "../../../types";
 import { scopedTranslation } from "../journeys/i18n";
 import { quietRecommendationJourneyTemplates } from "../journeys/quiet-recommendation.email";
+import { retentionJourneyTemplates } from "../journeys/retention.email";
 import { sideHustleJourneyTemplates } from "../journeys/side-hustle.email";
+import { signupNurtureJourneyTemplates } from "../journeys/signup-nurture.email";
 import { uncensoredConvertJourneyTemplates } from "../journeys/uncensored-convert.email";
+import { winbackJourneyTemplates } from "../journeys/winback.email";
 import type {
   EmailTemplateData,
   EmailTemplateFunction,
@@ -147,10 +150,15 @@ const JOURNEY_TEMPLATES: Partial<
     JourneyTemplateMap
   >
 > = {
+  // Cold lead A/B test variants
   [EmailJourneyVariant.UNCENSORED_CONVERT]: uncensoredConvertJourneyTemplates,
   [EmailJourneyVariant.SIDE_HUSTLE]: sideHustleJourneyTemplates,
   [EmailJourneyVariant.QUIET_RECOMMENDATION]:
     quietRecommendationJourneyTemplates,
+  // Post-conversion campaign variants
+  [EmailJourneyVariant.SIGNUP_NURTURE]: signupNurtureJourneyTemplates,
+  [EmailJourneyVariant.RETENTION]: retentionJourneyTemplates,
+  [EmailJourneyVariant.WINBACK]: winbackJourneyTemplates,
 };
 
 /**

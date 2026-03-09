@@ -17,7 +17,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import {
+  getConnectionCredentials,
+  openSshClient,
+  sshExecCommand,
+} from "../client";
 import { ExecBackend, SshCommandStatus } from "../enum";
 import type { SshExecRequestOutput, SshExecResponseOutput } from "./definition";
 import type { scopedTranslation } from "./i18n";
@@ -62,6 +68,7 @@ export class SshExecRepository {
   static async exec(
     data: SshExecRequestOutput,
     logger: EndpointLogger,
+    user: JwtPayloadType,
     t: ModuleT,
   ): Promise<ResponseType<SshExecResponseOutput>> {
     const timeoutMs = data.timeoutMs ?? LOCAL_DEFAULT_TIMEOUT_MS;
@@ -76,11 +83,14 @@ export class SshExecRepository {
     }
 
     if (data.connectionId) {
-      // SSH backend — not yet implemented
-      return fail({
-        message: t("errors.notImplemented.local"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
+      return SshExecRepository.execSsh(
+        data.connectionId,
+        command,
+        timeoutMs,
+        user,
+        logger,
+        t,
+      );
     }
 
     // LOCAL backend
@@ -167,6 +177,91 @@ export class SshExecRepository {
         backend: ExecBackend.LOCAL,
         truncated: stdoutTruncated || stderrTruncated,
       });
+    }
+  }
+
+  private static async execSsh(
+    connectionId: string,
+    command: string,
+    timeoutMs: number,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<SshExecResponseOutput>> {
+    const credsResult = await getConnectionCredentials(
+      connectionId,
+      user.id!,
+      t,
+    );
+    if (!credsResult.success) {
+      return fail({
+        message: credsResult.message,
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    const clientResult = await openSshClient(credsResult.data, t);
+    if (!clientResult.success) {
+      return fail({
+        message: clientResult.message,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const { client } = clientResult.data;
+    const start = Date.now();
+
+    try {
+      logger.info(
+        `Running SSH command on ${credsResult.data.host}: ${command.slice(0, 200)}`,
+      );
+      const {
+        stdout: rawStdout,
+        stderr: rawStderr,
+        exitCode,
+      } = await sshExecCommand(client, command, timeoutMs);
+
+      const durationMs = Date.now() - start;
+      const { value: stdout, truncated: stdoutTruncated } = capOutput(
+        rawStdout,
+        LOCAL_MAX_OUTPUT_BYTES,
+      );
+      const { value: stderr, truncated: stderrTruncated } = capOutput(
+        rawStderr,
+        LOCAL_MAX_OUTPUT_BYTES,
+      );
+
+      logger.debug(
+        `SSH command completed in ${durationMs}ms, exit ${exitCode}`,
+      );
+
+      return success({
+        stdout,
+        stderr,
+        exitCode,
+        status:
+          exitCode === 0 ? SshCommandStatus.SUCCESS : SshCommandStatus.ERROR,
+        durationMs,
+        backend: ExecBackend.SSH,
+        truncated: stdoutTruncated || stderrTruncated,
+      });
+    } catch (error) {
+      const durationMs = Date.now() - start;
+      const msg = String(parseError(error));
+      if (msg.includes("timed out")) {
+        logger.warn(`SSH command timed out after ${durationMs}ms`);
+        return fail({
+          message: t("errors.commandTimedOut"),
+          errorType: ErrorResponseTypes.UNKNOWN_ERROR,
+        });
+      }
+      logger.error("SSH exec failed", msg);
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    } finally {
+      client.end();
     }
   }
 }

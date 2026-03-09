@@ -116,7 +116,7 @@ export default async function LeadsEmailsPage({
 
                         <Button asChild className="w-full">
                           <Link
-                            href={`/${locale}/admin/leads/emails/${journey.variant}/${stage}`}
+                            href={`/${locale}/admin/email-campaigns/journeys/${journey.variant}/${stage}`}
                           >
                             {t(
                               "app.admin.leads.leads.admin.emails.view_preview",

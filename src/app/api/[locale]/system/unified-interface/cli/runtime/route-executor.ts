@@ -255,6 +255,7 @@ export class RouteDelegationHandler {
                   currentToolMessageId: undefined,
                   waitingForRemoteResult: undefined,
                   favoriteId: undefined,
+                  abortSignal: undefined,
                 },
               });
             return result;
@@ -399,6 +400,7 @@ export class RouteDelegationHandler {
             currentToolMessageId: undefined,
             waitingForRemoteResult: undefined,
             favoriteId: undefined,
+            abortSignal: undefined,
           },
         });
 

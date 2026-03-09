@@ -21,7 +21,12 @@ export function SshTerminalPageClient({
       user={user}
       endpointOptions={{
         read: {
-          queryOptions: { enabled: true, staleTime: 0 },
+          queryOptions: {
+            enabled: true,
+            staleTime: Infinity,
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+          },
         },
       }}
     />

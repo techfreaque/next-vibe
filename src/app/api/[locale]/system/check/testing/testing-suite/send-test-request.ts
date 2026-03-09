@@ -126,6 +126,7 @@ export async function sendTestRequest<
         currentToolMessageId: undefined,
         waitingForRemoteResult: undefined,
         favoriteId: undefined,
+        abortSignal: undefined,
       },
     });
 

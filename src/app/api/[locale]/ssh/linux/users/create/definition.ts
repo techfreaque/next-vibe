@@ -18,6 +18,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { LoginShell, LoginShellDB, LoginShellOptions } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 import { LinuxUserCreateContainer } from "./widget";
 
@@ -36,6 +37,14 @@ export const { POST } = createEndpoint({
     render: LinuxUserCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
+      connectionId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.connectionId.label",
+        description: "post.fields.connectionId.description",
+        placeholder: "post.fields.connectionId.placeholder",
+        schema: z.string().uuid().optional(),
+      }),
       username: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -58,11 +67,11 @@ export const { POST } = createEndpoint({
       }),
       loginShell: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "post.fields.shell.label",
         description: "post.fields.shell.description",
-        placeholder: "post.fields.shell.placeholder",
-        schema: z.string().optional(),
+        options: LoginShellOptions,
+        schema: z.enum(LoginShellDB).optional().default(LoginShell.BASH),
       }),
       homeDir: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

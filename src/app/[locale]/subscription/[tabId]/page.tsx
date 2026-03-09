@@ -12,7 +12,10 @@ import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -39,7 +42,13 @@ export default async function SubscriptionPage({
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
   // Get user
-  const userResponse = await UserRepository.getUserByAuth({}, locale, logger);
+  const userResponse = await UserRepository.getUserByAuth(
+    {
+      roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
+    },
+    locale,
+    logger,
+  );
   if (!userResponse.success) {
     notFound();
   }

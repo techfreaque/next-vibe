@@ -5,11 +5,26 @@ export const translations = {
     localModeOnly: {
       title: "Nur im lokalen Modus verfügbar",
     },
+    connectionNotFound: "Verbindung nicht gefunden",
+    encryptionFailed:
+      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
+    connectTimeout: "Verbindung hat Zeitlimit überschritten",
+    sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
+    sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",
+    fingerprintMismatch:
+      "Host-Fingerabdruck hat sich geändert. Möglicher MITM-Angriff. acknowledgeNewFingerprint=true setzen.",
   },
 
   get: {
     title: "Linux-Benutzer auflisten",
     description: "OS-Benutzerkonten auf dem Host auflisten (uid >= 1000)",
+    fields: {
+      connectionId: {
+        label: "Verbindung",
+        description: "SSH-Verbindung (leer lassen für lokal)",
+        placeholder: "uuid",
+      },
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

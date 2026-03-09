@@ -8,20 +8,20 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
+  customWidgetObject,
   scopedRequestField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { PublicCapContainer, PublicCapUpdateContainer } from "./widget";
 
 // ── GET ───────────────────────────────────────────────────────────────────
 
@@ -37,12 +37,9 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.container.title",
-    description: "get.container.description",
-    layoutType: LayoutType.GRID_2_COLUMNS,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: PublicCapContainer,
+    usage: { response: true } as const,
     children: {
       spendToday: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -149,10 +146,9 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: PublicCapUpdateContainer,
+    usage: { request: "data", response: true } as const,
     children: {
       capAmount: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -160,8 +156,8 @@ const { POST } = createEndpoint({
         label: "post.capAmount.label",
         description: "post.capAmount.description",
         placeholder: "post.capAmount.placeholder",
-        schema: z.number().positive(),
-        columns: 6,
+        schema: z.coerce.number().positive(),
+        columns: 12,
       }),
       message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,

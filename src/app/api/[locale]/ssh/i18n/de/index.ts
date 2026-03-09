@@ -1,6 +1,23 @@
 export const translations = {
   category: "SSH",
   type: "SSH",
+
+  enums: {
+    authType: {
+      password: "Passwort",
+      privateKey: "Privater Schlüssel (PEM)",
+      keyAgent: "SSH-Agent",
+    },
+    shell: {
+      bash: "/bin/bash",
+      zsh: "/usr/bin/zsh",
+      sh: "/bin/sh",
+      fish: "/usr/bin/fish",
+      dash: "/bin/dash",
+      nologin: "/usr/sbin/nologin (kein Login)",
+    },
+  },
+
   errors: {
     localModeOnly: {
       title: "Nur im lokalen Modus",
@@ -27,6 +44,13 @@ export const translations = {
       fileWrite: "SSH-Backend für Dateischreiben noch nicht implementiert",
       session: "SSH-PTY-Sitzungen noch nicht implementiert.",
     },
+    fingerprintMismatch:
+      "Host-Fingerabdruck hat sich geändert. Möglicher MITM-Angriff. acknowledgeNewFingerprint=true setzen.",
+    noDefaultConnection:
+      "Keine Standard-SSH-Verbindung konfiguriert. Verbindung erstellen und als Standard setzen.",
+    sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",
+    sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
+    connectTimeout: "Verbindung hat Zeitlimit überschritten",
     invalidWorkingDir:
       "Ungültiges Arbeitsverzeichnis: muss absoluter Pfad ohne '..' sein",
     invalidPath: "Ungültiger Pfad: muss absolut ohne '..' sein",

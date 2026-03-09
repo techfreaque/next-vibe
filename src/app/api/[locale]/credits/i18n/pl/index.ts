@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
       adminTitle: "Limit wydatków",
       description: "Używaj kredytów w {{modelCount}} modelach AI",
       adminDescription:
-        "Kredyty działają jako limit wydatków — kontroluj dozwolone użycie AI. Użyj własnych kluczy API, aby całkowicie usunąć limity.",
+        "Kredyty działają jako limit wydatków — kontroluj dozwolone użycie AI przez wszystkich użytkowników.",
       credit: "{{count}} kredyt",
       credits: "{{count}} kredytów",
       expiring: {
@@ -168,8 +168,9 @@ export const translations: typeof enTranslations = {
           "Zarobione przez polecenia — kliknij, aby zaprosić znajomych",
       },
       spending: {
-        title: "Zarobione kredyty",
-        adminDescription: "Kredyty zarobione przez polecenia",
+        title: "Twoje zarobione kredyty",
+        adminDescription:
+          "Twoje osobiste zarobki z poleceń (nie dla całej instancji)",
       },
     },
     total: {
@@ -359,7 +360,9 @@ export const translations: typeof enTranslations = {
       tag: "admin",
       container: {
         title: "Dodaj kredyty użytkownikowi",
-        description: "Przyznaj pakiety kredytów konkretnemu użytkownikowi",
+        description: "Przyznaj bonusowe kredyty konkretnemu kontu użytkownika",
+        selfTitle: "Dodaj kredyty do swojego konta",
+        selfDescription: "Przyznaj sobie bonusowe kredyty",
       },
       targetUserId: {
         label: "ID użytkownika docelowego",

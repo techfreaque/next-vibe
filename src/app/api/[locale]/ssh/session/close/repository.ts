@@ -19,7 +19,12 @@ export class SessionCloseRepository {
     const entry = sessionPool.get(data.sessionId);
     if (entry) {
       clearTimeout(entry.idleTimer);
-      entry.proc.kill();
+      if (entry.kind === "local") {
+        entry.proc.kill();
+      } else {
+        entry.channel.close();
+        entry.client.end();
+      }
       sessionPool.delete(data.sessionId);
       logger.info(`Closed session ${data.sessionId}`);
     }

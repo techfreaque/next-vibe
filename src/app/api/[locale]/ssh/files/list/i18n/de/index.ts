@@ -4,6 +4,14 @@ export const translations = {
   errors: {
     invalidPath: "Ungültiger Pfad: Muss absolut sein ohne '..' Segmente",
     directoryNotFound: "Verzeichnis nicht gefunden",
+    connectionNotFound: "Verbindung nicht gefunden",
+    encryptionFailed:
+      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
+    connectTimeout: "Verbindung hat Zeitlimit überschritten",
+    sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
+    sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",
+    fingerprintMismatch:
+      "Host-Fingerabdruck hat sich geändert. Möglicher MITM-Angriff. acknowledgeNewFingerprint=true setzen.",
     notImplemented: {
       fileList: "SSH-Backend noch nicht für Dateiauflistung implementiert",
     },

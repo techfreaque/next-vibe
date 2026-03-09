@@ -266,6 +266,7 @@ export class TaskExecuteRepository {
               modelId: undefined,
               headless: undefined,
               waitingForRemoteResult: undefined,
+              abortSignal: undefined,
             },
           }),
           new Promise<never>((...[, reject]) => {

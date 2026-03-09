@@ -48,5 +48,6 @@ export const translations = {
     connectPrompt: "Press Connect to start a terminal session.\n",
     prompt: "$ ",
     inputPlaceholder: "Enter command and press Enter...",
+    sendButton: "Send",
   },
 };

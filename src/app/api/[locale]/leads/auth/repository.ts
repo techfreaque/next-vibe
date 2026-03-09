@@ -316,6 +316,8 @@ export class LeadAuthRepository {
       monthStart.setDate(1);
       monthStart.setHours(0, 0, 0, 0);
 
+      // Cap at 20 — beyond that we already have enough pool links.
+      // A large unbounded VALUES clause overflows Drizzle's query AST stack.
       const sameIpLeads = await db
         .select({ id: leads.id })
         .from(leads)
@@ -326,22 +328,28 @@ export class LeadAuthRepository {
             sql`${leads.metadata}->>'ipAddress' = ${ipAddress}`,
             sql`${leads.createdAt} >= ${monthStart}`,
           ),
-        );
+        )
+        .limit(20);
 
       if (sameIpLeads.length === 0) {
         return;
       }
 
-      await db
-        .insert(leadLeadLinks)
-        .values(
-          sameIpLeads.map((existing) => ({
-            leadId1: newLeadId,
-            leadId2: existing.id,
-            linkReason: "ip_match" as const,
-          })),
-        )
-        .onConflictDoNothing();
+      // Insert in small batches to keep the VALUES clause manageable
+      const BATCH_SIZE = 10;
+      for (let i = 0; i < sameIpLeads.length; i += BATCH_SIZE) {
+        const batch = sameIpLeads.slice(i, i + BATCH_SIZE);
+        await db
+          .insert(leadLeadLinks)
+          .values(
+            batch.map((existing) => ({
+              leadId1: newLeadId,
+              leadId2: existing.id,
+              linkReason: "ip_match" as const,
+            })),
+          )
+          .onConflictDoNothing();
+      }
 
       logger.debug("Linked new lead to same-IP leads", {
         newLeadId,

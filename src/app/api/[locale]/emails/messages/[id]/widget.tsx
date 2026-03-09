@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -14,6 +13,7 @@ import React from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -73,14 +73,18 @@ export function EmailDetailContainer({
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const messagesT = messagesScopedTranslation.scopedT(locale).t;
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const isLoading = field.value === null || field.value === undefined;
 
   const handleViewLead = (): void => {
     if (!email?.leadId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/${email.leadId}/edit`);
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.GET, { urlPathParams: { id: email.leadId! } });
+    })();
   };
 
   return (

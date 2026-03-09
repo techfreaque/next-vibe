@@ -81,6 +81,20 @@ export class RouteExecuteRepository {
         }
       }
 
+      // Bail out immediately if the stream was cancelled before tool execution started.
+      // The abort signal fires when StreamRegistry.cancel() is called — any DB writes
+      // or network calls after this point would create orphaned rows.
+      if (streamContext?.abortSignal?.aborted) {
+        logger.info(
+          "[RouteExecute] Stream was cancelled before tool execution started — skipping",
+          { toolName: data.toolName },
+        );
+        return fail({
+          message: t("executeTool.post.errors.validation.title"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
       // Split prefixed tool ID: "hermes__ssh_exec_POST" → instanceId="hermes", toolName="ssh_exec_POST"
       // Prefixed form takes precedence over explicit instanceId prop
       let toolName = data.toolName;
@@ -279,6 +293,7 @@ export class RouteExecuteRepository {
             favoriteId: undefined,
             headless: undefined,
             waitingForRemoteResult: undefined,
+            abortSignal: undefined,
           },
         });
 
@@ -378,6 +393,7 @@ export class RouteExecuteRepository {
             favoriteId: undefined,
             headless: undefined,
             waitingForRemoteResult: undefined,
+            abortSignal: undefined,
           },
         });
 
@@ -469,6 +485,7 @@ export class RouteExecuteRepository {
           favoriteId: undefined,
           headless: undefined,
           waitingForRemoteResult: undefined,
+          abortSignal: undefined,
         },
       });
 

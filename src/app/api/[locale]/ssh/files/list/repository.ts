@@ -18,7 +18,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import {
+  getConnectionCredentials,
+  openSshClient,
+  sftpListDir,
+} from "../../client";
 import type {
   FilesListRequestOutput,
   FilesListResponseOutput,
@@ -43,13 +49,11 @@ export class FilesListRepository {
   static async list(
     data: FilesListRequestOutput,
     logger: EndpointLogger,
+    user: JwtPayloadType,
     t: ModuleT,
   ): Promise<ResponseType<FilesListResponseOutput>> {
     if (data.connectionId) {
-      return fail({
-        message: t("errors.notImplemented.fileList"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
+      return FilesListRepository.listSftp(data, user, logger, t);
     }
 
     const dirPath = resolvePath(data.path);
@@ -115,6 +119,57 @@ export class FilesListRepository {
         message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+  }
+
+  private static async listSftp(
+    data: FilesListRequestOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<FilesListResponseOutput>> {
+    const credsResult = await getConnectionCredentials(
+      data.connectionId!,
+      user.id!,
+      t,
+    );
+    if (!credsResult.success) {
+      return fail({
+        message: credsResult.message,
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    const clientResult = await openSshClient(credsResult.data, t);
+    if (!clientResult.success) {
+      return fail({
+        message: clientResult.message,
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const { client } = clientResult.data;
+    const dirPath = data.path ?? "~";
+
+    try {
+      logger.debug(`SFTP listing: ${dirPath} on ${credsResult.data.host}`);
+      const entries = await sftpListDir(client, dirPath);
+      return success({ entries, currentPath: dirPath });
+    } catch (error) {
+      const err = error as NodeJS.ErrnoException & { code?: string };
+      if (err.code === "ENOENT" || err.code === "ERR_SFTP_NO_SUCH_FILE") {
+        return fail({
+          message: t("errors.directoryNotFound"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      logger.error("SFTP list failed", parseError(error));
+      return fail({
+        message: t("get.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    } finally {
+      client.end();
     }
   }
 }

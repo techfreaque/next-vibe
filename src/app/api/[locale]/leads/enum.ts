@@ -71,6 +71,10 @@ export const {
   UNCENSORED_CONVERT: "enums.emailJourneyVariant.uncensoredConvert",
   SIDE_HUSTLE: "enums.emailJourneyVariant.sideHustle",
   QUIET_RECOMMENDATION: "enums.emailJourneyVariant.quietRecommendation",
+  // Post-conversion campaign variants (not A/B tested, one per campaign type)
+  SIGNUP_NURTURE: "enums.emailJourneyVariant.signupNurture",
+  RETENTION: "enums.emailJourneyVariant.retention",
+  WINBACK: "enums.emailJourneyVariant.winback",
 });
 
 export const {
@@ -82,6 +86,9 @@ export const {
   UNCENSORED_CONVERT: "enums.emailJourneyVariantFilter.uncensoredConvert",
   SIDE_HUSTLE: "enums.emailJourneyVariantFilter.sideHustle",
   QUIET_RECOMMENDATION: "enums.emailJourneyVariantFilter.quietRecommendation",
+  SIGNUP_NURTURE: "enums.emailJourneyVariantFilter.signupNurture",
+  RETENTION: "enums.emailJourneyVariantFilter.retention",
+  WINBACK: "enums.emailJourneyVariantFilter.winback",
 });
 
 /**
@@ -588,6 +595,9 @@ export const EmailJourneyVariantDB = [
   EmailJourneyVariant.UNCENSORED_CONVERT,
   EmailJourneyVariant.SIDE_HUSTLE,
   EmailJourneyVariant.QUIET_RECOMMENDATION,
+  EmailJourneyVariant.SIGNUP_NURTURE,
+  EmailJourneyVariant.RETENTION,
+  EmailJourneyVariant.WINBACK,
 ] as const;
 
 export const EmailProviderDB = [

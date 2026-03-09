@@ -4,45 +4,72 @@
 
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
+import type { JSX } from "react";
+import { useMemo } from "react";
 
-import {
-  useWidgetContext,
-  useWidgetOnSubmit,
-  useWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type endpoints from "./definition";
+import type { ConnectionCreateResponseOutput } from "./definition";
 
-export function ConnectionCreateContainer(): React.JSX.Element {
-  const t = useWidgetTranslation<typeof endpoints.POST>();
-  const onSubmit = useWidgetOnSubmit();
-  const { endpointMutations } = useWidgetContext();
-  const isLoading = endpointMutations?.read?.isLoading ?? false;
+interface CustomWidgetProps {
+  field: {
+    value: ConnectionCreateResponseOutput | null | undefined;
+  } & (typeof endpoints.POST)["fields"];
+  fieldName: string;
+}
 
-  const handleCreate = useCallback((): void => {
-    onSubmit?.();
-  }, [onSubmit]);
+export function ConnectionCreateContainer({
+  field,
+}: CustomWidgetProps): JSX.Element {
+  const children = field.children;
+  useWidgetForm<typeof endpoints.POST>();
+  const emptyField = useMemo(() => ({}), []);
 
   return (
-    <Div className="flex flex-col gap-0 h-full min-h-[300px]">
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
-        <Plus className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm mr-auto">
-          {t("widget.title")}
-        </Span>
-        <Button
-          type="button"
-          size="sm"
-          onClick={handleCreate}
-          disabled={isLoading}
-        >
-          {isLoading ? t("widget.creating") : t("widget.createButton")}
-        </Button>
+    <Div className="flex flex-col gap-0">
+      {/* Actions */}
+      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
+        <NavigateButtonWidget
+          field={{ icon: "arrow-left", variant: "outline" }}
+        />
+        <SubmitButtonWidget<typeof endpoints.POST>
+          field={{
+            text: "post.submitButton.text",
+            loadingText: "widget.creating",
+            icon: "plus",
+            variant: "primary",
+            className: "ml-auto",
+          }}
+        />
+      </Div>
+
+      {/* Scrollable form */}
+      <Div className="overflow-y-auto max-h-[min(600px,calc(100dvh-220px))] px-4 pb-4">
+        <FormAlertWidget field={emptyField} />
+
+        <Div className="flex flex-col gap-4">
+          <TextFieldWidget fieldName="label" field={children.label} />
+          <TextFieldWidget fieldName="host" field={children.host} />
+          <NumberFieldWidget fieldName="port" field={children.port} />
+          <TextFieldWidget fieldName="username" field={children.username} />
+          <TextFieldWidget fieldName="authType" field={children.authType} />
+          <TextFieldWidget fieldName="secret" field={children.secret} />
+          <TextFieldWidget fieldName="passphrase" field={children.passphrase} />
+          <BooleanFieldWidget
+            fieldName="isDefault"
+            field={children.isDefault}
+          />
+          <TextareaFieldWidget fieldName="notes" field={children.notes} />
+        </Div>
       </Div>
     </Div>
   );

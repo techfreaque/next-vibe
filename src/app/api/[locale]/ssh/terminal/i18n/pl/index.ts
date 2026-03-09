@@ -45,5 +45,6 @@ export const translations = {
     connectPrompt: "Kliknij Połącz, aby rozpocząć sesję terminala.\n",
     prompt: "$ ",
     inputPlaceholder: "Wpisz polecenie i naciśnij Enter...",
+    sendButton: "Wyślij",
   },
 };

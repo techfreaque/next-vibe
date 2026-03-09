@@ -5,6 +5,13 @@ export const translations = {
     invalidPath: "Invalid path: must be absolute without '..' segments",
     fileNotFound: "File not found",
     permissionDenied: "Permission denied",
+    connectionNotFound: "Connection not found",
+    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    connectTimeout: "Connection timed out",
+    sshAuthFailed: "SSH authentication failed",
+    sshConnectionFailed: "SSH connection failed",
+    fingerprintMismatch:
+      "Host fingerprint has changed. Potential MITM attack. Use acknowledgeNewFingerprint=true to proceed.",
     notImplemented: {
       fileRead: "SSH backend not yet implemented for file reading",
     },
