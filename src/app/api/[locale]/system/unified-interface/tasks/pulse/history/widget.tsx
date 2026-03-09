@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
@@ -28,6 +27,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -352,7 +352,7 @@ export function PulseHistoryContainer({
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -411,12 +411,18 @@ export function PulseHistoryContainer({
   }, [endpointMutations]);
 
   const handleViewStats = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../../cron/stats/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleViewHistory = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/history`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../../cron/history/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleStatusFilterChange = useCallback(
     (filter: StatusFilter): void => {

@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
@@ -27,7 +26,7 @@ import { MimeType } from "@/app/api/[locale]/leads/enum";
 import {
   useWidgetContext,
   useWidgetForm,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -65,8 +64,7 @@ export function LeadsExportContainer({
   const children = field.children;
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
-  const locale = useWidgetLocale();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
@@ -113,12 +111,19 @@ export function LeadsExportContainer({
   }, [data]);
 
   const handleViewList = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleImport = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/import`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const importDef =
+        await import("@/app/api/[locale]/leads/import/definition");
+      navigate(importDef.default.POST);
+    })();
+  }, [navigate]);
 
   const handleRunExport = useCallback((): void => {
     if (onSubmit) {

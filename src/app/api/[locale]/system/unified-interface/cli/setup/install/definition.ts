@@ -38,7 +38,6 @@ const { POST } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
     UserRole.CLI_AUTH_BYPASS,
-    UserRole.PRODUCTION_OFF,
   ],
   aliases: ["install", "setup"],
   method: Methods.POST,

@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
@@ -438,7 +437,6 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof endpoints.GET>();
-  const router = useRouter();
   const locale = useWidgetLocale();
   const { t: tTasks } = tasksScopedTranslation.scopedT(locale);
   const form = useWidgetForm<typeof endpoints.GET>();
@@ -654,8 +652,11 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   }, [endpointMutations]);
 
   const handleNavigateStats = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../stats/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleNavigateHistory = useCallback((): void => {
     void (async (): Promise<void> => {

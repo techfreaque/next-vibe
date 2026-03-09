@@ -164,7 +164,7 @@ export const { POST } = createEndpoint({
       default: {
         username: "alice",
         groups: ["www-data"],
-        loginShell: "/bin/bash",
+        loginShell: LoginShell.BASH,
         sudoAccess: false,
       },
     },

@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
@@ -29,6 +28,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -359,7 +359,7 @@ export function CronHistoryContainer({
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -431,16 +431,25 @@ export function CronHistoryContainer({
   }, [endpointMutations]);
 
   const handleViewTasks = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/tasks`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../tasks/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleViewStats = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../stats/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleViewPulse = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/pulse`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../../pulse/history/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleStatusFilterChange = useCallback(
     (filter: StatusFilter): void => {

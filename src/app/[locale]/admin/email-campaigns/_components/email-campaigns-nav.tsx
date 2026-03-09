@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { List } from "next-vibe-ui/ui/icons/List";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { TestTube } from "next-vibe-ui/ui/icons/TestTube";
@@ -33,6 +34,13 @@ export function EmailCampaignsNav({
       label: t("tabs.dashboard"),
       description: t("tabs.dashboard_description"),
       exact: true,
+    },
+    {
+      href: `/${locale}/admin/email-campaigns/queue` as const,
+      icon: List,
+      label: t("tabs.queue"),
+      description: t("tabs.queue_description"),
+      exact: false,
     },
     {
       href: `/${locale}/admin/email-campaigns/journeys` as const,

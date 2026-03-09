@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -26,6 +25,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -209,7 +209,7 @@ export function LeadsSearchContainer({
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
@@ -228,28 +228,48 @@ export function LeadsSearchContainer({
 
   const handleViewLead = useCallback(
     (lead: Lead): void => {
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigate(leadDef.default.GET, { urlPathParams: { id: lead.id } });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleEditLead = useCallback(
     (lead: Lead): void => {
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigate(leadDef.default.PATCH, {
+          urlPathParams: { id: lead.id },
+          prefillFromGet: true,
+          getEndpoint: leadDef.default.GET,
+        });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleDeleteLead = useCallback(
     (lead: Lead): void => {
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigate(leadDef.default.DELETE, { urlPathParams: { id: lead.id } });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleCreateLead = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/create`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const createDef =
+        await import("@/app/api/[locale]/leads/create/definition");
+      navigate(createDef.default.POST);
+    })();
+  }, [navigate]);
 
   // ── "Load more" – advances the offset field in the parent form ────────────
 

@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
@@ -30,7 +29,7 @@ import React from "react";
 
 import {
   useWidgetContext,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
@@ -139,8 +138,7 @@ export function LeadsImportContainer({
   const data = field.value;
   const t = useWidgetTranslation<typeof definition.POST>();
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
-  const locale = useWidgetLocale();
+  const { push: navigate } = useWidgetNavigation();
   const isLoading = endpointMutations?.create?.isSubmitting;
 
   const errors = data?.errors ?? [];
@@ -153,23 +151,41 @@ export function LeadsImportContainer({
   const hasSuccesses = (data?.successfulImports ?? 0) > 0;
 
   const handleCheckJobStatus = (jobId: string): void => {
-    router.push(`/${locale}/admin/leads/import?jobId=${jobId}`);
+    void (async (): Promise<void> => {
+      const jobDef =
+        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition");
+      navigate(jobDef.default.GET, { urlPathParams: { jobId } });
+    })();
   };
 
   const handleStopJob = (jobId: string): void => {
-    router.push(`/${locale}/admin/leads/import?jobId=${jobId}&action=stop`);
+    void (async (): Promise<void> => {
+      const stopDef =
+        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/stop/definition");
+      navigate(stopDef.default.POST, { urlPathParams: { jobId } });
+    })();
   };
 
   const handleRetryFailed = (jobId: string): void => {
-    router.push(`/${locale}/admin/leads/import?jobId=${jobId}&action=retry`);
+    void (async (): Promise<void> => {
+      const retryDef =
+        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/retry/definition");
+      navigate(retryDef.default.POST, { urlPathParams: { jobId } });
+    })();
   };
 
   const handleViewList = (): void => {
-    router.push(`/${locale}/admin/leads/list`);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
   };
 
   const handleFindLead = (): void => {
-    router.push(`/${locale}/admin/leads/list`);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
   };
 
   const progressBarColor =

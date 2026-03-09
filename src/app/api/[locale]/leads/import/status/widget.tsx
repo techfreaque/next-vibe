@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
@@ -27,7 +26,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -284,8 +283,7 @@ export function ImportStatusContainer({
   const children = field.children;
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
-  const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
 
   const form = useWidgetForm<typeof definition.GET>();
@@ -302,11 +300,19 @@ export function ImportStatusContainer({
   // ---------------------------------------------------------------------------
 
   const handleViewJob = (jobId: string): void => {
-    router.push(`/${locale}/admin/leads/import?jobId=${jobId}`);
+    void (async (): Promise<void> => {
+      const jobDef =
+        await import("@/app/api/[locale]/leads/import/jobs/[jobId]/definition");
+      navigate(jobDef.default.GET, { urlPathParams: { jobId } });
+    })();
   };
 
   const handleNewImport = (): void => {
-    router.push(`/${locale}/admin/leads/import`);
+    void (async (): Promise<void> => {
+      const importDef =
+        await import("@/app/api/[locale]/leads/import/definition");
+      navigate(importDef.default.POST);
+    })();
   };
 
   return (

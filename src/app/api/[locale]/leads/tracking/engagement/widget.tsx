@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
@@ -22,7 +21,7 @@ import React, { useCallback } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -68,8 +67,7 @@ export function LeadEngagementTrackingContainer({
   const children = field.children;
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
-  const locale = useWidgetLocale();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
 
   const isLoading = endpointMutations?.create?.isSubmitting;
@@ -80,12 +78,20 @@ export function LeadEngagementTrackingContainer({
     if (!leadId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/${leadId}/edit`);
-  }, [router, locale, leadId]);
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
+    })();
+  }, [navigate, leadId]);
 
   const handleViewStats = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const statsDef =
+        await import("@/app/api/[locale]/leads/stats/definition");
+      navigate(statsDef.default.GET);
+    })();
+  }, [navigate]);
 
   const engagementTypeLabel = data?.responseEngagementType
     ? String(data.responseEngagementType).replace(/_/g, " ")
@@ -296,8 +302,7 @@ export function LeadClickTrackingContainer({
   const children = field.children;
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
-  const locale = useWidgetLocale();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
 
   const isLoading = endpointMutations?.read?.isLoading;
@@ -308,12 +313,20 @@ export function LeadClickTrackingContainer({
     if (!leadId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/${leadId}/edit`);
-  }, [router, locale, leadId]);
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.GET, { urlPathParams: { id: leadId } });
+    })();
+  }, [navigate, leadId]);
 
   const handleViewStats = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/stats`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const statsDef =
+        await import("@/app/api/[locale]/leads/stats/definition");
+      navigate(statsDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleOpenRedirectUrl = useCallback((): void => {
     if (!data?.redirectUrl) {

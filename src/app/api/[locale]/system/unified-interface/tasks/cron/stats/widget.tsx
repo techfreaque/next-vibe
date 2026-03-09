@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
@@ -25,7 +24,7 @@ import React, { useCallback, useMemo } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -583,8 +582,7 @@ function DailyStatsTable({
 export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
-  const locale = useWidgetLocale();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof statsEndpoints.GET>();
 
   const data = field.value;
@@ -597,16 +595,25 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
   }, [endpointMutations]);
 
   const handleViewTasks = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/tasks`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../tasks/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleViewHistory = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/history`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../history/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleViewPulse = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/pulse`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../../pulse/history/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   // ─── Derived values ───────────────────────────────────────────────────────
 

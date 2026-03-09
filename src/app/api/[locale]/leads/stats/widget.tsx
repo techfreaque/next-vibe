@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
@@ -35,6 +34,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -527,7 +527,7 @@ export function LeadsStatsContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
@@ -573,32 +573,56 @@ export function LeadsStatsContainer({
   // ── Navigation handlers ──────────────────────────────────────────────────
 
   const handleViewAllLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleSearchLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleExportLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/export`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const exportDef =
+        await import("@/app/api/[locale]/leads/export/definition");
+      navigate(exportDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleImportLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/import`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const importDef =
+        await import("@/app/api/[locale]/leads/import/definition");
+      navigate(importDef.default.POST);
+    })();
+  }, [navigate]);
 
   const handleBatchUpdate = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/batch`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const batchDef =
+        await import("@/app/api/[locale]/leads/batch/definition");
+      navigate(batchDef.default.PATCH);
+    })();
+  }, [navigate]);
 
   const handleNavigateToStatus = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleNavigateToSource = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   // ── Clickable By Status section ──────────────────────────────────────────
 

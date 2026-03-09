@@ -6,6 +6,8 @@ export const translations: typeof enTranslations = {
     overview: "E-Mail-Kampagnen Navigation",
     dashboard: "Dashboard",
     dashboard_description: "Kampagnen-Performance-Übersicht",
+    queue: "Warteschlange",
+    queue_description: "Leads aktuell in aktiven Kampagnen",
     journeys: "E-Mail-Journeys",
     journeys_description: "E-Mail-Vorlagen und Journeys verwalten",
     abTesting: "A/B-Tests",

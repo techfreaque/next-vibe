@@ -11,6 +11,8 @@ import { useMemo } from "react";
 import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
+import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
@@ -61,9 +63,9 @@ export function ConnectionCreateContainer({
           <TextFieldWidget fieldName="host" field={children.host} />
           <NumberFieldWidget fieldName="port" field={children.port} />
           <TextFieldWidget fieldName="username" field={children.username} />
-          <TextFieldWidget fieldName="authType" field={children.authType} />
-          <TextFieldWidget fieldName="secret" field={children.secret} />
-          <TextFieldWidget fieldName="passphrase" field={children.passphrase} />
+          <SelectFieldWidget fieldName="authType" field={children.authType} />
+          <PasswordFieldWidget fieldName="secret" field={children.secret} />
+          <PasswordFieldWidget fieldName="passphrase" field={children.passphrase} />
           <BooleanFieldWidget
             fieldName="isDefault"
             field={children.isDefault}

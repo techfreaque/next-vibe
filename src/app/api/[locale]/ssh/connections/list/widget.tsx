@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
@@ -14,7 +13,6 @@ import { P } from "next-vibe-ui/ui/typography";
 import React, { useCallback } from "react";
 
 import {
-  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -33,9 +31,7 @@ export function ConnectionsListContainer({
   field,
 }: WidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
-  const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
-  const router = useRouter();
 
   const value = field.value;
   const connections = value?.connections ?? [];
@@ -78,9 +74,14 @@ export function ConnectionsListContainer({
             <Div
               key={conn.id}
               className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 cursor-pointer"
-              onClick={() =>
-                router.push(`/${locale}/admin/ssh/connections/${conn.id}`)
-              }
+              onClick={() => {
+                void (async (): Promise<void> => {
+                  const connDef = await import("../[id]/definition");
+                  navigation.push(connDef.default.GET, {
+                    urlPathParams: { id: conn.id },
+                  });
+                })();
+              }}
             >
               <Server className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               <Div className="flex flex-col min-w-0 flex-1">

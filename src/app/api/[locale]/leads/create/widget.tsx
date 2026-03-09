@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
@@ -18,7 +17,7 @@ import React, { useCallback } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
@@ -55,8 +54,7 @@ export function LeadCreateContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = field.value;
-  const router = useRouter();
-  const locale = useWidgetLocale();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
 
   const createdLeadId = data?.lead?.summary?.id;
@@ -70,19 +68,34 @@ export function LeadCreateContainer({
     if (!createdLeadId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/${createdLeadId}/edit`);
-  }, [router, locale, createdLeadId]);
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.GET, { urlPathParams: { id: createdLeadId } });
+    })();
+  }, [navigate, createdLeadId]);
 
   const handleEditLead = useCallback((): void => {
     if (!createdLeadId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/${createdLeadId}/edit`);
-  }, [router, locale, createdLeadId]);
+    void (async (): Promise<void> => {
+      const leadDef =
+        await import("@/app/api/[locale]/leads/lead/[id]/definition");
+      navigate(leadDef.default.PATCH, {
+        urlPathParams: { id: createdLeadId },
+        prefillFromGet: true,
+        getEndpoint: leadDef.default.GET,
+      });
+    })();
+  }, [navigate, createdLeadId]);
 
   const handleBackToList = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleCopyId = useCallback((): void => {
     if (!createdLeadId) {

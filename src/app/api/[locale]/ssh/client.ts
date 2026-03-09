@@ -24,7 +24,7 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import { decryptSecret } from "./connections/create/repository";
 import { sshConnections } from "./db";
-import { SshAuthType } from "./enum";
+import { SshAuthType, type SshAuthTypeType } from "./enum";
 
 /**
  * Minimal translation interface for client.ts error messages.
@@ -52,7 +52,7 @@ export interface SshCredentials {
   host: string;
   port: number;
   username: string;
-  authType: SshAuthType;
+  authType: SshAuthTypeType;
   secret: string;
   passphrase: string | null;
   fingerprint: string | null;
@@ -115,7 +115,7 @@ export async function getConnectionCredentials(
     host: row.host,
     port: row.port ?? 22,
     username: row.username,
-    authType: row.authType as SshAuthType,
+    authType: row.authType as SshAuthTypeType,
     secret,
     passphrase,
     fingerprint: row.fingerprint ?? null,

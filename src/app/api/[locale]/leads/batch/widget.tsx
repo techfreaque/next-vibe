@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
@@ -23,6 +22,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
@@ -59,7 +59,7 @@ export function LeadsBatchUpdateContainer({
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.PATCH>();
@@ -92,14 +92,21 @@ export function LeadsBatchUpdateContainer({
       if (!lead.id) {
         return;
       }
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleViewAllAffected = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -385,7 +392,7 @@ export function LeadsBatchDeleteContainer({
   const children = field.children;
   const data = field.value;
   const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.DELETE>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.DELETE>();
@@ -412,14 +419,21 @@ export function LeadsBatchDeleteContainer({
       if (!lead.id) {
         return;
       }
-      router.push(`/${locale}/admin/leads/${lead.id}/edit`);
+      void (async (): Promise<void> => {
+        const leadDef =
+          await import("@/app/api/[locale]/leads/lead/[id]/definition");
+        navigate(leadDef.default.GET, { urlPathParams: { id: lead.id! } });
+      })();
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleViewRemainingLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   return (
     <Div className="flex flex-col gap-4 p-4">

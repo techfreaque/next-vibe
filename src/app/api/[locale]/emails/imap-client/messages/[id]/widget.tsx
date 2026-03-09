@@ -26,7 +26,6 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   useWidgetContext,
-  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -263,14 +262,12 @@ function ThreadPanel({
   locale,
   logger,
   user,
-  widgetLocale,
   t,
 }: {
   email: ImapMessage;
   locale: CountryLanguage;
   logger: EndpointLogger;
   user: JwtPayloadType;
-  widgetLocale: string;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element | null {
   const { push: navigate } = useWidgetNavigation();
@@ -711,10 +708,9 @@ export function ImapMessageDetailContainer({
           {/* Thread / Conversation view */}
           <ThreadPanel
             email={email}
-            locale={widgetLocale}
+            locale={locale}
             logger={logger}
             user={user}
-            widgetLocale={widgetLocale}
             t={t}
           />
         </Div>

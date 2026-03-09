@@ -5,7 +5,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
@@ -23,7 +22,7 @@ import { CsvImportJobStatus } from "@/app/api/[locale]/leads/import/enum";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
-  useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -51,8 +50,7 @@ export function ImportJobStatusContainer({
   const children = field.children;
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
-  const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const isLoading = endpointMutations?.read?.isLoading;
 
@@ -64,19 +62,28 @@ export function ImportJobStatusContainer({
     if (!jobId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/import?jobId=${jobId}&action=stop`);
-  }, [router, locale, jobId]);
+    void (async (): Promise<void> => {
+      const stopDef = await import("./stop/definition");
+      navigate(stopDef.default.POST, { urlPathParams: { jobId } });
+    })();
+  }, [navigate, jobId]);
 
   const handleRetry = useCallback((): void => {
     if (!jobId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/import?jobId=${jobId}&action=retry`);
-  }, [router, locale, jobId]);
+    void (async (): Promise<void> => {
+      const retryDef = await import("./retry/definition");
+      navigate(retryDef.default.POST, { urlPathParams: { jobId } });
+    })();
+  }, [navigate, jobId]);
 
   const handleViewLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const progress = job?.progress;
   const configuration = job?.configuration;
@@ -366,8 +373,7 @@ export function ImportJobRetryContainer({
   const children = field.children;
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
-  const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const isLoading = endpointMutations?.create?.isSubmitting;
 
@@ -380,12 +386,18 @@ export function ImportJobRetryContainer({
     if (!jobId) {
       return;
     }
-    router.push(`/${locale}/admin/leads/import?jobId=${jobId}`);
-  }, [router, locale, jobId]);
+    void (async (): Promise<void> => {
+      const jobDef = await import("./definition");
+      navigate(jobDef.default.GET, { urlPathParams: { jobId } });
+    })();
+  }, [navigate, jobId]);
 
   const handleViewLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -498,20 +510,26 @@ export function ImportJobStopContainer({
   const children = field.children;
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
-  const locale = useWidgetLocale();
-  const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const isLoading = endpointMutations?.create?.isSubmitting;
 
   const result = data?.result;
 
   const handleViewLeads = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const listDef = await import("@/app/api/[locale]/leads/list/definition");
+      navigate(listDef.default.GET);
+    })();
+  }, [navigate]);
 
   const handleStartNewImport = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/import`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const importDef =
+        await import("@/app/api/[locale]/leads/import/definition");
+      navigate(importDef.default.POST);
+    })();
+  }, [navigate]);
 
   return (
     <Div className="flex flex-col gap-4 p-4">
