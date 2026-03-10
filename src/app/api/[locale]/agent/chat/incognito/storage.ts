@@ -107,16 +107,19 @@ let messageSaveQueue: Promise<void> = Promise.resolve();
  * Uses a queue to prevent concurrent writes from causing race conditions
  */
 export async function saveMessage(message: ChatMessage): Promise<void> {
-  // Chain this save operation after the previous one completes
-  messageSaveQueue = messageSaveQueue.then(async () => {
-    const messages = await getItem<Record<string, ChatMessage>>(
-      STORAGE_KEYS.MESSAGES,
-      {},
-    );
-    messages[message.id] = message;
-    await setItem(STORAGE_KEYS.MESSAGES, messages);
-    return undefined;
-  });
+  // Chain this save operation after the previous one completes.
+  // .catch(() => {}) ensures a failed predecessor doesn't break the chain.
+  messageSaveQueue = messageSaveQueue
+    .catch(() => undefined)
+    .then(async () => {
+      const messages = await getItem<Record<string, ChatMessage>>(
+        STORAGE_KEYS.MESSAGES,
+        {},
+      );
+      messages[message.id] = message;
+      await setItem(STORAGE_KEYS.MESSAGES, messages);
+      return undefined;
+    });
 
   // Wait for this operation to complete
   await messageSaveQueue;

@@ -461,7 +461,7 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       invalidJson: "Ungültiges JSON im Anforderungstext",
-      invalidRequestData: "Ungültige Anforderungsdaten",
+      invalidRequestData: "Ungültige Anforderungsdaten ({{issue}})",
       uncensoredApiKeyMissing: "Uncensored.ai API-Schlüssel nicht konfiguriert",
       openrouterApiKeyMissing: "OpenRouter API-Schlüssel nicht konfiguriert",
       streamCreationFailed:

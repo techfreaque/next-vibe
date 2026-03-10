@@ -126,7 +126,7 @@ export function useAIStream(): UseAIStreamReturn {
 
         toast({
           title: t("error.title"),
-          description: t(failResult.message as Parameters<typeof t>[0]),
+          description: t(failResult.message, failResult.messageParams),
           variant: "destructive",
           duration: Infinity,
         });
@@ -152,7 +152,7 @@ export function useAIStream(): UseAIStreamReturn {
 
         toast({
           title: t("error.title"),
-          description: t(result.message as Parameters<typeof t>[0]),
+          description: t(result.message, result.messageParams),
           variant: "destructive",
           duration: Infinity,
         });

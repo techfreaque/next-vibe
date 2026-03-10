@@ -9,8 +9,8 @@ dist
 .env.staging
 
 # Generated files - these are just to big and will generated before build anyways
-src/app/api/[locale]/system/generated/endpoints-meta
-src/app/api/[locale]/system/generated/remote-capabilities
+**/system/generated/endpoints-meta
+**/system/generated/remote-capabilities
 
 # TypeScript compilation artifacts (when accidentally generated)
 src/app/api/[locale]/system/check/oxlint/types.js

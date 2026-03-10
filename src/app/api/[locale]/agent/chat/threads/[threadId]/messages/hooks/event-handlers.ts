@@ -33,14 +33,20 @@ import type { MessagesEventHandlers } from "./use-messages-ws";
 // HELPERS
 // ============================================================================
 
-/** Check if a thread is incognito from either store */
+/** Check if a thread is incognito from either store or the URL */
 function isIncognito(threadId: string): boolean {
   const streamThread = useAIStreamStore.getState().threads[threadId];
   if (streamThread?.rootFolderId === "incognito") {
     return true;
   }
   const chatThread = useChatStore.getState().threads[threadId];
-  return chatThread?.rootFolderId === "incognito";
+  if (chatThread?.rootFolderId === "incognito") {
+    return true;
+  }
+  // After a page refresh the in-memory stores may not have the thread yet,
+  // but the URL is always correct.
+  return window.location.pathname.includes("/incognito/");
+  return false;
 }
 
 /** Build a ChatMessage-shaped object for incognito saves from streaming state */
@@ -389,6 +395,16 @@ function handleContentDone(
   }
 
   if (isIncognito(message.threadId)) {
+    const tokenMetadata: MessageMetadata = {
+      promptTokens: message.promptTokens,
+      completionTokens: message.completionTokens,
+      totalTokens: message.totalTokens ?? e.totalTokens ?? undefined,
+      cachedInputTokens: message.cachedInputTokens,
+      cacheWriteTokens: message.cacheWriteTokens,
+      timeToFirstToken: message.timeToFirstToken,
+      creditCost: message.creditCost,
+      finishReason: message.finishReason ?? e.finishReason ?? undefined,
+    };
     void saveMessage(
       buildIncognitoMessage(
         message.messageId,
@@ -399,6 +415,7 @@ function handleContentDone(
         message.sequenceId,
         message.model,
         message.character,
+        tokenMetadata,
       ),
     ).catch((storageError) => {
       logger.error("Failed to update incognito message", {
@@ -414,6 +431,7 @@ function handleContentDone(
 
 function handleTokensUpdated(
   e: StreamEventDataMap[StreamEventType.TOKENS_UPDATED],
+  logger: EndpointLogger,
 ): void {
   useStreamingMessagesStore
     .getState()
@@ -428,6 +446,43 @@ function handleTokensUpdated(
       e.creditCost,
       e.finishReason,
     );
+
+  const tokenMetadata: MessageMetadata = {
+    promptTokens: e.promptTokens,
+    completionTokens: e.completionTokens,
+    totalTokens: e.totalTokens,
+    cachedInputTokens: e.cachedInputTokens,
+    cacheWriteTokens: e.cacheWriteTokens > 0 ? e.cacheWriteTokens : undefined,
+    timeToFirstToken: e.timeToFirstToken ?? undefined,
+    creditCost: e.creditCost,
+    finishReason: e.finishReason ?? undefined,
+  };
+
+  useChatStore.getState().updateMessage(e.messageId, {
+    metadata: tokenMetadata,
+  });
+
+  const message =
+    useStreamingMessagesStore.getState().streamingMessages[e.messageId];
+  if (message && isIncognito(message.threadId)) {
+    void saveMessage(
+      buildIncognitoMessage(
+        message.messageId,
+        message.threadId,
+        message.role,
+        message.content,
+        message.parentId,
+        message.sequenceId,
+        message.model,
+        message.character,
+        tokenMetadata,
+      ),
+    ).catch((error) => {
+      logger.error("Failed to save token data to incognito storage", {
+        error: parseError(error).message,
+      });
+    });
+  }
 }
 
 function handleVoiceTranscribed(
@@ -656,7 +711,7 @@ export function createMessageEventHandlers(
       // Credits are user-scoped, refreshed independently
     },
     [StreamEventType.TOKENS_UPDATED]: (e) => {
-      handleTokensUpdated(e);
+      handleTokensUpdated(e, logger);
     },
     [StreamEventType.COMPACTING_DELTA]: (e) => {
       handleCompactingDelta(e, logger);

@@ -943,8 +943,16 @@ if (import.meta.main) {
       logger,
       defaultLocale,
     )
-    .then(() => {
-      return;
+    .then((result) => {
+      if (result.success) {
+        // oxlint-disable-next-line no-console
+        console.log(result.data.output);
+      } else {
+        // oxlint-disable-next-line no-console
+        console.error(`❌ Generation failed: ${result.message}`);
+        process.exitCode = 1;
+      }
+      return undefined;
     })
     .catch((error) => {
       logger.error("❌ Generation failed:", error);

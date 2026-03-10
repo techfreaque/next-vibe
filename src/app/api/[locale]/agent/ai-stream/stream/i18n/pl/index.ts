@@ -454,7 +454,7 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       invalidJson: "Nieprawidłowy JSON w treści żądania",
-      invalidRequestData: "Nieprawidłowe dane żądania",
+      invalidRequestData: "Nieprawidłowe dane żądania ({{issue}})",
       uncensoredApiKeyMissing:
         "Klucz API Uncensored.ai nie został skonfigurowany",
       openrouterApiKeyMissing: "Klucz API OpenRouter nie został skonfigurowany",

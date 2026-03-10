@@ -2082,7 +2082,7 @@ export class CreditRepository {
             await tx.insert(creditTransactions).values({
               walletId: lockedWallet.id,
               amount: -deduction,
-              balanceAfter: lockedWallet.balance,
+              balanceAfter: lockedWallet.freeCreditsRemaining - deduction,
               type: CreditTransactionType.USAGE,
               modelId,
               feature,

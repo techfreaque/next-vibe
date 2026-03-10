@@ -259,34 +259,6 @@ export const getPoolBalance = defineDbFunction({
           gt(creditPacks.remaining, 0),
         ),
       ),
-
-    // ── Free credit spend calculation ─────────────────────────────────────
-
-    /** Latest free grant for a specific wallet + period (scalar params) */
-    latestFreeGrant: db
-      .select({ createdAt: creditTransactions.createdAt })
-      .from(creditTransactions)
-      .where(
-        and(
-          eq(creditTransactions.walletId, p.p_user_id), // overridden at runtime via extra.walletId
-          eq(creditTransactions.freePeriodId, p.p_lead_id), // overridden at runtime via extra.periodId
-          eq(creditTransactions.type, "enums.transactionType.freeGrant"),
-        ),
-      )
-      .orderBy(sql`${creditTransactions.createdAt} DESC`)
-      .limit(1),
-
-    /** Usage transactions after the latest grant (scalar params + optional date filter) */
-    usageTransactions: db
-      .select({ metadata: creditTransactions.metadata })
-      .from(creditTransactions)
-      .where(
-        and(
-          eq(creditTransactions.walletId, p.p_user_id), // overridden via extra.walletId
-          eq(creditTransactions.freePeriodId, p.p_lead_id), // overridden via extra.periodId
-          eq(creditTransactions.type, "enums.transactionType.usage"),
-        ),
-      ),
   }),
 
   // eslint-disable-next-line no-unused-vars -- p_lead_id used by compiled queries (q.*ForLead), not directly in logic body
@@ -397,8 +369,8 @@ export const getPoolBalance = defineDbFunction({
 
     // ── Step 5: Calculate free credits spent this period ─────────────────
     // Sum usage across ALL lead wallets in the pool using the current calendar period.
-    // Do NOT filter by latestFreeGrant — after a pool merge, each lead has its own
-    // FREE_GRANT timestamp and filtering by the latest one misses older leads' spending.
+    // Uses plv8.execute() directly because wallet_id varies per-wallet in the loop
+    // and cannot use the function-level params (p_user_id / p_lead_id).
     let freeCreditsSpent = 0;
     const now = new Date();
     const activePeriodId = `${String(now.getFullYear())}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -406,13 +378,15 @@ export const getPoolBalance = defineDbFunction({
     for (const w of wallets) {
       if (w.leadId !== null) {
         // Fetch ALL usage transactions for this lead wallet in the current period
-        const usageRows = q.usageTransactions({
-          walletId: w.id,
-          periodId: activePeriodId,
-        });
+        const usageRows = plv8.execute<{
+          metadata: { freeCreditsUsed?: number } | null;
+        }>(
+          "SELECT metadata FROM credit_transactions WHERE wallet_id = $1 AND free_period_id = $2 AND type = 'enums.transactionType.usage'",
+          [w.id, activePeriodId],
+        );
 
         for (const row of usageRows) {
-          const meta = row.metadata as { freeCreditsUsed?: number } | null;
+          const meta = row.metadata;
           if (
             meta !== null &&
             typeof meta === "object" &&

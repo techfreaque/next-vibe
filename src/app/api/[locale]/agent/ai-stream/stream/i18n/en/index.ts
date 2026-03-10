@@ -200,7 +200,7 @@ export const translations = {
     },
     errors: {
       invalidJson: "Invalid JSON in request body",
-      invalidRequestData: "Invalid request data",
+      invalidRequestData: "Invalid request data ({{issue}})",
       uncensoredApiKeyMissing: "Uncensored.ai API key not configured",
       openrouterApiKeyMissing: "OpenRouter API key not configured",
       streamCreationFailed:

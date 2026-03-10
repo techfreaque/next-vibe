@@ -3,9 +3,28 @@
  * Common path manipulation functions
  */
 
-import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
-
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
+
+/**
+ * Lazy-loaded alias map. The generated file may not exist during bootstrap
+ * (e.g. first run of generators). We load it on first use so that path
+ * utilities that don't need the map (pathSegmentsToToolName, etc.) remain
+ * importable even before generation.
+ */
+let _aliasMap: Record<string, string> | null = null;
+
+function getAliasMap(): Record<string, string> {
+  if (_aliasMap === null) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports -- Lazy bootstrap: alias-map is a generated file that may not exist yet during first generator run. Using require() so we can catch the missing-module error gracefully.
+      _aliasMap = require("@/app/api/[locale]/system/generated/alias-map")
+        .pathToAliasMap as Record<string, string>;
+    } catch {
+      _aliasMap = {};
+    }
+  }
+  return _aliasMap;
+}
 
 /**
  * Path separator - underscore used consistently across entire codebase
@@ -87,10 +106,8 @@ export function getPreferredToolName(endpoint: CreateApiEndpointAny): string {
  * Resolve an alias or canonical path to the canonical full path.
  * Returns null if not found in the map.
  */
-export function getFullPath(
-  aliasOrPath: string,
-): (typeof pathToAliasMap)[keyof typeof pathToAliasMap] | null {
-  return pathToAliasMap[aliasOrPath as keyof typeof pathToAliasMap] ?? null;
+export function getFullPath(aliasOrPath: string): string | null {
+  return getAliasMap()[aliasOrPath] ?? null;
 }
 
 /**
@@ -101,7 +118,5 @@ export function getFullPath(
  * Use this when you only have a string, not a full endpoint object.
  */
 export function getPreferredName(nameOrAlias: string): string {
-  return (
-    pathToAliasMap[nameOrAlias as keyof typeof pathToAliasMap] ?? nameOrAlias
-  );
+  return getAliasMap()[nameOrAlias] ?? nameOrAlias;
 }

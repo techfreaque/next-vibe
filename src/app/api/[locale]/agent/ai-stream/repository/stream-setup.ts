@@ -323,9 +323,10 @@ export async function setupAiStream(params: {
   if (providerKeyMissing) {
     logger.warn("AI provider API key not configured", { model: data.model });
     return fail({
-      message: aiStreamT("route.errors.invalidRequestData"),
+      message: aiStreamT("route.errors.invalidRequestData", {
+        issue: providerKeyMissing,
+      }),
       errorType: ErrorResponseTypes.BAD_REQUEST,
-      messageParams: { issue: providerKeyMissing },
     });
   }
 
