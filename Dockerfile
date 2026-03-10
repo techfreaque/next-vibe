@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Base stage with Bun
-FROM oven/bun:1.3.0-alpine AS base
+FROM oven/bun:1.3.3-alpine AS base
 WORKDIR /app
 
 # Install Node.js for Next.js build compatibility
