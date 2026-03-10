@@ -6,7 +6,7 @@
 /// <reference types="bun-types" />
 
 import { existsSync, mkdirSync, statSync } from "node:fs";
-import { basename, dirname, resolve } from "node:path";
+import { basename, dirname, parse, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -184,7 +184,11 @@ export class BunCompiler implements IBunCompiler {
       minify: bunOptions?.minify ?? profileSettings.minify,
       sourcemap,
       external: externals,
-      naming: bunOptions?.naming || { entry: basename(fileConfig.output) },
+      naming:
+        bunOptions?.naming ??
+        (parse(fileConfig.output).name !== parse(entrypointPath).name
+          ? { entry: basename(fileConfig.output) }
+          : undefined),
       define: Object.keys(define).length > 0 ? define : undefined,
       splitting: bunOptions?.splitting,
       format: bunOptions?.format,
