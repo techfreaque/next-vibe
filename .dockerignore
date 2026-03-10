@@ -20,6 +20,7 @@ __tests__
 .next
 out
 dist
+.dist
 build
 
 # But keep workspace package builds

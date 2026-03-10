@@ -320,11 +320,16 @@ class EnvGeneratorRepositoryImpl {
         );
 
         // Update Dockerfile and docker-compose.prod.yml with the same key list
-        await this.updateDockerfile(join(process.cwd(), "Dockerfile"), envKeys);
-        await this.updateDockerCompose(
-          join(process.cwd(), "docker-compose.prod.yml"),
-          envKeys,
-        );
+        // Skip gracefully if files don't exist (e.g. inside Docker build context)
+        const { existsSync } = await import("node:fs");
+        const dockerfilePath = join(process.cwd(), "Dockerfile");
+        const dockerComposePath = join(process.cwd(), "docker-compose.prod.yml");
+        if (existsSync(dockerfilePath)) {
+          await this.updateDockerfile(dockerfilePath, envKeys);
+        }
+        if (existsSync(dockerComposePath)) {
+          await this.updateDockerCompose(dockerComposePath, envKeys);
+        }
       }
 
       const duration = Date.now() - startTime;
