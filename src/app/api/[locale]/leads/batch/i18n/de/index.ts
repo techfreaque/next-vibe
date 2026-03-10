@@ -262,6 +262,41 @@ export const translations: typeof enTranslations = {
       submitButtonLoading: "Wird gelöscht...",
     },
   },
+  enums: {
+    batchOperationScope: {
+      currentPage: "Aktuelle Seite",
+      allPages: "Alle Seiten",
+    },
+    leadStatus: {
+      new: "Neu",
+      pending: "Ausstehend",
+      campaignRunning: "Kampagne läuft",
+      websiteUser: "Website-Nutzer",
+      newsletterSubscriber: "Newsletter-Abonnent",
+      inContact: "In Kontakt",
+      signedUp: "Registriert",
+      subscriptionConfirmed: "Abonnement bestätigt",
+      unsubscribed: "Abgemeldet",
+      bounced: "Zurückgewiesen",
+      invalid: "Ungültig",
+    },
+    emailCampaignStage: {
+      notStarted: "Nicht gestartet",
+      initial: "Erstkontakt",
+      followup1: "Nachfassen 1",
+      followup2: "Nachfassen 2",
+      followup3: "Nachfassen 3",
+      nurture: "Pflege",
+      reactivation: "Reaktivierung",
+    },
+    leadSource: {
+      website: "Website",
+      socialMedia: "Soziale Medien",
+      emailCampaign: "E-Mail-Kampagne",
+      referral: "Empfehlung",
+      csvImport: "CSV-Import",
+    },
+  },
   email: {
     admin: {
       batchUpdate: {

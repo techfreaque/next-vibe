@@ -3,7 +3,7 @@
  * Sample data for testing the lead management system
  */
 
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -11,7 +11,12 @@ import { Countries, Languages } from "@/i18n/core/config";
 
 import { EmailStatus } from "../emails/messages/enum";
 import {
+  CampaignType,
+  type CampaignTypeValue,
+} from "../emails/smtp-client/enum";
+import {
   emailCampaigns,
+  emailJourneyVariants,
   leadEngagements,
   leads,
   type NewEmailCampaign,
@@ -601,6 +606,94 @@ async function generateEmailCampaigns(
   }
 }
 
+/**
+ * Seed journey variants into DB (upsert — safe to run repeatedly)
+ */
+async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
+  const variants: Array<{
+    variantKey: string;
+    displayName: string;
+    description: string;
+    weight: number;
+    campaignType: typeof CampaignTypeValue | null;
+  }> = [
+    {
+      variantKey: EmailJourneyVariant.UNCENSORED_CONVERT,
+      displayName: "Uncensored Convert",
+      description:
+        "Enthusiast persona sharing a genuine discovery with affiliate transparency",
+      weight: 34,
+      campaignType: null,
+    },
+    {
+      variantKey: EmailJourneyVariant.SIDE_HUSTLE,
+      displayName: "Side Hustle",
+      description:
+        "Transparent affiliate marketer sharing real weekly use cases",
+      weight: 33,
+      campaignType: null,
+    },
+    {
+      variantKey: EmailJourneyVariant.QUIET_RECOMMENDATION,
+      displayName: "Quiet Recommendation",
+      description: "Low-key professional passing along a tool tested for weeks",
+      weight: 33,
+      campaignType: null,
+    },
+    {
+      variantKey: EmailJourneyVariant.SIGNUP_NURTURE,
+      displayName: "Signup Nurture",
+      description: "Post-signup nurture sequence for new users",
+      weight: 100,
+      campaignType: CampaignType.SIGNUP_NURTURE,
+    },
+    {
+      variantKey: EmailJourneyVariant.RETENTION,
+      displayName: "Retention",
+      description: "Retention emails for active subscribers",
+      weight: 100,
+      campaignType: CampaignType.RETENTION,
+    },
+    {
+      variantKey: EmailJourneyVariant.WINBACK,
+      displayName: "Winback",
+      description: "Win-back emails for churned subscribers",
+      weight: 100,
+      campaignType: CampaignType.WINBACK,
+    },
+  ];
+
+  let created = 0;
+  let skipped = 0;
+
+  for (const v of variants) {
+    const [existing] = await db
+      .select({ id: emailJourneyVariants.id })
+      .from(emailJourneyVariants)
+      .where(eq(emailJourneyVariants.variantKey, v.variantKey));
+
+    if (existing) {
+      skipped++;
+      continue;
+    }
+
+    await db.insert(emailJourneyVariants).values({
+      variantKey: v.variantKey,
+      displayName: v.displayName,
+      description: v.description,
+      weight: v.weight,
+      active: true,
+      campaignType: v.campaignType,
+      checkErrors: [],
+    });
+    created++;
+  }
+
+  logger.debug(
+    `✅ Journey variants: ${created} created, ${skipped} already existed`,
+  );
+}
+
 const ENABLED = false;
 
 /**
@@ -659,6 +752,9 @@ function generateImportedLead(
  * Development seed data
  */
 export async function dev(logger: EndpointLogger): Promise<void> {
+  // Always seed journey variants so admin UI shows them
+  await seedJourneyVariants(logger);
+
   // Always seed campaign-ready imported leads for flow testing
   logger.debug(
     `🌱 Seeding ${CAMPAIGN_LEADS_PER_LOCALE} imported leads per locale...`,
@@ -721,8 +817,8 @@ export async function dev(logger: EndpointLogger): Promise<void> {
  * Production seed data (minimal or none)
  */
 export async function prod(logger: EndpointLogger): Promise<void> {
-  await Promise.resolve();
-  logger.debug("🌱 Skipping production leads seeding");
+  // Journey variants must exist in production for the admin UI
+  await seedJourneyVariants(logger);
 }
 
 /**

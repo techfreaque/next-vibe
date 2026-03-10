@@ -199,6 +199,22 @@ export const {
 });
 
 /**
+ * Device Type Enum
+ * Parsed from user agent string
+ */
+export const {
+  enum: DeviceType,
+  options: DeviceTypeOptions,
+  Value: DeviceTypeValues,
+} = createEnumOptions(scopedTranslation, {
+  DESKTOP: "enums.deviceType.desktop",
+  MOBILE: "enums.deviceType.mobile",
+  TABLET: "enums.deviceType.tablet",
+  BOT: "enums.deviceType.bot",
+  UNKNOWN: "enums.deviceType.unknown",
+});
+
+/**
  * Lead Source Enum
  * Defines the possible sources where leads come from
  */
@@ -617,4 +633,12 @@ export const LeadSourceDB = [
   LeadSource.EMAIL_CAMPAIGN,
   LeadSource.REFERRAL,
   LeadSource.CSV_IMPORT,
+] as const;
+
+export const DeviceTypeDB = [
+  DeviceType.DESKTOP,
+  DeviceType.MOBILE,
+  DeviceType.TABLET,
+  DeviceType.BOT,
+  DeviceType.UNKNOWN,
 ] as const;

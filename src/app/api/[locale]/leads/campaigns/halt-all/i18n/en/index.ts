@@ -47,4 +47,17 @@ export const translations = {
       description: "All campaigns have been halted successfully",
     },
   },
+  widget: {
+    title: "Emergency Halt",
+    description:
+      "Immediately stop all active email campaigns. Use this in case of errors or urgent issues.",
+    haltButton: "Halt All Campaigns",
+    halting: "Halting...",
+    confirmTitle: "Halt All Campaigns?",
+    confirmDescription:
+      "This will immediately stop all active email campaigns and cancel pending emails. This action cannot be undone.",
+    confirmButton: "Yes, Halt Everything",
+    cancelButton: "Cancel",
+    done: "Halted",
+  },
 };

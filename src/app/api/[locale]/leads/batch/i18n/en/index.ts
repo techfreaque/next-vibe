@@ -256,6 +256,41 @@ export const translations = {
       submitButtonLoading: "Deleting...",
     },
   },
+  enums: {
+    batchOperationScope: {
+      currentPage: "Current Page",
+      allPages: "All Pages",
+    },
+    leadStatus: {
+      new: "New",
+      pending: "Pending",
+      campaignRunning: "Campaign Running",
+      websiteUser: "Website User",
+      newsletterSubscriber: "Newsletter Subscriber",
+      inContact: "In Contact",
+      signedUp: "Signed Up",
+      subscriptionConfirmed: "Subscription Confirmed",
+      unsubscribed: "Unsubscribed",
+      bounced: "Bounced",
+      invalid: "Invalid",
+    },
+    emailCampaignStage: {
+      notStarted: "Not Started",
+      initial: "Initial Contact",
+      followup1: "Follow-up 1",
+      followup2: "Follow-up 2",
+      followup3: "Follow-up 3",
+      nurture: "Nurture",
+      reactivation: "Reactivation",
+    },
+    leadSource: {
+      website: "Website",
+      socialMedia: "Social Media",
+      emailCampaign: "Email Campaign",
+      referral: "Referral",
+      csvImport: "CSV Import",
+    },
+  },
   email: {
     admin: {
       batchUpdate: {

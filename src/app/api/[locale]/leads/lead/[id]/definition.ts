@@ -9,9 +9,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
+  scopedBackButton,
   scopedObjectFieldNew,
   scopedRequestField,
   scopedRequestUrlPathParamsField,
+  scopedResponseArrayFieldNew,
   scopedResponseField,
   scopedWidgetField,
   submitButton,
@@ -33,6 +35,7 @@ import {
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import {
+  DeviceType,
   EmailCampaignStage,
   EmailCampaignStageOptions,
   EmailJourneyVariant,
@@ -85,7 +88,8 @@ const { DELETE } = createEndpoint({
       }),
 
       // Navigation - back to previous screen
-      backButton: backButton({
+      backButton: scopedBackButton(scopedTranslation, {
+        label: "delete.backButton.label",
         icon: "arrow-left",
         variant: "outline",
         usage: { request: "urlPathParams" },
@@ -242,7 +246,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z
           .string()
-          .regex(/^\+?[1-9]\d{1,14}$/)
+          .regex(/^\+?[\d\s\-().]{4,20}$/)
           .optional(),
       }),
       website: scopedRequestField(scopedTranslation, {
@@ -919,6 +923,171 @@ const { GET } = createEndpoint({
               }),
             },
           }),
+
+          // Device / Identity (tracking)
+          identity: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.identity.title",
+            description: "get.response.identity.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              ipAddress: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.ipAddress.content",
+                schema: z.string().nullable(),
+              }),
+              userAgent: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.userAgent.content",
+                schema: z.string().nullable(),
+              }),
+              deviceType: scopedResponseField(scopedTranslation, {
+                type: WidgetType.BADGE,
+                text: "get.response.deviceType.content",
+                schema: z.enum(DeviceType).nullable(),
+              }),
+              browser: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.browser.content",
+                schema: z.string().nullable(),
+              }),
+              os: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.os.content",
+                schema: z.string().nullable(),
+              }),
+              referralCode: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.referralCode.content",
+                schema: z.string().nullable(),
+              }),
+            },
+          }),
+
+          // Lifecycle timestamps
+          lifecycle: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.lifecycle.title",
+            description: "get.response.lifecycle.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              bouncedAt: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.bouncedAt.content",
+                schema: dateSchema.nullable(),
+              }),
+              invalidAt: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.invalidAt.content",
+                schema: dateSchema.nullable(),
+              }),
+              campaignStartedAt: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                label: "get.response.campaignStartedAt.content",
+                schema: dateSchema.nullable(),
+              }),
+            },
+          }),
+
+          // Linked Leads
+          linkedLeads: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.GRID,
+              columns: 2,
+              usage: { response: true },
+              children: {
+                linkedLeadId: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.linkedLeadId.content",
+                  schema: z.uuid(),
+                }),
+                linkReason: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.linkReason.content",
+                  schema: z.string(),
+                }),
+                linkedAt: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.linkedAt.content",
+                  schema: dateSchema,
+                }),
+                email: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.email.content",
+                  schema: z.string().nullable(),
+                }),
+                businessName: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.businessName.content",
+                  schema: z.string(),
+                }),
+                status: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.BADGE,
+                  text: "get.response.linkedLeads.status.content",
+                  schema: z.enum(LeadStatus),
+                }),
+                ipAddress: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.ipAddress.content",
+                  schema: z.string().nullable(),
+                }),
+                userAgent: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.userAgent.content",
+                  schema: z.string().nullable(),
+                }),
+                createdAt: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedLeads.createdAt.content",
+                  schema: dateSchema,
+                }),
+              },
+            }),
+          }),
+
+          // Linked Users
+          linkedUsers: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.GRID,
+              columns: 2,
+              usage: { response: true },
+              children: {
+                userId: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedUsers.userId.content",
+                  schema: z.uuid(),
+                }),
+                linkReason: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedUsers.linkReason.content",
+                  schema: z.string(),
+                }),
+                linkedAt: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedUsers.linkedAt.content",
+                  schema: dateSchema,
+                }),
+                email: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedUsers.email.content",
+                  schema: z.string(),
+                }),
+                publicName: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.linkedUsers.publicName.content",
+                  schema: z.string(),
+                }),
+              },
+            }),
+          }),
         },
       }),
     },
@@ -1013,6 +1182,22 @@ const { GET } = createEndpoint({
             createdAt: new Date("2024-01-10T09:00:00Z"),
             updatedAt: new Date("2024-01-16T14:30:00Z"),
           },
+          identity: {
+            ipAddress: "203.0.113.42",
+            userAgent:
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            deviceType: DeviceType.DESKTOP,
+            browser: "Chrome",
+            os: "Windows",
+            referralCode: null,
+          },
+          lifecycle: {
+            bouncedAt: null,
+            invalidAt: null,
+            campaignStartedAt: new Date("2024-01-12T09:00:00Z"),
+          },
+          linkedLeads: [],
+          linkedUsers: [],
         },
       },
     },

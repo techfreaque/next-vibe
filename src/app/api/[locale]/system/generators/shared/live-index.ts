@@ -31,6 +31,10 @@ export interface FileClass {
   seeds?: boolean;
   /** email.tsx / *.email.tsx — affects email-templates generator */
   emailTemplates?: boolean;
+  /** indicators.ts — affects indicator-index generator */
+  indicatorIndex?: boolean;
+  /** graph-seeds.ts — affects graph-seeds-index generator */
+  graphSeedsIndex?: boolean;
 }
 
 /** Dirty flags — which generator groups need to run */
@@ -40,6 +44,8 @@ export interface DirtyFlags {
   taskIndex: boolean;
   seeds: boolean;
   emailTemplates: boolean;
+  indicatorIndex: boolean;
+  graphSeedsIndex: boolean;
 }
 
 /**
@@ -63,6 +69,12 @@ export interface LiveIndex {
 
   // --- Email-templates generator ---
   emailFiles: Set<string>;
+
+  // --- Indicator-index generator ---
+  indicatorFiles: Set<string>;
+
+  // --- Graph-seeds-index generator ---
+  graphSeedFiles: Set<string>;
 
   /**
    * Per-definition HTTP method cache.
@@ -175,6 +187,12 @@ export function classifyFile(filename: string): FileClass | null {
   if (base === "email.tsx" || base.endsWith(".email.tsx")) {
     return { emailTemplates: true };
   }
+  if (base === "indicators.ts") {
+    return { indicatorIndex: true };
+  }
+  if (base === "graph-seeds.ts") {
+    return { graphSeedsIndex: true };
+  }
 
   return null;
 }
@@ -222,6 +240,11 @@ export function buildLiveIndex(): LiveIndex {
   );
   const emailFiles = new Set([...emailTsxFiles, ...emailDotTsxFiles]);
 
+  const indicatorFiles = new Set(findFilesRecursively(apiDir, "indicators.ts"));
+  const graphSeedFiles = new Set(
+    findFilesRecursively(apiDir, "graph-seeds.ts"),
+  );
+
   // Build method cache for all definition files
   const methodCache = new Map<string, string[]>();
   for (const defFile of definitionFiles) {
@@ -234,6 +257,8 @@ export function buildLiveIndex(): LiveIndex {
     taskIndex: true,
     seeds: true,
     emailTemplates: true,
+    indicatorIndex: true,
+    graphSeedsIndex: true,
   };
 
   return {
@@ -244,6 +269,8 @@ export function buildLiveIndex(): LiveIndex {
     taskRunnerFiles,
     seedFiles,
     emailFiles,
+    indicatorFiles,
+    graphSeedFiles,
     methodCache,
     dirty,
   };
@@ -353,6 +380,26 @@ export function updateLiveIndex(
       index.emailFiles.delete(absPath);
     }
     index.dirty.emailTemplates = true;
+    return;
+  }
+
+  if (base === "indicators.ts") {
+    if (fileExists) {
+      index.indicatorFiles.add(absPath);
+    } else {
+      index.indicatorFiles.delete(absPath);
+    }
+    index.dirty.indicatorIndex = true;
+    return;
+  }
+
+  if (base === "graph-seeds.ts") {
+    if (fileExists) {
+      index.graphSeedFiles.add(absPath);
+    } else {
+      index.graphSeedFiles.delete(absPath);
+    }
+    index.dirty.graphSeedsIndex = true;
   }
 }
 
@@ -365,4 +412,6 @@ export function clearDirtyFlags(index: LiveIndex): void {
   index.dirty.taskIndex = false;
   index.dirty.seeds = false;
   index.dirty.emailTemplates = false;
+  index.dirty.indicatorIndex = false;
+  index.dirty.graphSeedsIndex = false;
 }

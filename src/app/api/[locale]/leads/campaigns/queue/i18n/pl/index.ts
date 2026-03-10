@@ -69,6 +69,8 @@ export const translations: typeof enTranslations = {
     title: "Kolejka kampanii",
     refresh: "Odśwież",
     noData: "Brak leadów aktualnie w kampaniach",
+    emptyDescription:
+      "Gdy leady zostaną zapisane do kampanii e-mail, pojawią się tutaj. Użyj Startera kampanii na Panelu lub skonfiguruj harmonogram w Ustawieniach.",
     empty: "Nie znaleziono leadów",
     columnEmail: "E-mail",
     columnBusiness: "Firma",

@@ -20,6 +20,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import { SshAuthType } from "../../enum";
 import { sshConnections } from "../../db";
 import type {
   ConnectionCreateRequestOutput,
@@ -77,12 +78,16 @@ export class ConnectionCreateRepository {
     user: JwtPayloadType,
     t: ModuleT,
   ): Promise<ResponseType<ConnectionCreateResponseOutput>> {
-    const secretKey = getSecretKey();
-    if (!secretKey) {
-      return fail({
-        message: t("errors.sshSecretKeyNotSet"),
-        errorType: ErrorResponseTypes.BAD_REQUEST,
-      });
+    const isLocal = data.authType === SshAuthType.LOCAL;
+
+    if (!isLocal) {
+      const secretKey = getSecretKey();
+      if (!secretKey) {
+        return fail({
+          message: t("errors.sshSecretKeyNotSet"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
     }
 
     try {
@@ -93,31 +98,35 @@ export class ConnectionCreateRepository {
           .where(eq(sshConnections.userId, user.id!));
       }
 
-      // Encrypt secret (required), store empty encrypted string if no secret provided
-      const rawSecret = data.secret ?? "";
-      const encryptedSecretOrNull = encryptSecret(rawSecret);
-      if (!encryptedSecretOrNull) {
-        return fail({
-          message: t("errors.encryptionFailed"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
+      let encryptedSecret = "";
+      let encryptedPassphrase: string | null = null;
+
+      if (!isLocal) {
+        const rawSecret = data.secret ?? "";
+        const enc = encryptSecret(rawSecret);
+        if (!enc) {
+          return fail({
+            message: t("errors.encryptionFailed"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+        encryptedSecret = enc;
+        encryptedPassphrase = data.passphrase
+          ? (encryptSecret(data.passphrase) ?? null)
+          : null;
       }
-      const encryptedSecret = encryptedSecretOrNull;
-      const encryptedPassphrase = data.passphrase
-        ? encryptSecret(data.passphrase)
-        : null;
 
       const [row] = await db
         .insert(sshConnections)
         .values({
           userId: user.id!,
           label: data.label,
-          host: data.host,
-          port: data.port ?? 22,
+          host: data.host ?? "localhost",
+          port: data.port ?? (isLocal ? 0 : 22),
           username: data.username,
           authType: data.authType,
           encryptedSecret,
-          encryptedPassphrase: encryptedPassphrase ?? null,
+          encryptedPassphrase,
           isDefault: data.isDefault ?? false,
           notes: data.notes ?? null,
         })

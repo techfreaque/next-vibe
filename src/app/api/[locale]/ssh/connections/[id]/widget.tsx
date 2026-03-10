@@ -1,52 +1,95 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { Server } from "next-vibe-ui/ui/icons/Server";
-import { Span } from "next-vibe-ui/ui/span";
-import React from "react";
+import type { JSX } from "react";
+import { useMemo } from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
+import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
+import { SshAuthType } from "../../enum";
 import type endpoints from "./definition";
 import type { ConnectionDetailResponseOutput } from "./definition";
 
-interface WidgetProps {
+interface CustomWidgetProps {
   field: {
     value: ConnectionDetailResponseOutput | null | undefined;
-  } & (typeof endpoints.GET)["fields"];
+  } & (typeof endpoints.PATCH)["fields"];
   fieldName: string;
 }
 
 export function ConnectionDetailContainer({
   field,
-}: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation<typeof endpoints.GET>();
-  const value = field.value;
+}: CustomWidgetProps): JSX.Element {
+  const children = field.children;
+  const form = useWidgetForm<typeof endpoints.PATCH>();
+  const emptyField = useMemo(() => ({}), []);
+
+  // Watch authType reactively; fall back to loaded value before form initialises
+  const watchedAuthType = form?.watch("authType");
+  const authType = watchedAuthType ?? field.value?.authType;
+  const isLocal = authType === SshAuthType.LOCAL;
+  const isKeyAgent = authType === SshAuthType.KEY_AGENT;
 
   return (
-    <Div className="flex flex-col gap-0 min-h-[200px]">
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
-        <Server className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-sm">
-          {value?.label ?? t("widget.title")}
-        </Span>
+    <Div className="flex flex-col gap-0">
+      {/* Actions */}
+      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4 sticky top-0 bg-background z-10 border-b">
+        <NavigateButtonWidget
+          field={{ icon: "arrow-left", variant: "outline" }}
+        />
+        <SubmitButtonWidget<typeof endpoints.PATCH>
+          field={{
+            text: "widget.saveButton",
+            loadingText: "widget.saveButton",
+            icon: "save",
+            variant: "primary",
+            className: "ml-auto",
+          }}
+        />
+        <SubmitButtonWidget<typeof endpoints.DELETE>
+          field={{
+            text: "widget.deleteButton",
+            loadingText: "widget.deleteButton",
+            icon: "trash",
+            variant: "destructive",
+          }}
+        />
       </Div>
-      {value && (
-        <Div className="px-4 py-3 grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
-          <Span className="text-muted-foreground">{t("widget.host")}</Span>
-          <Span className="font-mono">{`${value.host}:${value.port}`}</Span>
-          <Span className="text-muted-foreground">{t("widget.user")}</Span>
-          <Span className="font-mono">{value.username}</Span>
-          <Span className="text-muted-foreground">{t("widget.auth")}</Span>
-          <Span>{t(value.authType)}</Span>
-          {value.notes && (
-            <>
-              <Span className="text-muted-foreground">{t("widget.notes")}</Span>
-              <Span>{value.notes}</Span>
-            </>
-          )}
-        </Div>
-      )}
+
+      <Div className="px-4 pb-4 flex flex-col gap-4">
+        <FormAlertWidget field={emptyField} />
+        <TextFieldWidget fieldName="label" field={children.label} />
+        {!isLocal && (
+          <SelectFieldWidget fieldName="authType" field={children.authType} />
+        )}
+        {!isLocal && (
+          <>
+            <TextFieldWidget fieldName="host" field={children.host} />
+            <NumberFieldWidget fieldName="port" field={children.port} />
+          </>
+        )}
+        <TextFieldWidget fieldName="username" field={children.username} />
+        {!isLocal && !isKeyAgent && (
+          <PasswordFieldWidget fieldName="secret" field={children.secret} />
+        )}
+        {!isLocal && !isKeyAgent && (
+          <PasswordFieldWidget
+            fieldName="passphrase"
+            field={children.passphrase}
+          />
+        )}
+        <BooleanFieldWidget fieldName="isDefault" field={children.isDefault} />
+        <TextareaFieldWidget fieldName="notes" field={children.notes} />
+      </Div>
     </Div>
   );
 }

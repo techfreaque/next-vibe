@@ -421,4 +421,4 @@ export const journeysTranslations = {
       signature: "— The unbottled.ai team",
     },
   },
-} as const;
+};

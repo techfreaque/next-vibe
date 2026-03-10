@@ -56,6 +56,14 @@ export const translations = {
       description: "Campaign starter ran successfully",
     },
   },
+  widget: {
+    title: "Run Campaign Starter",
+    description:
+      "Manually trigger the campaign starter to process eligible leads and begin email sequences.",
+    runButton: "Start Campaigns",
+    running: "Running...",
+    done: "Done",
+  },
   errors: {
     server: {
       title: "Server Error",

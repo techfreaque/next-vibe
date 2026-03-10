@@ -10,6 +10,7 @@ export const translations: typeof enTranslations = {
     cronTasks: "Cron-Aufgaben",
     sshAccess: "SSH / Maschine",
     remoteConnections: "Fernverbindungen",
+    vibeSense: "Vibe Sense",
     endpoints: "Endpunkte",
     vibeFrame: "Vibe Frame",
     admin: "Admin",

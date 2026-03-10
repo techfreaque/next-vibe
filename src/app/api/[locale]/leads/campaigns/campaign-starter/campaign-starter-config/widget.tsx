@@ -1,16 +1,27 @@
 /**
  * Campaign Starter Config Custom Widget
- * Form view and success state for campaign starter configuration
+ * Form view organized into card sections
  */
 
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Rocket } from "next-vibe-ui/ui/icons/Rocket";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { Users } from "next-vibe-ui/ui/icons/Users";
+import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
@@ -55,7 +66,7 @@ export function CampaignStarterConfigContainer({
   const isPending = endpointMutations?.update?.isSubmitting;
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
+    <Div className="flex flex-col gap-5 p-4">
       {/* Header */}
       <Div className="flex items-center gap-2 pb-2 border-b">
         <NavigateButtonWidget field={children.backButton} />
@@ -93,92 +104,191 @@ export function CampaignStarterConfigContainer({
         </Div>
       )}
 
-      {/* Form */}
-      <Div className="flex flex-col gap-3">
-        <FormAlertWidget field={{}} />
+      <FormAlertWidget field={{}} />
 
-        <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
-        <NumberFieldWidget
-          fieldName="minAgeHours"
-          field={children.minAgeHours}
-        />
-        <MultiSelectFieldWidget
-          fieldName="enabledDays"
-          field={children.enabledDays}
-        />
-        <NumberFieldWidget
-          fieldName="enabledHours.start"
-          field={children.enabledHours.children.start}
-        />
-        <NumberFieldWidget
-          fieldName="enabledHours.end"
-          field={children.enabledHours.children.end}
-        />
-
-        {/* Leads per week — one number input per locale */}
-        <Div className="flex flex-col gap-1.5">
-          <Span className="text-sm font-medium">
-            {t("post.leadsPerWeek.label")}
-          </Span>
+      {/* Section 1 — General */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Settings className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.general")}
+          </CardTitle>
           <Span className="text-xs text-muted-foreground">
-            {t("post.leadsPerWeek.description")}
+            {t("widget.sections.generalDescription")}
           </Span>
-          <Div className="flex flex-col gap-2">
-            {Object.values(CountryLanguageValues).map((loc) => (
-              <Div key={loc} className="flex items-center gap-3">
-                <Label className="w-24 font-medium text-sm">{loc}</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  className="w-32"
-                  value={form?.watch("leadsPerWeek")?.[loc] ?? 0}
-                  onChange={(e) => {
-                    const num = Number(e.target.value);
-                    if (!Number.isNaN(num) && num >= 1) {
-                      form?.setValue("leadsPerWeek", {
-                        ...(form.getValues("leadsPerWeek") ?? {}),
-                        [loc]: num,
-                      });
-                    }
-                  }}
-                />
-              </Div>
-            ))}
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <BooleanFieldWidget fieldName="enabled" field={children.enabled} />
+          <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
+        </CardContent>
+      </Card>
+
+      {/* Section 2 — Schedule */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.schedule")}
+          </CardTitle>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.sections.scheduleDescription")}
+          </Span>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {/* Schedule — ScheduleAutocomplete */}
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-sm font-medium">
+              {t("post.schedule.label")}
+            </Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("post.schedule.description")}
+            </Span>
+            <ScheduleAutocomplete
+              value={form?.watch("schedule") ?? ""}
+              onChange={(value) => form?.setValue("schedule", value)}
+              onBlur={() => {
+                void form?.trigger("schedule");
+              }}
+              locale={locale}
+            />
           </Div>
-        </Div>
-
-        {/* Schedule — ScheduleAutocomplete */}
-        <Div className="flex flex-col gap-1.5">
-          <Span className="text-sm font-medium">
-            {t("post.schedule.label")}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {t("post.schedule.description")}
-          </Span>
-          <ScheduleAutocomplete
-            value={form?.watch("schedule") ?? ""}
-            onChange={(value) => form?.setValue("schedule", value)}
-            onBlur={() => {
-              void form?.trigger("schedule");
-            }}
-            locale={locale}
+          <MultiSelectFieldWidget
+            fieldName="enabledDays"
+            field={children.enabledDays}
           />
-        </Div>
+          <NumberFieldWidget
+            fieldName="enabledHours.start"
+            field={children.enabledHours.children.start}
+          />
+          <NumberFieldWidget
+            fieldName="enabledHours.end"
+            field={children.enabledHours.children.end}
+          />
+        </CardContent>
+      </Card>
 
-        <BooleanFieldWidget fieldName="enabled" field={children.enabled} />
-        <SelectFieldWidget fieldName="priority" field={children.priority} />
-        <NumberFieldWidget fieldName="timeout" field={children.timeout} />
-        <NumberFieldWidget fieldName="retries" field={children.retries} />
-        <NumberFieldWidget fieldName="retryDelay" field={children.retryDelay} />
-        <SubmitButtonWidget<typeof definition.PUT>
-          field={{
-            text: "post.success.title",
-            loadingText: "widget.saving",
-            icon: "save",
-            variant: "primary",
-          }}
-        />
-      </Div>
+      {/* Section 3 — Quotas */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.quotas")}
+          </CardTitle>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.sections.quotasDescription")}
+          </Span>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {/* Leads per week — one number input per active locale */}
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-sm font-medium">
+              {t("post.leadsPerWeek.label")}
+            </Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("post.leadsPerWeek.description")}
+            </Span>
+            <Div className="flex flex-col gap-2">
+              {Object.values(CountryLanguageValues)
+                .filter((loc) => {
+                  const val = form?.watch("leadsPerWeek")?.[loc];
+                  return val !== undefined && val > 0;
+                })
+                .map((loc) => (
+                  <Div key={loc} className="flex items-center gap-3">
+                    <Label className="w-24 font-medium text-sm">{loc}</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      className="w-32"
+                      value={form?.watch("leadsPerWeek")?.[loc] ?? ""}
+                      onChange={(e) => {
+                        const num = e.target.value;
+                        const current = form?.getValues("leadsPerWeek") ?? {};
+                        if (!Number.isNaN(num) && num >= 1) {
+                          form?.setValue("leadsPerWeek", {
+                            ...current,
+                            [loc]: num,
+                          });
+                        } else if (num === 0) {
+                          const updated = { ...current };
+                          delete updated[loc];
+                          form?.setValue("leadsPerWeek", updated);
+                        }
+                      }}
+                    />
+                  </Div>
+                ))}
+            </Div>
+            {/* Add locale selector */}
+            <Div className="flex items-center gap-2 mt-1">
+              <Select
+                value=""
+                onValueChange={(loc) => {
+                  if (!loc) {
+                    return;
+                  }
+                  const current = form?.getValues("leadsPerWeek") ?? {};
+                  if (!current[loc]) {
+                    form?.setValue("leadsPerWeek", { ...current, [loc]: 50 });
+                  }
+                }}
+              >
+                <SelectTrigger className="w-48 h-8 text-sm">
+                  <SelectValue placeholder={t("widget.addLocale")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(CountryLanguageValues)
+                    .filter((loc) => {
+                      const val = form?.watch("leadsPerWeek")?.[loc];
+                      return val === undefined || val === 0;
+                    })
+                    .map((loc) => (
+                      <SelectItem key={loc} value={loc}>
+                        {loc}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </Div>
+          </Div>
+        </CardContent>
+      </Card>
+
+      {/* Section 4 — Advanced */}
+      <Card className="border-dashed">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.advanced")}
+          </CardTitle>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.sections.advancedDescription")}
+          </Span>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <NumberFieldWidget
+            fieldName="minAgeHours"
+            field={children.minAgeHours}
+          />
+          <SelectFieldWidget fieldName="priority" field={children.priority} />
+          <NumberFieldWidget fieldName="timeout" field={children.timeout} />
+          <NumberFieldWidget fieldName="retries" field={children.retries} />
+          <NumberFieldWidget
+            fieldName="retryDelay"
+            field={children.retryDelay}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Submit */}
+      <SubmitButtonWidget<typeof definition.PUT>
+        field={{
+          text: "widget.save",
+          loadingText: "widget.saving",
+          icon: "save",
+          variant: "primary",
+        }}
+      />
     </Div>
   );
 }

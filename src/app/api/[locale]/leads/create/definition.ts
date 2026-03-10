@@ -128,7 +128,10 @@ const { POST } = createEndpoint({
             placeholder: "post.phone.placeholder",
             columns: 6,
             schema: z
-              .union([z.string().regex(/^\+?[1-9]\d{1,14}$/), z.literal("")])
+              .union([
+                z.string().regex(/^\+?[\d\s\-().]{4,20}$/),
+                z.literal(""),
+              ])
               .optional()
               .transform((v) => (v === "" ? undefined : v)),
           }),

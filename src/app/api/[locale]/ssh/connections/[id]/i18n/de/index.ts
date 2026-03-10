@@ -6,11 +6,14 @@ export const translations = {
       password: "Passwort",
       privateKey: "Privater Schlüssel (PEM)",
       keyAgent: "SSH-Agent",
+      local: "Lokaler Rechner",
     },
   },
 
   errors: {
     connectionNotFound: "Verbindung nicht gefunden",
+    encryptionFailed:
+      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
   },
 
   get: {
@@ -62,6 +65,53 @@ export const translations = {
   patch: {
     title: "SSH-Verbindung aktualisieren",
     description: "SSH-Verbindungseinstellungen aktualisieren",
+    fields: {
+      id: {
+        label: "Verbindungs-ID",
+        description: "Die zu aktualisierende Verbindung",
+      },
+      label: {
+        label: "Name",
+        description: "Anzeigename für diese Verbindung",
+        placeholder: "prod-web-01",
+      },
+      host: {
+        label: "Host",
+        description: "Hostname oder IP-Adresse",
+        placeholder: "1.2.3.4",
+      },
+      port: { label: "Port", description: "SSH-Port", placeholder: "22" },
+      username: {
+        label: "Benutzername",
+        description: "SSH-Anmeldebenutzer",
+        placeholder: "deploy",
+      },
+      authType: {
+        label: "Authentifizierungstyp",
+        description: "Authentifizierungsmethode",
+      },
+      secret: {
+        label: "Passwort / Privater Schlüssel",
+        description: "Leer lassen um vorhandenes Secret beizubehalten",
+      },
+      passphrase: {
+        label: "Schlüssel-Passphrase",
+        description:
+          "Leer lassen um vorhandene Passphrase beizubehalten oder zu löschen",
+      },
+      isDefault: {
+        label: "Als Standard setzen",
+        description:
+          "Diese Verbindung standardmäßig für Terminal-Sitzungen verwenden",
+      },
+      notes: {
+        label: "Notizen",
+        description: "Optionale Notizen zu dieser Verbindung",
+      },
+    },
+    response: {
+      updatedAt: { title: "Aktualisiert am" },
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",
@@ -102,6 +152,15 @@ export const translations = {
   delete: {
     title: "SSH-Verbindung löschen",
     description: "Eine SSH-Verbindung löschen",
+    fields: {
+      id: {
+        label: "Verbindungs-ID",
+        description: "Die zu löschende Verbindung",
+      },
+    },
+    response: {
+      deleted: { title: "Gelöscht" },
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",
@@ -148,5 +207,7 @@ export const translations = {
     saveButton: "Änderungen speichern",
     deleteButton: "Verbindung löschen",
     testButton: "Verbindung testen",
+    confirmDelete:
+      "Diese Verbindung löschen? Dies kann nicht rückgängig gemacht werden.",
   },
 };

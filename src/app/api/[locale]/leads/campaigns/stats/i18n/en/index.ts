@@ -29,6 +29,9 @@ export const translations = {
       byStage: "By stage",
       byJourneyVariant: "By journey variant",
       byStatus: "By status",
+      totalLeads: "Total leads",
+      linkedLeadsCount: "Linked leads",
+      uniquePersonsEstimate: "Unique persons (est.)",
       pendingLeadsCount: "Active leads in campaigns",
       emailsScheduledToday: "Emails scheduled today",
     },
@@ -69,5 +72,13 @@ export const translations = {
     statusLabel: "Send status",
     variantLabel: "By journey",
     emDash: "—",
+    leadOverview: "Lead Overview",
+    totalLeads: "Total leads",
+    linkedLeadsCount: "Linked leads",
+    uniquePersonsEstimate: "Unique persons (est.)",
+    uniquePersonsTooltip:
+      "Leads minus secondary linked leads (same-person duplicates)",
+    activeCampaigns: "Active Campaigns",
+    sendPerformance: "Send Performance",
   },
 };

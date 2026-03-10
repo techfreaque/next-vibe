@@ -275,6 +275,13 @@ export const translations: typeof enTranslations = {
       standalone: "Eigenständig",
       withBoth: "Mit beiden",
     },
+    deviceType: {
+      desktop: "Desktop",
+      mobile: "Mobilgerät",
+      tablet: "Tablet",
+      bot: "Bot",
+      unknown: "Unbekannt",
+    },
     leadSource: {
       website: "Website",
       socialMedia: "Soziale Medien",

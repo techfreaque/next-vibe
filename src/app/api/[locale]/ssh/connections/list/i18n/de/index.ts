@@ -6,6 +6,7 @@ export const translations = {
       password: "Passwort",
       privateKey: "Privater Schlüssel (PEM)",
       keyAgent: "SSH-Agent",
+      local: "Lokaler Rechner",
     },
   },
 

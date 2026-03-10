@@ -13,8 +13,19 @@ import definitions from "./definition";
 /**
  * Export handlers using endpointsHandler
  */
-export const { PATCH, DELETE, tools } = endpointsHandler({
+export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
+  [Methods.GET]: {
+    handler: async ({ user, urlPathParams, logger, locale }) => {
+      const { t } = importScopedTranslation.scopedT(locale);
+      return await leadsImportRepository.getImportJobFormatted(
+        user.id,
+        urlPathParams.jobId,
+        logger,
+        t,
+      );
+    },
+  },
   [Methods.PATCH]: {
     handler: async ({ user, data, urlPathParams, logger, locale }) => {
       const { t } = importScopedTranslation.scopedT(locale);

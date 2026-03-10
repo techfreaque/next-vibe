@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, gt, isNull, sql } from "drizzle-orm";
+import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -30,6 +30,7 @@ import type { JwtPayloadType } from "../../user/auth/types";
 import { LeadAuthRepository } from "../auth/repository";
 import { leads } from "../db";
 import {
+  DeviceType,
   EmailCampaignStage,
   EngagementTypes,
   isStatusTransitionAllowed,
@@ -83,6 +84,86 @@ const getMetadataNumber = (
   const value = meta[key];
   return typeof value === "number" ? value : 0;
 };
+
+type DeviceTypeValue = (typeof DeviceType)[keyof typeof DeviceType];
+
+/**
+ * Parse basic device type, browser and OS from user agent string
+ */
+function parseUserAgent(userAgent: string): {
+  deviceType: DeviceTypeValue;
+  browser: string;
+  os: string;
+} {
+  const ua = userAgent.toLowerCase();
+
+  // Device type detection
+  let deviceType: DeviceTypeValue = DeviceType.UNKNOWN;
+  if (
+    ua.includes("bot") ||
+    ua.includes("crawler") ||
+    ua.includes("spider") ||
+    ua.includes("googlebot") ||
+    ua.includes("bingbot") ||
+    ua.includes("slurp") ||
+    ua.includes("duckduckbot") ||
+    ua.includes("baidu") ||
+    ua.includes("yandex")
+  ) {
+    deviceType = DeviceType.BOT;
+  } else if (ua.includes("tablet") || ua.includes("ipad")) {
+    deviceType = DeviceType.TABLET;
+  } else if (
+    ua.includes("mobile") ||
+    ua.includes("android") ||
+    ua.includes("iphone") ||
+    ua.includes("ipod") ||
+    ua.includes("blackberry") ||
+    ua.includes("windows phone")
+  ) {
+    deviceType = DeviceType.MOBILE;
+  } else if (ua.length > 0) {
+    deviceType = DeviceType.DESKTOP;
+  }
+
+  // Browser detection
+  let browser = "Unknown";
+  if (ua.includes("firefox")) {
+    browser = "Firefox";
+  } else if (ua.includes("edg/")) {
+    browser = "Edge";
+  } else if (ua.includes("opr/") || ua.includes("opera")) {
+    browser = "Opera";
+  } else if (ua.includes("chrome") && !ua.includes("chromium")) {
+    browser = "Chrome";
+  } else if (ua.includes("safari") && !ua.includes("chrome")) {
+    browser = "Safari";
+  } else if (ua.includes("msie") || ua.includes("trident/")) {
+    browser = "Internet Explorer";
+  }
+
+  // OS detection
+  let os = "Unknown";
+  if (ua.includes("windows nt")) {
+    os = "Windows";
+  } else if (ua.includes("mac os x") || ua.includes("macos")) {
+    os = "macOS";
+  } else if (ua.includes("android")) {
+    os = "Android";
+  } else if (
+    ua.includes("ios") ||
+    ua.includes("iphone") ||
+    ua.includes("ipad")
+  ) {
+    os = "iOS";
+  } else if (ua.includes("linux")) {
+    os = "Linux";
+  } else if (ua.includes("cros")) {
+    os = "ChromeOS";
+  }
+
+  return { deviceType, browser, os };
+}
 
 /**
  * Handles all server-side tracking operations
@@ -311,8 +392,17 @@ export class LeadTrackingRepository {
             eq(leads.source, LeadSource.WEBSITE),
             isNull(leads.email), // Anonymous leads have no email
             gt(leads.createdAt, fiveMinutesAgo),
-            sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
-            sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
+            // Check new typed columns first, fall back to metadata JSONB for old rows
+            or(
+              and(
+                eq(leads.ipAddress, clientInfo.ipAddress),
+                eq(leads.userAgent, clientInfo.userAgent),
+              ),
+              and(
+                sql`${leads.metadata}->>'ipAddress' = ${clientInfo.ipAddress}`,
+                sql`${leads.metadata}->>'userAgent' = ${clientInfo.userAgent}`,
+              ),
+            ),
           ),
         )
         .limit(1);
@@ -326,6 +416,8 @@ export class LeadTrackingRepository {
       const country = getCountryFromLocale(locale);
       const language = getLanguageFromLocale(locale);
 
+      const parsedDevice = parseUserAgent(clientInfo.userAgent);
+
       const newLead = {
         email: `anonymous-${crypto.randomUUID()}@tracking.local`,
         businessName: "",
@@ -338,11 +430,15 @@ export class LeadTrackingRepository {
         status: LeadStatus.WEBSITE_USER, // Website leads are always WEBSITE_USER
         notes: "", // Will be set with proper translation key when needed
         currentCampaignStage: EmailCampaignStage.NOT_STARTED,
+        // Identity columns — first-touch, written once
+        ipAddress: clientInfo.ipAddress,
+        userAgent: clientInfo.userAgent,
+        deviceType: parsedDevice.deviceType,
+        browser: parsedDevice.browser,
+        os: parsedDevice.os,
         metadata: {
           anonymous: true,
           createdFromTracking: true,
-          userAgent: clientInfo.userAgent,
-          ipAddress: clientInfo.ipAddress,
           referer: clientInfo.referer,
           timestamp: new Date().toISOString(),
         },

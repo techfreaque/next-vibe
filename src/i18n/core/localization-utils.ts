@@ -12,6 +12,7 @@ import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { CountryLanguage, Currencies } from "./config";
 import { getCountryFromLocale } from "./language-utils";
 import { simpleT } from "./shared";
+import type { TranslationKey } from "./static-types";
 
 /**
  * Get locale string from CountryLanguage format
@@ -244,8 +245,10 @@ export function getCurrentTimeInTimezone(
 export function getDefaultTimezone(locale: CountryLanguage): string {
   const { t } = simpleT(locale);
   const country = getCountryFromLocale(locale);
-  const timezone = t(`config.timezone.${country}` as Parameters<typeof t>[0]);
-  return timezone;
+  const key: TranslationKey = `config.timezone.${country}`;
+  const resolved = t(key);
+  // If key wasn't found, t() returns the key itself — fall back to UTC
+  return resolved === key ? "UTC" : resolved;
 }
 
 /**

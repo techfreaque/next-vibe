@@ -1,6 +1,4 @@
-import type { journeysTranslations as enJourneys } from "../en/journeys";
-
-export const journeysTranslations: typeof enJourneys = {
+export const journeysTranslations = {
   uncensoredConvert: {
     initial: {
       subject: "hab was gefunden, das ich teilen musste",

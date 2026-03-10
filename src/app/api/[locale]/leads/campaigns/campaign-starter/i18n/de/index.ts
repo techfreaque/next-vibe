@@ -57,6 +57,14 @@ export const translations: typeof enTranslations = {
       description: "Kampagnenstarter wurde erfolgreich ausgeführt",
     },
   },
+  widget: {
+    title: "Kampagnenstarter ausführen",
+    description:
+      "Manuell den Kampagnenstarter auslösen, um berechtigte Leads zu verarbeiten und E-Mail-Sequenzen zu starten.",
+    runButton: "Kampagnen starten",
+    running: "Läuft...",
+    done: "Fertig",
+  },
   errors: {
     server: {
       title: "Serverfehler",

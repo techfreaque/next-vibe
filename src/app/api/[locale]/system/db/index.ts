@@ -13,6 +13,7 @@ import * as leadsSchema from "../../leads/db";
 import * as referralSchema from "../../referral/db";
 import * as sshSchema from "../../ssh/db";
 import * as cronTasksSchema from "../../system/unified-interface/tasks/cron/db";
+import * as vibeSenseSchema from "../../system/unified-interface/vibe-sense/db";
 import * as userSchema from "../../user/db";
 import * as userRemoteConnectionSchema from "../../user/remote-connection/db";
 
@@ -49,6 +50,7 @@ export const db = drizzle(pool, {
     ...leadsSchema,
     ...referralSchema,
     ...sshSchema,
+    ...vibeSenseSchema,
   },
 });
 

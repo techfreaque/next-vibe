@@ -75,21 +75,13 @@ export class NewsletterSubscribeRepository {
           const newStatus = getNewsletterSubscriptionStatus(currentStatus);
 
           const updateData = {
-            updates: {
-              basicInfo: {
-                status: newStatus,
-              },
-              contactDetails: {},
-              campaignManagement: {},
-              additionalDetails: {
-                metadata: {
-                  ...leadResult.data.lead.metadata.metadata,
-                  newsletterSubscribed: true,
-                  newsletterSubscriptionDate: new Date().toISOString(),
-                  subscribedEmail: data.email,
-                  subscribedName: data.name || "",
-                },
-              },
+            status: newStatus,
+            metadata: {
+              ...leadResult.data.lead.metadata.metadata,
+              newsletterSubscribed: true,
+              newsletterSubscriptionDate: new Date().toISOString(),
+              subscribedEmail: data.email,
+              subscribedName: data.name || "",
             },
           };
 

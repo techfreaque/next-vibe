@@ -24,6 +24,10 @@ export const translations = {
     connectTimeout: "Connection timed out",
     sshAuthFailed: "SSH authentication failed",
     sshConnectionFailed: "SSH connection failed",
+    sudoAuthFailed:
+      "Sudo authentication failed — wrong password or insufficient sudo privileges",
+    permissionDenied:
+      "Permission denied: provide your sudo password to create OS users",
     fingerprintMismatch:
       "Host fingerprint has changed. Potential MITM attack. Acknowledge to proceed.",
   },

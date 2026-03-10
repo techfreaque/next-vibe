@@ -25,6 +25,10 @@ export const translations = {
     connectTimeout: "Verbindung hat Zeitlimit überschritten",
     sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
     sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",
+    sudoAuthFailed:
+      "Sudo-Authentifizierung fehlgeschlagen — falsches Passwort oder unzureichende sudo-Rechte",
+    permissionDenied:
+      "Zugriff verweigert: Geben Sie Ihr sudo-Passwort an, um OS-Benutzer zu erstellen",
     fingerprintMismatch:
       "Host-Fingerabdruck hat sich geändert. Möglicher MITM-Angriff. Bestätigen Sie, um fortzufahren.",
   },

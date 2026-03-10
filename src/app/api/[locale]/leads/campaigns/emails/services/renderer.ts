@@ -389,6 +389,24 @@ export class EmailRendererService {
           "emailJourneys.components.journeyInfo.quietRecommendation.description",
         ),
       },
+      [EmailJourneyVariant.SIGNUP_NURTURE]: {
+        name: t("emailJourneys.components.journeyInfo.signupNurture.name"),
+        description: t(
+          "emailJourneys.components.journeyInfo.signupNurture.description",
+        ),
+      },
+      [EmailJourneyVariant.RETENTION]: {
+        name: t("emailJourneys.components.journeyInfo.retention.name"),
+        description: t(
+          "emailJourneys.components.journeyInfo.retention.description",
+        ),
+      },
+      [EmailJourneyVariant.WINBACK]: {
+        name: t("emailJourneys.components.journeyInfo.winback.name"),
+        description: t(
+          "emailJourneys.components.journeyInfo.winback.description",
+        ),
+      },
     };
 
     const info = journeyInfo[journeyVariant] ?? {
@@ -447,6 +465,8 @@ export class EmailRendererService {
       metadata: {},
       createdAt: new Date(),
       updatedAt: new Date(),
+      linkedLeadsCount: 0,
+      hasLinkedUser: false,
     };
 
     // Check cache first

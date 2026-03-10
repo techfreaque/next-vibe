@@ -29,6 +29,12 @@ import {
   type LeadsTranslationKey,
   scopedTranslation as leadsScopedTranslation,
 } from "@/app/api/[locale]/leads/i18n";
+import {
+  LeadSource,
+  LeadSourceFilter,
+  LeadStatus,
+  LeadStatusFilter,
+} from "@/app/api/[locale]/leads/enum";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
@@ -491,6 +497,37 @@ const SOURCE_BAR_COLORS: Record<string, string> = {
   "enums.leadSource.csvImport": "#f97316",
 };
 
+// ─── Enum mappings for navigation ────────────────────────────────────────────
+
+type LeadStatusValue = (typeof LeadStatus)[keyof typeof LeadStatus];
+type LeadStatusFilterValue =
+  (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
+type LeadSourceValue = (typeof LeadSource)[keyof typeof LeadSource];
+type LeadSourceFilterValue =
+  (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter];
+
+const LEAD_STATUS_TO_FILTER: Record<LeadStatusValue, LeadStatusFilterValue> = {
+  [LeadStatus.NEW]: LeadStatusFilter.NEW,
+  [LeadStatus.PENDING]: LeadStatusFilter.PENDING,
+  [LeadStatus.CAMPAIGN_RUNNING]: LeadStatusFilter.CAMPAIGN_RUNNING,
+  [LeadStatus.WEBSITE_USER]: LeadStatusFilter.WEBSITE_USER,
+  [LeadStatus.NEWSLETTER_SUBSCRIBER]: LeadStatusFilter.NEWSLETTER_SUBSCRIBER,
+  [LeadStatus.IN_CONTACT]: LeadStatusFilter.IN_CONTACT,
+  [LeadStatus.SIGNED_UP]: LeadStatusFilter.SIGNED_UP,
+  [LeadStatus.SUBSCRIPTION_CONFIRMED]: LeadStatusFilter.SUBSCRIPTION_CONFIRMED,
+  [LeadStatus.UNSUBSCRIBED]: LeadStatusFilter.UNSUBSCRIBED,
+  [LeadStatus.BOUNCED]: LeadStatusFilter.BOUNCED,
+  [LeadStatus.INVALID]: LeadStatusFilter.INVALID,
+};
+
+const LEAD_SOURCE_TO_FILTER: Record<LeadSourceValue, LeadSourceFilterValue> = {
+  [LeadSource.WEBSITE]: LeadSourceFilter.WEBSITE,
+  [LeadSource.SOCIAL_MEDIA]: LeadSourceFilter.SOCIAL_MEDIA,
+  [LeadSource.EMAIL_CAMPAIGN]: LeadSourceFilter.EMAIL_CAMPAIGN,
+  [LeadSource.REFERRAL]: LeadSourceFilter.REFERRAL,
+  [LeadSource.CSV_IMPORT]: LeadSourceFilter.CSV_IMPORT,
+};
+
 // ─── Quick action buttons ─────────────────────────────────────────────────────
 
 interface QuickActionProps {
@@ -611,32 +648,32 @@ export function LeadsStatsContainer({
   }, [navigate]);
 
   const handleNavigateToStatus = useCallback(
-    (category: LeadsTranslationKey): void => {
+    (category: LeadStatusValue): void => {
       void (async (): Promise<void> => {
         const listDef =
           await import("@/app/api/[locale]/leads/list/definition");
-        // Map "enums.leadStatus.X" → "enums.leadStatusFilter.X"
-        const filterValue = category.replace(
-          "enums.leadStatus.",
-          "enums.leadStatusFilter.",
-        );
-        navigate(listDef.default.GET, {
-          data: { statusFilters: { status: [filterValue] } },
-        });
+        const filterValue = LEAD_STATUS_TO_FILTER[category];
+        if (filterValue) {
+          navigate(listDef.default.GET, {
+            data: { statusFilters: { status: [filterValue] } },
+          });
+        }
       })();
     },
     [navigate],
   );
 
   const handleNavigateToSource = useCallback(
-    (category: LeadsTranslationKey): void => {
+    (category: LeadSourceValue): void => {
       void (async (): Promise<void> => {
         const listDef =
           await import("@/app/api/[locale]/leads/list/definition");
-        // LeadSourceFilter uses same values as LeadSource
-        navigate(listDef.default.GET, {
-          data: { statusFilters: { source: [category] } },
-        });
+        const filterValue = LEAD_SOURCE_TO_FILTER[category];
+        if (filterValue) {
+          navigate(listDef.default.GET, {
+            data: { statusFilters: { source: [filterValue] } },
+          });
+        }
       })();
     },
     [navigate],
@@ -1037,7 +1074,7 @@ export function LeadsStatsContainer({
                     {i + 1}.
                   </Span>
                   <Span className="flex-1 truncate">
-                    {leadsT(campaign.campaignName as LeadsTranslationKey)}
+                    {campaign.campaignName}
                   </Span>
                   {campaign.openRate !== null &&
                     campaign.openRate !== undefined && (
@@ -1087,7 +1124,7 @@ export function LeadsStatsContainer({
                   variant="ghost"
                   className="flex items-center gap-3 text-sm cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5 transition-colors w-full justify-start h-auto"
                   onClick={() => {
-                    handleNavigateToSource(src.source as LeadsTranslationKey);
+                    handleNavigateToSource(src.source);
                   }}
                 >
                   <Span className="w-5 text-muted-foreground text-xs">

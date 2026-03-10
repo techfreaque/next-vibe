@@ -66,6 +66,8 @@ export const translations = {
     title: "Campaign Queue",
     refresh: "Refresh",
     noData: "No leads currently in campaigns",
+    emptyDescription:
+      "When leads are enrolled in email campaigns, they will appear here. Use the Campaign Starter on the Dashboard or configure the scheduler in Settings to begin enrolling leads.",
     empty: "No leads found",
     columnEmail: "Email",
     columnBusiness: "Business",

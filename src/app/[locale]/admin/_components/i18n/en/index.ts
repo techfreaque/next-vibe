@@ -8,6 +8,7 @@ export const translations = {
     cronTasks: "Cron Tasks",
     sshAccess: "SSH / Machine",
     remoteConnections: "Remote Connections",
+    vibeSense: "Vibe Sense",
     endpoints: "Endpoints",
     vibeFrame: "Vibe Frame",
     admin: "Admin",

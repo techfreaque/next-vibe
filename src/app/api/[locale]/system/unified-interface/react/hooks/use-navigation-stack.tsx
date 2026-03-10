@@ -16,6 +16,7 @@ interface NavigationOptions<TEndpoint extends CreateApiEndpointAny> {
   getEndpoint?: CreateApiEndpointAny;
   renderInModal?: boolean;
   popNavigationOnSuccess?: number;
+  onSuccessCallback?: () => void;
   replaceOnSuccess?: {
     endpoint: CreateApiEndpointAny;
     getUrlPathParams?: (
@@ -79,6 +80,7 @@ function createNavigationStackStore() {
         getEndpoint,
         renderInModal = false,
         popNavigationOnSuccess,
+        onSuccessCallback,
         replaceOnSuccess,
         modalPosition,
       } = options;
@@ -91,6 +93,7 @@ function createNavigationStackStore() {
         getEndpoint,
         renderInModal,
         popNavigationOnSuccess,
+        onSuccessCallback,
         replaceOnSuccess,
         modalPosition,
       };
@@ -122,6 +125,7 @@ function createNavigationStackStore() {
         getEndpoint,
         renderInModal = false,
         popNavigationOnSuccess,
+        onSuccessCallback,
         replaceOnSuccess,
         modalPosition,
       } = options;
@@ -134,6 +138,7 @@ function createNavigationStackStore() {
         getEndpoint,
         renderInModal,
         popNavigationOnSuccess,
+        onSuccessCallback,
         replaceOnSuccess,
         modalPosition,
       };

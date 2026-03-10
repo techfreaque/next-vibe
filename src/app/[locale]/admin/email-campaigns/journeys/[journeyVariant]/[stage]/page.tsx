@@ -26,6 +26,7 @@ import {
   EmailJourneyVariant,
 } from "@/app/api/[locale]/leads/enum";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
+import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -52,12 +53,12 @@ export default async function EmailPreviewPage({
   );
 
   // Validate journey variant
-  if (!Object.values(EmailJourneyVariant).includes(journeyVariant)) {
+  if (!isValidEnumValue(EmailJourneyVariant, journeyVariant)) {
     notFound();
   }
 
   // Validate stage
-  if (!Object.values(EmailCampaignStage).includes(stage)) {
+  if (!isValidEnumValue(EmailCampaignStage, stage)) {
     notFound();
   }
 
@@ -117,7 +118,7 @@ export default async function EmailPreviewPage({
                   {t("app.admin.leads.leads.admin.emails.preview_title")}
                 </H1>
                 <P className="text-gray-600 dark:text-gray-400">
-                  {journeyInfo.name} - {stage}
+                  {journeyInfo.name} - {scopedT(stage)}
                 </P>
               </Div>
             </Div>

@@ -22,10 +22,13 @@ import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { Hash } from "next-vibe-ui/ui/icons/Hash";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Info } from "next-vibe-ui/ui/icons/Info";
+import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
 import { MousePointer } from "next-vibe-ui/ui/icons/MousePointer";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Phone } from "next-vibe-ui/ui/icons/Phone";
@@ -37,6 +40,7 @@ import { Target } from "next-vibe-ui/ui/icons/Target";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { User } from "next-vibe-ui/ui/icons/User";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Link } from "next-vibe-ui/ui/link";
@@ -57,6 +61,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
+  useWidgetEndpointMutations,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
@@ -76,6 +81,7 @@ import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import userDefinitions from "../../../users/user/[id]/definition";
 import {
+  DeviceType,
   EmailCampaignStage,
   EmailCampaignStageOptions,
   LeadSource,
@@ -968,6 +974,312 @@ function DetailsTab({
   );
 }
 
+// ─── Identity tab content ──────────────────────────────────────────────────────
+
+function LinkedIdentitiesTab({
+  data,
+  locale,
+  t,
+  leadsT,
+  onViewUserProfile,
+  onViewLinkedLead,
+}: {
+  data: NonNullable<LeadGetResponseOutput["lead"]>;
+  locale: ReturnType<typeof useWidgetLocale>;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  leadsT: LeadsT;
+  onViewUserProfile: (id: string) => void;
+  onViewLinkedLead: (id: string) => void;
+}): React.JSX.Element {
+  const { identity, lifecycle, linkedLeads, linkedUsers } = data;
+
+  const DEVICE_TYPE_COLORS: Record<string, string> = {
+    [DeviceType.DESKTOP]:
+      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    [DeviceType.MOBILE]:
+      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    [DeviceType.TABLET]:
+      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+    [DeviceType.BOT]:
+      "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+    [DeviceType.UNKNOWN]:
+      "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
+  };
+
+  return (
+    <Div className="flex flex-col gap-4">
+      {/* Device & Identity */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Monitor className="h-4 w-4" />
+            {t("widget.deviceIdentity")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Div className="grid grid-cols-2 gap-3">
+            {identity.ipAddress && (
+              <Div className="flex items-center gap-1 col-span-2">
+                <Div className="flex-1 min-w-0">
+                  <P className="text-xs text-muted-foreground">
+                    {t("widget.ipAddress")}
+                  </P>
+                  <P className="text-sm font-mono truncate">
+                    {identity.ipAddress}
+                  </P>
+                </Div>
+                <CopyButton
+                  text={identity.ipAddress}
+                  label={t("widget.copyIp")}
+                />
+              </Div>
+            )}
+            {identity.deviceType && (
+              <Div>
+                <P className="text-xs text-muted-foreground">
+                  {t("widget.deviceType")}
+                </P>
+                <Span
+                  className={cn(
+                    "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-0.5",
+                    DEVICE_TYPE_COLORS[identity.deviceType] ??
+                      "bg-gray-100 text-gray-800",
+                  )}
+                >
+                  {leadsT(identity.deviceType)}
+                </Span>
+              </Div>
+            )}
+            <InfoRow label={t("widget.browser")} value={identity.browser} />
+            <InfoRow label={t("widget.os")} value={identity.os} />
+            {identity.referralCode && (
+              <Div className="col-span-2">
+                <InfoRow
+                  label={t("widget.referralCode")}
+                  value={identity.referralCode}
+                  mono
+                />
+              </Div>
+            )}
+            {identity.userAgent && (
+              <Div className="col-span-2">
+                <P className="text-xs text-muted-foreground">
+                  {t("widget.userAgent")}
+                </P>
+                <P className="text-xs font-mono text-muted-foreground/80 mt-0.5 break-all leading-relaxed">
+                  {identity.userAgent}
+                </P>
+              </Div>
+            )}
+          </Div>
+        </CardContent>
+      </Card>
+
+      {/* Lifecycle timestamps */}
+      {(lifecycle.bouncedAt ??
+        lifecycle.invalidAt ??
+        lifecycle.campaignStartedAt) && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              {t("widget.lifecycleTimestamps")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Div className="grid grid-cols-2 gap-3">
+              {lifecycle.campaignStartedAt && (
+                <InfoRow
+                  label={t("widget.campaignStartedAt")}
+                  value={formatSimpleDate(lifecycle.campaignStartedAt, locale)}
+                />
+              )}
+              {lifecycle.bouncedAt && (
+                <Div className="flex items-start gap-2">
+                  <AlertTriangle className="h-3.5 w-3.5 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <InfoRow
+                    label={t("widget.bouncedAt")}
+                    value={formatSimpleDate(lifecycle.bouncedAt, locale)}
+                  />
+                </Div>
+              )}
+              {lifecycle.invalidAt && (
+                <Div className="flex items-start gap-2">
+                  <AlertCircle className="h-3.5 w-3.5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <InfoRow
+                    label={t("widget.invalidAt")}
+                    value={formatSimpleDate(lifecycle.invalidAt, locale)}
+                  />
+                </Div>
+              )}
+            </Div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Linked Leads */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Link2 className="h-4 w-4" />
+            {t("widget.linkedLeadsSection")}
+            {linkedLeads.length > 0 && (
+              <Span className="ml-auto inline-flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
+                {linkedLeads.length}
+              </Span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {linkedLeads.length === 0 ? (
+            <P className="text-sm text-muted-foreground">
+              {t("widget.linkedLeadsEmpty")}
+            </P>
+          ) : (
+            <Div className="flex flex-col gap-3">
+              {linkedLeads.map((link) => (
+                <Div
+                  key={link.linkedLeadId}
+                  className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
+                >
+                  <Div className="flex items-center justify-between gap-2">
+                    <Div className="flex items-center gap-2 min-w-0">
+                      <User className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                      <Strong className="text-sm font-medium truncate">
+                        {link.businessName ?? link.email ?? "—"}
+                      </Strong>
+                      {link.status && (
+                        <Span
+                          className={cn(
+                            "inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium",
+                            STATUS_COLORS[link.status] ??
+                              "bg-gray-100 text-gray-800",
+                          )}
+                        >
+                          {leadsT(link.status)}
+                        </Span>
+                      )}
+                    </Div>
+                    <Div className="flex items-center gap-1 flex-shrink-0">
+                      <CopyButton
+                        text={link.linkedLeadId}
+                        label={t("widget.copyLinkedLeadId")}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onViewLinkedLead(link.linkedLeadId)}
+                        className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                    </Div>
+                  </Div>
+                  {link.email && (
+                    <P className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Mail className="h-3 w-3 flex-shrink-0" />
+                      {link.email}
+                    </P>
+                  )}
+                  {link.ipAddress && (
+                    <P className="text-xs text-muted-foreground font-mono">
+                      {link.ipAddress}
+                    </P>
+                  )}
+                  <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
+                    <Span>
+                      {t("widget.linkReason")}{" "}
+                      <Strong className="text-foreground">
+                        {link.linkReason}
+                      </Strong>
+                    </Span>
+                    <Span>
+                      {t("widget.linkedAt")}{" "}
+                      {formatSimpleDate(link.linkedAt, locale)}
+                    </Span>
+                  </Div>
+                </Div>
+              ))}
+            </Div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Linked Users */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            {t("widget.linkedUsersSection")}
+            {linkedUsers.length > 0 && (
+              <Span className="ml-auto inline-flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5">
+                {linkedUsers.length}
+              </Span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {linkedUsers.length === 0 ? (
+            <P className="text-sm text-muted-foreground">
+              {t("widget.linkedUsersEmpty")}
+            </P>
+          ) : (
+            <Div className="flex flex-col gap-3">
+              {linkedUsers.map((link) => (
+                <Div
+                  key={link.userId}
+                  className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
+                >
+                  <Div className="flex items-center justify-between gap-2">
+                    <Div className="flex items-center gap-2 min-w-0">
+                      <Hash className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                      <Strong className="text-sm font-medium truncate">
+                        {link.publicName ?? link.email}
+                      </Strong>
+                    </Div>
+                    <Div className="flex items-center gap-1 flex-shrink-0">
+                      <CopyButton
+                        text={link.userId}
+                        label={t("widget.copyUserId2")}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onViewUserProfile(link.userId)}
+                        className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </Button>
+                    </Div>
+                  </Div>
+                  <P className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Mail className="h-3 w-3 flex-shrink-0" />
+                    {link.email}
+                  </P>
+                  <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
+                    <Span>
+                      {t("widget.linkReason")}{" "}
+                      <Strong className="text-foreground">
+                        {link.linkReason}
+                      </Strong>
+                    </Span>
+                    <Span>
+                      {t("widget.linkedAt")}{" "}
+                      {formatSimpleDate(link.linkedAt, locale)}
+                    </Span>
+                  </Div>
+                </Div>
+              ))}
+            </Div>
+          )}
+        </CardContent>
+      </Card>
+    </Div>
+  );
+}
+
 // ─── LeadDetailContainer (GET widget) ────────────────────────────────────────
 
 export function LeadDetailContainer({
@@ -977,6 +1289,7 @@ export function LeadDetailContainer({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
+  const endpointMutations = useWidgetEndpointMutations();
   const [activeTab, setActiveTab] = useState("overview");
 
   const data = field.value?.lead;
@@ -997,7 +1310,6 @@ export function LeadDetailContainer({
     navigation.push(definition.PATCH, {
       urlPathParams: { id: leadId },
       data: {
-        id: data.basicInfo.id,
         email: data.basicInfo.email ?? undefined,
         businessName: data.basicInfo.businessName ?? undefined,
         contactName: data.basicInfo.contactName ?? undefined,
@@ -1016,8 +1328,12 @@ export function LeadDetailContainer({
           ? new Date(data.conversion.subscriptionConfirmedAt)
           : undefined,
       },
+      popNavigationOnSuccess: 1,
+      onSuccessCallback: () => {
+        endpointMutations?.read?.refetch?.();
+      },
     });
-  }, [navigation, leadId, data]);
+  }, [navigation, leadId, data, endpointMutations]);
 
   const handleDelete = useCallback((): void => {
     if (!leadId) {
@@ -1025,6 +1341,8 @@ export function LeadDetailContainer({
     }
     navigation.push(definition.DELETE, {
       urlPathParams: { id: leadId },
+      renderInModal: true,
+      popNavigationOnSuccess: 1,
     });
   }, [navigation, leadId]);
 
@@ -1037,16 +1355,25 @@ export function LeadDetailContainer({
     [navigation],
   );
 
+  const handleViewLinkedLead = useCallback(
+    (linkedLeadId: string): void => {
+      navigation.push(definition.GET, {
+        urlPathParams: { id: linkedLeadId },
+      });
+    },
+    [navigation],
+  );
+
   const handleSendTestEmail = useCallback((): void => {
     void (async (): Promise<void> => {
       const testMailDef =
         await import("@/app/api/[locale]/leads/campaigns/emails/test-mail/definition");
       navigation.push(testMailDef.default.POST, {
         renderInModal: true,
-        data: leadId ? { leadId } : undefined,
+        data: undefined,
       });
     })();
-  }, [navigation, leadId]);
+  }, [navigation]);
 
   const handleViewInSearch = useCallback((): void => {
     navigation.push(leadsSearchDefinitions.GET);
@@ -1135,6 +1462,14 @@ export function LeadDetailContainer({
             <TabsTrigger value="details" className="flex-1">
               {t("widget.tabDetails")}
             </TabsTrigger>
+            <TabsTrigger value="identity" className="flex-1 relative">
+              {t("widget.tabIdentity")}
+              {(data.linkedLeads.length > 0 || data.linkedUsers.length > 0) && (
+                <Span className="absolute -top-1 -right-1 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4">
+                  {data.linkedLeads.length + data.linkedUsers.length}
+                </Span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-4">
@@ -1153,6 +1488,17 @@ export function LeadDetailContainer({
 
           <TabsContent value="details" className="mt-4">
             <DetailsTab data={data} locale={locale} t={t} />
+          </TabsContent>
+
+          <TabsContent value="identity" className="mt-4">
+            <LinkedIdentitiesTab
+              data={data}
+              locale={locale}
+              t={t}
+              leadsT={leadsT}
+              onViewUserProfile={handleViewUserProfile}
+              onViewLinkedLead={handleViewLinkedLead}
+            />
           </TabsContent>
         </Tabs>
       </Div>
@@ -1181,8 +1527,7 @@ function FormField({
 
 // ─── LeadEditContainer (PATCH widget) ────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- widget receives props from framework but uses context hooks instead
-export function LeadEditContainer(_props: PatchWidgetProps): React.JSX.Element {
+export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.PATCH>();
@@ -1196,22 +1541,23 @@ export function LeadEditContainer(_props: PatchWidgetProps): React.JSX.Element {
 
   const leadId = form.watch("id");
 
-  // Prefill flat form fields from GET response data (autoPrefillData arrives as nested `lead.*`)
-  // The form.getValues() returns the entire form state including nested GET response data
-  const allFormValues = form.watch();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- form values contain nested GET response data at runtime
-  const nestedLead = (allFormValues as Record<string, any>)
+  // Prefill flat form fields from GET response data.
+  // When navigated with prefillFromGet: true, the GET response is passed as field.value
+  // (typed as LeadPatchResponseOutput but at runtime contains { lead: { basicInfo: {...} } }).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- field.value contains GET response data at runtime when prefillFromGet: true
+  const fieldLead = (props.field.value as Record<string, any>)
     ?.lead as LeadGetResponseOutput["lead"];
-  const nestedLeadId = nestedLead?.basicInfo?.id;
   const prefillAppliedRef = useRef<string | undefined>(undefined);
+  const nestedLeadId = fieldLead?.basicInfo?.id;
   useEffect(() => {
-    if (!nestedLead?.basicInfo?.id) {
+    if (!fieldLead?.basicInfo?.id) {
       return;
     }
-    if (prefillAppliedRef.current === nestedLead.basicInfo.id) {
+    if (prefillAppliedRef.current === fieldLead.basicInfo.id) {
       return;
     }
-    prefillAppliedRef.current = nestedLead.basicInfo.id;
+    prefillAppliedRef.current = fieldLead.basicInfo.id;
+    const nestedLead = fieldLead;
     const {
       basicInfo,
       contactDetails,
@@ -1282,7 +1628,7 @@ export function LeadEditContainer(_props: PatchWidgetProps): React.JSX.Element {
         );
       }
     }
-  }, [nestedLeadId, form, nestedLead]);
+  }, [nestedLeadId, form, fieldLead]);
 
   const handleBack = useCallback((): void => {
     if (navigation.canGoBack) {
@@ -1293,13 +1639,17 @@ export function LeadEditContainer(_props: PatchWidgetProps): React.JSX.Element {
   }, [navigation]);
 
   const handleDelete = useCallback((): void => {
-    if (!leadId) {
+    const currentId = navigation.current?.params?.urlPathParams?.id;
+    const id = leadId ?? nestedLeadId ?? currentId;
+    if (!id) {
       return;
     }
     navigation.push(definition.DELETE, {
-      urlPathParams: { id: leadId },
+      urlPathParams: { id },
+      renderInModal: true,
+      popNavigationOnSuccess: 1,
     });
-  }, [navigation, leadId]);
+  }, [navigation, leadId, nestedLeadId]);
 
   const wasSubmittingRef = useRef(false);
 

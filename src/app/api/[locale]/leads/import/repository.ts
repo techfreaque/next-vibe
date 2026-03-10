@@ -20,6 +20,11 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import {
+  CronTaskPriority,
+  TaskCategory,
+  TaskOutputMode,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
@@ -102,6 +107,46 @@ export interface DomainImportRepository<T extends DomainRecord> {
       batchSize?: number;
       maxRetries?: number;
     },
+    logger: EndpointLogger,
+    t: ImportModuleT,
+  ): Promise<
+    ResponseType<{
+      job: {
+        info: {
+          id: string;
+          fileName: string;
+          status: (typeof CsvImportJobStatus)[keyof typeof CsvImportJobStatus];
+        };
+        progress: {
+          totalRows: number | null;
+          processedRows: number;
+          successfulImports: number;
+          failedImports: number;
+          duplicateEmails: number;
+        };
+        configuration: {
+          currentBatchStart: number;
+          batchSize: number;
+          retryCount: number;
+          maxRetries: number;
+          error: string | null;
+        };
+        timestamps: {
+          createdAt: string;
+          updatedAt: string;
+          startedAt: string | null;
+          completedAt: string | null;
+        };
+      };
+    }>
+  >;
+
+  /**
+   * Get import job by ID with formatted response
+   */
+  getImportJobFormatted(
+    userId: string,
+    jobId: string,
     logger: EndpointLogger,
     t: ImportModuleT,
   ): Promise<
@@ -516,15 +561,36 @@ export class LeadsImportRepository implements DomainImportRepository<LeadRecord>
 
       // Map the generic result to the leads-specific response format
       if (result.success) {
-        // Enable the csv-processor cron task only when a chunked job was created
-        if (result.data.isChunkedProcessing) {
+        // Create a one-shot cron task to process this import job
+        if (result.data.isChunkedProcessing && result.data.jobId) {
+          const taskId = `leads-import-${result.data.jobId}`;
           await db
-            .update(cronTasks)
-            .set({ enabled: true, updatedAt: new Date() })
-            .where(eq(cronTasks.routeId, "csv-processor"));
+            .insert(cronTasks)
+            .values({
+              id: taskId,
+              routeId: "leads_import_process_POST",
+              displayName: `Process import job ${result.data.jobId}`,
+              category: TaskCategory.MAINTENANCE,
+              schedule: "* * * * *",
+              priority: CronTaskPriority.MEDIUM,
+              enabled: true,
+              runOnce: true,
+              taskInput: {
+                dryRun: false,
+                maxJobsPerRun: 1,
+                maxRetriesPerJob: 0,
+                selfTaskId: taskId,
+              },
+              outputMode: TaskOutputMode.STORE_ONLY,
+              notificationTargets: [],
+              tags: ["leads-import", result.data.jobId],
+            })
+            .onConflictDoNothing();
 
-          logger.info("Enabled csv-processor cron task", {
+          logger.info("Created one-shot import task", {
+            taskId,
             userId: user.id,
+            jobId: result.data.jobId,
             fileName: data.fileName,
           });
         }
@@ -653,6 +719,87 @@ export class LeadsImportRepository implements DomainImportRepository<LeadRecord>
     const response = await importRepository.updateImportJob(
       userId,
       updates,
+      logger,
+      t,
+    );
+
+    if (!response.success) {
+      return response;
+    }
+
+    return success({
+      job: {
+        info: {
+          id: response.data.id,
+          fileName: response.data.fileName,
+          status: response.data.status,
+        },
+        progress: {
+          totalRows: response.data.totalRows,
+          processedRows: response.data.processedRows,
+          successfulImports: response.data.successfulImports,
+          failedImports: response.data.failedImports,
+          duplicateEmails: response.data.duplicateEmails,
+        },
+        configuration: {
+          currentBatchStart: response.data.currentBatchStart,
+          batchSize: response.data.batchSize,
+          retryCount: response.data.retryCount,
+          maxRetries: response.data.maxRetries,
+          error: response.data.error || null,
+        },
+        timestamps: {
+          createdAt: response.data.createdAt,
+          updatedAt: response.data.updatedAt,
+          startedAt: response.data.startedAt,
+          completedAt: response.data.completedAt,
+        },
+      },
+    });
+  }
+
+  /**
+   * Get import job by ID with formatted response
+   */
+  async getImportJobFormatted(
+    userId: string,
+    jobId: string,
+    logger: EndpointLogger,
+    t: ImportModuleT,
+  ): Promise<
+    ResponseType<{
+      job: {
+        info: {
+          id: string;
+          fileName: string;
+          status: (typeof CsvImportJobStatus)[keyof typeof CsvImportJobStatus];
+        };
+        progress: {
+          totalRows: number | null;
+          processedRows: number;
+          successfulImports: number;
+          failedImports: number;
+          duplicateEmails: number;
+        };
+        configuration: {
+          currentBatchStart: number;
+          batchSize: number;
+          retryCount: number;
+          maxRetries: number;
+          error: string | null;
+        };
+        timestamps: {
+          createdAt: string;
+          updatedAt: string;
+          startedAt: string | null;
+          completedAt: string | null;
+        };
+      };
+    }>
+  > {
+    const response = await importRepository.getCsvImportJobStatus(
+      jobId,
+      userId,
       logger,
       t,
     );

@@ -35,7 +35,6 @@ export const CRON_SCHEDULES = {
 
   // Monthly intervals
   MONTHLY_FIRST_DAY: "0 0 1 * *",
-  MONTHLY_LAST_DAY: "0 0 L * *",
 } as const;
 
 /**

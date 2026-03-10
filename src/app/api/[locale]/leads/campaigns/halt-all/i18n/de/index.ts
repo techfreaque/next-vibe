@@ -56,4 +56,17 @@ export const translations: typeof enTranslations = {
       description: "Alle Kampagnen wurden erfolgreich gestoppt",
     },
   },
+  widget: {
+    title: "Notfall-Stopp",
+    description:
+      "Alle aktiven E-Mail-Kampagnen sofort stoppen. Verwenden Sie dies bei Fehlern oder dringenden Problemen.",
+    haltButton: "Alle Kampagnen stoppen",
+    halting: "Stoppe...",
+    confirmTitle: "Alle Kampagnen stoppen?",
+    confirmDescription:
+      "Dies stoppt sofort alle aktiven E-Mail-Kampagnen und storniert ausstehende E-Mails. Diese Aktion kann nicht rückgängig gemacht werden.",
+    confirmButton: "Ja, alles stoppen",
+    cancelButton: "Abbrechen",
+    done: "Gestoppt",
+  },
 };

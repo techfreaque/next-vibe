@@ -25,6 +25,10 @@ export const translations = {
     connectTimeout: "Przekroczono limit czasu połączenia",
     sshAuthFailed: "Uwierzytelnianie SSH nieudane",
     sshConnectionFailed: "Połączenie SSH nieudane",
+    sudoAuthFailed:
+      "Uwierzytelnianie sudo nieudane — błędne hasło lub niewystarczające uprawnienia sudo",
+    permissionDenied:
+      "Odmowa dostępu: podaj hasło sudo, aby utworzyć użytkowników OS",
     fingerprintMismatch:
       "Odcisk palca hosta uległ zmianie. Możliwy atak MITM. Potwierdź, aby kontynuować.",
   },

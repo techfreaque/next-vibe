@@ -189,5 +189,8 @@ export const translations = {
     toggleActivate: "Aktywuj",
     toggleDeactivate: "Dezaktywuj",
     checkErrorsLabel: "Błędy sprawdzania:",
+    unsavedChanges: "niezapisane zmiany",
+    saving: "Zapisywanie…",
+    saveChanges: "Zapisz zmiany",
   },
 };

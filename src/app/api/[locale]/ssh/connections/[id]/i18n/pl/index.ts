@@ -6,11 +6,14 @@ export const translations = {
       password: "Hasło",
       privateKey: "Klucz prywatny (PEM)",
       keyAgent: "Agent SSH",
+      local: "Lokalny komputer",
     },
   },
 
   errors: {
     connectionNotFound: "Połączenie nie znalezione",
+    encryptionFailed:
+      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
   },
 
   get: {
@@ -56,6 +59,49 @@ export const translations = {
   patch: {
     title: "Aktualizuj połączenie SSH",
     description: "Zaktualizuj ustawienia połączenia SSH",
+    fields: {
+      id: { label: "ID połączenia", description: "Połączenie do aktualizacji" },
+      label: {
+        label: "Nazwa",
+        description: "Wyświetlana nazwa tego połączenia",
+        placeholder: "prod-web-01",
+      },
+      host: {
+        label: "Host",
+        description: "Nazwa hosta lub adres IP",
+        placeholder: "1.2.3.4",
+      },
+      port: { label: "Port", description: "Port SSH", placeholder: "22" },
+      username: {
+        label: "Nazwa użytkownika",
+        description: "Użytkownik SSH",
+        placeholder: "deploy",
+      },
+      authType: {
+        label: "Typ uwierzytelniania",
+        description: "Metoda uwierzytelniania",
+      },
+      secret: {
+        label: "Hasło / Klucz prywatny",
+        description: "Pozostaw puste aby zachować istniejące hasło",
+      },
+      passphrase: {
+        label: "Hasło klucza",
+        description:
+          "Pozostaw puste aby zachować lub wyczyścić istniejące hasło klucza",
+      },
+      isDefault: {
+        label: "Ustaw jako domyślne",
+        description: "Użyj tego połączenia domyślnie dla sesji terminala",
+      },
+      notes: {
+        label: "Notatki",
+        description: "Opcjonalne notatki o tym połączeniu",
+      },
+    },
+    response: {
+      updatedAt: { title: "Zaktualizowano" },
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",
@@ -93,6 +139,12 @@ export const translations = {
   delete: {
     title: "Usuń połączenie SSH",
     description: "Usuń połączenie SSH",
+    fields: {
+      id: { label: "ID połączenia", description: "Połączenie do usunięcia" },
+    },
+    response: {
+      deleted: { title: "Usunięto" },
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",
@@ -136,5 +188,6 @@ export const translations = {
     saveButton: "Zapisz zmiany",
     deleteButton: "Usuń połączenie",
     testButton: "Testuj połączenie",
+    confirmDelete: "Usunąć to połączenie? Tej operacji nie można cofnąć.",
   },
 };

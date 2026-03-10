@@ -56,4 +56,17 @@ export const translations: typeof enTranslations = {
       description: "Wszystkie kampanie zostały pomyślnie zatrzymane",
     },
   },
+  widget: {
+    title: "Zatrzymanie awaryjne",
+    description:
+      "Natychmiast zatrzymaj wszystkie aktywne kampanie e-mail. Użyj w przypadku błędów lub pilnych problemów.",
+    haltButton: "Zatrzymaj wszystkie kampanie",
+    halting: "Zatrzymywanie...",
+    confirmTitle: "Zatrzymać wszystkie kampanie?",
+    confirmDescription:
+      "Spowoduje to natychmiastowe zatrzymanie wszystkich aktywnych kampanii e-mail i anulowanie oczekujących wiadomości. Tej operacji nie można cofnąć.",
+    confirmButton: "Tak, zatrzymaj wszystko",
+    cancelButton: "Anuluj",
+    done: "Zatrzymano",
+  },
 };

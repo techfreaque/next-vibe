@@ -74,11 +74,15 @@ export function ConnectionsListContainer({
             <Div
               key={conn.id}
               className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 cursor-pointer"
-              onClick={() => {
+              onClick={(): void => {
                 void (async (): Promise<void> => {
                   const connDef = await import("../[id]/definition");
-                  navigation.push(connDef.default.GET, {
+                  navigation.push(connDef.PATCH, {
                     urlPathParams: { id: conn.id },
+                    getEndpoint: connDef.GET,
+                    prefillFromGet: true,
+                    renderInModal: true,
+                    popNavigationOnSuccess: 1,
                   });
                 })();
               }}

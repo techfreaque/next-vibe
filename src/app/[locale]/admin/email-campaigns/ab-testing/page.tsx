@@ -3,12 +3,10 @@
  * Configure and monitor A/B testing for email campaigns
  */
 
-import { Div } from "next-vibe-ui/ui/div";
-import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { ABTestingClient } from "./ab-testing-client";
 
@@ -22,19 +20,10 @@ export default async function ABTestingPage({
   params,
 }: ABTestingPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
-
-  return (
-    <Div className="flex flex-col gap-6">
-      {/* Page Description */}
-      <Div>
-        <P className="text-gray-600 dark:text-gray-400">
-          {t("app.admin.leads.leads.admin.tabs.abTesting_description")}
-        </P>
-      </Div>
-
-      {/* A/B Testing Client Component */}
-      <ABTestingClient locale={locale} />
-    </Div>
+  const user = await requireAdminUser(
+    locale,
+    `/${locale}/admin/email-campaigns/ab-testing`,
   );
+
+  return <ABTestingClient locale={locale} user={user} />;
 }

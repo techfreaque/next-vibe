@@ -9,6 +9,7 @@ import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Frame } from "next-vibe-ui/ui/icons/Frame";
 import { Home } from "next-vibe-ui/ui/icons/Home";
@@ -118,6 +119,13 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/remote` as const,
       icon: Link2,
       current: pathname.startsWith(`/${locale}/admin/remote`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.vibeSense"),
+      href: `/${locale}/admin/vibe-sense` as const,
+      icon: Activity,
+      current: pathname.startsWith(`/${locale}/admin/vibe-sense`),
       hidden: false,
     },
     {

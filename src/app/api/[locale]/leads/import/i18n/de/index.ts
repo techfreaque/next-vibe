@@ -192,6 +192,11 @@ export const translations: typeof enTranslations = {
           label: "Testlauf",
           description: "Ausführen ohne Änderungen vorzunehmen",
         },
+        selfTaskId: {
+          label: "Eigene Task-ID",
+          description:
+            "Interne Task-ID zur Selbstbereinigung nach der Verarbeitung",
+        },
       },
       response: {
         jobsProcessed: "Verarbeitete Aufträge",
@@ -322,6 +327,35 @@ export const translations: typeof enTranslations = {
       inApp: "In-App",
       webhook: "Webhook",
       none: "Keine",
+    },
+    leadStatus: {
+      new: "Neu",
+      pending: "Ausstehend",
+      campaignRunning: "Kampagne läuft",
+      websiteUser: "Website-Nutzer",
+      newsletterSubscriber: "Newsletter-Abonnent",
+      inContact: "In Kontakt",
+      signedUp: "Registriert",
+      subscriptionConfirmed: "Abonnement bestätigt",
+      unsubscribed: "Abgemeldet",
+      bounced: "Zurückgewiesen",
+      invalid: "Ungültig",
+    },
+    emailCampaignStage: {
+      notStarted: "Nicht gestartet",
+      initial: "Erstkontakt",
+      followup1: "Nachfassen 1",
+      followup2: "Nachfassen 2",
+      followup3: "Nachfassen 3",
+      nurture: "Pflege",
+      reactivation: "Reaktivierung",
+    },
+    leadSource: {
+      website: "Website",
+      socialMedia: "Soziale Medien",
+      emailCampaign: "E-Mail-Kampagne",
+      referral: "Empfehlung",
+      csvImport: "CSV-Import",
     },
   },
 };

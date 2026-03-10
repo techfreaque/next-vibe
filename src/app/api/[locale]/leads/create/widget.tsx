@@ -17,9 +17,12 @@ import React, { useCallback } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
@@ -27,6 +30,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
+import { LeadStatus } from "../enum";
 import type definition from "./definition";
 
 type PostResponseOutput = typeof definition.POST.types.ResponseOutput;
@@ -39,14 +43,16 @@ interface CustomWidgetProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  NEW: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  PENDING:
+  [LeadStatus.NEW]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  [LeadStatus.PENDING]:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  SUBSCRIPTION_CONFIRMED:
+  [LeadStatus.SUBSCRIPTION_CONFIRMED]:
     "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  UNSUBSCRIBED:
+  [LeadStatus.UNSUBSCRIBED]:
     "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  BOUNCED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [LeadStatus.BOUNCED]:
+    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
 };
 
 export function LeadCreateContainer({
@@ -55,7 +61,9 @@ export function LeadCreateContainer({
   const children = field.children;
   const data = field.value;
   const { push: navigate } = useWidgetNavigation();
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const { t: leadsT } = leadsScopedTranslation.scopedT(locale);
 
   const createdLeadId = data?.lead?.summary?.id;
   const businessName = data?.lead?.summary?.businessName;
@@ -130,7 +138,7 @@ export function LeadCreateContainer({
                     STATUS_COLORS[status] ?? "bg-gray-100 text-gray-800",
                   )}
                 >
-                  {status.replace(/_/g, " ")}
+                  {leadsT(status)}
                 </Span>
               )}
             </Div>
@@ -149,7 +157,7 @@ export function LeadCreateContainer({
             {source && (
               <Div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Tag className="h-3.5 w-3.5" />
-                <Span>{source.replace(/_/g, " ")}</Span>
+                <Span>{leadsT(source)}</Span>
               </Div>
             )}
             {createdLeadId && (

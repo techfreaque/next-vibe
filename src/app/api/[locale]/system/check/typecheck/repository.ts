@@ -444,6 +444,13 @@ export class TypecheckRepositoryImpl {
       mainTsConfig.compilerOptions?.typeRoots,
       prefix,
     );
+    // Ensure node_modules root is in typeRoots so packages like "bun-types"
+    // (which live at node_modules/bun-types, not node_modules/@types/bun-types)
+    // can be resolved when listed in compilerOptions.types.
+    const nodeModulesRoot = `${prefix}node_modules`;
+    if (adjustedTypeRoots && !adjustedTypeRoots.includes(nodeModulesRoot)) {
+      adjustedTypeRoots.push(nodeModulesRoot);
+    }
 
     // Create temporary tsconfig
     const tempTsConfig: TsConfig = {

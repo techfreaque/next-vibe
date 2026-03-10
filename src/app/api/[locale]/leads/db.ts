@@ -24,6 +24,7 @@ import { EmailStatus, EmailStatusDB } from "../emails/messages/enum";
 import { CampaignType, CampaignTypeDB } from "../emails/smtp-client/enum";
 import { users } from "../user/db";
 import {
+  DeviceTypeDB,
   EmailCampaignStage,
   EmailCampaignStageDB,
   EmailJourneyVariantDB,
@@ -59,6 +60,15 @@ export const leads = pgTable("leads", {
 
   // IP tracking for free tier credits
   ipAddress: text("ip_address"),
+
+  // Device / browser identity (latest, from user agent parsing)
+  userAgent: text("user_agent"),
+  deviceType: text("device_type", { enum: DeviceTypeDB }),
+  browser: text("browser"),
+  os: text("os"),
+
+  // Referral tracking (first-touch, immutable)
+  referralCode: text("referral_code"),
 
   // Lead qualification
   status: text("status", { enum: LeadStatusDB })

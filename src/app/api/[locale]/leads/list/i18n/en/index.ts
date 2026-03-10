@@ -200,5 +200,7 @@ export const translations = {
     sortEmailsSentLow: "Emails sent (low)",
     sortBusinessNameAZ: "Business name (A-Z)",
     sortBusinessNameZA: "Business name (Z-A)",
+    linkedCount: "{{count}} linked",
+    hasLinkedUser: "User",
   },
 };

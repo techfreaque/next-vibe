@@ -7,6 +7,15 @@ export const translations: typeof enTranslations = {
     create: "Erstellen",
   },
 
+  enums: {
+    leadSource: {
+      website: "Website",
+      socialMedia: "Soziale Medien",
+      emailCampaign: "E-Mail-Kampagne",
+      referral: "Empfehlung",
+      csvImport: "CSV-Import",
+    },
+  },
   widget: {
     headerLeadCreated: "Lead erstellt",
     headerCreateLead: "Lead erstellen",

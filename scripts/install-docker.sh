@@ -30,11 +30,11 @@ fi
 echo "Starting new app container..."
 $COMPOSE up -d app
 
-# Wait for the new container to be healthy (up to 120s)
+# Wait for the new container to be healthy (up to 180s)
 echo "Waiting for new app to respond..."
 TRIES=0
-MAX_TRIES=60
-until $COMPOSE exec -T app bun -e "fetch('http://localhost:3000').then(r=>process.exit(r.ok||r.status===404?0:1)).catch(()=>process.exit(1))" > /dev/null 2>&1; do
+MAX_TRIES=90
+until $COMPOSE exec -T app wget -q --server-response -O /dev/null http://localhost:3000 2>&1 | grep -q "HTTP/"; do
   # Bail early if container has already exited
   STATUS=$($COMPOSE ps -q app | xargs docker inspect --format='{{.State.Status}}' 2>/dev/null || echo "missing")
   if [ "$STATUS" = "exited" ] || [ "$STATUS" = "missing" ]; then

@@ -5,6 +5,15 @@ export const translations = {
     create: "Create",
   },
 
+  enums: {
+    leadSource: {
+      website: "Website",
+      socialMedia: "Social Media",
+      emailCampaign: "Email Campaign",
+      referral: "Referral",
+      csvImport: "CSV Import",
+    },
+  },
   widget: {
     headerLeadCreated: "Lead Created",
     headerCreateLead: "Create Lead",

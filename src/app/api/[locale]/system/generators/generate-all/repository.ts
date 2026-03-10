@@ -499,6 +499,78 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
       );
 
+      // 8. Indicator Index Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            outputLines.push("📊 Generating indicator index...");
+            const { indicatorIndexGeneratorRepository } =
+              await import("../indicator-index/repository");
+
+            const result =
+              await indicatorIndexGeneratorRepository.generateIndicatorIndex(
+                {
+                  outputFile:
+                    "src/app/api/[locale]/system/generated/indicator-index.ts",
+                  dryRun: false,
+                },
+                logger,
+              );
+
+            if (result.success) {
+              outputLines.push("✅ Indicator index generated successfully");
+              generatorsRun++;
+              return "indicator-index";
+            }
+            outputLines.push(
+              `❌ Indicator index generation failed: ${result.message}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Indicator index generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
+      // 9. Graph Seeds Index Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            outputLines.push("🌱 Generating graph seeds index...");
+            const { graphSeedsIndexGeneratorRepository } =
+              await import("../graph-seeds-index/repository");
+
+            const result =
+              await graphSeedsIndexGeneratorRepository.generateGraphSeedsIndex(
+                {
+                  outputFile:
+                    "src/app/api/[locale]/system/generated/graph-seeds-index.ts",
+                  dryRun: false,
+                },
+                logger,
+              );
+
+            if (result.success) {
+              outputLines.push("✅ Graph seeds index generated successfully");
+              generatorsRun++;
+              return "graph-seeds-index";
+            }
+            outputLines.push(
+              `❌ Graph seeds index generation failed: ${result.message}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Graph seeds index generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
       // Wait for all generators to complete
       const results = await Promise.allSettled(generatorPromises);
       const completedGenerators: string[] = [];
@@ -518,7 +590,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 8,
+          totalGenerators: 10,
           generatorsRun,
           generatorsSkipped,
           outputDirectory:
@@ -757,6 +829,62 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       );
     } else {
       skipped.push("email-templates");
+    }
+
+    if (dirty.indicatorIndex) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { indicatorIndexGeneratorRepository } =
+              await import("../indicator-index/repository");
+            await indicatorIndexGeneratorRepository.generateIndicatorIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/indicator-index.ts",
+                dryRun: false,
+              },
+              logger,
+              liveIndex,
+            );
+            ran.push("indicator-index");
+          } catch (error) {
+            logger.error(
+              "indicator-index failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("indicator-index");
+    }
+
+    if (dirty.graphSeedsIndex) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { graphSeedsIndexGeneratorRepository } =
+              await import("../graph-seeds-index/repository");
+            await graphSeedsIndexGeneratorRepository.generateGraphSeedsIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/graph-seeds-index.ts",
+                dryRun: false,
+              },
+              logger,
+              liveIndex,
+            );
+            ran.push("graph-seeds-index");
+          } catch (error) {
+            logger.error(
+              "graph-seeds-index failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("graph-seeds-index");
     }
 
     // Seeds: only run when dirty.seeds AND explicitly not skipped

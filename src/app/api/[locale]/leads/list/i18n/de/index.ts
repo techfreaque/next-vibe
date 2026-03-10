@@ -202,5 +202,7 @@ export const translations: typeof enTranslations = {
     sortEmailsSentLow: "E-Mails gesendet (niedrig)",
     sortBusinessNameAZ: "Firmenname (A-Z)",
     sortBusinessNameZA: "Firmenname (Z-A)",
+    linkedCount: "{{count}} verknüpft",
+    hasLinkedUser: "Nutzer",
   },
 };

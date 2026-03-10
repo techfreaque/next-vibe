@@ -185,10 +185,24 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
+  priority: {
+    critical: "Krytyczny",
+    high: "Wysoki",
+    medium: "Średni",
+    low: "Niski",
+    background: "Tło",
+    filter: {
+      all: "Wszystkie priorytety",
+      highAndAbove: "Wysoki i wyżej",
+      mediumAndAbove: "Średni i wyżej",
+    },
+  },
   widget: {
     title: "Konfiguracja uruchamiacza kampanii",
     titleSaved: "Konfiguracja zapisana",
     saving: "Zapisywanie...",
+    save: "Zapisz ustawienia",
+    addLocale: "+ Dodaj język",
     guidanceTitle: "Skonfiguruj uruchamiacz kampanii",
     guidanceDescription:
       "Ustaw harmonogram, aktywne dni/godziny, cele leadów na tydzień i ustawienia zadań cron. Po zapisaniu użyj przycisków akcji, aby wyświetlić statystyki lub natychmiast uruchomić kampanię.",
@@ -219,5 +233,19 @@ export const translations: typeof enTranslations = {
     dayFri: "Pt",
     daySat: "Sob",
     daySun: "Ndz",
+    sections: {
+      general: "Ogólne",
+      generalDescription:
+        "Główne kontrolki do włączania uruchamiacza kampanii i trybu próbnego.",
+      schedule: "Harmonogram",
+      scheduleDescription:
+        "Kiedy kampanie powinny działać? Ustaw harmonogram cron, aktywne dni i godziny.",
+      quotas: "Limity",
+      quotasDescription:
+        "Ile leadów przetwarzać tygodniowo, w podziale na język.",
+      advanced: "Zaawansowane",
+      advancedDescription:
+        "Ustawienia wykonywania zadań, takie jak priorytet, limity czasu i zachowanie ponownych prób.",
+    },
   },
 };

@@ -240,6 +240,7 @@ function EndpointsPageInternal<
             finalNavigation.stack[finalNavigation.stack.length - 1];
           const popCount = currentEntry?.popNavigationOnSuccess;
           const replaceConfig = currentEntry?.replaceOnSuccess;
+          const successCallback = currentEntry?.onSuccessCallback;
 
           if (replaceConfig) {
             const urlPathParams = replaceConfig.getUrlPathParams
@@ -256,6 +257,7 @@ function EndpointsPageInternal<
             for (let i = 0; i < popCount; i++) {
               finalNavigation.pop();
             }
+            successCallback?.();
           }
         },
       };
@@ -314,6 +316,7 @@ function EndpointsPageInternal<
           finalNavigation.stack[finalNavigation.stack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
         const replaceConfig = currentEntry?.replaceOnSuccess;
+        const successCallback = currentEntry?.onSuccessCallback;
 
         if (replaceConfig) {
           const urlPathParams = replaceConfig.getUrlPathParams
@@ -330,6 +333,7 @@ function EndpointsPageInternal<
           for (let i = 0; i < popCount; i++) {
             finalNavigation.pop();
           }
+          successCallback?.();
         }
       },
     };
@@ -384,6 +388,7 @@ function EndpointsPageInternal<
           finalNavigation.stack[finalNavigation.stack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
         const replaceConfig = currentEntry?.replaceOnSuccess;
+        const successCallback = currentEntry?.onSuccessCallback;
 
         if (replaceConfig) {
           const urlPathParams = replaceConfig.getUrlPathParams
@@ -400,6 +405,7 @@ function EndpointsPageInternal<
           for (let i = 0; i < popCount; i++) {
             finalNavigation.pop();
           }
+          successCallback?.();
         }
       },
     };
@@ -753,24 +759,18 @@ function StackEntryRenderer({
               });
               finalNavigation.pop();
             }}
-            className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center"
+            className="fixed inset-0 z-[100] bg-black/50"
             aria-hidden="true"
-          >
-            {/* Modal content - click stopPropagation to prevent backdrop click */}
+          />
+          {/* Modal content container */}
+          <Div className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none">
             <Div
               onClick={(e) => e.stopPropagation()}
-              style={{
-                display: "flex",
-                flexDirection: "column" as const,
-                width: "400px",
-                maxWidth: "90vw",
-                maxHeight: "min(600px,calc(100dvh-100px))",
-                overflow: "hidden" as const,
-              }}
+              role="dialog"
+              aria-modal="true"
+              className="relative bg-background border shadow-lg rounded-lg overflow-y-auto w-[400px] max-w-[90vw] max-h-[min(600px,calc(100dvh-100px))] pointer-events-auto"
             >
-              <Div className="relative z-[101] bg-background border shadow-lg rounded-lg overflow-y-auto">
-                {children}
-              </Div>
+              {children}
             </Div>
           </Div>
         </>

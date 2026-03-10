@@ -1,4 +1,5 @@
 import type { translations as enTranslations } from "../en";
+
 import { journeysTranslations } from "./journeys";
 
 export const translations: typeof enTranslations = {
@@ -58,6 +59,24 @@ export const translations: typeof enTranslations = {
             comparison: "Uczciwe porównanie z ChatGPT",
             affiliate: "Minimalne wzmianki o afiliacji",
           },
+        },
+        signupNurture: {
+          name: "Nurturing po rejestracji",
+          description: "Sekwencja onboardingowa dla nowych użytkowników",
+          longDescription:
+            "E-maile powitalne i onboardingowe pomagające nowym użytkownikom rozpocząć pracę",
+        },
+        retention: {
+          name: "Retencja",
+          description: "Reaktywacja dla istniejących subskrybentów",
+          longDescription:
+            "E-maile oparte na wartości, aby utrzymać aktywnych subskrybentów i eksplorować funkcje",
+        },
+        winback: {
+          name: "Odzyskiwanie klientów",
+          description: "Odzyskaj nieaktywnych lub odchodzących użytkowników",
+          longDescription:
+            "Kampania reaktywacyjna skierowana do użytkowników, którzy stali się nieaktywni lub zrezygnowali",
         },
       },
     },

@@ -57,6 +57,14 @@ export const translations: typeof enTranslations = {
       description: "Starter kampanii został uruchomiony pomyślnie",
     },
   },
+  widget: {
+    title: "Uruchom starter kampanii",
+    description:
+      "Ręcznie uruchom starter kampanii, aby przetworzyć kwalifikujące się leady i rozpocząć sekwencje e-mail.",
+    runButton: "Uruchom kampanie",
+    running: "Uruchamianie...",
+    done: "Gotowe",
+  },
   errors: {
     server: {
       title: "Błąd serwera",

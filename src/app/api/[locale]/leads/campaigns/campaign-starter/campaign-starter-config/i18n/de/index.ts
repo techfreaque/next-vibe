@@ -184,10 +184,24 @@ export const translations = {
       description: "Vorgang erfolgreich abgeschlossen",
     },
   },
+  priority: {
+    critical: "Kritisch",
+    high: "Hoch",
+    medium: "Mittel",
+    low: "Niedrig",
+    background: "Hintergrund",
+    filter: {
+      all: "Alle Prioritäten",
+      highAndAbove: "Hoch und höher",
+      mediumAndAbove: "Mittel und höher",
+    },
+  },
   widget: {
     title: "Campaign-Starter-Konfiguration",
     titleSaved: "Konfiguration gespeichert",
     saving: "Speichern...",
+    save: "Einstellungen speichern",
+    addLocale: "+ Sprache hinzufügen",
     guidanceTitle: "Campaign Starter konfigurieren",
     guidanceDescription:
       "Legen Sie den Zeitplan, aktive Tage/Stunden, Leads-pro-Woche-Ziele und Cron-Task-Einstellungen fest. Verwenden Sie nach dem Speichern die Aktionsschaltflächen, um Statistiken anzuzeigen oder die Kampagne sofort zu starten.",
@@ -218,5 +232,19 @@ export const translations = {
     dayFri: "Fr",
     daySat: "Sa",
     daySun: "So",
+    sections: {
+      general: "Allgemein",
+      generalDescription:
+        "Hauptsteuerung zum Aktivieren des Campaign Starters und des Testmodus.",
+      schedule: "Zeitplan",
+      scheduleDescription:
+        "Wann sollen Kampagnen laufen? Cron-Zeitplan, aktive Tage und Stunden festlegen.",
+      quotas: "Kontingente",
+      quotasDescription:
+        "Wie viele Leads pro Woche verarbeitet werden sollen, aufgeteilt nach Sprache.",
+      advanced: "Erweitert",
+      advancedDescription:
+        "Task-Ausführungseinstellungen wie Priorität, Timeouts und Wiederholungsverhalten.",
+    },
   },
 };

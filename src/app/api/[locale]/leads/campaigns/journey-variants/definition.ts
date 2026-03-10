@@ -95,51 +95,6 @@ const variantItemSchema = scopedObjectFieldNew(scopedTranslation, {
   },
 });
 
-// ── Error types (reused across methods) ──────────────────────────────────────
-
-function makeErrorTypes(
-  method: "get" | "post" | "patch",
-): Record<EndpointErrorTypes, { title: string; description: string }> {
-  return {
-    [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: `${method}.errors.unauthorized.title`,
-      description: `${method}.errors.unauthorized.description`,
-    },
-    [EndpointErrorTypes.FORBIDDEN]: {
-      title: `${method}.errors.forbidden.title`,
-      description: `${method}.errors.forbidden.description`,
-    },
-    [EndpointErrorTypes.SERVER_ERROR]: {
-      title: `${method}.errors.server.title`,
-      description: `${method}.errors.server.description`,
-    },
-    [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: `${method}.errors.unknown.title`,
-      description: `${method}.errors.unknown.description`,
-    },
-    [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: `${method}.errors.validation.title`,
-      description: `${method}.errors.validation.description`,
-    },
-    [EndpointErrorTypes.NOT_FOUND]: {
-      title: `${method}.errors.notFound.title`,
-      description: `${method}.errors.notFound.description`,
-    },
-    [EndpointErrorTypes.CONFLICT]: {
-      title: `${method}.errors.conflict.title`,
-      description: `${method}.errors.conflict.description`,
-    },
-    [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: `${method}.errors.network.title`,
-      description: `${method}.errors.network.description`,
-    },
-    [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: `${method}.errors.unsavedChanges.title`,
-      description: `${method}.errors.unsavedChanges.description`,
-    },
-  };
-}
-
 // ── GET — list all registered variants ───────────────────────────────────────
 
 const { GET } = createEndpoint({
@@ -171,13 +126,50 @@ const { GET } = createEndpoint({
     },
   }),
 
-  errorTypes: makeErrorTypes("get"),
+  errorTypes: {
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
+    },
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
+    },
+  },
   successTypes: {
     title: "get.success.title",
     description: "get.success.description",
   },
   examples: {
-    requests: { default: {} },
+    requests: undefined,
     responses: {
       default: {
         total: 0,
@@ -196,7 +188,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   category: "app.endpointCategories.leads",
-  icon: "plus-circle",
+  icon: "plus",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
 
@@ -289,7 +281,44 @@ const { POST } = createEndpoint({
     },
   }),
 
-  errorTypes: makeErrorTypes("post"),
+  errorTypes: {
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
+    },
+  },
   successTypes: {
     title: "post.success.title",
     description: "post.success.description",
@@ -304,12 +333,6 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        variantKey: "MY_VARIANT",
-        displayName: "My Custom Variant",
-        description: null,
-        weight: 33,
-        campaignType: null,
-        sourceFilePath: null,
         id: "00000000-0000-0000-0000-000000000000",
         active: true,
         checkErrors: [],
@@ -395,7 +418,44 @@ const { PATCH } = createEndpoint({
     },
   }),
 
-  errorTypes: makeErrorTypes("patch"),
+  errorTypes: {
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "patch.errors.unauthorized.title",
+      description: "patch.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "patch.errors.forbidden.title",
+      description: "patch.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "patch.errors.server.title",
+      description: "patch.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "patch.errors.unknown.title",
+      description: "patch.errors.unknown.description",
+    },
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "patch.errors.validation.title",
+      description: "patch.errors.validation.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "patch.errors.notFound.title",
+      description: "patch.errors.notFound.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "patch.errors.conflict.title",
+      description: "patch.errors.conflict.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "patch.errors.network.title",
+      description: "patch.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "patch.errors.unsavedChanges.title",
+      description: "patch.errors.unsavedChanges.description",
+    },
+  },
   successTypes: {
     title: "patch.success.title",
     description: "patch.success.description",
@@ -409,12 +469,7 @@ const { PATCH } = createEndpoint({
     },
     responses: {
       default: {
-        id: "00000000-0000-0000-0000-000000000000",
         variantKey: "MY_VARIANT",
-        active: true,
-        weight: 33,
-        displayName: "My Custom Variant",
-        description: null,
         updatedAt: new Date().toISOString(),
       },
     },

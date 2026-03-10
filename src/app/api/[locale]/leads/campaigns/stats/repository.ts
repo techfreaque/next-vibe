@@ -18,7 +18,7 @@ import { EmailStatus } from "@/app/api/[locale]/emails/messages/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { emailCampaigns, leads } from "../../db";
+import { emailCampaigns, leadLeadLinks, leads } from "../../db";
 import type { EmailJourneyVariantValues } from "../../enum";
 import { LeadStatus } from "../../enum";
 import { EmailJourneyVariantFilter } from "../../enum";
@@ -60,7 +60,7 @@ export class CampaignStatsRepository {
         .from(emailCampaigns)
         .where(variantFilter);
 
-      const totals = overall ?? {
+      const rawTotals = overall ?? {
         total: 0,
         pending: 0,
         sent: 0,
@@ -68,6 +68,15 @@ export class CampaignStatsRepository {
         opened: 0,
         clicked: 0,
         failed: 0,
+      };
+      const totals = {
+        total: Number(rawTotals.total),
+        pending: Number(rawTotals.pending),
+        sent: Number(rawTotals.sent),
+        delivered: Number(rawTotals.delivered),
+        opened: Number(rawTotals.opened),
+        clicked: Number(rawTotals.clicked),
+        failed: Number(rawTotals.failed),
       };
 
       // Sent includes delivered+opened+clicked for rate calculation denominator
@@ -98,11 +107,11 @@ export class CampaignStatsRepository {
 
       const byStage = stageRows.map((r) => ({
         stage: r.stage,
-        total: r.total,
-        sent: r.sent,
-        opened: r.opened,
-        clicked: r.clicked,
-        failed: r.failed,
+        total: Number(r.total),
+        sent: Number(r.sent),
+        opened: Number(r.opened),
+        clicked: Number(r.clicked),
+        failed: Number(r.failed),
       }));
 
       // ── Per-variant breakdown ───────────────────────────────────────────
@@ -119,15 +128,39 @@ export class CampaignStatsRepository {
         .groupBy(emailCampaigns.journeyVariant);
 
       const byJourneyVariant = variantRows.map((r) => {
-        const vSentBase = r.sent;
+        const vSentBase = Number(r.sent);
         return {
           variant: r.variant,
-          total: r.total,
-          sent: r.sent,
-          openRate: vSentBase > 0 ? r.opened / vSentBase : 0,
-          clickRate: vSentBase > 0 ? r.clicked / vSentBase : 0,
+          total: Number(r.total),
+          sent: vSentBase,
+          openRate: vSentBase > 0 ? Number(r.opened) / vSentBase : 0,
+          clickRate: vSentBase > 0 ? Number(r.clicked) / vSentBase : 0,
         };
       });
+
+      // ── Lead identity counts ─────────────────────────────────────────────
+      // Total leads (raw row count)
+      const [totalLeadsRow] = await db.select({ count: count() }).from(leads);
+      const totalLeads = Number(totalLeadsRow?.count ?? 0);
+
+      // Linked leads: unique lead IDs that appear in any link (either side)
+      const linkedLeadsResult = await db.execute(
+        sql`SELECT count(distinct v) as count FROM "lead_lead_links" ll, lateral unnest(array[ll.lead_id_1, ll.lead_id_2]) AS v`,
+      );
+      const linkedLeadsCountRow = linkedLeadsResult.rows[0] as
+        | { count: number }
+        | undefined;
+      const linkedLeadsCount = Number(linkedLeadsCountRow?.count ?? 0);
+
+      // Unique persons estimate: total leads minus the "secondary" leads
+      // A secondary lead is one where it appears as lead_id_2 in a link
+      // (lead_id_1 is the earlier/primary one by convention of linking order).
+      // This is an estimate — exact deduplication would require graph traversal.
+      const [secondaryLeadsRow] = await db
+        .select({ count: sql<number>`count(distinct lead_id_2)` })
+        .from(leadLeadLinks);
+      const secondaryCount = Number(secondaryLeadsRow?.count ?? 0);
+      const uniquePersonsEstimate = Math.max(0, totalLeads - secondaryCount);
 
       // ── Queue health ─────────────────────────────────────────────────────
       const [pendingLeadsRow] = await db
@@ -177,6 +210,9 @@ export class CampaignStatsRepository {
         clickRate,
         deliveryRate,
         failureRate,
+        totalLeads,
+        linkedLeadsCount,
+        uniquePersonsEstimate,
         pendingLeadsCount,
         emailsScheduledToday,
         byStage,

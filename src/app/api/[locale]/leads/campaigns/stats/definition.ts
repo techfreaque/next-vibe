@@ -91,6 +91,23 @@ const { GET } = createEndpoint({
         schema: z.number(),
       }),
 
+      // Total leads & unique persons
+      totalLeads: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.totalLeads",
+        schema: z.number(),
+      }),
+      linkedLeadsCount: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.linkedLeadsCount",
+        schema: z.number(),
+      }),
+      uniquePersonsEstimate: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.uniquePersonsEstimate",
+        schema: z.number(),
+      }),
+
       // Queue health
       pendingLeadsCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -270,6 +287,9 @@ const { GET } = createEndpoint({
         clickRate: 0,
         deliveryRate: 0,
         failureRate: 0,
+        totalLeads: 0,
+        linkedLeadsCount: 0,
+        uniquePersonsEstimate: 0,
         pendingLeadsCount: 0,
         emailsScheduledToday: 0,
         byStage: [],

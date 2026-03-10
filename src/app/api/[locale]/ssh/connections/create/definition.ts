@@ -51,7 +51,7 @@ export const { POST } = createEndpoint({
         label: "post.fields.host.label",
         description: "post.fields.host.description",
         placeholder: "post.fields.host.placeholder",
-        schema: z.string().min(1),
+        schema: z.string().optional(),
       }),
       port: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

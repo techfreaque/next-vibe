@@ -211,8 +211,24 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
 
           // Render the email template (returns JSX + subject)
           // fullLead.email is non-null here: getPendingEmails filters isNotNull(leads.email)
+          if (!fullLead.email) {
+            result.emailsFailed++;
+            result.errors.push({
+              leadId: campaign.leadId,
+              email: campaign.lead.email,
+              stage: campaign.stage,
+              error: "Lead has no email",
+            });
+            continue;
+          }
+          const leadWithEmail: LeadWithEmailType = {
+            ...fullLead,
+            email: fullLead.email,
+            linkedLeadsCount: 0,
+            hasLinkedUser: false,
+          };
           const rendered = await emailRendererService.renderEmail(
-            fullLead as LeadWithEmailType,
+            leadWithEmail,
             campaign.journeyVariant,
             campaign.stage,
             {

@@ -302,6 +302,8 @@ export interface NavigationStackEntry<
   prefillFromGet?: boolean;
   renderInModal?: boolean;
   popNavigationOnSuccess?: number;
+  /** Called after popNavigationOnSuccess completes (e.g. to trigger parent refetch) */
+  onSuccessCallback?: () => void;
   replaceOnSuccess?: {
     endpoint: CreateApiEndpointAny;
     getUrlPathParams?: (

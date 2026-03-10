@@ -128,6 +128,91 @@ export const translations = {
       updatedAt: {
         content: "Updated At",
       },
+      identity: {
+        title: "Device & Identity",
+        description: "Tracking identity and device information",
+      },
+      ipAddress: {
+        content: "IP Address",
+      },
+      userAgent: {
+        content: "User Agent",
+      },
+      deviceType: {
+        content: "Device Type",
+      },
+      browser: {
+        content: "Browser",
+      },
+      os: {
+        content: "Operating System",
+      },
+      referralCode: {
+        content: "Referral Code",
+      },
+      lifecycle: {
+        title: "Lifecycle",
+        description: "Additional lifecycle timestamps",
+      },
+      bouncedAt: {
+        content: "Bounced At",
+      },
+      invalidAt: {
+        content: "Invalid At",
+      },
+      campaignStartedAt: {
+        content: "Campaign Started At",
+      },
+      linkedLeads: {
+        title: "Linked Leads",
+        description: "Leads identified as the same person",
+        linkedLeadId: {
+          content: "Linked Lead ID",
+        },
+        linkReason: {
+          content: "Link Reason",
+        },
+        linkedAt: {
+          content: "Linked At",
+        },
+        email: {
+          content: "Email",
+        },
+        businessName: {
+          content: "Business Name",
+        },
+        status: {
+          content: "Status",
+        },
+        ipAddress: {
+          content: "IP Address",
+        },
+        userAgent: {
+          content: "User Agent",
+        },
+        createdAt: {
+          content: "Created At",
+        },
+      },
+      linkedUsers: {
+        title: "Linked User Accounts",
+        description: "User accounts associated with this lead",
+        userId: {
+          content: "User ID",
+        },
+        linkReason: {
+          content: "Link Reason",
+        },
+        linkedAt: {
+          content: "Linked At",
+        },
+        email: {
+          content: "Email",
+        },
+        publicName: {
+          content: "Display Name",
+        },
+      },
     },
     errors: {
       validation: {
@@ -582,9 +667,30 @@ export const translations = {
     stageReactivation: "Reactivation",
     tabOverview: "Overview",
     tabDetails: "Details",
+    tabIdentity: "Identity",
     tabBasic: "Basic",
     tabCampaign: "Campaign",
     tabAdvanced: "Advanced",
+    deviceIdentity: "Device & Identity",
+    ipAddress: "IP Address",
+    userAgent: "User Agent",
+    deviceType: "Device Type",
+    browser: "Browser",
+    os: "Operating System",
+    referralCode: "Referral Code",
+    lifecycleTimestamps: "Lifecycle",
+    bouncedAt: "Bounced At",
+    invalidAt: "Invalid At",
+    campaignStartedAt: "Campaign Started At",
+    linkedLeadsSection: "Linked Leads",
+    linkedLeadsEmpty: "No linked leads",
+    linkedUsersSection: "Linked User Accounts",
+    linkedUsersEmpty: "No linked user accounts",
+    linkReason: "Link reason:",
+    linkedAt: "Linked at:",
+    copyIp: "IP",
+    copyLinkedLeadId: "lead ID",
+    copyUserId2: "user ID",
   },
   delete: {
     title: "Delete Lead",

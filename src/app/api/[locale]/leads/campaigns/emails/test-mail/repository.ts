@@ -71,6 +71,8 @@ export class TestEmailRepository {
       metadata: {},
       createdAt: new Date(),
       updatedAt: new Date(),
+      linkedLeadsCount: 0,
+      hasLinkedUser: false,
     };
   }
   /**

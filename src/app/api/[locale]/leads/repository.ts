@@ -28,12 +28,14 @@ import {
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
+import { users } from "../user/db";
 import type { BatchUpdateRequestOutput } from "./batch/definition";
 import type { LeadCreateRequestTypeOutput } from "./create/definition";
 import {
   emailCampaigns,
   type Lead,
   leadEngagements,
+  leadLeadLinks,
   leads,
   userLeadLinks,
 } from "./db";
@@ -566,7 +568,52 @@ export class LeadsRepository {
       }
 
       const leadsList = await db
-        .select()
+        .select({
+          // All lead columns
+          id: leads.id,
+          email: leads.email,
+          businessName: leads.businessName,
+          contactName: leads.contactName,
+          phone: leads.phone,
+          website: leads.website,
+          country: leads.country,
+          language: leads.language,
+          status: leads.status,
+          source: leads.source,
+          notes: leads.notes,
+          convertedUserId: leads.convertedUserId,
+          convertedAt: leads.convertedAt,
+          signedUpAt: leads.signedUpAt,
+          subscriptionConfirmedAt: leads.subscriptionConfirmedAt,
+          currentCampaignStage: leads.currentCampaignStage,
+          emailsSent: leads.emailsSent,
+          lastEmailSentAt: leads.lastEmailSentAt,
+          unsubscribedAt: leads.unsubscribedAt,
+          emailsOpened: leads.emailsOpened,
+          emailsClicked: leads.emailsClicked,
+          lastEngagementAt: leads.lastEngagementAt,
+          metadata: leads.metadata,
+          createdAt: leads.createdAt,
+          updatedAt: leads.updatedAt,
+          ipAddress: leads.ipAddress,
+          userAgent: leads.userAgent,
+          deviceType: leads.deviceType,
+          browser: leads.browser,
+          os: leads.os,
+          referralCode: leads.referralCode,
+          emailJourneyVariant: leads.emailJourneyVariant,
+          bouncedAt: leads.bouncedAt,
+          invalidAt: leads.invalidAt,
+          campaignStartedAt: leads.campaignStartedAt,
+          // Subqueries for link counts
+          linkedLeadsCount: sql<number>`(
+            SELECT COUNT(*)::int FROM lead_lead_links
+            WHERE lead_id_1 = ${leads.id} OR lead_id_2 = ${leads.id}
+          )`,
+          hasLinkedUser: sql<boolean>`EXISTS (
+            SELECT 1 FROM user_lead_links WHERE lead_id = ${leads.id}
+          )`,
+        })
         .from(leads)
         .where(whereClause)
         .orderBy(orderClause)
@@ -632,7 +679,9 @@ export class LeadsRepository {
   /**
    * Private helper methods
    */
-  private static formatLeadResponse(lead: Lead): LeadResponseType {
+  private static formatLeadResponse(
+    lead: Lead & { linkedLeadsCount?: number; hasLinkedUser?: boolean },
+  ): LeadResponseType {
     return {
       id: lead.id,
       email: lead.email,
@@ -659,10 +708,16 @@ export class LeadsRepository {
       metadata: lead.metadata || {},
       createdAt: lead.createdAt,
       updatedAt: lead.updatedAt,
+      linkedLeadsCount: lead.linkedLeadsCount ?? 0,
+      hasLinkedUser: lead.hasLinkedUser ?? false,
     };
   }
 
-  private static formatLeadDetailResponse(lead: Lead): LeadDetailResponse {
+  private static formatLeadDetailResponse(
+    lead: Lead,
+    linkedLeads: LeadDetailResponse["lead"]["linkedLeads"] = [],
+    linkedUsers: LeadDetailResponse["lead"]["linkedUsers"] = [],
+  ): LeadDetailResponse {
     return {
       lead: {
         basicInfo: {
@@ -703,6 +758,21 @@ export class LeadsRepository {
           createdAt: lead.createdAt,
           updatedAt: lead.updatedAt,
         },
+        identity: {
+          ipAddress: lead.ipAddress,
+          userAgent: lead.userAgent,
+          deviceType: lead.deviceType,
+          browser: lead.browser,
+          os: lead.os,
+          referralCode: lead.referralCode,
+        },
+        lifecycle: {
+          bouncedAt: lead.bouncedAt,
+          invalidAt: lead.invalidAt,
+          campaignStartedAt: lead.campaignStartedAt,
+        },
+        linkedLeads,
+        linkedUsers,
       },
     };
   }
@@ -960,7 +1030,18 @@ export class LeadsRepository {
         });
       }
 
-      return success(LeadsRepository.formatLeadDetailResponse(lead));
+      const [linkedLeads, linkedUsers] = await Promise.all([
+        LeadsRepository.getLinkedLeads(id, logger),
+        LeadsRepository.getLinkedUsers(id, logger),
+      ]);
+
+      return success(
+        LeadsRepository.formatLeadDetailResponse(
+          lead,
+          linkedLeads,
+          linkedUsers,
+        ),
+      );
     } catch (error) {
       logger.error("Error fetching lead by ID (internal)", parseError(error));
       return fail({
@@ -1495,6 +1576,12 @@ export class LeadsRepository {
       t("export.headers.notes"),
       t("export.headers.createdAt"),
       t("export.headers.updatedAt"),
+      t("export.headers.ipAddress"),
+      t("export.headers.userAgent"),
+      t("export.headers.deviceType"),
+      t("export.headers.browser"),
+      t("export.headers.os"),
+      t("export.headers.referralCode"),
     ];
 
     if (includeEngagementData) {
@@ -1525,6 +1612,12 @@ export class LeadsRepository {
         lead.notes || "",
         lead.createdAt.toISOString(),
         lead.updatedAt.toISOString(),
+        lead.ipAddress || "",
+        lead.userAgent || "",
+        lead.deviceType || "",
+        lead.browser || "",
+        lead.os || "",
+        lead.referralCode || "",
       ];
 
       if (includeEngagementData) {
@@ -2211,7 +2304,7 @@ export class LeadsRepository {
   static async linkLeadToLead(
     leadId1: string,
     leadId2: string,
-    linkReason: "track_page" | "referral" | "manual" | "test",
+    linkReason: "track_page" | "referral" | "manual" | "test" | "ip_match",
     logger: EndpointLogger,
     t: ModuleT,
   ): Promise<ResponseType<void>> {
@@ -2229,9 +2322,6 @@ export class LeadsRepository {
         leadId1 < leadId2 ? [leadId1, leadId2] : [leadId2, leadId1];
 
       await withTransaction(logger, async (tx) => {
-        // Import leadLeadLinks here to avoid circular dependency
-        const { leadLeadLinks } = await import("./db");
-
         await tx
           .insert(leadLeadLinks)
           .values({
@@ -2253,6 +2343,177 @@ export class LeadsRepository {
       logger.error("Failed to link leads", parseError(error));
       return fail({
         message: t("errors.linkFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Get all leads linked to a given lead (via lead_lead_links)
+   * Returns the linked lead summaries for display in lead detail view
+   */
+  static async getLinkedLeads(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    Array<{
+      linkedLeadId: string;
+      linkReason: string;
+      linkedAt: Date;
+      email: string | null;
+      businessName: string;
+      status: typeof LeadStatusValues;
+      ipAddress: string | null;
+      userAgent: string | null;
+      createdAt: Date;
+    }>
+  > {
+    try {
+      const links = await db
+        .select({
+          linkedLeadId: sql<string>`CASE WHEN ${leadLeadLinks.leadId1} = ${leadId} THEN ${leadLeadLinks.leadId2} ELSE ${leadLeadLinks.leadId1} END`,
+          linkReason: leadLeadLinks.linkReason,
+          linkedAt: leadLeadLinks.linkedAt,
+          email: leads.email,
+          businessName: leads.businessName,
+          status: sql<typeof LeadStatusValues>`${leads.status}`,
+          ipAddress: leads.ipAddress,
+          userAgent: leads.userAgent,
+          createdAt: leads.createdAt,
+        })
+        .from(leadLeadLinks)
+        .innerJoin(
+          leads,
+          sql`${leads.id} = CASE WHEN ${leadLeadLinks.leadId1} = ${leadId} THEN ${leadLeadLinks.leadId2} ELSE ${leadLeadLinks.leadId1} END`,
+        )
+        .where(
+          or(
+            eq(leadLeadLinks.leadId1, leadId),
+            eq(leadLeadLinks.leadId2, leadId),
+          ),
+        );
+
+      return links;
+    } catch (error) {
+      logger.error("Error fetching linked leads", parseError(error));
+      return [];
+    }
+  }
+
+  /**
+   * Get all users linked to a given lead (via user_lead_links)
+   * Returns user summaries for display in lead detail view
+   */
+  static async getLinkedUsers(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<
+    Array<{
+      userId: string;
+      linkReason: string;
+      linkedAt: Date;
+      email: string;
+      publicName: string;
+    }>
+  > {
+    try {
+      const links = await db
+        .select({
+          userId: userLeadLinks.userId,
+          linkReason: userLeadLinks.linkReason,
+          linkedAt: userLeadLinks.linkedAt,
+          email: users.email,
+          publicName: users.publicName,
+        })
+        .from(userLeadLinks)
+        .innerJoin(users, eq(users.id, userLeadLinks.userId))
+        .where(eq(userLeadLinks.leadId, leadId));
+
+      return links;
+    } catch (error) {
+      logger.error("Error fetching linked users", parseError(error));
+      return [];
+    }
+  }
+
+  /**
+   * Find anonymous leads with the same IP for IP-match linking
+   * Used by the nightly IP-match cron task
+   * Returns pairs of lead IDs that share an IP and should be linked
+   */
+  static async findLeadPairsByIp(
+    windowDays: number,
+    logger: EndpointLogger,
+  ): Promise<Array<{ leadId1: string; leadId2: string; ipAddress: string }>> {
+    try {
+      const windowStart = new Date(
+        Date.now() - windowDays * 24 * 60 * 60 * 1000,
+      );
+
+      // Find anonymous leads grouped by IP that have more than one lead
+      const pairs = await db.execute<{
+        lead_id1: string;
+        lead_id2: string;
+        ip_address: string;
+      }>(
+        sql`
+          SELECT DISTINCT
+            LEAST(l1.id::text, l2.id::text) AS lead_id1,
+            GREATEST(l1.id::text, l2.id::text) AS lead_id2,
+            l1.ip_address
+          FROM leads l1
+          JOIN leads l2 ON l1.ip_address = l2.ip_address AND l1.id != l2.id
+          WHERE l1.ip_address IS NOT NULL
+            AND l1.status = ${LeadStatus.WEBSITE_USER}
+            AND l2.status = ${LeadStatus.WEBSITE_USER}
+            AND l1.created_at > ${windowStart}
+            AND l2.created_at > ${windowStart}
+            -- Exclude already linked pairs
+            AND NOT EXISTS (
+              SELECT 1 FROM lead_lead_links lll
+              WHERE (lll.lead_id_1 = LEAST(l1.id::text, l2.id::text)::uuid
+                 AND lll.lead_id_2 = GREATEST(l1.id::text, l2.id::text)::uuid)
+            )
+          LIMIT 1000
+        `,
+      );
+
+      return pairs.rows.map((row) => ({
+        leadId1: row.lead_id1,
+        leadId2: row.lead_id2,
+        ipAddress: row.ip_address,
+      }));
+    } catch (error) {
+      logger.error("Error finding IP-match lead pairs", parseError(error));
+      return [];
+    }
+  }
+
+  /**
+   * Delete a single lead by ID
+   */
+  static async deleteLead(
+    id: DbId,
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<never>> {
+    try {
+      const result = await db
+        .delete(leads)
+        .where(eq(leads.id, id))
+        .returning({ id: leads.id });
+      if (result.length === 0) {
+        return fail({
+          message: t("leadsErrors.leads.patch.error.not_found.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      logger.info("Lead deleted", { id });
+      return success();
+    } catch (error) {
+      logger.error("Error deleting lead", parseError(error));
+      return fail({
+        message: t("leadsErrors.leads.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

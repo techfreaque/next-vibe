@@ -16,12 +16,14 @@ export const {
   PASSWORD: "enums.authType.password",
   PRIVATE_KEY: "enums.authType.privateKey",
   KEY_AGENT: "enums.authType.keyAgent",
+  LOCAL: "enums.authType.local",
 });
 
 export const SshAuthTypeDB = [
   SshAuthType.PASSWORD,
   SshAuthType.PRIVATE_KEY,
   SshAuthType.KEY_AGENT,
+  SshAuthType.LOCAL,
 ] as const;
 
 export type SshAuthTypeType = typeof SshAuthTypeValue;

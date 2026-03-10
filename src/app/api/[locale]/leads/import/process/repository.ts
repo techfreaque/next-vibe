@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -110,35 +110,57 @@ export class LeadsImportProcessRepository {
         }
       }
 
-      // Self-disable when no pending or processing jobs remain
-      const [summaryStats] = await db
-        .select({
-          pending: db.$count(
-            csvImportJobs,
-            eq(csvImportJobs.status, CsvImportJobStatus.PENDING),
-          ),
-          processing: db.$count(
-            csvImportJobs,
-            eq(csvImportJobs.status, CsvImportJobStatus.PROCESSING),
-          ),
-        })
-        .from(csvImportJobs);
-
-      const hasActiveJobs =
-        (summaryStats?.pending || 0) > 0 || (summaryStats?.processing || 0) > 0;
-
-      if (!hasActiveJobs && !dryRun) {
+      // Self-delete this task, and re-create if more pending jobs remain
+      if (!dryRun) {
         const { cronTasks } =
           await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
-        await db
-          .update(cronTasks)
-          .set({ enabled: false, updatedAt: new Date() })
-          .where(
-            and(
-              eq(cronTasks.routeId, "leads_import_process_POST"),
-              ne(cronTasks.enabled, false),
+        const { CronTaskPriority, TaskCategory, TaskOutputMode } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
+
+        if (data.selfTaskId) {
+          await db.delete(cronTasks).where(eq(cronTasks.id, data.selfTaskId));
+          logger.info("tasks.csv_processor.self_deleted", {
+            taskId: data.selfTaskId,
+          });
+        }
+
+        const [summaryStats] = await db
+          .select({
+            pending: db.$count(
+              csvImportJobs,
+              eq(csvImportJobs.status, CsvImportJobStatus.PENDING),
             ),
-          );
+          })
+          .from(csvImportJobs);
+
+        const hasPendingJobs = (summaryStats?.pending || 0) > 0;
+
+        if (hasPendingJobs) {
+          const nextTaskId = `leads-import-next-${Date.now()}`;
+          await db
+            .insert(cronTasks)
+            .values({
+              id: nextTaskId,
+              routeId: "leads_import_process_POST",
+              displayName: "Process pending import jobs",
+              category: TaskCategory.MAINTENANCE,
+              schedule: "* * * * *",
+              priority: CronTaskPriority.MEDIUM,
+              enabled: true,
+              runOnce: true,
+              taskInput: {
+                dryRun: false,
+                maxJobsPerRun: 1,
+                maxRetriesPerJob: 0,
+                selfTaskId: nextTaskId,
+              },
+              outputMode: TaskOutputMode.STORE_ONLY,
+              notificationTargets: [],
+              tags: ["leads-import"],
+            })
+            .onConflictDoNothing();
+          logger.info("tasks.csv_processor.next_task_created", { nextTaskId });
+        }
       }
 
       return success({

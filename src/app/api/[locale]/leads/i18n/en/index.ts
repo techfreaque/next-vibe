@@ -274,6 +274,13 @@ export const translations = {
       standalone: "Standalone",
       withBoth: "With Both",
     },
+    deviceType: {
+      desktop: "Desktop",
+      mobile: "Mobile",
+      tablet: "Tablet",
+      bot: "Bot",
+      unknown: "Unknown",
+    },
     leadSource: {
       website: "Website",
       socialMedia: "Social Media",

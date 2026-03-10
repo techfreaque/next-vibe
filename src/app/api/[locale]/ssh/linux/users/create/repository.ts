@@ -158,8 +158,7 @@ export class LinuxUserCreateRepository {
         stderr.includes("is not allowed to execute")
       ) {
         return fail({
-          message:
-            "Sudo authentication failed — wrong password or insufficient sudo privileges",
+          message: t("errors.sudoAuthFailed"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -168,8 +167,7 @@ export class LinuxUserCreateRepository {
         stderr.includes("cannot lock")
       ) {
         return fail({
-          message:
-            "Permission denied: provide your sudo password to create OS users",
+          message: t("errors.permissionDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -255,14 +253,13 @@ export class LinuxUserCreateRepository {
           stderr.includes("is not allowed to execute")
         ) {
           return fail({
-            message:
-              "Sudo authentication failed — wrong password or insufficient sudo privileges",
+            message: t("errors.sudoAuthFailed"),
             errorType: ErrorResponseTypes.FORBIDDEN,
           });
         }
         logger.error("useradd failed", stderr);
         return fail({
-          message: stderr || t("post.errors.server.title"),
+          message: t("post.errors.server.title", { error: stderr }),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

@@ -38,7 +38,7 @@ export function LinuxUserCreateContainer({
   return (
     <Div className="flex flex-col gap-0">
       {/* Actions */}
-      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
+      <Div className="flex flex-row gap-2 px-4 pt-4 pb-4 sticky top-0 bg-background z-10 border-b">
         <NavigateButtonWidget
           field={{ icon: "arrow-left", variant: "outline" }}
         />

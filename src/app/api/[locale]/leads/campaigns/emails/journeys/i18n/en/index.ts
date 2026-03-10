@@ -56,6 +56,24 @@ export const translations = {
             affiliate: "Minimal affiliate mention",
           },
         },
+        signupNurture: {
+          name: "Signup Nurture",
+          description: "Onboarding sequence for newly signed-up users",
+          longDescription:
+            "Welcome and onboarding emails helping new users get started with the platform",
+        },
+        retention: {
+          name: "Retention",
+          description: "Re-engagement for existing subscribers",
+          longDescription:
+            "Value-driven emails to keep active subscribers engaged and exploring features",
+        },
+        winback: {
+          name: "Winback",
+          description: "Win back inactive or churned users",
+          longDescription:
+            "Re-activation campaign targeting users who have gone quiet or cancelled",
+        },
       },
     },
     leads: {

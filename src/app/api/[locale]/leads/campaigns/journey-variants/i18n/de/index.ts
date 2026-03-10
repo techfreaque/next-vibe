@@ -190,5 +190,8 @@ export const translations = {
     toggleActivate: "Aktivieren",
     toggleDeactivate: "Deaktivieren",
     checkErrorsLabel: "Prüffehler:",
+    unsavedChanges: "ungespeicherte Änderungen",
+    saving: "Speichern…",
+    saveChanges: "Änderungen speichern",
   },
 };

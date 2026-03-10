@@ -509,9 +509,22 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           endpoint.requestSchema.safeParse(mergedData);
 
         if (requestSchemaResult.success) {
-          // Only keep fields that passed request schema validation
-          const filteredData =
-            requestSchemaResult.data as TEndpoint["types"]["RequestOutput"];
+          // Parse current form data through requestSchema to get the user's
+          // current request field values (e.g. paginationInfo.page, filters).
+          // These must win over defaults injected from the response merge.
+          const currentRequestResult =
+            endpoint.requestSchema.safeParse(currentFormData);
+          const currentRequestData = currentRequestResult.success
+            ? (currentRequestResult.data as TEndpoint["types"]["RequestOutput"])
+            : ({} as TEndpoint["types"]["RequestOutput"]);
+
+          // Merge: response-derived request defaults first, then current form
+          // values on top — so the user's current page/filter state is preserved.
+          const filteredData = Object.assign(
+            {},
+            requestSchemaResult.data,
+            currentRequestData,
+          ) as TEndpoint["types"]["RequestOutput"];
 
           // Update form with filtered data
           // This will trigger auto-submit watcher, but watcher filters through requestSchema
@@ -827,15 +840,10 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   };
 
   // Create a result object that combines form and query functionality
-  // Simplify error message to avoid complex union type - use explicit type assertion
   const queryError = query.error;
   const formError = formState.formError;
-  const queryErrorMessage: string = queryError
-    ? (queryError.message as string)
-    : "";
-  const formErrorMessage: string = formError
-    ? (formError.message as string)
-    : "";
+  const queryErrorMessage: string = queryError ? queryError.message : "";
+  const formErrorMessage: string = formError ? formError.message : "";
   const errorMessage: string | undefined =
     queryErrorMessage || formErrorMessage || undefined;
 

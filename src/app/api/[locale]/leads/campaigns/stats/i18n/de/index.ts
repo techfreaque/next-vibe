@@ -29,6 +29,9 @@ export const translations = {
       byStage: "Nach Stufe",
       byJourneyVariant: "Nach Journey-Variante",
       byStatus: "Nach Status",
+      totalLeads: "Leads gesamt",
+      linkedLeadsCount: "Verknüpfte Leads",
+      uniquePersonsEstimate: "Eindeutige Personen (ca.)",
       pendingLeadsCount: "Aktive Leads in Kampagnen",
       emailsScheduledToday: "Heute geplante E-Mails",
     },
@@ -69,5 +72,13 @@ export const translations = {
     statusLabel: "Sendestatus",
     variantLabel: "Nach Journey",
     emDash: "—",
+    leadOverview: "Lead-Übersicht",
+    totalLeads: "Leads gesamt",
+    linkedLeadsCount: "Verknüpfte Leads",
+    uniquePersonsEstimate: "Eindeutige Personen (ca.)",
+    uniquePersonsTooltip:
+      "Leads abzüglich sekundärer verknüpfter Leads (Duplikate)",
+    activeCampaigns: "Aktive Kampagnen",
+    sendPerformance: "Sendeleistung",
   },
 };

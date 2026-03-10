@@ -81,16 +81,44 @@ export function parseSearchParams(searchParams: URLSearchParams): ParsedObject {
 
   for (const [key, value] of searchParams.entries()) {
     // Handle bracket notation for arrays: name[0], name[1], etc.
+    // Also handles dot+bracket combined: a.b[0] => { a: { b: [...] } }
     const bracketMatch = /^([^[]+)\[(\d+)\]$/.exec(key);
     if (bracketMatch) {
       const arrayKey = bracketMatch[1];
       const index = parseInt(bracketMatch[2], 10);
       if (arrayKey) {
-        if (!(arrayKey in result)) {
-          result[arrayKey] = [];
+        if (arrayKey.includes(".")) {
+          // Dot+bracket notation: navigate to the nested object first
+          const parts = arrayKey.split(".");
+          let current: ParsedObject = result;
+          for (let i = 0; i < parts.length - 1; i++) {
+            const part = parts[i];
+            if (part) {
+              if (
+                !(part in current) ||
+                (!Array.isArray(current[part]) &&
+                  typeof current[part] !== "object")
+              ) {
+                current[part] = {};
+              }
+              current = current[part] as ParsedObject;
+            }
+          }
+          const lastPart = parts.at(-1);
+          if (lastPart) {
+            if (!(lastPart in current) || !Array.isArray(current[lastPart])) {
+              current[lastPart] = [];
+            }
+            const arr = current[lastPart] as ParsedValue[];
+            arr[index] = tryParseValue(value);
+          }
+        } else {
+          if (!(arrayKey in result)) {
+            result[arrayKey] = [];
+          }
+          const arr = result[arrayKey] as ParsedValue[];
+          arr[index] = tryParseValue(value);
         }
-        const arr = result[arrayKey] as ParsedValue[];
-        arr[index] = tryParseValue(value);
       }
     } else if (key.includes(".")) {
       // Handle dot notation for nested objects

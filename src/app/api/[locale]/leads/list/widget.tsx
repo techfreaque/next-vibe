@@ -194,6 +194,17 @@ function LeadRow({
               {t("widget.converted")}
             </Span>
           )}
+          {lead.linkedLeadsCount > 0 && (
+            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
+              {t("widget.linkedCount", { count: lead.linkedLeadsCount })}
+            </Span>
+          )}
+          {lead.hasLinkedUser && (
+            <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
+              <Users className="h-2.5 w-2.5 mr-1" />
+              {t("widget.hasLinkedUser")}
+            </Span>
+          )}
           {lead.currentCampaignStage && (
             <Span
               className={cn(
@@ -344,12 +355,19 @@ export function LeadsListContainer({
   const handleToggleStatus = useCallback(
     (status: string): void => {
       const current = form?.getValues("statusFilters.status") ?? [];
+      // status may be a LeadStatus key ("enums.leadStatus.xxx") or already a LeadStatusFilter key
+      // Normalize to LeadStatusFilter key space ("enums.leadStatusFilter.xxx")
+      const filterKey = status.replace(
+        "enums.leadStatus.",
+        "enums.leadStatusFilter.",
+      );
       const typed =
-        status as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
+        filterKey as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
       const next = current.includes(typed)
         ? current.filter((s) => s !== typed)
         : [...current, typed];
       form?.setValue("statusFilters.status", next);
+      form?.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -366,6 +384,7 @@ export function LeadsListContainer({
       } else {
         form?.setValue("statusFilters.source", [typed]);
       }
+      form?.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -379,6 +398,7 @@ export function LeadsListContainer({
         "sortingOptions.sortBy",
         value as (typeof LeadSortField)[keyof typeof LeadSortField],
       );
+      form?.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -392,6 +412,7 @@ export function LeadsListContainer({
         "sortingOptions.sortOrder",
         value as (typeof SortOrder)[keyof typeof SortOrder],
       );
+      form?.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -421,6 +442,18 @@ export function LeadsListContainer({
           urlPathParams: { id: lead.id },
           prefillFromGet: true,
           getEndpoint: leadDef.default.GET,
+          data: {
+            email: lead.email ?? undefined,
+            businessName: lead.businessName ?? undefined,
+            contactName: lead.contactName ?? undefined,
+            status: lead.status ?? undefined,
+            phone: lead.phone ?? undefined,
+            website: lead.website ?? undefined,
+            country: lead.country ?? undefined,
+            language: lead.language ?? undefined,
+            source: lead.source ?? undefined,
+            notes: lead.notes ?? undefined,
+          },
         });
       })();
     },
@@ -436,10 +469,13 @@ export function LeadsListContainer({
           urlPathParams: { id: lead.id },
           renderInModal: true,
           popNavigationOnSuccess: 1,
+          onSuccessCallback: () => {
+            endpointMutations?.read?.refetch?.();
+          },
         });
       })();
     },
-    [navigation],
+    [navigation, endpointMutations],
   );
 
   const handleCreate = useCallback((): void => {
@@ -516,6 +552,7 @@ export function LeadsListContainer({
   const handleSearchChange = useCallback(
     (text: string): void => {
       form?.setValue("statusFilters.search", text);
+      form?.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -657,11 +694,12 @@ export function LeadsListContainer({
               onClick={() => {
                 if (tab.value === null) {
                   form?.setValue("statusFilters.status", []);
+                  form?.setValue("paginationInfo.page", 1);
+                  if (onSubmit) {
+                    onSubmit();
+                  }
                 } else {
                   handleToggleStatus(tab.value);
-                }
-                if (onSubmit) {
-                  onSubmit();
                 }
               }}
               className={cn(
@@ -751,28 +789,34 @@ export function LeadsListContainer({
           {objectEntries(statusCounts)
             .toSorted(([, a], [, b]) => b - a)
             .slice(0, 5)
-            .map(([status, count]) => (
-              <Button
-                key={status}
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => handleToggleStatus(status)}
-                className={cn(
-                  "text-xs text-muted-foreground hover:text-foreground transition-colors",
-                  activeStatuses.includes(status) &&
-                    "text-foreground font-medium",
-                )}
-              >
-                <Span
+            .map(([status, count]) => {
+              const filterKey = status.replace(
+                "enums.leadStatus.",
+                "enums.leadStatusFilter.",
+              ) as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
+              return (
+                <Button
+                  key={status}
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleToggleStatus(status)}
                   className={cn(
-                    "inline-block w-2 h-2 rounded-full mr-1",
-                    STATUS_COLORS[status]?.split(" ")[0] ?? "bg-gray-400",
+                    "text-xs text-muted-foreground hover:text-foreground transition-colors",
+                    activeStatuses.includes(filterKey) &&
+                      "text-foreground font-medium",
                   )}
-                />
-                {leadsT(status)}: {count}
-              </Button>
-            ))}
+                >
+                  <Span
+                    className={cn(
+                      "inline-block w-2 h-2 rounded-full mr-1",
+                      STATUS_COLORS[status]?.split(" ")[0] ?? "bg-gray-400",
+                    )}
+                  />
+                  {leadsT(status)}: {count}
+                </Button>
+              );
+            })}
         </Div>
       )}
 

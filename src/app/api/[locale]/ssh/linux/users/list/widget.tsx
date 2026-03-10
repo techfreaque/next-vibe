@@ -41,6 +41,7 @@ export function LinuxUsersListContainer({
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const navigation = useWidgetNavigation();
   const value = field.value;
+  const isLoading = value === null || value === undefined;
   const users = value?.users ?? [];
 
   const handleCreate = useCallback((): void => {
@@ -66,11 +67,9 @@ export function LinuxUsersListContainer({
         </Button>
       </Div>
 
-      {users.length === 0 ? (
+      {isLoading ? null : users.length === 0 ? (
         <Div className="flex items-center justify-center flex-1 py-12">
-          <P className="text-sm text-muted-foreground">
-            {t("widget.localModeOnly")}
-          </P>
+          <P className="text-sm text-muted-foreground">{t("widget.noUsers")}</P>
         </Div>
       ) : (
         <Div className="overflow-x-auto flex-1">

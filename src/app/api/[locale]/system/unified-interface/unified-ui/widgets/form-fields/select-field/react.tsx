@@ -214,7 +214,20 @@ export function SelectFieldWidget<
                             value={String(option.value)}
                             disabled={option.disabled}
                           >
-                            {tField(option.label, option.labelParams)}
+                            {((): string => {
+                              const translated = tField(
+                                option.label,
+                                option.labelParams,
+                              );
+                              // Fall back to globalT if scoped translation returned the raw key
+                              if (translated === option.label) {
+                                return globalT(
+                                  option.label as Parameters<typeof globalT>[0],
+                                  option.labelParams,
+                                );
+                              }
+                              return translated;
+                            })()}
                           </SelectItem>
                         ),
                       )}

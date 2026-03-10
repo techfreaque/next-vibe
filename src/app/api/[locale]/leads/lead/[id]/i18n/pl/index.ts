@@ -130,6 +130,91 @@ export const translations: typeof enTranslations = {
       updatedAt: {
         content: "Zaktualizowany dnia",
       },
+      identity: {
+        title: "Urządzenie i tożsamość",
+        description: "Dane identyfikacyjne i informacje o urządzeniu",
+      },
+      ipAddress: {
+        content: "Adres IP",
+      },
+      userAgent: {
+        content: "User Agent",
+      },
+      deviceType: {
+        content: "Typ urządzenia",
+      },
+      browser: {
+        content: "Przeglądarka",
+      },
+      os: {
+        content: "System operacyjny",
+      },
+      referralCode: {
+        content: "Kod polecenia",
+      },
+      lifecycle: {
+        title: "Cykl życia",
+        description: "Dodatkowe znaczniki czasu cyklu życia",
+      },
+      bouncedAt: {
+        content: "Odrzucony dnia",
+      },
+      invalidAt: {
+        content: "Nieprawidłowy od",
+      },
+      campaignStartedAt: {
+        content: "Kampania rozpoczęta dnia",
+      },
+      linkedLeads: {
+        title: "Powiązane leady",
+        description: "Leady zidentyfikowane jako ta sama osoba",
+        linkedLeadId: {
+          content: "ID powiązanego leada",
+        },
+        linkReason: {
+          content: "Powód powiązania",
+        },
+        linkedAt: {
+          content: "Powiązany dnia",
+        },
+        email: {
+          content: "E-mail",
+        },
+        businessName: {
+          content: "Nazwa firmy",
+        },
+        status: {
+          content: "Status",
+        },
+        ipAddress: {
+          content: "Adres IP",
+        },
+        userAgent: {
+          content: "User Agent",
+        },
+        createdAt: {
+          content: "Utworzony dnia",
+        },
+      },
+      linkedUsers: {
+        title: "Powiązane konta użytkowników",
+        description: "Konta użytkowników powiązane z tym leadem",
+        userId: {
+          content: "ID użytkownika",
+        },
+        linkReason: {
+          content: "Powód powiązania",
+        },
+        linkedAt: {
+          content: "Powiązany dnia",
+        },
+        email: {
+          content: "E-mail",
+        },
+        publicName: {
+          content: "Wyświetlana nazwa",
+        },
+      },
     },
     errors: {
       validation: {
@@ -585,9 +670,30 @@ export const translations: typeof enTranslations = {
     stageReactivation: "Reaktywacja",
     tabOverview: "Przegląd",
     tabDetails: "Szczegóły",
+    tabIdentity: "Tożsamość",
     tabBasic: "Podstawowe",
     tabCampaign: "Kampania",
     tabAdvanced: "Zaawansowane",
+    deviceIdentity: "Urządzenie i tożsamość",
+    ipAddress: "Adres IP",
+    userAgent: "User Agent",
+    deviceType: "Typ urządzenia",
+    browser: "Przeglądarka",
+    os: "System operacyjny",
+    referralCode: "Kod referencyjny",
+    lifecycleTimestamps: "Cykl życia",
+    bouncedAt: "Odbity dnia",
+    invalidAt: "Nieważny od",
+    campaignStartedAt: "Kampania rozpoczęta",
+    linkedLeadsSection: "Powiązane leady",
+    linkedLeadsEmpty: "Brak powiązanych leadów",
+    linkedUsersSection: "Powiązane konta użytkowników",
+    linkedUsersEmpty: "Brak powiązanych kont użytkowników",
+    linkReason: "Powód powiązania:",
+    linkedAt: "Powiązano dnia:",
+    copyIp: "IP",
+    copyLinkedLeadId: "ID leada",
+    copyUserId2: "ID użytkownika",
   },
   delete: {
     title: "Usuń leada",

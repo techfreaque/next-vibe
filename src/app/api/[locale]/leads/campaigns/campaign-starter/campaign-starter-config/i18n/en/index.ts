@@ -183,10 +183,24 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  priority: {
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    background: "Background",
+    filter: {
+      all: "All Priorities",
+      highAndAbove: "High and Above",
+      mediumAndAbove: "Medium and Above",
+    },
+  },
   widget: {
     title: "Campaign Starter Configuration",
     titleSaved: "Configuration Saved",
     saving: "Saving...",
+    save: "Save Settings",
+    addLocale: "+ Add locale",
     guidanceTitle: "Configure the Campaign Starter",
     guidanceDescription:
       "Set the schedule, active days/hours, leads-per-week targets, and cron task settings. After saving, use the action buttons to view stats or start the campaign immediately.",
@@ -217,5 +231,19 @@ export const translations = {
     dayFri: "Fri",
     daySat: "Sat",
     daySun: "Sun",
+    sections: {
+      general: "General",
+      generalDescription:
+        "Master controls for enabling the campaign starter and dry run mode.",
+      schedule: "Schedule",
+      scheduleDescription:
+        "When should campaigns run? Set the cron schedule, active days, and hours.",
+      quotas: "Quotas",
+      quotasDescription:
+        "How many leads to process per week, broken down by locale.",
+      advanced: "Advanced",
+      advancedDescription:
+        "Task execution settings like priority, timeouts, and retry behavior.",
+    },
   },
 };

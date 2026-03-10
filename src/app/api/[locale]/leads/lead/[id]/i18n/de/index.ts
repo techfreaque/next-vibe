@@ -128,6 +128,91 @@ export const translations = {
       updatedAt: {
         content: "Aktualisiert am",
       },
+      identity: {
+        title: "Gerät & Identität",
+        description: "Tracking-Identität und Geräteinformationen",
+      },
+      ipAddress: {
+        content: "IP-Adresse",
+      },
+      userAgent: {
+        content: "User Agent",
+      },
+      deviceType: {
+        content: "Gerätetyp",
+      },
+      browser: {
+        content: "Browser",
+      },
+      os: {
+        content: "Betriebssystem",
+      },
+      referralCode: {
+        content: "Empfehlungscode",
+      },
+      lifecycle: {
+        title: "Lebenszyklus",
+        description: "Weitere Lebenszyklus-Zeitstempel",
+      },
+      bouncedAt: {
+        content: "Zurückgesendet am",
+      },
+      invalidAt: {
+        content: "Ungültig ab",
+      },
+      campaignStartedAt: {
+        content: "Kampagne gestartet am",
+      },
+      linkedLeads: {
+        title: "Verknüpfte Leads",
+        description: "Als dieselbe Person identifizierte Leads",
+        linkedLeadId: {
+          content: "Verknüpfte Lead-ID",
+        },
+        linkReason: {
+          content: "Verknüpfungsgrund",
+        },
+        linkedAt: {
+          content: "Verknüpft am",
+        },
+        email: {
+          content: "E-Mail",
+        },
+        businessName: {
+          content: "Firmenname",
+        },
+        status: {
+          content: "Status",
+        },
+        ipAddress: {
+          content: "IP-Adresse",
+        },
+        userAgent: {
+          content: "User Agent",
+        },
+        createdAt: {
+          content: "Erstellt am",
+        },
+      },
+      linkedUsers: {
+        title: "Verknüpfte Benutzerkonten",
+        description: "Mit diesem Lead verknüpfte Benutzerkonten",
+        userId: {
+          content: "Benutzer-ID",
+        },
+        linkReason: {
+          content: "Verknüpfungsgrund",
+        },
+        linkedAt: {
+          content: "Verknüpft am",
+        },
+        email: {
+          content: "E-Mail",
+        },
+        publicName: {
+          content: "Anzeigename",
+        },
+      },
     },
     errors: {
       validation: {
@@ -585,9 +670,30 @@ export const translations = {
     stageReactivation: "Reaktivierung",
     tabOverview: "Übersicht",
     tabDetails: "Details",
+    tabIdentity: "Identität",
     tabBasic: "Basis",
     tabCampaign: "Kampagne",
     tabAdvanced: "Erweitert",
+    deviceIdentity: "Gerät & Identität",
+    ipAddress: "IP-Adresse",
+    userAgent: "User Agent",
+    deviceType: "Gerätetyp",
+    browser: "Browser",
+    os: "Betriebssystem",
+    referralCode: "Empfehlungscode",
+    lifecycleTimestamps: "Lebenszyklus",
+    bouncedAt: "Zurückgewiesen am",
+    invalidAt: "Ungültig ab",
+    campaignStartedAt: "Kampagne gestartet am",
+    linkedLeadsSection: "Verknüpfte Leads",
+    linkedLeadsEmpty: "Keine verknüpften Leads",
+    linkedUsersSection: "Verknüpfte Benutzerkonten",
+    linkedUsersEmpty: "Keine verknüpften Benutzerkonten",
+    linkReason: "Verknüpfungsgrund:",
+    linkedAt: "Verknüpft am:",
+    copyIp: "IP",
+    copyLinkedLeadId: "Lead-ID",
+    copyUserId2: "Benutzer-ID",
   },
   delete: {
     title: "Lead löschen",

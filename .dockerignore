@@ -67,12 +67,7 @@ docker-compose*.yml
 *.swp
 *.swo
 *~
-
-# Documentation
-*.md
-README.md
-CHANGELOG.md
-
+ 
 # CI/CD
 .github
 .gitlab-ci.yml

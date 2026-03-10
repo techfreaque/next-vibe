@@ -10,10 +10,9 @@ import { scopedTranslation as leadsScopedTranslation } from "../../i18n";
 import { LeadsRepository } from "../../repository";
 import definitions from "./definition";
 
-export const { GET, PATCH, tools } = endpointsHandler({
+export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    email: undefined,
     handler: async ({ urlPathParams, logger, locale }) => {
       const leadsT = leadsScopedTranslation.scopedT(locale).t;
       return await LeadsRepository.getLeadById(
@@ -24,7 +23,6 @@ export const { GET, PATCH, tools } = endpointsHandler({
     },
   },
   [Methods.PATCH]: {
-    email: undefined,
     handler: async ({ urlPathParams, data, logger, locale }) => {
       const leadsT = leadsScopedTranslation.scopedT(locale).t;
       return await LeadsRepository.updateLead(
@@ -33,6 +31,12 @@ export const { GET, PATCH, tools } = endpointsHandler({
         logger,
         leadsT,
       );
+    },
+  },
+  [Methods.DELETE]: {
+    handler: async ({ urlPathParams, logger, locale }) => {
+      const leadsT = leadsScopedTranslation.scopedT(locale).t;
+      return await LeadsRepository.deleteLead(urlPathParams.id, logger, leadsT);
     },
   },
 });

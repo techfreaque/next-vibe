@@ -65,6 +65,7 @@ export const translations = {
     locked: "Locked",
     active: "Active",
     localModeOnly: "Only available in LOCAL_MODE",
+    noUsers: "No users found",
     confirmDelete: "Delete user {username}? This cannot be undone.",
   },
 };

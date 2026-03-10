@@ -68,6 +68,15 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
+      selfTaskId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "import.process.post.fields.selfTaskId.label",
+        description: "import.process.post.fields.selfTaskId.description",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+
       jobsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "import.process.post.response.jobsProcessed",
@@ -140,7 +149,12 @@ const { POST } = createEndpoint({
 
   examples: {
     requests: {
-      default: { maxJobsPerRun: 5, maxRetriesPerJob: 3, dryRun: false },
+      default: {
+        maxJobsPerRun: 5,
+        maxRetriesPerJob: 3,
+        dryRun: false,
+        selfTaskId: undefined,
+      },
     },
     responses: {
       default: {

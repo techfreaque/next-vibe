@@ -61,6 +61,24 @@ export const translations: typeof enTranslations = {
             affiliate: "Minimale Affiliate-Erwähnung",
           },
         },
+        signupNurture: {
+          name: "Anmelde-Nurturing",
+          description: "Onboarding-Sequenz für neu angemeldete Benutzer",
+          longDescription:
+            "Willkommens- und Onboarding-E-Mails, die neuen Benutzern den Einstieg erleichtern",
+        },
+        retention: {
+          name: "Kundenbindung",
+          description: "Reaktivierung für bestehende Abonnenten",
+          longDescription:
+            "Wertorientierte E-Mails, um aktive Abonnenten zu binden und Funktionen zu erkunden",
+        },
+        winback: {
+          name: "Rückgewinnung",
+          description: "Inaktive oder abgewanderte Nutzer zurückgewinnen",
+          longDescription:
+            "Reaktivierungskampagne für Nutzer, die inaktiv geworden sind oder abgebrochen haben",
+        },
       },
     },
     leads: {

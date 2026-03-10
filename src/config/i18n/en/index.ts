@@ -51,6 +51,7 @@ export const translations = {
   timezone: {
     PL: "Europe/Warsaw",
     DE: "Europe/Berlin",
+    US: "America/New_York",
     GLOBAL: "UTC",
   },
 };

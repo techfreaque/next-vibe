@@ -19,6 +19,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
+import { SshAuthType } from "../../enum";
 import type endpoints from "./definition";
 import type { ConnectionCreateResponseOutput } from "./definition";
 
@@ -33,8 +34,12 @@ export function ConnectionCreateContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
-  useWidgetForm<typeof endpoints.POST>();
+  const form = useWidgetForm<typeof endpoints.POST>();
   const emptyField = useMemo(() => ({}), []);
+
+  const authType = form?.watch("authType");
+  const isLocal = authType === SshAuthType.LOCAL;
+  const isKeyAgent = authType === SshAuthType.KEY_AGENT;
 
   return (
     <Div className="flex flex-col gap-0">
@@ -54,27 +59,29 @@ export function ConnectionCreateContainer({
         />
       </Div>
 
-      {/* Scrollable form */}
-      <Div className="px-4 pb-4">
+      {/* Form */}
+      <Div className="px-4 pb-4 flex flex-col gap-4">
         <FormAlertWidget field={emptyField} />
-
-        <Div className="flex flex-col gap-4">
-          <TextFieldWidget fieldName="label" field={children.label} />
-          <TextFieldWidget fieldName="host" field={children.host} />
-          <NumberFieldWidget fieldName="port" field={children.port} />
-          <TextFieldWidget fieldName="username" field={children.username} />
-          <SelectFieldWidget fieldName="authType" field={children.authType} />
+        <TextFieldWidget fieldName="label" field={children.label} />
+        <SelectFieldWidget fieldName="authType" field={children.authType} />
+        {!isLocal && (
+          <>
+            <TextFieldWidget fieldName="host" field={children.host} />
+            <NumberFieldWidget fieldName="port" field={children.port} />
+          </>
+        )}
+        <TextFieldWidget fieldName="username" field={children.username} />
+        {!isLocal && !isKeyAgent && (
           <PasswordFieldWidget fieldName="secret" field={children.secret} />
+        )}
+        {!isLocal && !isKeyAgent && (
           <PasswordFieldWidget
             fieldName="passphrase"
             field={children.passphrase}
           />
-          <BooleanFieldWidget
-            fieldName="isDefault"
-            field={children.isDefault}
-          />
-          <TextareaFieldWidget fieldName="notes" field={children.notes} />
-        </Div>
+        )}
+        <BooleanFieldWidget fieldName="isDefault" field={children.isDefault} />
+        <TextareaFieldWidget fieldName="notes" field={children.notes} />
       </Div>
     </Div>
   );

@@ -275,6 +275,13 @@ export const translations: typeof enTranslations = {
       standalone: "Samodzielny",
       withBoth: "Z oboma",
     },
+    deviceType: {
+      desktop: "Komputer stacjonarny",
+      mobile: "Telefon komórkowy",
+      tablet: "Tablet",
+      bot: "Bot",
+      unknown: "Nieznany",
+    },
     leadSource: {
       website: "Strona internetowa",
       socialMedia: "Media społecznościowe",

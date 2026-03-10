@@ -72,6 +72,8 @@ export const translations: typeof enTranslations = {
     title: "Kampagnen-Warteschlange",
     refresh: "Aktualisieren",
     noData: "Keine Leads aktuell in Kampagnen",
+    emptyDescription:
+      "Wenn Leads in E-Mail-Kampagnen aufgenommen werden, erscheinen sie hier. Verwenden Sie den Kampagnen-Starter im Dashboard oder konfigurieren Sie den Zeitplaner in den Einstellungen.",
     empty: "Keine Leads gefunden",
     columnEmail: "E-Mail",
     columnBusiness: "Unternehmen",
