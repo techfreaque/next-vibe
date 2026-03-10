@@ -97,39 +97,9 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
     try {
       output.push(MESSAGES.BUILD_START);
 
-      if (data.package) {
-        // Build package using the builder with build.config.ts
-        output.push(MESSAGES.PACKAGE_BUILD_START);
-        const { builderRepository } = await import("../../builder/repository");
-        const { t: builderT } = builderScopedTranslation.scopedT(locale);
-        const builderResult = await builderRepository.execute(
-          {
-            configPath: "build.config.ts",
-          },
-          logger,
-          builderT,
-        );
-        if (builderResult.success && builderResult.data) {
-          output.push(builderResult.data.output);
-          output.push(MESSAGES.PACKAGE_BUILD_SUCCESS);
-          steps.push({ label: "Package", ok: true, skipped: false });
-        } else {
-          steps.push({ label: "Package", ok: false, skipped: false });
-          errors.push(MESSAGES.PACKAGE_BUILD_FAILED);
-          if (!data.force) {
-            const response: BuildResponseType = {
-              success: false,
-              output: output.join("\n"),
-              duration: Date.now() - startTime,
-              errors,
-              steps,
-            };
-            return success(response);
-          }
-        }
-      }
-
-      // Generate API endpoints
+      // Generate API endpoints first — package build (vibe-runtime) bundles
+      // interactive.cli.tsx which statically imports generated/endpoints-meta/en,
+      // so generated files must exist before the package build runs.
       if (!data.generate) {
         output.push(MESSAGES.SKIP_GENERATION);
         steps.push({ label: "Generate", ok: true, skipped: true });
@@ -170,6 +140,38 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           const errorMsg = `${MESSAGES.GENERATION_FAILED}: ${parseError(generatorError).message}`;
           steps.push({ label: "Generate", ok: false, skipped: false });
           errors.push(errorMsg);
+          if (!data.force) {
+            const response: BuildResponseType = {
+              success: false,
+              output: output.join("\n"),
+              duration: Date.now() - startTime,
+              errors,
+              steps,
+            };
+            return success(response);
+          }
+        }
+      }
+
+      if (data.package) {
+        // Build package using the builder with build.config.ts
+        output.push(MESSAGES.PACKAGE_BUILD_START);
+        const { builderRepository } = await import("../../builder/repository");
+        const { t: builderT } = builderScopedTranslation.scopedT(locale);
+        const builderResult = await builderRepository.execute(
+          {
+            configPath: "build.config.ts",
+          },
+          logger,
+          builderT,
+        );
+        if (builderResult.success && builderResult.data) {
+          output.push(builderResult.data.output);
+          output.push(MESSAGES.PACKAGE_BUILD_SUCCESS);
+          steps.push({ label: "Package", ok: true, skipped: false });
+        } else {
+          steps.push({ label: "Package", ok: false, skipped: false });
+          errors.push(MESSAGES.PACKAGE_BUILD_FAILED);
           if (!data.force) {
             const response: BuildResponseType = {
               success: false,
