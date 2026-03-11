@@ -10,6 +10,10 @@ export const translations: typeof enTranslations = {
     fields: {
       id: { label: "ID grafu", description: "UUID grafu" },
       name: { label: "Nazwa", description: "Zaktualizowana nazwa" },
+      slug: {
+        label: "Slug",
+        description: "Zaktualizowany slug (male litery, tylko myslniki)",
+      },
       description: { label: "Opis", description: "Zaktualizowany opis" },
       config: {
         label: "Konfiguracja",
@@ -65,6 +69,8 @@ export const translations: typeof enTranslations = {
     unsaved: "Niezapisane zmiany",
     help: "Przeciagnij wezly aby zmienic pozycje. Polacz uchwyty aby dodac krawedzie.",
     nameLabel: "Nazwa",
+    slugLabel: "Slug",
+    slugPlaceholder: "moj-graf",
     descriptionLabel: "Opis",
     configLabel: "Konfiguracja (JSON)",
     toggleJson: "Przelacz edytor JSON",

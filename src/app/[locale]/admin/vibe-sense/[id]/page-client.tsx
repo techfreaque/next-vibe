@@ -37,9 +37,6 @@ export function VibeSenseDetailClient({
             staleTime: 30 * 1000,
           },
         },
-        create: {
-          urlPathParams: { id: graphId },
-        },
       }}
     />
   );

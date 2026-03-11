@@ -7,6 +7,10 @@ export const translations = {
     fields: {
       id: { label: "Graph ID", description: "UUID of the graph" },
       name: { label: "Name", description: "Updated name" },
+      slug: {
+        label: "Slug",
+        description: "Updated slug (lowercase, hyphens only)",
+      },
       description: { label: "Description", description: "Updated description" },
       config: { label: "Config", description: "Updated graph config" },
     },
@@ -50,6 +54,8 @@ export const translations = {
     unsaved: "Unsaved changes",
     help: "Drag nodes to reposition. Connect handles to add edges.",
     nameLabel: "Name",
+    slugLabel: "Slug",
+    slugPlaceholder: "my-graph",
     descriptionLabel: "Description",
     configLabel: "Config (JSON)",
     toggleJson: "Toggle JSON editor",

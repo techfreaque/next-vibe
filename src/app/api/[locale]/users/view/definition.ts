@@ -49,6 +49,7 @@ export const { GET } = createEndpoint({
         schema: z.uuid(),
         label: "get.userId.label" as const,
         hidden: true,
+        includeInCacheKey: true,
       }),
 
       // Top action buttons

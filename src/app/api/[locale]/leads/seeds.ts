@@ -410,33 +410,41 @@ function generateRandomLead(index: number): NewLead {
     campaignStage,
   );
 
-  // Generate timestamps based on status
-  const createdAt = getRandomPastDate(180);
+  // Generate timestamps based on status — spread over 1 year of history
+  const createdAt = getRandomPastDate(365);
   const campaignStartedAt =
     campaignStage === EmailCampaignStage.NOT_STARTED
       ? null
-      : getRandomPastDate(90);
-  const lastEmailSentAt = emailsSent > 0 ? getRandomPastDate(30) : null;
-  const lastEngagementAt = emailsOpened > 0 ? getRandomPastDate(20) : null;
+      : getRandomPastDate(300);
+  const lastEmailSentAt = emailsSent > 0 ? getRandomPastDate(90) : null;
+  const lastEngagementAt = emailsOpened > 0 ? getRandomPastDate(60) : null;
 
   // Status-specific timestamps
   const signedUpAt =
     status === LeadStatus.SIGNED_UP ||
     status === LeadStatus.SUBSCRIPTION_CONFIRMED
-      ? getRandomPastDate(60)
+      ? getRandomPastDate(300)
+      : null;
+
+  const convertedAt =
+    status === LeadStatus.SIGNED_UP ||
+    status === LeadStatus.SUBSCRIPTION_CONFIRMED
+      ? getRandomPastDate(300)
       : null;
 
   const subscriptionConfirmedAt =
-    status === LeadStatus.SUBSCRIPTION_CONFIRMED ? getRandomPastDate(15) : null;
+    status === LeadStatus.SUBSCRIPTION_CONFIRMED
+      ? getRandomPastDate(270)
+      : null;
 
   const unsubscribedAt =
-    status === LeadStatus.UNSUBSCRIBED ? getRandomPastDate(45) : null;
+    status === LeadStatus.UNSUBSCRIBED ? getRandomPastDate(180) : null;
 
   const bouncedAt =
-    status === LeadStatus.BOUNCED ? getRandomPastDate(60) : null;
+    status === LeadStatus.BOUNCED ? getRandomPastDate(300) : null;
 
   const invalidAt =
-    status === LeadStatus.INVALID ? getRandomPastDate(90) : null;
+    status === LeadStatus.INVALID ? getRandomPastDate(365) : null;
 
   return {
     email,
@@ -456,6 +464,7 @@ function generateRandomLead(index: number): NewLead {
     lastEmailSentAt,
     unsubscribedAt,
     signedUpAt,
+    convertedAt,
     subscriptionConfirmedAt,
     bouncedAt,
     invalidAt,
@@ -477,7 +486,7 @@ function generateRandomLead(index: number): NewLead {
             : "UTC",
     },
     createdAt,
-    updatedAt: getRandomPastDate(30),
+    updatedAt: getRandomPastDate(90),
   };
 }
 
@@ -519,8 +528,8 @@ async function generateLeadEngagements(
             Math.floor(Math.random() * 4)
           ],
         },
-        timestamp: getRandomPastDate(60),
-        createdAt: getRandomPastDate(60),
+        timestamp: getRandomPastDate(365),
+        createdAt: getRandomPastDate(365),
       };
 
       engagements.push(engagement);
@@ -582,18 +591,18 @@ async function generateEmailCampaigns(
         subject: subjects[Math.floor(Math.random() * subjects.length)],
         templateName:
           templateNames[Math.floor(Math.random() * templateNames.length)],
-        scheduledAt: getRandomPastDate(90),
-        sentAt: Math.random() > 0.2 ? getRandomPastDate(60) : null,
+        scheduledAt: getRandomPastDate(365),
+        sentAt: Math.random() > 0.2 ? getRandomPastDate(300) : null,
         status: Math.random() > 0.2 ? EmailStatus.SENT : EmailStatus.PENDING,
-        openedAt: Math.random() > 0.6 ? getRandomPastDate(30) : null,
-        clickedAt: Math.random() > 0.8 ? getRandomPastDate(25) : null,
+        openedAt: Math.random() > 0.6 ? getRandomPastDate(270) : null,
+        clickedAt: Math.random() > 0.8 ? getRandomPastDate(270) : null,
         metadata: {
           campaign_id: `campaign_${i + 1}`,
           ab_test: Math.random() > 0.5,
           priority: Math.floor(Math.random() * 3) + 1,
         },
-        createdAt: getRandomPastDate(90),
-        updatedAt: getRandomPastDate(30),
+        createdAt: getRandomPastDate(365),
+        updatedAt: getRandomPastDate(90),
       };
 
       campaigns.push(campaign);
@@ -694,7 +703,7 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
   );
 }
 
-const ENABLED = false;
+const ENABLED = true;
 
 /**
  * Locales to seed campaign leads for
@@ -743,8 +752,8 @@ function generateImportedLead(
       imported: true,
       generated: true,
     },
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: getRandomPastDate(365),
+    updatedAt: getRandomPastDate(90),
   };
 }
 

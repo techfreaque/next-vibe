@@ -24,18 +24,19 @@ import { envClient } from "@/config/env-client";
 
 import { scopedTranslation } from "./i18n";
 import { RemoteConnectWidget } from "./widget";
+import { Environment } from "../../../shared/utils";
 
-// Default instanceId: "thea" on cloud (production), "hermes" on local/dev
-const defaultInstanceId = envClient.VIBE_IS_CLOUD ? "thea" : "hermes";
-// Default remoteUrl: the project URL (unbottled.ai for cloud, localhost for local)
-const defaultRemoteUrl = envClient.NEXT_PUBLIC_PROJECT_URL;
+// Default instanceId: "thea" on production, "hermes" on local/dev
+const defaultInstanceId =
+  envClient.NODE_ENV === Environment.PRODUCTION ? "thea" : "hermes";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["user", "remote-connection", "connect"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-
+  allowedRoles: envClient.VIBE_IS_CLOUD
+    ? ([UserRole.CUSTOMER, UserRole.ADMIN] as const)
+    : ([] as const),
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "link" as const,
@@ -92,7 +93,7 @@ const { POST } = createEndpoint({
           .min(1, { message: "post.remoteUrl.validation.required" })
           .url({ message: "post.remoteUrl.validation.invalid" })
           .transform((val) => val.replace(/\/+$/, "")) // strip trailing slashes
-          .default(defaultRemoteUrl),
+          .default(envClient.NEXT_PUBLIC_PROJECT_URL),
       }),
       // email and password are NOT sent to the local backend.
       // The widget POSTs credentials directly from the browser to the remote server,
@@ -237,7 +238,7 @@ const { POST } = createEndpoint({
       default: {
         instanceId: defaultInstanceId,
         friendlyName: "My Laptop",
-        remoteUrl: defaultRemoteUrl,
+        remoteUrl: envClient.NEXT_PUBLIC_PROJECT_URL,
         token: "<jwt-from-remote-login>",
         leadId: "<lead-id-from-remote>",
       },

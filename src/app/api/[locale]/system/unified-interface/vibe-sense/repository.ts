@@ -88,10 +88,13 @@ export interface GraphCreateResponse {
 
 export interface GraphGetResponse {
   graph: GraphSummary & { config: GraphConfig };
+  series: GraphDataResponse["series"];
+  signals: GraphDataResponse["signals"];
 }
 
 export interface GraphEditInput {
   name?: string;
+  slug?: string;
   description?: string;
   config: GraphConfig;
 }
@@ -124,8 +127,8 @@ export interface GraphBacktestResponse {
 }
 
 export interface GraphDataInput {
-  rangeFrom: string;
-  rangeTo: string;
+  resolution: Resolution;
+  cursor?: string;
 }
 
 export interface GraphDataResponse {
@@ -145,6 +148,40 @@ export interface CleanupResponse {
   snapshotsDeleted: number;
   graphsChecked: number;
   graphsExecuted: number;
+}
+
+/**
+ * Downsample a raw 1D (or finer) series into buckets of `bucketMs` width.
+ * Each bucket timestamp = floor of first point in bucket.
+ * Bucket value = average of all points that fall within the bucket.
+ * If bucketMs <= ONE_DAY_MS the original points are returned unchanged.
+ */
+function downsampleToResolution(
+  points: Array<{ timestamp: Date; value: number }>,
+  bucketMs: number,
+): Array<{ timestamp: Date; value: number }> {
+  const ONE_DAY_MS = 86_400_000;
+  if (bucketMs <= ONE_DAY_MS || points.length === 0) {
+    return points;
+  }
+
+  const buckets = new Map<number, number[]>();
+  for (const p of points) {
+    const bucketKey = Math.floor(p.timestamp.getTime() / bucketMs) * bucketMs;
+    const existing = buckets.get(bucketKey);
+    if (existing) {
+      existing.push(p.value);
+    } else {
+      buckets.set(bucketKey, [p.value]);
+    }
+  }
+
+  return [...buckets.entries()]
+    .toSorted(([a], [b]) => a - b)
+    .map(([ts, values]) => ({
+      timestamp: new Date(ts),
+      value: values.reduce((sum, v) => sum + v, 0) / values.length,
+    }));
 }
 
 export class VibeSenseRepository {
@@ -302,6 +339,7 @@ export class VibeSenseRepository {
 
   static async getGraph(
     id: string,
+    params: { resolution: Resolution; cursor?: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: VibeSenseT,
@@ -329,6 +367,21 @@ export class VibeSenseRepository {
         });
       }
 
+      let series: GraphDataResponse["series"] = [];
+      let signals: GraphDataResponse["signals"] = [];
+
+      const dataResult = await VibeSenseRepository.getGraphData(
+        id,
+        { resolution: params.resolution, cursor: params.cursor },
+        user,
+        logger,
+        t,
+      );
+      if (dataResult.success) {
+        series = dataResult.data.series;
+        signals = dataResult.data.signals;
+      }
+
       return success({
         graph: {
           id: row.id,
@@ -342,6 +395,8 @@ export class VibeSenseRepository {
           createdAt: row.createdAt.toISOString(),
           config: row.config,
         },
+        series,
+        signals,
       });
     } catch (error) {
       logger.error("[vibe-sense] getGraph failed", parseError(error));
@@ -395,6 +450,8 @@ export class VibeSenseRepository {
         });
       }
 
+      const newSlug = data.slug ?? parent.slug;
+
       // Deactivate old active version for this slug+owner (if same owner)
       if (parent.ownerType !== "system") {
         await db
@@ -407,13 +464,26 @@ export class VibeSenseRepository {
               eq(pipelineGraphs.isActive, true),
             ),
           );
+        // If slug changed, also deactivate any existing active version under the new slug
+        if (newSlug !== parent.slug) {
+          await db
+            .update(pipelineGraphs)
+            .set({ isActive: false })
+            .where(
+              and(
+                eq(pipelineGraphs.slug, newSlug),
+                eq(pipelineGraphs.ownerId, user.id!),
+                eq(pipelineGraphs.isActive, true),
+              ),
+            );
+        }
       }
 
       // Create new branch
       const [newRow] = await db
         .insert(pipelineGraphs)
         .values({
-          slug: parent.slug,
+          slug: newSlug,
           name: data.name ?? parent.name,
           description: data.description ?? parent.description,
           ownerType: "admin",
@@ -636,10 +706,23 @@ export class VibeSenseRepository {
         });
       }
 
-      const range = {
-        from: new Date(data.rangeFrom),
-        to: new Date(data.rangeTo),
-      };
+      // Derive time range from resolution + cursor (backwards pagination)
+      // Page size: 200 buckets per resolution
+      const PAGE_BUCKETS = 200;
+      const { RESOLUTION_MS } = await import("./indicators/types");
+      const resMs = RESOLUTION_MS[data.resolution];
+      const rangeTo = data.cursor ? new Date(data.cursor) : new Date();
+      const rangeFrom = new Date(rangeTo.getTime() - PAGE_BUCKETS * resMs);
+
+      // For coarser resolutions (>1D), always fetch full stored history so we
+      // have enough raw 1D points to aggregate into weekly/monthly buckets.
+      const ONE_DAY_MS = 86_400_000;
+      const fetchFrom =
+        resMs > ONE_DAY_MS
+          ? new Date(rangeTo.getTime() - 730 * ONE_DAY_MS) // 2 years max
+          : rangeFrom;
+
+      const range = { from: fetchFrom, to: rangeTo };
 
       await initializeRegistry();
       const result = await runGraph(graph.id, graph.config, range, undefined, {
@@ -648,7 +731,7 @@ export class VibeSenseRepository {
 
       const series = [...result.series.entries()].map(([nodeId, points]) => ({
         nodeId,
-        points: points.map((p) => ({
+        points: downsampleToResolution(points, resMs).map((p) => ({
           timestamp: p.timestamp.toISOString(),
           value: p.value,
         })),

@@ -44,7 +44,7 @@ const { PUT } = createEndpoint({
         label: "put.fields.id.label",
         description: "put.fields.id.description",
         hidden: true,
-        schema: z.string().uuid(),
+        schema: z.union([z.string().uuid(), z.literal("new")]).optional(),
       }),
       name: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -52,6 +52,18 @@ const { PUT } = createEndpoint({
         label: "put.fields.name.label",
         description: "put.fields.name.description",
         schema: z.string().max(100).optional(),
+      }),
+      slug: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "put.fields.slug.label",
+        description: "put.fields.slug.description",
+        schema: z
+          .string()
+          .min(1)
+          .max(100)
+          .regex(/^[a-z0-9-]+$/)
+          .optional(),
       }),
       description: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

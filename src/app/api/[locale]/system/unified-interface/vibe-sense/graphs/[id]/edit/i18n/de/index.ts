@@ -10,6 +10,10 @@ export const translations: typeof enTranslations = {
     fields: {
       id: { label: "Graph-ID", description: "UUID des Graphen" },
       name: { label: "Name", description: "Aktualisierter Name" },
+      slug: {
+        label: "Slug",
+        description: "Aktualisierter Slug (Kleinbuchstaben, nur Bindestriche)",
+      },
       description: {
         label: "Beschreibung",
         description: "Aktualisierte Beschreibung",
@@ -68,6 +72,8 @@ export const translations: typeof enTranslations = {
     unsaved: "Ungespeicherte Aenderungen",
     help: "Knoten verschieben. Handles verbinden um Kanten hinzuzufuegen.",
     nameLabel: "Name",
+    slugLabel: "Slug",
+    slugPlaceholder: "mein-graph",
     descriptionLabel: "Beschreibung",
     configLabel: "Konfiguration (JSON)",
     toggleJson: "JSON-Editor umschalten",

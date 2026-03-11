@@ -4,7 +4,17 @@ export const translations = {
   get: {
     title: "Graph Detail",
     description: "View graph chart with indicators and signals",
-    fields: { id: { label: "Graph ID", description: "UUID of the graph" } },
+    fields: {
+      id: { label: "Graph ID", description: "UUID of the graph" },
+      resolution: {
+        label: "Resolution",
+        description: "Bucket size for time series",
+      },
+      cursor: {
+        label: "Cursor",
+        description: "Oldest loaded timestamp for pagination",
+      },
+    },
     response: {
       graph: {
         id: "ID",
@@ -15,6 +25,16 @@ export const translations = {
         isActive: "Active",
         createdAt: "Created At",
         config: "Config",
+      },
+      series: {
+        nodeId: "Node ID",
+        timestamp: "Timestamp",
+        value: "Value",
+      },
+      signals: {
+        nodeId: "Node ID",
+        timestamp: "Timestamp",
+        fired: "Fired",
       },
     },
     widget: {
@@ -29,6 +49,7 @@ export const translations = {
       archive: "Archive",
       promote: "Promote",
       signal: "Signal",
+      noData: "No data in this range",
     },
     success: {
       title: "Graph loaded",
@@ -46,69 +67,6 @@ export const translations = {
         description: "An unexpected error occurred",
       },
       validation: { title: "Validation failed", description: "Invalid ID" },
-      notFound: { title: "Not found", description: "Graph not found" },
-      conflict: { title: "Conflict", description: "Resource conflict" },
-      network: {
-        title: "Network error",
-        description: "Network request failed",
-      },
-      unsavedChanges: {
-        title: "Unsaved changes",
-        description: "Save changes first",
-      },
-    },
-  },
-  post: {
-    title: "Graph Data",
-    description: "Fetch time-series data for a graph (on-demand execution)",
-    fields: {
-      id: { label: "Graph ID", description: "UUID of the graph" },
-      rangeFrom: { label: "From", description: "Range start (ISO date)" },
-      rangeTo: { label: "To", description: "Range end (ISO date)" },
-    },
-    response: {
-      series: {
-        nodeId: "Node ID",
-        points: {
-          timestamp: "Timestamp",
-          value: "Value",
-        },
-      },
-      signals: {
-        nodeId: "Node ID",
-        events: {
-          timestamp: "Timestamp",
-          fired: "Fired",
-        },
-      },
-    },
-    widget: {
-      loadButton: "Load Data",
-      loadingButton: "Loading...",
-      noData: "No data in this range",
-    },
-    success: {
-      title: "Data loaded",
-      description: "Graph data retrieved successfully",
-    },
-    errors: {
-      unauthorized: {
-        title: "Unauthorized",
-        description: "Authentication required",
-      },
-      forbidden: { title: "Forbidden", description: "Access denied" },
-      server: {
-        title: "Server error",
-        description: "Failed to fetch data",
-      },
-      unknown: {
-        title: "Unknown error",
-        description: "An unexpected error occurred",
-      },
-      validation: {
-        title: "Validation failed",
-        description: "Invalid parameters",
-      },
       notFound: { title: "Not found", description: "Graph not found" },
       conflict: { title: "Conflict", description: "Resource conflict" },
       network: {

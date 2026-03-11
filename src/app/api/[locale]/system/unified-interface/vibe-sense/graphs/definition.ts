@@ -191,7 +191,8 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.JSON,
         label: "create.fields.config.label",
         description: "create.fields.config.description",
-        schema: graphConfigSchema,
+        hidden: true,
+        schema: graphConfigSchema.optional(),
       }),
       id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,

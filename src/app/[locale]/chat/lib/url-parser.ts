@@ -44,6 +44,12 @@ export function parseChatUrl(urlPath: string[] | undefined): ParsedChatUrl {
     return defaultResult;
   }
 
+  // Reject static asset requests that got caught by the catch-all route
+  // (e.g. installHook.js.map, favicon.ico)
+  if (urlPath.some((segment) => segment.includes("."))) {
+    return defaultResult;
+  }
+
   // First segment should be a root folder - validate it
   const firstSegment = urlPath[0];
   if (!firstSegment || !isDefaultFolderId(firstSegment)) {

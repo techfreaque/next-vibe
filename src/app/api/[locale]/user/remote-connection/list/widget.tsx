@@ -1,8 +1,8 @@
 /**
  * Remote Connections Widget
  *
- * Cloud context:  Marketing panel (sell local install) + connect form for
- *                 users who already have a local instance running.
+ * Cloud context:  Marketing panel (sell local install) + read-only connection
+ *                 list. Connecting is done from the local side, not from cloud.
  * Local context:  "Connect to cloud" pitch + existing connection list.
  */
 
@@ -296,7 +296,7 @@ function FeatureCard({
   );
 }
 
-// ─── Cloud view: marketing + connect form ─────────────────────────────────────
+// ─── Cloud view: marketing + read-only connection list ────────────────────────
 
 function CloudView({
   connections,
@@ -363,7 +363,7 @@ function CloudView({
 
       <Separator />
 
-      {/* Connect section */}
+      {/* Connected instances (read-only on cloud) */}
       <Div className="flex flex-col gap-4">
         <Div className="flex flex-col gap-1">
           <Span className="text-sm font-semibold">
@@ -375,24 +375,15 @@ function CloudView({
         </Div>
 
         {connections.length > 0 ? (
-          <Div className="flex flex-col gap-3">
-            <Div className="flex flex-col divide-y rounded-lg border overflow-hidden">
-              {connections.map((conn) => (
-                <ConnectionRow
-                  key={conn.instanceId}
-                  conn={conn}
-                  navigate={navigate}
-                  t={t}
-                />
-              ))}
-            </Div>
-            <Div className="flex">
-              <AddConnectionButton
+          <Div className="flex flex-col divide-y rounded-lg border overflow-hidden">
+            {connections.map((conn) => (
+              <ConnectionRow
+                key={conn.instanceId}
+                conn={conn}
                 navigate={navigate}
-                label={t("widget.connectButton")}
-                variant="outline"
+                t={t}
               />
-            </Div>
+            ))}
           </Div>
         ) : (
           <Div className="flex flex-col items-start gap-3 p-4 rounded-lg border border-dashed bg-muted/30">
@@ -400,10 +391,6 @@ function CloudView({
               <WifiOff className="h-4 w-4" />
               <P className="text-sm">{t("widget.emptyStateCloud")}</P>
             </Div>
-            <AddConnectionButton
-              navigate={navigate}
-              label={t("widget.connectButton")}
-            />
           </Div>
         )}
       </Div>

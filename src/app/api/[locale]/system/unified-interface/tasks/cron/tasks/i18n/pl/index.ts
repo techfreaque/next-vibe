@@ -295,6 +295,9 @@ export const translations: typeof enTranslations = {
       disabled: "Wyłączone",
       allPriorities: "Wszystkie priorytety",
       allCategories: "Wszystkie kategorie",
+      visible: "Widoczne",
+      hiddenOnly: "Ukryte",
+      allTasks: "Wszystkie zadania",
     },
     search: {
       placeholder: "Szukaj zadań...",
@@ -313,6 +316,7 @@ export const translations: typeof enTranslations = {
       nextRun: "Następny przebieg:",
       notScheduled: "Nie zaplanowano",
       routeId: "ID trasy",
+      hiddenBadge: "Ukryte",
       owner: {
         system: "System",
         user: "Użytkownik",

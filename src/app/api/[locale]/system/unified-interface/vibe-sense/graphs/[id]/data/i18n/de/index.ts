@@ -6,7 +6,17 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Graph-Details",
     description: "Graph-Diagramm mit Indikatoren und Signalen anzeigen",
-    fields: { id: { label: "Graph-ID", description: "UUID des Graphen" } },
+    fields: {
+      id: { label: "Graph-ID", description: "UUID des Graphen" },
+      resolution: {
+        label: "Aufloesung",
+        description: "Bucket-Groesse fuer Zeitreihen",
+      },
+      cursor: {
+        label: "Cursor",
+        description: "Aeltester geladener Zeitstempel fuer Paginierung",
+      },
+    },
     response: {
       graph: {
         id: "ID",
@@ -17,6 +27,12 @@ export const translations: typeof enTranslations = {
         isActive: "Aktiv",
         createdAt: "Erstellt am",
         config: "Konfiguration",
+      },
+      series: { nodeId: "Knoten-ID", timestamp: "Zeitstempel", value: "Wert" },
+      signals: {
+        nodeId: "Knoten-ID",
+        timestamp: "Zeitstempel",
+        fired: "Ausgeloest",
       },
     },
     widget: {
@@ -31,6 +47,7 @@ export const translations: typeof enTranslations = {
       archive: "Archivieren",
       promote: "Promote",
       signal: "Signal",
+      noData: "Keine Daten in diesem Bereich",
     },
     success: {
       title: "Graph geladen",
@@ -53,73 +70,6 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Validierung fehlgeschlagen",
         description: "Ungueltige ID",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Graph nicht gefunden",
-      },
-      conflict: { title: "Konflikt", description: "Ressourcenkonflikt" },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Netzwerkanfrage fehlgeschlagen",
-      },
-      unsavedChanges: {
-        title: "Ungespeicherte Aenderungen",
-        description: "Aenderungen zuerst speichern",
-      },
-    },
-  },
-  post: {
-    title: "Graph-Daten",
-    description:
-      "Zeitreihendaten eines Graphen abrufen (On-Demand-Ausfuehrung)",
-    fields: {
-      id: { label: "Graph-ID", description: "UUID des Graphen" },
-      rangeFrom: { label: "Von", description: "Bereichsanfang (ISO-Datum)" },
-      rangeTo: { label: "Bis", description: "Bereichsende (ISO-Datum)" },
-    },
-    response: {
-      series: {
-        nodeId: "Knoten-ID",
-        points: {
-          timestamp: "Zeitstempel",
-          value: "Wert",
-        },
-      },
-      signals: {
-        nodeId: "Knoten-ID",
-        events: {
-          timestamp: "Zeitstempel",
-          fired: "Ausgeloest",
-        },
-      },
-    },
-    widget: {
-      loadButton: "Daten laden",
-      loadingButton: "Laden...",
-      noData: "Keine Daten in diesem Bereich",
-    },
-    success: {
-      title: "Daten geladen",
-      description: "Graph-Daten erfolgreich abgerufen",
-    },
-    errors: {
-      unauthorized: {
-        title: "Nicht autorisiert",
-        description: "Authentifizierung erforderlich",
-      },
-      forbidden: { title: "Verboten", description: "Zugriff verweigert" },
-      server: {
-        title: "Serverfehler",
-        description: "Daten konnten nicht abgerufen werden",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unerwarteter Fehler ist aufgetreten",
-      },
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungueltige Parameter",
       },
       notFound: {
         title: "Nicht gefunden",

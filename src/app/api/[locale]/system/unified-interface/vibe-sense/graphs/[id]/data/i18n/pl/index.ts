@@ -6,7 +6,17 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Szczegoly grafu",
     description: "Wyswietl wykres grafu z wskaznikami i sygnalami",
-    fields: { id: { label: "ID grafu", description: "UUID grafu" } },
+    fields: {
+      id: { label: "ID grafu", description: "UUID grafu" },
+      resolution: {
+        label: "Rozdzielczosc",
+        description: "Rozmiar kubeka dla szeregów czasowych",
+      },
+      cursor: {
+        label: "Kursor",
+        description: "Najstarszy zaladowany znacznik czasu do paginacji",
+      },
+    },
     response: {
       graph: {
         id: "ID",
@@ -17,6 +27,16 @@ export const translations: typeof enTranslations = {
         isActive: "Aktywny",
         createdAt: "Utworzono",
         config: "Konfiguracja",
+      },
+      series: {
+        nodeId: "ID wezla",
+        timestamp: "Znacznik czasu",
+        value: "Wartosc",
+      },
+      signals: {
+        nodeId: "ID wezla",
+        timestamp: "Znacznik czasu",
+        fired: "Wystrzelony",
       },
     },
     widget: {
@@ -31,6 +51,7 @@ export const translations: typeof enTranslations = {
       archive: "Archiwizuj",
       promote: "Promote",
       signal: "Sygnal",
+      noData: "Brak danych w tym zakresie",
     },
     success: {
       title: "Graf zaladowany",
@@ -53,72 +74,6 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Walidacja nie powiodla sie",
         description: "Nieprawidlowe ID",
-      },
-      notFound: {
-        title: "Nie znaleziono",
-        description: "Graf nie znaleziony",
-      },
-      conflict: { title: "Konflikt", description: "Konflikt zasobow" },
-      network: {
-        title: "Blad sieci",
-        description: "Zadanie sieciowe nie powiodlo sie",
-      },
-      unsavedChanges: {
-        title: "Niezapisane zmiany",
-        description: "Najpierw zapisz zmiany",
-      },
-    },
-  },
-  post: {
-    title: "Dane grafu",
-    description: "Pobierz dane szeregow czasowych grafu (wykonanie na zadanie)",
-    fields: {
-      id: { label: "ID grafu", description: "UUID grafu" },
-      rangeFrom: { label: "Od", description: "Poczatek zakresu (data ISO)" },
-      rangeTo: { label: "Do", description: "Koniec zakresu (data ISO)" },
-    },
-    response: {
-      series: {
-        nodeId: "ID wezla",
-        points: {
-          timestamp: "Znacznik czasu",
-          value: "Wartosc",
-        },
-      },
-      signals: {
-        nodeId: "ID wezla",
-        events: {
-          timestamp: "Znacznik czasu",
-          fired: "Wystrzelony",
-        },
-      },
-    },
-    widget: {
-      loadButton: "Zaladuj dane",
-      loadingButton: "Ladowanie...",
-      noData: "Brak danych w tym zakresie",
-    },
-    success: {
-      title: "Dane zaladowane",
-      description: "Dane grafu pobrane pomyslnie",
-    },
-    errors: {
-      unauthorized: {
-        title: "Brak autoryzacji",
-        description: "Wymagane uwierzytelnienie",
-      },
-      forbidden: { title: "Zabronione", description: "Odmowa dostepu" },
-      server: {
-        title: "Blad serwera",
-        description: "Nie udalo sie pobrac danych",
-      },
-      unknown: {
-        title: "Nieznany blad",
-        description: "Wystapil nieoczekiwany blad",
-      },
-      validation: {
-        title: "Blad walidacji",
-        description: "Nieprawidlowe parametry",
       },
       notFound: { title: "Nie znaleziono", description: "Graf nie znaleziony" },
       conflict: { title: "Konflikt", description: "Konflikt zasobow" },

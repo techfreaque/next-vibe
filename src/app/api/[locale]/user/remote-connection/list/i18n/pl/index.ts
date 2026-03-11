@@ -75,6 +75,9 @@ export const translations: typeof enTranslations = {
       heroTitle: "Twoja AI. Wszędzie.",
       heroSubtitle:
         "unbottled.ai to twój mózg w chmurze. Dodaj lokalną instancję, a twoja AI działa na obu — wspomnienia synchronizują się, narzędzia działają na twoim komputerze.",
+      benefit1: "Wspomnienia synchronizują się dwukierunkowo, automatycznie",
+      benefit2: "AI w chmurze odkrywa i uruchamia twoje lokalne narzędzia",
+      benefit3: "Deleguj zadania z chmury do swojego komputera",
       feature1Title: "Twoje narzędzia, twój komputer",
       feature1Body:
         "SSH, lokalne pliki, wykonywanie kodu — AI w chmurze automatycznie odkrywa i uruchamia twoje lokalne narzędzia. Bez przekierowania portów. Bez VPN.",
@@ -91,7 +94,7 @@ export const translations: typeof enTranslations = {
       quickstartCta: "Przewodnik Quickstart",
       alreadyHaveLocal: "Masz już lokalną instancję?",
       alreadyHaveLocalSub:
-        "Połącz ją poniżej. Pulse synchronizuje co 60 sekund — wspomnienia, możliwości i zadania przepływają automatycznie.",
+        "Połącz się ze swojego lokalnego komputera — otwórz tam Połączenia zdalne i połącz z tą instancją w chmurze.",
       connectSectionTitle: "Połącz lokalną instancję",
     },
     local: {

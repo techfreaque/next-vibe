@@ -46,6 +46,7 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CronTaskPriorityDB, TaskCategoryDB } from "../../enum";
 import {
   CronTaskEnabledFilter,
+  CronTaskHiddenFilter,
   CronTaskPriority,
   CronTaskPriorityOptions,
   CronTaskStatus,
@@ -184,6 +185,18 @@ function EnabledDot({ enabled }: { enabled: boolean }): React.JSX.Element {
   );
 }
 
+function HiddenBadge({
+  t,
+}: {
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+}): React.JSX.Element {
+  return (
+    <Span className="px-1.5 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400 line-through">
+      {t("widget.task.hiddenBadge")}
+    </Span>
+  );
+}
+
 function TaskRow({
   task,
   onView,
@@ -264,6 +277,7 @@ function TaskRow({
               {tTasks(task.priority)}
             </Span>
           )}
+          {task.hidden && <HiddenBadge t={t} />}
         </Div>
 
         {task.description && (
@@ -646,6 +660,25 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     [patchForm],
   );
 
+  // ── Hidden filter handler ────────────────────────────────────────────────
+  const hiddenValue = form?.watch("hidden");
+  const activeHiddenFilter = hiddenValue ?? CronTaskHiddenFilter.VISIBLE;
+  const handleHiddenFilterChange = useCallback(
+    (
+      value: (typeof CronTaskHiddenFilter)[keyof typeof CronTaskHiddenFilter],
+    ): void => {
+      if (!form) {
+        return;
+      }
+      form.setValue("hidden", value, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    },
+    [form],
+  );
+
   // ── Navigation handlers ──────────────────────────────────────────────────
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
@@ -753,7 +786,14 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
       category: [],
       enabled: CronTaskEnabledFilter.ALL,
     });
-  }, [patchForm]);
+    if (form) {
+      form.setValue("hidden", CronTaskHiddenFilter.VISIBLE, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    }
+  }, [form, patchForm]);
 
   // ── Tab definitions ───────────────────────────────────────────────────────
   const tabs: Array<{
@@ -870,6 +910,27 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             onClick={() => handleStatusTabChange(tab.key)}
           />
         ))}
+
+        {/* Visibility separator + toggle */}
+        <Div className="w-px bg-border mx-1 self-stretch" />
+        <FilterTab
+          label={t("widget.filter.visible")}
+          count={0}
+          active={activeHiddenFilter === CronTaskHiddenFilter.VISIBLE}
+          onClick={() => handleHiddenFilterChange(CronTaskHiddenFilter.VISIBLE)}
+        />
+        <FilterTab
+          label={t("widget.filter.hiddenOnly")}
+          count={0}
+          active={activeHiddenFilter === CronTaskHiddenFilter.HIDDEN}
+          onClick={() => handleHiddenFilterChange(CronTaskHiddenFilter.HIDDEN)}
+        />
+        <FilterTab
+          label={t("widget.filter.allTasks")}
+          count={0}
+          active={activeHiddenFilter === CronTaskHiddenFilter.ALL}
+          onClick={() => handleHiddenFilterChange(CronTaskHiddenFilter.ALL)}
+        />
       </Div>
 
       {/* ── Filters + Sort row ──────────────────────────────────────── */}

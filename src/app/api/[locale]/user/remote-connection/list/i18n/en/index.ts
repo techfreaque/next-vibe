@@ -68,6 +68,9 @@ export const translations = {
       heroTitle: "Own Your AI. Run It Anywhere.",
       heroSubtitle:
         "unbottled.ai is your cloud brain. Add a local instance and your AI operates across both — memories sync, tools run on your machine, Claude Code executes on your hardware.",
+      benefit1: "Memories sync bidirectionally, automatically",
+      benefit2: "Cloud AI discovers and runs your local tools",
+      benefit3: "Delegate tasks from cloud to your machine",
       feature1Title: "Your tools, your machine",
       feature1Body:
         "SSH, local files, code execution — the cloud AI discovers and runs your local tools automatically. No port forwarding. No VPN.",
@@ -84,7 +87,7 @@ export const translations = {
       quickstartCta: "Quickstart Guide",
       alreadyHaveLocal: "Already running a local instance?",
       alreadyHaveLocalSub:
-        "Link it below. The pulse syncs every 60 seconds — memories, capabilities, and tasks flow automatically.",
+        "Connect from your local machine — open Remote Connections there and link it to this cloud instance.",
       connectSectionTitle: "Link Your Local Instance",
     },
     // Local panel

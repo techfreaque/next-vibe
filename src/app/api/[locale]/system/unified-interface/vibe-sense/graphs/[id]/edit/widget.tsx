@@ -63,7 +63,13 @@ import {
   SelectValue,
 } from "next-vibe-ui/ui/select";
 import { P } from "next-vibe-ui/ui/typography";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
@@ -97,6 +103,26 @@ import registryDefinitions from "../../../registry/definition";
 import type definition from "./definition";
 
 // ─── i18n helpers ───────────────────────────────────────────────────────────
+
+/** Map resolution enum value → readable label */
+const RESOLUTION_LABELS: Record<string, string> = {
+  [GraphResolution.ONE_MINUTE]: "1m",
+  [GraphResolution.THREE_MINUTES]: "3m",
+  [GraphResolution.FIVE_MINUTES]: "5m",
+  [GraphResolution.FIFTEEN_MINUTES]: "15m",
+  [GraphResolution.THIRTY_MINUTES]: "30m",
+  [GraphResolution.ONE_HOUR]: "1h",
+  [GraphResolution.FOUR_HOURS]: "4h",
+  [GraphResolution.ONE_DAY]: "1d",
+  [GraphResolution.ONE_WEEK]: "1w",
+  [GraphResolution.ONE_MONTH]: "1M",
+};
+
+function formatResolution(resolution: string): string {
+  return (
+    RESOLUTION_LABELS[resolution] ?? resolution.split(".").pop() ?? resolution
+  );
+}
 
 /** Map TransformerFn → i18n key (avoids template literal assertions) */
 const TRANSFORMER_I18N_KEYS: Record<
@@ -1126,7 +1152,7 @@ function InspectorInlineDerived({
       />
       <InspectorField
         label={t("widget.inspector.resolution")}
-        value={nodeConfig.resolution}
+        value={formatResolution(nodeConfig.resolution)}
         readOnly
       />
     </Div>
@@ -1158,7 +1184,11 @@ function InspectorField({
 
 // ─── Edit Form Inner ────────────────────────────────────────────────────────
 
-function EditFormInner(): React.JSX.Element {
+function EditFormInner({
+  savedResponse,
+}: {
+  savedResponse: EditResponseOutput | null | undefined;
+}): React.JSX.Element {
   const t = useWidgetTranslation<typeof definition.PUT>();
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
@@ -1167,6 +1197,7 @@ function EditFormInner(): React.JSX.Element {
   const reactFlow = useReactFlow();
 
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [dirty, setDirty] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -1180,6 +1211,22 @@ function EditFormInner(): React.JSX.Element {
   const [indicatorSearch, setIndicatorSearch] = useState("");
 
   const graphId = form?.getValues("id") ?? "";
+  const isNewGraph = !graphId || graphId === "new";
+
+  // ── React to successful save ──
+  useEffect(() => {
+    if (!savedResponse?.newId) {
+      return;
+    }
+    setDirty(false);
+    void (async (): Promise<void> => {
+      const dataDef = await import("../data/definition");
+      navigation.push(dataDef.default.GET, {
+        urlPathParams: { id: savedResponse.newId },
+      });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only fire on new save
+  }, [savedResponse?.newId]);
 
   // ── Load parent graph ──
   const parentOptions = useMemo(
@@ -1187,14 +1234,13 @@ function EditFormInner(): React.JSX.Element {
       read: {
         urlPathParams: { id: graphId },
         queryOptions: {
-          enabled: !!graphId,
+          enabled: !isNewGraph,
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000,
         },
       },
-      create: { urlPathParams: { id: graphId } },
     }),
-    [graphId],
+    [graphId, isNewGraph],
   );
 
   const parentEndpoint = useEndpoint(
@@ -1221,7 +1267,7 @@ function EditFormInner(): React.JSX.Element {
     Record<string, GraphNodeConfig>
   >({});
 
-  const isLoading = parentEndpoint.read?.isLoading ?? true;
+  const isLoading = !isNewGraph && (parentEndpoint.read?.isLoading ?? true);
 
   // ── Load registry ──
   const registryOptions = useMemo(
@@ -1250,6 +1296,7 @@ function EditFormInner(): React.JSX.Element {
   useEffect(() => {
     if (parentGraph) {
       setName(parentGraph.name);
+      setSlug(parentGraph.slug);
       setDescription(parentGraph.description ?? "");
       setWorkingNodes(parentGraph.config.nodes);
       if (parentGraph.config.trigger.type === "cron") {
@@ -1263,15 +1310,22 @@ function EditFormInner(): React.JSX.Element {
   const initial = useMemo(() => configToFlow(graphConfig), [graphConfig]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
+  const loadingRef = useRef(true);
 
   useEffect(() => {
     if (!isLoading) {
+      loadingRef.current = true;
       const flow = configToFlow(graphConfig);
       setNodes(flow.nodes);
       setEdges(flow.edges);
+      setDirty(false);
       setTimeout((): void => {
         reactFlow.fitView({ padding: 0.2 });
-      }, 200);
+        setTimeout((): void => {
+          loadingRef.current = false;
+          setDirty(false);
+        }, 300);
+      }, 100);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sync after load
   }, [graphConfig, isLoading]);
@@ -1285,7 +1339,7 @@ function EditFormInner(): React.JSX.Element {
   const handleNodesChange = useCallback<OnNodesChange<VibeNode>>(
     (changes) => {
       onNodesChange(changes);
-      if (changes.some((c) => c.type === "position")) {
+      if (!loadingRef.current && changes.some((c) => c.type === "position")) {
         setDirty(true);
       }
       // Track selection
@@ -1485,6 +1539,7 @@ function EditFormInner(): React.JSX.Element {
         : { type: "manual" };
     newConfig.trigger = trigger;
     form.setValue("name", name || undefined);
+    form.setValue("slug", slug || undefined);
     form.setValue("description", description || undefined);
     form.setValue("config", newConfig);
   }, [
@@ -1494,6 +1549,7 @@ function EditFormInner(): React.JSX.Element {
     graphConfig,
     workingNodes,
     name,
+    slug,
     description,
     triggerType,
     cronSchedule,
@@ -1613,7 +1669,7 @@ function EditFormInner(): React.JSX.Element {
                     <PaletteItem
                       key={ind.id}
                       label={ind.id}
-                      detail={`${ind.resolution} · ${ind.persist}`}
+                      detail={`${formatResolution(ind.resolution)} · ${ind.persist}`}
                       onClick={() => addIndicatorNode(ind.id)}
                     />
                   ))
@@ -1718,6 +1774,18 @@ function EditFormInner(): React.JSX.Element {
           />
         </Div>
         <Div className="flex items-center gap-1.5 flex-1">
+          <Label className="text-xs shrink-0">{t("widget.slugLabel")}</Label>
+          <Input
+            value={slug}
+            onChangeText={(v) => {
+              setSlug(v);
+              setDirty(true);
+            }}
+            className="h-8 text-xs min-w-[100px] flex-1 font-mono"
+            placeholder={t("widget.slugPlaceholder")}
+          />
+        </Div>
+        <Div className="flex items-center gap-1.5 flex-1">
           <Label className="text-xs shrink-0">
             {t("widget.descriptionLabel")}
           </Label>
@@ -1776,11 +1844,12 @@ function EditFormInner(): React.JSX.Element {
 
 // ─── Export ──────────────────────────────────────────────────────────────────
 
-export function EditGraphWidget(props: CustomWidgetProps): React.JSX.Element {
-  void props;
+export function EditGraphWidget({
+  field,
+}: CustomWidgetProps): React.JSX.Element {
   return (
     <ReactFlowProvider>
-      <EditFormInner />
+      <EditFormInner savedResponse={field.value} />
     </ReactFlowProvider>
   );
 }

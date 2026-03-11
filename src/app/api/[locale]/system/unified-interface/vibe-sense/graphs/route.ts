@@ -28,7 +28,12 @@ export const { GET, POST, tools } = endpointsHandler({
           name: data.name,
           slug: data.slug,
           description: data.description,
-          config: data.config,
+          config: data.config ?? {
+            nodes: {},
+            edges: [],
+            positions: {},
+            trigger: { type: "manual" },
+          },
         },
         user,
         logger,

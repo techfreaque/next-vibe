@@ -291,6 +291,9 @@ export const translations = {
       disabled: "Disabled",
       allPriorities: "All Priorities",
       allCategories: "All Categories",
+      visible: "Visible",
+      hiddenOnly: "Hidden",
+      allTasks: "All Tasks",
     },
     search: {
       placeholder: "Search tasks...",
@@ -309,6 +312,7 @@ export const translations = {
       nextRun: "Next run:",
       notScheduled: "Not scheduled",
       routeId: "Route ID",
+      hiddenBadge: "Hidden",
       owner: {
         system: "System",
         user: "User",

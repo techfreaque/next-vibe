@@ -84,14 +84,10 @@ function GraphCard({
   const isSystem = graph.ownerType === "system";
 
   return (
-    <Button
-      variant="ghost"
-      className="cursor-pointer text-left w-full h-auto p-0 hover:bg-transparent"
-      onClick={onClick}
-    >
-      <Card className="group hover:border-primary/50 focus-within:ring-2 focus-within:ring-primary/40 transition-colors h-full">
+    <Div className="cursor-pointer text-left w-full block" onClick={onClick}>
+      <Card className="group hover:border-primary/50 transition-colors w-full overflow-hidden">
         <CardContent className="pt-4">
-          <Div className="flex items-start gap-3">
+          <Div className="flex items-start gap-3 min-w-0">
             {/* Icon circle */}
             <Div
               className={cn(
@@ -110,11 +106,13 @@ function GraphCard({
             {/* Content */}
             <Div className="flex-1 min-w-0">
               {/* Name + badge row */}
-              <Div className="flex items-center gap-2 mb-1">
-                <P className="font-semibold text-sm truncate">{graph.name}</P>
+              <Div className="flex items-start justify-between gap-2 mb-1 min-w-0">
+                <P className="font-semibold text-sm truncate min-w-0 flex-1">
+                  {graph.name}
+                </P>
                 <Badge
                   variant={graph.isActive ? "default" : "secondary"}
-                  className="text-xs flex-shrink-0"
+                  className="text-xs flex-shrink-0 mt-0.5"
                 >
                   {graph.isActive ? t("widget.active") : t("widget.inactive")}
                 </Badge>
@@ -127,14 +125,14 @@ function GraphCard({
 
               {/* Description */}
               {graph.description && (
-                <P className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                <Div className="text-xs text-muted-foreground mb-2 line-clamp-2 whitespace-normal leading-relaxed">
                   {graph.description}
-                </P>
+                </Div>
               )}
 
               {/* Footer: owner type + date + archive */}
-              <Div className="flex items-center justify-between">
-                <Div className="flex items-center gap-1 text-muted-foreground">
+              <Div className="flex items-center justify-between min-w-0">
+                <Div className="flex items-center gap-1 text-muted-foreground flex-shrink-0">
                   {isSystem ? (
                     <Shield className="h-3 w-3" />
                   ) : (
@@ -142,7 +140,7 @@ function GraphCard({
                   )}
                   <Span className="text-xs capitalize">{graph.ownerType}</Span>
                 </Div>
-                <Div className="flex items-center gap-2">
+                <Div className="flex items-center gap-2 flex-shrink-0">
                   {!isSystem && (
                     <Button
                       variant="ghost"
@@ -166,7 +164,7 @@ function GraphCard({
           </Div>
         </CardContent>
       </Card>
-    </Button>
+    </Div>
   );
 }
 
@@ -214,9 +212,10 @@ export function GraphListContainer({
 
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {
-      const graphsDef = await import("./definition");
-      navigation.push(graphsDef.default.POST, {
-        renderInModal: true,
+      const editDef =
+        await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/edit/definition");
+      navigation.push(editDef.default.PUT, {
+        urlPathParams: { id: "new" },
         onSuccessCallback: () => {
           endpointMutations?.read?.refetch?.();
         },
@@ -332,7 +331,7 @@ export function GraphListContainer({
           </Div>
 
           {/* Graph cards grid */}
-          <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {graphs.map((graph) => (
               <GraphCard
                 key={graph.id}

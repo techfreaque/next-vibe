@@ -300,6 +300,9 @@ export const translations: typeof enTranslations = {
       disabled: "Deaktiviert",
       allPriorities: "Alle Prioritäten",
       allCategories: "Alle Kategorien",
+      visible: "Sichtbar",
+      hiddenOnly: "Versteckt",
+      allTasks: "Alle Aufgaben",
     },
     search: {
       placeholder: "Aufgaben suchen...",
@@ -318,6 +321,7 @@ export const translations: typeof enTranslations = {
       nextRun: "Nächster Lauf:",
       notScheduled: "Nicht geplant",
       routeId: "Route-ID",
+      hiddenBadge: "Versteckt",
       owner: {
         system: "System",
         user: "Benutzer",

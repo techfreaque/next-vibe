@@ -57,6 +57,7 @@ const { GET } = createEndpoint({
         label: "history.get.targetUserId.label" as const,
         hidden: true,
         schema: z.string().optional(),
+        includeInCacheKey: true,
       }),
 
       // === ADMIN: optional target lead override ===
@@ -66,6 +67,7 @@ const { GET } = createEndpoint({
         label: "history.get.targetLeadId.label" as const,
         hidden: true,
         schema: z.string().optional(),
+        includeInCacheKey: true,
       }),
 
       // === TRANSACTION LIST ===
