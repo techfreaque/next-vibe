@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,7 +43,7 @@ const { GET } = createEndpoint({
   ],
   allowedLocalModeRoles: [] as const,
   aliases: ["newsletter-status", "newsletter:status"],
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.title",
     description: "form.description",
@@ -52,7 +52,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // REQUEST FIELDS
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "email.label",
@@ -64,12 +64,12 @@ const { GET } = createEndpoint({
         order: 1,
       }),
       // RESPONSE FIELDS
-      subscribed: scopedResponseField(scopedTranslation, {
+      subscribed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.subscribed",
         schema: z.boolean(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.status",
         schema: z.string(),

@@ -20,12 +20,12 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestDataArrayOptionalField,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestDataArrayOptionalField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
     noFormElement: true,
     children: {
       // ── Favorite shortcut ─────────────────────────────────────────────
-      favoriteId: scopedRequestField(scopedTranslation, {
+      favoriteId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "run.post.fields.favoriteId.label",
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Model & character ───────────────────────────────────────────────
-      model: scopedRequestField(scopedTranslation, {
+      model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "run.post.fields.model.label",
@@ -107,7 +107,7 @@ const { POST } = createEndpoint({
         schema: z.enum(ModelId).optional(),
       }),
 
-      character: scopedRequestField(scopedTranslation, {
+      character: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "run.post.fields.character.label",
@@ -118,7 +118,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── User prompt ─────────────────────────────────────────────────────
-      prompt: scopedRequestField(scopedTranslation, {
+      prompt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "run.post.fields.prompt.label",
@@ -129,7 +129,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Optional extra instructions for the system prompt ────────────────
-      instructions: scopedRequestField(scopedTranslation, {
+      instructions: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "run.post.fields.instructions.label",
@@ -140,7 +140,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Pre-calls — executed before the prompt, results injected as context ──
-      preCalls: scopedRequestDataArrayOptionalField(
+      preCalls: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
@@ -149,13 +149,13 @@ const { POST } = createEndpoint({
           title: "run.post.fields.preCalls.label",
           description: "run.post.fields.preCalls.description",
         },
-        scopedObjectFieldNew(scopedTranslation, {
+        objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { request: "data" },
           children: {
-            routeId: scopedRequestField(scopedTranslation, {
+            routeId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "run.post.fields.preCalls.routeId.label",
@@ -164,7 +164,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string().min(1),
             }),
-            args: scopedRequestField(scopedTranslation, {
+            args: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.JSON,
               label: "run.post.fields.preCalls.args.label",
@@ -178,7 +178,7 @@ const { POST } = createEndpoint({
 
       // ── Tool controls (mirrors regular ai-stream) ────────────────────────
       // allowedTools: null = all tools permitted; array = restrict to listed tools
-      allowedTools: scopedRequestDataArrayOptionalField(
+      allowedTools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
@@ -187,13 +187,13 @@ const { POST } = createEndpoint({
           title: "run.post.fields.allowedTools.label",
           description: "run.post.fields.allowedTools.description",
         },
-        scopedObjectFieldNew(scopedTranslation, {
+        objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { request: "data" },
           children: {
-            toolId: scopedRequestField(scopedTranslation, {
+            toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "run.post.fields.allowedTools.toolId.label",
@@ -201,7 +201,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string(),
             }),
-            requiresConfirmation: scopedRequestField(scopedTranslation, {
+            requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "run.post.fields.allowedTools.requiresConfirmation.label",
@@ -214,7 +214,7 @@ const { POST } = createEndpoint({
         }),
       ),
       // tools: null = no tools visible to model; array = these tools are in context
-      tools: scopedRequestDataArrayOptionalField(
+      tools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
@@ -223,13 +223,13 @@ const { POST } = createEndpoint({
           title: "run.post.fields.tools.label",
           description: "run.post.fields.tools.description",
         },
-        scopedObjectFieldNew(scopedTranslation, {
+        objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { request: "data" },
           children: {
-            toolId: scopedRequestField(scopedTranslation, {
+            toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "run.post.fields.tools.toolId.label",
@@ -237,7 +237,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string(),
             }),
-            requiresConfirmation: scopedRequestField(scopedTranslation, {
+            requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "run.post.fields.tools.requiresConfirmation.label",
@@ -250,7 +250,7 @@ const { POST } = createEndpoint({
         }),
       ),
 
-      maxTurns: scopedRequestField(scopedTranslation, {
+      maxTurns: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "run.post.fields.maxTurns.label",
@@ -262,7 +262,7 @@ const { POST } = createEndpoint({
       // ── Thread persistence ───────────────────────────────────────────────
       // appendThreadId: continue an existing thread; omit to start a new one
       // rootFolderId: incognito = no persistence, cron (default) = persisted
-      appendThreadId: scopedRequestField(scopedTranslation, {
+      appendThreadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "run.post.fields.appendThreadId.label",
@@ -276,7 +276,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Thread folder placement ──────────────────────────────────────────
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "run.post.fields.rootFolderId.label",
@@ -307,7 +307,7 @@ const { POST } = createEndpoint({
         schema: z.enum(DefaultFolderId).default(DefaultFolderId.CRON),
       }),
 
-      subFolderId: scopedRequestField(scopedTranslation, {
+      subFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "run.post.fields.subFolderId.label",
@@ -321,7 +321,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Memory control ────────────────────────────────────────────────
-      excludeMemories: scopedRequestField(scopedTranslation, {
+      excludeMemories: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "run.post.fields.excludeMemories.label",
@@ -331,21 +331,21 @@ const { POST } = createEndpoint({
       }),
 
       // ── Response ────────────────────────────────────────────────────────
-      text: scopedResponseField(scopedTranslation, {
+      text: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.text",
         columns: 12,
         schema: z.string().nullable(),
       }),
 
-      promptTokens: scopedResponseField(scopedTranslation, {
+      promptTokens: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.promptTokens",
         columns: 6,
         schema: z.number().nullable(),
       }),
 
-      completionTokens: scopedResponseField(scopedTranslation, {
+      completionTokens: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.completionTokens",
         columns: 6,
@@ -353,53 +353,53 @@ const { POST } = createEndpoint({
       }),
 
       // ── Thread metadata (null when rootFolderId is incognito) ───────────
-      threadId: scopedResponseField(scopedTranslation, {
+      threadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.threadId",
         columns: 6,
         schema: z.string().uuid().nullable(),
       }),
 
-      lastAiMessageId: scopedResponseField(scopedTranslation, {
+      lastAiMessageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.lastAiMessageId",
         columns: 6,
         schema: z.string().uuid().nullable(),
       }),
 
-      threadTitle: scopedResponseField(scopedTranslation, {
+      threadTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.threadTitle",
         schema: z.string().nullable(),
         columns: 6,
       }),
 
-      threadCreatedAt: scopedResponseField(scopedTranslation, {
+      threadCreatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.threadCreatedAt",
         schema: z.string().datetime().nullable(),
         columns: 6,
       }),
 
-      preCallResults: scopedResponseArrayFieldNew(scopedTranslation, {
+      preCallResults: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.STACKED,
         title: "run.post.response.preCallResults.title",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            routeId: scopedResponseField(scopedTranslation, {
+            routeId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "run.post.response.preCallResults.routeId",
               schema: z.string(),
             }),
-            success: scopedResponseField(scopedTranslation, {
+            success: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "run.post.response.preCallResults.succeeded",
               schema: z.boolean(),
             }),
-            error: scopedResponseField(scopedTranslation, {
+            error: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "run.post.response.preCallResults.errorMessage",
               schema: z.string().nullable(),

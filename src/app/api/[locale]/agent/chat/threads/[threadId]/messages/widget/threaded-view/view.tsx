@@ -74,7 +74,6 @@ interface ThreadedMessageProps {
     attachments: File[],
   ) => Promise<void>;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
-  onDeleteMessage: (messageId: string) => void;
   user: JwtPayloadType;
   ttsAutoplay: boolean;
   deductCredits: (amount: number, feature: string) => void;
@@ -98,7 +97,6 @@ export function ThreadedMessage({
   onAnswerAsModel,
   onReplyMessage,
   onVoteMessage,
-  onDeleteMessage,
   user,
   ttsAutoplay,
   deductCredits,
@@ -501,7 +499,6 @@ export function ThreadedMessage({
               userVote={userVote}
               voteScore={voteScore}
               onVoteMessage={onVoteMessage}
-              onDeleteMessage={onDeleteMessage}
               replyCount={replies.length}
               hasReplies={hasReplies}
               isCollapsed={isCollapsed}
@@ -580,7 +577,6 @@ export function ThreadedMessage({
                       onAnswerAsModel={onAnswerAsModel}
                       onReplyMessage={onReplyMessage}
                       onVoteMessage={onVoteMessage}
-                      onDeleteMessage={onDeleteMessage}
                       user={user}
                       ttsAutoplay={ttsAutoplay}
                       deductCredits={deductCredits}

@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   tags: ["errorMonitor.tag" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "errorMonitor.post.container.title",
     description: "errorMonitor.post.container.description",
@@ -43,29 +43,29 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      errorsFound: scopedResponseField(scopedTranslation, {
+      errorsFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "errorMonitor.post.response.errorsFound",
         schema: z.number(),
       }),
-      threadsScanned: scopedResponseField(scopedTranslation, {
+      threadsScanned: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "errorMonitor.post.response.threadsScanned",
         schema: z.number(),
       }),
-      scanWindowFrom: scopedResponseField(scopedTranslation, {
+      scanWindowFrom: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "errorMonitor.post.response.scanWindowFrom",
         schema: z.string(),
       }),
-      scanWindowTo: scopedResponseField(scopedTranslation, {
+      scanWindowTo: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "errorMonitor.post.response.scanWindowTo",
         schema: z.string(),
       }),
-      patterns: scopedResponseArrayFieldNew(scopedTranslation, {
+      patterns: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "errorMonitor.post.response.patternType",
           description: "errorMonitor.post.response.patternType",
@@ -73,37 +73,37 @@ const { POST } = createEndpoint({
           columns: 12,
           usage: { response: true },
           children: {
-            type: scopedResponseField(scopedTranslation, {
+            type: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "errorMonitor.post.response.patternType",
               schema: z.string(),
             }),
-            count: scopedResponseField(scopedTranslation, {
+            count: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "errorMonitor.post.response.patternCount",
               schema: z.number(),
             }),
-            threadIds: scopedResponseField(scopedTranslation, {
+            threadIds: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "errorMonitor.post.response.patternThreadIds",
               schema: z.array(z.string()),
             }),
-            model: scopedResponseField(scopedTranslation, {
+            model: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "errorMonitor.post.response.patternModel",
               schema: z.string().nullable(),
             }),
-            tool: scopedResponseField(scopedTranslation, {
+            tool: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "errorMonitor.post.response.patternTool",
               schema: z.string().nullable(),
             }),
-            firstSeen: scopedResponseField(scopedTranslation, {
+            firstSeen: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "errorMonitor.post.response.patternFirstSeen",
               schema: z.string(),
             }),
-            lastSeen: scopedResponseField(scopedTranslation, {
+            lastSeen: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "errorMonitor.post.response.patternLastSeen",
               schema: z.string(),

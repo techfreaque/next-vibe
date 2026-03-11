@@ -8,13 +8,13 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedObjectOptionalField,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  objectOptionalField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -65,11 +65,11 @@ const { GET } = createEndpoint({
     render: EmailsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
       // === FILTER AND SEARCH ===
-      filters: scopedObjectFieldNew(scopedTranslation, {
+      filters: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "filters.title",
         description: "filters.description",
@@ -77,7 +77,7 @@ const { GET } = createEndpoint({
         columns: 4,
         usage: { request: "data" },
         children: {
-          search: scopedRequestField(scopedTranslation, {
+          search: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "fields.search.label",
@@ -87,7 +87,7 @@ const { GET } = createEndpoint({
             schema: z.string().optional(),
           }),
 
-          channel: scopedRequestField(scopedTranslation, {
+          channel: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.channel.label",
@@ -98,7 +98,7 @@ const { GET } = createEndpoint({
               .default(MessageChannelFilter.ANY),
           }),
 
-          status: scopedRequestField(scopedTranslation, {
+          status: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.status.label",
@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
             schema: z.enum(EmailStatusFilter).default(EmailStatusFilter.ANY),
           }),
 
-          type: scopedRequestField(scopedTranslation, {
+          type: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.type.label",
@@ -118,13 +118,13 @@ const { GET } = createEndpoint({
             schema: z.enum(EmailTypeFilter).default(EmailTypeFilter.ANY),
           }),
 
-          dateRange: scopedObjectOptionalField(scopedTranslation, {
+          dateRange: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "fields.dateRange.title",
             layoutType: LayoutType.GRID_2_COLUMNS,
             usage: { request: "data" },
             children: {
-              dateFrom: scopedRequestField(scopedTranslation, {
+              dateFrom: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.DATETIME,
                 label: "fields.dateFrom.label",
@@ -133,7 +133,7 @@ const { GET } = createEndpoint({
                 schema: dateSchema.optional(),
               }),
 
-              dateTo: scopedRequestField(scopedTranslation, {
+              dateTo: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.DATETIME,
                 label: "fields.dateTo.label",
@@ -147,14 +147,14 @@ const { GET } = createEndpoint({
       }),
 
       // === SORTING AND PAGINATION ===
-      displayOptions: scopedObjectFieldNew(scopedTranslation, {
+      displayOptions: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "displayOptions.title",
         layoutType: LayoutType.GRID,
         columns: 4,
         usage: { request: "data" },
         children: {
-          sortBy: scopedRequestField(scopedTranslation, {
+          sortBy: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.sortBy.label",
@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
             schema: z.enum(EmailSortField).default(EmailSortField.CREATED_AT),
           }),
 
-          sortOrder: scopedRequestField(scopedTranslation, {
+          sortOrder: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.sortOrder.label",
@@ -174,7 +174,7 @@ const { GET } = createEndpoint({
             schema: z.enum(SortOrder).default(SortOrder.DESC),
           }),
 
-          page: scopedRequestField(scopedTranslation, {
+          page: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "fields.page.label",
@@ -183,7 +183,7 @@ const { GET } = createEndpoint({
             schema: z.coerce.number().int().min(1).default(1),
           }),
 
-          limit: scopedRequestField(scopedTranslation, {
+          limit: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "fields.limit.label",
@@ -195,37 +195,37 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      emails: scopedResponseArrayFieldNew(scopedTranslation, {
+      emails: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.HORIZONTAL,
           usage: { response: true },
           children: {
             // === CORE EMAIL INFO ===
-            emailCore: scopedObjectFieldNew(scopedTranslation, {
+            emailCore: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "response.emails.item.emailCore.title",
               layoutType: LayoutType.GRID,
               columns: 3,
               usage: { response: true },
               children: {
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.id",
                   schema: z.uuid(),
                 }),
-                subject: scopedResponseField(scopedTranslation, {
+                subject: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.subject",
                   schema: z.string(),
                 }),
-                status: scopedResponseField(scopedTranslation, {
+                status: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.emails.item.status",
                   schema: z.enum(EmailStatus),
                 }),
-                channel: scopedResponseField(scopedTranslation, {
+                channel: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.emails.item.channel",
                   schema: z
@@ -236,42 +236,42 @@ const { GET } = createEndpoint({
             }),
 
             // === RECIPIENT AND SENDER ===
-            emailParties: scopedObjectFieldNew(scopedTranslation, {
+            emailParties: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "response.emails.item.emailParties.title",
               layoutType: LayoutType.GRID_2_COLUMNS,
               usage: { response: true },
               children: {
-                recipient: scopedObjectFieldNew(scopedTranslation, {
+                recipient: objectField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "response.emails.item.recipientEmail",
                   layoutType: LayoutType.STACKED,
                   usage: { response: true },
                   children: {
-                    recipientEmail: scopedResponseField(scopedTranslation, {
+                    recipientEmail: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.recipientEmail",
                       schema: z.string(),
                     }),
-                    recipientName: scopedResponseField(scopedTranslation, {
+                    recipientName: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.recipientName",
                       schema: z.string().nullable(),
                     }),
                   },
                 }),
-                sender: scopedObjectFieldNew(scopedTranslation, {
+                sender: objectField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "response.emails.item.senderEmail",
                   layoutType: LayoutType.STACKED,
                   usage: { response: true },
                   children: {
-                    senderEmail: scopedResponseField(scopedTranslation, {
+                    senderEmail: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.senderEmail",
                       schema: z.string(),
                     }),
-                    senderName: scopedResponseField(scopedTranslation, {
+                    senderName: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.senderName",
                       schema: z.string().nullable(),
@@ -282,29 +282,29 @@ const { GET } = createEndpoint({
             }),
 
             // === EMAIL METADATA ===
-            emailMetadata: scopedObjectFieldNew(scopedTranslation, {
+            emailMetadata: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "response.emails.item.emailMetadata.title",
               layoutType: LayoutType.GRID,
               columns: 4,
               usage: { response: true },
               children: {
-                type: scopedResponseField(scopedTranslation, {
+                type: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.emails.item.type",
                   schema: z.enum(EmailType),
                 }),
-                templateName: scopedResponseField(scopedTranslation, {
+                templateName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.templateName",
                   schema: z.string().nullable(),
                 }),
-                emailProvider: scopedResponseField(scopedTranslation, {
+                emailProvider: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.emails.item.emailProvider",
                   schema: z.string().nullable(),
                 }),
-                externalId: scopedResponseField(scopedTranslation, {
+                externalId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.externalId",
                   schema: z.string().nullable(),
@@ -313,28 +313,28 @@ const { GET } = createEndpoint({
             }),
 
             // === ENGAGEMENT TRACKING ===
-            emailEngagement: scopedObjectFieldNew(scopedTranslation, {
+            emailEngagement: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "response.emails.item.emailEngagement.title",
               layoutType: LayoutType.VERTICAL,
               usage: { response: true },
               children: {
-                sentAt: scopedResponseField(scopedTranslation, {
+                sentAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.sentAt",
                   schema: dateSchema.nullable(),
                 }),
-                deliveredAt: scopedResponseField(scopedTranslation, {
+                deliveredAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.deliveredAt",
                   schema: dateSchema.nullable(),
                 }),
-                openedAt: scopedResponseField(scopedTranslation, {
+                openedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.openedAt",
                   schema: dateSchema.nullable(),
                 }),
-                clickedAt: scopedResponseField(scopedTranslation, {
+                clickedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.clickedAt",
                   schema: dateSchema.nullable(),
@@ -343,53 +343,53 @@ const { GET } = createEndpoint({
             }),
 
             // === TECHNICAL DETAILS ===
-            technicalDetails: scopedObjectFieldNew(scopedTranslation, {
+            technicalDetails: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "response.emails.item.technicalDetails.title",
               layoutType: LayoutType.GRID,
               columns: 3,
               usage: { response: true },
               children: {
-                retryCount: scopedResponseField(scopedTranslation, {
+                retryCount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.retryCount",
                   schema: z.coerce.number().int(),
                 }),
-                error: scopedResponseField(scopedTranslation, {
+                error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.emails.item.error",
                   schema: z.string().nullable(),
                 }),
-                associatedIds: scopedObjectFieldNew(scopedTranslation, {
+                associatedIds: objectField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "response.emails.item.associatedIds.title",
                   layoutType: LayoutType.HORIZONTAL,
                   usage: { response: true },
                   children: {
-                    userId: scopedResponseField(scopedTranslation, {
+                    userId: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.userId",
                       schema: z.string().nullable(),
                     }),
-                    leadId: scopedResponseField(scopedTranslation, {
+                    leadId: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.leadId",
                       schema: z.string().nullable(),
                     }),
                   },
                 }),
-                timestamps: scopedObjectFieldNew(scopedTranslation, {
+                timestamps: objectField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "response.emails.item.timestamps.title",
                   layoutType: LayoutType.GRID_2_COLUMNS,
                   usage: { response: true },
                   children: {
-                    createdAt: scopedResponseField(scopedTranslation, {
+                    createdAt: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.createdAt",
                       schema: dateSchema,
                     }),
-                    updatedAt: scopedResponseField(scopedTranslation, {
+                    updatedAt: responseField(scopedTranslation, {
                       type: WidgetType.TEXT,
                       content: "response.emails.item.updatedAt",
                       schema: dateSchema,
@@ -402,7 +402,7 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      pagination: scopedObjectFieldNew(scopedTranslation, {
+      pagination: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.pagination.title",
         description: "response.pagination.description",
@@ -410,22 +410,22 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          page: scopedResponseField(scopedTranslation, {
+          page: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.page",
             schema: z.coerce.number().int().min(1),
           }),
-          limit: scopedResponseField(scopedTranslation, {
+          limit: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.limit",
             schema: z.coerce.number().int().min(1),
           }),
-          total: scopedResponseField(scopedTranslation, {
+          total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.total",
             schema: z.coerce.number().int().min(0),
           }),
-          totalPages: scopedResponseField(scopedTranslation, {
+          totalPages: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.totalPages",
             schema: z.coerce.number().int().min(0),

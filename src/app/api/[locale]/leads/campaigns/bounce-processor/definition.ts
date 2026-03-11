@@ -7,20 +7,20 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  customWidgetObject,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { BounceProcessorWidget } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -33,15 +33,11 @@ const { POST } = createEndpoint({
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.container.title",
-    description: "post.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: BounceProcessorWidget,
+    usage: { request: "data", response: true } as const,
     children: {
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -50,7 +46,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      batchSize: scopedRequestField(scopedTranslation, {
+      batchSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.batchSize.label",
@@ -59,19 +55,19 @@ const { POST } = createEndpoint({
         schema: z.number().int().min(1).max(500).default(100),
       }),
 
-      bouncesFound: scopedResponseField(scopedTranslation, {
+      bouncesFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.bouncesFound",
         schema: z.number(),
       }),
 
-      leadsUpdated: scopedResponseField(scopedTranslation, {
+      leadsUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.leadsUpdated",
         schema: z.number(),
       }),
 
-      campaignsCancelled: scopedResponseField(scopedTranslation, {
+      campaignsCancelled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.campaignsCancelled",
         schema: z.number(),

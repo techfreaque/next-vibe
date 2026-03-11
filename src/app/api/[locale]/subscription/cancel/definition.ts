@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,14 +46,14 @@ const { DELETE } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // REQUEST FIELDS
-      cancelAtPeriodEnd: scopedRequestField(scopedTranslation, {
+      cancelAtPeriodEnd: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "form.fields.cancelAtPeriodEnd.label" as const,
         description: "form.fields.cancelAtPeriodEnd.description" as const,
         schema: z.boolean().default(true),
       }),
-      reason: scopedRequestField(scopedTranslation, {
+      reason: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "form.fields.reason.label" as const,
@@ -62,12 +62,12 @@ const { DELETE } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success" as const,
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.message" as const,
         schema: z.string(),

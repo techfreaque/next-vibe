@@ -2,10 +2,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title" as const,
     description: "post.form.description" as const,
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      operation: scopedRequestField(scopedTranslation, {
+      operation: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.form.fields.operation.label" as const,
@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
         ],
         schema: z.enum(["check", "install", "tunnel", "status"]),
       }),
-      port: scopedRequestField(scopedTranslation, {
+      port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.form.fields.port.label" as const,
@@ -124,49 +124,49 @@ const { POST } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.success" as const,
         schema: z.boolean().optional(),
       }),
 
-      installed: scopedResponseField(scopedTranslation, {
+      installed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.installed" as const,
         schema: z.boolean().optional(),
       }),
 
-      version: scopedResponseField(scopedTranslation, {
+      version: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.version" as const,
         schema: z.string().optional(),
       }),
 
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.status" as const,
         schema: z.string().optional(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.output" as const,
         schema: z.string().optional(),
       }),
 
-      instructions: scopedResponseField(scopedTranslation, {
+      instructions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.instructions" as const,
         schema: z.string().optional(),
       }),
 
-      tunnelUrl: scopedResponseField(scopedTranslation, {
+      tunnelUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.tunnelUrl" as const,
         schema: z.string().optional(),
       }),
 
-      webhookUrl: scopedResponseField(scopedTranslation, {
+      webhookUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.webhookUrl" as const,
         schema: z.string().optional(),

@@ -8,11 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,7 +43,7 @@ export const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // Request fields
-      userId: scopedRequestField(scopedTranslation, {
+      userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         schema: z.uuid(),
@@ -53,18 +53,18 @@ export const { GET } = createEndpoint({
       }),
 
       // Top action buttons
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
 
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.title" as const,
         usage: { response: true },
       }),
 
       // Basic User Information
-      basicInfo: scopedResponseField(scopedTranslation, {
+      basicInfo: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           id: z.string(),
@@ -85,7 +85,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Chat Activity Statistics
-      chatStats: scopedResponseField(scopedTranslation, {
+      chatStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           totalThreads: z.coerce.number(),
@@ -99,7 +99,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Credit Information
-      creditInfo: scopedResponseField(scopedTranslation, {
+      creditInfo: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           currentBalance: z.coerce.number(),
@@ -118,7 +118,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Payment & Revenue Statistics
-      paymentStats: scopedResponseField(scopedTranslation, {
+      paymentStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           totalRevenueCents: z.coerce.number(),
@@ -133,7 +133,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Newsletter Status
-      newsletterInfo: scopedResponseField(scopedTranslation, {
+      newsletterInfo: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           isSubscribed: z.boolean(),
@@ -144,7 +144,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Referral Statistics
-      referralStats: scopedResponseField(scopedTranslation, {
+      referralStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           totalReferrals: z.coerce.number(),
@@ -155,7 +155,7 @@ export const { GET } = createEndpoint({
       }),
 
       // User Roles
-      roles: scopedResponseField(scopedTranslation, {
+      roles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
           z.object({
@@ -166,7 +166,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Recent Activity Summary
-      recentActivity: scopedResponseField(scopedTranslation, {
+      recentActivity: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           lastLogin: z.coerce.date().nullable(),
@@ -177,7 +177,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Model Usage Statistics
-      modelUsageStats: scopedResponseField(scopedTranslation, {
+      modelUsageStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
           z.object({

@@ -8,13 +8,13 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestResponseField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseArrayOptionalFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestResponseField,
+  requestUrlPathParamsField,
+  responseArrayOptionalField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,84 +41,84 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "urlPathParams", response: true },
     children: {
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      shareLinks: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+      shareLinks: responseArrayOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         emptyTitle: "shareLinks.emptyTitle" as const,
         emptyDescription: "shareLinks.emptyDescription" as const,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.STACKED,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "empty" as const,
               order: 999,
               schema: z.string().uuid(),
             }),
-            token: scopedResponseField(scopedTranslation, {
+            token: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "empty" as const,
               order: 999,
               schema: z.string(),
             }),
-            label: scopedResponseField(scopedTranslation, {
+            label: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "shareLink.label" as const,
               order: 1,
               schema: z.string().nullable(),
             }),
-            shareUrl: scopedResponseField(scopedTranslation, {
+            shareUrl: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "shareLink.shareUrl" as const,
               order: 2,
               schema: z.string(),
             }),
-            active: scopedResponseField(scopedTranslation, {
+            active: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "shareLink.active" as const,
               variant: "default" as const,
               order: 3,
               schema: z.boolean(),
             }),
-            allowPosting: scopedResponseField(scopedTranslation, {
+            allowPosting: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "shareLink.allowPosting" as const,
               variant: "info" as const,
               order: 4,
               schema: z.boolean(),
             }),
-            requireAuth: scopedResponseField(scopedTranslation, {
+            requireAuth: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "shareLink.requireAuth" as const,
               variant: "info" as const,
               order: 5,
               schema: z.boolean(),
             }),
-            accessCount: scopedResponseField(scopedTranslation, {
+            accessCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "shareLink.accessCount" as const,
               order: 6,
               schema: z.number(),
             }),
-            lastAccessedAt: scopedResponseField(scopedTranslation, {
+            lastAccessedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "shareLink.lastAccessedAt" as const,
               order: 7,
               schema: dateSchema.nullable(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "shareLink.createdAt" as const,
               order: 8,
@@ -203,18 +203,18 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data&urlPathParams", response: true },
     children: {
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      label: scopedRequestResponseField(scopedTranslation, {
+      label: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "label.label" as const,
@@ -222,26 +222,26 @@ const { POST } = createEndpoint({
         placeholder: "label.placeholder" as const,
         schema: z.string().nullable().optional(),
       }),
-      allowPosting: scopedRequestResponseField(scopedTranslation, {
+      allowPosting: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "allowPosting.label" as const,
         description: "allowPosting.description" as const,
         schema: z.boolean().default(false),
       }),
-      requireAuth: scopedRequestResponseField(scopedTranslation, {
+      requireAuth: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "requireAuth.label" as const,
         description: "requireAuth.description" as const,
         schema: z.boolean().default(false),
       }),
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.string().uuid(),
       }),
-      token: scopedResponseField(scopedTranslation, {
+      token: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.string(),
@@ -333,24 +333,24 @@ const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data&urlPathParams", response: true },
     children: {
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      linkId: scopedRequestField(scopedTranslation, {
+      linkId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "linkId.label" as const,
         schema: z.string().uuid(),
       }),
-      label: scopedRequestResponseField(scopedTranslation, {
+      label: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "label.label" as const,
@@ -358,21 +358,21 @@ const { PATCH } = createEndpoint({
         placeholder: "label.placeholder" as const,
         schema: z.string().nullable().optional(),
       }),
-      allowPosting: scopedRequestResponseField(scopedTranslation, {
+      allowPosting: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "allowPosting.label" as const,
         description: "allowPosting.description" as const,
         schema: z.boolean().default(false),
       }),
-      requireAuth: scopedRequestResponseField(scopedTranslation, {
+      requireAuth: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "requireAuth.label" as const,
         description: "requireAuth.description" as const,
         schema: z.boolean().default(false),
       }),
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.string().uuid(),
@@ -464,50 +464,50 @@ const { DELETE } = createEndpoint({
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data&urlPathParams", response: true },
     children: {
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      linkId: scopedRequestField(scopedTranslation, {
+      linkId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "linkId.label" as const,
         schema: z.string().uuid(),
       }),
       // === RESPONSE ===
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.string().uuid(),
       }),
-      token: scopedResponseField(scopedTranslation, {
+      token: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.string(),
       }),
-      label: scopedResponseField(scopedTranslation, {
+      label: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.string().nullable(),
       }),
-      allowPosting: scopedResponseField(scopedTranslation, {
+      allowPosting: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.boolean(),
       }),
-      requireAuth: scopedResponseField(scopedTranslation, {
+      requireAuth: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.boolean(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: dateSchema,

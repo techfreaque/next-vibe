@@ -3,9 +3,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -32,28 +32,28 @@ export const { POST } = createEndpoint({
     render: SessionWriteContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      sessionId: scopedRequestField(scopedTranslation, {
+      sessionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "session.write.post.fields.sessionId.label" as const,
         description: "session.write.post.fields.sessionId.description" as const,
         schema: z.string(),
       }),
-      input: scopedRequestField(scopedTranslation, {
+      input: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "session.write.post.fields.input.label" as const,
         description: "session.write.post.fields.input.description" as const,
         schema: z.string(),
       }),
-      raw: scopedRequestField(scopedTranslation, {
+      raw: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "session.write.post.fields.raw.label" as const,
         description: "session.write.post.fields.raw.description" as const,
         schema: z.boolean().optional(),
       }),
-      ok: scopedResponseField(scopedTranslation, {
+      ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.write.post.response.ok.title" as const,
         schema: z.boolean(),

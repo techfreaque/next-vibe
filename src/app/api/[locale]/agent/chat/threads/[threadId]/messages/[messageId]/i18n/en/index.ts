@@ -239,6 +239,16 @@ export const translations = {
       title: "Delete Message",
       description: "Remove message from thread",
     },
+    confirmTitle: "Delete message",
+    confirmText:
+      "Are you sure you want to delete this message? This action cannot be undone.",
+    backButton: {
+      label: "Cancel",
+    },
+    deleteButton: {
+      label: "Delete",
+      loadingText: "Deleting…",
+    },
     threadId: {
       label: "Thread ID",
       description: "ID of the thread containing the message",
@@ -252,9 +262,14 @@ export const translations = {
       description: "Root folder of the thread (used for client routing)",
     },
     response: {
-      success: {
-        content: "Success",
-      },
+      success: { content: "Success" },
+      role: { content: "Role" },
+      content: { content: "Content" },
+      parentId: { content: "Parent Message ID" },
+      authorId: { content: "Author ID" },
+      isAI: { content: "Is AI" },
+      model: { content: "Model" },
+      createdAt: { content: "Created At" },
     },
     errors: {
       validation: {

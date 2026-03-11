@@ -9,11 +9,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   responseArrayOptionalField,
-  scopedObjectFieldNew,
-  scopedRequestUrlPathParamsField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestUrlPathParamsField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -58,7 +58,7 @@ const { GET } = createEndpoint({
     usage: { response: true, request: "urlPathParams" } as const,
     children: {
       // === REQUEST URL PATH PARAMS ===
-      rootFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      rootFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.rootFolderId.label" as const,
@@ -101,7 +101,7 @@ const { GET } = createEndpoint({
 
       // === RESPONSE ===
       // Root folder permissions - computed server-side for the requested root folder
-      rootFolderPermissions: scopedObjectFieldNew(scopedTranslation, {
+      rootFolderPermissions: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.rootFolderPermissions.title" as const,
         description: "get.response.rootFolderPermissions.description" as const,
@@ -109,7 +109,7 @@ const { GET } = createEndpoint({
         columns: 2,
         usage: { response: true },
         children: {
-          canCreateThread: scopedResponseField(scopedTranslation, {
+          canCreateThread: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content:
               "get.response.rootFolderPermissions.canCreateThread.content" as const,
@@ -119,7 +119,7 @@ const { GET } = createEndpoint({
                 "Whether the current user can create threads in the root folder",
               ),
           }),
-          canCreateFolder: scopedResponseField(scopedTranslation, {
+          canCreateFolder: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content:
               "get.response.rootFolderPermissions.canCreateFolder.content" as const,
@@ -131,121 +131,109 @@ const { GET } = createEndpoint({
           }),
         },
       }),
-      folders: scopedResponseArrayFieldNew(scopedTranslation, {
+      folders: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.id.content" as const,
               schema: z.uuid(),
             }),
-            userId: scopedResponseField(scopedTranslation, {
+            userId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.userId.content" as const,
               schema: z.uuid().nullable(),
             }),
-            rootFolderId: scopedResponseField(scopedTranslation, {
+            rootFolderId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.folders.folder.rootFolderId.content" as const,
               schema: z.enum(DefaultFolderId),
             }),
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.name.content" as const,
               schema: z.string(),
             }),
-            icon: scopedResponseField(scopedTranslation, {
+            icon: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.icon.content" as const,
               // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
               schema: iconSchema.nullable(),
             }),
-            color: scopedResponseField(scopedTranslation, {
+            color: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.color.content" as const,
               schema: z.string().nullable(),
             }),
-            parentId: scopedResponseField(scopedTranslation, {
+            parentId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.parentId.content" as const,
               schema: z.uuid().nullable(),
             }),
-            expanded: scopedResponseField(scopedTranslation, {
+            expanded: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.expanded.content" as const,
               schema: z.boolean(),
             }),
-            sortOrder: scopedResponseField(scopedTranslation, {
+            sortOrder: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.sortOrder.content" as const,
               schema: z.coerce.number(),
             }),
-            rolesView: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            rolesView: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 enumOptions: UserPermissionRoleOptions,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesManage: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesManage: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 enumOptions: UserPermissionRoleOptions,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesCreateThread: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesCreateThread: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 enumOptions: UserPermissionRoleOptions,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesPost: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesPost: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 enumOptions: UserPermissionRoleOptions,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesModerate: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesModerate: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 enumOptions: UserPermissionRoleOptions,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesAdmin: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesAdmin: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 enumOptions: UserPermissionRoleOptions,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
+            }),
             // Permission flags - computed server-side based on user's roles
-            canManage: scopedResponseField(scopedTranslation, {
+            canManage: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.canManage.content" as const,
               schema: z
@@ -254,7 +242,7 @@ const { GET } = createEndpoint({
                   "Whether the current user can manage (edit/rename) this folder and create subfolders",
                 ),
             }),
-            canCreateThread: scopedResponseField(scopedTranslation, {
+            canCreateThread: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.folders.folder.canCreateThread.content" as const,
@@ -264,7 +252,7 @@ const { GET } = createEndpoint({
                   "Whether the current user can create threads in this folder",
                 ),
             }),
-            canModerate: scopedResponseField(scopedTranslation, {
+            canModerate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.folders.folder.canModerate.content" as const,
@@ -274,14 +262,14 @@ const { GET } = createEndpoint({
                   "Whether the current user can moderate/hide content in this folder",
                 ),
             }),
-            canDelete: scopedResponseField(scopedTranslation, {
+            canDelete: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.canDelete.content" as const,
               schema: z
                 .boolean()
                 .describe("Whether the current user can delete this folder"),
             }),
-            canManagePermissions: scopedResponseField(scopedTranslation, {
+            canManagePermissions: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.folders.folder.canManagePermissions.content" as const,
@@ -291,12 +279,12 @@ const { GET } = createEndpoint({
                   "Whether the current user can manage permissions for this folder",
                 ),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.createdAt.content" as const,
               schema: dateSchema,
             }),
-            updatedAt: scopedResponseField(scopedTranslation, {
+            updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.folders.folder.updatedAt.content" as const,
               schema: dateSchema,

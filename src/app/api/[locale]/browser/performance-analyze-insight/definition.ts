@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "performance-analyze-insight.form.label",
     description: "performance-analyze-insight.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      insightSetId: scopedRequestField(scopedTranslation, {
+      insightSetId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "performance-analyze-insight.form.fields.insightSetId.label",
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
             'The id for the specific insight set. Only use the ids given in the "Available insight sets" list.',
           ),
       }),
-      insightName: scopedRequestField(scopedTranslation, {
+      insightName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "performance-analyze-insight.form.fields.insightName.label",
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-analyze-insight.response.success",
         schema: z
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
             "Whether the performance insight analysis operation succeeded",
           ),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-analyze-insight.response.result",
         schema: z
@@ -101,7 +101,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-analyze-insight.response.error",
         schema: z
@@ -109,7 +109,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-analyze-insight.response.executionId",
         schema: z

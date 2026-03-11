@@ -8,13 +8,13 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedNavigateButtonField,
-  scopedObjectFieldNew,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  navigateButtonField,
+  objectField,
+  responseArrayField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -55,15 +55,15 @@ const { GET } = createEndpoint({
     usage: { response: true } as const,
     children: {
       // Flattened top action buttons (no container wrapper)
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.container.title" as const,
         usage: { response: true },
       }),
-      createButton: scopedNavigateButtonField(scopedTranslation, {
+      createButton: navigateButtonField(scopedTranslation, {
         targetEndpoint: async () =>
           (await import("../characters/definition")).default.GET,
         extractParams: () => ({}),
@@ -76,9 +76,9 @@ const { GET } = createEndpoint({
       }),
 
       // Favorites list
-      favorites: scopedResponseArrayFieldNew(scopedTranslation, {
+      favorites: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.INLINE,
           gap: "4",
@@ -86,34 +86,34 @@ const { GET } = createEndpoint({
           noCard: true,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.string().uuid(),
             }),
-            characterId: scopedResponseField(scopedTranslation, {
+            characterId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.string(),
             }),
-            modelId: scopedResponseField(scopedTranslation, {
+            modelId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.enum(ModelId).nullable(),
             }),
-            voice: scopedResponseField(scopedTranslation, {
+            voice: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.string().nullable() as z.ZodType<
                 typeof TtsVoiceValue | null
               >,
             }),
-            position: scopedResponseField(scopedTranslation, {
+            position: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.number().int(),
             }),
-            icon: scopedResponseField(scopedTranslation, {
+            icon: responseField(scopedTranslation, {
               type: WidgetType.ICON,
               containerSize: "lg",
               iconSize: "lg",
@@ -121,19 +121,19 @@ const { GET } = createEndpoint({
               schema: iconSchema,
             }),
             // Flattened fields (no nested content/titleRow/modelRow objects)
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "base",
               emphasis: "bold",
               schema: z.string(),
             }),
-            tagline: scopedResponseField(scopedTranslation, {
+            tagline: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "sm",
               variant: "muted",
               schema: z.string().nullable(),
             }),
-            activeBadge: scopedResponseField(scopedTranslation, {
+            activeBadge: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "default",
               size: "xs",
@@ -141,39 +141,39 @@ const { GET } = createEndpoint({
                 .string()
                 .nullable() as z.ZodType<FavoritesTranslationKey | null>,
             }),
-            description: scopedResponseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
               schema: z.string().nullable(),
             }),
-            modelIcon: scopedResponseField(scopedTranslation, {
+            modelIcon: responseField(scopedTranslation, {
               type: WidgetType.ICON,
               iconSize: "xs",
               noHover: true,
               schema: iconSchema,
             }),
-            modelInfo: scopedResponseField(scopedTranslation, {
+            modelInfo: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
               schema: z.string(),
             }),
-            separator1: scopedWidgetField(scopedTranslation, {
+            separator1: widgetField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
               content: "get.response.favorite.separator.content" as const,
               usage: { response: true },
             }),
-            modelProvider: scopedResponseField(scopedTranslation, {
+            modelProvider: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",
               className: "hidden sm:inline",
               schema: z.string(),
             }),
-            separator2: scopedWidgetField(scopedTranslation, {
+            separator2: widgetField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "xs",
               variant: "muted",

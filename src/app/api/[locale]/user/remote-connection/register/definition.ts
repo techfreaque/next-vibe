@@ -10,10 +10,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
     render: RemoteRegisterWidget,
     usage: { request: "data", response: true } as const,
     children: {
-      instanceId: scopedRequestField(scopedTranslation, {
+      instanceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.instanceId.label" as const,
@@ -56,7 +56,7 @@ const { POST } = createEndpoint({
             message: "post.instanceId.validation.invalid",
           }),
       }),
-      localUrl: scopedRequestField(scopedTranslation, {
+      localUrl: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
         label: "post.localUrl.label" as const,
@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
           .url({ message: "post.localUrl.validation.invalid" })
           .transform((val) => val.replace(/\/+$/, "")),
       }),
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "post.title" as const,
         loadingText: "post.title" as const,
@@ -79,12 +79,12 @@ const { POST } = createEndpoint({
         order: 10,
         usage: { request: "data" },
       }),
-      registered: scopedResponseField(scopedTranslation, {
+      registered: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),
       }),
-      remoteInstanceId: scopedResponseField(scopedTranslation, {
+      remoteInstanceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),

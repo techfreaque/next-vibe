@@ -13,13 +13,13 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -279,11 +279,13 @@ const { GET } = createEndpoint({
     render: LeadsStatsContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === REQUEST FIELDS (Filters) ===
 
       // Time-based filtering
-      timePeriod: scopedRequestField(scopedTranslation, {
+      timePeriod: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "timePeriod.label",
@@ -293,7 +295,7 @@ const { GET } = createEndpoint({
         schema: z.enum(TimePeriod).default(TimePeriod.DAY),
       }),
 
-      dateRangePreset: scopedRequestField(scopedTranslation, {
+      dateRangePreset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "dateRangePreset.label",
@@ -303,7 +305,7 @@ const { GET } = createEndpoint({
         schema: z.enum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
       }),
 
-      dateFrom: scopedRequestField(scopedTranslation, {
+      dateFrom: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "dateFrom.label",
@@ -312,7 +314,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      dateTo: scopedRequestField(scopedTranslation, {
+      dateTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "dateTo.label",
@@ -321,7 +323,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      chartType: scopedRequestField(scopedTranslation, {
+      chartType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "chartType.label",
@@ -331,7 +333,7 @@ const { GET } = createEndpoint({
         schema: z.enum(ChartType).default(ChartType.LINE),
       }),
 
-      includeComparison: scopedRequestField(scopedTranslation, {
+      includeComparison: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "includeComparison.label",
@@ -340,7 +342,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().default(false),
       }),
 
-      comparisonPeriod: scopedRequestField(scopedTranslation, {
+      comparisonPeriod: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "comparisonPeriod.label",
@@ -351,7 +353,7 @@ const { GET } = createEndpoint({
       }),
 
       // Lead-specific filters
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "status.label",
@@ -361,7 +363,7 @@ const { GET } = createEndpoint({
         schema: z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
       }),
 
-      source: scopedRequestField(scopedTranslation, {
+      source: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "source.label",
@@ -371,7 +373,7 @@ const { GET } = createEndpoint({
         schema: z.enum(LeadSourceFilter).default(LeadSourceFilter.ALL),
       }),
 
-      country: scopedRequestField(scopedTranslation, {
+      country: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "country.label",
@@ -381,7 +383,7 @@ const { GET } = createEndpoint({
         schema: z.enum(CountryFilter).default(CountryFilter.ALL),
       }),
 
-      language: scopedRequestField(scopedTranslation, {
+      language: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "language.label",
@@ -391,7 +393,7 @@ const { GET } = createEndpoint({
         schema: z.enum(LanguageFilter).default(LanguageFilter.ALL),
       }),
 
-      campaignStage: scopedRequestField(scopedTranslation, {
+      campaignStage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "campaignStage.label",
@@ -404,7 +406,7 @@ const { GET } = createEndpoint({
       }),
 
       // Engagement filters
-      hasEngagement: scopedRequestField(scopedTranslation, {
+      hasEngagement: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasEngagement.label",
@@ -413,7 +415,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      minEmailsOpened: scopedRequestField(scopedTranslation, {
+      minEmailsOpened: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "minEmailsOpened.label",
@@ -422,7 +424,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
-      minEmailsClicked: scopedRequestField(scopedTranslation, {
+      minEmailsClicked: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "minEmailsClicked.label",
@@ -432,7 +434,7 @@ const { GET } = createEndpoint({
       }),
 
       // Conversion filters
-      isConverted: scopedRequestField(scopedTranslation, {
+      isConverted: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "isConverted.label",
@@ -441,7 +443,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasSignedUp: scopedRequestField(scopedTranslation, {
+      hasSignedUp: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasSignedUp.label",
@@ -450,7 +452,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasConfirmedSubscription: scopedRequestField(scopedTranslation, {
+      hasConfirmedSubscription: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasConfirmedSubscription.label",
@@ -460,7 +462,7 @@ const { GET } = createEndpoint({
       }),
 
       // Business filters
-      hasBusinessName: scopedRequestField(scopedTranslation, {
+      hasBusinessName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasBusinessName.label",
@@ -469,7 +471,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasContactName: scopedRequestField(scopedTranslation, {
+      hasContactName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasContactName.label",
@@ -478,7 +480,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasPhone: scopedRequestField(scopedTranslation, {
+      hasPhone: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasPhone.label",
@@ -487,7 +489,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasWebsite: scopedRequestField(scopedTranslation, {
+      hasWebsite: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasWebsite.label",
@@ -496,7 +498,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasNotes: scopedRequestField(scopedTranslation, {
+      hasNotes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasNotes.label",
@@ -506,7 +508,7 @@ const { GET } = createEndpoint({
       }),
 
       // Association filters
-      hasUserId: scopedRequestField(scopedTranslation, {
+      hasUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "hasUserId.label",
@@ -515,7 +517,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().optional(),
       }),
 
-      emailVerified: scopedRequestField(scopedTranslation, {
+      emailVerified: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "emailVerified.label",
@@ -525,7 +527,7 @@ const { GET } = createEndpoint({
       }),
 
       // Journey and campaign filters
-      journeyVariant: scopedRequestField(scopedTranslation, {
+      journeyVariant: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "journeyVariant.label",
@@ -534,7 +536,7 @@ const { GET } = createEndpoint({
         schema: z.enum(EmailJourneyVariant).optional(),
       }),
 
-      minEmailsSent: scopedRequestField(scopedTranslation, {
+      minEmailsSent: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "minEmailsSent.label",
@@ -544,7 +546,7 @@ const { GET } = createEndpoint({
       }),
 
       // Date range filters
-      createdAfter: scopedRequestField(scopedTranslation, {
+      createdAfter: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "createdAfter.label",
@@ -553,7 +555,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      createdBefore: scopedRequestField(scopedTranslation, {
+      createdBefore: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "createdBefore.label",
@@ -562,7 +564,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      updatedAfter: scopedRequestField(scopedTranslation, {
+      updatedAfter: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "updatedAfter.label",
@@ -571,7 +573,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      updatedBefore: scopedRequestField(scopedTranslation, {
+      updatedBefore: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "updatedBefore.label",
@@ -581,7 +583,7 @@ const { GET } = createEndpoint({
       }),
 
       // Search
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "search.label",
@@ -592,7 +594,7 @@ const { GET } = createEndpoint({
       }),
 
       // Sorting
-      sortBy: scopedRequestField(scopedTranslation, {
+      sortBy: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "sortBy.label",
@@ -602,7 +604,7 @@ const { GET } = createEndpoint({
         schema: z.enum(LeadSortField).default(LeadSortField.CREATED_AT),
       }),
 
-      sortOrder: scopedRequestField(scopedTranslation, {
+      sortOrder: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "sortOrder.label",
@@ -613,373 +615,373 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      totalLeads: scopedResponseField(scopedTranslation, {
+      totalLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.totalLeads",
         schema: z.coerce.number(),
       }),
 
-      newLeads: scopedResponseField(scopedTranslation, {
+      newLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.newLeads",
         schema: z.coerce.number(),
       }),
 
-      activeLeads: scopedResponseField(scopedTranslation, {
+      activeLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.activeLeads",
         schema: z.coerce.number(),
       }),
 
-      conversionRate: scopedResponseField(scopedTranslation, {
+      conversionRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.conversionRate",
         schema: z.coerce.number(),
       }),
 
-      averageOpenRate: scopedResponseField(scopedTranslation, {
+      averageOpenRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.averageOpenRate",
         schema: z.coerce.number(),
       }),
 
-      averageClickRate: scopedResponseField(scopedTranslation, {
+      averageClickRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.averageClickRate",
         schema: z.coerce.number(),
       }),
 
       // Additional lead metrics
-      campaignRunningLeads: scopedResponseField(scopedTranslation, {
+      campaignRunningLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.campaignRunningLeads",
         schema: z.coerce.number(),
       }),
 
-      websiteUserLeads: scopedResponseField(scopedTranslation, {
+      websiteUserLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.websiteUserLeads",
         schema: z.coerce.number(),
       }),
 
-      newsletterSubscriberLeads: scopedResponseField(scopedTranslation, {
+      newsletterSubscriberLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.newsletterSubscriberLeads",
         schema: z.coerce.number(),
       }),
 
-      convertedLeads: scopedResponseField(scopedTranslation, {
+      convertedLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.convertedLeads",
         schema: z.coerce.number(),
       }),
 
-      signedUpLeads: scopedResponseField(scopedTranslation, {
+      signedUpLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.signedUpLeads",
         schema: z.coerce.number(),
       }),
 
-      consultationBookedLeads: scopedResponseField(scopedTranslation, {
+      consultationBookedLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.consultationBookedLeads",
         schema: z.coerce.number(),
       }),
 
-      subscriptionConfirmedLeads: scopedResponseField(scopedTranslation, {
+      subscriptionConfirmedLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.subscriptionConfirmedLeads",
         schema: z.coerce.number(),
       }),
 
-      unsubscribedLeads: scopedResponseField(scopedTranslation, {
+      unsubscribedLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.unsubscribedLeads",
         schema: z.coerce.number(),
       }),
 
-      bouncedLeads: scopedResponseField(scopedTranslation, {
+      bouncedLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.bouncedLeads",
         schema: z.coerce.number(),
       }),
 
-      invalidLeads: scopedResponseField(scopedTranslation, {
+      invalidLeads: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.invalidLeads",
         schema: z.coerce.number(),
       }),
 
       // Email campaign metrics
-      totalEmailsSent: scopedResponseField(scopedTranslation, {
+      totalEmailsSent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.totalEmailsSent",
         schema: z.coerce.number(),
       }),
 
-      totalEmailsOpened: scopedResponseField(scopedTranslation, {
+      totalEmailsOpened: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.totalEmailsOpened",
         schema: z.coerce.number(),
       }),
 
-      totalEmailsClicked: scopedResponseField(scopedTranslation, {
+      totalEmailsClicked: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.totalEmailsClicked",
         schema: z.coerce.number(),
       }),
 
-      averageEmailsPerLead: scopedResponseField(scopedTranslation, {
+      averageEmailsPerLead: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.averageEmailsPerLead",
         schema: z.coerce.number(),
       }),
 
       // Engagement metrics
-      leadsWithEmailEngagement: scopedResponseField(scopedTranslation, {
+      leadsWithEmailEngagement: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsWithEmailEngagement",
         schema: z.coerce.number(),
       }),
 
-      leadsWithoutEmailEngagement: scopedResponseField(scopedTranslation, {
+      leadsWithoutEmailEngagement: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsWithoutEmailEngagement",
         schema: z.coerce.number(),
       }),
 
-      averageEmailEngagementScore: scopedResponseField(scopedTranslation, {
+      averageEmailEngagementScore: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.averageEmailEngagementScore",
         schema: z.coerce.number(),
       }),
 
-      totalEmailEngagements: scopedResponseField(scopedTranslation, {
+      totalEmailEngagements: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.totalEmailEngagements",
         schema: z.coerce.number(),
       }),
 
       // Conversion metrics
-      signupRate: scopedResponseField(scopedTranslation, {
+      signupRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.signupRate",
         schema: z.coerce.number(),
       }),
 
-      consultationBookingRate: scopedResponseField(scopedTranslation, {
+      consultationBookingRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.consultationBookingRate",
         schema: z.coerce.number(),
       }),
 
-      subscriptionConfirmationRate: scopedResponseField(scopedTranslation, {
+      subscriptionConfirmationRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.subscriptionConfirmationRate",
         schema: z.coerce.number(),
       }),
 
       // Data completeness
-      dataCompletenessRate: scopedResponseField(scopedTranslation, {
+      dataCompletenessRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.dataCompletenessRate",
         schema: z.coerce.number(),
       }),
 
       // Performance metrics
-      leadVelocity: scopedResponseField(scopedTranslation, {
+      leadVelocity: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadVelocity",
         schema: z.coerce.number(),
       }),
 
       // Time-based metrics
-      leadsCreatedToday: scopedResponseField(scopedTranslation, {
+      leadsCreatedToday: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsCreatedToday",
         schema: z.coerce.number(),
       }),
 
-      leadsCreatedThisWeek: scopedResponseField(scopedTranslation, {
+      leadsCreatedThisWeek: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsCreatedThisWeek",
         schema: z.coerce.number(),
       }),
 
-      leadsCreatedThisMonth: scopedResponseField(scopedTranslation, {
+      leadsCreatedThisMonth: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsCreatedThisMonth",
         schema: z.coerce.number(),
       }),
 
-      leadsUpdatedToday: scopedResponseField(scopedTranslation, {
+      leadsUpdatedToday: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsUpdatedToday",
         schema: z.coerce.number(),
       }),
 
-      leadsUpdatedThisWeek: scopedResponseField(scopedTranslation, {
+      leadsUpdatedThisWeek: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsUpdatedThisWeek",
         schema: z.coerce.number(),
       }),
 
-      leadsUpdatedThisMonth: scopedResponseField(scopedTranslation, {
+      leadsUpdatedThisMonth: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsUpdatedThisMonth",
         schema: z.coerce.number(),
       }),
 
       // Distribution metrics
-      leadsByCampaignStage: scopedResponseField(scopedTranslation, {
+      leadsByCampaignStage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsByCampaignStage",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsInActiveCampaigns: scopedResponseField(scopedTranslation, {
+      leadsInActiveCampaigns: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsInActiveCampaigns",
         schema: z.coerce.number(),
       }),
 
-      leadsNotInCampaigns: scopedResponseField(scopedTranslation, {
+      leadsNotInCampaigns: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsNotInCampaigns",
         schema: z.coerce.number(),
       }),
 
-      leadsByJourneyVariant: scopedResponseField(scopedTranslation, {
+      leadsByJourneyVariant: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsByJourneyVariant",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsByCountry: scopedResponseField(scopedTranslation, {
+      leadsByCountry: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsByCountry",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsByLanguage: scopedResponseField(scopedTranslation, {
+      leadsByLanguage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsByLanguage",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsBySource: scopedResponseField(scopedTranslation, {
+      leadsBySource: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsBySource",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsByStatus: scopedResponseField(scopedTranslation, {
+      leadsByStatus: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsByStatus",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
       // Business information completeness
-      leadsWithBusinessName: scopedResponseField(scopedTranslation, {
+      leadsWithBusinessName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsWithBusinessName",
         schema: z.coerce.number(),
       }),
 
-      leadsWithContactName: scopedResponseField(scopedTranslation, {
+      leadsWithContactName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsWithContactName",
         schema: z.coerce.number(),
       }),
 
-      leadsWithPhone: scopedResponseField(scopedTranslation, {
+      leadsWithPhone: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsWithPhone",
         schema: z.coerce.number(),
       }),
 
-      leadsWithWebsite: scopedResponseField(scopedTranslation, {
+      leadsWithWebsite: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsWithWebsite",
         schema: z.coerce.number(),
       }),
 
-      leadsWithNotes: scopedResponseField(scopedTranslation, {
+      leadsWithNotes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadsWithNotes",
         schema: z.coerce.number(),
       }),
 
       // Historical data with proper Zod schema
-      historicalData: scopedResponseField(scopedTranslation, {
+      historicalData: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.historicalData",
         schema: historicalDataSchema,
       }),
 
       // Grouped stats with proper Zod schema
-      groupedStats: scopedResponseField(scopedTranslation, {
+      groupedStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.groupedStats",
         schema: groupedStatsSchema,
       }),
 
       // Performance metrics - time-based
-      averageTimeToConversion: scopedResponseField(scopedTranslation, {
+      averageTimeToConversion: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.averageTimeToConversion",
         schema: z.coerce.number(),
       }),
 
-      averageTimeToSignup: scopedResponseField(scopedTranslation, {
+      averageTimeToSignup: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.averageTimeToSignup",
         schema: z.coerce.number(),
       }),
 
-      averageTimeToConsultation: scopedResponseField(scopedTranslation, {
+      averageTimeToConsultation: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.averageTimeToConsultation",
         schema: z.coerce.number(),
       }),
 
       // Top performers with proper Zod schemas
-      topPerformingCampaigns: scopedResponseArrayFieldNew(scopedTranslation, {
+      topPerformingCampaigns: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.topPerformingCampaigns",
         description: "response.topPerformingCampaigns",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            campaignId: scopedResponseField(scopedTranslation, {
+            campaignId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.topPerformingCampaigns",
               schema: z.string(),
             }),
-            campaignName: scopedResponseField(scopedTranslation, {
+            campaignName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.topPerformingCampaigns",
               schema: z.string(),
             }),
-            leadsGenerated: scopedResponseField(scopedTranslation, {
+            leadsGenerated: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.topPerformingCampaigns",
               schema: z.coerce.number(),
             }),
-            conversionRate: scopedResponseField(scopedTranslation, {
+            conversionRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.conversionRate",
               schema: z.coerce.number(),
             }),
-            openRate: scopedResponseField(scopedTranslation, {
+            openRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.averageOpenRate",
               schema: z.coerce.number(),
             }),
-            clickRate: scopedResponseField(scopedTranslation, {
+            clickRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.averageClickRate",
               schema: z.coerce.number(),
@@ -988,32 +990,32 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      topPerformingSources: scopedResponseArrayFieldNew(scopedTranslation, {
+      topPerformingSources: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.topPerformingSources",
         description: "response.topPerformingSources",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            source: scopedResponseField(scopedTranslation, {
+            source: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.leadsBySource",
               schema: z.enum(LeadSource),
             }),
-            leadsGenerated: scopedResponseField(scopedTranslation, {
+            leadsGenerated: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.topPerformingSources",
               schema: z.coerce.number(),
             }),
-            conversionRate: scopedResponseField(scopedTranslation, {
+            conversionRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.conversionRate",
               schema: z.coerce.number(),
             }),
-            qualityScore: scopedResponseField(scopedTranslation, {
+            qualityScore: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.topPerformingSources",
               schema: z.coerce.number(),
@@ -1023,84 +1025,84 @@ const { GET } = createEndpoint({
       }),
 
       // Recent activity with proper Zod schema
-      recentActivity: scopedResponseArrayFieldNew(scopedTranslation, {
+      recentActivity: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.recentActivity",
         description: "response.recentActivity",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.recentActivity",
               schema: z.string(),
             }),
-            leadEmail: scopedResponseField(scopedTranslation, {
+            leadEmail: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.recentActivity",
               schema: z.string(),
             }),
-            leadBusinessName: scopedResponseField(scopedTranslation, {
+            leadBusinessName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.recentActivity",
               schema: z.string(),
             }),
-            timestamp: scopedResponseField(scopedTranslation, {
+            timestamp: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.generatedAt",
               schema: z.string(),
             }),
-            type: scopedResponseField(scopedTranslation, {
+            type: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.recentActivity",
               schema: z.enum(ActivityType),
             }),
-            details: scopedObjectFieldNew(scopedTranslation, {
+            details: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "response.recentActivity",
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                status: scopedResponseField(scopedTranslation, {
+                status: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.leadsByStatus",
                   schema: z.enum(LeadStatus),
                 }),
-                source: scopedResponseField(scopedTranslation, {
+                source: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.leadsBySource",
                   schema: z.string(),
                 }),
-                country: scopedResponseField(scopedTranslation, {
+                country: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.leadsByCountry",
                   schema: z.string(),
                 }),
-                emailsSent: scopedResponseField(scopedTranslation, {
+                emailsSent: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.totalEmailsSent",
                   schema: z.coerce.number(),
                 }),
-                emailsOpened: scopedResponseField(scopedTranslation, {
+                emailsOpened: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.totalEmailsOpened",
                   schema: z.coerce.number(),
                 }),
-                emailsClicked: scopedResponseField(scopedTranslation, {
+                emailsClicked: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.totalEmailsClicked",
                   schema: z.coerce.number(),
                 }),
-                daysSinceCreated: scopedResponseField(scopedTranslation, {
+                daysSinceCreated: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.recentActivity",
                   schema: z.coerce.number(),
                 }),
-                isConverted: scopedResponseField(scopedTranslation, {
+                isConverted: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.convertedLeads",
                   schema: z.boolean(),
@@ -1112,13 +1114,13 @@ const { GET } = createEndpoint({
       }),
 
       // Metadata
-      generatedAt: scopedResponseField(scopedTranslation, {
+      generatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.generatedAt",
         schema: z.string(),
       }),
 
-      dataRange: scopedResponseField(scopedTranslation, {
+      dataRange: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.dataRange",
         schema: dataRangeSchema,

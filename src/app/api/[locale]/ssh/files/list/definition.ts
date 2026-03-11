@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ export const { GET } = createEndpoint({
     render: FilesListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.connectionId.label",
@@ -45,7 +45,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
-      path: scopedRequestField(scopedTranslation, {
+      path: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.path.label",
@@ -53,7 +53,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.path.placeholder",
         schema: z.string().optional(),
       }),
-      entries: scopedResponseField(scopedTranslation, {
+      entries: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.entries.title",
         schema: z.array(
@@ -66,7 +66,7 @@ export const { GET } = createEndpoint({
           }),
         ),
       }),
-      currentPath: scopedResponseField(scopedTranslation, {
+      currentPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.currentPath.title",
         schema: z.string(),

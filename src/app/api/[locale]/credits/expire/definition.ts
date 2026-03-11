@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   tags: ["expire.post.tag"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "expire.post.container.title",
     description: "expire.post.container.description",
@@ -39,7 +39,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      expiredCount: scopedResponseField(scopedTranslation, {
+      expiredCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "expire.post.response.expiredCount",
         schema: z.number(),

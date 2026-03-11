@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,7 +44,7 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.campaigns"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.form.title",
     description: "get.form.description",
@@ -52,35 +52,35 @@ const { GET } = createEndpoint({
     usage: { response: true },
     children: {
       // Campaign settings
-      dryRun: scopedResponseField(scopedTranslation, {
+      dryRun: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.dryRun",
         schema: z.boolean(),
       }),
-      minAgeHours: scopedResponseField(scopedTranslation, {
+      minAgeHours: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.minAgeHours",
         schema: z.coerce.number().min(0).max(168),
       }),
-      enabledDays: scopedResponseField(scopedTranslation, {
+      enabledDays: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.enabledDays",
         schema: z.array(z.coerce.number().min(1).max(7)),
       }),
-      enabledHours: scopedObjectFieldNew(scopedTranslation, {
+      enabledHours: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.enabledHours",
         layoutType: LayoutType.GRID,
         columns: 2,
         usage: { response: true },
         children: {
-          start: scopedResponseField(scopedTranslation, {
+          start: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.enabledHours",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().min(0).max(23),
           }),
-          end: scopedResponseField(scopedTranslation, {
+          end: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.enabledHours",
             fieldType: FieldDataType.NUMBER,
@@ -88,7 +88,7 @@ const { GET } = createEndpoint({
           }),
         },
       }),
-      leadsPerWeek: scopedResponseField(scopedTranslation, {
+      leadsPerWeek: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.leadsPerWeek",
         label: "post.leadsPerWeek.label",
@@ -96,32 +96,32 @@ const { GET } = createEndpoint({
         schema: z.record(z.string(), z.coerce.number().min(1)),
       }),
       // Cron settings
-      schedule: scopedResponseField(scopedTranslation, {
+      schedule: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.schedule",
         schema: z.string().min(1),
       }),
-      enabled: scopedResponseField(scopedTranslation, {
+      enabled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.enabled",
         schema: z.boolean().default(true),
       }),
-      priority: scopedResponseField(scopedTranslation, {
+      priority: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.priority",
         schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
       }),
-      timeout: scopedResponseField(scopedTranslation, {
+      timeout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.timeout",
         schema: z.coerce.number().min(1000).max(3600000).default(300000),
       }),
-      retries: scopedResponseField(scopedTranslation, {
+      retries: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.retries",
         schema: z.coerce.number().min(0).max(10).default(3),
       }),
-      retryDelay: scopedResponseField(scopedTranslation, {
+      retryDelay: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.retryDelay",
         schema: z.coerce.number().min(1000).max(300000).default(30000),
@@ -217,23 +217,25 @@ const { PUT } = createEndpoint({
     render: CampaignStarterConfigContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // Request fields
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.dryRun.label",
         description: "post.dryRun.description",
         schema: z.boolean(),
       }),
-      minAgeHours: scopedRequestField(scopedTranslation, {
+      minAgeHours: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.minAgeHours.label",
         description: "post.minAgeHours.description",
         schema: z.coerce.number().min(0).max(168),
       }),
-      enabledDays: scopedRequestField(scopedTranslation, {
+      enabledDays: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "post.enabledDays.label",
@@ -270,7 +272,7 @@ const { PUT } = createEndpoint({
         ],
         schema: z.array(z.coerce.number().min(1).max(7)),
       }),
-      enabledHours: scopedObjectFieldNew(scopedTranslation, {
+      enabledHours: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.enabledHours.label",
         description: "post.enabledHours.description",
@@ -278,14 +280,14 @@ const { PUT } = createEndpoint({
         columns: 2,
         usage: { request: "data" },
         children: {
-          start: scopedRequestField(scopedTranslation, {
+          start: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "post.enabledHours.start.label",
             description: "post.enabledHours.start.description",
             schema: z.coerce.number().min(0).max(23),
           }),
-          end: scopedRequestField(scopedTranslation, {
+          end: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "post.enabledHours.end.label",
@@ -294,21 +296,21 @@ const { PUT } = createEndpoint({
           }),
         },
       }),
-      schedule: scopedRequestField(scopedTranslation, {
+      schedule: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.schedule.label",
         description: "post.schedule.description",
         schema: z.string().min(1),
       }),
-      enabled: scopedRequestField(scopedTranslation, {
+      enabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.enabled.label",
         description: "post.enabled.description",
         schema: z.boolean().default(true),
       }),
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.priority.label",
@@ -316,28 +318,28 @@ const { PUT } = createEndpoint({
         options: CronTaskPriorityOptions,
         schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
       }),
-      timeout: scopedRequestField(scopedTranslation, {
+      timeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.timeout.label",
         description: "post.timeout.description",
         schema: z.coerce.number().min(1000).max(3600000).default(300000),
       }),
-      retries: scopedRequestField(scopedTranslation, {
+      retries: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.retries.label",
         description: "post.retries.description",
         schema: z.coerce.number().min(0).max(10).default(3),
       }),
-      retryDelay: scopedRequestField(scopedTranslation, {
+      retryDelay: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.retryDelay.label",
         description: "post.retryDelay.description",
         schema: z.coerce.number().min(1000).max(300000).default(30000),
       }),
-      leadsPerWeek: scopedRequestField(scopedTranslation, {
+      leadsPerWeek: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "post.leadsPerWeek.label",

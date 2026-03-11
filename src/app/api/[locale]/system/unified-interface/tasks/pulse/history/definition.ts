@@ -7,11 +7,11 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,10 +41,12 @@ export const { GET } = createEndpoint({
     render: PulseHistoryContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
       // === REQUEST FIELDS ===
-      startDate: scopedRequestField(scopedTranslation, {
+      startDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "get.fields.startDate.label",
@@ -52,7 +54,7 @@ export const { GET } = createEndpoint({
         columns: 6,
         schema: dateSchema.optional(),
       }),
-      endDate: scopedRequestField(scopedTranslation, {
+      endDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "get.fields.endDate.label",
@@ -60,7 +62,7 @@ export const { GET } = createEndpoint({
         columns: 6,
         schema: dateSchema.optional(),
       }),
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.status.label",
@@ -68,7 +70,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.status.placeholder",
         schema: z.string().optional(),
       }),
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.limit.label",
@@ -76,7 +78,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.limit.placeholder",
         schema: z.coerce.number().optional(),
       }),
-      offset: scopedRequestField(scopedTranslation, {
+      offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.offset.label",
@@ -86,7 +88,7 @@ export const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      executions: scopedResponseField(scopedTranslation, {
+      executions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.executions.title",
         schema: z.array(
@@ -111,17 +113,17 @@ export const { GET } = createEndpoint({
           }),
         ),
       }),
-      totalCount: scopedResponseField(scopedTranslation, {
+      totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.totalCount.title",
         schema: z.coerce.number(),
       }),
-      hasMore: scopedResponseField(scopedTranslation, {
+      hasMore: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.hasMore.title",
         schema: z.boolean(),
       }),
-      summary: scopedResponseField(scopedTranslation, {
+      summary: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.summary.title",
         schema: z.object({

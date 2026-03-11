@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "take-snapshot.form.label",
     description: "take-snapshot.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      verbose: scopedRequestField(scopedTranslation, {
+      verbose: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "take-snapshot.form.fields.verbose.label",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
             "Whether to include all possible information available in the full a11y tree. Default is false.",
           ),
       }),
-      filePath: scopedRequestField(scopedTranslation, {
+      filePath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "take-snapshot.form.fields.filePath.label",
@@ -75,14 +75,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-snapshot.response.success",
         schema: z
           .boolean()
           .describe("Whether the snapshot capture operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-snapshot.response.result",
         schema: z
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-snapshot.response.error",
         schema: z
@@ -105,7 +105,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-snapshot.response.executionId",
         schema: z

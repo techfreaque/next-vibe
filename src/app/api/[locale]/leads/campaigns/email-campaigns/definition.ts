@@ -7,20 +7,20 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  customWidgetObject,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
+import { EmailCampaignsWidget } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -33,15 +33,11 @@ const { POST } = createEndpoint({
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.container.title",
-    description: "post.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: EmailCampaignsWidget,
+    usage: { request: "data", response: true } as const,
     children: {
-      batchSize: scopedRequestField(scopedTranslation, {
+      batchSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.batchSize.label",
@@ -50,7 +46,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(100).default(100),
       }),
 
-      maxEmailsPerRun: scopedRequestField(scopedTranslation, {
+      maxEmailsPerRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.maxEmailsPerRun.label",
@@ -59,7 +55,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(1000).default(500),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -68,25 +64,25 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      emailsScheduled: scopedResponseField(scopedTranslation, {
+      emailsScheduled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.emailsScheduled",
         schema: z.number(),
       }),
 
-      emailsSent: scopedResponseField(scopedTranslation, {
+      emailsSent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.emailsSent",
         schema: z.number(),
       }),
 
-      emailsFailed: scopedResponseField(scopedTranslation, {
+      emailsFailed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.emailsFailed",
         schema: z.number(),
       }),
 
-      leadsProcessed: scopedResponseField(scopedTranslation, {
+      leadsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.leadsProcessed",
         schema: z.number(),

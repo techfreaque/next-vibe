@@ -4,10 +4,10 @@ import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -40,14 +40,14 @@ const { PATCH } = createEndpoint({
     render: FolderMoveContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      subFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.id.label" as const,
         description: "patch.id.description" as const,
         schema: z.uuid(),
       }),
-      parentId: scopedRequestField(scopedTranslation, {
+      parentId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.parentId.label" as const,
@@ -55,12 +55,12 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.uuid().nullable().optional(),
       }),
-      folderId: scopedResponseField(scopedTranslation, {
+      folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.folder.id.content" as const,
         schema: z.uuid(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.folder.updatedAt.content" as const,
         schema: dateSchema,

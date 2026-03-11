@@ -4,11 +4,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   responseArrayOptionalField,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,7 +48,7 @@ const { PATCH } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.folders" as const, "tags.permissions" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "patch.container.title" as const,
     description: "patch.container.description" as const,
@@ -56,7 +56,7 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === REQUEST URL PARAMS ===
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      subFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.id.label" as const,
@@ -65,7 +65,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      rolesView: scopedRequestField(scopedTranslation, {
+      rolesView: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesView.label" as const,
@@ -74,7 +74,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)),
       }),
-      rolesManage: scopedRequestField(scopedTranslation, {
+      rolesManage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesManage.label" as const,
@@ -83,7 +83,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)),
       }),
-      rolesCreateThread: scopedRequestField(scopedTranslation, {
+      rolesCreateThread: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesCreateThread.label" as const,
@@ -92,7 +92,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)),
       }),
-      rolesPost: scopedRequestField(scopedTranslation, {
+      rolesPost: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesPost.label" as const,
@@ -101,7 +101,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)),
       }),
-      rolesModerate: scopedRequestField(scopedTranslation, {
+      rolesModerate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesModerate.label" as const,
@@ -110,7 +110,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)),
       }),
-      rolesAdmin: scopedRequestField(scopedTranslation, {
+      rolesAdmin: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesAdmin.label" as const,
@@ -121,54 +121,54 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      rolesViewResult: responseArrayOptionalField(
-        { type: WidgetType.CONTAINER },
-        scopedResponseField(scopedTranslation, {
+      rolesViewResult: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "patch.response.rolesView.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesManageResult: responseArrayOptionalField(
-        { type: WidgetType.CONTAINER },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesManageResult: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "patch.response.rolesManage.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesCreateThreadResult: responseArrayOptionalField(
-        { type: WidgetType.CONTAINER },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesCreateThreadResult: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "patch.response.rolesCreateThread.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesPostResult: responseArrayOptionalField(
-        { type: WidgetType.CONTAINER },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesPostResult: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "patch.response.rolesPost.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesModerateResult: responseArrayOptionalField(
-        { type: WidgetType.CONTAINER },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesModerateResult: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "patch.response.rolesModerate.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesAdminResult: responseArrayOptionalField(
-        { type: WidgetType.CONTAINER },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesAdminResult: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "patch.response.rolesAdmin.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
+      }),
     },
   }),
 
@@ -271,7 +271,7 @@ const { GET } = createEndpoint({
     usage: { response: true, request: "urlPathParams" } as const,
     children: {
       // === REQUEST URL PARAMS ===
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      subFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.id.label" as const,
@@ -280,66 +280,54 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      rolesView: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
+      rolesView: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "get.response.rolesView.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesManage: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesManage: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "get.response.rolesManage.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesCreateThread: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesCreateThread: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "get.response.rolesCreateThread.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesPost: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesPost: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "get.response.rolesPost.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesModerate: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesModerate: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "get.response.rolesModerate.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
-      rolesAdmin: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
+      }),
+      rolesAdmin: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "get.response.rolesAdmin.label" as const,
           schema: z.enum(UserRoleDB),
         }),
-      ),
+      }),
     },
   }),
 

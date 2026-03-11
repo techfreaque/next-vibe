@@ -18,8 +18,13 @@ import React from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
+import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import {
+  useChatNavigationStore,
+  type ChatNavigationState,
+} from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";
@@ -42,8 +47,6 @@ interface ThreadedMessageActionsProps {
   userVote: "up" | "down" | null;
   voteScore: number;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
-  // Message actions
-  onDeleteMessage?: (messageId: string) => void;
   // Reply count
   replyCount: number;
   hasReplies: boolean;
@@ -72,7 +75,6 @@ export function ThreadedMessageActions({
   userVote,
   voteScore,
   onVoteMessage,
-  onDeleteMessage,
   replyCount,
   hasReplies,
   isCollapsed,
@@ -84,11 +86,28 @@ export function ThreadedMessageActions({
 }: ThreadedMessageActionsProps): JSX.Element | null {
   const { t } = scopedTranslation.scopedT(locale);
   const { groupHover } = useMessageGroupName();
+  const { push: navigate } = useWidgetNavigation();
+  const rootFolderId = useChatNavigationStore(
+    (s: ChatNavigationState) => s.currentRootFolderId,
+  );
 
   // Editor actions from Zustand store
   const startEdit = useMessageEditorStore((s) => s.startEdit);
   const startAnswer = useMessageEditorStore((s) => s.startAnswer);
   const startReply = useMessageEditorStore((s) => s.startReply);
+
+  const handleDelete = (): void => {
+    void (async (): Promise<void> => {
+      const messageIdDefs =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      navigate(messageIdDefs.default.DELETE, {
+        urlPathParams: { threadId: message.threadId, messageId: message.id },
+        data: rootFolderId ? { rootFolderId } : undefined,
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
 
   // Calculate TTS credit cost based on text length
   const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
@@ -309,17 +328,15 @@ export function ThreadedMessageActions({
       </Button>
 
       {/* Delete */}
-      {onDeleteMessage && (
-        <Button
-          variant="ghost"
-          size="unset"
-          onClick={(): void => onDeleteMessage(message.id)}
-          className="flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
-          title={t("widget.threadedView.actions.deleteMessage")}
-        >
-          <Span>{t("widget.threadedView.actions.delete")}</Span>
-        </Button>
-      )}
+      <Button
+        variant="ghost"
+        size="unset"
+        onClick={handleDelete}
+        className="flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
+        title={t("widget.threadedView.actions.deleteMessage")}
+      >
+        <Span>{t("widget.threadedView.actions.delete")}</Span>
+      </Button>
 
       {/* Show parent (if not root) */}
       {message.parentId && (

@@ -16,11 +16,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  scopedObjectField,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "../system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+  widgetField,
+} from "../system/unified-interface/shared/field/utils";
 import { CONTACT_FORM_ALIAS } from "./constants";
 import {
   ContactPriority,
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
   ],
   allowedLocalModeRoles: [] as const,
 
-  fields: scopedObjectField(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.label",
     description: "form.description",
@@ -68,7 +68,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         schema: z.string().min(2),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
         placeholder: "form.fields.name.placeholder",
         columns: 12,
       }),
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         schema: z.string().email(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
         placeholder: "form.fields.email.placeholder",
         columns: 12,
       }),
-      subject: scopedRequestField(scopedTranslation, {
+      subject: requestField(scopedTranslation, {
         schema: z.enum(ContactSubject).default(ContactSubject.HELP_SUPPORT),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -96,7 +96,7 @@ const { POST } = createEndpoint({
         options: ContactSubjectOptions,
         columns: 12,
       }),
-      message: scopedRequestField(scopedTranslation, {
+      message: requestField(scopedTranslation, {
         schema: z.string().min(10),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
@@ -105,7 +105,7 @@ const { POST } = createEndpoint({
         placeholder: "form.fields.message.placeholder",
         columns: 12,
       }),
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         schema: z.enum(ContactPriority).optional(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -117,13 +117,13 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.ALERT,
         columns: 12,
       }),
 
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "form.submitButton.label",
         loadingText: "form.submitButton.loadingText",

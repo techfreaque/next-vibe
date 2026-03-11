@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   Methods,
@@ -35,7 +35,7 @@ export const { GET } = createEndpoint({
     render: ConnectionsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connections: scopedResponseField(scopedTranslation, {
+      connections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.connections.title",
         schema: z.array(

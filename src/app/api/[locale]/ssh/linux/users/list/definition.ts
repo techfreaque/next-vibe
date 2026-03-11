@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -36,7 +36,7 @@ export const { GET } = createEndpoint({
     render: LinuxUsersListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.connectionId.label",
@@ -44,7 +44,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
-      users: scopedResponseField(scopedTranslation, {
+      users: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.users.title",
         schema: z.array(

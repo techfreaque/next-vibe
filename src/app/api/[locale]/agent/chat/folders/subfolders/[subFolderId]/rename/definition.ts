@@ -7,10 +7,10 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,14 +43,14 @@ const { PATCH } = createEndpoint({
     render: FolderRenameContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      subFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.id.label" as const,
         description: "patch.id.description" as const,
         schema: z.uuid(),
       }),
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.name.label" as const,
@@ -58,7 +58,7 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).max(255).optional(),
       }),
-      icon: scopedRequestField(scopedTranslation, {
+      icon: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.icon.label" as const,
@@ -66,12 +66,12 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: iconNullishSchema,
       }),
-      folderId: scopedResponseField(scopedTranslation, {
+      folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.folder.id.content" as const,
         schema: z.uuid(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.folder.updatedAt.content" as const,
         schema: dateSchema,

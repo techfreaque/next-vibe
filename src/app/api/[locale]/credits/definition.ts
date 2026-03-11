@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   Methods,
@@ -41,42 +41,42 @@ const { GET } = createEndpoint({
     usage: { response: true } as const,
     children: {
       // Total credits available
-      total: scopedResponseField(scopedTranslation, {
+      total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.total.content",
         schema: z.coerce.number(),
       }),
 
       // Expiring credits (from subscription)
-      expiring: scopedResponseField(scopedTranslation, {
+      expiring: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.expiring.content",
         schema: z.coerce.number(),
       }),
 
       // Permanent credits (from packs)
-      permanent: scopedResponseField(scopedTranslation, {
+      permanent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.permanent.content",
         schema: z.coerce.number(),
       }),
 
       // Earned credits (from referrals)
-      earned: scopedResponseField(scopedTranslation, {
+      earned: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.earned.content",
         schema: z.coerce.number(),
       }),
 
       // Free tier credits
-      free: scopedResponseField(scopedTranslation, {
+      free: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.free.content",
         schema: z.coerce.number(),
       }),
 
       // Expiration date for expiring credits
-      expiresAt: scopedResponseField(scopedTranslation, {
+      expiresAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.expiresAt.content",
         schema: dateSchema.nullable(),

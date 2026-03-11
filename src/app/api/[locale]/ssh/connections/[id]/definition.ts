@@ -7,10 +7,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,54 +38,54 @@ export const { GET } = createEndpoint({
     render: ConnectionDetailContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         schema: z.string().uuid(),
         label: "get.fields.id.label",
         description: "get.fields.id.description",
       }),
-      label: scopedResponseField(scopedTranslation, {
+      label: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.label.title",
         schema: z.string(),
       }),
-      host: scopedResponseField(scopedTranslation, {
+      host: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.host.title",
         schema: z.string(),
       }),
-      port: scopedResponseField(scopedTranslation, {
+      port: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.port.title",
         schema: z.number(),
       }),
-      username: scopedResponseField(scopedTranslation, {
+      username: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.username.title",
         schema: z.string(),
       }),
-      authType: scopedResponseField(scopedTranslation, {
+      authType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.authType.title",
         schema: z.enum(SshAuthTypeDB),
       }),
-      isDefault: scopedResponseField(scopedTranslation, {
+      isDefault: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.isDefault.title",
         schema: z.boolean(),
       }),
-      fingerprint: scopedResponseField(scopedTranslation, {
+      fingerprint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.fingerprint.title",
         schema: z.string().nullable(),
       }),
-      notes: scopedResponseField(scopedTranslation, {
+      notes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.notes.title",
         schema: z.string().nullable(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.createdAt.title",
         schema: z.string(),
@@ -170,14 +170,14 @@ export const { PATCH } = createEndpoint({
     render: ConnectionDetailContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         schema: z.string().uuid(),
         label: "patch.fields.id.label",
         description: "patch.fields.id.description",
       }),
-      label: scopedRequestField(scopedTranslation, {
+      label: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.fields.label.label",
@@ -185,7 +185,7 @@ export const { PATCH } = createEndpoint({
         placeholder: "patch.fields.label.placeholder",
         schema: z.string().min(1).max(100).optional(),
       }),
-      host: scopedRequestField(scopedTranslation, {
+      host: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.fields.host.label",
@@ -193,7 +193,7 @@ export const { PATCH } = createEndpoint({
         placeholder: "patch.fields.host.placeholder",
         schema: z.string().min(1).optional(),
       }),
-      port: scopedRequestField(scopedTranslation, {
+      port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "patch.fields.port.label",
@@ -201,7 +201,7 @@ export const { PATCH } = createEndpoint({
         placeholder: "patch.fields.port.placeholder",
         schema: z.coerce.number().min(1).max(65535).optional(),
       }),
-      username: scopedRequestField(scopedTranslation, {
+      username: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.fields.username.label",
@@ -209,7 +209,7 @@ export const { PATCH } = createEndpoint({
         placeholder: "patch.fields.username.placeholder",
         schema: z.string().min(1).optional(),
       }),
-      authType: scopedRequestField(scopedTranslation, {
+      authType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "patch.fields.authType.label",
@@ -217,35 +217,35 @@ export const { PATCH } = createEndpoint({
         options: SshAuthTypeOptions,
         schema: z.enum(SshAuthTypeDB).optional(),
       }),
-      secret: scopedRequestField(scopedTranslation, {
+      secret: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "patch.fields.secret.label",
         description: "patch.fields.secret.description",
         schema: z.string().optional(),
       }),
-      passphrase: scopedRequestField(scopedTranslation, {
+      passphrase: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "patch.fields.passphrase.label",
         description: "patch.fields.passphrase.description",
         schema: z.string().optional(),
       }),
-      isDefault: scopedRequestField(scopedTranslation, {
+      isDefault: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.fields.isDefault.label",
         description: "patch.fields.isDefault.description",
         schema: z.boolean().optional(),
       }),
-      notes: scopedRequestField(scopedTranslation, {
+      notes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "patch.fields.notes.label",
         description: "patch.fields.notes.description",
         schema: z.string().optional(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.updatedAt.title",
         schema: z.string(),
@@ -318,14 +318,14 @@ export const { DELETE } = createEndpoint({
     render: ConnectionDetailContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         schema: z.string().uuid(),
         label: "delete.fields.id.label",
         description: "delete.fields.id.description",
       }),
-      deleted: scopedResponseField(scopedTranslation, {
+      deleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.deleted.title",
         schema: z.boolean(),

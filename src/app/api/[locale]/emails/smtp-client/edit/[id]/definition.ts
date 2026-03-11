@@ -9,13 +9,13 @@ import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestResponseField,
-  scopedRequestUrlPathParamsResponseField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  requestResponseField,
+  requestUrlPathParamsResponseField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -62,7 +62,7 @@ const { GET } = createEndpoint({
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title",
     description: "get.container.description",
@@ -71,7 +71,7 @@ const { GET } = createEndpoint({
     usage: { request: "urlPathParams", response: true },
     children: {
       // === URL PARAMETER ===
-      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
+      id: requestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.id.label",
@@ -80,97 +80,97 @@ const { GET } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      name: scopedResponseField(scopedTranslation, {
+      name: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.name",
         schema: z.string(),
       }),
-      description: scopedResponseField(scopedTranslation, {
+      description: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.fields.description",
         schema: z.string().optional(),
       }),
-      host: scopedResponseField(scopedTranslation, {
+      host: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.host",
         schema: z.string(),
       }),
-      port: scopedResponseField(scopedTranslation, {
+      port: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.port",
         schema: z.coerce.number().int(),
       }),
-      securityType: scopedResponseField(scopedTranslation, {
+      securityType: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "response.account.securityType",
         schema: z.enum(SmtpSecurityType),
       }),
-      username: scopedResponseField(scopedTranslation, {
+      username: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.username",
         schema: z.string(),
       }),
-      fromEmail: scopedResponseField(scopedTranslation, {
+      fromEmail: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.fromEmail",
         schema: z.email(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "response.account.status",
         schema: z.enum(SmtpAccountStatus),
       }),
-      healthCheckStatus: scopedResponseField(scopedTranslation, {
+      healthCheckStatus: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "response.account.healthCheckStatus",
         schema: z.enum(SmtpHealthStatus).nullable(),
       }),
-      priority: scopedResponseField(scopedTranslation, {
+      priority: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.priority",
         schema: z.coerce.number().int().optional(),
       }),
-      totalEmailsSent: scopedResponseField(scopedTranslation, {
+      totalEmailsSent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.totalEmailsSent",
         schema: z.coerce.number().int(),
       }),
-      lastUsedAt: scopedResponseField(scopedTranslation, {
+      lastUsedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.lastUsedAt",
         schema: dateSchema.nullable(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.createdAt",
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.updatedAt",
         schema: dateSchema,
       }),
-      campaignTypes: scopedResponseField(scopedTranslation, {
+      campaignTypes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.campaignTypes",
         schema: z.array(z.enum(CampaignType)).optional(),
       }),
-      emailJourneyVariants: scopedResponseField(scopedTranslation, {
+      emailJourneyVariants: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.emailJourneyVariants",
         schema: z.array(z.enum(EmailJourneyVariant)).optional(),
       }),
-      emailCampaignStages: scopedResponseField(scopedTranslation, {
+      emailCampaignStages: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.emailCampaignStages",
         schema: z.array(z.enum(EmailCampaignStage)).optional(),
       }),
-      countries: scopedResponseField(scopedTranslation, {
+      countries: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.countries",
         schema: z.array(z.enum(Countries)).optional(),
       }),
-      languages: scopedResponseField(scopedTranslation, {
+      languages: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.account.languages",
         schema: z.array(z.enum(Languages)).optional(),
@@ -271,12 +271,12 @@ const { PUT } = createEndpoint({
     render: SmtpEditContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === URL PARAMETER ===
-      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
+      id: requestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.id.label",
@@ -285,7 +285,7 @@ const { PUT } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      name: scopedRequestResponseField(scopedTranslation, {
+      name: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.name.label",
@@ -295,7 +295,7 @@ const { PUT } = createEndpoint({
         schema: z.string().min(1).optional(),
       }),
 
-      description: scopedRequestResponseField(scopedTranslation, {
+      description: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "fields.description.label",
@@ -305,7 +305,7 @@ const { PUT } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      host: scopedRequestResponseField(scopedTranslation, {
+      host: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.host.label",
@@ -315,7 +315,7 @@ const { PUT } = createEndpoint({
         schema: z.string().min(1).optional(),
       }),
 
-      port: scopedRequestResponseField(scopedTranslation, {
+      port: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.port.label",
@@ -325,7 +325,7 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().min(1).max(65535).optional(),
       }),
 
-      securityType: scopedRequestResponseField(scopedTranslation, {
+      securityType: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.securityType.label",
@@ -336,7 +336,7 @@ const { PUT } = createEndpoint({
         schema: z.enum(SmtpSecurityType).optional(),
       }),
 
-      username: scopedRequestResponseField(scopedTranslation, {
+      username: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.username.label",
@@ -346,7 +346,7 @@ const { PUT } = createEndpoint({
         schema: z.string().min(1).optional(),
       }),
 
-      password: scopedRequestField(scopedTranslation, {
+      password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "fields.password.label",
@@ -357,7 +357,7 @@ const { PUT } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      fromEmail: scopedRequestResponseField(scopedTranslation, {
+      fromEmail: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "fields.fromEmail.label",
@@ -367,7 +367,7 @@ const { PUT } = createEndpoint({
         schema: z.email().optional(),
       }),
 
-      priority: scopedRequestResponseField(scopedTranslation, {
+      priority: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.priority.label",
@@ -377,7 +377,7 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().int().min(1).max(100).optional(),
       }),
 
-      campaignTypes: scopedRequestResponseField(scopedTranslation, {
+      campaignTypes: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.campaignTypes.label",
@@ -388,7 +388,7 @@ const { PUT } = createEndpoint({
         schema: z.array(z.enum(CampaignType)).optional(),
       }),
 
-      emailJourneyVariants: scopedRequestResponseField(scopedTranslation, {
+      emailJourneyVariants: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.emailJourneyVariants.label",
@@ -399,7 +399,7 @@ const { PUT } = createEndpoint({
         schema: z.array(z.enum(EmailJourneyVariant)).optional(),
       }),
 
-      emailCampaignStages: scopedRequestResponseField(scopedTranslation, {
+      emailCampaignStages: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.emailCampaignStages.label",
@@ -410,7 +410,7 @@ const { PUT } = createEndpoint({
         schema: z.array(z.enum(EmailCampaignStage)).optional(),
       }),
 
-      countries: scopedRequestResponseField(scopedTranslation, {
+      countries: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.countries.label",
@@ -421,7 +421,7 @@ const { PUT } = createEndpoint({
         schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
       }),
 
-      languages: scopedRequestResponseField(scopedTranslation, {
+      languages: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.languages.label",

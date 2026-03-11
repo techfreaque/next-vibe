@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -79,7 +79,7 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
     description: "post.container.description",
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST ===
-      threadId: scopedRequestField(scopedTranslation, {
+      threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.threadId.label",
@@ -96,7 +96,7 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      cancelled: scopedResponseField(scopedTranslation, {
+      cancelled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.cancelled",
         schema: z.boolean(),

@@ -323,7 +323,10 @@ class EnvGeneratorRepositoryImpl {
         // Skip gracefully if files don't exist (e.g. inside Docker build context)
         const { existsSync } = await import("node:fs");
         const dockerfilePath = join(process.cwd(), "Dockerfile");
-        const dockerComposePath = join(process.cwd(), "docker-compose.prod.yml");
+        const dockerComposePath = join(
+          process.cwd(),
+          "docker-compose.prod.yml",
+        );
         if (existsSync(dockerfilePath)) {
           await this.updateDockerfile(dockerfilePath, envKeys);
         }

@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
       },
     },
   },
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      command: scopedRequestField(scopedTranslation, {
+      command: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.command.label",
@@ -112,7 +112,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).describe("Docker command to execute"),
       }),
-      options: scopedRequestField(scopedTranslation, {
+      options: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "fields.options.label",
@@ -138,19 +138,19 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success.label",
         schema: z
           .boolean()
           .describe("Whether the command executed successfully"),
       }),
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.output.label",
         schema: z.string().describe("Command output"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.error.label",
         schema: z

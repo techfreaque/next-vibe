@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayOptionalFieldNew,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayOptionalField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -54,7 +54,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         content: "title",
         level: 1,
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
         usage: { request: "data" },
       }),
 
-      fix: scopedRequestField(scopedTranslation, {
+      fix: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.fix.label",
@@ -71,7 +71,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      timeout: scopedRequestField(scopedTranslation, {
+      timeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.timeoutSeconds.label",
@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(36000).optional(),
       }),
 
-      paths: scopedRequestField(scopedTranslation, {
+      paths: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TAGS,
         label: "fields.paths.label",
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.limit.label",
@@ -106,7 +106,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).optional(),
       }),
 
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.page.label",
@@ -115,7 +115,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).optional().default(1),
       }),
 
-      filter: scopedRequestField(scopedTranslation, {
+      filter: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.filter.label",
@@ -125,7 +125,7 @@ const { POST } = createEndpoint({
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
-      summaryOnly: scopedRequestField(scopedTranslation, {
+      summaryOnly: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.summaryOnly.label",
@@ -134,7 +134,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      extensive: scopedRequestField(scopedTranslation, {
+      extensive: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.extensive.label",
@@ -144,40 +144,40 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      editorUriSchema: scopedResponseField(scopedTranslation, {
+      editorUriSchema: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().optional(),
       }),
 
-      items: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+      items: responseArrayOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           layoutType: LayoutType.STACKED,
           columns: 12,
           children: {
-            file: scopedResponseField(scopedTranslation, {
+            file: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.string(),
             }),
-            line: scopedResponseField(scopedTranslation, {
+            line: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.coerce.number().optional(),
             }),
-            column: scopedResponseField(scopedTranslation, {
+            column: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.coerce.number().optional(),
             }),
-            rule: scopedResponseField(scopedTranslation, {
+            rule: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.string().optional(),
             }),
-            severity: scopedResponseField(scopedTranslation, {
+            severity: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.enum(["error", "warning", "info"]),
             }),
-            message: scopedResponseField(scopedTranslation, {
+            message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.string(),
             }),
@@ -185,27 +185,27 @@ const { POST } = createEndpoint({
         }),
       }),
 
-      files: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+      files: responseArrayOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           layoutType: LayoutType.STACKED,
           columns: 12,
           children: {
-            file: scopedResponseField(scopedTranslation, {
+            file: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.string(),
             }),
-            errors: scopedResponseField(scopedTranslation, {
+            errors: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.number(),
             }),
-            warnings: scopedResponseField(scopedTranslation, {
+            warnings: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.number(),
             }),
-            total: scopedResponseField(scopedTranslation, {
+            total: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.number(),
             }),
@@ -214,43 +214,43 @@ const { POST } = createEndpoint({
       }),
 
       // Summary (flat)
-      totalIssues: scopedResponseField(scopedTranslation, {
+      totalIssues: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      totalFiles: scopedResponseField(scopedTranslation, {
+      totalFiles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      totalErrors: scopedResponseField(scopedTranslation, {
+      totalErrors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      filteredIssues: scopedResponseField(scopedTranslation, {
+      filteredIssues: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      filteredFiles: scopedResponseField(scopedTranslation, {
+      filteredFiles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      displayedIssues: scopedResponseField(scopedTranslation, {
+      displayedIssues: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      displayedFiles: scopedResponseField(scopedTranslation, {
+      displayedFiles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      truncatedMessage: scopedResponseField(scopedTranslation, {
+      truncatedMessage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().optional(),
       }),
-      currentPage: scopedResponseField(scopedTranslation, {
+      currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),
-      totalPages: scopedResponseField(scopedTranslation, {
+      totalPages: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number().optional(),
       }),

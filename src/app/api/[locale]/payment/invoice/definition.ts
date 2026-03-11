@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title" as const,
     description: "post.form.description" as const,
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // REQUEST FIELDS
-      customerId: scopedRequestField(scopedTranslation, {
+      customerId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "customerId.label" as const,
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      amount: scopedRequestField(scopedTranslation, {
+      amount: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "amount.label" as const,
@@ -70,7 +70,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(0.01),
       }),
 
-      currency: scopedRequestField(scopedTranslation, {
+      currency: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "currency.label" as const,
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         schema: z.enum(["USD", "EUR", "PLN"]),
       }),
 
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "description.label" as const,
@@ -104,7 +104,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      dueDate: scopedRequestField(scopedTranslation, {
+      dueDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "dueDate.label" as const,
@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      metadata: scopedRequestField(scopedTranslation, {
+      metadata: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "metadata.label" as const,
@@ -125,19 +125,19 @@ const { POST } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
-      invoice: scopedObjectFieldNew(scopedTranslation, {
+      invoice: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.response.invoice.title" as const,
         description: "post.response.invoice.description" as const,
@@ -145,67 +145,67 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.id" as const,
             schema: z.uuid(),
           }),
-          userId: scopedResponseField(scopedTranslation, {
+          userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.userId" as const,
             schema: z.uuid(),
           }),
-          stripeInvoiceId: scopedResponseField(scopedTranslation, {
+          stripeInvoiceId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.stripeInvoiceId" as const,
             schema: z.string(),
           }),
-          invoiceNumber: scopedResponseField(scopedTranslation, {
+          invoiceNumber: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.invoiceNumber" as const,
             schema: z.string(),
           }),
-          amount: scopedResponseField(scopedTranslation, {
+          amount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.amount" as const,
             schema: z.coerce.number(),
           }),
-          currency: scopedResponseField(scopedTranslation, {
+          currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.currency" as const,
             schema: z.string(),
           }),
-          status: scopedResponseField(scopedTranslation, {
+          status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.status" as const,
             schema: z.enum(InvoiceStatus),
           }),
-          invoiceUrl: scopedResponseField(scopedTranslation, {
+          invoiceUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.invoiceUrl" as const,
             schema: z.string().url(),
           }),
-          invoicePdf: scopedResponseField(scopedTranslation, {
+          invoicePdf: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.invoicePdf" as const,
             schema: z.string().url(),
           }),
-          dueDate: scopedResponseField(scopedTranslation, {
+          dueDate: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.dueDate" as const,
             schema: z.string(),
           }),
-          paidAt: scopedResponseField(scopedTranslation, {
+          paidAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.paidAt" as const,
             schema: z.string().nullable().optional(),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.createdAt" as const,
             schema: z.string(),
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.invoice.updatedAt" as const,
             schema: z.string(),

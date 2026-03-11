@@ -7,11 +7,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  requestUrlPathParamsField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
     render: BacktestWidget,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.fields.id.label",
@@ -54,21 +54,21 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().uuid(),
       }),
-      rangeFrom: scopedRequestField(scopedTranslation, {
+      rangeFrom: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.rangeFrom.label",
         description: "post.fields.rangeFrom.description",
         schema: z.string().datetime(),
       }),
-      rangeTo: scopedRequestField(scopedTranslation, {
+      rangeTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.rangeTo.label",
         description: "post.fields.rangeTo.description",
         schema: z.string().datetime(),
       }),
-      resolution: scopedRequestField(scopedTranslation, {
+      resolution: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.fields.resolution.label",
@@ -76,19 +76,19 @@ const { POST } = createEndpoint({
         options: GraphResolutionOptions,
         schema: z.enum(GraphResolutionDB),
       }),
-      runId: scopedResponseField(scopedTranslation, {
+      runId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.runId",
         schema: z.string(),
       }),
-      eligible: scopedResponseField(scopedTranslation, {
+      eligible: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.eligible",
         schema: z.boolean(),
       }),
-      ineligibleNodes: scopedResponseArrayFieldNew(scopedTranslation, {
+      ineligibleNodes: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedResponseField(scopedTranslation, {
+        child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
           content: "post.response.ineligibleNodes",
           schema: z.string(),

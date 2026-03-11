@@ -14,10 +14,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
@@ -35,7 +35,7 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.userAuth",
   tags: ["validate.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "validate.title",
     description: "validate.description",
@@ -44,7 +44,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === TOKEN VALIDATION ===
-      tokenInput: scopedObjectFieldNew(scopedTranslation, {
+      tokenInput: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "validate.groups.tokenInput.title",
         description: "validate.groups.tokenInput.description",
@@ -52,7 +52,7 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
         children: {
-          token: scopedRequestField(scopedTranslation, {
+          token: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "validate.fields.token.label",
@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "validate.response.title",
         description: "validate.response.description",
@@ -76,27 +76,27 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          valid: scopedResponseField(scopedTranslation, {
+          valid: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "validate.response.valid",
             schema: z.boolean(),
           }),
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "validate.response.message",
             schema: z.string(),
           }),
-          userId: scopedResponseField(scopedTranslation, {
+          userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "validate.response.userId",
             schema: z.uuid().optional(),
           }),
-          expiresAt: scopedResponseField(scopedTranslation, {
+          expiresAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "validate.response.expiresAt",
             schema: z.string().optional(),
           }),
-          nextSteps: scopedResponseField(scopedTranslation, {
+          nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "validate.response.nextSteps.item",
             schema: z.array(z.string()),

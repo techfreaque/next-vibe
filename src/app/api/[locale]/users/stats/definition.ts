@@ -16,13 +16,13 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedObjectOptionalField,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  objectOptionalField,
+  requestField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -69,19 +69,19 @@ const { GET } = createEndpoint({
     render: UsersStatsContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 3.5,
         usage: { request: "data" },
       }),
 
       // === BASIC FILTERS ===
-      basicFilters: scopedObjectOptionalField(scopedTranslation, {
+      basicFilters: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "basicFilters.title" as const,
         description: "basicFilters.description" as const,
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { request: "data" },
         children: {
-          search: scopedRequestField(scopedTranslation, {
+          search: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "fields.search.label" as const,
@@ -101,7 +101,7 @@ const { GET } = createEndpoint({
             columns: 12,
             schema: z.string().optional(),
           }),
-          status: scopedRequestField(scopedTranslation, {
+          status: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.status.label" as const,
@@ -110,7 +110,7 @@ const { GET } = createEndpoint({
             columns: 6,
             schema: z.enum(UserStatusFilter).default(UserStatusFilter.ALL),
           }),
-          role: scopedRequestField(scopedTranslation, {
+          role: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.role.label" as const,
@@ -123,7 +123,7 @@ const { GET } = createEndpoint({
       }),
 
       // === SUBSCRIPTION FILTERS ===
-      subscriptionFilters: scopedObjectOptionalField(scopedTranslation, {
+      subscriptionFilters: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "subscriptionFilters.title" as const,
         description: "subscriptionFilters.description" as const,
@@ -133,7 +133,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { request: "data" },
         children: {
-          subscriptionStatus: scopedRequestField(scopedTranslation, {
+          subscriptionStatus: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.subscriptionStatus.label" as const,
@@ -144,7 +144,7 @@ const { GET } = createEndpoint({
               .enum(SubscriptionStatusFilter)
               .default(SubscriptionStatusFilter.ALL),
           }),
-          paymentMethod: scopedRequestField(scopedTranslation, {
+          paymentMethod: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.paymentMethod.label" as const,
@@ -159,7 +159,7 @@ const { GET } = createEndpoint({
       }),
 
       // === LOCATION FILTERS ===
-      locationFilters: scopedObjectOptionalField(scopedTranslation, {
+      locationFilters: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "locationFilters.title" as const,
         description: "locationFilters.description" as const,
@@ -169,7 +169,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { request: "data" },
         children: {
-          country: scopedRequestField(scopedTranslation, {
+          country: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.country.label" as const,
@@ -179,7 +179,7 @@ const { GET } = createEndpoint({
             columns: 6,
             schema: z.enum(Countries).optional(),
           }),
-          language: scopedRequestField(scopedTranslation, {
+          language: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.language.label" as const,
@@ -193,7 +193,7 @@ const { GET } = createEndpoint({
       }),
 
       // === TIME PERIOD OPTIONS ===
-      timePeriodOptions: scopedObjectOptionalField(scopedTranslation, {
+      timePeriodOptions: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "timePeriodOptions.title" as const,
         description: "timePeriodOptions.description" as const,
@@ -204,7 +204,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { request: "data" },
         children: {
-          timePeriod: scopedRequestField(scopedTranslation, {
+          timePeriod: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.timePeriod.label" as const,
@@ -213,7 +213,7 @@ const { GET } = createEndpoint({
             columns: 3,
             schema: z.enum(TimePeriod).default(TimePeriod.DAY),
           }),
-          dateRangePreset: scopedRequestField(scopedTranslation, {
+          dateRangePreset: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.dateRangePreset.label" as const,
@@ -224,7 +224,7 @@ const { GET } = createEndpoint({
               .enum(DateRangePreset)
               .default(DateRangePreset.LAST_30_DAYS),
           }),
-          chartType: scopedRequestField(scopedTranslation, {
+          chartType: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.chartType.label" as const,
@@ -233,7 +233,7 @@ const { GET } = createEndpoint({
             columns: 3,
             schema: z.enum(ChartType).default(ChartType.LINE),
           }),
-          includeComparison: scopedRequestField(scopedTranslation, {
+          includeComparison: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "fields.includeComparison.label" as const,
@@ -245,7 +245,7 @@ const { GET } = createEndpoint({
       }),
 
       // === OVERVIEW STATISTICS ===
-      overviewStats: scopedObjectFieldNew(scopedTranslation, {
+      overviewStats: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.overviewStats.title" as const,
         description: "response.overviewStats.description" as const,
@@ -256,7 +256,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { response: true },
         children: {
-          totalUsers: scopedResponseField(scopedTranslation, {
+          totalUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.overviewStats.totalUsers.label" as const,
             icon: "users",
@@ -266,7 +266,7 @@ const { GET } = createEndpoint({
               .number()
               .describe("Total number of users in system"),
           }),
-          activeUsers: scopedResponseField(scopedTranslation, {
+          activeUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.overviewStats.activeUsers.label" as const,
             icon: "check",
@@ -274,7 +274,7 @@ const { GET } = createEndpoint({
             format: "compact",
             schema: z.coerce.number().describe("Number of active users"),
           }),
-          inactiveUsers: scopedResponseField(scopedTranslation, {
+          inactiveUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.overviewStats.inactiveUsers.label" as const,
             icon: "alert-circle",
@@ -282,7 +282,7 @@ const { GET } = createEndpoint({
             format: "compact",
             schema: z.coerce.number().describe("Number of inactive users"),
           }),
-          newUsers: scopedResponseField(scopedTranslation, {
+          newUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.overviewStats.newUsers.label" as const,
             icon: "trending-up",
@@ -294,7 +294,7 @@ const { GET } = createEndpoint({
       }),
 
       // === EMAIL VERIFICATION STATISTICS ===
-      emailStats: scopedObjectFieldNew(scopedTranslation, {
+      emailStats: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.emailStats.title" as const,
         description: "response.emailStats.description" as const,
@@ -305,7 +305,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { response: true },
         children: {
-          emailVerifiedUsers: scopedResponseField(scopedTranslation, {
+          emailVerifiedUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.emailStats.emailVerifiedUsers.label" as const,
             icon: "check-circle",
@@ -313,7 +313,7 @@ const { GET } = createEndpoint({
             format: "compact",
             schema: z.coerce.number().describe("Users with verified emails"),
           }),
-          emailUnverifiedUsers: scopedResponseField(scopedTranslation, {
+          emailUnverifiedUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.emailStats.emailUnverifiedUsers.label" as const,
             icon: "x-circle",
@@ -321,7 +321,7 @@ const { GET } = createEndpoint({
             format: "compact",
             schema: z.coerce.number().describe("Users with unverified emails"),
           }),
-          verificationRate: scopedResponseField(scopedTranslation, {
+          verificationRate: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.emailStats.verificationRate.label" as const,
             icon: "activity",
@@ -335,7 +335,7 @@ const { GET } = createEndpoint({
       }),
 
       // === SUBSCRIPTION STATISTICS ===
-      subscriptionStats: scopedObjectFieldNew(scopedTranslation, {
+      subscriptionStats: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.subscriptionStats.title" as const,
         description: "response.subscriptionStats.description" as const,
@@ -346,7 +346,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { response: true },
         children: {
-          activeSubscriptions: scopedResponseField(scopedTranslation, {
+          activeSubscriptions: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label:
               "response.subscriptionStats.activeSubscriptions.label" as const,
@@ -357,7 +357,7 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with active subscriptions"),
           }),
-          canceledSubscriptions: scopedResponseField(scopedTranslation, {
+          canceledSubscriptions: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label:
               "response.subscriptionStats.canceledSubscriptions.label" as const,
@@ -368,7 +368,7 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with canceled subscriptions"),
           }),
-          expiredSubscriptions: scopedResponseField(scopedTranslation, {
+          expiredSubscriptions: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label:
               "response.subscriptionStats.expiredSubscriptions.label" as const,
@@ -379,7 +379,7 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with expired subscriptions"),
           }),
-          noSubscription: scopedResponseField(scopedTranslation, {
+          noSubscription: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.subscriptionStats.noSubscription.label" as const,
             icon: "users",
@@ -389,7 +389,7 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users without any subscription"),
           }),
-          subscriptionChart: scopedResponseField(scopedTranslation, {
+          subscriptionChart: responseField(scopedTranslation, {
             type: WidgetType.CHART,
             chartType: "pie",
             label:
@@ -413,7 +413,7 @@ const { GET } = createEndpoint({
       }),
 
       // === PAYMENT STATISTICS ===
-      paymentStats: scopedObjectFieldNew(scopedTranslation, {
+      paymentStats: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.paymentStats.title" as const,
         description: "response.paymentStats.description" as const,
@@ -424,7 +424,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { response: true },
         children: {
-          totalRevenue: scopedResponseField(scopedTranslation, {
+          totalRevenue: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.paymentStats.totalRevenue.label" as const,
             icon: "dollar-sign",
@@ -432,7 +432,7 @@ const { GET } = createEndpoint({
             format: "currency",
             schema: z.coerce.number().describe("Total revenue in cents"),
           }),
-          transactionCount: scopedResponseField(scopedTranslation, {
+          transactionCount: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.paymentStats.transactionCount.label" as const,
             icon: "receipt",
@@ -440,7 +440,7 @@ const { GET } = createEndpoint({
             format: "compact",
             schema: z.coerce.number().describe("Total number of transactions"),
           }),
-          averageOrderValue: scopedResponseField(scopedTranslation, {
+          averageOrderValue: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.paymentStats.averageOrderValue.label" as const,
             icon: "trending-up",
@@ -448,7 +448,7 @@ const { GET } = createEndpoint({
             format: "currency",
             schema: z.coerce.number().describe("Average order value in cents"),
           }),
-          refundRate: scopedResponseField(scopedTranslation, {
+          refundRate: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.paymentStats.refundRate.label" as const,
             icon: "refresh-cw",
@@ -460,7 +460,7 @@ const { GET } = createEndpoint({
       }),
 
       // === ROLE DISTRIBUTION ===
-      roleDistribution: scopedObjectFieldNew(scopedTranslation, {
+      roleDistribution: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.roleStats.title" as const,
         description: "response.roleStats.description" as const,
@@ -471,7 +471,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { response: true },
         children: {
-          publicUsers: scopedResponseField(scopedTranslation, {
+          publicUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.roleStats.publicUsers.label" as const,
             icon: "users",
@@ -479,7 +479,7 @@ const { GET } = createEndpoint({
             size: "sm",
             schema: z.coerce.number().describe("Users with public role"),
           }),
-          customerUsers: scopedResponseField(scopedTranslation, {
+          customerUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.roleStats.customerUsers.label" as const,
             icon: "users",
@@ -487,7 +487,7 @@ const { GET } = createEndpoint({
             size: "sm",
             schema: z.coerce.number().describe("Users with customer role"),
           }),
-          partnerAdminUsers: scopedResponseField(scopedTranslation, {
+          partnerAdminUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.roleStats.partnerAdminUsers.label" as const,
             icon: "users",
@@ -495,7 +495,7 @@ const { GET } = createEndpoint({
             size: "sm",
             schema: z.coerce.number().describe("Users with partner admin role"),
           }),
-          partnerEmployeeUsers: scopedResponseField(scopedTranslation, {
+          partnerEmployeeUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.roleStats.partnerEmployeeUsers.label" as const,
             icon: "users",
@@ -505,7 +505,7 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with partner employee role"),
           }),
-          adminUsers: scopedResponseField(scopedTranslation, {
+          adminUsers: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "response.roleStats.adminUsers.label" as const,
             icon: "star",
@@ -513,7 +513,7 @@ const { GET } = createEndpoint({
             size: "sm",
             schema: z.coerce.number().describe("Users with admin role"),
           }),
-          roleChart: scopedResponseField(scopedTranslation, {
+          roleChart: responseField(scopedTranslation, {
             type: WidgetType.CHART,
             chartType: "pie",
             label: "response.roleStats.roleChart.label" as const,
@@ -535,7 +535,7 @@ const { GET } = createEndpoint({
       }),
 
       // === GROWTH METRICS ===
-      growthMetrics: scopedObjectFieldNew(scopedTranslation, {
+      growthMetrics: objectField(scopedTranslation, {
         title: "response.growthMetrics.title" as const,
         description: "response.growthMetrics.description" as const,
         type: WidgetType.CONTAINER,
@@ -545,7 +545,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { response: true },
         children: {
-          timeSeriesData: scopedObjectFieldNew(scopedTranslation, {
+          timeSeriesData: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "response.timeStats.title" as const,
             description: "response.timeStats.description" as const,
@@ -555,7 +555,7 @@ const { GET } = createEndpoint({
             showSubmitButton: false,
             usage: { response: true },
             children: {
-              usersCreatedToday: scopedResponseField(scopedTranslation, {
+              usersCreatedToday: responseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label: "response.timeStats.usersCreatedToday.label" as const,
                 icon: "clock",
@@ -563,7 +563,7 @@ const { GET } = createEndpoint({
                 size: "sm",
                 schema: z.coerce.number().describe("Users created today"),
               }),
-              usersCreatedThisWeek: scopedResponseField(scopedTranslation, {
+              usersCreatedThisWeek: responseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label: "response.timeStats.usersCreatedThisWeek.label" as const,
                 icon: "clock",
@@ -571,7 +571,7 @@ const { GET } = createEndpoint({
                 size: "sm",
                 schema: z.coerce.number().describe("Users created this week"),
               }),
-              usersCreatedThisMonth: scopedResponseField(scopedTranslation, {
+              usersCreatedThisMonth: responseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label:
                   "response.timeStats.usersCreatedThisMonth.label" as const,
@@ -580,7 +580,7 @@ const { GET } = createEndpoint({
                 size: "sm",
                 schema: z.coerce.number().describe("Users created this month"),
               }),
-              usersCreatedLastMonth: scopedResponseField(scopedTranslation, {
+              usersCreatedLastMonth: responseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label:
                   "response.timeStats.usersCreatedLastMonth.label" as const,
@@ -591,7 +591,7 @@ const { GET } = createEndpoint({
               }),
             },
           }),
-          performanceRates: scopedObjectFieldNew(scopedTranslation, {
+          performanceRates: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "response.performanceRates.title" as const,
             description: "response.performanceRates.description" as const,
@@ -601,7 +601,7 @@ const { GET } = createEndpoint({
             showSubmitButton: false,
             usage: { response: true },
             children: {
-              growthRate: scopedResponseField(scopedTranslation, {
+              growthRate: responseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label: "response.performanceRates.growthRate.label" as const,
                 icon: "trending-up",
@@ -611,7 +611,7 @@ const { GET } = createEndpoint({
                   .number()
                   .describe("User growth rate percentage (0-1)"),
               }),
-              leadToUserConversionRate: scopedResponseField(scopedTranslation, {
+              leadToUserConversionRate: responseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label:
                   "response.performanceRates.leadToUserConversionRate.label" as const,
@@ -622,7 +622,7 @@ const { GET } = createEndpoint({
                   .number()
                   .describe("Lead to user conversion rate (0-1)"),
               }),
-              retentionRate: scopedResponseField(scopedTranslation, {
+              retentionRate: responseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label: "response.performanceRates.retentionRate.label" as const,
                 icon: "users",
@@ -632,7 +632,7 @@ const { GET } = createEndpoint({
               }),
             },
           }),
-          growthChart: scopedResponseField(scopedTranslation, {
+          growthChart: responseField(scopedTranslation, {
             type: WidgetType.CHART,
             chartType: "bar",
             label: "response.growthMetrics.growthChart.label" as const,
@@ -657,7 +657,7 @@ const { GET } = createEndpoint({
       }),
 
       // === BUSINESS INSIGHTS ===
-      businessInsights: scopedObjectFieldNew(scopedTranslation, {
+      businessInsights: objectField(scopedTranslation, {
         title: "response.businessInsights.title" as const,
         description: "response.businessInsights.description" as const,
         type: WidgetType.CONTAINER,
@@ -667,7 +667,7 @@ const { GET } = createEndpoint({
         showSubmitButton: false,
         usage: { response: true },
         children: {
-          generatedAt: scopedResponseField(scopedTranslation, {
+          generatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             fieldType: FieldDataType.DATETIME,
             label: "response.businessInsights.generatedAt.label" as const,

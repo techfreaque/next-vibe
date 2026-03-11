@@ -3,9 +3,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -32,38 +32,38 @@ export const { GET } = createEndpoint({
     render: SessionReadContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      sessionId: scopedRequestField(scopedTranslation, {
+      sessionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "session.read.get.fields.sessionId.label" as const,
         description: "session.read.get.fields.sessionId.description" as const,
         schema: z.string(),
       }),
-      waitMs: scopedRequestField(scopedTranslation, {
+      waitMs: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "session.read.get.fields.waitMs.label" as const,
         description: "session.read.get.fields.waitMs.description" as const,
         schema: z.coerce.number().min(0).max(5000).optional(),
       }),
-      maxBytes: scopedRequestField(scopedTranslation, {
+      maxBytes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "session.read.get.fields.maxBytes.label" as const,
         description: "session.read.get.fields.maxBytes.description" as const,
         schema: z.coerce.number().min(1).max(65536).optional(),
       }),
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.read.get.response.output.title" as const,
         schema: z.string(),
       }),
-      eof: scopedResponseField(scopedTranslation, {
+      eof: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.read.get.response.eof.title" as const,
         schema: z.boolean(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.read.get.response.status.title" as const,
         schema: z.string(),

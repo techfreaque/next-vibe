@@ -8,11 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -31,63 +31,63 @@ import { JourneyVariantsWidget } from "./widget";
 
 // ── Shared item schema ────────────────────────────────────────────────────────
 
-const variantItemSchema = scopedObjectFieldNew(scopedTranslation, {
+const variantItemSchema = objectField(scopedTranslation, {
   type: WidgetType.CONTAINER,
   layoutType: LayoutType.GRID,
   columns: 12,
   usage: { response: true },
   children: {
-    id: scopedResponseField(scopedTranslation, {
+    id: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.id",
       schema: z.string(),
     }),
-    variantKey: scopedResponseField(scopedTranslation, {
+    variantKey: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.variantKey",
       schema: z.string(),
     }),
-    displayName: scopedResponseField(scopedTranslation, {
+    displayName: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.displayName",
       schema: z.string(),
     }),
-    description: scopedResponseField(scopedTranslation, {
+    description: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.description",
       schema: z.string().nullable(),
     }),
-    weight: scopedResponseField(scopedTranslation, {
+    weight: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.weight",
       schema: z.number(),
     }),
-    active: scopedResponseField(scopedTranslation, {
+    active: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.active",
       schema: z.boolean(),
     }),
-    campaignType: scopedResponseField(scopedTranslation, {
+    campaignType: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.campaignType",
       schema: z.string().nullable(),
     }),
-    sourceFilePath: scopedResponseField(scopedTranslation, {
+    sourceFilePath: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.sourceFilePath",
       schema: z.string().nullable(),
     }),
-    checkErrors: scopedResponseField(scopedTranslation, {
+    checkErrors: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.checkErrors",
       schema: z.array(z.string()),
     }),
-    createdAt: scopedResponseField(scopedTranslation, {
+    createdAt: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.createdAt",
       schema: z.string(),
     }),
-    updatedAt: scopedResponseField(scopedTranslation, {
+    updatedAt: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.updatedAt",
       schema: z.string(),
@@ -112,12 +112,12 @@ const { GET } = createEndpoint({
     render: JourneyVariantsWidget,
     usage: { response: true } as const,
     children: {
-      total: scopedResponseField(scopedTranslation, {
+      total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.total",
         schema: z.number(),
       }),
-      items: scopedResponseArrayFieldNew(scopedTranslation, {
+      items: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.items",
         description: "get.response.items",
@@ -192,7 +192,7 @@ const { POST } = createEndpoint({
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.title",
     description: "post.description",
@@ -200,7 +200,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      variantKey: scopedRequestField(scopedTranslation, {
+      variantKey: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.variantKey.label",
@@ -215,7 +215,7 @@ const { POST } = createEndpoint({
             "Must be uppercase letters, digits and underscores",
           ),
       }),
-      displayName: scopedRequestField(scopedTranslation, {
+      displayName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.displayName.label",
@@ -223,7 +223,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().min(2).max(100),
       }),
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.description.label",
@@ -231,7 +231,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().max(500).optional(),
       }),
-      weight: scopedRequestField(scopedTranslation, {
+      weight: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.weight.label",
@@ -239,7 +239,7 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.number().int().min(1).max(100).default(33),
       }),
-      campaignType: scopedRequestField(scopedTranslation, {
+      campaignType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.fields.campaignType.label",
@@ -248,7 +248,7 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.enum(CampaignTypeDB).optional(),
       }),
-      sourceFilePath: scopedRequestField(scopedTranslation, {
+      sourceFilePath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.sourceFilePath.label",
@@ -258,22 +258,22 @@ const { POST } = createEndpoint({
       }),
 
       // Response — the created record
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.id",
         schema: z.string(),
       }),
-      active: scopedResponseField(scopedTranslation, {
+      active: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.active",
         schema: z.boolean(),
       }),
-      checkErrors: scopedResponseField(scopedTranslation, {
+      checkErrors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.checkErrors",
         schema: z.array(z.string()),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.createdAt",
         schema: z.string(),
@@ -355,7 +355,7 @@ const { PATCH } = createEndpoint({
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "patch.title",
     description: "patch.description",
@@ -363,7 +363,7 @@ const { PATCH } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      id: scopedRequestField(scopedTranslation, {
+      id: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.fields.id.label",
@@ -371,7 +371,7 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.string().uuid(),
       }),
-      active: scopedRequestField(scopedTranslation, {
+      active: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.fields.active.label",
@@ -379,7 +379,7 @@ const { PATCH } = createEndpoint({
         columns: 4,
         schema: z.boolean().optional(),
       }),
-      weight: scopedRequestField(scopedTranslation, {
+      weight: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "patch.fields.weight.label",
@@ -387,7 +387,7 @@ const { PATCH } = createEndpoint({
         columns: 4,
         schema: z.number().int().min(1).max(100).optional(),
       }),
-      displayName: scopedRequestField(scopedTranslation, {
+      displayName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.fields.displayName.label",
@@ -395,7 +395,7 @@ const { PATCH } = createEndpoint({
         columns: 4,
         schema: z.string().min(2).max(100).optional(),
       }),
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.fields.description.label",
@@ -405,12 +405,12 @@ const { PATCH } = createEndpoint({
       }),
 
       // Response
-      variantKey: scopedResponseField(scopedTranslation, {
+      variantKey: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.variantKey",
         schema: z.string(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.updatedAt",
         schema: z.string(),

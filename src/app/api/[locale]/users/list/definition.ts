@@ -8,15 +8,15 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedObjectOptionalField,
-  scopedRequestField,
-  scopedRequestResponseField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  objectOptionalField,
+  requestField,
+  requestResponseField,
+  responseArrayField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -61,11 +61,11 @@ const { GET } = createEndpoint({
     render: UsersListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
       // === SEARCH & FILTERS ===
-      searchFilters: scopedObjectOptionalField(scopedTranslation, {
+      searchFilters: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.searchFilters.title" as const,
         description: "get.searchFilters.description" as const,
@@ -74,7 +74,7 @@ const { GET } = createEndpoint({
         order: 1,
         usage: { request: "data" },
         children: {
-          search: scopedRequestField(scopedTranslation, {
+          search: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "get.search.label" as const,
@@ -83,7 +83,7 @@ const { GET } = createEndpoint({
             columns: 12,
             schema: z.string().optional(),
           }),
-          status: scopedRequestField(scopedTranslation, {
+          status: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
             label: "get.status.label" as const,
@@ -93,7 +93,7 @@ const { GET } = createEndpoint({
             columns: 6,
             schema: z.array(z.enum(UserStatusFilter)).optional(),
           }),
-          role: scopedRequestField(scopedTranslation, {
+          role: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
             label: "get.role.label" as const,
@@ -107,7 +107,7 @@ const { GET } = createEndpoint({
       }),
 
       // === SORTING OPTIONS ===
-      sortingOptions: scopedObjectFieldNew(scopedTranslation, {
+      sortingOptions: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.sortingOptions.title" as const,
         description: "get.sortingOptions.description" as const,
@@ -115,7 +115,7 @@ const { GET } = createEndpoint({
         order: 2,
         usage: { request: "data" },
         children: {
-          sortBy: scopedRequestField(scopedTranslation, {
+          sortBy: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "get.sortBy.label" as const,
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
               .optional()
               .default(UserSortField.CREATED_AT),
           }),
-          sortOrder: scopedRequestField(scopedTranslation, {
+          sortOrder: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "get.sortOrder.label" as const,
@@ -142,14 +142,14 @@ const { GET } = createEndpoint({
       }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 2.5,
         usage: { request: "data" },
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.title" as const,
         description: "get.response.description" as const,
@@ -158,53 +158,53 @@ const { GET } = createEndpoint({
         order: 3,
         usage: { response: true },
         children: {
-          users: scopedResponseArrayFieldNew(scopedTranslation, {
+          users: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             columns: 12,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                email: scopedResponseField(scopedTranslation, {
+                email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.users.email" as const,
                   schema: z.string(),
                 }),
-                privateName: scopedResponseField(scopedTranslation, {
+                privateName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.users.privateName" as const,
                   schema: z.string(),
                 }),
-                publicName: scopedResponseField(scopedTranslation, {
+                publicName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.users.publicName" as const,
                   schema: z.string(),
                 }),
-                isActive: scopedResponseField(scopedTranslation, {
+                isActive: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "get.response.users.isActive" as const,
                   schema: z.boolean(),
                 }),
-                emailVerified: scopedResponseField(scopedTranslation, {
+                emailVerified: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "get.response.users.emailVerified" as const,
                   schema: z.boolean(),
                 }),
-                createdAt: scopedResponseField(scopedTranslation, {
+                createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   content: "get.response.users.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
-                updatedAt: scopedResponseField(scopedTranslation, {
+                updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   content: "get.response.users.updatedAt" as const,
                   schema: z.coerce.date(),
                 }),
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.users.id" as const,
                   schema: z.string(),
@@ -216,7 +216,7 @@ const { GET } = createEndpoint({
       }),
 
       // === PAGINATION INFO (Editable controls + display in one row) ===
-      paginationInfo: scopedObjectFieldNew(scopedTranslation, {
+      paginationInfo: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.HORIZONTAL,
         noCard: true,
@@ -224,28 +224,28 @@ const { GET } = createEndpoint({
         order: 4,
         usage: { request: "data", response: true },
         children: {
-          page: scopedRequestResponseField(scopedTranslation, {
+          page: requestResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "get.page.label" as const,
             columns: 3,
             schema: z.coerce.number().optional().default(1),
           }),
-          limit: scopedRequestResponseField(scopedTranslation, {
+          limit: requestResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "get.limit.label" as const,
             columns: 3,
             schema: z.coerce.number().optional().default(20),
           }),
-          totalCount: scopedResponseField(scopedTranslation, {
+          totalCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.totalCount" as const,
             content: "get.response.totalCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
-          pageCount: scopedResponseField(scopedTranslation, {
+          pageCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "get.response.pageCount" as const,
             content: "get.response.pageCount" as const,

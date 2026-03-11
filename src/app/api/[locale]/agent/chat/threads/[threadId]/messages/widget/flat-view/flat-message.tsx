@@ -17,6 +17,7 @@ import {
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -81,7 +82,6 @@ export interface FlatMessageProps {
     content: string,
     attachments: File[],
   ) => Promise<void>;
-  onDeleteMessage: (messageId: string) => void;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
 }
 
@@ -104,12 +104,25 @@ export const FlatMessage = memo(function FlatMessage({
   onRetryMessage,
   onAnswerAsModel,
   onReplyMessage,
-  onDeleteMessage,
   onVoteMessage,
 }: FlatMessageProps): JSX.Element {
   // Navigation state from Zustand store directly
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
+  const { push: navigate } = useWidgetNavigation();
   const { t } = scopedTranslation.scopedT(locale);
+
+  const handleDelete = (): void => {
+    void (async (): Promise<void> => {
+      const messageIdDefs =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      navigate(messageIdDefs.default.DELETE, {
+        urlPathParams: { threadId: message.threadId, messageId: message.id },
+        data: rootFolderId ? { rootFolderId } : undefined,
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
   // simpleT needed for format4chanTimestamp which uses global app.chat.flatView.timestamp.* keys
   const { t: tGlobal } = simpleT(locale);
 
@@ -863,9 +876,7 @@ export const FlatMessage = memo(function FlatMessage({
             <Button
               variant="ghost"
               size="unset"
-              onClick={(): void => {
-                onDeleteMessage(message.id);
-              }}
+              onClick={handleDelete}
               className="px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive/80 transition-all"
               title={t("widget.flatView.actions.deleteMessage")}
             >

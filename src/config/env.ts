@@ -118,7 +118,7 @@ export const {
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     comment: "Cron job secret — generate with: openssl rand -hex 32",
   },
-  VIBE_IS_CLOUD: {
+  NEXT_PUBLIC_VIBE_IS_CLOUD: {
     schema: z
       .string()
       .optional()

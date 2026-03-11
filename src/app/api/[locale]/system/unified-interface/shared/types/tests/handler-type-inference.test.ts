@@ -12,7 +12,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import { objectFieldNew } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -61,11 +61,12 @@ const testPublicOnlyEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { request: "data" },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data" },
+    children: {},
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -119,11 +120,12 @@ const testAdminOnlyEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { request: "data" },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data" },
+    children: {},
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -177,11 +179,12 @@ const testMixedRolesEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { request: "data" },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data" },
+    children: {},
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,

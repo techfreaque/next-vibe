@@ -8,11 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,7 +41,7 @@ const { GET } = createEndpoint({
   icon: "settings",
   tags: ["tags.config" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.title" as const,
     description: "form.description" as const,
@@ -50,187 +50,187 @@ const { GET } = createEndpoint({
     usage: { response: true },
     children: {
       // Host field
-      host: scopedResponseField(scopedTranslation, {
+      host: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.host",
         schema: z.string().min(1),
       }),
 
       // Port field
-      port: scopedResponseField(scopedTranslation, {
+      port: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.port",
         schema: z.coerce.number().int().min(1).max(65535),
       }),
 
       // Username field
-      username: scopedResponseField(scopedTranslation, {
+      username: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.username",
         schema: z.string().min(1),
       }),
 
       // Password field
-      password: scopedResponseField(scopedTranslation, {
+      password: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.password",
         schema: z.string().min(1),
       }),
 
       // TLS field
-      tls: scopedResponseField(scopedTranslation, {
+      tls: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.tls",
         schema: z.boolean(),
       }),
 
       // Auto-reconnect field
-      autoReconnect: scopedResponseField(scopedTranslation, {
+      autoReconnect: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.autoReconnect",
         schema: z.boolean(),
       }),
 
       // Logging level field
-      loggingLevel: scopedResponseField(scopedTranslation, {
+      loggingLevel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.loggingLevel",
         schema: z.enum(ImapLoggingLevel),
       }),
 
       // Server configuration fields
-      serverEnabled: scopedResponseField(scopedTranslation, {
+      serverEnabled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.serverEnabled",
         schema: z.boolean(),
       }),
 
-      maxConnections: scopedResponseField(scopedTranslation, {
+      maxConnections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.maxConnections",
         schema: z.coerce.number().int().min(1),
       }),
 
-      connectionTimeout: scopedResponseField(scopedTranslation, {
+      connectionTimeout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.connectionTimeout",
         schema: z.coerce.number().int().min(1),
       }),
 
-      poolIdleTimeout: scopedResponseField(scopedTranslation, {
+      poolIdleTimeout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.poolIdleTimeout",
         schema: z.coerce.number().int().min(1),
       }),
 
-      keepAlive: scopedResponseField(scopedTranslation, {
+      keepAlive: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.keepAlive",
         schema: z.boolean(),
       }),
 
       // Sync configuration fields
-      syncEnabled: scopedResponseField(scopedTranslation, {
+      syncEnabled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.syncEnabled",
         schema: z.boolean(),
       }),
 
-      syncInterval: scopedResponseField(scopedTranslation, {
+      syncInterval: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.syncInterval",
         schema: z.coerce.number().int().min(1),
       }),
 
-      maxMessages: scopedResponseField(scopedTranslation, {
+      maxMessages: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.maxMessages",
         schema: z.coerce.number().int().min(1),
       }),
 
-      batchSize: scopedResponseField(scopedTranslation, {
+      batchSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.batchSize",
         schema: z.coerce.number().int().min(1),
       }),
 
-      concurrentAccounts: scopedResponseField(scopedTranslation, {
+      concurrentAccounts: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.concurrentAccounts",
         schema: z.coerce.number().int().min(1),
       }),
 
       // Performance configuration fields
-      cacheEnabled: scopedResponseField(scopedTranslation, {
+      cacheEnabled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.cacheEnabled",
         schema: z.boolean(),
       }),
 
-      cacheMaxSize: scopedResponseField(scopedTranslation, {
+      cacheMaxSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.cacheMaxSize",
         schema: z.coerce.number().int().min(1),
       }),
 
-      cacheTtl: scopedResponseField(scopedTranslation, {
+      cacheTtl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.cacheTtl",
         schema: z.coerce.number().int().min(1),
       }),
 
-      memoryThreshold: scopedResponseField(scopedTranslation, {
+      memoryThreshold: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.memoryThreshold",
         schema: z.coerce.number().int().min(1),
       }),
 
       // Resilience configuration fields
-      maxRetries: scopedResponseField(scopedTranslation, {
+      maxRetries: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.maxRetries",
         schema: z.coerce.number().int().min(0),
       }),
 
-      retryDelay: scopedResponseField(scopedTranslation, {
+      retryDelay: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.retryDelay",
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerThreshold: scopedResponseField(scopedTranslation, {
+      circuitBreakerThreshold: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.circuitBreakerThreshold",
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerTimeout: scopedResponseField(scopedTranslation, {
+      circuitBreakerTimeout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.circuitBreakerTimeout",
         schema: z.coerce.number().int().min(1),
       }),
 
       // Monitoring configuration fields
-      healthCheckInterval: scopedResponseField(scopedTranslation, {
+      healthCheckInterval: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.healthCheckInterval",
         schema: z.coerce.number().int().min(1),
       }),
 
-      metricsEnabled: scopedResponseField(scopedTranslation, {
+      metricsEnabled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.metricsEnabled",
         schema: z.boolean(),
       }),
 
       // Development configuration fields
-      debugMode: scopedResponseField(scopedTranslation, {
+      debugMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.debugMode",
         schema: z.boolean(),
       }),
 
-      testMode: scopedResponseField(scopedTranslation, {
+      testMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.testMode",
         schema: z.boolean(),
@@ -368,12 +368,12 @@ const { POST } = createEndpoint({
     render: ImapConfigContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // Host field
-      host: scopedRequestField(scopedTranslation, {
+      host: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "serverEnabled.label",
@@ -384,7 +384,7 @@ const { POST } = createEndpoint({
       }),
 
       // Port field
-      port: scopedRequestField(scopedTranslation, {
+      port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "maxConnections.label",
@@ -395,7 +395,7 @@ const { POST } = createEndpoint({
       }),
 
       // Username field
-      username: scopedRequestField(scopedTranslation, {
+      username: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "accounts.create.username.label",
@@ -406,7 +406,7 @@ const { POST } = createEndpoint({
       }),
 
       // Password field
-      password: scopedRequestField(scopedTranslation, {
+      password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "accounts.create.password.label",
@@ -417,7 +417,7 @@ const { POST } = createEndpoint({
       }),
 
       // TLS field
-      tls: scopedRequestField(scopedTranslation, {
+      tls: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "accounts.create.secure.label",
@@ -427,7 +427,7 @@ const { POST } = createEndpoint({
       }),
 
       // Auto-reconnect field
-      autoReconnect: scopedRequestField(scopedTranslation, {
+      autoReconnect: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "accounts.create.keepAlive.label",
@@ -437,7 +437,7 @@ const { POST } = createEndpoint({
       }),
 
       // Logging level field
-      loggingLevel: scopedRequestField(scopedTranslation, {
+      loggingLevel: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "loggingLevel.label",
@@ -448,7 +448,7 @@ const { POST } = createEndpoint({
       }),
 
       // Server configuration fields
-      serverEnabled: scopedRequestField(scopedTranslation, {
+      serverEnabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "serverEnabled.label",
@@ -457,7 +457,7 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      maxConnections: scopedRequestField(scopedTranslation, {
+      maxConnections: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.maxConnections",
@@ -466,7 +466,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      connectionTimeout: scopedRequestField(scopedTranslation, {
+      connectionTimeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.connectionTimeout",
@@ -475,7 +475,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      poolIdleTimeout: scopedRequestField(scopedTranslation, {
+      poolIdleTimeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.poolIdleTimeout",
@@ -484,7 +484,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      keepAlive: scopedRequestField(scopedTranslation, {
+      keepAlive: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "response.keepAlive",
@@ -494,7 +494,7 @@ const { POST } = createEndpoint({
       }),
 
       // Sync configuration fields
-      syncEnabled: scopedRequestField(scopedTranslation, {
+      syncEnabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "syncEnabled.label",
@@ -503,7 +503,7 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      syncInterval: scopedRequestField(scopedTranslation, {
+      syncInterval: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "syncInterval.label",
@@ -512,7 +512,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      maxMessages: scopedRequestField(scopedTranslation, {
+      maxMessages: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.maxMessages",
@@ -521,7 +521,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      batchSize: scopedRequestField(scopedTranslation, {
+      batchSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.batchSize",
@@ -530,7 +530,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      concurrentAccounts: scopedRequestField(scopedTranslation, {
+      concurrentAccounts: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.concurrentAccounts",
@@ -540,7 +540,7 @@ const { POST } = createEndpoint({
       }),
 
       // Performance configuration fields
-      cacheEnabled: scopedRequestField(scopedTranslation, {
+      cacheEnabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "response.cacheEnabled",
@@ -549,7 +549,7 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      cacheMaxSize: scopedRequestField(scopedTranslation, {
+      cacheMaxSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.cacheMaxSize",
@@ -558,7 +558,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      cacheTtl: scopedRequestField(scopedTranslation, {
+      cacheTtl: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.cacheTtl",
@@ -567,7 +567,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      memoryThreshold: scopedRequestField(scopedTranslation, {
+      memoryThreshold: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.memoryThreshold",
@@ -577,7 +577,7 @@ const { POST } = createEndpoint({
       }),
 
       // Resilience configuration fields
-      maxRetries: scopedRequestField(scopedTranslation, {
+      maxRetries: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.maxRetries",
@@ -586,7 +586,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(0),
       }),
 
-      retryDelay: scopedRequestField(scopedTranslation, {
+      retryDelay: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.retryDelay",
@@ -595,7 +595,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerThreshold: scopedRequestField(scopedTranslation, {
+      circuitBreakerThreshold: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.circuitBreakerThreshold",
@@ -604,7 +604,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerTimeout: scopedRequestField(scopedTranslation, {
+      circuitBreakerTimeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.circuitBreakerTimeout",
@@ -614,7 +614,7 @@ const { POST } = createEndpoint({
       }),
 
       // Monitoring configuration fields
-      healthCheckInterval: scopedRequestField(scopedTranslation, {
+      healthCheckInterval: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "response.healthCheckInterval",
@@ -623,7 +623,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().int().min(1),
       }),
 
-      metricsEnabled: scopedRequestField(scopedTranslation, {
+      metricsEnabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "response.metricsEnabled",
@@ -633,7 +633,7 @@ const { POST } = createEndpoint({
       }),
 
       // Development configuration fields
-      debugMode: scopedRequestField(scopedTranslation, {
+      debugMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "response.debugMode",
@@ -642,7 +642,7 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      testMode: scopedRequestField(scopedTranslation, {
+      testMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "response.testMode",
@@ -652,7 +652,7 @@ const { POST } = createEndpoint({
       }),
 
       // Response message
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "update.response.message",
         schema: z.string(),

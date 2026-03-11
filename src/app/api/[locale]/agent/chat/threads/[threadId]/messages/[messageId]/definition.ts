@@ -8,11 +8,12 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  customWidgetObject,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -25,6 +26,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../enum";
 import { scopedTranslation } from "./i18n";
+import { DeleteMessageWidget } from "./widget";
 
 /**
  * Get Message by ID Endpoint (GET)
@@ -81,7 +83,7 @@ const { GET } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title" as const,
     description: "get.container.description" as const,
@@ -89,14 +91,14 @@ const { GET } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMS ===
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.threadId.label" as const,
         description: "get.threadId.description" as const,
         schema: z.uuid(),
       }),
-      messageId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      messageId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.messageId.label" as const,
@@ -105,7 +107,7 @@ const { GET } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.rootFolderId.label" as const,
@@ -115,42 +117,42 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      role: scopedResponseField(scopedTranslation, {
+      role: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.role.content" as const,
         schema: z.enum(ChatMessageRole),
       }),
-      content: scopedResponseField(scopedTranslation, {
+      content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.content.content" as const,
         schema: z.string().nullable(),
       }),
-      parentId: scopedResponseField(scopedTranslation, {
+      parentId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.parentId.content" as const,
         schema: z.uuid().nullable(),
       }),
-      authorId: scopedResponseField(scopedTranslation, {
+      authorId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.authorId.content" as const,
         schema: z.string().nullable(),
       }),
-      isAI: scopedResponseField(scopedTranslation, {
+      isAI: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.isAI.content" as const,
         schema: z.boolean(),
       }),
-      model: scopedResponseField(scopedTranslation, {
+      model: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.model.content" as const,
         schema: z.string().nullable(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.updatedAt.content" as const,
         schema: dateSchema,
@@ -246,7 +248,7 @@ const { PATCH } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "patch.container.title" as const,
     description: "patch.container.description" as const,
@@ -254,14 +256,14 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMS ===
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.threadId.label" as const,
         description: "patch.threadId.description" as const,
         schema: z.uuid(),
       }),
-      messageId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      messageId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.messageId.label" as const,
@@ -270,7 +272,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "patch.rootFolderId.label" as const,
@@ -278,14 +280,14 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.enum(DefaultFolderId),
       }),
-      content: scopedRequestField(scopedTranslation, {
+      content: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.content.label" as const,
         description: "patch.content.description" as const,
         schema: z.string().min(1),
       }),
-      role: scopedRequestField(scopedTranslation, {
+      role: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "patch.role.label" as const,
@@ -295,17 +297,17 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      updatedContent: scopedResponseField(scopedTranslation, {
+      updatedContent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.message.content.content" as const,
         schema: z.string().nullable(),
       }),
-      updatedRole: scopedResponseField(scopedTranslation, {
+      updatedRole: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.message.role.content" as const,
         schema: z.enum(ChatMessageRole),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.message.updatedAt.content" as const,
         schema: dateSchema,
@@ -400,22 +402,19 @@ const { DELETE } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "delete.container.title" as const,
-    description: "delete.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data&urlPathParams", response: true },
+  fields: customWidgetObject({
+    render: DeleteMessageWidget,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // === URL PARAMS ===
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "delete.threadId.label" as const,
         description: "delete.threadId.description" as const,
         schema: z.uuid(),
       }),
-      messageId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      messageId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "delete.messageId.label" as const,
@@ -424,48 +423,53 @@ const { DELETE } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "delete.rootFolderId.label" as const,
         description: "delete.rootFolderId.description" as const,
         columns: 6,
+        options: [
+          { value: DefaultFolderId.PRIVATE, label: "Private" },
+          { value: DefaultFolderId.SHARED, label: "Shared" },
+          { value: DefaultFolderId.PUBLIC, label: "Public" },
+          { value: DefaultFolderId.INCOGNITO, label: "Incognito" },
+        ],
         schema: z.enum(DefaultFolderId),
       }),
 
       // === RESPONSE ===
-      // Note: threadId and messageId are already known from URL params, not repeated
-      role: scopedResponseField(scopedTranslation, {
+      role: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.role.content" as const,
         schema: z.enum(ChatMessageRole),
       }),
-      content: scopedResponseField(scopedTranslation, {
+      content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.content.content" as const,
         schema: z.string().nullable(),
       }),
-      parentId: scopedResponseField(scopedTranslation, {
+      parentId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.parentId.content" as const,
         schema: z.uuid().nullable(),
       }),
-      authorId: scopedResponseField(scopedTranslation, {
+      authorId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.authorId.content" as const,
         schema: z.string().nullable(),
       }),
-      isAI: scopedResponseField(scopedTranslation, {
+      isAI: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.isAI.content" as const,
         schema: z.boolean(),
       }),
-      model: scopedResponseField(scopedTranslation, {
+      model: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.model.content" as const,
         schema: z.string().nullable(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.createdAt.content" as const,
         schema: dateSchema,

@@ -274,7 +274,6 @@ export function useEndpoint<
     null;
 
   // Memoize create operation wrapper
-  const createValues = createOperation?.form.watch();
   const create = useMemo(() => {
     if (!createOperation) {
       return undefined;
@@ -282,7 +281,7 @@ export function useEndpoint<
 
     return {
       ...createOperation,
-      values: createValues,
+      values: createOperation.form.getValues(),
       setValue: createOperation.form.setValue.bind(createOperation.form),
       onSubmit: createOperation.submitForm,
       reset: (): void => createOperation.form.reset(resetData || {}),
@@ -294,7 +293,7 @@ export function useEndpoint<
           ? createOperation.submitError
           : null,
     };
-  }, [createOperation, createValues, resetData]);
+  }, [createOperation, resetData]);
 
   // Generate alert state from success/error states and endpoint types
   const alert = useMemo((): FormAlertState | null => {

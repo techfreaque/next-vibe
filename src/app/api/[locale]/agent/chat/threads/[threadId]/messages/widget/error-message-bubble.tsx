@@ -3,27 +3,56 @@
 import { AlertCircle } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import {
+  useWidgetLogger,
+  useWidgetNavigation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { scopedTranslation } from "../i18n";
+import { CopyButton } from "./copy-button";
+import { useMessageGroupName } from "./embedded-context";
+import { MessageActionButton } from "./message-action-button";
 
 interface ErrorMessageBubbleProps {
   message: ChatMessage;
+  rootFolderId: DefaultFolderId;
 }
 
 export function ErrorMessageBubble({
   message,
+  rootFolderId,
 }: ErrorMessageBubbleProps): JSX.Element {
   const { t, locale } = useTranslation();
   const { t: ts } = scopedTranslation.scopedT(locale);
   const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+  const { push: navigate } = useWidgetNavigation();
+  const logger = useWidgetLogger();
+  const isTouch = useTouchDevice();
+  const { group, groupHover } = useMessageGroupName();
+
+  const handleDelete = (): void => {
+    void (async (): Promise<void> => {
+      const messageIdDefs =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      navigate(messageIdDefs.default.DELETE, {
+        urlPathParams: { threadId: message.threadId, messageId: message.id },
+        data: { rootFolderId },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
 
   let errorData: ErrorResponseType | null = null;
   let displayContent: string;
@@ -56,7 +85,7 @@ export function ErrorMessageBubble({
   }
 
   return (
-    <Div className="flex items-start gap-3">
+    <Div className={cn("flex items-start gap-3", group)}>
       <Div className="max-w-full">
         <Div
           className={cn(
@@ -84,8 +113,28 @@ export function ErrorMessageBubble({
           </Div>
         </Div>
 
-        {/* Fixed height container to maintain consistent spacing */}
-        <Div className="h-8" />
+        {/* Actions — same hover pattern as other messages */}
+        <Div
+          className={cn(
+            "flex items-center gap-1 mt-1",
+            "transition-opacity duration-150",
+            isTouch
+              ? "opacity-70 active:opacity-100"
+              : `opacity-0 ${groupHover} focus-within:opacity-100`,
+          )}
+        >
+          <CopyButton
+            content={message.content ?? undefined}
+            locale={locale}
+            logger={logger}
+          />
+          <MessageActionButton
+            icon={Trash2}
+            onClick={handleDelete}
+            title={ts("widget.common.userMessageActions.deleteMessage")}
+            variant="destructive"
+          />
+        </Div>
       </Div>
     </Div>
   );

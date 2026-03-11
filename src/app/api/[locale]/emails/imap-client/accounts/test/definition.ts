@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,7 +38,7 @@ const { POST } = createEndpoint({
   icon: "inbox",
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      accountId: scopedRequestField(scopedTranslation, {
+      accountId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "accountId.label",
@@ -58,25 +58,25 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "response.success",
         schema: z.boolean(),
       }),
 
-      connectionStatus: scopedResponseField(scopedTranslation, {
+      connectionStatus: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "response.connectionStatus",
         schema: z.enum(ImapConnectionStatus),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.message",
         schema: z.string(),
       }),
 
-      details: scopedObjectFieldNew(scopedTranslation, {
+      details: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.details.title",
         description: "response.details.description",
@@ -84,32 +84,32 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          host: scopedResponseField(scopedTranslation, {
+          host: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.details.host",
             schema: z.string().optional(),
           }),
-          port: scopedResponseField(scopedTranslation, {
+          port: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.details.port",
             schema: z.coerce.number().optional(),
           }),
-          secure: scopedResponseField(scopedTranslation, {
+          secure: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "response.details.secure",
             schema: z.boolean().optional(),
           }),
-          authMethod: scopedResponseField(scopedTranslation, {
+          authMethod: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "response.details.authMethod",
             schema: z.enum(ImapAuthMethod).optional(),
           }),
-          responseTime: scopedResponseField(scopedTranslation, {
+          responseTime: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.details.responseTime",
             schema: z.coerce.number().optional(),
           }),
-          serverCapabilities: scopedResponseField(scopedTranslation, {
+          serverCapabilities: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.details.serverCapabilities",
             schema: z.array(z.string()).optional(),

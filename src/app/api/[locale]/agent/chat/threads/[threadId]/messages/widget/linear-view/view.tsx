@@ -52,7 +52,6 @@ interface LinearMessageViewProps {
   collapseState: CollapseStateStore | null;
   rootFolderId: DefaultFolderId;
   subFolderId: string | null;
-  onDeleteMessage: ((messageId: string) => void) | null;
   onRetryMessage:
     | ((messageId: string, attachments?: File[]) => Promise<void>)
     | null;
@@ -110,7 +109,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   collapseState,
   rootFolderId,
   subFolderId,
-  onDeleteMessage,
   onRetryMessage,
   onSwitchBranch,
   onBranchMessage,
@@ -336,7 +334,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                                 }
                               : undefined
                           }
-                          onDelete={onDeleteMessage ?? undefined}
                           showAuthor={rootFolderId === "public"}
                           rootFolderId={rootFolderId}
                           currentUserId={currentUserId ?? undefined}
@@ -350,10 +347,9 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           group={group}
                           locale={locale}
                           onAnswerAsModel={onStartAnswer}
-                          onDelete={onDeleteMessage}
                           showAuthor={true}
                           logger={logger}
-                          readOnly={!onDeleteMessage}
+                          readOnly={false}
                           collapseState={collapseState}
                           platformOverride={null}
                           rootFolderId={rootFolderId}
@@ -377,7 +373,10 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         />
                       )}
                     {message.role === "error" && (
-                      <ErrorMessageBubble message={message} />
+                      <ErrorMessageBubble
+                        message={message}
+                        rootFolderId={rootFolderId}
+                      />
                     )}
                     {/* Debug mode: Show system messages inline */}
                     {viewMode === ViewMode.DEBUG &&

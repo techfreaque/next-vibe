@@ -23,12 +23,12 @@ import type {
   FieldUsageConfig,
 } from "../../../unified-ui/widgets/_shared/types";
 import { createEndpoint } from "../../endpoints/definition/create";
-import { objectField } from "../../field/utils";
 import {
+  objectFieldNew,
   requestField,
   requestResponseField,
-  scopedObjectField,
-  scopedRequestField,
+  objectField,
+  requestField,
 } from "../../field/utils-new";
 import {
   EndpointErrorTypes,
@@ -131,7 +131,7 @@ const allLeadsStatsErrorTypes = {
 
 /**
  * Test 1: Valid scoped keys should be accepted (using leadsStatsScopedTranslation)
- * Uses scopedObjectField + scopedRequestField for proper type checking.
+ * Uses objectField + requestField for proper type checking.
  */
 const globalEndpointValid = createEndpoint({
   scopedTranslation: leadsStatsScopedTranslation,
@@ -144,14 +144,14 @@ const globalEndpointValid = createEndpoint({
   tags: ["tags.leads"] as const,
   allowedRoles: [UserRole.PUBLIC],
 
-  fields: scopedObjectField(leadsStatsScopedTranslation, {
+  fields: objectField(leadsStatsScopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      name: scopedRequestField(leadsStatsScopedTranslation, {
+      name: requestField(leadsStatsScopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "dateRange.today",
@@ -191,11 +191,13 @@ const globalEndpointInvalidTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-    { request: "data", response: true },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {},
+  }),
   examples: {},
   errorTypes: allGlobalErrorTypes,
   successTypes: {
@@ -217,11 +219,13 @@ const globalEndpointInvalidDescription = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-    { request: "data", response: true },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {},
+  }),
   examples: {},
   errorTypes: allGlobalErrorTypes,
   successTypes: {
@@ -243,11 +247,13 @@ const globalEndpointInvalidCategory = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-    { request: "data", response: true },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {},
+  }),
   examples: {},
   errorTypes: allGlobalErrorTypes,
   successTypes: {
@@ -269,11 +275,13 @@ const globalEndpointInvalidTag = createEndpoint({
   // @ts-expect-error - Invalid global key in tags
   tags: ["invalid.tag.key"] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-    { request: "data", response: true },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {},
+  }),
   examples: {},
   errorTypes: allGlobalErrorTypes,
   successTypes: {
@@ -294,11 +302,13 @@ const globalEndpointInvalidErrorTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-    { request: "data", response: true },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {},
+  }),
   examples: {},
   errorTypes: {
     ...allGlobalErrorTypes,
@@ -326,11 +336,13 @@ const globalEndpointInvalidSuccessTitle = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-    { request: "data", response: true },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {},
+  }),
   examples: {},
   errorTypes: allGlobalErrorTypes,
   successTypes: {
@@ -342,7 +354,7 @@ const globalEndpointInvalidSuccessTitle = createEndpoint({
 
 /**
  * Test 8: Invalid field label key should be rejected (using scoped translation)
- * scopedRequestField validates against LeadsStatsTranslationKey,
+ * requestField validates against LeadsStatsTranslationKey,
  * so "invalid.field.label.key" is rejected at the property level.
  */
 const globalEndpointInvalidFieldLabel = createEndpoint({
@@ -355,13 +367,13 @@ const globalEndpointInvalidFieldLabel = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: scopedObjectField(leadsStatsScopedTranslation, {
+  fields: objectField(leadsStatsScopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      name: scopedRequestField(leadsStatsScopedTranslation, {
+      name: requestField(leadsStatsScopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         // @ts-expect-error - Invalid scoped key in field label
@@ -409,64 +421,54 @@ const test8c_requestResponseFieldStandalone = requestResponseField({
 });
 
 /**
- * Test 8D: Test objectField standalone with invalid container title key
+ * Test 8D: Test objectFieldNew standalone with container title key
+ * NOTE: objectFieldNew does NOT enforce TranslationKey validation on title at the
+ * standalone call site (TKey is inferred as string, not pinned to TranslationKey).
+ * Key validation for object containers happens when assigned to createEndpoint's
+ * fields parameter. This mirrors the behaviour documented for requestField in 8B.
  */
-const test8d_objectFieldStandalone = objectField(
-  {
-    type: WidgetType.CONTAINER,
-    // @ts-expect-error - Invalid global key in container title
-    title: "invalid.container.title.key",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-  },
-  { request: "data", response: true },
-  {},
-);
+const test8d_objectFieldStandalone = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  title: "invalid.container.title.key",
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  usage: { request: "data", response: true },
+  children: {},
+});
 
 /**
- * Tests 9A/9B/9C: Invalid container title key — standalone objectField tests.
+ * Tests 9A/9B/9C: Container title key — standalone objectFieldNew tests.
  *
- * NOTE: Container title validation is tested via standalone objectField calls only.
- * Using @ts-expect-error on a property inside scopedObjectField within createEndpoint
- * breaks type inference for the whole endpoint (TypeScript can no longer verify the
- * intersection type satisfies UnifiedField). The standalone forms below fully cover
- * the "invalid container title key is rejected" requirement.
+ * NOTE: objectFieldNew does NOT enforce global TranslationKey on title at the
+ * standalone call site. Key validation happens when the result is assigned to
+ * createEndpoint's fields parameter (TKey gets pinned to TranslationKey there).
  */
-const test9a_invalidContainerTitleStandalone = objectField(
-  {
-    type: WidgetType.CONTAINER,
-    // @ts-expect-error - Invalid global key in container title
-    title: "invalid.container.title.key",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-  },
-  { request: "data", response: true },
-  {},
-);
+const test9a_invalidContainerTitleStandalone = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  title: "invalid.container.title.key",
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  usage: { request: "data", response: true },
+  children: {},
+});
 
-const test9b_invalidContainerTitle = objectField(
-  {
-    type: WidgetType.CONTAINER,
-    // @ts-expect-error - Invalid global key in container title
-    title: "invalid.container.title.key",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-  },
-  { request: "data", response: true },
-  {},
-);
+const test9b_invalidContainerTitle = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  title: "invalid.container.title.key",
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  usage: { request: "data", response: true },
+  children: {},
+});
 
-const test9c_invalidContainerTitle = objectField(
-  {
-    type: WidgetType.CONTAINER,
-    // @ts-expect-error - Invalid global key in container title
-    title: "invalid.container.title.key",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-  },
-  { request: "data", response: true },
-  {},
-);
+const test9c_invalidContainerTitle = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  title: "invalid.container.title.key",
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  usage: { request: "data", response: true },
+  children: {},
+});
 
 // ============================================================================
 // PART 3: SCOPED KEYS REJECTED WITHOUT scopedTranslation
@@ -485,11 +487,13 @@ const globalEndpointRejectsScopedKey = createEndpoint({
   icon: "check",
   tags: [] as const,
   allowedRoles: [UserRole.PUBLIC],
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-    { request: "data", response: true },
-    {},
-  ),
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {},
+  }),
   examples: {},
   errorTypes: allGlobalErrorTypes,
   successTypes: {

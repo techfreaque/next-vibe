@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -39,7 +39,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["schema-verify", "db:schema-verify"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      fixIssues: scopedRequestField(scopedTranslation, {
+      fixIssues: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.fixIssues.title",
@@ -57,7 +57,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      silent: scopedRequestField(scopedTranslation, {
+      silent: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.silent.title",
@@ -67,31 +67,31 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      valid: scopedResponseField(scopedTranslation, {
+      valid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.valid.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.title",
         schema: z.string(),
       }),
 
-      issues: scopedResponseField(scopedTranslation, {
+      issues: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.issues.title",
         schema: z.array(z.string()).optional(),
       }),
 
-      fixedIssues: scopedResponseField(scopedTranslation, {
+      fixedIssues: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.fixedIssues.title",
         schema: z.array(z.string()).optional(),

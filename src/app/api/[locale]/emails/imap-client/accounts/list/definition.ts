@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -57,12 +57,12 @@ const { GET } = createEndpoint({
     render: ImapAccountsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === REQUEST FIELDS ===
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.page.label",
@@ -72,7 +72,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number().min(1).default(1),
       }),
 
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.limit.label",
@@ -82,7 +82,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number().min(1).max(100).default(20),
       }),
 
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.search.label",
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.status.label",
@@ -105,7 +105,7 @@ const { GET } = createEndpoint({
           .default(ImapAccountStatusFilter.ALL),
       }),
 
-      enabled: scopedRequestField(scopedTranslation, {
+      enabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.enabled.label",
@@ -114,7 +114,7 @@ const { GET } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      sortBy: scopedRequestField(scopedTranslation, {
+      sortBy: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.sortBy.label",
@@ -127,7 +127,7 @@ const { GET } = createEndpoint({
           .default(ImapAccountSortField.CREATED_AT),
       }),
 
-      sortOrder: scopedRequestField(scopedTranslation, {
+      sortOrder: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.sortOrder.label",
@@ -139,112 +139,112 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      accounts: scopedResponseArrayFieldNew(scopedTranslation, {
+      accounts: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         sortBy: "name",
         columns: 12,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.id",
               schema: z.uuid(),
             }),
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.name",
               schema: z.string(),
             }),
-            email: scopedResponseField(scopedTranslation, {
+            email: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.email",
               schema: z.email(),
             }),
-            host: scopedResponseField(scopedTranslation, {
+            host: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.host",
               schema: z.string(),
             }),
-            port: scopedResponseField(scopedTranslation, {
+            port: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.port",
               schema: z.coerce.number(),
             }),
-            secure: scopedResponseField(scopedTranslation, {
+            secure: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.accounts.item.secure",
               schema: z.boolean(),
             }),
-            username: scopedResponseField(scopedTranslation, {
+            username: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.username",
               schema: z.string(),
             }),
-            authMethod: scopedResponseField(scopedTranslation, {
+            authMethod: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.accounts.item.authMethod",
               schema: z.enum(ImapAuthMethod),
             }),
-            connectionTimeout: scopedResponseField(scopedTranslation, {
+            connectionTimeout: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.connectionTimeout",
               schema: z.coerce.number(),
             }),
-            keepAlive: scopedResponseField(scopedTranslation, {
+            keepAlive: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.accounts.item.keepAlive",
               schema: z.boolean(),
             }),
-            enabled: scopedResponseField(scopedTranslation, {
+            enabled: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.accounts.item.enabled",
               schema: z.boolean(),
             }),
-            syncInterval: scopedResponseField(scopedTranslation, {
+            syncInterval: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.syncInterval",
               schema: z.coerce.number(),
             }),
-            maxMessages: scopedResponseField(scopedTranslation, {
+            maxMessages: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.maxMessages",
               schema: z.coerce.number(),
             }),
-            syncFolders: scopedResponseField(scopedTranslation, {
+            syncFolders: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.syncFolders",
               schema: z.array(z.string()),
             }),
-            lastSyncAt: scopedResponseField(scopedTranslation, {
+            lastSyncAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.lastSyncAt",
               schema: z.string().nullable(),
             }),
-            syncStatus: scopedResponseField(scopedTranslation, {
+            syncStatus: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.accounts.item.syncStatus",
               schema: z.enum(ImapSyncStatus),
             }),
-            syncError: scopedResponseField(scopedTranslation, {
+            syncError: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.syncError",
               schema: z.string().nullable(),
             }),
-            isConnected: scopedResponseField(scopedTranslation, {
+            isConnected: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.accounts.item.isConnected",
               schema: z.boolean(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.createdAt",
               schema: z.string(),
             }),
-            updatedAt: scopedResponseField(scopedTranslation, {
+            updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.accounts.item.updatedAt",
               schema: z.string(),
@@ -253,7 +253,7 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      pagination: scopedObjectFieldNew(scopedTranslation, {
+      pagination: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.pagination.title",
         description: "response.pagination.description",
@@ -261,22 +261,22 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          page: scopedResponseField(scopedTranslation, {
+          page: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.page",
             schema: z.coerce.number(),
           }),
-          limit: scopedResponseField(scopedTranslation, {
+          limit: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.limit",
             schema: z.coerce.number(),
           }),
-          total: scopedResponseField(scopedTranslation, {
+          total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.total",
             schema: z.coerce.number(),
           }),
-          totalPages: scopedResponseField(scopedTranslation, {
+          totalPages: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.totalPages",
             schema: z.coerce.number(),

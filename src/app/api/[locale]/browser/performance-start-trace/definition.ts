@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "performance-start-trace.form.label",
     description: "performance-start-trace.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      reload: scopedRequestField(scopedTranslation, {
+      reload: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "performance-start-trace.form.fields.reload.label",
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
             "Determines if, once tracing has started, the page should be automatically reloaded",
           ),
       }),
-      autoStop: scopedRequestField(scopedTranslation, {
+      autoStop: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "performance-start-trace.form.fields.autoStop.label",
@@ -75,7 +75,7 @@ const { POST } = createEndpoint({
             "Determines if the trace recording should be automatically stopped",
           ),
       }),
-      filePath: scopedRequestField(scopedTranslation, {
+      filePath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "performance-start-trace.form.fields.reload.label",
@@ -90,14 +90,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-start-trace.response.success",
         schema: z
           .boolean()
           .describe("Whether the trace start operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-start-trace.response.result",
         schema: z
@@ -112,7 +112,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-start-trace.response.error",
         schema: z
@@ -120,7 +120,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "performance-start-trace.response.executionId",
         schema: z

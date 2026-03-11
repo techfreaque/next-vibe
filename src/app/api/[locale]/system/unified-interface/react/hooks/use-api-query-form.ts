@@ -157,11 +157,17 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   } = formOptions;
 
   // Get Zustand store methods
-  const { getFormId, setFormQueryParams } = useApiStore();
-  const formId = getFormId(endpoint);
+  const { setFormQueryParams } = useApiStore();
 
   // For query state - use number type instead of NodeJS.Timeout
   const debounceTimerRef = useRef<number | null>(null);
+
+  // formId / storageKey: both include urlPathParams + cacheKey fields so the Zustand
+  // form store and localStorage are scoped per resource (not shared across users/items).
+  const storageKey =
+    persistenceKey ||
+    buildKey("query-form", endpoint, urlPathParams, logger, requestData);
+  const formId = storageKey;
   // Recursively extract default values from the Zod schema
   // This traverses the entire schema tree and builds an object with all default values
   // Works even when the top-level schema has required fields without defaults
@@ -301,14 +307,6 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const setFormErrorStore = useApiStore((state) => state.setFormError);
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
 
-  // Generate a storage key based on the endpoint + urlPathParams if not provided
-  // Include urlPathParams so endpoints with dynamic path segments (e.g. /threads/:threadId/messages)
-  // get a unique storage key per resource — prevents stale persisted form data from a previous
-  // resource overwriting the correct params when navigating to a different resource.
-  const storageKey =
-    persistenceKey ||
-    buildKey("query-form", endpoint, urlPathParams, logger, requestData);
-
   // Create form configuration with schema defaults
   const formConfigWithDefaults: UseFormProps<
     TEndpoint["types"]["RequestOutput"]
@@ -327,6 +325,10 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const formMethods = useForm<TEndpoint["types"]["RequestOutput"]>(
     formConfigWithDefaults,
   );
+  // Stable ref so effects don't re-run every render when react-hook-form
+  // returns a new formMethods object reference on each render.
+  const formMethodsRef = useRef(formMethods);
+  formMethodsRef.current = formMethods;
   const { watch } = formMethods;
 
   // Implement form persistence directly
@@ -343,7 +345,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         const resetData: TEndpoint["types"]["RequestOutput"] =
           (restFormOptions.defaultValues as TEndpoint["types"]["RequestOutput"]) ||
           ({} as TEndpoint["types"]["RequestOutput"]);
-        formMethods.reset(resetData);
+        formMethodsRef.current.reset(resetData);
         // Update query params with reset data
         setQueryParams(resetData);
       } catch {
@@ -351,17 +353,30 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [formMethods, storageKey, setQueryParams, restFormOptions.defaultValues]);
+  }, [storageKey, setQueryParams, restFormOptions.defaultValues]);
 
-  // Sync form default values to store on mount.
+  // Sync form default values to store on mount AND whenever mergedDefaultValues changes.
   // This ensures the queryFn always picks up the correct initial values
-  // even when a previous instance left stale params in the global store.
-  // Only runs once on mount (empty deps) — subsequent changes are handled
-  // by the form watch subscription.
-  const initialDefaultsRef = useRef(mergedDefaultValues);
+  // even when a previous instance left stale params in the global store,
+  // and also handles prop changes (e.g. switching to a different user's data
+  // where includeInCacheKey fields like targetUserId change).
+  const prevMergedDefaultsRef = useRef<
+    TEndpoint["types"]["RequestOutput"] | undefined
+  >(undefined);
   useEffect(() => {
-    setQueryParams(initialDefaultsRef.current);
-  }, [setQueryParams]);
+    const prev = prevMergedDefaultsRef.current;
+    const hasChanged =
+      prev === undefined ||
+      JSON.stringify(prev) !== JSON.stringify(mergedDefaultValues);
+    if (hasChanged) {
+      prevMergedDefaultsRef.current = mergedDefaultValues;
+      setQueryParams(mergedDefaultValues);
+      formMethodsRef.current.reset(mergedDefaultValues, {
+        keepDirty: false,
+        keepTouched: false,
+      });
+    }
+  }, [mergedDefaultValues, setQueryParams]);
 
   // Load saved form values on mount - merge with schema defaults
   useEffect(() => {
@@ -378,7 +393,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
           ) as TEndpoint["types"]["RequestOutput"];
           // Merge saved data with schema defaults - defaults take precedence for undefined/null values
           const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
-          formMethods.reset(mergedData);
+          formMethodsRef.current.reset(mergedData);
           // Update query params with merged data
           setQueryParams(mergedData);
         }
@@ -387,13 +402,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         // In a production app, this would use a proper error logging service
       }
     })();
-  }, [
-    formMethods,
-    storageKey,
-    persistForm,
-    setQueryParams,
-    mergedDefaultValues,
-  ]);
+  }, [storageKey, persistForm, setQueryParams, mergedDefaultValues]);
 
   // Save form values when they change
   useEffect(() => {
@@ -404,7 +413,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     let persistDebounceTimer: number | null = null;
     const persistDebounceMs = 500; // 500ms debounce for persistence
 
-    const subscription = formMethods.watch((formValues) => {
+    const subscription = formMethodsRef.current.watch((formValues) => {
       if (formValues && Object.keys(formValues).length > 0) {
         // Clear any existing timer
         if (persistDebounceTimer !== null) {
@@ -431,7 +440,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         window.clearTimeout(persistDebounceTimer);
       }
     };
-  }, [formMethods, storageKey, persistForm]);
+  }, [storageKey, persistForm]);
 
   // Error management functions
   const clearFormError = useCallback(
@@ -847,42 +856,56 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const errorMessage: string | undefined =
     queryErrorMessage || formErrorMessage || undefined;
 
-  return {
-    form: formMethods,
+  const submitError = query.error || formState.formError || undefined;
 
-    // Use the query response as the primary response
-    response: query.response,
-
-    // Backward compatibility properties
-    isSubmitSuccessful: query.isSuccess,
-    submitError: query.error || formState.formError || undefined,
-    errorMessage,
-
-    // Query-specific properties (backward compatibility)
-    data: query.data,
-    error: query.error,
-    isError: query.isError,
-    isSuccess: query.isSuccess,
-
-    isSubmitting: query.isLoading,
-    isLoading: query.isLoading,
-    isLoadingFresh: query.isLoadingFresh,
-    isFetching: query.isFetching,
-    isCachedData: query.isCachedData,
-    status: query.status,
-    refetch: query.refetch,
-    submitForm,
-    setErrorType: (error: ErrorResponseType | null): void => {
-      // Update form error state
+  // Stable setErrorType — depends only on stable refs
+  const setErrorType = useCallback(
+    (error: ErrorResponseType | null): void => {
       setFormErrorStore(formId, error);
-
-      // Also update query error state if query.setErrorType exists
       if (query.setErrorType) {
         query.setErrorType(error);
       }
     },
+    [setFormErrorStore, formId, query],
+  );
 
-    // Form persistence
-    clearSavedForm,
-  };
+  return useMemo(
+    () => ({
+      form: formMethods,
+      response: query.response,
+      isSubmitSuccessful: query.isSuccess,
+      submitError,
+      errorMessage,
+      data: query.data,
+      error: query.error,
+      isError: query.isError,
+      isSuccess: query.isSuccess,
+      isSubmitting: query.isLoading,
+      isLoading: query.isLoading,
+      isLoadingFresh: query.isLoadingFresh,
+      isFetching: query.isFetching,
+      isCachedData: query.isCachedData,
+      status: query.status,
+      refetch: query.refetch,
+      submitForm,
+      setErrorType,
+      clearSavedForm,
+    }),
+    // formMethods, submitForm, clearSavedForm, setErrorType are stable refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      query.response,
+      query.isSuccess,
+      query.data,
+      query.error,
+      query.isError,
+      query.isLoading,
+      query.isLoadingFresh,
+      query.isFetching,
+      query.isCachedData,
+      query.status,
+      submitError,
+      errorMessage,
+    ],
+  );
 }

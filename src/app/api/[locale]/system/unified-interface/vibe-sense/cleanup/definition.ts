@@ -6,9 +6,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -30,33 +30,33 @@ const { POST } = createEndpoint({
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { response: true },
     children: {
-      nodesProcessed: scopedResponseField(scopedTranslation, {
+      nodesProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.nodesProcessed",
         schema: z.number(),
       }),
-      totalDeleted: scopedResponseField(scopedTranslation, {
+      totalDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.totalDeleted",
         schema: z.number(),
       }),
-      snapshotsDeleted: scopedResponseField(scopedTranslation, {
+      snapshotsDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.snapshotsDeleted",
         schema: z.number(),
       }),
-      graphsChecked: scopedResponseField(scopedTranslation, {
+      graphsChecked: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.graphsChecked",
         schema: z.number(),
       }),
-      graphsExecuted: scopedResponseField(scopedTranslation, {
+      graphsExecuted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.graphsExecuted",
         schema: z.number(),

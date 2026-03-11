@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     render: CampaignStarterWidget,
     usage: { request: "data", response: true } as const,
     children: {
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -46,25 +46,25 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      leadsProcessed: scopedResponseField(scopedTranslation, {
+      leadsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.leadsProcessed",
         schema: z.number(),
       }),
 
-      leadsStarted: scopedResponseField(scopedTranslation, {
+      leadsStarted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.leadsStarted",
         schema: z.number(),
       }),
 
-      leadsSkipped: scopedResponseField(scopedTranslation, {
+      leadsSkipped: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.leadsSkipped",
         schema: z.number(),
       }),
 
-      executionTimeMs: scopedResponseField(scopedTranslation, {
+      executionTimeMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.executionTimeMs",
         schema: z.number(),

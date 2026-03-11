@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // REQUEST FIELDS
-      plan: scopedRequestField(scopedTranslation, {
+      plan: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.planId.label" as const,
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
         options: SubscriptionPlanOptions,
         schema: z.enum(SubscriptionPlan).default(SubscriptionPlan.SUBSCRIPTION),
       }),
-      billingInterval: scopedRequestField(scopedTranslation, {
+      billingInterval: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.billingInterval.label" as const,
@@ -68,7 +68,7 @@ const { POST } = createEndpoint({
         options: BillingIntervalOptions,
         schema: z.enum(BillingInterval).default(BillingInterval.MONTHLY),
       }),
-      provider: scopedRequestField(scopedTranslation, {
+      provider: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.provider.label" as const,
@@ -78,12 +78,12 @@ const { POST } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
-      checkoutUrl: scopedResponseField(scopedTranslation, {
+      checkoutUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.checkoutUrl" as const,
         schema: z.string().url(),
       }),
-      sessionId: scopedResponseField(scopedTranslation, {
+      sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.sessionId" as const,
         schema: z.string(),

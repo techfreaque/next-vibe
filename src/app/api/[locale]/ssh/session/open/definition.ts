@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,7 +38,7 @@ export const { POST } = createEndpoint({
     render: SessionOpenContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "session.open.post.fields.connectionId.label" as const,
@@ -46,38 +46,38 @@ export const { POST } = createEndpoint({
           "session.open.post.fields.connectionId.description" as const,
         schema: z.string().uuid().optional(),
       }),
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "session.open.post.fields.name.label" as const,
         description: "session.open.post.fields.name.description" as const,
         schema: z.string().optional(),
       }),
-      cols: scopedRequestField(scopedTranslation, {
+      cols: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "session.open.post.fields.cols.label" as const,
         description: "session.open.post.fields.cols.description" as const,
         schema: z.coerce.number().min(40).max(500).optional(),
       }),
-      rows: scopedRequestField(scopedTranslation, {
+      rows: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "session.open.post.fields.rows.label" as const,
         description: "session.open.post.fields.rows.description" as const,
         schema: z.coerce.number().min(10).max(200).optional(),
       }),
-      sessionId: scopedResponseField(scopedTranslation, {
+      sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.open.post.response.sessionId.title" as const,
         schema: z.string(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.open.post.response.status.title" as const,
         schema: z.nativeEnum(SshSessionStatus),
       }),
-      shell: scopedResponseField(scopedTranslation, {
+      shell: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.open.post.response.shell.title" as const,
         schema: z.string(),

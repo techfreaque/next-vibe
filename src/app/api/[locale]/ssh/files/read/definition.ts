@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -39,7 +39,7 @@ export const { GET } = createEndpoint({
     render: FilesReadContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.connectionId.label",
@@ -47,7 +47,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
-      path: scopedRequestField(scopedTranslation, {
+      path: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.path.label",
@@ -55,7 +55,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.path.placeholder",
         schema: z.string().min(1),
       }),
-      maxBytes: scopedRequestField(scopedTranslation, {
+      maxBytes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.maxBytes.label",
@@ -63,7 +63,7 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.maxBytes.placeholder",
         schema: z.coerce.number().min(1).max(524288).optional(),
       }),
-      offset: scopedRequestField(scopedTranslation, {
+      offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.offset.label",
@@ -71,22 +71,22 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.offset.placeholder",
         schema: z.coerce.number().min(0).optional(),
       }),
-      content: scopedResponseField(scopedTranslation, {
+      content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.content.title",
         schema: z.string(),
       }),
-      size: scopedResponseField(scopedTranslation, {
+      size: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.size.title",
         schema: z.number(),
       }),
-      truncated: scopedResponseField(scopedTranslation, {
+      truncated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.truncated.title",
         schema: z.boolean(),
       }),
-      encoding: scopedResponseField(scopedTranslation, {
+      encoding: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.encoding.title",
         schema: z.string(),

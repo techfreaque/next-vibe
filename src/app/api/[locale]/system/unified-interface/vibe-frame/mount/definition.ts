@@ -13,12 +13,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestDataArrayFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestDataArrayField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
 
   allowedLocalModeRoles: [] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.VERTICAL,
     title: "post.container.title" as const,
@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST ===
-      leadId: scopedRequestField(scopedTranslation, {
+      leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.leadId.label" as const,
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().uuid().optional(),
       }),
-      authToken: scopedRequestField(scopedTranslation, {
+      authToken: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.authToken.label" as const,
@@ -82,18 +82,18 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      integrations: scopedRequestDataArrayFieldNew(scopedTranslation, {
+      integrations: requestDataArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.fields.integrations.label" as const,
         description: "post.fields.integrations.description" as const,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.VERTICAL,
           title: "post.fields.integration.label" as const,
           description: "post.fields.integration.description" as const,
           usage: { request: "data" } as const,
           children: {
-            id: scopedRequestField(scopedTranslation, {
+            id: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.fields.id.label" as const,
@@ -102,7 +102,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string().min(1),
             }),
-            endpoint: scopedRequestField(scopedTranslation, {
+            endpoint: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.fields.endpoint.label" as const,
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string().optional(),
             }),
-            hasRendered: scopedRequestField(scopedTranslation, {
+            hasRendered: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "post.fields.hasRendered.label" as const,
@@ -119,7 +119,7 @@ const { POST } = createEndpoint({
               columns: 3,
               schema: z.boolean().optional(),
             }),
-            theme: scopedRequestField(scopedTranslation, {
+            theme: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.fields.theme.label" as const,
@@ -130,7 +130,7 @@ const { POST } = createEndpoint({
                 .optional()
                 .default("system"),
             }),
-            urlPathParams: scopedRequestField(scopedTranslation, {
+            urlPathParams: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.fields.urlPathParams.label" as const,
@@ -139,7 +139,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.record(z.string(), z.string()).optional(),
             }),
-            data: scopedRequestField(scopedTranslation, {
+            data: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.fields.data.label" as const,
@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.record(z.string(), z.string()).optional(),
             }),
-            frameId: scopedRequestField(scopedTranslation, {
+            frameId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.fields.frameId.label" as const,
@@ -161,23 +161,23 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      widgets: scopedResponseArrayFieldNew(scopedTranslation, {
+      widgets: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.fields.widgets.label" as const,
         description: "post.fields.widgets.description" as const,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.VERTICAL,
           title: "post.fields.widget.label" as const,
           description: "post.fields.widget.description" as const,
           usage: { response: true } as const,
           children: {
-            frameId: scopedResponseField(scopedTranslation, {
+            frameId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.fields.frameId.label" as const,
               schema: z.string(),
             }),
-            widgetUrl: scopedResponseField(scopedTranslation, {
+            widgetUrl: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.fields.widgetUrl.label" as const,
               schema: z.string(),

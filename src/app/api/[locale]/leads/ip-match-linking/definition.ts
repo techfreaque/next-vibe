@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
     description: "post.container.description",
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      windowDays: scopedRequestField(scopedTranslation, {
+      windowDays: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.windowDays.label",
@@ -59,13 +59,13 @@ const { POST } = createEndpoint({
         schema: z.number().int().min(1).max(365).default(30),
       }),
 
-      pairsFound: scopedResponseField(scopedTranslation, {
+      pairsFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.pairsFound",
         schema: z.number(),
       }),
 
-      pairsLinked: scopedResponseField(scopedTranslation, {
+      pairsLinked: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.pairsLinked",
         schema: z.number(),

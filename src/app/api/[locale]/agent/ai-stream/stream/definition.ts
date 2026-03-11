@@ -12,11 +12,11 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestDataArrayOptionalField,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestDataArrayOptionalField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === OPERATION context ===
-      operation: scopedRequestField(scopedTranslation, {
+      operation: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.operation.label",
@@ -99,7 +99,7 @@ const { POST } = createEndpoint({
           .enum(["send", "retry", "edit", "answer-as-ai", "wakeup-resume"])
           .default("send"),
       }),
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.rootFolderId.label",
@@ -129,7 +129,7 @@ const { POST } = createEndpoint({
         ],
         schema: z.enum(DefaultFolderId),
       }),
-      subFolderId: scopedRequestField(scopedTranslation, {
+      subFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.subFolderId.label",
@@ -137,7 +137,7 @@ const { POST } = createEndpoint({
         columns: 3,
         schema: z.string().nullable().optional(),
       }),
-      threadId: scopedRequestField(scopedTranslation, {
+      threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.threadId.label",
@@ -145,7 +145,7 @@ const { POST } = createEndpoint({
         columns: 3,
         schema: z.uuid(),
       }),
-      userMessageId: scopedRequestField(scopedTranslation, {
+      userMessageId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.userMessageId.label",
@@ -153,7 +153,7 @@ const { POST } = createEndpoint({
         columns: 3,
         schema: z.uuid().nullable(),
       }),
-      parentMessageId: scopedRequestField(scopedTranslation, {
+      parentMessageId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.parentMessageId.label",
@@ -163,7 +163,7 @@ const { POST } = createEndpoint({
       }),
 
       // === MESSAGE CONTENT ===
-      content: scopedRequestField(scopedTranslation, {
+      content: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "post.content.label",
@@ -174,7 +174,7 @@ const { POST } = createEndpoint({
         // For other operations, content must be at least 1 character
         schema: z.string().max(AGENT_MESSAGE_LENGTH),
       }),
-      role: scopedRequestField(scopedTranslation, {
+      role: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.role.label",
@@ -185,7 +185,7 @@ const { POST } = createEndpoint({
       }),
 
       // === AI CONFIGURATION ===
-      model: scopedRequestField(scopedTranslation, {
+      model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.model.label",
@@ -194,7 +194,7 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.enum(ModelId),
       }),
-      character: scopedRequestField(scopedTranslation, {
+      character: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.character.label",
@@ -205,20 +205,20 @@ const { POST } = createEndpoint({
 
       // optional allowed tools - null/undefined = all tools permitted
       // allowed tools = permission gate (what the model is allowed to call)
-      allowedTools: scopedRequestDataArrayOptionalField(
+      allowedTools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
           title: "post.activeTool.label",
           description: "post.activeTool.description",
         },
-        scopedObjectFieldNew(scopedTranslation, {
+        objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 2,
           usage: { request: "data" },
           children: {
-            toolId: scopedRequestField(scopedTranslation, {
+            toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.activeTool.toolId.label",
@@ -226,7 +226,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string(),
             }),
-            requiresConfirmation: scopedRequestField(scopedTranslation, {
+            requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "post.tools.requiresConfirmation.label",
@@ -240,20 +240,20 @@ const { POST } = createEndpoint({
       // required array of tools - null/undefined = no tools enabled
       // Enabled tools are the ones the model sees and is able to execute
       // They are in the tools array and are part of the context window
-      tools: scopedRequestDataArrayOptionalField(
+      tools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
           title: "post.tools.label",
           description: "post.tools.description",
         },
-        scopedObjectFieldNew(scopedTranslation, {
+        objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 2,
           usage: { request: "data" },
           children: {
-            toolId: scopedRequestField(scopedTranslation, {
+            toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "post.tools.toolId.label",
@@ -261,7 +261,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string(),
             }),
-            requiresConfirmation: scopedRequestField(scopedTranslation, {
+            requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               label: "post.tools.requiresConfirmation.label",
@@ -272,28 +272,28 @@ const { POST } = createEndpoint({
           },
         }),
       ),
-      toolConfirmations: scopedRequestDataArrayOptionalField(
+      toolConfirmations: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
           title: "post.toolConfirmation.label",
           description: "post.toolConfirmation.description",
         },
-        scopedObjectFieldNew(scopedTranslation, {
+        objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { request: "data" },
           children: {
-            messageId: scopedRequestField(scopedTranslation, {
+            messageId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               schema: z.string().uuid(),
             }),
-            confirmed: scopedRequestField(scopedTranslation, {
+            confirmed: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean(),
             }),
-            updatedArgs: scopedRequestField(scopedTranslation, {
+            updatedArgs: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.JSON,
               schema: z
@@ -313,7 +313,7 @@ const { POST } = createEndpoint({
       ),
 
       // === MESSAGE HISTORY (for incognito mode) ===
-      messageHistory: scopedRequestField(scopedTranslation, {
+      messageHistory: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "post.messageHistory.label" as const,
@@ -330,14 +330,14 @@ const { POST } = createEndpoint({
       }),
 
       // === FILE ATTACHMENTS ===
-      attachments: scopedRequestDataArrayOptionalField(
+      attachments: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
           title: "post.attachments.label",
           description: "post.attachments.description",
         },
-        scopedRequestField(scopedTranslation, {
+        requestField(scopedTranslation, {
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.FILE,
           schema: z.instanceof(File),
@@ -345,7 +345,7 @@ const { POST } = createEndpoint({
       ),
 
       // === RESUMABLE STREAM SUPPORT ===
-      resumeToken: scopedRequestField(scopedTranslation, {
+      resumeToken: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.resumeToken.label",
@@ -355,7 +355,7 @@ const { POST } = createEndpoint({
       }),
 
       // === VOICE MODE (TTS streaming) ===
-      voiceMode: scopedObjectFieldNew(scopedTranslation, {
+      voiceMode: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.voiceMode.label",
         description: "post.voiceMode.description",
@@ -364,7 +364,7 @@ const { POST } = createEndpoint({
         optional: true,
         usage: { request: "data" },
         children: {
-          enabled: scopedRequestField(scopedTranslation, {
+          enabled: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.voiceMode.enabled.label",
@@ -372,7 +372,7 @@ const { POST } = createEndpoint({
             columns: 6,
             schema: z.coerce.boolean().default(false),
           }),
-          voice: scopedRequestField(scopedTranslation, {
+          voice: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "post.voiceMode.voice.label",
@@ -394,7 +394,7 @@ const { POST } = createEndpoint({
       }),
 
       // === AUDIO INPUT (for voice-to-voice mode) ===
-      audioInput: scopedObjectFieldNew(scopedTranslation, {
+      audioInput: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.audioInput.title",
         description: "post.audioInput.description",
@@ -403,7 +403,7 @@ const { POST } = createEndpoint({
         optional: true,
         usage: { request: "data" },
         children: {
-          file: scopedRequestField(scopedTranslation, {
+          file: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
             label: "post.audioInput.file.label",
@@ -432,7 +432,7 @@ const { POST } = createEndpoint({
       }),
 
       // === TIMEZONE (for cache-stable timestamps) ===
-      timezone: scopedRequestField(scopedTranslation, {
+      timezone: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.timezone.label",
@@ -442,27 +442,27 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.success",
         schema: z.boolean(),
       }),
-      messageId: scopedResponseField(scopedTranslation, {
+      messageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.messageId",
         schema: z.string(),
       }),
-      responseThreadId: scopedResponseField(scopedTranslation, {
+      responseThreadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.threadId",
         schema: z.string().optional(),
       }),
-      totalTokens: scopedResponseField(scopedTranslation, {
+      totalTokens: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.totalTokens",
         schema: z.coerce.number().optional(),
       }),
-      finishReason: scopedResponseField(scopedTranslation, {
+      finishReason: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.finishReason",
         schema: z.string().optional(),

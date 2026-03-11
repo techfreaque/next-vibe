@@ -286,7 +286,7 @@ export async function getUserCreatedTasks(params: {
 /**
  * Pull from all users' remote connections using hash-first protocol.
  * Local sends hashes → remote diffs → returns only changed payloads.
- * Cloud instances (VIBE_IS_CLOUD=true) skip outbound sync entirely.
+ * Cloud instances (NEXT_PUBLIC_VIBE_IS_CLOUD=true) skip outbound sync entirely.
  */
 export async function pullFromRemote(
   logger: EndpointLogger,
@@ -294,7 +294,7 @@ export async function pullFromRemote(
 ): Promise<ResponseType<{ pulled: number }>> {
   const { t } = scopedTranslation.scopedT(locale);
 
-  if (env.VIBE_IS_CLOUD) {
+  if (env.NEXT_PUBLIC_VIBE_IS_CLOUD) {
     return success({ pulled: 0 });
   }
 
@@ -568,7 +568,7 @@ export async function pullFromRemote(
 /**
  * Push a task status update to all active remote connections.
  * Fire-and-forget per user — logs errors but never fails the caller.
- * Cloud instances (VIBE_IS_CLOUD=true) skip outbound push.
+ * Cloud instances (NEXT_PUBLIC_VIBE_IS_CLOUD=true) skip outbound push.
  */
 export async function pushStatusToRemote(params: {
   /** The task's unique id (e.g. "remote-hermes-dev-...") — used by /report to look up the exact task */
@@ -585,7 +585,7 @@ export async function pushStatusToRemote(params: {
 }): Promise<ResponseType<{ pushed: boolean }>> {
   const { logger, ...payload } = params;
 
-  if (env.VIBE_IS_CLOUD) {
+  if (env.NEXT_PUBLIC_VIBE_IS_CLOUD) {
     return success({ pushed: false });
   }
 

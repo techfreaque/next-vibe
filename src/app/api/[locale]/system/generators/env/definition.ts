@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,13 +37,13 @@ const { POST } = createEndpoint({
   ],
   aliases: ["generate:env"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      outputDir: scopedRequestField(scopedTranslation, {
+      outputDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.outputDir.label",
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
         schema: z.string().default("src/app/api/[locale]/system/generated"),
       }),
 
-      verbose: scopedRequestField(scopedTranslation, {
+      verbose: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.verbose.label",
@@ -61,7 +61,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -71,32 +71,32 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.label",
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.message.label",
         schema: z.string(),
       }),
-      serverEnvFiles: scopedResponseField(scopedTranslation, {
+      serverEnvFiles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.serverEnvFiles.label",
         schema: z.coerce.number(),
       }),
-      clientEnvFiles: scopedResponseField(scopedTranslation, {
+      clientEnvFiles: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.clientEnvFiles.label",
         schema: z.coerce.number(),
       }),
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.duration.label",
         schema: z.coerce.number(),
       }),
-      outputPaths: scopedResponseField(scopedTranslation, {
+      outputPaths: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.outputPaths.label",
         schema: z.object({

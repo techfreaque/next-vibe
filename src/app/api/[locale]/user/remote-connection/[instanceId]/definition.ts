@@ -10,13 +10,13 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,10 +46,10 @@ const { GET } = createEndpoint({
     render: RemoteConnectionByIdWidget,
     usage: { response: true, request: "urlPathParams" } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
-      instanceId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      instanceId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.instanceId.label" as const,
@@ -57,27 +57,27 @@ const { GET } = createEndpoint({
         schema: z.string().min(1).max(32),
         hidden: true,
       }),
-      isConnected: scopedResponseField(scopedTranslation, {
+      isConnected: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),
       }),
-      friendlyName: scopedResponseField(scopedTranslation, {
+      friendlyName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
       }),
-      remoteUrl: scopedResponseField(scopedTranslation, {
+      remoteUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
       }),
-      isActive: scopedResponseField(scopedTranslation, {
+      isActive: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean().nullable(),
       }),
-      lastSyncedAt: scopedResponseField(scopedTranslation, {
+      lastSyncedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
@@ -165,15 +165,15 @@ const { PATCH } = createEndpoint({
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-rename", "rename-connection"] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data&urlPathParams", response: true },
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data" },
       }),
-      instanceId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      instanceId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.instanceId.label" as const,
@@ -181,7 +181,7 @@ const { PATCH } = createEndpoint({
         schema: z.string().min(1).max(32),
         hidden: true,
       }),
-      friendlyName: scopedRequestField(scopedTranslation, {
+      friendlyName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.friendlyName.label" as const,
@@ -190,7 +190,7 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).max(64),
       }),
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "patch.title" as const,
         loadingText: "patch.title" as const,
@@ -200,7 +200,7 @@ const { PATCH } = createEndpoint({
         order: 10,
         usage: { request: "data" },
       }),
-      updated: scopedResponseField(scopedTranslation, {
+      updated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),
@@ -326,12 +326,12 @@ const { DELETE } = createEndpoint({
   tags: ["tags.remoteConnection" as const],
   aliases: ["remote-disconnect", "disconnect-remote"] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data&urlPathParams", response: true },
     children: {
-      instanceId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      instanceId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "delete.instanceId.label" as const,
@@ -339,7 +339,7 @@ const { DELETE } = createEndpoint({
         schema: z.string().min(1).max(32),
         hidden: true,
       }),
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "delete.title" as const,
         loadingText: "delete.title" as const,
@@ -349,7 +349,7 @@ const { DELETE } = createEndpoint({
         order: 10,
         usage: { request: "data" },
       }),
-      disconnected: scopedResponseField(scopedTranslation, {
+      disconnected: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),

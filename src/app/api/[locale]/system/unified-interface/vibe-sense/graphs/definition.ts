@@ -8,11 +8,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import { graphConfigSchema } from "../graph/schema";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -42,48 +42,48 @@ const { GET } = createEndpoint({
     render: GraphListContainer,
     usage: { response: true } as const,
     children: {
-      graphs: scopedResponseArrayFieldNew(scopedTranslation, {
+      graphs: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "list.response.graph.id",
               schema: z.string(),
             }),
-            slug: scopedResponseField(scopedTranslation, {
+            slug: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "list.response.graph.slug",
               schema: z.string(),
             }),
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "list.response.graph.name",
               schema: z.string(),
             }),
-            description: scopedResponseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "list.response.graph.description",
               schema: z.string().nullable(),
             }),
-            ownerType: scopedResponseField(scopedTranslation, {
+            ownerType: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "list.response.graph.ownerType",
               schema: z.string(),
             }),
-            ownerId: scopedResponseField(scopedTranslation, {
+            ownerId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "list.response.graph.ownerId",
               schema: z.string().nullable(),
             }),
-            isActive: scopedResponseField(scopedTranslation, {
+            isActive: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               content: "list.response.graph.isActive",
               schema: z.boolean(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "list.response.graph.createdAt",
               schema: z.string(),
@@ -152,13 +152,13 @@ const { POST } = createEndpoint({
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "create.fields.name.label",
@@ -166,7 +166,7 @@ const { POST } = createEndpoint({
         placeholder: "create.fields.name.placeholder",
         schema: z.string().min(1).max(100),
       }),
-      slug: scopedRequestField(scopedTranslation, {
+      slug: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "create.fields.slug.label",
@@ -178,7 +178,7 @@ const { POST } = createEndpoint({
           .max(100)
           .regex(/^[a-z0-9-]+$/),
       }),
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "create.fields.description.label",
@@ -186,7 +186,7 @@ const { POST } = createEndpoint({
         placeholder: "create.fields.description.placeholder",
         schema: z.string().optional(),
       }),
-      config: scopedRequestField(scopedTranslation, {
+      config: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "create.fields.config.label",
@@ -194,7 +194,7 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: graphConfigSchema.optional(),
       }),
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "create.response.id",
         schema: z.string(),

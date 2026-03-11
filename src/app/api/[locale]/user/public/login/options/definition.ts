@@ -9,11 +9,11 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../../user-roles/enum";
@@ -42,7 +42,7 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.userAuth",
   tags: ["tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -51,7 +51,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "fields.email.label",
@@ -61,26 +61,26 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.title",
         description: "response.description",
         layoutType: LayoutType.VERTICAL,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "response.success.badge",
             schema: z
               .boolean()
               .describe("Whether login options were retrieved successfully"),
           }),
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.message.content",
             schema: z.string().describe("Human-readable status message"),
           }),
-          forUser: scopedResponseField(scopedTranslation, {
+          forUser: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.forUser.content",
             schema: z
@@ -88,61 +88,61 @@ const { GET } = createEndpoint({
               .optional()
               .describe("Email address these options are specific to"),
           }),
-          loginMethods: scopedObjectFieldNew(scopedTranslation, {
+          loginMethods: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "response.loginMethods.title",
             description: "response.loginMethods.description",
             layoutType: LayoutType.VERTICAL,
             usage: { response: true },
             children: {
-              password: scopedObjectFieldNew(scopedTranslation, {
+              password: objectField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 title: "response.loginMethods.password.title",
                 description: "response.loginMethods.password.description",
                 layoutType: LayoutType.HORIZONTAL,
                 usage: { response: true },
                 children: {
-                  enabled: scopedResponseField(scopedTranslation, {
+                  enabled: responseField(scopedTranslation, {
                     type: WidgetType.BADGE,
                     text: "response.loginMethods.password.enabled.badge",
                     schema: z
                       .boolean()
                       .describe("Whether password login is allowed"),
                   }),
-                  passwordDescription: scopedResponseField(scopedTranslation, {
+                  passwordDescription: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "response.loginMethods.password.description",
                     schema: z.string().describe("Human-readable description"),
                   }),
                 },
               }),
-              social: scopedObjectFieldNew(scopedTranslation, {
+              social: objectField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 title: "response.loginMethods.social.title",
                 description: "response.loginMethods.social.description",
                 layoutType: LayoutType.VERTICAL,
                 usage: { response: true },
                 children: {
-                  enabled: scopedResponseField(scopedTranslation, {
+                  enabled: responseField(scopedTranslation, {
                     type: WidgetType.BADGE,
                     text: "response.loginMethods.social.enabled.badge",
                     schema: z
                       .boolean()
                       .describe("Whether social login is allowed"),
                   }),
-                  socialDescription: scopedResponseField(scopedTranslation, {
+                  socialDescription: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "response.loginMethods.social.description",
                     schema: z.string().describe("Human-readable description"),
                   }),
-                  providers: scopedResponseArrayFieldNew(scopedTranslation, {
+                  providers: responseArrayField(scopedTranslation, {
                     type: WidgetType.CONTAINER,
-                    child: scopedObjectFieldNew(scopedTranslation, {
+                    child: objectField(scopedTranslation, {
                       type: WidgetType.CONTAINER,
                       layoutType: LayoutType.HORIZONTAL,
                       usage: { response: true },
                       children: {
-                        name: scopedResponseField(scopedTranslation, {
+                        name: responseField(scopedTranslation, {
                           type: WidgetType.TEXT,
                           content:
                             "response.loginMethods.social.providers.name.content",
@@ -152,20 +152,20 @@ const { GET } = createEndpoint({
                               "Provider display name (e.g., 'Google', 'GitHub')",
                             ),
                         }),
-                        id: scopedResponseField(scopedTranslation, {
+                        id: responseField(scopedTranslation, {
                           type: WidgetType.TEXT,
                           content:
                             "response.loginMethods.social.providers.id.content",
                           schema: z.string().describe("Provider identifier"),
                         }),
-                        enabled: scopedResponseField(scopedTranslation, {
+                        enabled: responseField(scopedTranslation, {
                           type: WidgetType.BADGE,
                           text: "response.loginMethods.social.providers.enabled.badge",
                           schema: z
                             .boolean()
                             .describe("Whether this provider is available"),
                         }),
-                        description: scopedResponseField(scopedTranslation, {
+                        description: responseField(scopedTranslation, {
                           type: WidgetType.TEXT,
                           content:
                             "response.loginMethods.social.providers.description",
@@ -180,14 +180,14 @@ const { GET } = createEndpoint({
               }),
             },
           }),
-          security: scopedObjectFieldNew(scopedTranslation, {
+          security: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "response.security.title",
             description: "response.security.description",
             layoutType: LayoutType.HORIZONTAL,
             usage: { response: true },
             children: {
-              maxAttempts: scopedResponseField(scopedTranslation, {
+              maxAttempts: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.security.maxAttempts.content",
                 schema: z
@@ -195,7 +195,7 @@ const { GET } = createEndpoint({
                   .optional()
                   .describe("Maximum login attempts allowed"),
               }),
-              requireTwoFactor: scopedResponseField(scopedTranslation, {
+              requireTwoFactor: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 text: "response.security.requireTwoFactor.badge",
                 schema: z
@@ -203,7 +203,7 @@ const { GET } = createEndpoint({
                   .optional()
                   .describe("Whether 2FA is required for this user"),
               }),
-              securityDescription: scopedResponseField(scopedTranslation, {
+              securityDescription: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.security.description",
                 schema: z.string().describe("Security requirements summary"),

@@ -8,9 +8,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "generate.post.title",
     description: "generate.post.description",
@@ -56,25 +56,25 @@ const { POST } = createEndpoint({
     usage: { response: true },
     children: {
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "generate.post.response.fields.success",
         schema: z.boolean(),
       }),
 
-      created: scopedResponseField(scopedTranslation, {
+      created: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "generate.post.response.fields.created",
         schema: z.array(z.string()),
       }),
 
-      skipped: scopedResponseField(scopedTranslation, {
+      skipped: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "generate.post.response.fields.skipped",
         schema: z.array(z.string()),
       }),
 
-      errors: scopedResponseField(scopedTranslation, {
+      errors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "generate.post.response.fields.errors",
         schema: z.array(
@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         ),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "generate.post.response.fields.message",
         schema: z.string(),

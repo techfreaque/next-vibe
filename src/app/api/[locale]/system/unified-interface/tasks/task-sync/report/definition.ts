@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -36,26 +36,26 @@ const { POST } = createEndpoint({
   tags: ["tags.tasks" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // Request
-      taskId: scopedRequestField(scopedTranslation, {
+      taskId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().min(1),
       }),
-      executionId: scopedRequestField(scopedTranslation, {
+      executionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
       }),
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -67,43 +67,43 @@ const { POST } = createEndpoint({
           CronTaskStatus.TIMEOUT,
         ]),
       }),
-      durationMs: scopedRequestField(scopedTranslation, {
+      durationMs: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
-      summary: scopedRequestField(scopedTranslation, {
+      summary: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
         schema: z.string().optional(),
       }),
-      error: scopedRequestField(scopedTranslation, {
+      error: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
         schema: z.string().optional(),
       }),
-      serverTimezone: scopedRequestField(scopedTranslation, {
+      serverTimezone: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
       }),
-      executedByInstance: scopedRequestField(scopedTranslation, {
+      executedByInstance: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
       }),
-      output: scopedRequestField(scopedTranslation, {
+      output: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
         schema: taskInputSchema.optional(),
       }),
-      startedAt: scopedRequestField(scopedTranslation, {
+      startedAt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
       }),
 
       // Response
-      processed: scopedResponseField(scopedTranslation, {
+      processed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
       }),

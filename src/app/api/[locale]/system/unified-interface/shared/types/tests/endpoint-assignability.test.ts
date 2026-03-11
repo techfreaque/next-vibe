@@ -20,8 +20,10 @@ import type {
   CreateApiEndpoint,
   EndpointReadOptions,
 } from "../../endpoints/definition/create";
-import { objectField } from "../../field/utils";
-import { requestUrlPathParamsField } from "../../field/utils-new";
+import {
+  objectFieldNew,
+  requestUrlPathParamsField,
+} from "../../field/utils-new";
 import type {
   ExamplesList,
   ExtractInput,
@@ -68,11 +70,11 @@ const test1_4: Test1_4_TupleExtends = "PASS";
 // ============================================================================
 
 // Test 2.1: ApiEndpoint with literal type parameters
-const test2_1_field = objectField(
-  { type: WidgetType.CONTAINER },
-  { request: "data" },
-  {},
-);
+const test2_1_field = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  usage: { request: "data" },
+  children: {},
+});
 
 type Test2_1_LiteralEndpoint = ApiEndpoint<
   Methods.POST,
@@ -123,10 +125,10 @@ const test2_3: Test2_3_WithVariance = "PASS"; // Passes with 'out' variance!
 // ============================================================================
 
 // Test 3.1: CreateApiEndpoint with literal type parameters
-const test3_1_field = objectField(
-  { type: WidgetType.CONTAINER },
-  { request: "urlPathParams", response: true },
-  {
+const test3_1_field = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  usage: { request: "urlPathParams", response: true },
+  children: {
     jobId: requestUrlPathParamsField({
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.UUID,
@@ -135,7 +137,7 @@ const test3_1_field = objectField(
       schema: z.string().uuid(),
     }),
   },
-);
+});
 
 type Test3_1_LiteralCreate = CreateApiEndpoint<
   Methods.POST,
@@ -259,11 +261,11 @@ type Test3_8_Direct =
 const test3_8: Test3_8_Direct = "PASS"; // We WANT objectField to extend UnifiedField
 
 // Test 3.9: Test SimpleObjectField
-const simpleObjectFieldValue = objectField(
-  { type: WidgetType.CONTAINER },
-  { request: "data" },
-  {},
-);
+const simpleObjectFieldValue = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  usage: { request: "data" },
+  children: {},
+});
 
 type SimpleObjectField = typeof simpleObjectFieldValue;
 type Test3_10_SimpleObject =

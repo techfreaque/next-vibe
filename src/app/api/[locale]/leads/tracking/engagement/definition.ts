@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -100,10 +100,12 @@ const { POST } = createEndpoint({
     render: LeadEngagementTrackingContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
       // === REQUEST FIELDS ===
-      leadId: scopedRequestField(scopedTranslation, {
+      leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.leadId.label",
@@ -113,7 +115,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.uuid().nullable().optional(),
       }),
-      engagementType: scopedRequestField(scopedTranslation, {
+      engagementType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.engagementType.label",
@@ -124,7 +126,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(EngagementTypesDB),
       }),
-      campaignId: scopedRequestField(scopedTranslation, {
+      campaignId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.campaignId.label",
@@ -134,7 +136,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.uuid().optional(),
       }),
-      metadata: scopedRequestField(scopedTranslation, {
+      metadata: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "post.metadata.label",
@@ -144,7 +146,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: engagementMetadataSchema,
       }),
-      userId: scopedRequestField(scopedTranslation, {
+      userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.userId.label",
@@ -156,59 +158,59 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.id",
         schema: z.uuid(),
       }),
-      responseLeadId: scopedResponseField(scopedTranslation, {
+      responseLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.leadId",
         schema: z.uuid(),
       }),
-      responseEngagementType: scopedResponseField(scopedTranslation, {
+      responseEngagementType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.engagementType",
         schema: z.enum(EngagementTypesDB),
       }),
-      responseCampaignId: scopedResponseField(scopedTranslation, {
+      responseCampaignId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.campaignId",
         schema: z.uuid().optional(),
       }),
-      responseMetadata: scopedResponseField(scopedTranslation, {
+      responseMetadata: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.metadata",
         schema: z
           .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
           .optional(),
       }),
-      timestamp: scopedResponseField(scopedTranslation, {
+      timestamp: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.timestamp",
         schema: dateSchema,
       }),
-      ipAddress: scopedResponseField(scopedTranslation, {
+      ipAddress: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.ipAddress",
         schema: z.string().optional(),
       }),
-      userAgent: scopedResponseField(scopedTranslation, {
+      userAgent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.userAgent",
         schema: z.string().optional(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.createdAt",
         schema: dateSchema,
       }),
-      leadCreated: scopedResponseField(scopedTranslation, {
+      leadCreated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.leadCreated",
         schema: z.boolean().optional(),
       }),
-      relationshipEstablished: scopedResponseField(scopedTranslation, {
+      relationshipEstablished: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.relationshipEstablished",
         schema: z.boolean().optional(),
@@ -347,10 +349,12 @@ const { GET } = createEndpoint({
     render: LeadClickTrackingContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
       // === REQUEST FIELDS (Query Parameters) ===
-      id: scopedRequestField(scopedTranslation, {
+      id: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.id.label",
@@ -360,7 +364,7 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.uuid().optional(),
       }),
-      campaignId: scopedRequestField(scopedTranslation, {
+      campaignId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.campaignId.label",
@@ -370,7 +374,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.uuid().optional(),
       }),
-      stage: scopedRequestField(scopedTranslation, {
+      stage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.stage.label",
@@ -381,7 +385,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.enum(EmailCampaignStage).optional(),
       }),
-      source: scopedRequestField(scopedTranslation, {
+      source: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.source.label",
@@ -392,7 +396,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.enum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
       }),
-      url: scopedRequestField(scopedTranslation, {
+      url: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.url.label",
@@ -402,7 +406,7 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.string(),
       }),
-      ref: scopedRequestField(scopedTranslation, {
+      ref: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.ref.label",
@@ -414,37 +418,37 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.success",
         schema: z.boolean(),
       }),
-      redirectUrl: scopedResponseField(scopedTranslation, {
+      redirectUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.redirectUrl",
         schema: z.string(),
       }),
-      responseLeadId: scopedResponseField(scopedTranslation, {
+      responseLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.leadId",
         schema: z.string().optional(),
       }),
-      responseCampaignId: scopedResponseField(scopedTranslation, {
+      responseCampaignId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.campaignId",
         schema: z.uuid().optional(),
       }),
-      engagementRecorded: scopedResponseField(scopedTranslation, {
+      engagementRecorded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.engagementRecorded",
         schema: z.boolean(),
       }),
-      leadStatusUpdated: scopedResponseField(scopedTranslation, {
+      leadStatusUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.leadStatusUpdated",
         schema: z.boolean(),
       }),
-      isLoggedIn: scopedResponseField(scopedTranslation, {
+      isLoggedIn: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.isLoggedIn",
         schema: z.boolean(),

@@ -8,11 +8,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedObjectOptionalField,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  objectOptionalField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -74,7 +74,7 @@ const { GET } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "title",
     description: "description",
@@ -83,7 +83,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      includeDetails: scopedRequestField(scopedTranslation, {
+      includeDetails: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "includeDetails.title",
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      checkConnections: scopedRequestField(scopedTranslation, {
+      checkConnections: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "checkConnections.title",
@@ -102,32 +102,32 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "status.title",
         schema: z.enum(["healthy", "degraded", "unhealthy"]),
       }),
 
-      timestamp: scopedResponseField(scopedTranslation, {
+      timestamp: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "timestamp.title",
         schema: z.string(),
       }),
 
-      connections: scopedObjectFieldNew(scopedTranslation, {
+      connections: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "connections.title",
         layoutType: LayoutType.GRID,
         columns: 2,
         usage: { response: true },
         children: {
-          primary: scopedResponseField(scopedTranslation, {
+          primary: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "connections.primary",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean(),
           }),
-          replica: scopedResponseField(scopedTranslation, {
+          replica: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "connections.replica",
             fieldType: FieldDataType.BOOLEAN,
@@ -136,32 +136,32 @@ const { GET } = createEndpoint({
         },
       }),
 
-      details: scopedObjectOptionalField(scopedTranslation, {
+      details: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "details.title",
         layoutType: LayoutType.GRID,
         columns: 2,
         usage: { response: true },
         children: {
-          version: scopedResponseField(scopedTranslation, {
+          version: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "details.version",
             fieldType: FieldDataType.TEXT,
             schema: z.string().optional(),
           }),
-          uptime: scopedResponseField(scopedTranslation, {
+          uptime: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "details.uptime",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),
-          activeConnections: scopedResponseField(scopedTranslation, {
+          activeConnections: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "details.activeConnections",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),
-          maxConnections: scopedResponseField(scopedTranslation, {
+          maxConnections: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "details.maxConnections",
             fieldType: FieldDataType.NUMBER,

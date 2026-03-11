@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     UserRole.CLI_AUTH_BYPASS,
   ],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -54,7 +54,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      vibeStart: scopedRequestField(scopedTranslation, {
+      vibeStart: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.vibeStart.title",
@@ -64,25 +64,25 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.output.title",
         schema: z.string(),
       }),
 
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.duration.title",
         schema: z.coerce.number(),
       }),
 
-      errors: scopedResponseField(scopedTranslation, {
+      errors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.errors.title",
         schema: z.array(z.string()).optional(),

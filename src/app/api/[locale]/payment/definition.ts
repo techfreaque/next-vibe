@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestResponseField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestResponseField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -42,7 +42,7 @@ const { GET } = createEndpoint({
   tags: ["tags.payment" as const, "tags.stripe" as const, "tags.info" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.title" as const,
     description: "form.description" as const,
@@ -50,7 +50,7 @@ const { GET } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      priceId: scopedResponseField(scopedTranslation, {
+      priceId: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "priceId.label" as const,
@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.string().min(1),
       }),
-      mode: scopedResponseField(scopedTranslation, {
+      mode: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "mode.label" as const,
@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.enum(CheckoutMode),
       }),
-      paymentMethodTypes: scopedResponseField(scopedTranslation, {
+      paymentMethodTypes: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "create.paymentMethodTypes.label" as const,
@@ -77,7 +77,7 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.array(z.enum(PaymentMethodType)).optional(),
       }),
-      successUrl: scopedResponseField(scopedTranslation, {
+      successUrl: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
         label: "create.successUrl.label" as const,
@@ -86,7 +86,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      cancelUrl: scopedResponseField(scopedTranslation, {
+      cancelUrl: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
         label: "create.cancelUrl.label" as const,
@@ -95,7 +95,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      customerEmail: scopedResponseField(scopedTranslation, {
+      customerEmail: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "create.customerEmail.label" as const,
@@ -104,12 +104,12 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.string().email().optional(),
       }),
-      sessionUrl: scopedResponseField(scopedTranslation, {
+      sessionUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.sessionUrl" as const,
         schema: z.string().url(),
       }),
-      sessionId: scopedResponseField(scopedTranslation, {
+      sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.sessionId" as const,
         schema: z.string(),
@@ -201,7 +201,7 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.title" as const,
     description: "form.description" as const,
@@ -209,7 +209,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      priceId: scopedRequestResponseField(scopedTranslation, {
+      priceId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "priceId.label" as const,
@@ -218,7 +218,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1),
       }),
-      mode: scopedRequestResponseField(scopedTranslation, {
+      mode: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "mode.label" as const,
@@ -227,7 +227,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.enum(CheckoutMode),
       }),
-      paymentMethodTypes: scopedRequestResponseField(scopedTranslation, {
+      paymentMethodTypes: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "create.paymentMethodTypes.label" as const,
@@ -236,7 +236,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.array(z.enum(PaymentMethodType)).optional(),
       }),
-      successUrl: scopedRequestResponseField(scopedTranslation, {
+      successUrl: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
         label: "create.successUrl.label" as const,
@@ -245,7 +245,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      cancelUrl: scopedRequestResponseField(scopedTranslation, {
+      cancelUrl: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
         label: "create.cancelUrl.label" as const,
@@ -254,7 +254,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      customerEmail: scopedRequestResponseField(scopedTranslation, {
+      customerEmail: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "create.customerEmail.label" as const,
@@ -263,17 +263,17 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().email().optional(),
       }),
-      sessionUrl: scopedResponseField(scopedTranslation, {
+      sessionUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.sessionUrl" as const,
         schema: z.string().url(),
       }),
-      sessionId: scopedResponseField(scopedTranslation, {
+      sessionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.sessionId" as const,
         schema: z.string(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "create.success.message" as const,
         schema: z.string(),

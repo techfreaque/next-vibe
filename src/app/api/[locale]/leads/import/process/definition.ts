@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   tags: ["import.process.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "import.process.post.container.title",
     description: "import.process.post.container.description",
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      maxJobsPerRun: scopedRequestField(scopedTranslation, {
+      maxJobsPerRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "import.process.post.fields.maxJobsPerRun.label",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(10).default(5),
       }),
 
-      maxRetriesPerJob: scopedRequestField(scopedTranslation, {
+      maxRetriesPerJob: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "import.process.post.fields.maxRetriesPerJob.label",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(5).default(3),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "import.process.post.fields.dryRun.label",
@@ -68,7 +68,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      selfTaskId: scopedRequestField(scopedTranslation, {
+      selfTaskId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "import.process.post.fields.selfTaskId.label",
@@ -77,25 +77,25 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      jobsProcessed: scopedResponseField(scopedTranslation, {
+      jobsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "import.process.post.response.jobsProcessed",
         schema: z.number(),
       }),
 
-      totalRowsProcessed: scopedResponseField(scopedTranslation, {
+      totalRowsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "import.process.post.response.totalRowsProcessed",
         schema: z.number(),
       }),
 
-      successfulImports: scopedResponseField(scopedTranslation, {
+      successfulImports: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "import.process.post.response.successfulImports",
         schema: z.number(),
       }),
 
-      failedImports: scopedResponseField(scopedTranslation, {
+      failedImports: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "import.process.post.response.failedImports",
         schema: z.number(),

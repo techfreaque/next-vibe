@@ -8,13 +8,13 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -115,10 +115,12 @@ const { GET } = createEndpoint({
     render: CronTasksContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // Request fields for filtering
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.fields.status.label",
@@ -128,7 +130,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.array(z.enum(CronTaskStatusDB)).optional(),
       }),
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.fields.priority.label",
@@ -138,7 +140,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.array(z.enum(CronTaskPriorityDB)).optional(),
       }),
-      category: scopedRequestField(scopedTranslation, {
+      category: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.fields.category.label",
@@ -148,7 +150,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.array(z.enum(TaskCategoryDB)).optional(),
       }),
-      enabled: scopedRequestField(scopedTranslation, {
+      enabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.fields.enabled.label",
@@ -161,7 +163,7 @@ const { GET } = createEndpoint({
           .optional()
           .default(CronTaskEnabledFilter.ALL),
       }),
-      hidden: scopedRequestField(scopedTranslation, {
+      hidden: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.fields.hidden.label",
@@ -174,7 +176,7 @@ const { GET } = createEndpoint({
           .optional()
           .default(CronTaskHiddenFilter.VISIBLE),
       }),
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.limit.label",
@@ -182,7 +184,7 @@ const { GET } = createEndpoint({
         columns: 3,
         schema: z.string().optional(),
       }),
-      offset: scopedRequestField(scopedTranslation, {
+      offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.offset.label",
@@ -192,9 +194,9 @@ const { GET } = createEndpoint({
       }),
 
       // Response fields
-      tasks: scopedResponseArrayFieldNew(scopedTranslation, {
+      tasks: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "get.response.task.title",
           description: "get.response.task.description",
@@ -202,142 +204,142 @@ const { GET } = createEndpoint({
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.id",
               schema: z.string(),
             }),
-            routeId: scopedResponseField(scopedTranslation, {
+            routeId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.routeId",
               schema: z.string(),
             }),
-            displayName: scopedResponseField(scopedTranslation, {
+            displayName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.displayName",
               schema: z.string(),
             }),
-            description: scopedResponseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.taskDescription",
               schema: z.string().nullable(),
             }),
-            version: scopedResponseField(scopedTranslation, {
+            version: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.version",
               schema: z.string(),
             }),
-            category: scopedResponseField(scopedTranslation, {
+            category: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.category",
               schema: z.enum(TaskCategoryDB),
             }),
-            schedule: scopedResponseField(scopedTranslation, {
+            schedule: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.schedule",
               schema: z.string(),
             }),
-            timezone: scopedResponseField(scopedTranslation, {
+            timezone: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.timezone",
               schema: z.string().nullable(),
             }),
-            enabled: scopedResponseField(scopedTranslation, {
+            enabled: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.enabled",
               schema: z.boolean(),
             }),
-            hidden: scopedResponseField(scopedTranslation, {
+            hidden: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.hidden",
               schema: z.boolean(),
             }),
-            priority: scopedResponseField(scopedTranslation, {
+            priority: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.priority",
               schema: z.enum(CronTaskPriorityDB),
             }),
-            timeout: scopedResponseField(scopedTranslation, {
+            timeout: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.timeout",
               schema: z.number().nullable(),
             }),
-            retries: scopedResponseField(scopedTranslation, {
+            retries: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.retries",
               schema: z.number().nullable(),
             }),
-            retryDelay: scopedResponseField(scopedTranslation, {
+            retryDelay: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.retryDelay",
               schema: z.number().nullable(),
             }),
-            outputMode: scopedResponseField(scopedTranslation, {
+            outputMode: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.outputMode",
               schema: z.enum(TaskOutputModeDB),
             }),
-            userId: scopedResponseField(scopedTranslation, {
+            userId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.userId",
               schema: z.string().nullable(),
             }),
-            lastExecutedAt: scopedResponseField(scopedTranslation, {
+            lastExecutedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.lastExecutedAt",
               schema: z.string().nullable(),
             }),
-            lastExecutionStatus: scopedResponseField(scopedTranslation, {
+            lastExecutionStatus: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.lastExecutionStatus",
               schema: z.enum(CronTaskStatusDB).nullable(),
             }),
-            lastExecutionError: scopedResponseField(scopedTranslation, {
+            lastExecutionError: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.lastExecutionError",
               schema: z.string().nullable(),
             }),
-            lastExecutionDuration: scopedResponseField(scopedTranslation, {
+            lastExecutionDuration: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.lastExecutionDuration",
               schema: z.number().nullable(),
             }),
-            nextExecutionAt: scopedResponseField(scopedTranslation, {
+            nextExecutionAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.nextExecutionAt",
               schema: z.string().nullable(),
             }),
-            executionCount: scopedResponseField(scopedTranslation, {
+            executionCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.executionCount",
               schema: z.number(),
             }),
-            consecutiveFailures: scopedResponseField(scopedTranslation, {
+            consecutiveFailures: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.consecutiveFailures",
               schema: z.number(),
             }),
-            successCount: scopedResponseField(scopedTranslation, {
+            successCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.successCount",
               schema: z.number(),
             }),
-            errorCount: scopedResponseField(scopedTranslation, {
+            errorCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.errorCount",
               schema: z.number(),
             }),
-            averageExecutionTime: scopedResponseField(scopedTranslation, {
+            averageExecutionTime: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.averageExecutionTime",
               schema: z.number().nullable(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.createdAt",
               schema: z.string(),
             }),
-            updatedAt: scopedResponseField(scopedTranslation, {
+            updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.updatedAt",
               schema: z.string(),
@@ -345,7 +347,7 @@ const { GET } = createEndpoint({
           },
         }),
       }),
-      totalTasks: scopedResponseField(scopedTranslation, {
+      totalTasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.totalTasks",
         schema: z.coerce.number(),
@@ -427,7 +429,7 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
   ],
   tags: ["tags.cron" as const, "tags.scheduling" as const],
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
     description: "post.container.description",
@@ -436,7 +438,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // Request fields
-      id: scopedRequestField(scopedTranslation, {
+      id: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.id.label",
@@ -445,7 +447,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      routeId: scopedRequestField(scopedTranslation, {
+      routeId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.routeId.label",
@@ -454,7 +456,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1),
       }),
-      displayName: scopedRequestField(scopedTranslation, {
+      displayName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.displayName.label",
@@ -463,7 +465,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1),
       }),
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "post.fields.description.label",
@@ -472,7 +474,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
-      schedule: scopedRequestField(scopedTranslation, {
+      schedule: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.schedule.label",
@@ -481,7 +483,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().min(1),
       }),
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.fields.priority.label",
@@ -490,7 +492,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(CronTaskPriorityDB).default(CronTaskPriority.MEDIUM),
       }),
-      category: scopedRequestField(scopedTranslation, {
+      category: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.fields.category.label",
@@ -499,7 +501,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(TaskCategoryDB).default(TaskCategory.SYSTEM),
       }),
-      enabled: scopedRequestField(scopedTranslation, {
+      enabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.enabled.label",
@@ -507,7 +509,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      outputMode: scopedRequestField(scopedTranslation, {
+      outputMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         options: TaskOutputModeOptions,
@@ -516,7 +518,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(TaskOutputModeDB).default(TaskOutputModeDB[0]),
       }),
-      timeout: scopedRequestField(scopedTranslation, {
+      timeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.timeout.label",
@@ -524,7 +526,7 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.coerce.number().default(300000),
       }),
-      retries: scopedRequestField(scopedTranslation, {
+      retries: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.retries.label",
@@ -532,7 +534,7 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.coerce.number().default(3),
       }),
-      retryDelay: scopedRequestField(scopedTranslation, {
+      retryDelay: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.retryDelay.label",
@@ -540,7 +542,7 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.coerce.number().default(5000),
       }),
-      taskInput: scopedRequestField(scopedTranslation, {
+      taskInput: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "post.fields.taskInput.label",
@@ -548,7 +550,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: taskInputSchema.optional(),
       }),
-      runOnce: scopedRequestField(scopedTranslation, {
+      runOnce: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.runOnce.label",
@@ -556,7 +558,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(false),
       }),
-      targetInstance: scopedRequestField(scopedTranslation, {
+      targetInstance: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.targetInstance.label",
@@ -567,7 +569,7 @@ const { POST } = createEndpoint({
       }),
 
       // Response - return the created task
-      task: scopedResponseField(scopedTranslation, {
+      task: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.task.title",
         schema: cronTaskResponseSchema,

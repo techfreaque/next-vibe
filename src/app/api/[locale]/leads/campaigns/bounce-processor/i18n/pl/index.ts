@@ -57,4 +57,12 @@ export const translations: typeof enTranslations = {
       description: "Powiadomienia o zwrotach przetworzone pomyślnie",
     },
   },
+  widget: {
+    title: "Uruchom przetwarzanie zwrotów",
+    description:
+      "Ręcznie skanuj skrzynkę IMAP w poszukiwaniu powiadomień o zwrotach i aktualizuj statusy leadów.",
+    runButton: "Uruchom teraz",
+    running: "Uruchamianie...",
+    done: "Gotowe",
+  },
 };

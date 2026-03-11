@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
     } as const,
     children: {
       // === REQUEST FIELDS ===
-      quantity: scopedRequestField(scopedTranslation, {
+      quantity: requestField(scopedTranslation, {
         schema: z.coerce.number().int().min(1).default(1),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.INT,
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         placeholder: "post.quantity.placeholder",
       }),
 
-      provider: scopedRequestField(scopedTranslation, {
+      provider: requestField(scopedTranslation, {
         schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -70,25 +70,25 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      checkoutUrl: scopedResponseField(scopedTranslation, {
+      checkoutUrl: responseField(scopedTranslation, {
         schema: z.string().url(),
         type: WidgetType.TEXT,
         content: "post.checkoutUrl.content",
       }),
 
-      sessionId: scopedResponseField(scopedTranslation, {
+      sessionId: responseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.TEXT,
         content: "post.sessionId.content",
       }),
 
-      totalAmount: scopedResponseField(scopedTranslation, {
+      totalAmount: responseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
         content: "post.totalAmount.content",
       }),
 
-      totalCredits: scopedResponseField(scopedTranslation, {
+      totalCredits: responseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
         content: "post.totalCredits.content",

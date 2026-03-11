@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -39,7 +39,7 @@ const { GET } = createEndpoint({
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -48,14 +48,14 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === SEARCH CRITERIA ===
-      searchCriteria: scopedObjectFieldNew(scopedTranslation, {
+      searchCriteria: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "groups.searchCriteria.title",
         description: "groups.searchCriteria.description",
         layoutType: LayoutType.VERTICAL,
         usage: { request: "data" },
         children: {
-          search: scopedRequestField(scopedTranslation, {
+          search: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "fields.search.label",
@@ -74,14 +74,14 @@ const { GET } = createEndpoint({
       }),
 
       // === SEARCH FILTERS (PROGRESSIVE DISCLOSURE) ===
-      filters: scopedObjectFieldNew(scopedTranslation, {
+      filters: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "groups.filters.title",
         description: "groups.filters.description",
         layoutType: LayoutType.VERTICAL,
         usage: { request: "data" },
         children: {
-          roles: scopedRequestField(scopedTranslation, {
+          roles: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
             label: "fields.roles.label",
@@ -93,7 +93,7 @@ const { GET } = createEndpoint({
             schema: z.array(z.enum(UserRoleDB)).optional(),
           }),
 
-          status: scopedRequestField(scopedTranslation, {
+          status: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.status.label",
@@ -111,14 +111,14 @@ const { GET } = createEndpoint({
       }),
 
       // === PAGINATION CONTROLS ===
-      pagination: scopedObjectFieldNew(scopedTranslation, {
+      pagination: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "groups.pagination.title",
         description: "groups.pagination.description",
         layoutType: LayoutType.VERTICAL,
         usage: { request: "data" },
         children: {
-          limit: scopedRequestField(scopedTranslation, {
+          limit: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "fields.limit.label",
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
             schema: z.coerce.number().min(1).max(100).default(20),
           }),
 
-          offset: scopedRequestField(scopedTranslation, {
+          offset: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "fields.offset.label",
@@ -141,24 +141,24 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.title",
         description: "response.description",
         layoutType: LayoutType.VERTICAL,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "response.success.badge",
             schema: z.boolean().describe("Whether the search was successful"),
           }),
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.message.content",
             schema: z.string().describe("Human-readable search result summary"),
           }),
-          searchInfo: scopedObjectFieldNew(scopedTranslation, {
+          searchInfo: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "response.searchInfo.title",
             description: "response.searchInfo.description",
@@ -166,22 +166,22 @@ const { GET } = createEndpoint({
             columns: 12,
             usage: { response: true },
             children: {
-              searchTerm: scopedResponseField(scopedTranslation, {
+              searchTerm: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.searchInfo.searchTerm",
                 schema: z.string().optional().describe("The search term used"),
               }),
-              appliedFilters: scopedResponseField(scopedTranslation, {
+              appliedFilters: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.searchInfo.appliedFilters",
                 schema: z.array(z.string()).describe("Active search filters"),
               }),
-              searchTime: scopedResponseField(scopedTranslation, {
+              searchTime: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.searchInfo.searchTime",
                 schema: z.string().describe("How long the search took"),
               }),
-              totalResults: scopedResponseField(scopedTranslation, {
+              totalResults: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.searchInfo.totalResults",
                 schema: z.coerce
@@ -190,78 +190,78 @@ const { GET } = createEndpoint({
               }),
             },
           }),
-          users: scopedResponseArrayFieldNew(scopedTranslation, {
+          users: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.users.id",
                   schema: z.uuid(),
                 }),
-                leadId: scopedResponseField(scopedTranslation, {
+                leadId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.users.leadId",
                   schema: z.uuid().nullable(),
                 }),
-                isPublic: scopedResponseField(scopedTranslation, {
+                isPublic: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.users.isPublic",
                   schema: z.literal(false),
                 }),
-                privateName: scopedResponseField(scopedTranslation, {
+                privateName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.users.privateName",
                   schema: z.string(),
                 }),
-                publicName: scopedResponseField(scopedTranslation, {
+                publicName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.users.publicName",
                   schema: z.string(),
                 }),
-                email: scopedResponseField(scopedTranslation, {
+                email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.users.email",
                   schema: z.email(),
                 }),
-                isActive: scopedResponseField(scopedTranslation, {
+                isActive: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.users.isActive",
                   schema: z.boolean().nullable(),
                 }),
-                emailVerified: scopedResponseField(scopedTranslation, {
+                emailVerified: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.users.emailVerified",
                   schema: z.boolean().nullable(),
                 }),
-                requireTwoFactor: scopedResponseField(scopedTranslation, {
+                requireTwoFactor: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.users.requireTwoFactor",
                   schema: z.boolean().optional(),
                 }),
-                marketingConsent: scopedResponseField(scopedTranslation, {
+                marketingConsent: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "response.users.marketingConsent",
                   schema: z.boolean().optional(),
                 }),
-                userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+                userRoles: responseArrayField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   groupBy: "role",
-                  child: scopedObjectFieldNew(scopedTranslation, {
+                  child: objectField(scopedTranslation, {
                     type: WidgetType.CONTAINER,
                     layoutType: LayoutType.HORIZONTAL,
                     usage: { response: true },
                     children: {
-                      id: scopedResponseField(scopedTranslation, {
+                      id: responseField(scopedTranslation, {
                         type: WidgetType.TEXT,
                         content: "response.users.userRoles.id",
                         schema: z.string(),
                       }),
-                      role: scopedResponseField(scopedTranslation, {
+                      role: responseField(scopedTranslation, {
                         type: WidgetType.BADGE,
                         text: "response.users.userRoles.role",
                         schema: z.enum(UserRole),
@@ -269,12 +269,12 @@ const { GET } = createEndpoint({
                     },
                   }),
                 }),
-                createdAt: scopedResponseField(scopedTranslation, {
+                createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.users.createdAt",
                   schema: dateSchema,
                 }),
-                updatedAt: scopedResponseField(scopedTranslation, {
+                updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "response.users.updatedAt",
                   schema: dateSchema,
@@ -282,7 +282,7 @@ const { GET } = createEndpoint({
               },
             }),
           }),
-          pagination: scopedObjectFieldNew(scopedTranslation, {
+          pagination: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "response.pagination.title",
             description: "response.pagination.description",
@@ -290,34 +290,34 @@ const { GET } = createEndpoint({
             columns: 12,
             usage: { response: true },
             children: {
-              currentPage: scopedResponseField(scopedTranslation, {
+              currentPage: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.pagination.currentPage",
                 schema: z.coerce
                   .number()
                   .describe("Current page number (1-based)"),
               }),
-              totalPages: scopedResponseField(scopedTranslation, {
+              totalPages: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.pagination.totalPages",
                 schema: z.coerce.number().describe("Total number of pages"),
               }),
-              itemsPerPage: scopedResponseField(scopedTranslation, {
+              itemsPerPage: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.pagination.itemsPerPage",
                 schema: z.coerce.number().describe("Number of items per page"),
               }),
-              totalItems: scopedResponseField(scopedTranslation, {
+              totalItems: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.pagination.totalItems",
                 schema: z.coerce.number().describe("Total number of items"),
               }),
-              hasMore: scopedResponseField(scopedTranslation, {
+              hasMore: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 text: "response.pagination.hasMore",
                 schema: z.boolean().describe("Whether there are more pages"),
               }),
-              hasPrevious: scopedResponseField(scopedTranslation, {
+              hasPrevious: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 text: "response.pagination.hasPrevious",
                 schema: z

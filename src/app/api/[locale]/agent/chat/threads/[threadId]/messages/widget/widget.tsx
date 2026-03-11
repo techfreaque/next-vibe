@@ -121,7 +121,6 @@ function ReadOnlyMessages({
         collapseState={null}
         rootFolderId={DefaultFolderId.PRIVATE}
         subFolderId={null}
-        onDeleteMessage={null}
         onRetryMessage={null}
         onSwitchBranch={null}
         onBranchMessage={null}

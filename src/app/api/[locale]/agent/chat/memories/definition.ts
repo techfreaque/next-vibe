@@ -8,13 +8,13 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedNavigateButtonField,
-  scopedObjectFieldNew,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  navigateButtonField,
+  objectField,
+  responseArrayField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -63,15 +63,15 @@ const { GET } = createEndpoint({
     usage: { response: true } as const,
     children: {
       // Top action buttons
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.container.title" as const,
         usage: { response: true },
       }),
-      createButton: scopedNavigateButtonField(scopedTranslation, {
+      createButton: navigateButtonField(scopedTranslation, {
         targetEndpoint: createDefinition.POST,
         extractParams: () => ({}),
         prefillFromGet: false,
@@ -84,57 +84,57 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      memories: scopedResponseArrayFieldNew(scopedTranslation, {
+      memories: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layout: {
           type: LayoutType.GRID,
           columns: 1,
         },
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "get.response.memories.memory.title" as const,
           layoutType: LayoutType.STACKED,
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.memories.memory.memoryNumber.text" as const,
               schema: z.coerce.number().int(),
             }),
-            content: scopedResponseField(scopedTranslation, {
+            content: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.memories.memory.content.content" as const,
               schema: z.string(),
             }),
-            priority: scopedResponseField(scopedTranslation, {
+            priority: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.memories.memory.priority.text" as const,
               schema: z.coerce.number(),
             }),
-            isPublic: scopedResponseField(scopedTranslation, {
+            isPublic: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.memories.memory.isPublic.text" as const,
               schema: z.boolean(),
             }),
-            isArchived: scopedResponseField(scopedTranslation, {
+            isArchived: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.memories.memory.isArchived.text" as const,
               schema: z.boolean(),
             }),
-            isShared: scopedResponseField(scopedTranslation, {
+            isShared: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.memories.memory.isShared.text" as const,
               schema: z.boolean(),
             }),
-            tags: scopedResponseArrayFieldNew(scopedTranslation, {
+            tags: responseArrayField(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              child: scopedResponseField(scopedTranslation, {
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 schema: z.string(),
               }),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.memories.memory.createdAt.content" as const,

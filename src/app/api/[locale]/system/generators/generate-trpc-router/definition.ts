@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
     // use vibe generate instead
   ],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      apiDir: scopedRequestField(scopedTranslation, {
+      apiDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.apiDir.title",
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional().default("src/app/api"),
       }),
 
-      outputFile: scopedRequestField(scopedTranslation, {
+      outputFile: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.outputFile.title",
@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
           ),
       }),
 
-      includeWarnings: scopedRequestField(scopedTranslation, {
+      includeWarnings: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.includeWarnings.title",
@@ -75,7 +75,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      excludePatterns: scopedRequestField(scopedTranslation, {
+      excludePatterns: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.excludePatterns.title",
@@ -85,25 +85,25 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      generationCompleted: scopedResponseField(scopedTranslation, {
+      generationCompleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.generationCompleted.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.title",
         schema: z.string(),
       }),
 
-      generationStats: scopedResponseField(scopedTranslation, {
+      generationStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.generationStats.title",
         schema: z.object({

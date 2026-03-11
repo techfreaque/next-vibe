@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,10 +44,12 @@ const { POST } = createEndpoint({
     render: ImportJobRetryContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
       // === URL PARAMETERS ===
-      jobId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      jobId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.jobId.label",
@@ -57,19 +59,19 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      result: scopedObjectFieldNew(scopedTranslation, {
+      result: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.response.title",
         description: "post.response.description",
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.success.content",
             schema: z.boolean(),
           }),
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.message.content",
             schema: z.string(),

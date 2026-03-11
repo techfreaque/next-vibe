@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,7 +44,7 @@ const { POST } = createEndpoint({
     firstCliArgKey: "path",
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -53,7 +53,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      path: scopedRequestField(scopedTranslation, {
+      path: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.path.label",
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional().default("src/"),
       }),
 
-      verbose: scopedRequestField(scopedTranslation, {
+      verbose: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.verbose.label",
@@ -72,7 +72,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      watch: scopedRequestField(scopedTranslation, {
+      watch: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.watch.label",
@@ -81,7 +81,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      coverage: scopedRequestField(scopedTranslation, {
+      coverage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.coverage.label",
@@ -91,19 +91,19 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.output",
         schema: z.string(),
       }),
 
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.duration",
         schema: z.coerce.number(),

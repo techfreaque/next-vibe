@@ -8,11 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -45,7 +45,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // Request fields
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.page.label",
@@ -54,7 +54,7 @@ const { GET } = createEndpoint({
         schema: z.number().int().min(1).default(1),
       }),
 
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.pageSize.label",
@@ -63,7 +63,7 @@ const { GET } = createEndpoint({
         schema: z.number().int().min(1).max(100).default(20),
       }),
 
-      campaignType: scopedRequestField(scopedTranslation, {
+      campaignType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.fields.campaignType.label",
@@ -74,85 +74,85 @@ const { GET } = createEndpoint({
       }),
 
       // Response fields — named distinctly from request fields to avoid duplicate keys
-      totalCount: scopedResponseField(scopedTranslation, {
+      totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.total",
         schema: z.number(),
       }),
 
-      currentPage: scopedResponseField(scopedTranslation, {
+      currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.page",
         schema: z.number(),
       }),
 
-      pageSize: scopedResponseField(scopedTranslation, {
+      pageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.pageSize",
         schema: z.number(),
       }),
 
-      items: scopedResponseArrayFieldNew(scopedTranslation, {
+      items: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.items",
         description: "get.response.items",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            leadId: scopedResponseField(scopedTranslation, {
+            leadId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.leadId",
               schema: z.string(),
             }),
-            leadEmail: scopedResponseField(scopedTranslation, {
+            leadEmail: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.leadEmail",
               schema: z.string().nullable(),
             }),
-            businessName: scopedResponseField(scopedTranslation, {
+            businessName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.businessName",
               schema: z.string(),
             }),
-            campaignType: scopedResponseField(scopedTranslation, {
+            campaignType: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.campaignType",
               schema: z.string(),
             }),
-            journeyVariant: scopedResponseField(scopedTranslation, {
+            journeyVariant: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.journeyVariant",
               schema: z.string(),
             }),
-            currentStage: scopedResponseField(scopedTranslation, {
+            currentStage: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.currentStage",
               schema: z.string(),
             }),
-            nextScheduledAt: scopedResponseField(scopedTranslation, {
+            nextScheduledAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.nextScheduledAt",
               schema: z.string().nullable(),
             }),
-            emailsSent: scopedResponseField(scopedTranslation, {
+            emailsSent: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.emailsSent",
               schema: z.number(),
             }),
-            emailsOpened: scopedResponseField(scopedTranslation, {
+            emailsOpened: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.emailsOpened",
               schema: z.number(),
             }),
-            emailsClicked: scopedResponseField(scopedTranslation, {
+            emailsClicked: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.emailsClicked",
               schema: z.number(),
             }),
-            startedAt: scopedResponseField(scopedTranslation, {
+            startedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.startedAt",
               schema: z.string(),

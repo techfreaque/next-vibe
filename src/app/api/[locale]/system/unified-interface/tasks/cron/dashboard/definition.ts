@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -81,7 +81,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.limit.label",
@@ -89,7 +89,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().int().min(1).max(100).optional().default(20),
       }),
-      historyDepth: scopedRequestField(scopedTranslation, {
+      historyDepth: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.historyDepth.label",
@@ -99,17 +99,17 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      tasks: scopedResponseField(scopedTranslation, {
+      tasks: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.tasks.title",
         schema: z.array(dashboardTaskSchema),
       }),
-      alerts: scopedResponseField(scopedTranslation, {
+      alerts: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.alerts.title",
         schema: z.array(alertSchema),
       }),
-      stats: scopedResponseField(scopedTranslation, {
+      stats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.stats.title",
         schema: statsSchema,

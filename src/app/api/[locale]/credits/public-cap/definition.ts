@@ -9,9 +9,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,32 +41,32 @@ const { GET } = createEndpoint({
     render: PublicCapContainer,
     usage: { response: true } as const,
     children: {
-      spendToday: scopedResponseField(scopedTranslation, {
+      spendToday: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.spendToday.content",
         schema: z.number(),
       }),
-      capAmount: scopedResponseField(scopedTranslation, {
+      capAmount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.capAmount.content",
         schema: z.number(),
       }),
-      remainingToday: scopedResponseField(scopedTranslation, {
+      remainingToday: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.remainingToday.content",
         schema: z.number(),
       }),
-      percentUsed: scopedResponseField(scopedTranslation, {
+      percentUsed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.percentUsed.content",
         schema: z.number(),
       }),
-      lastResetAt: scopedResponseField(scopedTranslation, {
+      lastResetAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.lastResetAt.content",
         schema: z.string(),
       }),
-      capExceeded: scopedResponseField(scopedTranslation, {
+      capExceeded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.capExceeded.content",
         schema: z.boolean(),
@@ -150,7 +150,7 @@ const { POST } = createEndpoint({
     render: PublicCapUpdateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      capAmount: scopedRequestField(scopedTranslation, {
+      capAmount: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.capAmount.label",
@@ -159,7 +159,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().positive(),
         columns: 12,
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.message.content",
         schema: z.string(),

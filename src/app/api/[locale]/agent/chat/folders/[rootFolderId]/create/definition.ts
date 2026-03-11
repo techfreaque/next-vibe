@@ -12,10 +12,10 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // === REQUEST URL PATH PARAMS ===
-      rootFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      rootFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "sections.folder.rootFolderId.label" as const,
@@ -76,7 +76,7 @@ const { POST } = createEndpoint({
         ],
         schema: z.enum(DefaultFolderId),
       }),
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "sections.folder.name.label" as const,
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).max(255),
       }),
-      icon: scopedRequestField(scopedTranslation, {
+      icon: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "sections.folder.icon.label" as const,
@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
         // Runtime: accepts any string (emoji, IconKey), Type: IconKey | undefined
         schema: iconSchema.optional(),
       }),
-      color: scopedRequestField(scopedTranslation, {
+      color: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "sections.folder.color.label" as const,
@@ -101,7 +101,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      parentId: scopedRequestField(scopedTranslation, {
+      parentId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "sections.folder.parentId.label" as const,
@@ -111,17 +111,17 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      folderId: scopedResponseField(scopedTranslation, {
+      folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.folder.id.content" as const,
         schema: z.uuid(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.folder.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.folder.updatedAt.content" as const,
         schema: dateSchema,

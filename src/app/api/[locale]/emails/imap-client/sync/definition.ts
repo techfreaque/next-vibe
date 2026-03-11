@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -45,12 +45,12 @@ const { POST } = createEndpoint({
     render: ImapSyncContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === REQUEST FIELDS ===
-      accountIds: scopedRequestField(scopedTranslation, {
+      accountIds: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT_ARRAY,
         label: "accountIds.label",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         schema: z.array(z.string()),
       }),
 
-      force: scopedRequestField(scopedTranslation, {
+      force: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "force.label",
@@ -68,7 +68,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "dryRun.label",
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      maxMessages: scopedRequestField(scopedTranslation, {
+      maxMessages: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "maxMessages.label",
@@ -89,47 +89,47 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
 
-      accountsProcessed: scopedResponseField(scopedTranslation, {
+      accountsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.result.accountsProcessed",
         schema: z.coerce.number(),
       }),
-      foldersProcessed: scopedResponseField(scopedTranslation, {
+      foldersProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.result.foldersProcessed",
         schema: z.coerce.number(),
       }),
-      messagesProcessed: scopedResponseField(scopedTranslation, {
+      messagesProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.result.messagesProcessed",
         schema: z.coerce.number(),
       }),
-      messagesAdded: scopedResponseField(scopedTranslation, {
+      messagesAdded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.result.messagesAdded",
         schema: z.coerce.number(),
       }),
-      messagesUpdated: scopedResponseField(scopedTranslation, {
+      messagesUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.result.messagesUpdated",
         schema: z.coerce.number(),
       }),
-      messagesDeleted: scopedResponseField(scopedTranslation, {
+      messagesDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.result.messagesDeleted",
         schema: z.coerce.number(),
       }),
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.result.duration",
         schema: z.coerce.number(),
       }),
 
-      errors: scopedResponseArrayFieldNew(scopedTranslation, {
+      errors: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         groupBy: "code",
         sortBy: "message",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "post.response.errors.error.title",
           description: "post.response.errors.error.description",
@@ -137,12 +137,12 @@ const { POST } = createEndpoint({
           columns: 12,
           usage: { response: true },
           children: {
-            code: scopedResponseField(scopedTranslation, {
+            code: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "post.response.errors.error.code",
               schema: z.string(),
             }),
-            message: scopedResponseField(scopedTranslation, {
+            message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.errors.error.message",
               schema: z.string(),

@@ -276,5 +276,5 @@ One row per user per instance.
 
 - **`TASK_COMPLETED` WS event**: `/report` route needs to emit this on the originating thread's WS channel so client can auto-resume the AI stream. Currently result is stored but no event is emitted.
 - **Client auto-resume**: Frontend needs to handle `TASK_COMPLETED` event → call AI stream with `operation:"answer-as-ai"`.
-- **`pushStatusToRemote` from cloud side**: Currently skipped when `VIBE_IS_CLOUD=true`. Cloud needs to push results to local's `/report` using stored `localUrl`, with a fallback of queuing for next pull if local is unreachable.
+- **`pushStatusToRemote` from cloud side**: Currently skipped when `NEXT_PUBLIC_VIBE_IS_CLOUD=true`. Cloud needs to push results to local's `/report` using stored `localUrl`, with a fallback of queuing for next pull if local is unreachable.
 - **Token auto-refresh on 401**: marks `isActive: false`, requires manual reconnect. Auto re-auth planned.

@@ -21,7 +21,9 @@ import {
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -38,8 +40,9 @@ interface AssistantMessageActionsProps {
   contentMarkdown: string;
   contentText: string;
   locale: CountryLanguage;
+  threadId: string;
+  rootFolderId: DefaultFolderId | null;
   onAnswerAsModel: ((messageId: string) => void) | null;
-  onDelete: ((messageId: string) => void) | null;
   className: string | null;
   logger: EndpointLogger;
   promptTokens: number | null;
@@ -66,8 +69,9 @@ export function AssistantMessageActions({
   contentMarkdown,
   contentText,
   locale,
+  threadId,
+  rootFolderId,
   onAnswerAsModel,
-  onDelete,
   className,
   logger,
   promptTokens,
@@ -86,6 +90,20 @@ export function AssistantMessageActions({
   const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const { groupHover } = useMessageGroupName();
+  const { push: navigate } = useWidgetNavigation();
+
+  const handleDelete = (): void => {
+    void (async (): Promise<void> => {
+      const messageIdDefs =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      navigate(messageIdDefs.default.DELETE, {
+        urlPathParams: { threadId, messageId },
+        data: rootFolderId ? { rootFolderId } : undefined,
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
 
   // Get settings directly
   const { initialSettingsData } = useChatBootContext();
@@ -245,13 +263,12 @@ export function AssistantMessageActions({
         />
       )}
 
-      {onDelete && (
+      {!readOnly && (
         <MessageActionButton
           icon={Trash2}
-          onClick={() => onDelete(messageId)}
+          onClick={handleDelete}
           title={t("widget.common.assistantMessageActions.deleteMessage")}
           variant="destructive"
-          disabled={readOnly}
         />
       )}
 

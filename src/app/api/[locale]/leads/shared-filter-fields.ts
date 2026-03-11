@@ -11,9 +11,9 @@
 import { z } from "zod";
 
 import {
-  scopedObjectOptionalField,
-  scopedRequestField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectOptionalField,
+  requestField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   FieldDataType,
   LayoutType,
@@ -47,7 +47,7 @@ import { scopedTranslation } from "./i18n";
  * Usage: import and spread into your endpoint's fields children.
  */
 export const leadsListFilterFields = {
-  search: scopedRequestField(scopedTranslation, {
+  search: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
     label: "filters.search.label",
@@ -57,7 +57,7 @@ export const leadsListFilterFields = {
     schema: z.string().optional(),
   }),
 
-  status: scopedRequestField(scopedTranslation, {
+  status: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.status.label",
@@ -68,7 +68,7 @@ export const leadsListFilterFields = {
     schema: z.array(z.enum(LeadStatusFilter)).optional(),
   }),
 
-  currentCampaignStage: scopedRequestField(scopedTranslation, {
+  currentCampaignStage: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.currentCampaignStage.label",
@@ -79,7 +79,7 @@ export const leadsListFilterFields = {
     schema: z.array(z.enum(EmailCampaignStageFilter)).optional(),
   }),
 
-  source: scopedRequestField(scopedTranslation, {
+  source: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.source.label",
@@ -95,7 +95,7 @@ export const leadsListFilterFields = {
  * Location filter fields used in list and export operations.
  */
 export const leadsLocationFilterFields = {
-  country: scopedRequestField(scopedTranslation, {
+  country: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.country.label",
@@ -105,7 +105,7 @@ export const leadsLocationFilterFields = {
     schema: z.array(z.enum(Countries)).optional(),
   }),
 
-  language: scopedRequestField(scopedTranslation, {
+  language: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.language.label",
@@ -120,7 +120,7 @@ export const leadsLocationFilterFields = {
  * Sorting field definitions used in list and export operations.
  */
 export const leadsSortingFields = {
-  sortBy: scopedRequestField(scopedTranslation, {
+  sortBy: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
     label: "filters.sortBy.label",
@@ -130,7 +130,7 @@ export const leadsSortingFields = {
     schema: z.enum(LeadSortField).optional().default(LeadSortField.CREATED_AT),
   }),
 
-  sortOrder: scopedRequestField(scopedTranslation, {
+  sortOrder: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
     label: "filters.sortOrder.label",
@@ -147,7 +147,7 @@ export const leadsSortingFields = {
  * Schema uses arrays to match the list filter format for easy prefilling.
  */
 export const leadsBatchFilterFields = {
-  search: scopedRequestField(scopedTranslation, {
+  search: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
     label: "filters.search.label",
@@ -157,7 +157,7 @@ export const leadsBatchFilterFields = {
     schema: z.string().optional(),
   }),
 
-  status: scopedRequestField(scopedTranslation, {
+  status: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.status.label",
@@ -168,7 +168,7 @@ export const leadsBatchFilterFields = {
     schema: z.array(z.enum(LeadStatusFilter)).optional(),
   }),
 
-  currentCampaignStage: scopedRequestField(scopedTranslation, {
+  currentCampaignStage: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.currentCampaignStage.label",
@@ -179,7 +179,7 @@ export const leadsBatchFilterFields = {
     schema: z.array(z.enum(EmailCampaignStageFilter)).optional(),
   }),
 
-  source: scopedRequestField(scopedTranslation, {
+  source: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
     label: "filters.source.label",
@@ -193,9 +193,9 @@ export const leadsBatchFilterFields = {
 
 /**
  * Pre-composed filter containers for use in endpoint field definitions.
- * These are scopedObjectOptionalField wrappers around the filter field sets.
+ * These are objectOptionalField wrappers around the filter field sets.
  */
-export const leadsStatusFiltersContainer = scopedObjectOptionalField(
+export const leadsStatusFiltersContainer = objectOptionalField(
   scopedTranslation,
   {
     type: WidgetType.CONTAINER,
@@ -210,7 +210,7 @@ export const leadsStatusFiltersContainer = scopedObjectOptionalField(
   },
 );
 
-export const leadsLocationFiltersContainer = scopedObjectOptionalField(
+export const leadsLocationFiltersContainer = objectOptionalField(
   scopedTranslation,
   {
     type: WidgetType.CONTAINER,
@@ -225,7 +225,7 @@ export const leadsLocationFiltersContainer = scopedObjectOptionalField(
   },
 );
 
-export const leadsSortingOptionsContainer = scopedObjectOptionalField(
+export const leadsSortingOptionsContainer = objectOptionalField(
   scopedTranslation,
   {
     type: WidgetType.CONTAINER,

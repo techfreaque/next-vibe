@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,7 +38,7 @@ export const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // REQUEST
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.connectionId.label",
@@ -46,7 +46,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.connectionId.placeholder",
         schema: z.string().uuid(),
       }),
-      acknowledgeNewFingerprint: scopedRequestField(scopedTranslation, {
+      acknowledgeNewFingerprint: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.acknowledgeNewFingerprint.label",
@@ -56,22 +56,22 @@ export const { POST } = createEndpoint({
       }),
 
       // RESPONSE
-      ok: scopedResponseField(scopedTranslation, {
+      ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.ok.title",
         schema: z.boolean(),
       }),
-      latencyMs: scopedResponseField(scopedTranslation, {
+      latencyMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.latencyMs.title",
         schema: z.number(),
       }),
-      fingerprint: scopedResponseField(scopedTranslation, {
+      fingerprint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fingerprint.title",
         schema: z.string().nullable(),
       }),
-      fingerprintChanged: scopedResponseField(scopedTranslation, {
+      fingerprintChanged: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fingerprintChanged.title",
         schema: z.boolean().optional(),

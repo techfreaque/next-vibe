@@ -9,9 +9,9 @@ import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/type
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -167,13 +167,13 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
       }),
 
       // === REQUEST ===
-      characterId: scopedRequestField(scopedTranslation, {
+      characterId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.characterId.label" as const,
@@ -182,7 +182,7 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
-      icon: scopedRequestField(scopedTranslation, {
+      icon: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
         label: "post.icon.label" as const,
@@ -193,7 +193,7 @@ const { POST } = createEndpoint({
         } as const,
       }),
 
-      voice: scopedRequestField(scopedTranslation, {
+      voice: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.voice.label" as const,
@@ -207,7 +207,7 @@ const { POST } = createEndpoint({
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
 
-      modelSelection: scopedRequestField(scopedTranslation, {
+      modelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.modelSelection.label" as const,
@@ -216,7 +216,7 @@ const { POST } = createEndpoint({
       }),
 
       // Auto-compacting token threshold (null = fall through to character/settings default)
-      compactTrigger: scopedRequestField(scopedTranslation, {
+      compactTrigger: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.compactTrigger.label" as const,
@@ -226,7 +226,7 @@ const { POST } = createEndpoint({
       }),
 
       // Tool configuration — null = fall through to character/settings default
-      allowedTools: scopedRequestField(scopedTranslation, {
+      allowedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.allowedTools.label" as const,
@@ -243,7 +243,7 @@ const { POST } = createEndpoint({
       }),
 
       // Pinned tools — always shown in the toolbar for this slot
-      pinnedTools: scopedRequestField(scopedTranslation, {
+      pinnedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.pinnedTools.label" as const,
@@ -260,7 +260,7 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().uuid(),
         hidden: true,

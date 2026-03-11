@@ -2,11 +2,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -34,7 +34,7 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.threads" as const, "tags.permissions" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title" as const,
     description: "get.container.description" as const,
@@ -42,7 +42,7 @@ const { GET } = createEndpoint({
     usage: { request: "urlPathParams", response: true },
     children: {
       // === REQUEST URL PARAMS ===
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.threadId.label" as const,
@@ -51,7 +51,7 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      rolesView: scopedResponseField(scopedTranslation, {
+      rolesView: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.response.rolesView.label" as const,
@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesEdit: scopedResponseField(scopedTranslation, {
+      rolesEdit: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.response.rolesEdit.label" as const,
@@ -67,7 +67,7 @@ const { GET } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesPost: scopedResponseField(scopedTranslation, {
+      rolesPost: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.response.rolesPost.label" as const,
@@ -75,7 +75,7 @@ const { GET } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesModerate: scopedResponseField(scopedTranslation, {
+      rolesModerate: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.response.rolesModerate.label" as const,
@@ -83,7 +83,7 @@ const { GET } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesAdmin: scopedResponseField(scopedTranslation, {
+      rolesAdmin: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "get.response.rolesAdmin.label" as const,
@@ -170,7 +170,7 @@ const { PATCH } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.threads" as const, "tags.permissions" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "patch.container.title" as const,
     description: "patch.container.description" as const,
@@ -178,7 +178,7 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === REQUEST URL PARAMS ===
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.threadId.label" as const,
@@ -187,7 +187,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      rolesView: scopedRequestField(scopedTranslation, {
+      rolesView: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesView.label" as const,
@@ -196,7 +196,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesEdit: scopedRequestField(scopedTranslation, {
+      rolesEdit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesEdit.label" as const,
@@ -205,7 +205,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesPost: scopedRequestField(scopedTranslation, {
+      rolesPost: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesPost.label" as const,
@@ -214,7 +214,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesModerate: scopedRequestField(scopedTranslation, {
+      rolesModerate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesModerate.label" as const,
@@ -223,7 +223,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesAdmin: scopedRequestField(scopedTranslation, {
+      rolesAdmin: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesAdmin.label" as const,
@@ -234,7 +234,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      rolesViewResult: scopedResponseField(scopedTranslation, {
+      rolesViewResult: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.response.rolesView.label" as const,
@@ -242,7 +242,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesEditResult: scopedResponseField(scopedTranslation, {
+      rolesEditResult: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.response.rolesEdit.label" as const,
@@ -250,7 +250,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesPostResult: scopedResponseField(scopedTranslation, {
+      rolesPostResult: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.response.rolesPost.label" as const,
@@ -258,7 +258,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesModerateResult: scopedResponseField(scopedTranslation, {
+      rolesModerateResult: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.response.rolesModerate.label" as const,
@@ -266,7 +266,7 @@ const { PATCH } = createEndpoint({
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesAdminResult: scopedResponseField(scopedTranslation, {
+      rolesAdminResult: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.response.rolesAdmin.label" as const,

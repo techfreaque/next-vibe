@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
   tags: ["post.title" as const, "post.title" as const, "post.title" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title" as const,
     description: "post.form.description" as const,
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // REQUEST FIELDS
-      returnUrl: scopedRequestField(scopedTranslation, {
+      returnUrl: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
         label: "post.returnUrl.label" as const,
@@ -56,19 +56,19 @@ const { POST } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
-      customerPortalUrl: scopedResponseField(scopedTranslation, {
+      customerPortalUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.customerPortalUrl" as const,
         schema: z.string().url().nullable(),

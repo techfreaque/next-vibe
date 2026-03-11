@@ -9,11 +9,11 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -77,7 +77,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      query: scopedRequestField(scopedTranslation, {
+      query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.query.title" as const,
@@ -87,36 +87,36 @@ const { GET } = createEndpoint({
         schema: z.string().min(1).max(400),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
         content: "get.response.output.title" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      references: scopedResponseArrayFieldNew(scopedTranslation, {
+      references: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.STACKED,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           linkable: true,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            title: scopedResponseField(scopedTranslation, {
+            title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.references.title" as const,
               schema: z.string(),
             }),
-            url: scopedResponseField(scopedTranslation, {
+            url: responseField(scopedTranslation, {
               type: WidgetType.LINK,
               href: "/{url}",
               text: "get.response.references.item.url" as const,
               external: true,
               schema: z.string(),
             }),
-            snippet: scopedResponseField(scopedTranslation, {
+            snippet: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.references.item.snippet" as const,
               schema: z.string().optional(),

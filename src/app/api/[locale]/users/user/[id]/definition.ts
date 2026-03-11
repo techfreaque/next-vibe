@@ -8,15 +8,15 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestResponseField,
-  scopedRequestUrlPathParamsField,
-  scopedRequestUrlPathParamsResponseField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-  scopedSubmitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestResponseField,
+  requestUrlPathParamsField,
+  requestUrlPathParamsResponseField,
+  responseArrayField,
+  responseField,
+  submitButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 // // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
 import {
   EndpointErrorTypes,
@@ -53,11 +53,11 @@ const { GET } = createEndpoint({
     render: UserDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
       // === URL PARAMS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "id.get.id.label" as const,
@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
       }),
 
       // === USER PROFILE INFORMATION ===
-      userProfile: scopedObjectFieldNew(scopedTranslation, {
+      userProfile: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "id.get.response.userProfile.title" as const,
         description: "id.get.response.userProfile.description" as const,
@@ -76,7 +76,7 @@ const { GET } = createEndpoint({
         columns: 2,
         usage: { response: true },
         children: {
-          basicInfo: scopedObjectFieldNew(scopedTranslation, {
+          basicInfo: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "id.get.response.userProfile.basicInfo.title" as const,
             description:
@@ -84,25 +84,25 @@ const { GET } = createEndpoint({
             layoutType: LayoutType.VERTICAL,
             usage: { response: true },
             children: {
-              id: scopedResponseField(scopedTranslation, {
+              id: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
                   "id.get.response.userProfile.basicInfo.id.content" as const,
                 schema: z.string().uuid().describe("User unique identifier"),
               }),
-              email: scopedResponseField(scopedTranslation, {
+              email: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
                   "id.get.response.userProfile.basicInfo.email.content" as const,
                 schema: z.string().email().describe("User's email address"),
               }),
-              privateName: scopedResponseField(scopedTranslation, {
+              privateName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
                   "id.get.response.userProfile.basicInfo.privateName.content" as const,
                 schema: z.string().describe("User's private name"),
               }),
-              publicName: scopedResponseField(scopedTranslation, {
+              publicName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
                   "id.get.response.userProfile.basicInfo.publicName.content" as const,
@@ -114,7 +114,7 @@ const { GET } = createEndpoint({
       }),
 
       // === ACCOUNT STATUS ===
-      accountStatus: scopedObjectFieldNew(scopedTranslation, {
+      accountStatus: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "id.get.response.accountStatus.title" as const,
         description: "id.get.response.accountStatus.description" as const,
@@ -122,36 +122,36 @@ const { GET } = createEndpoint({
         columns: 2,
         usage: { response: true },
         children: {
-          isActive: scopedResponseField(scopedTranslation, {
+          isActive: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "id.get.response.accountStatus.isActive.content" as const,
             schema: z.boolean().describe("Account active status"),
           }),
-          emailVerified: scopedResponseField(scopedTranslation, {
+          emailVerified: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "id.get.response.accountStatus.emailVerified.content" as const,
             schema: z.boolean().describe("Email verification status"),
           }),
-          stripeCustomerId: scopedResponseField(scopedTranslation, {
+          stripeCustomerId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content:
               "id.get.response.accountStatus.stripeCustomerId.content" as const,
             schema: z.string().nullable().describe("Stripe customer ID"),
           }),
-          userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+          userRoles: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               layoutType: LayoutType.HORIZONTAL,
               usage: { response: true },
               children: {
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
                     "id.get.response.accountStatus.userRoles.content" as const,
                   schema: z.uuid().describe("Role ID"),
                 }),
-                role: scopedResponseField(scopedTranslation, {
+                role: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "id.get.response.accountStatus.userRoles.content" as const,
                   schema: z.string().describe("Role name"),
@@ -163,7 +163,7 @@ const { GET } = createEndpoint({
       }),
 
       // === TIMESTAMPS ===
-      timestamps: scopedObjectFieldNew(scopedTranslation, {
+      timestamps: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "id.get.response.timestamps.title" as const,
         description: "id.get.response.timestamps.description" as const,
@@ -171,12 +171,12 @@ const { GET } = createEndpoint({
         columns: 2,
         usage: { response: true },
         children: {
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "id.get.response.timestamps.createdAt.content" as const,
             schema: dateSchema.describe("Account creation date"),
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "id.get.response.timestamps.updatedAt.content" as const,
             schema: dateSchema.describe("Last update date"),
@@ -184,54 +184,54 @@ const { GET } = createEndpoint({
         },
       }),
 
-      leadId: scopedResponseField(scopedTranslation, {
+      leadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.leadId.content" as const,
         schema: z.uuid().nullable(),
       }),
-      email: scopedResponseField(scopedTranslation, {
+      email: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.email.content" as const,
         schema: z.email(),
       }),
-      privateName: scopedResponseField(scopedTranslation, {
+      privateName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.privateName.content" as const,
         schema: z.string(),
       }),
-      publicName: scopedResponseField(scopedTranslation, {
+      publicName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.publicName.content" as const,
         schema: z.string(),
       }),
-      emailVerified: scopedResponseField(scopedTranslation, {
+      emailVerified: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "id.get.response.emailVerified.content" as const,
         schema: z.boolean(),
       }),
-      isActive: scopedResponseField(scopedTranslation, {
+      isActive: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "id.get.response.isActive.content" as const,
         schema: z.boolean(),
       }),
-      stripeCustomerId: scopedResponseField(scopedTranslation, {
+      stripeCustomerId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.stripeCustomerId.content" as const,
         schema: z.string().nullable(),
       }),
-      userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+      userRoles: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.HORIZONTAL,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "id.get.response.userRoles.content" as const,
               schema: z.uuid(),
             }),
-            role: scopedResponseField(scopedTranslation, {
+            role: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "id.get.response.userRoles.content" as const,
               schema: z.string(),
@@ -239,12 +239,12 @@ const { GET } = createEndpoint({
           },
         }),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.get.response.updatedAt.content" as const,
         schema: dateSchema,
@@ -410,12 +410,12 @@ const { PUT } = createEndpoint({
     render: UserEditContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === URL PARAMS ===
-      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
+      id: requestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "id.put.id.label" as const,
@@ -426,7 +426,7 @@ const { PUT } = createEndpoint({
       }),
 
       // === BASIC INFORMATION ===
-      email: scopedRequestResponseField(scopedTranslation, {
+      email: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "id.put.email.label" as const,
@@ -439,7 +439,7 @@ const { PUT } = createEndpoint({
           .transform((val) => val.toLowerCase().trim())
           .optional(),
       }),
-      privateName: scopedRequestResponseField(scopedTranslation, {
+      privateName: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "id.put.privateName.label" as const,
@@ -452,7 +452,7 @@ const { PUT } = createEndpoint({
           .transform((val) => val.trim())
           .optional(),
       }),
-      publicName: scopedRequestResponseField(scopedTranslation, {
+      publicName: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "id.put.publicName.label" as const,
@@ -467,7 +467,7 @@ const { PUT } = createEndpoint({
       }),
 
       // === ADMINISTRATIVE SETTINGS ===
-      emailVerified: scopedRequestResponseField(scopedTranslation, {
+      emailVerified: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "id.put.emailVerified.label" as const,
@@ -475,7 +475,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      isActive: scopedRequestResponseField(scopedTranslation, {
+      isActive: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "id.put.isActive.label" as const,
@@ -483,7 +483,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      leadId: scopedRequestResponseField(scopedTranslation, {
+      leadId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "id.put.leadId.label" as const,
@@ -493,7 +493,7 @@ const { PUT } = createEndpoint({
       }),
 
       // === BAN SETTINGS ===
-      isBanned: scopedRequestResponseField(scopedTranslation, {
+      isBanned: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "id.put.isBanned.label" as const,
@@ -501,7 +501,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      bannedReason: scopedRequestResponseField(scopedTranslation, {
+      bannedReason: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "id.put.bannedReason.label" as const,
@@ -511,24 +511,24 @@ const { PUT } = createEndpoint({
       }),
 
       // === RESPONSE-ONLY FIELDS ===
-      stripeCustomerId: scopedResponseField(scopedTranslation, {
+      stripeCustomerId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.put.response.stripeCustomerId.content" as const,
         schema: z.string().nullable(),
       }),
-      userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+      userRoles: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.HORIZONTAL,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "id.put.response.userRoles.content" as const,
               schema: z.uuid(),
             }),
-            role: scopedResponseField(scopedTranslation, {
+            role: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "id.put.response.userRoles.content" as const,
               schema: z.string(),
@@ -536,12 +536,12 @@ const { PUT } = createEndpoint({
           },
         }),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.put.response.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.put.response.updatedAt.content" as const,
         schema: dateSchema,
@@ -692,11 +692,11 @@ const { DELETE } = createEndpoint({
     render: UserDeleteContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
       // === URL PARAMS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "id.delete.id.label" as const,
@@ -708,7 +708,7 @@ const { DELETE } = createEndpoint({
       }),
 
       // === SUBMIT BUTTON ===
-      submitButton: scopedSubmitButton(scopedTranslation, {
+      submitButton: submitButton(scopedTranslation, {
         label: "id.delete.submitButton.label" as const,
         loadingText: "id.delete.submitButton.loadingText" as const,
         icon: "trash",
@@ -717,17 +717,17 @@ const { DELETE } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "id.delete.response.deletionResult.success.content" as const,
         schema: z.boolean().describe("Whether the deletion was successful"),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.delete.response.deletionResult.message.content" as const,
         schema: z.string().describe("Human-readable result message"),
       }),
-      deletedAt: scopedResponseField(scopedTranslation, {
+      deletedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "id.delete.response.deletionResult.deletedAt.content" as const,
         schema: dateSchema.describe("When the user was deleted"),

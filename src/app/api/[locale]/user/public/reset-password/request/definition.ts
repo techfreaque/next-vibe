@@ -14,11 +14,11 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
@@ -36,13 +36,13 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.userAuth",
   tags: ["request.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      icon: scopedWidgetField(scopedTranslation, {
+      icon: widgetField(scopedTranslation, {
         type: WidgetType.ICON,
         icon: "mail",
         containerSize: "base",
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
         order: 0,
         usage: { request: "data", response: true },
       }),
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         content: "request.ui.title",
         level: 3,
@@ -60,14 +60,14 @@ const { POST } = createEndpoint({
         inline: true,
         usage: { request: "data", response: true },
       }),
-      subtitle: scopedWidgetField(scopedTranslation, {
+      subtitle: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "request.ui.subtitle",
         order: 2,
         usage: { request: "data", response: true },
       }),
 
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "request.fields.email.label",
@@ -86,13 +86,13 @@ const { POST } = createEndpoint({
           .transform((val) => val.toLowerCase().trim()),
       }),
 
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 5,
         usage: { request: "data" },
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         content: "request.response.success.message",
         order: 6,
@@ -101,7 +101,7 @@ const { POST } = createEndpoint({
           .describe("Human-readable status message explaining the result"),
       }),
       // === SUBMIT BUTTON (inside card) ===
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "request.ui.sendResetLink",
         loadingText: "actions.submitting",
@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
       }),
 
       // === FOOTER LINK (inside card, below button) ===
-      alreadyHaveAccount: scopedWidgetField(scopedTranslation, {
+      alreadyHaveAccount: widgetField(scopedTranslation, {
         type: WidgetType.LINK,
         text: "request.ui.alreadyHaveAccount",
         href: "/user/login",

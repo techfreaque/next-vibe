@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -40,7 +40,7 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.folders" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title" as const,
     description: "get.container.description" as const,
@@ -48,7 +48,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST ===
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.rootFolderId.label" as const,
@@ -58,12 +58,12 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      canCreateThread: scopedResponseField(scopedTranslation, {
+      canCreateThread: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.canCreateThread.content" as const,
         schema: z.boolean(),
       }),
-      canCreateFolder: scopedResponseField(scopedTranslation, {
+      canCreateFolder: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.canCreateFolder.content" as const,
         schema: z.boolean(),

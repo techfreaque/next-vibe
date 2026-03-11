@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -45,12 +45,12 @@ const { GET } = createEndpoint({
     render: ImapMessageDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "urlPathParams", response: true },
       }),
 
       // === URL PARAM FIELDS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.id.label",
@@ -60,7 +60,7 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      message: scopedObjectFieldNew(scopedTranslation, {
+      message: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.title",
         description: "get.response.description",
@@ -68,167 +68,167 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "tag",
             schema: z.uuid(),
           }),
-          subject: scopedResponseField(scopedTranslation, {
+          subject: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string(),
           }),
-          recipientEmail: scopedResponseField(scopedTranslation, {
+          recipientEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string(),
           }),
-          recipientName: scopedResponseField(scopedTranslation, {
+          recipientName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          senderEmail: scopedResponseField(scopedTranslation, {
+          senderEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string(),
           }),
-          senderName: scopedResponseField(scopedTranslation, {
+          senderName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          imapUid: scopedResponseField(scopedTranslation, {
+          imapUid: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          imapMessageId: scopedResponseField(scopedTranslation, {
+          imapMessageId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          imapFolderId: scopedResponseField(scopedTranslation, {
+          imapFolderId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.uuid().optional(),
           }),
-          accountId: scopedResponseField(scopedTranslation, {
+          accountId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "tags.accounts",
             schema: z.uuid().optional(),
           }),
-          bodyText: scopedResponseField(scopedTranslation, {
+          bodyText: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          bodyHtml: scopedResponseField(scopedTranslation, {
+          bodyHtml: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          headers: scopedResponseField(scopedTranslation, {
+          headers: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.record(z.string(), z.string()).optional(),
           }),
-          isRead: scopedResponseField(scopedTranslation, {
+          isRead: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean(),
           }),
-          isFlagged: scopedResponseField(scopedTranslation, {
+          isFlagged: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean(),
           }),
-          isDeleted: scopedResponseField(scopedTranslation, {
+          isDeleted: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isDraft: scopedResponseField(scopedTranslation, {
+          isDraft: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isAnswered: scopedResponseField(scopedTranslation, {
+          isAnswered: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          inReplyTo: scopedResponseField(scopedTranslation, {
+          inReplyTo: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          references: scopedResponseField(scopedTranslation, {
+          references: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          threadId: scopedResponseField(scopedTranslation, {
+          threadId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          messageSize: scopedResponseField(scopedTranslation, {
+          messageSize: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          hasAttachments: scopedResponseField(scopedTranslation, {
+          hasAttachments: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean(),
           }),
-          attachmentCount: scopedResponseField(scopedTranslation, {
+          attachmentCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          lastSyncAt: scopedResponseField(scopedTranslation, {
+          lastSyncAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncStatus: scopedResponseField(scopedTranslation, {
+          syncStatus: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncError: scopedResponseField(scopedTranslation, {
+          syncError: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          sentAt: scopedResponseField(scopedTranslation, {
+          sentAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          receivedAt: scopedResponseField(scopedTranslation, {
+          receivedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          folderName: scopedResponseField(scopedTranslation, {
+          folderName: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.string(),
           }),
-          size: scopedResponseField(scopedTranslation, {
+          size: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),
@@ -349,7 +349,7 @@ const { PATCH } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "patch.container.title",
     description: "patch.container.description",
@@ -358,7 +358,7 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAM FIELDS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.id.label",
@@ -368,7 +368,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA FIELDS ===
-      isRead: scopedRequestField(scopedTranslation, {
+      isRead: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isRead.label",
@@ -376,7 +376,7 @@ const { PATCH } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      isFlagged: scopedRequestField(scopedTranslation, {
+      isFlagged: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isFlagged.label",
@@ -384,7 +384,7 @@ const { PATCH } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      subject: scopedRequestField(scopedTranslation, {
+      subject: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.subject.label",
@@ -394,7 +394,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      message: scopedObjectFieldNew(scopedTranslation, {
+      message: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "patch.response.title",
         description: "patch.response.description",
@@ -402,167 +402,167 @@ const { PATCH } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "tag",
             schema: z.uuid(),
           }),
-          subject: scopedResponseField(scopedTranslation, {
+          subject: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string(),
           }),
-          recipientEmail: scopedResponseField(scopedTranslation, {
+          recipientEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string(),
           }),
-          recipientName: scopedResponseField(scopedTranslation, {
+          recipientName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          senderEmail: scopedResponseField(scopedTranslation, {
+          senderEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string(),
           }),
-          senderName: scopedResponseField(scopedTranslation, {
+          senderName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          imapUid: scopedResponseField(scopedTranslation, {
+          imapUid: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          imapMessageId: scopedResponseField(scopedTranslation, {
+          imapMessageId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          imapFolderId: scopedResponseField(scopedTranslation, {
+          imapFolderId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.uuid().optional(),
           }),
-          accountId: scopedResponseField(scopedTranslation, {
+          accountId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "tags.accounts",
             schema: z.uuid().optional(),
           }),
-          bodyText: scopedResponseField(scopedTranslation, {
+          bodyText: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          bodyHtml: scopedResponseField(scopedTranslation, {
+          bodyHtml: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          headers: scopedResponseField(scopedTranslation, {
+          headers: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.record(z.string(), z.string()).optional(),
           }),
-          isRead: scopedResponseField(scopedTranslation, {
+          isRead: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean(),
           }),
-          isFlagged: scopedResponseField(scopedTranslation, {
+          isFlagged: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean(),
           }),
-          isDeleted: scopedResponseField(scopedTranslation, {
+          isDeleted: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isDraft: scopedResponseField(scopedTranslation, {
+          isDraft: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isAnswered: scopedResponseField(scopedTranslation, {
+          isAnswered: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          inReplyTo: scopedResponseField(scopedTranslation, {
+          inReplyTo: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          references: scopedResponseField(scopedTranslation, {
+          references: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          threadId: scopedResponseField(scopedTranslation, {
+          threadId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          messageSize: scopedResponseField(scopedTranslation, {
+          messageSize: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          hasAttachments: scopedResponseField(scopedTranslation, {
+          hasAttachments: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.boolean(),
           }),
-          attachmentCount: scopedResponseField(scopedTranslation, {
+          attachmentCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          lastSyncAt: scopedResponseField(scopedTranslation, {
+          lastSyncAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncStatus: scopedResponseField(scopedTranslation, {
+          syncStatus: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncError: scopedResponseField(scopedTranslation, {
+          syncError: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          sentAt: scopedResponseField(scopedTranslation, {
+          sentAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          receivedAt: scopedResponseField(scopedTranslation, {
+          receivedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.string().optional(),
           }),
-          folderName: scopedResponseField(scopedTranslation, {
+          folderName: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "messages.tag",
             schema: z.string(),
           }),
-          size: scopedResponseField(scopedTranslation, {
+          size: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "messages.tag",
             schema: z.coerce.number().optional(),

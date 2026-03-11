@@ -17,7 +17,4 @@ import { graphSeeds as seedModule1 } from "../../user/graph-seeds";
 /**
  * All graph seed entries discovered from the codebase.
  */
-export const allGraphSeeds: GraphSeedEntry[] = [
-  ...seedModule0,
-  ...seedModule1,
-];
+export const allGraphSeeds: GraphSeedEntry[] = [...seedModule0, ...seedModule1];

@@ -6,11 +6,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseArrayFieldNew,
-  scopedResponseArrayOptionalFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseArrayField,
+  responseArrayOptionalField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -32,7 +32,7 @@ const { GET } = createEndpoint({
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title",
     description: "get.container.description",
@@ -40,56 +40,56 @@ const { GET } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      indicators: scopedResponseArrayFieldNew(scopedTranslation, {
+      indicators: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.indicator.id",
               schema: z.string(),
             }),
-            domain: scopedResponseField(scopedTranslation, {
+            domain: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.indicator.domain",
               schema: z.string(),
             }),
-            description: scopedResponseField(scopedTranslation, {
+            description: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.indicator.description",
               schema: z.string().optional(),
             }),
-            resolution: scopedResponseField(scopedTranslation, {
+            resolution: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.indicator.resolution",
               schema: z.string(),
             }),
-            persist: scopedResponseField(scopedTranslation, {
+            persist: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.indicator.persist",
               schema: z.string(),
             }),
-            lookback: scopedResponseField(scopedTranslation, {
+            lookback: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.indicator.lookback",
               schema: z.number().optional(),
             }),
-            inputs: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+            inputs: responseArrayOptionalField(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              child: scopedResponseField(scopedTranslation, {
+              child: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "get.response.indicator.inputs.item",
                 schema: z.string(),
               }),
             }),
-            isDerived: scopedResponseField(scopedTranslation, {
+            isDerived: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               content: "get.response.indicator.isDerived",
               schema: z.boolean(),
             }),
-            isMultiValue: scopedResponseField(scopedTranslation, {
+            isMultiValue: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               content: "get.response.indicator.isMultiValue",
               schema: z.boolean(),

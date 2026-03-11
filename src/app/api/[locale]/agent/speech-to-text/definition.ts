@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -42,7 +42,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.ai",
   tags: ["hotkey.tags.speech", "hotkey.tags.transcription", "hotkey.tags.ai"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === FILE UPLOAD SECTION ===
-      fileUpload: scopedObjectFieldNew(scopedTranslation, {
+      fileUpload: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.fileUpload.title",
         description: "post.fileUpload.description",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
         children: {
-          file: scopedRequestField(scopedTranslation, {
+          file: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
             label: "post.audio.label",
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
       }),
 
       // // === CONFIG FIELDS ===
-      // provider: scopedRequestField(scopedTranslation, {
+      // provider: requestField(scopedTranslation, {
       //   type: WidgetType.FORM_FIELD,
       //   fieldType: FieldDataType.SELECT,
       //   label: "post.provider.label",
@@ -97,12 +97,12 @@ const { POST } = createEndpoint({
       // }),
 
       // === RESPONSE FIELDS ===
-      creditCost: scopedResponseField(scopedTranslation, {
+      creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.creditCost",
         schema: z.number().optional(),
       }),
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.response.title",
         description: "post.response.description",
@@ -110,22 +110,22 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.success",
             schema: z.boolean(),
           }),
-          text: scopedResponseField(scopedTranslation, {
+          text: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.text",
             schema: z.string(),
           }),
-          provider: scopedResponseField(scopedTranslation, {
+          provider: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.provider",
             schema: z.string(),
           }),
-          confidence: scopedResponseField(scopedTranslation, {
+          confidence: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.confidence",
             schema: z.coerce.number().optional(),

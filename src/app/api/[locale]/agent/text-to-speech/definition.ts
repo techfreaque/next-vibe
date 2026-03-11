@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,7 +44,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.ai",
   tags: ["tags.speech", "tags.tts", "tags.ai"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -53,7 +53,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      text: scopedRequestField(scopedTranslation, {
+      text: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "post.text.label",
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
         placeholder: "post.text.placeholder",
         schema: z.string().min(1).max(5000),
       }),
-      voice: scopedRequestField(scopedTranslation, {
+      voice: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.voice.label",
@@ -72,12 +72,12 @@ const { POST } = createEndpoint({
         schema: z.string().default(DEFAULT_TTS_VOICE),
       }),
 
-      audioUrl: scopedResponseField(scopedTranslation, {
+      audioUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.audioUrl",
         schema: z.string(),
       }),
-      creditCost: scopedResponseField(scopedTranslation, {
+      creditCost: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.creditCost",
         schema: z.number().optional(),

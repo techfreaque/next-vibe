@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "list-console-messages.form.label",
     description: "list-console-messages.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      includePreservedMessages: scopedRequestField(scopedTranslation, {
+      includePreservedMessages: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label:
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
             "Set to true to return the preserved messages over the last 3 navigations.",
           ),
       }),
-      pageIdx: scopedRequestField(scopedTranslation, {
+      pageIdx: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "list-console-messages.form.fields.pageIdx.label",
@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
             "Page number to return (0-based). When omitted, returns the first page.",
           ),
       }),
-      pageSize: scopedRequestField(scopedTranslation, {
+      pageSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "list-console-messages.form.fields.pageSize.label",
@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
             "Maximum number of messages to return. When omitted, returns all messages.",
           ),
       }),
-      types: scopedRequestField(scopedTranslation, {
+      types: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "list-console-messages.form.fields.types.label",
@@ -132,14 +132,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-console-messages.response.success",
         schema: z
           .boolean()
           .describe("Whether the console messages listing operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-console-messages.response.result",
         schema: z
@@ -154,7 +154,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-console-messages.response.error",
         schema: z
@@ -162,7 +162,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-console-messages.response.executionId",
         schema: z

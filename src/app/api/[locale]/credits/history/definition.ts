@@ -9,12 +9,12 @@ import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -47,11 +47,11 @@ const { GET } = createEndpoint({
     render: CreditHistoryContainer,
     usage: { response: true, request: "data" },
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true, request: "data" },
       }),
       // === ADMIN: optional target user override ===
-      targetUserId: scopedRequestField(scopedTranslation, {
+      targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "history.get.targetUserId.label" as const,
@@ -61,7 +61,7 @@ const { GET } = createEndpoint({
       }),
 
       // === ADMIN: optional target lead override ===
-      targetLeadId: scopedRequestField(scopedTranslation, {
+      targetLeadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "history.get.targetLeadId.label" as const,
@@ -71,38 +71,38 @@ const { GET } = createEndpoint({
       }),
 
       // === TRANSACTION LIST ===
-      transactions: scopedResponseArrayFieldNew(scopedTranslation, {
+      transactions: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "history.get.id" as const,
               schema: z.string(),
             }),
-            amount: scopedResponseField(scopedTranslation, {
+            amount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "history.get.amount" as const,
               schema: z.coerce.number(),
             }),
-            balanceAfter: scopedResponseField(scopedTranslation, {
+            balanceAfter: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "history.get.transaction.balanceAfter.content" as const,
               schema: z.coerce.number(),
             }),
-            type: scopedResponseField(scopedTranslation, {
+            type: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "history.get.type" as const,
               schema: z.string().optional(),
             }),
-            messageId: scopedResponseField(scopedTranslation, {
+            messageId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "history.get.messageId" as const,
               schema: z.string().nullable(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.DATE,
               content: "history.get.createdAt" as const,

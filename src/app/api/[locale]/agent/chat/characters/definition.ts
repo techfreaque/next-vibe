@@ -8,14 +8,14 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedNavigateButtonField,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  navigateButtonField,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -82,7 +82,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS (for AI/CLI filtering) ===
-      query: scopedRequestField(scopedTranslation, {
+      query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.query.label" as const,
@@ -91,7 +91,7 @@ const { GET } = createEndpoint({
         columns: 8,
         schema: z.string().optional(),
       }),
-      characterId: scopedRequestField(scopedTranslation, {
+      characterId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.characterId.label" as const,
@@ -101,12 +101,12 @@ const { GET } = createEndpoint({
       }),
 
       // Flattened top action buttons (no container wrapper)
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
 
       // Flattened fields (no container wrapper)
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
         content: "get.browser.advancedModelAccess" as const,
@@ -115,7 +115,7 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
 
-      description: scopedWidgetField(scopedTranslation, {
+      description: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "xs",
         variant: "muted",
@@ -124,7 +124,7 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
       // Flattened model fields (no container wrapper)
-      icon: scopedWidgetField(scopedTranslation, {
+      icon: widgetField(scopedTranslation, {
         type: WidgetType.ICON,
         icon: "sparkles",
         containerSize: "lg",
@@ -133,7 +133,7 @@ const { GET } = createEndpoint({
         className: "text-primary bg-primary/15",
         usage: { response: true },
       }),
-      name: scopedWidgetField(scopedTranslation, {
+      name: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
         content: "get.browser.configureAiModelsTitle" as const,
@@ -142,7 +142,7 @@ const { GET } = createEndpoint({
         inline: true,
         usage: { response: true },
       }),
-      modelDescription: scopedWidgetField(scopedTranslation, {
+      modelDescription: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "xs",
         variant: "muted",
@@ -150,7 +150,7 @@ const { GET } = createEndpoint({
         contentParams: { count: TOTAL_MODEL_COUNT },
         usage: { response: true },
       }),
-      selectButton: scopedNavigateButtonField(scopedTranslation, {
+      selectButton: navigateButtonField(scopedTranslation, {
         targetEndpoint: createFavoriteDefinitions.POST,
         extractParams: async () => {
           return {
@@ -177,13 +177,13 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
 
-      separator: scopedWidgetField(scopedTranslation, {
+      separator: widgetField(scopedTranslation, {
         type: WidgetType.SEPARATOR,
         label: "separator.or" as const,
         usage: { response: true },
       }),
 
-      charactersTitle: scopedWidgetField(scopedTranslation, {
+      charactersTitle: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
         content: "get.browser.characterPresets" as const,
@@ -192,7 +192,7 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
 
-      charactersDesc: scopedWidgetField(scopedTranslation, {
+      charactersDesc: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "xs",
         variant: "muted",
@@ -202,9 +202,9 @@ const { GET } = createEndpoint({
       }),
 
       // Sections array
-      sections: scopedResponseArrayFieldNew(scopedTranslation, {
+      sections: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.INLINE,
           gap: "4",
@@ -213,25 +213,25 @@ const { GET } = createEndpoint({
           usage: { response: true },
           children: {
             // Flattened section header fields (no nested sectionHeader object)
-            sectionIcon: scopedResponseField(scopedTranslation, {
+            sectionIcon: responseField(scopedTranslation, {
               type: WidgetType.ICON,
               iconSize: "sm",
               noHover: true,
               schema: iconSchema,
             }),
-            sectionTitle: scopedResponseField(scopedTranslation, {
+            sectionTitle: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               size: "lg",
               emphasis: "bold",
               schema: z.string(),
             }),
-            sectionCount: scopedResponseField(scopedTranslation, {
+            sectionCount: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               schema: z.number(),
             }),
-            characters: scopedResponseArrayFieldNew(scopedTranslation, {
+            characters: responseArrayField(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              child: scopedObjectFieldNew(scopedTranslation, {
+              child: objectField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 layoutType: LayoutType.INLINE,
                 gap: "4",
@@ -239,22 +239,22 @@ const { GET } = createEndpoint({
                 noCard: true,
                 usage: { response: true },
                 children: {
-                  id: scopedResponseField(scopedTranslation, {
+                  id: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
                     schema: z.string(),
                   }),
-                  category: scopedResponseField(scopedTranslation, {
+                  category: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
                     schema: z.enum(CharacterCategoryDB),
                   }),
-                  modelId: scopedResponseField(scopedTranslation, {
+                  modelId: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
                     schema: z.enum(ModelId),
                   }),
-                  icon: scopedResponseField(scopedTranslation, {
+                  icon: responseField(scopedTranslation, {
                     type: WidgetType.ICON,
                     containerSize: "lg",
                     iconSize: "base",
@@ -263,41 +263,41 @@ const { GET } = createEndpoint({
                   }),
 
                   // Flattened content fields (no nested content object)
-                  name: scopedResponseField(scopedTranslation, {
+                  name: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "base",
                     emphasis: "bold",
                     inline: true,
                     schema: z.string(),
                   }),
-                  tagline: scopedResponseField(scopedTranslation, {
+                  tagline: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
                     inline: true,
                     schema: z.string(),
                   }),
-                  description: scopedResponseField(scopedTranslation, {
+                  description: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
                     schema: z.string(),
                   }),
-                  modelIcon: scopedResponseField(scopedTranslation, {
+                  modelIcon: responseField(scopedTranslation, {
                     type: WidgetType.ICON,
                     iconSize: "xs",
                     inline: true,
                     noHover: true,
                     schema: iconSchema,
                   }),
-                  modelInfo: scopedResponseField(scopedTranslation, {
+                  modelInfo: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     inline: true,
                     variant: "muted",
                     schema: z.string(),
                   }),
-                  separator1: scopedWidgetField(scopedTranslation, {
+                  separator1: widgetField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
@@ -307,7 +307,7 @@ const { GET } = createEndpoint({
                       "get.response.characters.character.separator.content" as const,
                     usage: { response: true },
                   }),
-                  modelProvider: scopedResponseField(scopedTranslation, {
+                  modelProvider: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
@@ -315,7 +315,7 @@ const { GET } = createEndpoint({
                     inline: true,
                     schema: z.string(),
                   }),
-                  separator2: scopedWidgetField(scopedTranslation, {
+                  separator2: widgetField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
@@ -325,14 +325,14 @@ const { GET } = createEndpoint({
                     usage: { response: true },
                   }),
 
-                  favoriteButton: scopedWidgetField(scopedTranslation, {
+                  favoriteButton: widgetField(scopedTranslation, {
                     type: WidgetType.BUTTON,
                     icon: "star",
                     variant: "ghost",
                     size: "sm",
                     usage: { response: true },
                   }),
-                  editButton: scopedWidgetField(scopedTranslation, {
+                  editButton: widgetField(scopedTranslation, {
                     type: WidgetType.BUTTON,
                     icon: "pencil",
                     variant: "ghost",

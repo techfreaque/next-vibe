@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -33,14 +33,14 @@ const { POST } = createEndpoint({
     // use vibe generate instead
   ] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title" as const,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      outputFile: scopedRequestField(scopedTranslation, {
+      outputFile: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.outputFile.label" as const,
@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
           .default("src/app/api/[locale]/emails/registry/generated.ts"),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label" as const,
@@ -61,22 +61,22 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.title" as const,
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.message.title" as const,
         schema: z.string(),
       }),
-      templatesFound: scopedResponseField(scopedTranslation, {
+      templatesFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.templatesFound.title" as const,
         schema: z.coerce.number(),
       }),
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.duration.title" as const,
         schema: z.coerce.number(),

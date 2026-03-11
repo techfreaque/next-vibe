@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "upload.title",
     description: "upload.description",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === FILE UPLOAD SECTION ===
-      fileUpload: scopedObjectFieldNew(scopedTranslation, {
+      fileUpload: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "upload.groups.fileUpload.title",
         description: "upload.groups.fileUpload.description",
@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
         children: {
-          file: scopedRequestField(scopedTranslation, {
+          file: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
             label: "upload.fields.file.label",
@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "upload.response.title",
         description: "upload.response.description",
@@ -101,27 +101,27 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "upload.response.success",
             schema: z.boolean(),
           }),
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "upload.response.message",
             schema: z.string(),
           }),
-          avatarUrl: scopedResponseField(scopedTranslation, {
+          avatarUrl: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "upload.response.avatarUrl",
             schema: z.string().url().optional(),
           }),
-          uploadTime: scopedResponseField(scopedTranslation, {
+          uploadTime: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "upload.response.uploadTime",
             schema: z.string().optional(),
           }),
-          nextSteps: scopedResponseField(scopedTranslation, {
+          nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "upload.response.nextSteps.item",
             schema: z.array(z.string()),
@@ -257,7 +257,7 @@ const { DELETE } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "delete.response.title",
     description: "delete.response.description",
@@ -265,17 +265,17 @@ const { DELETE } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.success",
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.message",
         schema: z.string(),
       }),
-      nextSteps: scopedResponseField(scopedTranslation, {
+      nextSteps: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.nextSteps.item",
         schema: z.array(z.string()),

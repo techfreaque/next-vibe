@@ -7,10 +7,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,7 +44,7 @@ const { POST } = createEndpoint({
     render: TriggerWidget,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.fields.id.label",
@@ -52,26 +52,26 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().uuid(),
       }),
-      rangeFrom: scopedRequestField(scopedTranslation, {
+      rangeFrom: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.rangeFrom.label",
         description: "post.fields.rangeFrom.description",
         schema: z.string().datetime(),
       }),
-      rangeTo: scopedRequestField(scopedTranslation, {
+      rangeTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.rangeTo.label",
         description: "post.fields.rangeTo.description",
         schema: z.string().datetime(),
       }),
-      nodeCount: scopedResponseField(scopedTranslation, {
+      nodeCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.nodeCount",
         schema: z.number(),
       }),
-      errorCount: scopedResponseField(scopedTranslation, {
+      errorCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.errorCount",
         schema: z.number(),

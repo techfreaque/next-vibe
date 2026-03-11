@@ -160,34 +160,40 @@ import {
   objectField,
   requestField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   Methods,
   WidgetType,
   FieldDataType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { scopedTranslation } from "./i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["hello", "world"],
-  title: "app.api.hello.world.post.title",
-  description: "app.api.hello.world.post.description",
+  title: "post.title",
+  description: "post.description",
 
-  fields: objectField(
-    { type: WidgetType.CONTAINER },
-    { request: "data", response: true },
-    {
-      name: requestField(
-        {
-          type: WidgetType.FORM_FIELD,
-          fieldType: FieldDataType.TEXT,
-          label: "app.api.hello.world.post.name.label",
-        },
-        z.string().min(1),
-      ),
-      message: responseField({ type: WidgetType.TEXT }, z.string()),
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    usage: { request: "data", response: true },
+    children: {
+      name: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.name.label",
+        schema: z.string().min(1),
+        columns: 12,
+      }),
+      message: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.message.content",
+        schema: z.string(),
+      }),
     },
-  ),
+  }),
 });
 
 export default { POST };
@@ -255,6 +261,9 @@ export const translations = {
     description: "A simple hello endpoint",
     name: {
       label: "Your Name",
+    },
+    message: {
+      content: "Response message",
     },
   },
 };

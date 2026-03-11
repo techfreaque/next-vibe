@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "navigate-page.form.label",
     description: "navigate-page.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      type: scopedRequestField(scopedTranslation, {
+      type: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "navigate-page.form.fields.type.label",
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
             "Navigate the page by URL, back or forward in history, or reload.",
           ),
       }),
-      url: scopedRequestField(scopedTranslation, {
+      url: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "navigate-page.form.fields.url.label",
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional().describe("Target URL (only type=url)"),
       }),
-      ignoreCache: scopedRequestField(scopedTranslation, {
+      ignoreCache: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "navigate-page.form.fields.ignoreCache.label",
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Whether to ignore cache on reload."),
       }),
-      handleBeforeUnload: scopedRequestField(scopedTranslation, {
+      handleBeforeUnload: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "navigate-page.form.fields.ignoreCache.label",
@@ -121,7 +121,7 @@ const { POST } = createEndpoint({
             "Whether to auto accept or beforeunload dialogs triggered by this navigation. Default is accept.",
           ),
       }),
-      initScript: scopedRequestField(scopedTranslation, {
+      initScript: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "navigate-page.form.fields.url.label",
@@ -134,7 +134,7 @@ const { POST } = createEndpoint({
             "A JavaScript script to be executed on each new document before any other scripts for the next navigation.",
           ),
       }),
-      timeout: scopedRequestField(scopedTranslation, {
+      timeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "navigate-page.form.fields.timeout.label",
@@ -150,14 +150,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "navigate-page.response.success",
         schema: z
           .boolean()
           .describe("Whether the navigation operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "navigate-page.response.result",
         schema: z
@@ -172,7 +172,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "navigate-page.response.error",
         schema: z
@@ -180,7 +180,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "navigate-page.response.executionId",
         schema: z

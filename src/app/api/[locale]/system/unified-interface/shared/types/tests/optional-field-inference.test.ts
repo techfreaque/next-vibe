@@ -15,7 +15,7 @@
 import { z } from "zod";
 
 import {
-  objectField,
+  objectFieldNew,
   objectOptionalField,
   requestDataArrayField,
   requestDataArrayOptionalField,
@@ -23,7 +23,7 @@ import {
   responseArrayField,
   responseArrayOptionalField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   FieldDataType,
   type FieldUsage,
@@ -50,14 +50,12 @@ const optionalArrayField = requestDataArrayField(
     description: "app.admin.common.actions.back",
     optional: true,
   } as const,
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "test" as TranslationKey,
-      description: "test" as TranslationKey,
-    },
-    { request: "data" },
-    {
+  objectFieldNew({
+    type: WidgetType.CONTAINER,
+    title: "test" as TranslationKey,
+    description: "test" as TranslationKey,
+    usage: { request: "data" },
+    children: {
       role: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -71,23 +69,19 @@ const optionalArrayField = requestDataArrayField(
         schema: z.string(),
       }),
     },
-  ),
+  }),
 );
 
 // Test 1: responseArrayOptionalField should create array-optional type
-const testResponseArrayOptional = responseArrayOptionalField(
-  {
+const testResponseArrayOptional = responseArrayOptionalField({
+  type: WidgetType.CONTAINER,
+  title: "app.test.optional.array.title" as TranslationKey,
+  child: objectFieldNew({
     type: WidgetType.CONTAINER,
-    title: "app.test.optional.array.title" as TranslationKey,
-  },
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.GRID,
-      columns: 2,
-    },
-    { response: true },
-    {
+    layoutType: LayoutType.GRID,
+    columns: 2,
+    usage: { response: true },
+    children: {
       id: responseField({
         type: WidgetType.TEXT,
         content: "app.test.id" as TranslationKey,
@@ -101,8 +95,8 @@ const testResponseArrayOptional = responseArrayOptionalField(
         schema: z.string(),
       }),
     },
-  ),
-);
+  }),
+});
 
 // Verify schemaType is array-optional
 type TestResponseArrayOptionalType =

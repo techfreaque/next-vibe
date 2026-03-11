@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ export const { POST } = createEndpoint({
     render: LinuxUserCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.connectionId.label",
@@ -45,7 +45,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
-      username: scopedRequestField(scopedTranslation, {
+      username: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.username.label",
@@ -57,7 +57,7 @@ export const { POST } = createEndpoint({
           .max(32)
           .regex(/^[a-z][a-z0-9-]*$/),
       }),
-      groups: scopedRequestField(scopedTranslation, {
+      groups: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.groups.label",
@@ -65,7 +65,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.groups.placeholder",
         schema: z.array(z.string()).optional(),
       }),
-      loginShell: scopedRequestField(scopedTranslation, {
+      loginShell: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.fields.shell.label",
@@ -73,7 +73,7 @@ export const { POST } = createEndpoint({
         options: LoginShellOptions,
         schema: z.enum(LoginShellDB).default(LoginShell.BASH),
       }),
-      homeDir: scopedRequestField(scopedTranslation, {
+      homeDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.homeDir.label",
@@ -81,14 +81,14 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.homeDir.placeholder",
         schema: z.string().optional(),
       }),
-      sudoAccess: scopedRequestField(scopedTranslation, {
+      sudoAccess: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.sudoAccess.label",
         description: "post.fields.sudoAccess.description",
         schema: z.boolean().optional(),
       }),
-      sudoPassword: scopedRequestField(scopedTranslation, {
+      sudoPassword: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "post.fields.sudoPassword.label",
@@ -96,27 +96,27 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.sudoPassword.placeholder",
         schema: z.string().optional(),
       }),
-      ok: scopedResponseField(scopedTranslation, {
+      ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.ok.title",
         schema: z.boolean(),
       }),
-      uid: scopedResponseField(scopedTranslation, {
+      uid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.uid.title",
         schema: z.number(),
       }),
-      gid: scopedResponseField(scopedTranslation, {
+      gid: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.gid.title",
         schema: z.number(),
       }),
-      homeDirectory: scopedResponseField(scopedTranslation, {
+      homeDirectory: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.homeDirectory.title",
         schema: z.string(),
       }),
-      shellPath: scopedResponseField(scopedTranslation, {
+      shellPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.shell.title",
         schema: z.string(),

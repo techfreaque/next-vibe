@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   Methods,
@@ -36,7 +36,7 @@ export const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // No meaningful server fields — widget manages its own session
-      ok: scopedResponseField(scopedTranslation, {
+      ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.ok.title",
         schema: z.boolean(),

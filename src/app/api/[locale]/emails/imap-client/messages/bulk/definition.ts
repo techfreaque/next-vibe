@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,7 +38,7 @@ const { POST } = createEndpoint({
     render: undefined,
     usage: { request: "data", response: true } as const,
     children: {
-      ids: scopedRequestField(scopedTranslation, {
+      ids: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.ids.label",
@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
         schema: z.array(z.uuid()).min(1),
       }),
 
-      action: scopedRequestField(scopedTranslation, {
+      action: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.action.label",
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
         schema: z.enum(BulkMessageAction),
       }),
 
-      updated: scopedResponseField(scopedTranslation, {
+      updated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.success.title",
         schema: z.number().int(),

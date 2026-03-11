@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -50,13 +50,13 @@ const { POST } = createEndpoint({
     // use vibe generate instead
   ],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.title",
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      outputDir: scopedRequestField(scopedTranslation, {
+      outputDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.title",
@@ -65,7 +65,7 @@ const { POST } = createEndpoint({
         schema: z.string().default("src/app/api/[locale]/system/generated"),
       }),
 
-      includeTestData: scopedRequestField(scopedTranslation, {
+      includeTestData: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.title",
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(true),
       }),
 
-      includeProdData: scopedRequestField(scopedTranslation, {
+      includeProdData: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.title",
@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      verbose: scopedRequestField(scopedTranslation, {
+      verbose: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.title",
@@ -92,7 +92,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.title",
@@ -102,27 +102,27 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.string(),
       }),
-      seedsFound: scopedResponseField(scopedTranslation, {
+      seedsFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.coerce.number(),
       }),
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.coerce.number(),
       }),
-      outputPath: scopedResponseField(scopedTranslation, {
+      outputPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.string(),

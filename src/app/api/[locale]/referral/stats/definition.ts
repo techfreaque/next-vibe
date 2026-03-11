@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   Methods,
@@ -45,54 +45,54 @@ export const { GET } = createEndpoint({
     render: ReferralStatsContainer,
     usage: { response: true } as const,
     children: {
-      totalSignupsTitle: scopedResponseField(scopedTranslation, {
+      totalSignupsTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
-      totalSignupsValue: scopedResponseField(scopedTranslation, {
+      totalSignupsValue: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      totalSignupsDescription: scopedResponseField(scopedTranslation, {
+      totalSignupsDescription: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
 
-      totalRevenueTitle: scopedResponseField(scopedTranslation, {
+      totalRevenueTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
-      totalRevenueValue: scopedResponseField(scopedTranslation, {
+      totalRevenueValue: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      totalRevenueDescription: scopedResponseField(scopedTranslation, {
+      totalRevenueDescription: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
 
-      totalEarnedTitle: scopedResponseField(scopedTranslation, {
+      totalEarnedTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
-      totalEarnedValue: scopedResponseField(scopedTranslation, {
+      totalEarnedValue: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      totalEarnedDescription: scopedResponseField(scopedTranslation, {
+      totalEarnedDescription: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
 
-      availableCreditsTitle: scopedResponseField(scopedTranslation, {
+      availableCreditsTitle: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
-      availableCreditsValue: scopedResponseField(scopedTranslation, {
+      availableCreditsValue: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      availableCreditsDescription: scopedResponseField(scopedTranslation, {
+      availableCreditsDescription: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),

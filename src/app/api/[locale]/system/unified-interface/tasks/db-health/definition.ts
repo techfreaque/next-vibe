@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   tags: ["dbHealth.tag" as const],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "dbHealth.post.container.title",
     description: "dbHealth.post.container.description",
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      healthy: scopedResponseField(scopedTranslation, {
+      healthy: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "dbHealth.post.response.healthy",
         schema: z.boolean(),

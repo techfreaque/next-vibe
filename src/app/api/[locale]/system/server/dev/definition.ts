@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     UserRole.PRODUCTION_OFF,
   ],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -54,7 +54,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      skipDbSetup: scopedRequestField(scopedTranslation, {
+      skipDbSetup: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipDbSetup.title",
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      skipNextCommand: scopedRequestField(scopedTranslation, {
+      skipNextCommand: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipNextCommand.title",
@@ -70,7 +70,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      dbReset: scopedRequestField(scopedTranslation, {
+      dbReset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipDbReset.title",
@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
       // shortcut for dbReset
-      r: scopedRequestField(scopedTranslation, {
+      r: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipDbReset.title",
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      port: scopedRequestField(scopedTranslation, {
+      port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.port.title",
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
-      skipGeneratorWatcher: scopedRequestField(scopedTranslation, {
+      skipGeneratorWatcher: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipGeneratorWatcher.title",
@@ -102,7 +102,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      generatorWatcherInterval: scopedRequestField(scopedTranslation, {
+      generatorWatcherInterval: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.generatorWatcherInterval.title",
@@ -110,7 +110,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().default(5000),
       }),
 
-      skipTaskRunner: scopedRequestField(scopedTranslation, {
+      skipTaskRunner: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipTaskRunner.title",
@@ -118,7 +118,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      skipMigrations: scopedRequestField(scopedTranslation, {
+      skipMigrations: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipMigrations.title",
@@ -126,7 +126,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      skipMigrationGeneration: scopedRequestField(scopedTranslation, {
+      skipMigrationGeneration: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipMigrationGeneration.title",
@@ -134,7 +134,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      skipSeeding: scopedRequestField(scopedTranslation, {
+      skipSeeding: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipSeeding.title",
@@ -142,7 +142,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      profile: scopedRequestField(scopedTranslation, {
+      profile: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.profile.title",
@@ -150,7 +150,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.output.title",
         schema: z.string() as z.ZodType<TranslationKey>,

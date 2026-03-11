@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   Methods,
@@ -39,12 +39,12 @@ export const { GET } = createEndpoint({
   fields: customWidgetObject({
     usage: { response: true } as const,
     children: {
-      referralCode: scopedResponseField(scopedTranslation, {
+      referralCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.referralCode",
         schema: z.string().nullable(),
       }),
-      referralLabel: scopedResponseField(scopedTranslation, {
+      referralLabel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.referralLabel",
         schema: z.string().nullable(),

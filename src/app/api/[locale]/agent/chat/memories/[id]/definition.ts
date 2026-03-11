@@ -8,15 +8,15 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedBackButton,
-  scopedDeleteButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-  scopedSubmitButton,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  deleteButton,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -81,7 +81,7 @@ const { DELETE } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "delete.container.title" as const,
     description: "delete.container.description" as const,
@@ -90,7 +90,7 @@ const { DELETE } = createEndpoint({
     usage: { request: "urlPathParams", response: true },
     children: {
       // === REQUEST URL PARAMS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "delete.id.label" as const,
@@ -100,14 +100,14 @@ const { DELETE } = createEndpoint({
       }),
 
       // Back button
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         label: "delete.backButton.label" as const,
         usage: { request: "urlPathParams", response: true } as const,
         inline: true,
       }),
 
       // Delete button (submit)
-      deleteButton: scopedSubmitButton(scopedTranslation, {
+      deleteButton: submitButton(scopedTranslation, {
         label: "delete.deleteButton.label" as const,
         icon: "trash",
         variant: "destructive",
@@ -117,23 +117,23 @@ const { DELETE } = createEndpoint({
 
       // === RESPONSE ===
       // Note: id (memoryNumber) is already known from the URL param, not repeated
-      content: scopedResponseField(scopedTranslation, {
+      content: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      tags: scopedResponseField(scopedTranslation, {
+      tags: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(z.string()),
       }),
-      priority: scopedResponseField(scopedTranslation, {
+      priority: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: dateSchema,
       }),
@@ -261,13 +261,13 @@ const { PATCH } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === REQUEST URL PARAMS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "patch.id.label" as const,
@@ -276,7 +276,7 @@ const { PATCH } = createEndpoint({
         hidden: true,
       }),
 
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         content: "patch.title" as const,
         usage: { request: "data&urlPathParams", response: true } as const,
@@ -284,7 +284,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // Delete button configuration
-      deleteButton: scopedDeleteButton(scopedTranslation, {
+      deleteButton: deleteButton(scopedTranslation, {
         label: "patch.deleteButton.label" as const,
         targetEndpoint: DELETE,
         extractParams: (source) => ({
@@ -301,7 +301,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      content: scopedRequestField(scopedTranslation, {
+      content: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "patch.content.label" as const,
@@ -309,7 +309,7 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.string().max(5000).optional(),
       }),
-      tags: scopedRequestField(scopedTranslation, {
+      tags: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TAGS,
         label: "patch.tags.label" as const,
@@ -317,7 +317,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.array(z.string()).optional(),
       }),
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "patch.priority.label" as const,
@@ -325,7 +325,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().min(0).max(100).optional(),
       }),
-      isPublic: scopedRequestField(scopedTranslation, {
+      isPublic: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isPublic.label" as const,
@@ -333,7 +333,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      isArchived: scopedRequestField(scopedTranslation, {
+      isArchived: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isArchived.label" as const,
@@ -341,7 +341,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      isShared: scopedRequestField(scopedTranslation, {
+      isShared: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isShared.label" as const,
@@ -351,7 +351,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // Back button
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         label: "patch.backButton.label" as const,
         usage: { request: "data&urlPathParams", response: true } as const,
         className: "ml-auto",
@@ -359,14 +359,14 @@ const { PATCH } = createEndpoint({
       }),
 
       // Submit button
-      submitButton: scopedSubmitButton(scopedTranslation, {
+      submitButton: submitButton(scopedTranslation, {
         label: "patch.submitButton.label" as const,
         usage: { request: "data&urlPathParams" },
         inline: true,
       }),
 
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
         hidden: true,

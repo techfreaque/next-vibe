@@ -47,10 +47,10 @@ src/app/api/[locale]/<category>/<feature>/
 - `createEndpoint({scopedTranslation, ...})` — Factory for endpoint contracts; `scopedTranslation` required
 - `endpointsHandler()` — Wires definition + handler into Next.js route
 - `createEnumOptions(scopedTranslation, {...})` — i18n-friendly enum pattern
-- `scopedRequestField(scopedTranslation, {...})` — Request input fields (label, description, columns, schema)
-- `scopedResponseField(scopedTranslation, {...})` — Response display fields (content/text, schema)
-- `scopedObjectFieldNew(scopedTranslation, {...})` — Container/grouping with `children`, `layoutType`, `usage`
-- `scopedResponseArrayFieldNew(scopedTranslation, {...})` — Array response fields (takes `child`)
+- `requestField(scopedTranslation, {...})` — Request input fields (label, description, columns, schema)
+- `responseField(scopedTranslation, {...})` — Response display fields (content/text, schema)
+- `objectField(scopedTranslation, {...})` — Container/grouping with `children`, `layoutType`, `usage`
+- `responseArrayField(scopedTranslation, {...})` — Array response fields (takes `child`)
 - `customWidgetObject({render, usage, children})` — Custom React widget container
 - `responseArrayOptionalField(opts, childField)` — Nullable/optional array fields
 - `EndpointLogger` — Structured logging, passed through all layers

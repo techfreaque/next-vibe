@@ -8,11 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -42,11 +42,11 @@ const { GET } = createEndpoint({
     render: EmailDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "urlPathParams", response: true },
       }),
       // === URL PARAMETER ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.id.label",
@@ -56,7 +56,7 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      email: scopedObjectFieldNew(scopedTranslation, {
+      email: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.email.title",
         description: "response.email.description",
@@ -64,107 +64,107 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.id",
             schema: z.uuid(),
           }),
-          subject: scopedResponseField(scopedTranslation, {
+          subject: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.subject",
             schema: z.string(),
           }),
-          recipientEmail: scopedResponseField(scopedTranslation, {
+          recipientEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.recipientEmail",
             schema: z.email(),
           }),
-          recipientName: scopedResponseField(scopedTranslation, {
+          recipientName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.recipientName",
             schema: z.string().nullable(),
           }),
-          senderEmail: scopedResponseField(scopedTranslation, {
+          senderEmail: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.senderEmail",
             schema: z.email(),
           }),
-          senderName: scopedResponseField(scopedTranslation, {
+          senderName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.senderName",
             schema: z.string().nullable(),
           }),
-          type: scopedResponseField(scopedTranslation, {
+          type: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "response.email.type",
             schema: z.enum(EmailType),
           }),
-          status: scopedResponseField(scopedTranslation, {
+          status: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "response.email.status",
             schema: z.enum(EmailStatus),
           }),
-          templateName: scopedResponseField(scopedTranslation, {
+          templateName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.templateName",
             schema: z.string().nullable(),
           }),
-          emailProvider: scopedResponseField(scopedTranslation, {
+          emailProvider: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.emailProvider",
             schema: z.enum(EmailProvider).nullable(),
           }),
-          externalId: scopedResponseField(scopedTranslation, {
+          externalId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.externalId",
             schema: z.string().nullable(),
           }),
-          sentAt: scopedResponseField(scopedTranslation, {
+          sentAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.sentAt",
             schema: dateSchema.nullable(),
           }),
-          deliveredAt: scopedResponseField(scopedTranslation, {
+          deliveredAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.deliveredAt",
             schema: dateSchema.nullable(),
           }),
-          openedAt: scopedResponseField(scopedTranslation, {
+          openedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.openedAt",
             schema: dateSchema.nullable(),
           }),
-          clickedAt: scopedResponseField(scopedTranslation, {
+          clickedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.clickedAt",
             schema: dateSchema.nullable(),
           }),
-          retryCount: scopedResponseField(scopedTranslation, {
+          retryCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.retryCount",
             schema: z.coerce.number().int(),
           }),
-          error: scopedResponseField(scopedTranslation, {
+          error: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.error",
             schema: z.string().nullable(),
           }),
-          userId: scopedResponseField(scopedTranslation, {
+          userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.userId",
             schema: z.uuid().nullable(),
           }),
-          leadId: scopedResponseField(scopedTranslation, {
+          leadId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.leadId",
             schema: z.uuid().nullable(),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.createdAt",
             schema: dateSchema,
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.updatedAt",
             schema: dateSchema,

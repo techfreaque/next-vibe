@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     render: HaltAllWidget,
     usage: { request: "data", response: true } as const,
     children: {
-      confirm: scopedRequestField(scopedTranslation, {
+      confirm: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.confirm.label",
@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      reason: scopedRequestField(scopedTranslation, {
+      reason: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.reason.label",
@@ -55,13 +55,13 @@ const { POST } = createEndpoint({
         schema: z.string().optional().default("admin_global_halt"),
       }),
 
-      halted: scopedResponseField(scopedTranslation, {
+      halted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.halted",
         schema: z.number(),
       }),
 
-      emailsCancelled: scopedResponseField(scopedTranslation, {
+      emailsCancelled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.emailsCancelled",
         schema: z.number(),

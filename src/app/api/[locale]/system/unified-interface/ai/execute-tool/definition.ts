@@ -17,9 +17,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -75,7 +75,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // ── Request fields ────────────────────────────────────────────────────
-      toolName: scopedRequestField(scopedTranslation, {
+      toolName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "executeTool.post.fields.toolName.label",
@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         schema: z.string().min(1),
       }),
 
-      input: scopedRequestField(scopedTranslation, {
+      input: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "executeTool.post.fields.input.label",
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         schema: taskInputSchema.default({}),
       }),
 
-      instanceId: scopedRequestField(scopedTranslation, {
+      instanceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "executeTool.post.fields.instanceId.label",
@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      callbackMode: scopedRequestField(scopedTranslation, {
+      callbackMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "executeTool.post.fields.callbackMode.label",
@@ -122,7 +122,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Response fields ───────────────────────────────────────────────────
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "executeTool.post.response.result" as const,
@@ -130,19 +130,19 @@ const { POST } = createEndpoint({
         schema: z.unknown().optional(),
       }),
 
-      taskId: scopedResponseField(scopedTranslation, {
+      taskId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().optional(),
       }),
 
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(CronTaskStatusDB).optional(),
       }),
 
-      hint: scopedResponseField(scopedTranslation, {
+      hint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().optional(),

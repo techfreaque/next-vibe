@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseArrayOptionalFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseArrayOptionalField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -58,10 +58,12 @@ const { PATCH } = createEndpoint({
     render: LeadsBatchUpdateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // Filter criteria — hidden fields prefilled from list widget
       ...leadsBatchFilterFields,
-      scope: scopedRequestField(scopedTranslation, {
+      scope: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "patch.scope.label",
@@ -71,14 +73,14 @@ const { PATCH } = createEndpoint({
           .enum(BatchOperationScope)
           .default(BatchOperationScope.ALL_PAGES),
       }),
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.dryRun.label",
         description: "patch.dryRun.description",
         schema: z.boolean().optional().default(false),
       }),
-      maxRecords: scopedRequestField(scopedTranslation, {
+      maxRecords: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "patch.maxRecords.label",
@@ -86,14 +88,14 @@ const { PATCH } = createEndpoint({
         schema: z.coerce.number().min(1).max(10000).optional().default(1000),
       }),
       // Update data
-      updates: scopedObjectFieldNew(scopedTranslation, {
+      updates: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "patch.updates.title",
         description: "patch.updates.description",
         layoutType: LayoutType.GRID_2_COLUMNS,
         usage: { request: "data" },
         children: {
-          status: scopedRequestField(scopedTranslation, {
+          status: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "patch.updates.status.label",
@@ -101,7 +103,7 @@ const { PATCH } = createEndpoint({
             options: LeadStatusOptions,
             schema: z.enum(LeadStatus).optional(),
           }),
-          currentCampaignStage: scopedRequestField(scopedTranslation, {
+          currentCampaignStage: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "patch.updates.currentCampaignStage.label",
@@ -109,7 +111,7 @@ const { PATCH } = createEndpoint({
             options: EmailCampaignStageOptions,
             schema: z.enum(EmailCampaignStage).optional(),
           }),
-          source: scopedRequestField(scopedTranslation, {
+          source: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "patch.updates.source.label",
@@ -117,7 +119,7 @@ const { PATCH } = createEndpoint({
             options: LeadSourceOptions,
             schema: z.enum(LeadSource).optional(),
           }),
-          notes: scopedRequestField(scopedTranslation, {
+          notes: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "patch.updates.notes.label",
@@ -127,65 +129,65 @@ const { PATCH } = createEndpoint({
         },
       }),
       // Response fields
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "patch.response.title",
         description: "patch.response.description",
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "patch.response.success",
             schema: z.boolean(),
           }),
-          totalMatched: scopedResponseField(scopedTranslation, {
+          totalMatched: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "patch.response.totalMatched",
             schema: z.coerce.number(),
           }),
-          totalProcessed: scopedResponseField(scopedTranslation, {
+          totalProcessed: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "patch.response.totalProcessed",
             schema: z.coerce.number(),
           }),
-          totalUpdated: scopedResponseField(scopedTranslation, {
+          totalUpdated: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "patch.response.totalUpdated",
             schema: z.coerce.number(),
           }),
-          preview: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+          preview: responseArrayOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "patch.response.preview",
             description: "patch.response.preview",
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "patch.response.preview",
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "patch.response.preview",
                   schema: z.string(),
                 }),
-                email: scopedResponseField(scopedTranslation, {
+                email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "patch.response.preview",
                   schema: z.string().nullable(),
                 }),
-                businessName: scopedResponseField(scopedTranslation, {
+                businessName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "patch.response.preview",
                   schema: z.string(),
                 }),
-                currentStatus: scopedResponseField(scopedTranslation, {
+                currentStatus: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "patch.response.preview",
                   schema: z.enum(LeadStatus),
                 }),
-                currentCampaignStage: scopedResponseField(scopedTranslation, {
+                currentCampaignStage: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "patch.response.preview",
                   schema: z.enum(EmailCampaignStage).nullable(),
@@ -193,23 +195,23 @@ const { PATCH } = createEndpoint({
               },
             }),
           }),
-          errors: scopedResponseArrayFieldNew(scopedTranslation, {
+          errors: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "patch.response.errors",
             description: "patch.response.errors",
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "patch.response.errors",
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                leadId: scopedResponseField(scopedTranslation, {
+                leadId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "patch.response.errors",
                   schema: z.string(),
                 }),
-                error: scopedResponseField(scopedTranslation, {
+                error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "patch.response.errors",
                   schema: z.string(),
@@ -317,10 +319,12 @@ const { DELETE } = createEndpoint({
     render: LeadsBatchDeleteContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // Filter criteria — hidden fields prefilled from list widget
       ...leadsBatchFilterFields,
-      confirmDelete: scopedRequestField(scopedTranslation, {
+      confirmDelete: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "delete.confirmDelete.label",
@@ -329,14 +333,14 @@ const { DELETE } = createEndpoint({
           message: "Delete confirmation required",
         }),
       }),
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "delete.dryRun.label",
         description: "delete.dryRun.description",
         schema: z.boolean().optional().default(false),
       }),
-      maxRecords: scopedRequestField(scopedTranslation, {
+      maxRecords: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "delete.maxRecords.label",
@@ -344,65 +348,65 @@ const { DELETE } = createEndpoint({
         schema: z.coerce.number().min(1).max(10000).optional().default(1000),
       }),
       // Response fields
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "delete.response.title",
         description: "delete.response.description",
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "delete.response.success",
             schema: z.boolean(),
           }),
-          totalMatched: scopedResponseField(scopedTranslation, {
+          totalMatched: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "delete.response.totalMatched",
             schema: z.coerce.number(),
           }),
-          totalProcessed: scopedResponseField(scopedTranslation, {
+          totalProcessed: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "delete.response.totalProcessed",
             schema: z.coerce.number(),
           }),
-          totalDeleted: scopedResponseField(scopedTranslation, {
+          totalDeleted: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "delete.response.totalDeleted",
             schema: z.coerce.number(),
           }),
-          preview: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+          preview: responseArrayOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "delete.response.preview",
             description: "delete.response.preview",
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "delete.response.preview",
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "delete.response.preview",
                   schema: z.string(),
                 }),
-                email: scopedResponseField(scopedTranslation, {
+                email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "delete.response.preview",
                   schema: z.string().nullable(),
                 }),
-                businessName: scopedResponseField(scopedTranslation, {
+                businessName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "delete.response.preview",
                   schema: z.string(),
                 }),
-                currentStatus: scopedResponseField(scopedTranslation, {
+                currentStatus: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "delete.response.preview",
                   schema: z.enum(LeadStatus),
                 }),
-                currentCampaignStage: scopedResponseField(scopedTranslation, {
+                currentCampaignStage: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "delete.response.preview",
                   schema: z.enum(EmailCampaignStage).nullable(),
@@ -410,23 +414,23 @@ const { DELETE } = createEndpoint({
               },
             }),
           }),
-          errors: scopedResponseArrayFieldNew(scopedTranslation, {
+          errors: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "delete.response.errors",
             description: "delete.response.errors",
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "delete.response.errors",
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                leadId: scopedResponseField(scopedTranslation, {
+                leadId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "delete.response.errors",
                   schema: z.string(),
                 }),
-                error: scopedResponseField(scopedTranslation, {
+                error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "delete.response.errors",
                   schema: z.string(),

@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     render: AdminAddCreditsContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      targetUserId: scopedRequestField(scopedTranslation, {
+      targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "adminAdd.post.targetUserId.label" as const,
@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().uuid(),
       }),
-      amount: scopedRequestField(scopedTranslation, {
+      amount: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "adminAdd.post.amount.label" as const,
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.coerce.number().int().positive(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "adminAdd.post.response.message.content" as const,
         schema: z.string(),

@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -39,7 +39,7 @@ export const { POST } = createEndpoint({
     render: FilesWriteContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.connectionId.label",
@@ -47,7 +47,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
-      path: scopedRequestField(scopedTranslation, {
+      path: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.path.label",
@@ -55,7 +55,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.path.placeholder",
         schema: z.string().min(1),
       }),
-      content: scopedRequestField(scopedTranslation, {
+      content: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.content.label",
@@ -63,19 +63,19 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.content.placeholder",
         schema: z.string(),
       }),
-      createDirs: scopedRequestField(scopedTranslation, {
+      createDirs: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.createDirs.label",
         description: "post.fields.createDirs.description",
         schema: z.boolean().optional(),
       }),
-      ok: scopedResponseField(scopedTranslation, {
+      ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.ok.title",
         schema: z.boolean(),
       }),
-      bytesWritten: scopedResponseField(scopedTranslation, {
+      bytesWritten: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.bytesWritten.title",
         schema: z.number(),

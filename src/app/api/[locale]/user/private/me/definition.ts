@@ -9,11 +9,11 @@ import { z } from "zod";
 import { leadId } from "@/app/api/[locale]/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedObjectUnionField,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  objectUnionField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
-  fields: scopedObjectUnionField(
+  fields: objectUnionField(
     scopedTranslation,
     {
       type: WidgetType.CONTAINER,
@@ -57,19 +57,19 @@ const { GET } = createEndpoint({
     "isPublic",
     [
       // Public user variant (JWT payload only)
-      scopedObjectFieldNew(scopedTranslation, {
+      objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.user.title" as const,
         description: "get.response.user.description" as const,
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          isPublic: scopedResponseField(scopedTranslation, {
+          isPublic: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "get.response.isPublic" as const,
             schema: z.literal(true),
           }),
-          leadId: scopedResponseField(scopedTranslation, {
+          leadId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.leadId" as const,
             schema: leadId,
@@ -77,86 +77,86 @@ const { GET } = createEndpoint({
         },
       }),
       // Private user variant (full profile)
-      scopedObjectFieldNew(scopedTranslation, {
+      objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.user.title" as const,
         description: "get.response.user.description" as const,
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          isPublic: scopedResponseField(scopedTranslation, {
+          isPublic: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "get.response.isPublic" as const,
             schema: z.literal(false),
           }),
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.id" as const,
             schema: z.uuid(),
           }),
-          leadId: scopedResponseField(scopedTranslation, {
+          leadId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.leadId" as const,
             schema: leadId.nullable(),
           }),
-          email: scopedResponseField(scopedTranslation, {
+          email: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.email" as const,
             schema: z.email({
               message: "validationErrors.user.profile.email_invalid",
             }),
           }),
-          privateName: scopedResponseField(scopedTranslation, {
+          privateName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.privateName" as const,
             schema: z.string(),
           }),
-          publicName: scopedResponseField(scopedTranslation, {
+          publicName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.publicName" as const,
             schema: z.string(),
           }),
-          locale: scopedResponseField(scopedTranslation, {
+          locale: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.locale" as const,
             schema: z.string() as z.ZodType<CountryLanguage>,
           }),
-          isActive: scopedResponseField(scopedTranslation, {
+          isActive: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "get.response.isActive" as const,
             schema: z.boolean().nullable(),
           }),
-          emailVerified: scopedResponseField(scopedTranslation, {
+          emailVerified: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "get.response.emailVerified" as const,
             schema: z.boolean().nullable(),
           }),
-          requireTwoFactor: scopedResponseField(scopedTranslation, {
+          requireTwoFactor: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "get.response.requireTwoFactor" as const,
             schema: z.boolean(),
           }),
-          marketingConsent: scopedResponseField(scopedTranslation, {
+          marketingConsent: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "get.response.marketingConsent" as const,
             schema: z.boolean(),
           }),
-          userRoles: scopedResponseField(scopedTranslation, {
+          userRoles: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.userRoles" as const,
             schema: z.array(userRoleResponseSchema),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.createdAt" as const,
             schema: dateSchema,
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.updatedAt" as const,
             schema: dateSchema,
           }),
-          stripeCustomerId: scopedResponseField(scopedTranslation, {
+          stripeCustomerId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.stripeCustomerId" as const,
             schema: z.string().nullable(),
@@ -260,7 +260,7 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "update.title" as const,
     description: "update.description" as const,
@@ -268,7 +268,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === BASIC INFORMATION ===
-      basicInfo: scopedObjectFieldNew(scopedTranslation, {
+      basicInfo: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "update.groups.basicInfo.title" as const,
         description: "update.groups.basicInfo.description" as const,
@@ -276,7 +276,7 @@ const { POST } = createEndpoint({
         columns: 2,
         usage: { request: "data" },
         children: {
-          privateName: scopedRequestField(scopedTranslation, {
+          privateName: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "update.fields.privateName.label" as const,
@@ -294,7 +294,7 @@ const { POST } = createEndpoint({
               .optional(),
           }),
 
-          publicName: scopedRequestField(scopedTranslation, {
+          publicName: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "update.fields.publicName.label" as const,
@@ -312,7 +312,7 @@ const { POST } = createEndpoint({
               .optional(),
           }),
 
-          email: scopedRequestField(scopedTranslation, {
+          email: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.EMAIL,
             label: "update.fields.email.label" as const,
@@ -330,14 +330,14 @@ const { POST } = createEndpoint({
       }),
 
       // === PRIVACY AND PREFERENCES ===
-      privacySettings: scopedObjectFieldNew(scopedTranslation, {
+      privacySettings: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "update.groups.privacySettings.title" as const,
         description: "update.groups.privacySettings.description" as const,
         layoutType: LayoutType.VERTICAL,
         usage: { request: "data" },
         children: {
-          marketingConsent: scopedRequestField(scopedTranslation, {
+          marketingConsent: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "update.fields.marketingConsent.label" as const,
@@ -349,104 +349,104 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELD ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "update.response.title" as const,
         description: "update.response.description" as const,
         layoutType: LayoutType.VERTICAL,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "update.response.success" as const,
             schema: z
               .boolean()
               .describe("Whether the profile update was successful"),
           }),
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.message" as const,
             schema: z.string().describe("Human-readable update status message"),
           }),
           // === USER FIELDS (FLATTENED) ===
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.id" as const,
             schema: z.uuid(),
           }),
-          leadId: scopedResponseField(scopedTranslation, {
+          leadId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.leadId" as const,
             schema: leadId.nullable(),
           }),
-          isPublic: scopedResponseField(scopedTranslation, {
+          isPublic: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "update.response.isPublic" as const,
             schema: z.literal(false),
           }),
-          email: scopedResponseField(scopedTranslation, {
+          email: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.email" as const,
             schema: z.email({
               message: "validationErrors.user.profile.email_invalid",
             }),
           }),
-          privateName: scopedResponseField(scopedTranslation, {
+          privateName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.privateName" as const,
             schema: z.string(),
           }),
-          publicName: scopedResponseField(scopedTranslation, {
+          publicName: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.publicName" as const,
             schema: z.string(),
           }),
-          locale: scopedResponseField(scopedTranslation, {
+          locale: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.locale" as const,
             schema: z.string() as z.ZodType<CountryLanguage>,
           }),
-          isActive: scopedResponseField(scopedTranslation, {
+          isActive: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "update.response.isActive" as const,
             schema: z.boolean().nullable(),
           }),
-          emailVerified: scopedResponseField(scopedTranslation, {
+          emailVerified: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "update.response.emailVerified" as const,
             schema: z.boolean().nullable(),
           }),
-          requireTwoFactor: scopedResponseField(scopedTranslation, {
+          requireTwoFactor: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "update.response.requireTwoFactor" as const,
             schema: z.boolean().optional(),
           }),
-          marketingConsent: scopedResponseField(scopedTranslation, {
+          marketingConsent: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "update.response.marketingConsent" as const,
             schema: z.boolean().optional(),
           }),
-          userRoles: scopedResponseField(scopedTranslation, {
+          userRoles: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.userRoles" as const,
             schema: z.array(userRoleResponseSchema),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.createdAt" as const,
             schema: dateSchema,
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.updatedAt" as const,
             schema: dateSchema,
           }),
-          stripeCustomerId: scopedResponseField(scopedTranslation, {
+          stripeCustomerId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.stripeCustomerId" as const,
             schema: z.string().nullable(),
           }),
-          changesSummary: scopedObjectFieldNew(scopedTranslation, {
+          changesSummary: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "update.response.changesSummary.title" as const,
             description: "update.response.changesSummary.description" as const,
@@ -454,12 +454,12 @@ const { POST } = createEndpoint({
             columns: 12,
             usage: { response: true },
             children: {
-              totalChanges: scopedResponseField(scopedTranslation, {
+              totalChanges: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "update.response.changesSummary.totalChanges" as const,
                 schema: z.coerce.number().describe("Number of fields updated"),
               }),
-              changedFields: scopedResponseField(scopedTranslation, {
+              changedFields: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
                   "update.response.changesSummary.changedFields" as const,
@@ -467,14 +467,14 @@ const { POST } = createEndpoint({
                   .array(z.string())
                   .describe("List of updated field names"),
               }),
-              verificationRequired: scopedResponseField(scopedTranslation, {
+              verificationRequired: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 text: "update.response.changesSummary.verificationRequired" as const,
                 schema: z
                   .boolean()
                   .describe("Whether email verification is needed"),
               }),
-              lastUpdated: scopedResponseField(scopedTranslation, {
+              lastUpdated: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "update.response.changesSummary.lastUpdated" as const,
                 schema: z
@@ -485,7 +485,7 @@ const { POST } = createEndpoint({
               }),
             },
           }),
-          nextSteps: scopedResponseField(scopedTranslation, {
+          nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "update.response.nextSteps" as const,
             schema: z
@@ -659,7 +659,7 @@ const { DELETE } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "delete.response.title" as const,
     description: "delete.response.description" as const,
@@ -667,7 +667,7 @@ const { DELETE } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      exists: scopedResponseField(scopedTranslation, {
+      exists: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.title" as const,
         schema: z.boolean(),

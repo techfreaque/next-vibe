@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -44,42 +44,42 @@ const { GET } = createEndpoint({
     render: ImapHealthContainer,
     usage: { response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
 
       // === RESPONSE FIELDS ===
-      accountsHealthy: scopedResponseField(scopedTranslation, {
+      accountsHealthy: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.accountsHealthy",
         schema: z.coerce.number().int(),
       }),
-      accountsTotal: scopedResponseField(scopedTranslation, {
+      accountsTotal: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.accountsTotal",
         schema: z.coerce.number().int(),
       }),
-      connectionsActive: scopedResponseField(scopedTranslation, {
+      connectionsActive: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.connectionsActive",
         schema: z.coerce.number().int(),
       }),
-      connectionErrors: scopedResponseField(scopedTranslation, {
+      connectionErrors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.connectionErrors",
         schema: z.coerce.number().int(),
       }),
-      lastSyncAt: scopedResponseField(scopedTranslation, {
+      lastSyncAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.lastSyncAt",
         schema: z.string().nullable(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "health.get.response.data.status",
         schema: z.enum(ImapHealthStatus),
       }),
-      syncStats: scopedObjectFieldNew(scopedTranslation, {
+      syncStats: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "health.get.response.data.syncStats.title",
         description: "health.get.response.data.syncStats.description",
@@ -87,44 +87,44 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          totalSyncs: scopedResponseField(scopedTranslation, {
+          totalSyncs: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "health.get.response.data.syncStats.totalSyncs",
             schema: z.coerce.number().int(),
           }),
-          lastSyncTime: scopedResponseField(scopedTranslation, {
+          lastSyncTime: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "health.get.response.data.syncStats.lastSyncTime",
             schema: z.string().nullable(),
           }),
         },
       }),
-      serverStatus: scopedResponseField(scopedTranslation, {
+      serverStatus: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "health.get.response.data.serverStatus",
         schema: z.enum(ImapHealthStatus),
       }),
-      uptime: scopedResponseField(scopedTranslation, {
+      uptime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.uptime",
         schema: z.string(),
       }),
-      syncedAccounts: scopedResponseField(scopedTranslation, {
+      syncedAccounts: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.syncedAccounts",
         schema: z.coerce.number().int(),
       }),
-      totalAccounts: scopedResponseField(scopedTranslation, {
+      totalAccounts: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.totalAccounts",
         schema: z.coerce.number().int(),
       }),
-      activeConnections: scopedResponseField(scopedTranslation, {
+      activeConnections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.activeConnections",
         schema: z.coerce.number().int(),
       }),
-      avgResponseTime: scopedResponseField(scopedTranslation, {
+      avgResponseTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "health.get.response.data.performanceMetrics.avgResponseTime",
         schema: z.coerce.number(),

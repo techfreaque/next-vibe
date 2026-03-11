@@ -18,17 +18,16 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedDeleteButton,
-  scopedNavigateButtonField,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-  scopedSubmitButton,
-  scopedWidgetField,
-  scopedWidgetObjectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  deleteButton,
+  navigateButtonField,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -156,14 +155,14 @@ const { DELETE } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     gap: "4",
     noCard: true,
     usage: { request: "urlPathParams", response: true },
     children: {
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
         content: "delete.container.description" as const,
@@ -171,7 +170,7 @@ const { DELETE } = createEndpoint({
       }),
 
       // === REQUEST (URL Path Params) ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "delete.id.label" as const,
@@ -181,20 +180,20 @@ const { DELETE } = createEndpoint({
       }),
 
       // Button container for horizontal layout
-      actions: scopedWidgetObjectField(scopedTranslation, {
+      actions: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.INLINE,
         gap: "2",
         noCard: true,
         usage: { request: "urlPathParams" },
         children: {
-          backButton: scopedBackButton(scopedTranslation, {
+          backButton: backButton(scopedTranslation, {
             label: "delete.backButton.label" as const,
             icon: "arrow-left",
             variant: "outline",
             usage: { request: "urlPathParams" },
           }),
-          deleteButton: scopedSubmitButton(scopedTranslation, {
+          deleteButton: submitButton(scopedTranslation, {
             label: "delete.actions.delete" as const,
             loadingText: "delete.actions.deleting" as const,
             icon: "trash",
@@ -207,23 +206,23 @@ const { DELETE } = createEndpoint({
 
       // === RESPONSE ===
       // Note: id is already known from the URL param, not repeated
-      characterId: scopedResponseField(scopedTranslation, {
+      characterId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      voice: scopedResponseField(scopedTranslation, {
+      voice: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.enum(TtsVoiceDB).nullable(),
       }),
-      modelSelection: scopedResponseField(scopedTranslation, {
+      modelSelection: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: dateSchema,
       }),
@@ -493,7 +492,7 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.id.label" as const,
@@ -502,7 +501,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // Delete button configuration
-      deleteButton: scopedDeleteButton(scopedTranslation, {
+      deleteButton: deleteButton(scopedTranslation, {
         label: "patch.deleteButton.label" as const,
         targetEndpoint: DELETE,
         extractParams: (source) => ({
@@ -518,13 +517,13 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
       }),
 
       // === REQUEST ===
-      characterId: scopedRequestField(scopedTranslation, {
+      characterId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.characterId.label" as const,
@@ -533,7 +532,7 @@ const { PATCH } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      icon: scopedRequestField(scopedTranslation, {
+      icon: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
         label: "patch.icon.label" as const,
@@ -544,7 +543,7 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
 
-      voice: scopedRequestField(scopedTranslation, {
+      voice: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "patch.voice.label" as const,
@@ -558,7 +557,7 @@ const { PATCH } = createEndpoint({
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
 
-      modelSelection: scopedRequestField(scopedTranslation, {
+      modelSelection: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.modelSelection.label" as const,
@@ -567,7 +566,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // Auto-compacting token threshold (null = fall through to character/settings default)
-      compactTrigger: scopedRequestField(scopedTranslation, {
+      compactTrigger: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "patch.compactTrigger.label" as const,
@@ -577,7 +576,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // Tool configuration — null = fall through to character/settings default
-      allowedTools: scopedRequestField(scopedTranslation, {
+      allowedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.allowedTools.label" as const,
@@ -592,7 +591,7 @@ const { PATCH } = createEndpoint({
           .nullable()
           .optional(),
       }),
-      pinnedTools: scopedRequestField(scopedTranslation, {
+      pinnedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.pinnedTools.label" as const,
@@ -713,12 +712,12 @@ const { GET } = createEndpoint({
 
   aliases: [FAVORITE_GET_ALIAS],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.id.label" as const,
@@ -727,7 +726,7 @@ const { GET } = createEndpoint({
       }),
 
       // Edit button configuration
-      editButton: scopedNavigateButtonField(scopedTranslation, {
+      editButton: navigateButtonField(scopedTranslation, {
         targetEndpoint: PATCH,
         extractParams: (source) => ({
           urlPathParams: {
@@ -743,7 +742,7 @@ const { GET } = createEndpoint({
       }),
 
       // Delete button configuration
-      deleteButton: scopedDeleteButton(scopedTranslation, {
+      deleteButton: deleteButton(scopedTranslation, {
         targetEndpoint: DELETE,
         extractParams: (source) => ({
           urlPathParams: {
@@ -758,7 +757,7 @@ const { GET } = createEndpoint({
       }),
 
       // Separator
-      separator: scopedWidgetField(scopedTranslation, {
+      separator: widgetField(scopedTranslation, {
         type: WidgetType.SEPARATOR,
         spacingTop: SpacingSize.RELAXED,
         spacingBottom: SpacingSize.RELAXED,
@@ -766,13 +765,13 @@ const { GET } = createEndpoint({
       }),
 
       // === FLAT RESPONSE FIELDS ===
-      characterId: scopedResponseField(scopedTranslation, {
+      characterId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
         hidden: true,
       }),
 
-      icon: scopedResponseField(scopedTranslation, {
+      icon: responseField(scopedTranslation, {
         type: WidgetType.ICON,
         containerSize: "lg",
         iconSize: "lg",
@@ -780,54 +779,54 @@ const { GET } = createEndpoint({
         schema: iconSchema,
       }),
 
-      name: scopedResponseField(scopedTranslation, {
+      name: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
         emphasis: "bold",
         schema: z.string(),
       }),
 
-      tagline: scopedResponseField(scopedTranslation, {
+      tagline: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "sm",
         variant: "muted",
         schema: z.string(),
       }),
 
-      description: scopedResponseField(scopedTranslation, {
+      description: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "xs",
         variant: "muted",
         schema: z.string(),
       }),
 
-      voice: scopedResponseField(scopedTranslation, {
+      voice: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "default",
         schema: z.enum(TtsVoiceDB).nullable(),
       }),
 
-      modelSelection: scopedResponseField(scopedTranslation, {
+      modelSelection: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
-      characterModelSelection: scopedResponseField(scopedTranslation, {
+      characterModelSelection: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple.nullable().optional(),
       }),
 
       // Auto-compacting token threshold (null = fall through to character/settings default)
-      compactTrigger: scopedResponseField(scopedTranslation, {
+      compactTrigger: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.number().int().nullable(),
       }),
 
       // Tool configuration — null = fall through to character/settings default
-      allowedTools: scopedResponseField(scopedTranslation, {
+      allowedTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
@@ -839,7 +838,7 @@ const { GET } = createEndpoint({
           )
           .nullable(),
       }),
-      pinnedTools: scopedResponseField(scopedTranslation, {
+      pinnedTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z

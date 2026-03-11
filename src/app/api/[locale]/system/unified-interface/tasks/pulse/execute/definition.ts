@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.system",
   tags: ["tags.execute"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
     description: "post.container.description",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST DATA FIELDS ===
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      taskNames: scopedRequestField(scopedTranslation, {
+      taskNames: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "post.fields.taskNames.label",
@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
         schema: z.array(z.string()).optional(),
       }),
 
-      force: scopedRequestField(scopedTranslation, {
+      force: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.force.label",
@@ -79,30 +79,30 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.title",
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.message.title",
         schema: z.string(),
       }),
-      executedAt: scopedResponseField(scopedTranslation, {
+      executedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.executedAt",
         schema: z.string(),
       }),
-      tasksExecuted: scopedResponseField(scopedTranslation, {
+      tasksExecuted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.tasksExecuted",
         schema: z.coerce.number(),
       }),
-      results: scopedResponseArrayFieldNew(scopedTranslation, {
+      results: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.response.results",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "post.response.results",
           description: "post.response.resultsDescription",
@@ -110,22 +110,22 @@ const { POST } = createEndpoint({
           columns: 4,
           usage: { response: true },
           children: {
-            taskName: scopedResponseField(scopedTranslation, {
+            taskName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.taskName",
               schema: z.string(),
             }),
-            success: scopedResponseField(scopedTranslation, {
+            success: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.success",
               schema: z.boolean(),
             }),
-            duration: scopedResponseField(scopedTranslation, {
+            duration: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.duration",
               schema: z.coerce.number(),
             }),
-            message: scopedResponseField(scopedTranslation, {
+            message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.message",
               schema: z.string().optional(),

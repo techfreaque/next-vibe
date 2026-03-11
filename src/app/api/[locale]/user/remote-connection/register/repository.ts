@@ -14,10 +14,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
 import {
-  ErrorResponseTypes,
-  fail,
   type ResponseType,
   success,
 } from "next-vibe/shared/types/response.schema";
@@ -30,7 +27,6 @@ import { envClient } from "@/config/env-client";
 import { userRemoteConnections } from "../db";
 import { invalidateInstanceIdCache } from "../repository";
 import type { RemoteRegisterPostRequestInput } from "./definition";
-import type { RemoteRegisterT } from "./i18n";
 
 /**
  * Derive a default instanceId for this host from its app URL.
@@ -65,47 +61,36 @@ export async function registerLocalInstance(
   data: RemoteRegisterPostRequestInput,
   user: JwtPrivatePayloadType,
   logger: EndpointLogger,
-  t: RemoteRegisterT,
 ): Promise<ResponseType<{ registered: boolean; remoteInstanceId: string }>> {
   const { instanceId, localUrl } = data;
 
-  // Collision check: instanceId must be unique per user
-  const [existing] = await db
-    .select({ id: userRemoteConnections.id })
-    .from(userRemoteConnections)
-    .where(
-      and(
-        eq(userRemoteConnections.userId, user.id),
-        eq(userRemoteConnections.instanceId, instanceId),
-      ),
-    )
-    .limit(1);
-
-  if (existing) {
-    logger.warn("Instance ID already registered for user", {
-      userId: user.id,
-      instanceId,
-    });
-    return fail({
-      message: t("post.errors.conflict.title"),
-      errorType: ErrorResponseTypes.CONFLICT,
-    });
-  }
-
-  // Store cloud-side record: token=null (cloud never calls local), localUrl set.
+  // Upsert cloud-side record: token=null (cloud never calls local), localUrl set.
   // remoteInstanceId = instanceId: the connecting client's own identity, used by
   // execute-tool to set targetInstance correctly when routing tasks back to this client.
-  await db.insert(userRemoteConnections).values({
-    userId: user.id,
-    instanceId,
-    friendlyName: instanceId,
-    remoteUrl: localUrl, // from cloud's perspective, the local IS the remote
-    localUrl,
-    token: null,
-    isActive: true,
-    remoteInstanceId: instanceId,
-    updatedAt: new Date(),
-  });
+  // Reconnect is allowed — update localUrl/isActive if the record already exists.
+  await db
+    .insert(userRemoteConnections)
+    .values({
+      userId: user.id,
+      instanceId,
+      friendlyName: instanceId,
+      remoteUrl: localUrl, // from cloud's perspective, the local IS the remote
+      localUrl,
+      token: null,
+      isActive: true,
+      remoteInstanceId: instanceId,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [userRemoteConnections.userId, userRemoteConnections.instanceId],
+      set: {
+        localUrl,
+        remoteUrl: localUrl,
+        isActive: true,
+        remoteInstanceId: instanceId,
+        updatedAt: new Date(),
+      },
+    });
 
   logger.info("Registered local instance on cloud", {
     userId: user.id,

@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ export const { POST } = createEndpoint({
     render: ConnectionCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      label: scopedRequestField(scopedTranslation, {
+      label: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.label.label",
@@ -45,7 +45,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.label.placeholder",
         schema: z.string().min(1).max(100),
       }),
-      host: scopedRequestField(scopedTranslation, {
+      host: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.host.label",
@@ -53,7 +53,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.host.placeholder",
         schema: z.string().optional(),
       }),
-      port: scopedRequestField(scopedTranslation, {
+      port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.port.label",
@@ -61,7 +61,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.port.placeholder",
         schema: z.coerce.number().min(1).max(65535).default(22),
       }),
-      username: scopedRequestField(scopedTranslation, {
+      username: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.username.label",
@@ -69,7 +69,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.username.placeholder",
         schema: z.string().min(1),
       }),
-      authType: scopedRequestField(scopedTranslation, {
+      authType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.fields.authType.label",
@@ -77,35 +77,35 @@ export const { POST } = createEndpoint({
         options: SshAuthTypeOptions,
         schema: z.enum(SshAuthTypeDB),
       }),
-      secret: scopedRequestField(scopedTranslation, {
+      secret: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.secret.label",
         description: "post.fields.secret.description",
         schema: z.string().optional(),
       }),
-      passphrase: scopedRequestField(scopedTranslation, {
+      passphrase: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.passphrase.label",
         description: "post.fields.passphrase.description",
         schema: z.string().optional(),
       }),
-      isDefault: scopedRequestField(scopedTranslation, {
+      isDefault: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.isDefault.label",
         description: "post.fields.isDefault.description",
         schema: z.boolean().optional(),
       }),
-      notes: scopedRequestField(scopedTranslation, {
+      notes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.notes.label",
         description: "post.fields.notes.description",
         schema: z.string().optional(),
       }),
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.id.title",
         schema: z.string(),

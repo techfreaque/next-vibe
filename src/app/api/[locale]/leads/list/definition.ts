@@ -7,13 +7,13 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  responseArrayField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -71,7 +71,7 @@ const { GET } = createEndpoint({
     render: LeadsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         content: "get.title",
         getCount: (responseData: {
@@ -82,12 +82,12 @@ const { GET } = createEndpoint({
         inline: true,
       }),
 
-      backButton: backButton({
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
         inline: true,
       }),
 
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "get.actions.refresh",
         loadingText: "get.actions.refreshing",
@@ -99,7 +99,7 @@ const { GET } = createEndpoint({
       }),
 
       // Separator between buttons and content
-      separator: scopedWidgetField(scopedTranslation, {
+      separator: widgetField(scopedTranslation, {
         type: WidgetType.SEPARATOR,
         spacingTop: SpacingSize.RELAXED,
         spacingBottom: SpacingSize.RELAXED,
@@ -116,14 +116,14 @@ const { GET } = createEndpoint({
       sortingOptions: leadsSortingOptionsContainer,
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 3.5,
         usage: { request: "data" },
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.title",
         description: "get.response.description",
@@ -132,142 +132,139 @@ const { GET } = createEndpoint({
         order: 4,
         usage: { response: true },
         children: {
-          leads: scopedResponseArrayFieldNew(scopedTranslation, {
+          leads: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             columns: 12,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { response: true },
               children: {
-                email: scopedResponseField(scopedTranslation, {
+                email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                businessName: scopedResponseField(scopedTranslation, {
+                businessName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string(),
                 }),
-                contactName: scopedResponseField(scopedTranslation, {
+                contactName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                country: scopedResponseField(scopedTranslation, {
+                country: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   label: "get.response.leads.country",
                   enumOptions: CountriesOptions,
                   schema: z.enum(Countries),
                 }),
-                language: scopedResponseField(scopedTranslation, {
+                language: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   label: "get.response.leads.language",
                   enumOptions: LanguagesOptions,
                   schema: z.enum(Languages),
                 }),
-                status: scopedResponseField(scopedTranslation, {
+                status: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   label: "get.response.leads.status",
                   enumOptions: LeadStatusOptions,
                   schema: z.enum(LeadStatus),
                 }),
-                source: scopedResponseField(scopedTranslation, {
+                source: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   label: "get.response.leads.source",
                   enumOptions: LeadSourceOptions,
                   schema: z.enum(LeadSource).nullable(),
                 }),
-                currentCampaignStage: scopedResponseField(scopedTranslation, {
+                currentCampaignStage: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   label: "get.response.leads.currentCampaignStage",
                   enumOptions: EmailCampaignStageOptions,
                   schema: z.enum(EmailCampaignStage).nullable(),
                 }),
-                createdAt: scopedResponseField(scopedTranslation, {
+                createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date(),
                 }),
-                phone: scopedResponseField(scopedTranslation, {
+                phone: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                website: scopedResponseField(scopedTranslation, {
+                website: responseField(scopedTranslation, {
                   type: WidgetType.LINK,
                   schema: z.string().nullable(),
                 }),
-                notes: scopedResponseField(scopedTranslation, {
+                notes: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                convertedUserId: scopedResponseField(scopedTranslation, {
+                convertedUserId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                convertedAt: scopedResponseField(scopedTranslation, {
+                convertedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                signedUpAt: scopedResponseField(scopedTranslation, {
+                signedUpAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                subscriptionConfirmedAt: scopedResponseField(
-                  scopedTranslation,
-                  {
-                    type: WidgetType.TEXT,
-                    fieldType: FieldDataType.DATETIME,
-                    schema: z.coerce.date().nullable(),
-                  },
-                ),
-                emailsSent: scopedResponseField(scopedTranslation, {
+                subscriptionConfirmedAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  schema: z.coerce.date().nullable(),
+                }),
+                emailsSent: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.coerce.number(),
                 }),
-                lastEmailSentAt: scopedResponseField(scopedTranslation, {
+                lastEmailSentAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                unsubscribedAt: scopedResponseField(scopedTranslation, {
+                unsubscribedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                emailsOpened: scopedResponseField(scopedTranslation, {
+                emailsOpened: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.coerce.number(),
                 }),
-                emailsClicked: scopedResponseField(scopedTranslation, {
+                emailsClicked: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.coerce.number(),
                 }),
-                lastEngagementAt: scopedResponseField(scopedTranslation, {
+                lastEngagementAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                metadata: scopedResponseField(scopedTranslation, {
+                metadata: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.record(z.string(), z.any()),
                 }),
-                updatedAt: scopedResponseField(scopedTranslation, {
+                updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date(),
                 }),
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   hidden: true,
                   schema: z.string(),
                 }),
-                linkedLeadsCount: scopedResponseField(scopedTranslation, {
+                linkedLeadsCount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.coerce.number(),
                 }),
-                hasLinkedUser: scopedResponseField(scopedTranslation, {
+                hasLinkedUser: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.boolean(),
                 }),

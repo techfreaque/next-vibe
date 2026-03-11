@@ -10,10 +10,12 @@ import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import type React from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -31,7 +33,7 @@ interface UserMessageActionsProps {
   deductCredits: ((creditCost: number, feature: string) => void) | null;
   onBranch?: (messageId: string) => void;
   onRetry?: (message: ChatMessage) => Promise<void>;
-  onDelete?: (messageId: string) => void;
+  rootFolderId?: DefaultFolderId;
   className?: string;
 }
 
@@ -43,12 +45,13 @@ export function UserMessageActions({
   deductCredits,
   onBranch,
   onRetry,
-  onDelete,
+  rootFolderId,
   className,
 }: UserMessageActionsProps): React.JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const { groupHover } = useMessageGroupName();
+  const { push: navigate } = useWidgetNavigation();
 
   const ttsText = message.content ?? "";
   const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
@@ -75,6 +78,19 @@ export function UserMessageActions({
         /* no-op */
       }),
   });
+
+  const handleDelete = (): void => {
+    void (async (): Promise<void> => {
+      const messageIdDefs =
+        await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition");
+      navigate(messageIdDefs.default.DELETE, {
+        urlPathParams: { threadId: message.threadId, messageId: message.id },
+        data: rootFolderId ? { rootFolderId } : undefined,
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
 
   return (
     <Div
@@ -146,14 +162,12 @@ export function UserMessageActions({
         />
       )}
 
-      {onDelete && (
-        <MessageActionButton
-          icon={Trash2}
-          onClick={() => onDelete(message.id)}
-          title={t("widget.common.userMessageActions.deleteMessage")}
-          variant="destructive"
-        />
-      )}
+      <MessageActionButton
+        icon={Trash2}
+        onClick={handleDelete}
+        title={t("widget.common.userMessageActions.deleteMessage")}
+        variant="destructive"
+      />
     </Div>
   );
 }

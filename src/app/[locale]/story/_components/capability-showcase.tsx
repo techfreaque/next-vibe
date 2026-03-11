@@ -360,7 +360,6 @@ function AutonomousVisual({
           showAuthor
           platformOverride={Platform.CLI}
           onAnswerAsModel={null}
-          onDelete={null}
           collapseState={null}
           rootFolderId={DefaultFolderId.PUBLIC}
           user={{

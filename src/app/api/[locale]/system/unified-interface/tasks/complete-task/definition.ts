@@ -9,10 +9,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,20 +38,20 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.MCP_VISIBLE, UserRole.PRODUCTION_OFF],
   aliases: ["complete-task"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // Request
-      taskId: scopedRequestField(scopedTranslation, {
+      taskId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
         schema: z.string().min(1),
       }),
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -61,13 +61,13 @@ const { POST } = createEndpoint({
           CronTaskStatus.CANCELLED,
         ]),
       }),
-      summary: scopedRequestField(scopedTranslation, {
+      summary: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
         schema: z.string().min(1),
       }),
-      output: scopedRequestField(scopedTranslation, {
+      output: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
@@ -75,15 +75,15 @@ const { POST } = createEndpoint({
       }),
 
       // Response
-      completed: scopedResponseField(scopedTranslation, {
+      completed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
       }),
-      pushedToRemote: scopedResponseField(scopedTranslation, {
+      pushedToRemote: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().optional(),
       }),

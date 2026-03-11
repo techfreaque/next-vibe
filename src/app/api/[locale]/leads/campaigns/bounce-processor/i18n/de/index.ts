@@ -57,4 +57,12 @@ export const translations: typeof enTranslations = {
       description: "Bounce-Benachrichtigungen erfolgreich verarbeitet",
     },
   },
+  widget: {
+    title: "Bounce-Verarbeitung ausführen",
+    description:
+      "IMAP-Posteingang manuell nach Bounce-Benachrichtigungen durchsuchen und betroffene Lead-Status aktualisieren.",
+    runButton: "Jetzt ausführen",
+    running: "Wird ausgeführt...",
+    done: "Fertig",
+  },
 };

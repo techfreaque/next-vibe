@@ -405,16 +405,21 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   const submitError: ErrorResponseType | undefined =
     mutation.error || formState.formError || undefined;
 
-  return {
-    form: formMethods,
-    response,
-    // Backward compatibility properties
-    isSubmitSuccessful: mutation.isSuccess,
-    submitError,
-
-    isSubmitting: mutation.isPending,
-    submitForm,
-    clearSavedForm,
-    setErrorType,
-  };
+  return useMemo(
+    () => ({
+      form: formMethods,
+      response,
+      // Backward compatibility properties
+      isSubmitSuccessful: mutation.isSuccess,
+      submitError,
+      isSubmitting: mutation.isPending,
+      submitForm,
+      clearSavedForm,
+      setErrorType,
+    }),
+    // formMethods is stable (useForm returns stable ref), submitForm/clearSavedForm/setErrorType
+    // are useCallback-stable. Only reactive values need to be deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [response, mutation.isSuccess, submitError, mutation.isPending],
+  );
 }

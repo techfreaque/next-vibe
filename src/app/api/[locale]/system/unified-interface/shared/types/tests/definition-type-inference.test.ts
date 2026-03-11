@@ -19,9 +19,9 @@ import type { z } from "zod";
 import type imapAccountsListDefinition from "@/app/api/[locale]/emails/imap-client/accounts/list/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import {
-  objectField,
+  objectFieldNew,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type {
   InferSchemaFromField,
   UnifiedField,
@@ -502,17 +502,19 @@ type Test12a_ExtractTKey =
 // What is TKey here? Should be "app.common.test" if const preserves it
 
 // Test 12b: Create an object field with children
-const containerField = objectField(
-  { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-  { response: true },
-  {
+const containerField = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  usage: { response: true },
+  children: {
     name: responseField({
       type: WidgetType.TEXT,
       content: "app.common.active" as const,
       schema: {} as z.ZodString,
     }),
   },
-);
+});
 type Test12b_ContainerField = typeof containerField;
 type Test12b_ExtractTKey =
   Test12b_ContainerField extends ObjectField<infer _C, infer _U, infer TKey>
@@ -728,11 +730,13 @@ type Test14h_Method = typeof imapAccountsListDefinition.GET.method;
 // ============================================================================
 
 // Test 15a: Call objectField directly and check the return type
-const directObjectField = objectField(
-  { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 12 },
-  { response: true },
-  {},
-);
+const directObjectField = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  usage: { response: true },
+  children: {},
+});
 type Test15a_DirectType = typeof directObjectField;
 
 // Test 15b: Does this direct field have schemaType: "object"?
@@ -758,22 +762,20 @@ type Test15e_ExtractTKey =
     : "no-match";
 
 // Test 15f: Create field with explicit string literals for translation keys
-const fieldWithLabels = objectField(
-  {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    title: "app.common.active" as const,
-  },
-  { response: true },
-  {
+const fieldWithLabels = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  layoutType: LayoutType.GRID,
+  columns: 12,
+  title: "app.common.active" as const,
+  usage: { response: true },
+  children: {
     test: responseField({
       type: WidgetType.TEXT,
       content: "app.common.active" as const,
       schema: {} as z.ZodString,
     }),
   },
-);
+});
 type Test15f_FieldWithLabels = typeof fieldWithLabels;
 type Test15f_HasTypeObject = Test15f_FieldWithLabels extends {
   schemaType: "object";

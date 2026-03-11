@@ -8,11 +8,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -34,9 +34,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["user", "remote-connection", "connect"],
-  allowedRoles: envClient.VIBE_IS_CLOUD
-    ? ([UserRole.CUSTOMER, UserRole.ADMIN] as const)
-    : ([] as const),
+  allowedRoles: envClient.NEXT_PUBLIC_VIBE_IS_CLOUD
+    ? ([] as const) // Cloud instances don't initiate connections; local side does
+    : ([UserRole.CUSTOMER, UserRole.ADMIN] as const),
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "link" as const,
@@ -48,10 +48,10 @@ const { POST } = createEndpoint({
     render: RemoteConnectWidget,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data" },
       }),
-      instanceId: scopedRequestField(scopedTranslation, {
+      instanceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.instanceId.label" as const,
@@ -68,7 +68,7 @@ const { POST } = createEndpoint({
           })
           .default(defaultInstanceId),
       }),
-      friendlyName: scopedRequestField(scopedTranslation, {
+      friendlyName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.friendlyName.label" as const,
@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
         theme: { style: "none" },
         schema: z.string().min(1).max(64).default(defaultInstanceId),
       }),
-      remoteUrl: scopedRequestField(scopedTranslation, {
+      remoteUrl: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
         label: "post.remoteUrl.label" as const,
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
       // email and password are NOT sent to the local backend.
       // The widget POSTs credentials directly from the browser to the remote server,
       // extracts the token from the Set-Cookie response, and passes only the token here.
-      token: scopedRequestField(scopedTranslation, {
+      token: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.token.label" as const,
@@ -110,7 +110,7 @@ const { POST } = createEndpoint({
           .string()
           .min(1, { message: "post.token.validation.required" }),
       }),
-      leadId: scopedRequestField(scopedTranslation, {
+      leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.leadId.label" as const,
@@ -120,12 +120,12 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().optional(),
       }),
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 10,
         usage: { request: "data" },
       }),
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "post.actions.submit" as const,
         loadingText: "post.actions.submitting" as const,
@@ -135,12 +135,12 @@ const { POST } = createEndpoint({
         order: 11,
         usage: { request: "data" },
       }),
-      remoteUrlResult: scopedResponseField(scopedTranslation, {
+      remoteUrlResult: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),
       }),
-      isConnected: scopedResponseField(scopedTranslation, {
+      isConnected: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),

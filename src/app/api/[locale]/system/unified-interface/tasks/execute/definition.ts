@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedRequestResponseField,
-  scopedResponseField,
-  scopedSubmitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestResponseField,
+  responseField,
+  submitButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -54,10 +54,12 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === NAVIGATION ===
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST + RESPONSE FIELDS ===
-      taskId: scopedRequestResponseField(scopedTranslation, {
+      taskId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.taskId.label",
@@ -67,39 +69,39 @@ const { POST } = createEndpoint({
       }),
 
       // === SUBMIT BUTTON ===
-      submitButton: scopedSubmitButton(scopedTranslation, {
+      submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label",
         loadingText: "post.submitButton.loadingText",
         usage: { request: "data", response: true },
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.title",
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.message.title",
         schema: z.string().optional(),
       }),
-      taskName: scopedResponseField(scopedTranslation, {
+      taskName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.taskName",
         schema: z.string(),
       }),
-      executedAt: scopedResponseField(scopedTranslation, {
+      executedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.executedAt",
         schema: z.string(),
       }),
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.duration",
         schema: z.coerce.number(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.status",
         schema: z.string(),

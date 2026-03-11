@@ -11,10 +11,10 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -51,42 +51,42 @@ const { GET } = createEndpoint({
 
   aliases: [CHAT_SETTINGS_GET_ALIAS],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { response: true },
     children: {
-      selectedModel: scopedResponseField(scopedTranslation, {
+      selectedModel: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(ModelId),
       }),
-      selectedCharacter: scopedResponseField(scopedTranslation, {
+      selectedCharacter: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),
       }),
-      activeFavoriteId: scopedResponseField(scopedTranslation, {
+      activeFavoriteId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
       }),
-      ttsAutoplay: scopedResponseField(scopedTranslation, {
+      ttsAutoplay: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),
       }),
-      ttsVoice: scopedResponseField(scopedTranslation, {
+      ttsVoice: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(TtsVoiceDB),
       }),
-      viewMode: scopedResponseField(scopedTranslation, {
+      viewMode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(ViewModeDB),
       }),
-      allowedTools: scopedResponseField(scopedTranslation, {
+      allowedTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
@@ -98,7 +98,7 @@ const { GET } = createEndpoint({
           )
           .nullable(),
       }),
-      pinnedTools: scopedResponseField(scopedTranslation, {
+      pinnedTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
@@ -112,7 +112,7 @@ const { GET } = createEndpoint({
       }),
 
       // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
-      compactTrigger: scopedResponseField(scopedTranslation, {
+      compactTrigger: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.number().int().nullable(),
@@ -200,13 +200,13 @@ const { POST } = createEndpoint({
 
   aliases: [CHAT_SETTINGS_UPDATE_ALIAS],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title" as const,
     layoutType: LayoutType.STACKED,
     usage: { request: "data" },
     children: {
-      selectedModel: scopedRequestField(scopedTranslation, {
+      selectedModel: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.selectedModel.label" as const,
@@ -214,28 +214,28 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(ModelId).optional(),
       }),
-      selectedCharacter: scopedRequestField(scopedTranslation, {
+      selectedCharacter: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.selectedCharacter.label" as const,
         columns: 6,
         schema: z.string().optional(),
       }),
-      activeFavoriteId: scopedRequestField(scopedTranslation, {
+      activeFavoriteId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.activeFavoriteId.label" as const,
         columns: 6,
         schema: z.string().nullable().optional(),
       }),
-      ttsAutoplay: scopedRequestField(scopedTranslation, {
+      ttsAutoplay: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.ttsAutoplay.label" as const,
         columns: 12,
         schema: z.boolean().optional(),
       }),
-      ttsVoice: scopedRequestField(scopedTranslation, {
+      ttsVoice: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.ttsVoice.label" as const,
@@ -243,7 +243,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(TtsVoiceDB).optional(),
       }),
-      viewMode: scopedRequestField(scopedTranslation, {
+      viewMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.viewMode.label" as const,
@@ -251,7 +251,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(ViewModeDB).optional(),
       }),
-      allowedTools: scopedRequestField(scopedTranslation, {
+      allowedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.allowedTools.label" as const,
@@ -266,7 +266,7 @@ const { POST } = createEndpoint({
           .nullable()
           .optional(),
       }),
-      pinnedTools: scopedRequestField(scopedTranslation, {
+      pinnedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.pinnedTools.label" as const,
@@ -284,7 +284,7 @@ const { POST } = createEndpoint({
 
       // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
       // Hidden from default widget — rendered via CompactTriggerEdit in custom UI
-      compactTrigger: scopedRequestField(scopedTranslation, {
+      compactTrigger: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.compactTrigger.label" as const,

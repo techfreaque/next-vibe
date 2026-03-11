@@ -8,10 +8,10 @@ import { z } from "zod";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -60,7 +60,7 @@ const { GET } = createEndpoint({
   credits: FEATURE_COSTS.FETCH_URL_CONTENT, // 0.13 credits per fetch
   icon: "globe",
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     linkable: true,
     title: "get.form.title" as const,
@@ -70,7 +70,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      url: scopedRequestField(scopedTranslation, {
+      url: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.url.title" as const,
@@ -81,14 +81,14 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.message.title" as const,
         columns: 12,
         schema: z.string(),
       }),
 
-      fetchedUrl: scopedResponseField(scopedTranslation, {
+      fetchedUrl: responseField(scopedTranslation, {
         type: WidgetType.LINK,
         href: "/{fetchedUrl}",
         text: "get.response.url.title" as const,
@@ -97,7 +97,7 @@ const { GET } = createEndpoint({
         schema: z.string(),
       }),
 
-      content: scopedResponseField(scopedTranslation, {
+      content: responseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
         label: "get.response.content.title" as const,
         description: "get.response.content.description" as const,
@@ -105,14 +105,14 @@ const { GET } = createEndpoint({
         schema: z.string(),
       }),
 
-      statusCode: scopedResponseField(scopedTranslation, {
+      statusCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.statusCode.title" as const,
         columns: 6,
         schema: z.number().optional(),
       }),
 
-      timeElapsed: scopedResponseField(scopedTranslation, {
+      timeElapsed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.timeElapsed.title" as const,
         columns: 6,

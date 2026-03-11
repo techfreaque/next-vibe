@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.title",
     description: "post.description",
@@ -64,7 +64,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      verbose: scopedRequestField(scopedTranslation, {
+      verbose: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.title",
@@ -74,37 +74,37 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.success.title",
         schema: z.boolean(),
       }),
 
-      installed: scopedResponseField(scopedTranslation, {
+      installed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.boolean(),
       }),
 
-      version: scopedResponseField(scopedTranslation, {
+      version: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.description",
         schema: z.string().optional(),
       }),
 
-      path: scopedResponseField(scopedTranslation, {
+      path: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.string().optional(),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.success.description",
         schema: z.string(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.title",
         schema: z.string().optional(),

@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -44,12 +44,12 @@ const { POST } = createEndpoint({
     render: EmailPreviewRenderContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === REQUEST FIELDS ===
-      templateId: scopedRequestField(scopedTranslation, {
+      templateId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "preview.render.post.fields.templateId.label" as const,
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
-      language: scopedRequestField(scopedTranslation, {
+      language: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "preview.render.post.fields.language.label" as const,
@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
         schema: z.enum(LanguagesArr),
       }),
 
-      country: scopedRequestField(scopedTranslation, {
+      country: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "preview.render.post.fields.country.label" as const,
@@ -79,7 +79,7 @@ const { POST } = createEndpoint({
         schema: z.enum(CountriesArr),
       }),
 
-      props: scopedRequestField(scopedTranslation, {
+      props: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "preview.render.post.fields.props.label" as const,
@@ -92,19 +92,19 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      html: scopedResponseField(scopedTranslation, {
+      html: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "preview.render.post.fields.html.title" as const,
         schema: z.string(),
       }),
 
-      subject: scopedResponseField(scopedTranslation, {
+      subject: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "preview.render.post.fields.subject.title" as const,
         schema: z.string(),
       }),
 
-      templateVersion: scopedResponseField(scopedTranslation, {
+      templateVersion: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "preview.render.post.fields.templateVersion.title" as const,
         schema: z.string(),

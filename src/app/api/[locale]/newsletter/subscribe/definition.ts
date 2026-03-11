@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
   cli: {
     firstCliArgKey: "email",
   },
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -57,7 +57,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "email.label",
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().email(),
       }),
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "name.label",
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
-      preferences: scopedRequestField(scopedTranslation, {
+      preferences: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "preferences.label",
@@ -91,27 +91,27 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       // Note: leadId comes from JWT payload (user.leadId) on server-side
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success",
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.message",
         schema: z.string(),
       }),
-      leadId: scopedResponseField(scopedTranslation, {
+      leadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.leadId",
         schema: z.string(),
       }),
-      subscriptionId: scopedResponseField(scopedTranslation, {
+      subscriptionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.subscriptionId",
         schema: z.string(),
       }),
-      userId: scopedResponseField(scopedTranslation, {
+      userId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.userId",
         schema: z.string().optional(),

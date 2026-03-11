@@ -9,11 +9,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -59,7 +59,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      sortMode: scopedRequestField(scopedTranslation, {
+      sortMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.sortMode.label" as const,
@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
         options: FeedSortModeOptions,
         schema: z.enum(FeedSortModeDB).optional().default(FeedSortMode.HOT),
       }),
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.page.label" as const,
@@ -76,7 +76,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().min(1).optional().default(1),
       }),
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.limit.label" as const,
@@ -84,7 +84,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().min(1).max(100).optional().default(20),
       }),
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.search.label" as const,
@@ -94,91 +94,91 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      items: scopedResponseArrayFieldNew(scopedTranslation, {
+      items: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "get.response.items.item.title" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.id.content" as const,
               schema: z.uuid(),
             }),
-            title: scopedResponseField(scopedTranslation, {
+            title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.threadTitle.content" as const,
               schema: z.string(),
             }),
-            preview: scopedResponseField(scopedTranslation, {
+            preview: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.preview.content" as const,
               schema: z.string().nullable(),
             }),
-            folderId: scopedResponseField(scopedTranslation, {
+            folderId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.folderId.content" as const,
               schema: z.uuid().nullable(),
             }),
-            folderName: scopedResponseField(scopedTranslation, {
+            folderName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.folderName.content" as const,
               schema: z.string().nullable(),
             }),
-            authorId: scopedResponseField(scopedTranslation, {
+            authorId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.authorId.content" as const,
               schema: z.uuid().nullable(),
             }),
-            authorName: scopedResponseField(scopedTranslation, {
+            authorName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.authorName.content" as const,
               schema: z.string().nullable(),
             }),
-            messageCount: scopedResponseField(scopedTranslation, {
+            messageCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.messageCount.content" as const,
               schema: z.number().int().min(0),
             }),
-            authorCount: scopedResponseField(scopedTranslation, {
+            authorCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.authorCount.content" as const,
               schema: z.number().int().min(0),
             }),
-            upvotes: scopedResponseField(scopedTranslation, {
+            upvotes: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.upvotes.content" as const,
               schema: z.number().int().min(0),
             }),
-            downvotes: scopedResponseField(scopedTranslation, {
+            downvotes: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.downvotes.content" as const,
               schema: z.number().int().min(0),
             }),
-            score: scopedResponseField(scopedTranslation, {
+            score: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.score.content" as const,
               schema: z.number().int(),
             }),
-            modelNames: scopedResponseField(scopedTranslation, {
+            modelNames: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.modelNames.content" as const,
               schema: z.array(z.string()),
             }),
-            isStreaming: scopedResponseField(scopedTranslation, {
+            isStreaming: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.isStreaming.content" as const,
               schema: z.boolean(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.createdAt.content" as const,
               schema: z.date(),
             }),
-            updatedAt: scopedResponseField(scopedTranslation, {
+            updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.updatedAt.content" as const,
               schema: z.date(),
@@ -186,22 +186,22 @@ const { GET } = createEndpoint({
           },
         }),
       }),
-      totalCount: scopedResponseField(scopedTranslation, {
+      totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.totalCount.content" as const,
         schema: z.number().int().min(0),
       }),
-      pageCount: scopedResponseField(scopedTranslation, {
+      pageCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.pageCount.content" as const,
         schema: z.number().int().min(0),
       }),
-      currentPage: scopedResponseField(scopedTranslation, {
+      currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.currentPage.content" as const,
         schema: z.number().int().min(1),
       }),
-      pageSize: scopedResponseField(scopedTranslation, {
+      pageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.pageSize.content" as const,
         schema: z.number().int().min(1),

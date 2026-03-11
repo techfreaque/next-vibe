@@ -214,7 +214,9 @@ export function ThreadedMessageContent({
         </Div>
       </Div>
 
-      {message.role === "error" && <ErrorMessageBubble message={message} />}
+      {message.role === "error" && (
+        <ErrorMessageBubble message={message} rootFolderId={rootFolderId} />
+      )}
     </>
   );
 }

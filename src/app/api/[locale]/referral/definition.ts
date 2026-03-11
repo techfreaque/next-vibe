@@ -10,13 +10,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-  scopedSubmitButton,
-  scopedWidgetField,
-  scopedWidgetObjectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+  submitButton,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -82,7 +81,7 @@ export const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     noCard: true,
     layoutType: LayoutType.STACKED,
@@ -90,7 +89,7 @@ export const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // Fields grid
-      fieldsGrid: scopedObjectFieldNew(scopedTranslation, {
+      fieldsGrid: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         noCard: true,
         layoutType: LayoutType.GRID,
@@ -98,7 +97,7 @@ export const { POST } = createEndpoint({
         gap: "4",
         usage: { request: "data" },
         children: {
-          code: scopedRequestField(scopedTranslation, {
+          code: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "form.fields.code.label",
@@ -110,7 +109,7 @@ export const { POST } = createEndpoint({
               showAllRequired: false,
             },
           }),
-          label: scopedRequestField(scopedTranslation, {
+          label: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "form.fields.label.label",
@@ -126,26 +125,26 @@ export const { POST } = createEndpoint({
       }),
 
       // Form alert for validation and API errors
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         usage: { request: "data" },
       }),
       // Success message
-      successMessage: scopedResponseField(scopedTranslation, {
+      successMessage: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
         usage: { response: true },
       }),
 
       // Submit button row
-      submitRow: scopedWidgetObjectField(scopedTranslation, {
+      submitRow: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         noCard: true,
         layoutType: LayoutType.INLINE,
         className: "flex justify-end",
         usage: { request: "data" },
         children: {
-          submit: scopedSubmitButton(scopedTranslation, {
+          submit: submitButton(scopedTranslation, {
             label: "post.submit.label",
             loadingText: "post.submit.loading",
             usage: { request: "data" },

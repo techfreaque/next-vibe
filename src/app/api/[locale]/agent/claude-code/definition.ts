@@ -9,10 +9,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -54,14 +54,14 @@ const { POST } = createEndpoint({
     firstCliArgKey: "prompt",
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // Request
-      prompt: scopedRequestField(scopedTranslation, {
+      prompt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "claudeCode.run.post.fields.prompt.label",
@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1),
       }),
-      model: scopedRequestField(scopedTranslation, {
+      model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "claudeCode.run.post.fields.model.label",
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
           .default("claude-sonnet-4-6"),
       }),
 
-      taskTitle: scopedRequestField(scopedTranslation, {
+      taskTitle: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "claudeCode.run.post.fields.taskTitle.label",
@@ -106,7 +106,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
-      interactiveMode: scopedRequestField(scopedTranslation, {
+      interactiveMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "claudeCode.run.post.fields.interactiveMode.label",
@@ -114,7 +114,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      timeoutSeconds: scopedRequestField(scopedTranslation, {
+      timeoutSeconds: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "claudeCode.run.post.fields.timeoutSeconds.label",
@@ -124,17 +124,17 @@ const { POST } = createEndpoint({
       }),
 
       // Response
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "claudeCode.run.post.fields.output.label",
         schema: z.string(),
       }),
-      exitCode: scopedResponseField(scopedTranslation, {
+      exitCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "claudeCode.run.post.fields.exitCode.label",
         schema: z.number(),
       }),
-      durationMs: scopedResponseField(scopedTranslation, {
+      durationMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "claudeCode.run.post.fields.durationMs.label",
         schema: z.number(),

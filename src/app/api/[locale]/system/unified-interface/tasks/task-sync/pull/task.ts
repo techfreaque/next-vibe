@@ -31,8 +31,8 @@ const syncTask = createCronTask(endpoints.POST, tools.POST, {
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.SYSTEM,
   // Always enabled — pullFromRemote skips when no active user connections exist,
-  // and skips outbound sync on VIBE_IS_CLOUD instances.
-  enabled: !env.VIBE_IS_CLOUD,
+  // and skips outbound sync on NEXT_PUBLIC_VIBE_IS_CLOUD instances.
+  enabled: !env.NEXT_PUBLIC_VIBE_IS_CLOUD,
   hidden: true,
   priority: CronTaskPriority.HIGH,
   timeout: TASK_TIMEOUTS.MEDIUM,

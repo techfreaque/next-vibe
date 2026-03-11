@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -40,7 +40,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["config-create", "create-config", "cc"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "title",
     description: "description",
@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      createMcpConfig: scopedRequestField(scopedTranslation, {
+      createMcpConfig: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.createMcpConfig.label",
@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      updateVscodeSettings: scopedRequestField(scopedTranslation, {
+      updateVscodeSettings: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.updateVscodeSettings.label",
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      updatePackageJson: scopedRequestField(scopedTranslation, {
+      updatePackageJson: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.updatePackageJson.label",
@@ -76,7 +76,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(true),
       }),
 
-      enableEslint: scopedRequestField(scopedTranslation, {
+      enableEslint: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.enableEslint.label",
@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      enableReactRules: scopedRequestField(scopedTranslation, {
+      enableReactRules: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.enableReactRules.label",
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      enableNextjsRules: scopedRequestField(scopedTranslation, {
+      enableNextjsRules: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.enableNextjsRules.label",
@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      enableI18nRules: scopedRequestField(scopedTranslation, {
+      enableI18nRules: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.enableI18nRules.label",
@@ -112,7 +112,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      jsxCapitalization: scopedRequestField(scopedTranslation, {
+      jsxCapitalization: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.jsxCapitalization.label",
@@ -121,7 +121,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      enablePedanticRules: scopedRequestField(scopedTranslation, {
+      enablePedanticRules: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.enablePedanticRules.label",
@@ -130,7 +130,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      enableRestrictedSyntax: scopedRequestField(scopedTranslation, {
+      enableRestrictedSyntax: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.enableRestrictedSyntax.label",
@@ -139,7 +139,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      interactive: scopedRequestField(scopedTranslation, {
+      interactive: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.interactive.label",
@@ -149,7 +149,7 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.message",
         schema: z.string(),

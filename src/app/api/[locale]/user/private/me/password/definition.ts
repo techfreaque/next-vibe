@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,7 +38,7 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "title",
     description: "description",
@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === CURRENT PASSWORD VERIFICATION ===
-      currentCredentials: scopedObjectFieldNew(scopedTranslation, {
+      currentCredentials: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "groups.currentCredentials.title",
         description: "groups.currentCredentials.description",
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
         children: {
-          currentPassword: scopedRequestField(scopedTranslation, {
+          currentPassword: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.PASSWORD,
             label: "currentPassword.label",
@@ -71,7 +71,7 @@ const { POST } = createEndpoint({
       }),
 
       // === NEW PASSWORD SETUP ===
-      newCredentials: scopedObjectFieldNew(scopedTranslation, {
+      newCredentials: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "groups.newCredentials.title",
         description: "groups.newCredentials.description",
@@ -79,7 +79,7 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
         children: {
-          newPassword: scopedRequestField(scopedTranslation, {
+          newPassword: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.PASSWORD,
             label: "newPassword.label",
@@ -92,7 +92,7 @@ const { POST } = createEndpoint({
             }),
           }),
 
-          confirmPassword: scopedRequestField(scopedTranslation, {
+          confirmPassword: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.PASSWORD,
             label: "confirmPassword.label",
@@ -108,7 +108,7 @@ const { POST } = createEndpoint({
       }),
 
       // === TWO-FACTOR AUTHENTICATION (OPTIONAL) ===
-      twoFactorCode: scopedRequestField(scopedTranslation, {
+      twoFactorCode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "twoFactorCode.label",
@@ -120,7 +120,7 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELD ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.title",
         description: "response.description",
@@ -128,22 +128,22 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.success",
             schema: z.boolean(),
           }),
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.message",
             schema: z.string(),
           }),
-          securityTip: scopedResponseField(scopedTranslation, {
+          securityTip: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.securityTip",
             schema: z.string().optional(),
           }),
-          nextSteps: scopedResponseField(scopedTranslation, {
+          nextSteps: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.nextSteps.item",
             schema: z.array(z.string()),

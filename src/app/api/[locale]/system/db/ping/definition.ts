@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["ping", "db:ping"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      silent: scopedRequestField(scopedTranslation, {
+      silent: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.silent.title",
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      keepConnectionOpen: scopedRequestField(scopedTranslation, {
+      keepConnectionOpen: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.keepConnectionOpen.title",
@@ -62,42 +62,42 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.content" as const,
         label: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      isAccessible: scopedResponseField(scopedTranslation, {
+      isAccessible: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.isAccessible.content" as const,
         label: "fields.isAccessible.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.content" as const,
         label: "fields.output.title",
         schema: z.string(),
       }),
 
-      totalConnections: scopedResponseField(scopedTranslation, {
+      totalConnections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.connectionInfo.totalConnections.content" as const,
         label: "fields.connectionInfo.totalConnections.content",
         schema: z.coerce.number(),
       }),
 
-      idleConnections: scopedResponseField(scopedTranslation, {
+      idleConnections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.connectionInfo.idleConnections.content" as const,
         label: "fields.connectionInfo.idleConnections.content",
         schema: z.coerce.number(),
       }),
 
-      waitingClients: scopedResponseField(scopedTranslation, {
+      waitingClients: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.connectionInfo.waitingClients.content" as const,
         label: "fields.connectionInfo.waitingClients.content",

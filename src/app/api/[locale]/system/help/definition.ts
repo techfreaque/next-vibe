@@ -14,9 +14,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -100,7 +100,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      query: scopedRequestField(scopedTranslation, {
+      query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.query.label" as const,
@@ -110,7 +110,7 @@ const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      category: scopedRequestField(scopedTranslation, {
+      category: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.category.label" as const,
@@ -119,7 +119,7 @@ const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      toolName: scopedRequestField(scopedTranslation, {
+      toolName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.toolName.label" as const,
@@ -128,7 +128,7 @@ const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.page.label" as const,
@@ -141,7 +141,7 @@ const { GET } = createEndpoint({
           .transform((v) => (v && v >= 1 ? v : undefined)),
       }),
 
-      pageSize: scopedRequestField(scopedTranslation, {
+      pageSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.pageSize.label" as const,
@@ -155,7 +155,7 @@ const { GET } = createEndpoint({
           .transform((v) => (v && v >= 1 ? v : undefined)),
       }),
 
-      platform: scopedRequestField(scopedTranslation, {
+      platform: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.platform.label" as const,
@@ -164,7 +164,7 @@ const { GET } = createEndpoint({
         schema: z.enum(["cli", "mcp", "ai", "web", "all"]).optional(),
       }),
 
-      includeProdOnly: scopedRequestField(scopedTranslation, {
+      includeProdOnly: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "get.fields.includeProdOnly.label" as const,
@@ -173,7 +173,7 @@ const { GET } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      instanceId: scopedRequestField(scopedTranslation, {
+      instanceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.instanceId.label" as const,
@@ -183,25 +183,25 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      tools: scopedResponseField(scopedTranslation, {
+      tools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.tools.title" as const,
         schema: z.array(aiToolMetadataSchema),
       }),
 
-      totalCount: scopedResponseField(scopedTranslation, {
+      totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.totalCount.title" as const,
         schema: z.number(),
       }),
 
-      matchedCount: scopedResponseField(scopedTranslation, {
+      matchedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.matchedCount.title" as const,
         schema: z.number(),
       }),
 
-      categories: scopedResponseField(scopedTranslation, {
+      categories: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.categories.title" as const,
         schema: z
@@ -209,43 +209,43 @@ const { GET } = createEndpoint({
           .optional(),
       }),
 
-      hint: scopedResponseField(scopedTranslation, {
+      hint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.hint.title" as const,
         schema: z.string().optional(),
       }),
 
-      currentPlatform: scopedResponseField(scopedTranslation, {
+      currentPlatform: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.platform.label" as const,
         schema: z.string().optional(),
       }),
 
-      currentEnv: scopedResponseField(scopedTranslation, {
+      currentEnv: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.platform.label" as const,
         schema: z.enum(["development", "production"]).optional(),
       }),
 
-      isAdmin: scopedResponseField(scopedTranslation, {
+      isAdmin: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.platform.label" as const,
         schema: z.boolean().optional(),
       }),
 
-      currentPage: scopedResponseField(scopedTranslation, {
+      currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.currentPage.title" as const,
         schema: z.number().optional(),
       }),
 
-      effectivePageSize: scopedResponseField(scopedTranslation, {
+      effectivePageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.effectivePageSize.title" as const,
         schema: z.number().optional(),
       }),
 
-      totalPages: scopedResponseField(scopedTranslation, {
+      totalPages: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.totalPages.title" as const,
         schema: z.number().optional(),

@@ -14,11 +14,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
+  requestField,
+  responseField,
   widgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
@@ -42,13 +41,13 @@ const { POST } = createEndpoint({
     render: SignupFormContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      title: scopedWidgetField(scopedTranslation, {
+      title: widgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         content: "form.title",
         order: 0,
         usage: { request: "data", response: true },
       }),
-      subtitle: scopedWidgetField(scopedTranslation, {
+      subtitle: widgetField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "form.description",
         variant: "body-lg",
@@ -56,7 +55,7 @@ const { POST } = createEndpoint({
         usage: { request: "data", response: true },
       }),
 
-      privateName: scopedRequestField(scopedTranslation, {
+      privateName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.privateName.label",
@@ -79,7 +78,7 @@ const { POST } = createEndpoint({
           }),
       }),
 
-      publicName: scopedRequestField(scopedTranslation, {
+      publicName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.publicName.label",
@@ -102,7 +101,7 @@ const { POST } = createEndpoint({
           }),
       }),
 
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "fields.email.label",
@@ -126,7 +125,7 @@ const { POST } = createEndpoint({
           .transform((val) => val.toLowerCase().trim()),
       }),
 
-      password: scopedRequestField(scopedTranslation, {
+      password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "fields.password.label",
@@ -149,7 +148,7 @@ const { POST } = createEndpoint({
           }),
       }),
 
-      confirmPassword: scopedRequestField(scopedTranslation, {
+      confirmPassword: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "fields.confirmPassword.label",
@@ -167,7 +166,7 @@ const { POST } = createEndpoint({
           }),
       }),
 
-      subscribeToNewsletter: scopedRequestField(scopedTranslation, {
+      subscribeToNewsletter: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.subscribeToNewsletter.label",
@@ -180,7 +179,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(true),
       }),
 
-      acceptTerms: scopedRequestField(scopedTranslation, {
+      acceptTerms: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.acceptTerms.label",
@@ -195,7 +194,7 @@ const { POST } = createEndpoint({
         }),
       }),
 
-      referralCode: scopedRequestField(scopedTranslation, {
+      referralCode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.referralCode.label",
@@ -215,14 +214,14 @@ const { POST } = createEndpoint({
       }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         columns: 12,
         order: 18,
         usage: { request: "data" },
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         variant: "default",
         order: 19,
@@ -230,7 +229,7 @@ const { POST } = createEndpoint({
       }),
 
       // === SUBMIT BUTTON (inside card) ===
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "actions.submit",
         loadingText: "actions.submitting",
@@ -244,7 +243,7 @@ const { POST } = createEndpoint({
       }),
 
       // === FOOTER LINK (inside card, below button) ===
-      alreadyHaveAccount: scopedWidgetField(scopedTranslation, {
+      alreadyHaveAccount: widgetField(scopedTranslation, {
         type: WidgetType.LINK,
         text: "footer.alreadyHaveAccount",
         href: "/user/login",

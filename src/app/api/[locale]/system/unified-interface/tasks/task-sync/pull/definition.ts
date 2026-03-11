@@ -8,9 +8,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -33,13 +33,13 @@ const { POST } = createEndpoint({
   aliases: ["sync-pull", "task-pull"] as const,
   allowedRoles: [UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { response: true },
     children: {
-      pulled: scopedResponseField(scopedTranslation, {
+      pulled: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),

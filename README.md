@@ -288,24 +288,24 @@ const { POST } = createEndpoint({
   tags: ["tags.contactForm"],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     usage: { request: "data", response: true } as const,
     children: {
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         schema: z.string().min(2),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "form.fields.name.label",
       }),
-      message: scopedRequestField(scopedTranslation, {
+      message: requestField(scopedTranslation, {
         schema: z.string().min(10),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "form.fields.message.label",
       }),
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.ALERT,
       }),

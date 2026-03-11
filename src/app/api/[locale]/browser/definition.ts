@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayOptionalFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayOptionalField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.label",
     description: "form.description",
@@ -54,7 +54,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      tool: scopedRequestField(scopedTranslation, {
+      tool: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.tool.label",
@@ -64,7 +64,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.enum(BrowserTool),
       }),
-      arguments: scopedRequestField(scopedTranslation, {
+      arguments: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "form.fields.arguments.label",
@@ -75,12 +75,12 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success",
         schema: z.boolean(),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.result",
         schema: z
@@ -95,16 +95,16 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      status: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+      status: responseArrayOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.status",
-        child: scopedResponseField(scopedTranslation, {
+        child: responseField(scopedTranslation, {
           type: WidgetType.BADGE,
           text: "response.statusItem",
           schema: z.string(),
         }),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.executionId",
         schema: z.string().optional(),

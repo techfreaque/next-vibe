@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,7 +38,7 @@ const { POST } = createEndpoint({
   icon: "refresh-ccw" as const,
   tags: ["tags.refund" as const, "tags.transaction" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "form.title" as const,
     description: "form.description" as const,
@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // REQUEST FIELDS
-      transactionId: scopedRequestField(scopedTranslation, {
+      transactionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "form.fields.transactionId.label" as const,
@@ -57,7 +57,7 @@ const { POST } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      amount: scopedRequestField(scopedTranslation, {
+      amount: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "form.fields.amount.label" as const,
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().positive().optional(),
       }),
 
-      reason: scopedRequestField(scopedTranslation, {
+      reason: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "form.fields.reason.label" as const,
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      metadata: scopedRequestField(scopedTranslation, {
+      metadata: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "form.fields.metadata.label" as const,
@@ -88,19 +88,19 @@ const { POST } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
-      refund: scopedObjectFieldNew(scopedTranslation, {
+      refund: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.response.refund.title" as const,
         description: "post.response.refund.description" as const,
@@ -108,52 +108,52 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.id" as const,
             schema: z.uuid(),
           }),
-          userId: scopedResponseField(scopedTranslation, {
+          userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.userId" as const,
             schema: z.uuid(),
           }),
-          transactionId: scopedResponseField(scopedTranslation, {
+          transactionId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.transactionId" as const,
             schema: z.uuid(),
           }),
-          stripeRefundId: scopedResponseField(scopedTranslation, {
+          stripeRefundId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.stripeRefundId" as const,
             schema: z.string(),
           }),
-          amount: scopedResponseField(scopedTranslation, {
+          amount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.amount" as const,
             schema: z.coerce.number(),
           }),
-          currency: scopedResponseField(scopedTranslation, {
+          currency: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.currency" as const,
             schema: z.string(),
           }),
-          status: scopedResponseField(scopedTranslation, {
+          status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.status" as const,
             schema: z.string(),
           }),
-          reason: scopedResponseField(scopedTranslation, {
+          reason: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.reason" as const,
             schema: z.string(),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.createdAt" as const,
             schema: z.string(),
           }),
-          updatedAt: scopedResponseField(scopedTranslation, {
+          updatedAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.refund.updatedAt" as const,
             schema: z.string(),

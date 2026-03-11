@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "list-network-requests.form.label",
     description: "list-network-requests.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      includePreservedRequests: scopedRequestField(scopedTranslation, {
+      includePreservedRequests: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label:
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
             "Set to true to return the preserved requests over the last 3 navigations.",
           ),
       }),
-      pageIdx: scopedRequestField(scopedTranslation, {
+      pageIdx: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "list-network-requests.form.fields.pageIdx.label",
@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
             "Page number to return (0-based). When omitted, returns the first page.",
           ),
       }),
-      pageSize: scopedRequestField(scopedTranslation, {
+      pageSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "list-network-requests.form.fields.pageSize.label",
@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
             "Maximum number of requests to return. When omitted, returns all requests.",
           ),
       }),
-      resourceTypes: scopedRequestField(scopedTranslation, {
+      resourceTypes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "list-network-requests.form.fields.resourceTypes.label",
@@ -133,14 +133,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-network-requests.response.success",
         schema: z
           .boolean()
           .describe("Whether the network requests listing operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-network-requests.response.result",
         schema: z
@@ -155,7 +155,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-network-requests.response.error",
         schema: z
@@ -163,7 +163,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list-network-requests.response.executionId",
         schema: z

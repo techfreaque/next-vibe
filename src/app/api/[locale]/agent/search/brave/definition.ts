@@ -9,11 +9,11 @@ import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -88,7 +88,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      query: scopedRequestField(scopedTranslation, {
+      query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.query.title" as const,
@@ -98,7 +98,7 @@ const { GET } = createEndpoint({
         schema: z.string().min(1).max(400),
       }),
 
-      maxResults: scopedRequestField(scopedTranslation, {
+      maxResults: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.fields.maxResults.title" as const,
@@ -107,7 +107,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number().min(1).max(10).optional().default(5),
       }),
 
-      includeNews: scopedRequestField(scopedTranslation, {
+      includeNews: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "get.fields.includeNews.title" as const,
@@ -116,7 +116,7 @@ const { GET } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      freshness: scopedRequestField(scopedTranslation, {
+      freshness: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.fields.freshness.title" as const,
@@ -144,39 +144,39 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      results: scopedResponseArrayFieldNew(scopedTranslation, {
+      results: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.STACKED,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           linkable: true,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            title: scopedResponseField(scopedTranslation, {
+            title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.results.title" as const,
               schema: z.string(),
             }),
-            url: scopedResponseField(scopedTranslation, {
+            url: responseField(scopedTranslation, {
               type: WidgetType.LINK,
               href: "/{url}",
               text: "get.response.results.item.url" as const,
               external: true,
               schema: z.string(),
             }),
-            snippet: scopedResponseField(scopedTranslation, {
+            snippet: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.results.item.snippet" as const,
               schema: z.string(),
             }),
-            age: scopedResponseField(scopedTranslation, {
+            age: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.results.item.age" as const,
               schema: z.string().optional(),
             }),
-            source: scopedResponseField(scopedTranslation, {
+            source: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.results.item.source" as const,
               schema: z.string().optional(),

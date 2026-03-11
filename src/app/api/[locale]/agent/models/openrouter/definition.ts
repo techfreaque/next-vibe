@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -38,7 +38,7 @@ const { GET } = createEndpoint({
   aliases: ["update-openrouter-models"],
   icon: "database",
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     linkable: true,
     title: "get.form.title" as const,
@@ -47,32 +47,32 @@ const { GET } = createEndpoint({
     usage: { response: true },
     children: {
       // Summary statistics section
-      summary: scopedObjectFieldNew(scopedTranslation, {
+      summary: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.summary.title" as const,
         layoutType: LayoutType.GRID,
         columns: 12,
         usage: { response: true },
         children: {
-          totalModels: scopedResponseField(scopedTranslation, {
+          totalModels: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "get.response.summary.totalModels" as const,
             columns: 3,
             schema: z.number(),
           }),
-          modelsFound: scopedResponseField(scopedTranslation, {
+          modelsFound: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "get.response.summary.modelsFound" as const,
             columns: 3,
             schema: z.number(),
           }),
-          modelsUpdated: scopedResponseField(scopedTranslation, {
+          modelsUpdated: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label: "get.response.summary.modelsUpdated" as const,
             columns: 3,
             schema: z.number(),
           }),
-          fileUpdated: scopedResponseField(scopedTranslation, {
+          fileUpdated: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             label: "get.response.summary.fileUpdated" as const,
             columns: 3,
@@ -82,55 +82,55 @@ const { GET } = createEndpoint({
       }),
 
       // Updated models section
-      models: scopedResponseArrayFieldNew(scopedTranslation, {
+      models: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.models.title" as const,
         cardTitle: "name",
         cardSubtitle: "id",
         columns: 12,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.models.model.id" as const,
               columns: 6,
               schema: z.string(),
             }),
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.models.model.name" as const,
               columns: 6,
               schema: z.string(),
             }),
-            contextLength: scopedResponseField(scopedTranslation, {
+            contextLength: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               label: "get.response.models.model.contextLength" as const,
               columns: 4,
               schema: z.number(),
             }),
-            inputTokenCost: scopedResponseField(scopedTranslation, {
+            inputTokenCost: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               label: "get.response.models.model.inputTokenCost" as const,
               columns: 4,
               schema: z.number(),
             }),
-            outputTokenCost: scopedResponseField(scopedTranslation, {
+            outputTokenCost: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               label: "get.response.models.model.outputTokenCost" as const,
               columns: 4,
               schema: z.number(),
             }),
-            cacheReadTokenCost: scopedResponseField(scopedTranslation, {
+            cacheReadTokenCost: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               label: "get.response.models.model.cacheReadTokenCost" as const,
               columns: 4,
               schema: z.number().optional(),
             }),
-            cacheWriteTokenCost: scopedResponseField(scopedTranslation, {
+            cacheWriteTokenCost: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               label: "get.response.models.model.cacheWriteTokenCost" as const,
               columns: 4,
@@ -141,31 +141,31 @@ const { GET } = createEndpoint({
       }),
 
       // Missing OpenRouter models section
-      missingOpenRouterModels: scopedResponseArrayFieldNew(scopedTranslation, {
+      missingOpenRouterModels: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.missingOpenRouterModels.title" as const,
         columns: 12,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            modelId: scopedResponseField(scopedTranslation, {
+            modelId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label:
                 "get.response.missingOpenRouterModels.model.modelId" as const,
               columns: 4,
               schema: z.string(),
             }),
-            openRouterId: scopedResponseField(scopedTranslation, {
+            openRouterId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label:
                 "get.response.missingOpenRouterModels.model.openRouterId" as const,
               columns: 4,
               schema: z.string(),
             }),
-            suggestion: scopedResponseField(scopedTranslation, {
+            suggestion: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label:
                 "get.response.missingOpenRouterModels.model.suggestion" as const,
@@ -177,23 +177,23 @@ const { GET } = createEndpoint({
       }),
 
       // Non-OpenRouter models section
-      nonOpenRouterModels: scopedResponseArrayFieldNew(scopedTranslation, {
+      nonOpenRouterModels: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.nonOpenRouterModels.title" as const,
         columns: 12,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            modelId: scopedResponseField(scopedTranslation, {
+            modelId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.nonOpenRouterModels.model.modelId" as const,
               columns: 6,
               schema: z.string(),
             }),
-            provider: scopedResponseField(scopedTranslation, {
+            provider: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               label: "get.response.nonOpenRouterModels.model.provider" as const,
               columns: 6,

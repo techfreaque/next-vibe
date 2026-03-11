@@ -14,10 +14,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
@@ -38,7 +38,7 @@ const { POST } = createEndpoint({
     render: LoginFormContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "fields.email.label",
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
           .transform((val) => val.toLowerCase().trim()),
       }),
 
-      password: scopedRequestField(scopedTranslation, {
+      password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "fields.password.label",
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
           }),
       }),
 
-      rememberMe: scopedRequestField(scopedTranslation, {
+      rememberMe: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.rememberMe.label",
@@ -95,14 +95,14 @@ const { POST } = createEndpoint({
       }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: scopedWidgetField(scopedTranslation, {
+      formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 5,
         usage: { request: "data" },
       }),
 
       // === RESPONSE ALERT (outside card) ===
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         variant: "default",
         order: 6,
@@ -113,19 +113,19 @@ const { POST } = createEndpoint({
       // Returned in the JSON body so a local instance can extract them
       // without needing to read httpOnly Set-Cookie headers (which browsers
       // block for cross-origin responses).
-      token: scopedResponseField(scopedTranslation, {
+      token: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().optional(),
       }),
-      leadId: scopedResponseField(scopedTranslation, {
+      leadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().optional(),
       }),
 
       // === SUBMIT BUTTON (inside card) ===
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "actions.submit",
         loadingText: "actions.submitting",
@@ -138,7 +138,7 @@ const { POST } = createEndpoint({
 
       // === FOOTER LINKS (inside card, below button) ===
 
-      forgotPassword: scopedWidgetField(scopedTranslation, {
+      forgotPassword: widgetField(scopedTranslation, {
         type: WidgetType.LINK,
         text: "footer.forgotPassword",
         href: "/user/reset-password",
@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
       }),
-      createAccount: scopedWidgetField(scopedTranslation, {
+      createAccount: widgetField(scopedTranslation, {
         type: WidgetType.LINK,
         text: "footer.createAccount",
         href: "/user/signup",

@@ -78,4 +78,12 @@ export const translations = {
       description: "Operation completed successfully",
     },
   },
+  widget: {
+    title: "Run Email Campaigns",
+    description:
+      "Manually trigger email campaign processing. Picks up pending emails and sends them based on lead stage and timing.",
+    runButton: "Run Now",
+    running: "Running...",
+    done: "Done",
+  },
 };

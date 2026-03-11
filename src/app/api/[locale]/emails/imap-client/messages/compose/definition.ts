@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     render: ComposeEmailContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      to: scopedRequestField(scopedTranslation, {
+      to: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.to.label",
@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
         schema: z.email(),
       }),
 
-      toName: scopedRequestField(scopedTranslation, {
+      toName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.toName.label",
@@ -57,7 +57,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      subject: scopedRequestField(scopedTranslation, {
+      subject: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.subject.label",
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
         schema: z.string().min(1),
       }),
 
-      body: scopedRequestField(scopedTranslation, {
+      body: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "post.body.label",
@@ -78,13 +78,13 @@ const { POST } = createEndpoint({
       }),
 
       // Response
-      sent: scopedResponseField(scopedTranslation, {
+      sent: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "post.success.title",
         schema: z.boolean(),
       }),
 
-      messageId: scopedResponseField(scopedTranslation, {
+      messageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.success.title",
         schema: z.string().optional(),

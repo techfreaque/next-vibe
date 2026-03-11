@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   Methods,
@@ -44,72 +44,72 @@ const { GET } = createEndpoint({
     render: SubscriptionOverviewContainer,
     usage: { response: true } as const,
     children: {
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.id",
         schema: z.uuid(),
       }),
-      plan: scopedResponseField(scopedTranslation, {
+      plan: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.planId",
         schema: z.enum(SubscriptionPlan),
       }),
-      billingInterval: scopedResponseField(scopedTranslation, {
+      billingInterval: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.billingInterval",
         schema: z.enum(BillingInterval),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.status",
         schema: z.enum(SubscriptionStatus),
       }),
-      currentPeriodStart: scopedResponseField(scopedTranslation, {
+      currentPeriodStart: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.currentPeriodStart",
         schema: z.string(),
       }),
-      currentPeriodEnd: scopedResponseField(scopedTranslation, {
+      currentPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.currentPeriodEnd",
         schema: z.string(),
       }),
-      cancelAtPeriodEnd: scopedResponseField(scopedTranslation, {
+      cancelAtPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.cancelAtPeriodEnd",
         schema: z.boolean(),
       }),
-      cancelAt: scopedResponseField(scopedTranslation, {
+      cancelAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.cancelAt",
         schema: z.string().optional(),
       }),
-      canceledAt: scopedResponseField(scopedTranslation, {
+      canceledAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.canceledAt",
         schema: z.string().optional(),
       }),
-      endedAt: scopedResponseField(scopedTranslation, {
+      endedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.endedAt",
         schema: z.string().optional(),
       }),
-      provider: scopedResponseField(scopedTranslation, {
+      provider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.provider",
         schema: z.enum(PaymentProviderDB),
       }),
-      providerSubscriptionId: scopedResponseField(scopedTranslation, {
+      providerSubscriptionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.providerSubscriptionId",
         schema: z.string().optional(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.createdAt",
         schema: z.string(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.updatedAt",
         schema: z.string(),

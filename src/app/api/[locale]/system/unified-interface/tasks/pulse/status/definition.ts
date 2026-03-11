@@ -8,9 +8,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -38,7 +38,7 @@ const pulseStatusEndpoint = createEndpoint({
   aliases: [PULSE_STATUS_ALIAS, "pulse:status"],
   tags: ["tags.status"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title",
     description: "get.container.description",
@@ -47,25 +47,25 @@ const pulseStatusEndpoint = createEndpoint({
     usage: { response: true },
     children: {
       // === RESPONSE FIELDS ===
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.status.title",
         schema: z.string(),
       }),
 
-      lastPulseAt: scopedResponseField(scopedTranslation, {
+      lastPulseAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.lastPulseAt.title",
         schema: z.string().nullable(),
       }),
 
-      successRate: scopedResponseField(scopedTranslation, {
+      successRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.successRate.title",
         schema: z.coerce.number().nullable(),
       }),
 
-      totalExecutions: scopedResponseField(scopedTranslation, {
+      totalExecutions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.totalExecutions.title",
         schema: z.coerce.number(),

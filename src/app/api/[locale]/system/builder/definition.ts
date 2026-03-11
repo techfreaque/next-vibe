@@ -13,12 +13,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   responseArrayOptionalField,
-  scopedObjectFieldNew,
-  scopedObjectOptionalField,
-  scopedRequestDataArrayOptionalField,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  objectOptionalField,
+  requestDataArrayOptionalField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["builder", "package", "bundle"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
       // ========================================================================
       // CONFIG FILE PATH
       // ========================================================================
-      configPath: scopedRequestField(scopedTranslation, {
+      configPath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.configPath.title",
@@ -109,7 +109,7 @@ const { POST } = createEndpoint({
       // ========================================================================
       // CONFIG OBJECT - Full inline build configuration
       // ========================================================================
-      configObject: scopedObjectOptionalField(scopedTranslation, {
+      configObject: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.fields.configObject.title",
         description: "post.fields.configObject.description",
@@ -123,7 +123,7 @@ const { POST } = createEndpoint({
           // ==================================================================
           // RUNTIME OPTIONS SECTION
           // ==================================================================
-          profile: scopedRequestField(scopedTranslation, {
+          profile: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "post.fields.profile.title",
@@ -135,7 +135,7 @@ const { POST } = createEndpoint({
             schema: z.enum(BuildProfileEnum).optional(),
           }),
 
-          dryRun: scopedRequestField(scopedTranslation, {
+          dryRun: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.fields.dryRun.title",
@@ -146,7 +146,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          verbose: scopedRequestField(scopedTranslation, {
+          verbose: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.fields.verbose.title",
@@ -157,7 +157,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          analyze: scopedRequestField(scopedTranslation, {
+          analyze: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.fields.analyze.title",
@@ -168,7 +168,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          watch: scopedRequestField(scopedTranslation, {
+          watch: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.fields.watch.title",
@@ -179,7 +179,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          parallel: scopedRequestField(scopedTranslation, {
+          parallel: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.fields.parallel.title",
@@ -190,7 +190,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          report: scopedRequestField(scopedTranslation, {
+          report: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.fields.report.title",
@@ -201,7 +201,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          minify: scopedRequestField(scopedTranslation, {
+          minify: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "post.fields.minify.title",
@@ -215,7 +215,7 @@ const { POST } = createEndpoint({
           // ==================================================================
           // FOLDERS TO CLEAN
           // ==================================================================
-          foldersToClean: scopedRequestField(scopedTranslation, {
+          foldersToClean: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TAGS,
             label: "post.fields.foldersToClean.title",
@@ -230,7 +230,7 @@ const { POST } = createEndpoint({
           // ==================================================================
           // FILES TO COMPILE
           // ==================================================================
-          filesToCompile: scopedRequestDataArrayOptionalField(
+          filesToCompile: requestDataArrayOptionalField(
             scopedTranslation,
             {
               type: WidgetType.CONTAINER,
@@ -241,7 +241,7 @@ const { POST } = createEndpoint({
               optional: true,
               icon: "code" as const,
             },
-            scopedObjectFieldNew(scopedTranslation, {
+            objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "post.fields.fileToCompile.title",
               layoutType: LayoutType.GRID,
@@ -249,7 +249,7 @@ const { POST } = createEndpoint({
               icon: "file",
               usage: { request: "data" },
               children: {
-                input: scopedRequestField(scopedTranslation, {
+                input: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "post.fields.input.title",
@@ -260,7 +260,7 @@ const { POST } = createEndpoint({
                   schema: z.string(),
                 }),
 
-                output: scopedRequestField(scopedTranslation, {
+                output: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "post.fields.output.title",
@@ -271,7 +271,7 @@ const { POST } = createEndpoint({
                   schema: z.string(),
                 }),
 
-                type: scopedRequestField(scopedTranslation, {
+                type: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
                   label: "post.fields.type.title",
@@ -285,7 +285,7 @@ const { POST } = createEndpoint({
                   ]),
                 }),
 
-                modulesToExternalize: scopedRequestField(scopedTranslation, {
+                modulesToExternalize: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TAGS,
                   label: "post.fields.modulesToExternalize.title",
@@ -298,7 +298,7 @@ const { POST } = createEndpoint({
                 }),
 
                 // Vite-specific options
-                inlineCss: scopedRequestField(scopedTranslation, {
+                inlineCss: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
                   label: "post.fields.inlineCss.title",
@@ -309,7 +309,7 @@ const { POST } = createEndpoint({
                   schema: z.boolean().optional(),
                 }),
 
-                bundleReact: scopedRequestField(scopedTranslation, {
+                bundleReact: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
                   label: "post.fields.bundleReact.title",
@@ -321,7 +321,7 @@ const { POST } = createEndpoint({
                 }),
 
                 // Package config for library builds
-                packageConfig: scopedObjectOptionalField(scopedTranslation, {
+                packageConfig: objectOptionalField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "post.fields.packageConfig.title",
                   description: "post.fields.packageConfig.description",
@@ -331,7 +331,7 @@ const { POST } = createEndpoint({
                   icon: "package",
                   usage: { request: "data" },
                   children: {
-                    isPackage: scopedRequestField(scopedTranslation, {
+                    isPackage: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
                       label: "post.fields.isPackage.title",
@@ -340,7 +340,7 @@ const { POST } = createEndpoint({
                       schema: z.literal(true),
                     }),
 
-                    dtsInclude: scopedRequestField(scopedTranslation, {
+                    dtsInclude: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TAGS,
                       label: "post.fields.dtsInclude.title",
@@ -351,7 +351,7 @@ const { POST } = createEndpoint({
                       schema: z.array(z.string()),
                     }),
 
-                    dtsEntryRoot: scopedRequestField(scopedTranslation, {
+                    dtsEntryRoot: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "post.fields.dtsEntryRoot.title",
@@ -365,7 +365,7 @@ const { POST } = createEndpoint({
                 }),
 
                 // Bun-specific options
-                bunOptions: scopedObjectOptionalField(scopedTranslation, {
+                bunOptions: objectOptionalField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "post.fields.bunOptions.title",
                   description: "post.fields.bunOptions.description",
@@ -375,7 +375,7 @@ const { POST } = createEndpoint({
                   icon: "zap",
                   usage: { request: "data" },
                   children: {
-                    target: scopedRequestField(scopedTranslation, {
+                    target: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
                       label: "post.fields.bunTarget.title",
@@ -387,7 +387,7 @@ const { POST } = createEndpoint({
                       schema: z.enum(BunTargetEnum).optional(),
                     }),
 
-                    minify: scopedRequestField(scopedTranslation, {
+                    minify: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
                       label: "post.fields.bunMinify.title",
@@ -398,7 +398,7 @@ const { POST } = createEndpoint({
                       schema: z.boolean().optional(),
                     }),
 
-                    sourcemap: scopedRequestField(scopedTranslation, {
+                    sourcemap: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
                       label: "post.fields.sourcemap.title",
@@ -410,7 +410,7 @@ const { POST } = createEndpoint({
                       schema: z.enum(SourcemapModeEnum).optional(),
                     }),
 
-                    external: scopedRequestField(scopedTranslation, {
+                    external: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TAGS,
                       label: "post.fields.external.title",
@@ -422,7 +422,7 @@ const { POST } = createEndpoint({
                       schema: z.array(z.string()).optional(),
                     }),
 
-                    define: scopedRequestField(scopedTranslation, {
+                    define: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
                       label: "post.fields.define.title",
@@ -434,7 +434,7 @@ const { POST } = createEndpoint({
                       schema: z.record(z.string(), z.string()).optional(),
                     }),
 
-                    splitting: scopedRequestField(scopedTranslation, {
+                    splitting: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
                       label: "post.fields.splitting.title",
@@ -445,7 +445,7 @@ const { POST } = createEndpoint({
                       schema: z.boolean().optional(),
                     }),
 
-                    format: scopedRequestField(scopedTranslation, {
+                    format: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
                       label: "post.fields.format.title",
@@ -457,7 +457,7 @@ const { POST } = createEndpoint({
                       schema: z.enum(OutputFormatEnum).optional(),
                     }),
 
-                    bytecode: scopedRequestField(scopedTranslation, {
+                    bytecode: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
                       label: "post.fields.bytecode.title",
@@ -468,7 +468,7 @@ const { POST } = createEndpoint({
                       schema: z.boolean().optional(),
                     }),
 
-                    banner: scopedRequestField(scopedTranslation, {
+                    banner: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXTAREA,
                       label: "post.fields.banner.title",
@@ -480,7 +480,7 @@ const { POST } = createEndpoint({
                       schema: z.string().optional(),
                     }),
 
-                    footer: scopedRequestField(scopedTranslation, {
+                    footer: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXTAREA,
                       label: "post.fields.footer.title",
@@ -493,7 +493,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // Advanced Bun options (passthrough to Bun.build)
-                    publicPath: scopedRequestField(scopedTranslation, {
+                    publicPath: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "post.fields.publicPath.label",
@@ -503,7 +503,7 @@ const { POST } = createEndpoint({
                       schema: z.string().optional(),
                     }),
 
-                    naming: scopedRequestField(scopedTranslation, {
+                    naming: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
                       label: "post.fields.naming.label",
@@ -522,7 +522,7 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    root: scopedRequestField(scopedTranslation, {
+                    root: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "post.fields.root.label",
@@ -532,7 +532,7 @@ const { POST } = createEndpoint({
                       schema: z.string().optional(),
                     }),
 
-                    conditions: scopedRequestField(scopedTranslation, {
+                    conditions: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
                       label: "post.fields.conditions.label",
@@ -542,7 +542,7 @@ const { POST } = createEndpoint({
                       schema: z.array(z.string()).optional(),
                     }),
 
-                    loader: scopedRequestField(scopedTranslation, {
+                    loader: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
                       label: "post.fields.loader.label",
@@ -568,7 +568,7 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    drop: scopedRequestField(scopedTranslation, {
+                    drop: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
                       label: "post.fields.drop.label",
@@ -581,7 +581,7 @@ const { POST } = createEndpoint({
                 }),
 
                 // Vite advanced options
-                viteOptions: scopedObjectOptionalField(scopedTranslation, {
+                viteOptions: objectOptionalField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "post.fields.viteOptions.title",
                   description: "post.fields.viteOptions.description",
@@ -591,7 +591,7 @@ const { POST } = createEndpoint({
                   icon: "bot",
                   usage: { request: "data" },
                   children: {
-                    target: scopedRequestField(scopedTranslation, {
+                    target: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TAGS,
                       label: "post.fields.viteTarget.title",
@@ -605,7 +605,7 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    outDir: scopedRequestField(scopedTranslation, {
+                    outDir: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "post.fields.viteOutDir.title",
@@ -617,7 +617,7 @@ const { POST } = createEndpoint({
                       schema: z.string().optional(),
                     }),
 
-                    assetsDir: scopedRequestField(scopedTranslation, {
+                    assetsDir: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "post.fields.viteAssetsDir.title",
@@ -629,7 +629,7 @@ const { POST } = createEndpoint({
                       schema: z.string().optional(),
                     }),
 
-                    assetsInlineLimit: scopedRequestField(scopedTranslation, {
+                    assetsInlineLimit: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.NUMBER,
                       label: "post.fields.viteAssetsInlineLimit.title",
@@ -643,24 +643,21 @@ const { POST } = createEndpoint({
                       schema: z.number().optional(),
                     }),
 
-                    chunkSizeWarningLimit: scopedRequestField(
-                      scopedTranslation,
-                      {
-                        type: WidgetType.FORM_FIELD,
-                        fieldType: FieldDataType.NUMBER,
-                        label: "post.fields.viteChunkSizeWarningLimit.title",
-                        description:
-                          "post.fields.viteChunkSizeWarningLimit.description",
-                        placeholder:
-                          "post.fields.viteChunkSizeWarningLimit.placeholder",
-                        optional: true,
-                        icon: "alert-triangle",
-                        colSpan: 4,
-                        schema: z.number().optional(),
-                      },
-                    ),
+                    chunkSizeWarningLimit: requestField(scopedTranslation, {
+                      type: WidgetType.FORM_FIELD,
+                      fieldType: FieldDataType.NUMBER,
+                      label: "post.fields.viteChunkSizeWarningLimit.title",
+                      description:
+                        "post.fields.viteChunkSizeWarningLimit.description",
+                      placeholder:
+                        "post.fields.viteChunkSizeWarningLimit.placeholder",
+                      optional: true,
+                      icon: "alert-triangle",
+                      colSpan: 4,
+                      schema: z.number().optional(),
+                    }),
 
-                    cssCodeSplit: scopedRequestField(scopedTranslation, {
+                    cssCodeSplit: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
                       label: "post.fields.viteCssCodeSplit.title",
@@ -671,7 +668,7 @@ const { POST } = createEndpoint({
                       schema: z.boolean().optional(),
                     }),
 
-                    sourcemap: scopedRequestField(scopedTranslation, {
+                    sourcemap: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
                       label: "post.fields.viteSourcemap.title",
@@ -706,7 +703,7 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    minify: scopedRequestField(scopedTranslation, {
+                    minify: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
                       label: "post.fields.viteMinify.title",
@@ -724,7 +721,7 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    emptyOutDir: scopedRequestField(scopedTranslation, {
+                    emptyOutDir: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
                       label: "post.fields.viteEmptyOutDir.title",
@@ -735,22 +732,19 @@ const { POST } = createEndpoint({
                       schema: z.boolean().optional(),
                     }),
 
-                    reportCompressedSize: scopedRequestField(
-                      scopedTranslation,
-                      {
-                        type: WidgetType.FORM_FIELD,
-                        fieldType: FieldDataType.BOOLEAN,
-                        label: "post.fields.viteReportCompressedSize.title",
-                        description:
-                          "post.fields.viteReportCompressedSize.description",
-                        optional: true,
-                        icon: "archive",
-                        colSpan: 4,
-                        schema: z.boolean().optional(),
-                      },
-                    ),
+                    reportCompressedSize: requestField(scopedTranslation, {
+                      type: WidgetType.FORM_FIELD,
+                      fieldType: FieldDataType.BOOLEAN,
+                      label: "post.fields.viteReportCompressedSize.title",
+                      description:
+                        "post.fields.viteReportCompressedSize.description",
+                      optional: true,
+                      icon: "archive",
+                      colSpan: 4,
+                      schema: z.boolean().optional(),
+                    }),
 
-                    manifest: scopedRequestField(scopedTranslation, {
+                    manifest: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
                       label: "post.fields.viteManifest.title",
@@ -762,7 +756,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // Library mode options
-                    lib: scopedObjectOptionalField(scopedTranslation, {
+                    lib: objectOptionalField(scopedTranslation, {
                       type: WidgetType.CONTAINER,
                       title: "post.fields.viteLib.title",
                       description: "post.fields.viteLib.description",
@@ -772,7 +766,7 @@ const { POST } = createEndpoint({
                       icon: "library",
                       usage: { request: "data" },
                       children: {
-                        entry: scopedRequestField(scopedTranslation, {
+                        entry: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "post.fields.viteLibEntry.title",
@@ -787,7 +781,7 @@ const { POST } = createEndpoint({
                           ]),
                         }),
 
-                        name: scopedRequestField(scopedTranslation, {
+                        name: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "post.fields.viteLibName.title",
@@ -799,7 +793,7 @@ const { POST } = createEndpoint({
                           schema: z.string().optional(),
                         }),
 
-                        formats: scopedRequestField(scopedTranslation, {
+                        formats: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.MULTISELECT,
                           label: "post.fields.viteLibFormats.title",
@@ -811,7 +805,7 @@ const { POST } = createEndpoint({
                           schema: z.array(z.enum(ViteLibFormatEnum)).optional(),
                         }),
 
-                        fileName: scopedRequestField(scopedTranslation, {
+                        fileName: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "post.fields.viteLibFileName.title",
@@ -828,72 +822,64 @@ const { POST } = createEndpoint({
                     }),
 
                     // Rollup options subset
-                    rollupOptions: scopedObjectOptionalField(
-                      scopedTranslation,
-                      {
-                        type: WidgetType.CONTAINER,
-                        title: "post.fields.viteRollupOptions.title",
-                        description:
-                          "post.fields.viteRollupOptions.description",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                        icon: "package",
-                        usage: { request: "data" },
-                        children: {
-                          external: scopedRequestField(scopedTranslation, {
-                            type: WidgetType.FORM_FIELD,
-                            fieldType: FieldDataType.TAGS,
-                            label: "post.fields.rollupExternal.title",
-                            description:
-                              "post.fields.rollupExternal.description",
-                            placeholder:
-                              "post.fields.rollupExternal.placeholder",
-                            optional: true,
-                            icon: "external-link",
-                            colSpan: 12,
-                            schema: z
-                              .union([z.string(), z.array(z.string())])
-                              .optional(),
-                          }),
+                    rollupOptions: objectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "post.fields.viteRollupOptions.title",
+                      description: "post.fields.viteRollupOptions.description",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      icon: "package",
+                      usage: { request: "data" },
+                      children: {
+                        external: requestField(scopedTranslation, {
+                          type: WidgetType.FORM_FIELD,
+                          fieldType: FieldDataType.TAGS,
+                          label: "post.fields.rollupExternal.title",
+                          description: "post.fields.rollupExternal.description",
+                          placeholder: "post.fields.rollupExternal.placeholder",
+                          optional: true,
+                          icon: "external-link",
+                          colSpan: 12,
+                          schema: z
+                            .union([z.string(), z.array(z.string())])
+                            .optional(),
+                        }),
 
-                          treeshake: scopedRequestField(scopedTranslation, {
-                            type: WidgetType.FORM_FIELD,
-                            fieldType: FieldDataType.BOOLEAN,
-                            label: "post.fields.rollupTreeshake.title",
-                            description:
-                              "post.fields.rollupTreeshake.description",
-                            optional: true,
-                            icon: "tree",
-                            colSpan: 6,
-                            schema: z
-                              .union([
-                                z.boolean(),
-                                z.object({
-                                  moduleSideEffects: z.boolean().optional(),
-                                }),
-                              ])
-                              .optional(),
-                          }),
+                        treeshake: requestField(scopedTranslation, {
+                          type: WidgetType.FORM_FIELD,
+                          fieldType: FieldDataType.BOOLEAN,
+                          label: "post.fields.rollupTreeshake.title",
+                          description:
+                            "post.fields.rollupTreeshake.description",
+                          optional: true,
+                          icon: "tree",
+                          colSpan: 6,
+                          schema: z
+                            .union([
+                              z.boolean(),
+                              z.object({
+                                moduleSideEffects: z.boolean().optional(),
+                              }),
+                            ])
+                            .optional(),
+                        }),
 
-                          output: scopedRequestField(scopedTranslation, {
-                            type: WidgetType.FORM_FIELD,
-                            fieldType: FieldDataType.JSON,
-                            label: "post.fields.rollupOutput.label",
-                            description: "post.fields.rollupOutput.description",
-                            optional: true,
-                            icon: "file-output",
-                            colSpan: 12,
-                            schema: z
-                              .record(z.string(), z.unknown())
-                              .optional(),
-                          }),
-                        },
+                        output: requestField(scopedTranslation, {
+                          type: WidgetType.FORM_FIELD,
+                          fieldType: FieldDataType.JSON,
+                          label: "post.fields.rollupOutput.label",
+                          description: "post.fields.rollupOutput.description",
+                          optional: true,
+                          icon: "file-output",
+                          colSpan: 12,
+                          schema: z.record(z.string(), z.unknown()).optional(),
+                        }),
                       },
-                    ),
+                    }),
 
                     // Raw plugins passthrough (for programmatic config files)
-                    plugins: scopedRequestField(scopedTranslation, {
+                    plugins: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
                       label: "post.fields.vitePlugins.label",
@@ -905,7 +891,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // Raw build options passthrough
-                    build: scopedRequestField(scopedTranslation, {
+                    build: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
                       label: "post.fields.viteBuild.label",
@@ -924,7 +910,7 @@ const { POST } = createEndpoint({
           // ==================================================================
           // FILES/FOLDERS TO COPY
           // ==================================================================
-          filesOrFoldersToCopy: scopedRequestDataArrayOptionalField(
+          filesOrFoldersToCopy: requestDataArrayOptionalField(
             scopedTranslation,
             {
               type: WidgetType.CONTAINER,
@@ -935,7 +921,7 @@ const { POST } = createEndpoint({
               optional: true,
               icon: "copy" as const,
             },
-            scopedObjectFieldNew(scopedTranslation, {
+            objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "post.fields.copyConfig.title",
               layoutType: LayoutType.GRID,
@@ -943,7 +929,7 @@ const { POST } = createEndpoint({
               icon: "copy",
               usage: { request: "data" },
               children: {
-                input: scopedRequestField(scopedTranslation, {
+                input: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "post.fields.copyInput.title",
@@ -954,7 +940,7 @@ const { POST } = createEndpoint({
                   schema: z.string(),
                 }),
 
-                output: scopedRequestField(scopedTranslation, {
+                output: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "post.fields.copyOutput.title",
@@ -965,7 +951,7 @@ const { POST } = createEndpoint({
                   schema: z.string(),
                 }),
 
-                pattern: scopedRequestField(scopedTranslation, {
+                pattern: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "post.fields.copyPattern.title",
@@ -983,7 +969,7 @@ const { POST } = createEndpoint({
           // ==================================================================
           // NPM PACKAGE CONFIGURATION
           // ==================================================================
-          npmPackage: scopedObjectOptionalField(scopedTranslation, {
+          npmPackage: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "post.fields.npmPackage.title",
             description: "post.fields.npmPackage.description",
@@ -994,7 +980,7 @@ const { POST } = createEndpoint({
             defaultExpanded: false,
             usage: { request: "data" },
             children: {
-              name: scopedRequestField(scopedTranslation, {
+              name: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageName.title",
@@ -1005,7 +991,7 @@ const { POST } = createEndpoint({
                 schema: z.string(),
               }),
 
-              version: scopedRequestField(scopedTranslation, {
+              version: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageVersion.title",
@@ -1017,7 +1003,7 @@ const { POST } = createEndpoint({
                 schema: z.string().optional(),
               }),
 
-              description: scopedRequestField(scopedTranslation, {
+              description: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXTAREA,
                 label: "post.fields.packageDescription.title",
@@ -1029,7 +1015,7 @@ const { POST } = createEndpoint({
                 schema: z.string().optional(),
               }),
 
-              main: scopedRequestField(scopedTranslation, {
+              main: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageMain.title",
@@ -1041,7 +1027,7 @@ const { POST } = createEndpoint({
                 schema: z.string().optional(),
               }),
 
-              module: scopedRequestField(scopedTranslation, {
+              module: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageModule.title",
@@ -1053,7 +1039,7 @@ const { POST } = createEndpoint({
                 schema: z.string().optional(),
               }),
 
-              types: scopedRequestField(scopedTranslation, {
+              types: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageTypes.title",
@@ -1065,7 +1051,7 @@ const { POST } = createEndpoint({
                 schema: z.string().optional(),
               }),
 
-              bin: scopedRequestField(scopedTranslation, {
+              bin: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
                 label: "post.fields.packageBin.title",
@@ -1077,7 +1063,7 @@ const { POST } = createEndpoint({
                 schema: z.record(z.string(), z.string()).optional(),
               }),
 
-              exports: scopedRequestField(scopedTranslation, {
+              exports: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
                 label: "post.fields.packageExports.title",
@@ -1091,7 +1077,7 @@ const { POST } = createEndpoint({
                   .optional(),
               }),
 
-              dependencies: scopedRequestField(scopedTranslation, {
+              dependencies: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
                 label: "post.fields.packageDependencies.title",
@@ -1103,7 +1089,7 @@ const { POST } = createEndpoint({
                 schema: z.record(z.string(), z.string()).optional(),
               }),
 
-              peerDependencies: scopedRequestField(scopedTranslation, {
+              peerDependencies: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
                 label: "post.fields.packagePeerDependencies.title",
@@ -1115,7 +1101,7 @@ const { POST } = createEndpoint({
                 schema: z.record(z.string(), z.string()).optional(),
               }),
 
-              files: scopedRequestField(scopedTranslation, {
+              files: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TAGS,
                 label: "post.fields.packageFiles.title",
@@ -1127,7 +1113,7 @@ const { POST } = createEndpoint({
                 schema: z.array(z.string()).optional(),
               }),
 
-              keywords: scopedRequestField(scopedTranslation, {
+              keywords: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TAGS,
                 label: "post.fields.packageKeywords.title",
@@ -1139,7 +1125,7 @@ const { POST } = createEndpoint({
                 schema: z.array(z.string()).optional(),
               }),
 
-              license: scopedRequestField(scopedTranslation, {
+              license: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageLicense.title",
@@ -1151,7 +1137,7 @@ const { POST } = createEndpoint({
                 schema: z.string().optional(),
               }),
 
-              repository: scopedRequestField(scopedTranslation, {
+              repository: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageRepository.title",
@@ -1168,7 +1154,7 @@ const { POST } = createEndpoint({
                   .optional(),
               }),
 
-              outputDir: scopedRequestField(scopedTranslation, {
+              outputDir: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "post.fields.packageOutputDir.title",
@@ -1187,7 +1173,7 @@ const { POST } = createEndpoint({
       // ========================================================================
       // RESPONSE FIELDS
       // ========================================================================
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.STATUS_INDICATOR,
         status: "success",
         label: "post.fields.success.title",
@@ -1195,7 +1181,7 @@ const { POST } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
         content: "post.fields.buildOutput.title",
         language: "plaintext",
@@ -1203,7 +1189,7 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.STAT,
         content: "post.fields.duration.title",
         icon: "clock",
@@ -1211,35 +1197,31 @@ const { POST } = createEndpoint({
         schema: z.coerce.number(),
       }),
 
-      filesBuilt: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          items: [],
-          optional: true,
-          icon: "check-circle",
-        },
-        scopedResponseField(scopedTranslation, {
+      filesBuilt: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        items: [],
+        optional: true,
+        icon: "check-circle",
+        child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
           content: "post.fields.filesBuilt.item",
           schema: z.string(),
         }),
-      ),
+      }),
 
-      filesCopied: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          items: [],
-          optional: true,
-          icon: "copy",
-        },
-        scopedResponseField(scopedTranslation, {
+      filesCopied: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        items: [],
+        optional: true,
+        icon: "copy",
+        child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
           content: "post.fields.filesCopied.item",
           schema: z.string(),
         }),
-      ),
+      }),
 
-      packageJson: scopedResponseField(scopedTranslation, {
+      packageJson: responseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
         content: "post.fields.packageJson.title",
         language: "json",
@@ -1248,7 +1230,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      profileUsed: scopedResponseField(scopedTranslation, {
+      profileUsed: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         content: "post.fields.profileUsed.title",
         optional: true,
@@ -1256,44 +1238,42 @@ const { POST } = createEndpoint({
         schema: z.enum(BuildProfileEnum).optional(),
       }),
 
-      reportPath: scopedResponseField(scopedTranslation, {
+      reportPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.reportPath.title",
         schema: z.string().optional(),
       }),
 
-      stepTimings: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          optional: true,
-          icon: "list",
-        },
-        scopedObjectFieldNew(scopedTranslation, {
+      stepTimings: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        optional: true,
+        icon: "list",
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            step: scopedResponseField(scopedTranslation, {
+            step: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.fields.stepTimings.step",
               icon: "chevron-right",
               schema: z.string(),
             }),
-            duration: scopedResponseField(scopedTranslation, {
+            duration: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               label: "post.fields.stepTimings.duration",
               icon: "clock",
               suffix: "ms",
               schema: z.coerce.number(),
             }),
-            status: scopedResponseField(scopedTranslation, {
+            status: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               label: "post.fields.stepTimings.status",
               icon: "activity",
               schema: z.enum(StepStatusEnum),
             }),
-            filesAffected: scopedResponseField(scopedTranslation, {
+            filesAffected: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               label: "post.fields.stepTimings.filesAffected",
               optional: true,
@@ -1302,7 +1282,7 @@ const { POST } = createEndpoint({
             }),
           },
         }),
-      ),
+      }),
     },
   }),
 

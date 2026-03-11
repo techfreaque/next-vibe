@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "take-screenshot.form.label",
     description: "take-screenshot.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      uid: scopedRequestField(scopedTranslation, {
+      uid: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "take-screenshot.form.fields.uid.label",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
             "The uid of an element on the page from the page content snapshot. If omitted takes a pages screenshot.",
           ),
       }),
-      fullPage: scopedRequestField(scopedTranslation, {
+      fullPage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "take-screenshot.form.fields.fullPage.label",
@@ -73,7 +73,7 @@ const { POST } = createEndpoint({
             "If set to true takes a screenshot of the full page instead of the currently visible viewport. Incompatible with uid.",
           ),
       }),
-      format: scopedRequestField(scopedTranslation, {
+      format: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "take-screenshot.form.fields.format.label",
@@ -102,7 +102,7 @@ const { POST } = createEndpoint({
             'Type of format to save the screenshot as. Default is "png"',
           ),
       }),
-      quality: scopedRequestField(scopedTranslation, {
+      quality: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "take-screenshot.form.fields.quality.label",
@@ -118,7 +118,7 @@ const { POST } = createEndpoint({
             "Compression quality for JPEG and WebP formats (0-100). Higher values mean better quality but larger file sizes. Ignored for PNG format.",
           ),
       }),
-      filePath: scopedRequestField(scopedTranslation, {
+      filePath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "take-screenshot.form.fields.filePath.label",
@@ -134,14 +134,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-screenshot.response.success",
         schema: z
           .boolean()
           .describe("Whether the screenshot capture operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-screenshot.response.result",
         schema: z
@@ -156,7 +156,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-screenshot.response.error",
         schema: z
@@ -164,7 +164,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "take-screenshot.response.executionId",
         schema: z

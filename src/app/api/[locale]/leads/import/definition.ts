@@ -7,13 +7,13 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -65,9 +65,11 @@ const { POST } = createEndpoint({
     render: LeadsImportContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === REQUEST FIELDS ===
-      file: scopedRequestField(scopedTranslation, {
+      file: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.FILE,
         label: "post.file.label",
@@ -77,7 +79,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1),
       }),
-      fileName: scopedRequestField(scopedTranslation, {
+      fileName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fileName.label",
@@ -87,7 +89,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
-      skipDuplicates: scopedRequestField(scopedTranslation, {
+      skipDuplicates: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.skipDuplicates.label",
@@ -96,7 +98,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      updateExisting: scopedRequestField(scopedTranslation, {
+      updateExisting: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.updateExisting.label",
@@ -105,7 +107,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(false),
       }),
-      defaultCountry: scopedRequestField(scopedTranslation, {
+      defaultCountry: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.defaultCountry.label",
@@ -115,7 +117,7 @@ const { POST } = createEndpoint({
         options: CountriesOptions,
         schema: z.enum(Countries),
       }),
-      defaultLanguage: scopedRequestField(scopedTranslation, {
+      defaultLanguage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.defaultLanguage.label",
@@ -125,7 +127,7 @@ const { POST } = createEndpoint({
         options: LanguagesOptions,
         schema: z.enum(Languages),
       }),
-      defaultStatus: scopedRequestField(scopedTranslation, {
+      defaultStatus: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.defaultStatus.label",
@@ -135,7 +137,7 @@ const { POST } = createEndpoint({
         options: LeadStatusOptions,
         schema: z.enum(LeadStatus).default(LeadStatus.NEW),
       }),
-      defaultCampaignStage: scopedRequestField(scopedTranslation, {
+      defaultCampaignStage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.defaultCampaignStage.label",
@@ -147,7 +149,7 @@ const { POST } = createEndpoint({
           .enum(EmailCampaignStage)
           .default(EmailCampaignStage.NOT_STARTED),
       }),
-      defaultSource: scopedRequestField(scopedTranslation, {
+      defaultSource: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.defaultSource.label",
@@ -157,7 +159,7 @@ const { POST } = createEndpoint({
         options: LeadSourceOptions,
         schema: z.enum(LeadSource).default(LeadSource.CSV_IMPORT),
       }),
-      useChunkedProcessing: scopedRequestField(scopedTranslation, {
+      useChunkedProcessing: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.useChunkedProcessing.label",
@@ -166,7 +168,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      batchSize: scopedRequestField(scopedTranslation, {
+      batchSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.batchSize.label",
@@ -177,53 +179,53 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      batchId: scopedResponseField(scopedTranslation, {
+      batchId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.batchId",
         schema: z.uuid(),
       }),
-      totalRows: scopedResponseField(scopedTranslation, {
+      totalRows: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.totalRows",
         schema: z.coerce.number(),
       }),
-      successfulImports: scopedResponseField(scopedTranslation, {
+      successfulImports: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.successfulImports",
         schema: z.coerce.number(),
       }),
-      failedImports: scopedResponseField(scopedTranslation, {
+      failedImports: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.failedImports",
         schema: z.coerce.number(),
       }),
-      duplicateEmails: scopedResponseField(scopedTranslation, {
+      duplicateEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.duplicateEmails",
         schema: z.coerce.number(),
       }),
-      errors: scopedResponseArrayFieldNew(scopedTranslation, {
+      errors: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.response.errors",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 3,
           usage: { response: true },
           children: {
-            row: scopedResponseField(scopedTranslation, {
+            row: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.errors",
               fieldType: FieldDataType.NUMBER,
               schema: z.coerce.number(),
             }),
-            email: scopedResponseField(scopedTranslation, {
+            email: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.errors",
               fieldType: FieldDataType.TEXT,
               schema: z.string().optional(),
             }),
-            error: scopedResponseField(scopedTranslation, {
+            error: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "post.response.errors",
               fieldType: FieldDataType.TEXT,
@@ -232,26 +234,26 @@ const { POST } = createEndpoint({
           },
         }),
       }),
-      summary: scopedObjectFieldNew(scopedTranslation, {
+      summary: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "post.response.summary",
         layoutType: LayoutType.GRID,
         columns: 3,
         usage: { response: true },
         children: {
-          newLeads: scopedResponseField(scopedTranslation, {
+          newLeads: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.summary",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          updatedLeads: scopedResponseField(scopedTranslation, {
+          updatedLeads: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.summary",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          skippedDuplicates: scopedResponseField(scopedTranslation, {
+          skippedDuplicates: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "post.response.summary",
             fieldType: FieldDataType.NUMBER,
@@ -259,12 +261,12 @@ const { POST } = createEndpoint({
           }),
         },
       }),
-      isChunkedProcessing: scopedResponseField(scopedTranslation, {
+      isChunkedProcessing: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.isChunkedProcessing",
         schema: z.boolean().default(false),
       }),
-      jobId: scopedResponseField(scopedTranslation, {
+      jobId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.jobId",
         schema: z.uuid().optional(),

@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   tags: ["unsubscribe.sync.tag"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "unsubscribe.sync.post.container.title",
     description: "unsubscribe.sync.post.container.description",
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      batchSize: scopedRequestField(scopedTranslation, {
+      batchSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "unsubscribe.sync.post.fields.batchSize.label",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(1000).default(500),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "unsubscribe.sync.post.fields.dryRun.label",
@@ -59,19 +59,19 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      leadsProcessed: scopedResponseField(scopedTranslation, {
+      leadsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "unsubscribe.sync.post.response.leadsProcessed",
         schema: z.number(),
       }),
 
-      leadsUpdated: scopedResponseField(scopedTranslation, {
+      leadsUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "unsubscribe.sync.post.response.leadsUpdated",
         schema: z.number(),
       }),
 
-      executionTimeMs: scopedResponseField(scopedTranslation, {
+      executionTimeMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "unsubscribe.sync.post.response.executionTimeMs",
         schema: z.number(),

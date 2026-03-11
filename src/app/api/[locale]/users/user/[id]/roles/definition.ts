@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-  scopedSubmitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "roles.post.container.title" as const,
     description: "roles.post.container.description" as const,
@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "roles.post.id.label" as const,
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
       }),
 
       // === REQUEST BODY ===
-      role: scopedRequestField(scopedTranslation, {
+      role: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "roles.post.role.label" as const,
@@ -73,24 +73,24 @@ const { POST } = createEndpoint({
         schema: z.enum(UserRoleDB),
       }),
 
-      submitButton: scopedSubmitButton(scopedTranslation, {
+      submitButton: submitButton(scopedTranslation, {
         label: "roles.post.submit.label" as const,
         inline: true,
         usage: { request: "data" },
       }),
 
       // === RESPONSE ===
-      roleId: scopedResponseField(scopedTranslation, {
+      roleId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "roles.post.response.roleId.content" as const,
         schema: z.string().uuid().describe("Role assignment ID"),
       }),
-      userId: scopedResponseField(scopedTranslation, {
+      userId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "roles.post.response.userId.content" as const,
         schema: z.string().uuid().describe("User ID"),
       }),
-      assignedRole: scopedResponseField(scopedTranslation, {
+      assignedRole: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "roles.post.response.assignedRole.content" as const,
         schema: z.string().describe("Assigned role"),
@@ -180,7 +180,7 @@ const { DELETE } = createEndpoint({
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "roles.delete.container.title" as const,
     description: "roles.delete.container.description" as const,
@@ -188,7 +188,7 @@ const { DELETE } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMS ===
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "roles.delete.id.label" as const,
@@ -199,7 +199,7 @@ const { DELETE } = createEndpoint({
       }),
 
       // === REQUEST BODY ===
-      role: scopedRequestField(scopedTranslation, {
+      role: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "roles.delete.role.label" as const,
@@ -210,14 +210,14 @@ const { DELETE } = createEndpoint({
         schema: z.enum(UserRoleDB),
       }),
 
-      submitButton: scopedSubmitButton(scopedTranslation, {
+      submitButton: submitButton(scopedTranslation, {
         label: "roles.delete.submit.label" as const,
         inline: true,
         usage: { request: "data" },
       }),
 
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "roles.delete.response.success.content" as const,
         schema: z.boolean().describe("Whether the role was removed"),

@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -39,7 +39,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["guard", "guard:start", "guard-start"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      projectPath: scopedRequestField(scopedTranslation, {
+      projectPath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.projectPath.title",
@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      startAll: scopedRequestField(scopedTranslation, {
+      startAll: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.startAll.title",
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      guardIdInput: scopedRequestField(scopedTranslation, {
+      guardIdInput: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.guardId.title",
@@ -78,26 +78,26 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      summary: scopedObjectFieldNew(scopedTranslation, {
+      summary: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "fields.summary.title",
         layoutType: LayoutType.GRID,
         columns: 3,
         usage: { response: true },
         children: {
-          totalStarted: scopedResponseField(scopedTranslation, {
+          totalStarted: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "fields.totalStarted.title",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          status: scopedResponseField(scopedTranslation, {
+          status: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "fields.status.title",
             fieldType: FieldDataType.TEXT,
             schema: z.string(),
           }),
-          hasIssues: scopedResponseField(scopedTranslation, {
+          hasIssues: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "fields.hasIssues.title",
             fieldType: FieldDataType.BOOLEAN,
@@ -106,31 +106,31 @@ const { POST } = createEndpoint({
         },
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.title",
         schema: z.string(),
       }),
 
-      guardId: scopedResponseField(scopedTranslation, {
+      guardId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.guardId.title",
         schema: z.string(),
       }),
 
-      username: scopedResponseField(scopedTranslation, {
+      username: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.startedGuards.columns.username",
         schema: z.string(),
       }),
 
-      guardProjectPath: scopedResponseField(scopedTranslation, {
+      guardProjectPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.startedGuards.columns.projectPath",
         schema: z.string(),
       }),
 
-      scriptPath: scopedResponseField(scopedTranslation, {
+      scriptPath: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.title",
         schema: z.string(),

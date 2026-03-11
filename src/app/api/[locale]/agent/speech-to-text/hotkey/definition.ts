@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
   // Credit cost
   credits: 2, // Same as regular STT
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "speechToText.hotkey.post.form.title" as const,
     description: "speechToText.hotkey.post.form.description" as const,
@@ -64,7 +64,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      action: scopedRequestField(scopedTranslation, {
+      action: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "speechToText.hotkey.post.action.label" as const,
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         schema: z.enum(HotkeyAction).optional(),
       }),
 
-      // provider: scopedRequestField(scopedTranslation, {
+      // provider: requestField(scopedTranslation, {
       //   type: WidgetType.FORM_FIELD,
       //   fieldType: FieldDataType.SELECT,
       //   label:
@@ -86,7 +86,7 @@ const { POST } = createEndpoint({
       //   schema: z.enum(SttProvider).default(SttProvider.OPENAI),
       // }),
 
-      insertPrefix: scopedRequestField(scopedTranslation, {
+      insertPrefix: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "speechToText.hotkey.post.insertPrefix.label" as const,
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
         schema: z.string().default(""),
       }),
 
-      insertSuffix: scopedRequestField(scopedTranslation, {
+      insertSuffix: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "speechToText.hotkey.post.insertSuffix.label" as const,
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "speechToText.hotkey.post.response.title" as const,
         description: "speechToText.hotkey.post.response.description" as const,
@@ -119,31 +119,31 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          success: scopedResponseField(scopedTranslation, {
+          success: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "speechToText.hotkey.post.response.success" as const,
             schema: z.boolean(),
           }),
 
-          status: scopedResponseField(scopedTranslation, {
+          status: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             text: "speechToText.hotkey.post.response.status" as const,
             schema: z.string(),
           }),
 
-          message: scopedResponseField(scopedTranslation, {
+          message: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "speechToText.hotkey.post.response.message" as const,
             schema: z.string(),
           }),
 
-          text: scopedResponseField(scopedTranslation, {
+          text: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "speechToText.hotkey.post.response.text" as const,
             schema: z.string().optional(),
           }),
 
-          recordingDuration: scopedResponseField(scopedTranslation, {
+          recordingDuration: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content:
               "speechToText.hotkey.post.response.recordingDuration" as const,

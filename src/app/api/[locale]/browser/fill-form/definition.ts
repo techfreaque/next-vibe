@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestDataArrayField,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestDataArrayField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "fill-form.form.label",
     description: "fill-form.form.description",
@@ -43,21 +43,18 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      elements: scopedRequestDataArrayField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "fill-form.form.fields.elements.label",
-          description: "fill-form.form.fields.elements.description",
-          columns: 12,
-        },
-        scopedObjectFieldNew(scopedTranslation, {
+      elements: requestDataArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "fill-form.form.fields.elements.label",
+        description: "fill-form.form.fields.elements.description",
+        columns: 12,
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 2,
           usage: { request: "data" },
           children: {
-            uid: scopedRequestField(scopedTranslation, {
+            uid: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "fill-form.form.fields.elements.uid.label",
@@ -65,7 +62,7 @@ const { POST } = createEndpoint({
               columns: 6,
               schema: z.string().describe("The uid of the element to fill out"),
             }),
-            value: scopedRequestField(scopedTranslation, {
+            value: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label: "fill-form.form.fields.elements.value.label",
@@ -75,17 +72,17 @@ const { POST } = createEndpoint({
             }),
           },
         }),
-      ),
+      }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fill-form.response.success",
         schema: z
           .boolean()
           .describe("Whether the form fill operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fill-form.response.result",
         schema: z
@@ -100,7 +97,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fill-form.response.error",
         schema: z
@@ -108,7 +105,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fill-form.response.executionId",
         schema: z

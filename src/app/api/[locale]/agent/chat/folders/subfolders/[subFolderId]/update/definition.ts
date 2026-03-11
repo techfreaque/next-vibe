@@ -6,11 +6,11 @@ import {
 } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,7 +43,7 @@ const { PATCH } = createEndpoint({
   tags: ["tags.folders" as const],
   icon: "folder-pen" as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "patch.container.title" as const,
     description: "patch.container.description" as const,
@@ -51,7 +51,7 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === REQUEST URL PARAMS ===
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      subFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.id.label" as const,
@@ -60,7 +60,7 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.name.label" as const,
@@ -68,7 +68,7 @@ const { PATCH } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).max(255).optional(),
       }),
-      icon: scopedRequestField(scopedTranslation, {
+      icon: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.icon.label" as const,
@@ -76,7 +76,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: iconSchema.nullish(),
       }),
-      color: scopedRequestField(scopedTranslation, {
+      color: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.color.label" as const,
@@ -84,7 +84,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      parentId: scopedRequestField(scopedTranslation, {
+      parentId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "patch.parentId.label" as const,
@@ -92,7 +92,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.uuid().nullable().optional(),
       }),
-      expanded: scopedRequestField(scopedTranslation, {
+      expanded: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.expanded.label" as const,
@@ -100,7 +100,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      sortOrder: scopedRequestField(scopedTranslation, {
+      sortOrder: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "patch.sortOrder.label" as const,
@@ -108,7 +108,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
-      pinned: scopedRequestField(scopedTranslation, {
+      pinned: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.pinned.label" as const,
@@ -116,7 +116,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      rolesView: scopedRequestField(scopedTranslation, {
+      rolesView: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesView.label" as const,
@@ -125,7 +125,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesManage: scopedRequestField(scopedTranslation, {
+      rolesManage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesManage.label" as const,
@@ -134,7 +134,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesCreateThread: scopedRequestField(scopedTranslation, {
+      rolesCreateThread: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesCreateThread.label" as const,
@@ -143,7 +143,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesPost: scopedRequestField(scopedTranslation, {
+      rolesPost: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesPost.label" as const,
@@ -152,7 +152,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesModerate: scopedRequestField(scopedTranslation, {
+      rolesModerate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesModerate.label" as const,
@@ -161,7 +161,7 @@ const { PATCH } = createEndpoint({
         options: UserPermissionRoleOptions,
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesAdmin: scopedRequestField(scopedTranslation, {
+      rolesAdmin: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "patch.rolesAdmin.label" as const,
@@ -172,12 +172,12 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      folderId: scopedResponseField(scopedTranslation, {
+      folderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.folder.id.content" as const,
         schema: z.uuid(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "patch.response.folder.updatedAt.content" as const,
         schema: dateSchema,

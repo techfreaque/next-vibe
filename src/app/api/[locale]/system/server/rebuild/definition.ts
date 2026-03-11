@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
     "rebuild-and-restart",
   ],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -51,12 +51,12 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
 
-      errors: scopedResponseField(scopedTranslation, {
+      errors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(z.string()).optional(),
       }),

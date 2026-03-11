@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -82,14 +82,14 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.userAuth",
   tags: ["list.tag"],
   allowedRoles: ALLOWED_ROLES,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "list.title",
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { response: true },
     children: {
-      sessions: scopedResponseField(scopedTranslation, {
+      sessions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "list.response.sessions",
         schema: z.array(
@@ -129,36 +129,36 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.userAuth",
   tags: ["create.tag"],
   allowedRoles: ALLOWED_ROLES,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "create.title",
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true } as const,
     children: {
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "create.form.name",
         description: "create.form.namePlaceholder",
         schema: z.string().min(1).max(100),
       }),
-      token: scopedResponseField(scopedTranslation, {
+      token: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "create.response.token",
         schema: z.string(),
       }),
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "create.response.id",
         schema: z.string().uuid(),
       }),
-      sessionName: scopedResponseField(scopedTranslation, {
+      sessionName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "create.response.name",
         schema: z.string(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         content: "create.response.message",
         schema: z.string(),

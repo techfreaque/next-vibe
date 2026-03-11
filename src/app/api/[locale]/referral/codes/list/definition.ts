@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -45,14 +45,14 @@ export const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // Admin override: view another user's referral codes
-      targetUserId: scopedRequestField(scopedTranslation, {
+      targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.title" as const,
         hidden: true,
         schema: z.string().optional(),
       }),
-      codes: scopedResponseField(scopedTranslation, {
+      codes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
           z.object({

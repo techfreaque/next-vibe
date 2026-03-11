@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestResponseField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestResponseField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,7 +53,7 @@ const { PUT } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // REQUEST & RESPONSE FIELDS
-      plan: scopedRequestResponseField(scopedTranslation, {
+      plan: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.planId.label" as const,
@@ -61,7 +61,7 @@ const { PUT } = createEndpoint({
         options: SubscriptionPlanOptions,
         schema: z.enum(SubscriptionPlan),
       }),
-      billingInterval: scopedRequestResponseField(scopedTranslation, {
+      billingInterval: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.billingInterval.label" as const,
@@ -71,42 +71,42 @@ const { PUT } = createEndpoint({
       }),
 
       // RESPONSE ONLY FIELDS
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.id" as const,
         schema: z.uuid(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.status" as const,
         schema: z.enum(SubscriptionStatus),
       }),
-      currentPeriodStart: scopedResponseField(scopedTranslation, {
+      currentPeriodStart: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.currentPeriodStart" as const,
         schema: z.string(),
       }),
-      currentPeriodEnd: scopedResponseField(scopedTranslation, {
+      currentPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.currentPeriodEnd" as const,
         schema: z.string(),
       }),
-      cancelAtPeriodEnd: scopedResponseField(scopedTranslation, {
+      cancelAtPeriodEnd: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.cancelAtPeriodEnd" as const,
         schema: z.boolean(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.createdAt" as const,
         schema: z.string(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.updatedAt" as const,
         schema: z.string(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.message" as const,
         schema: z.string(),

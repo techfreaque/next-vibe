@@ -7,9 +7,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
     render: ArchiveWidget,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.fields.id.label",
@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.string().uuid(),
       }),
-      archivedId: scopedResponseField(scopedTranslation, {
+      archivedId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.archivedId",
         schema: z.string(),

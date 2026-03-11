@@ -14,9 +14,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
@@ -39,7 +39,7 @@ const { POST } = createEndpoint({
     render: ResetPasswordConfirmContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      token: scopedRequestField(scopedTranslation, {
+      token: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "confirm.fields.token.label",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
           message: "confirm.fields.token.validation.required",
         }),
       }),
-      email: scopedRequestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "confirm.fields.email.label",
@@ -62,7 +62,7 @@ const { POST } = createEndpoint({
           })
           .transform((val) => val.toLowerCase().trim()),
       }),
-      password: scopedRequestField(scopedTranslation, {
+      password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "confirm.fields.password.label",
@@ -73,7 +73,7 @@ const { POST } = createEndpoint({
           message: "confirm.fields.password.validation.minLength",
         }),
       }),
-      confirmPassword: scopedRequestField(scopedTranslation, {
+      confirmPassword: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "confirm.fields.confirmPassword.label",
@@ -84,7 +84,7 @@ const { POST } = createEndpoint({
         }),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string().describe("Human-readable status message"),
       }),

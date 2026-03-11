@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -40,7 +40,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["guard:destroy", "guard-destroy", "guard:remove"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -49,7 +49,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      projectPath: scopedRequestField(scopedTranslation, {
+      projectPath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.projectPath.title",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      guardId: scopedRequestField(scopedTranslation, {
+      guardId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.guardId.title",
@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      force: scopedRequestField(scopedTranslation, {
+      force: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.force.title",
@@ -78,7 +78,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      cleanupFiles: scopedRequestField(scopedTranslation, {
+      cleanupFiles: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.cleanupFiles.title",
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(true),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.dryRun.title",
@@ -97,58 +97,58 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.title",
         schema: z.string(),
       }),
 
-      destroyedGuards: scopedResponseArrayFieldNew(scopedTranslation, {
+      destroyedGuards: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "fields.destroyedGuards.title",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 3,
           usage: { response: true },
           children: {
-            guardId: scopedResponseField(scopedTranslation, {
+            guardId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "fields.guardId.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            username: scopedResponseField(scopedTranslation, {
+            username: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "fields.username.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            projectPath: scopedResponseField(scopedTranslation, {
+            projectPath: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "fields.projectPath.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            wasRunning: scopedResponseField(scopedTranslation, {
+            wasRunning: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "fields.wasRunning.title",
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean(),
             }),
-            filesRemoved: scopedResponseField(scopedTranslation, {
+            filesRemoved: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "fields.filesRemoved.title",
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean(),
             }),
-            userRemoved: scopedResponseField(scopedTranslation, {
+            userRemoved: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "fields.userRemoved.title",
               fieldType: FieldDataType.BOOLEAN,
@@ -158,13 +158,13 @@ const { POST } = createEndpoint({
         }),
       }),
 
-      warnings: scopedResponseField(scopedTranslation, {
+      warnings: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.warnings.title",
         schema: z.array(z.string()).optional(),
       }),
 
-      totalDestroyed: scopedResponseField(scopedTranslation, {
+      totalDestroyed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.totalDestroyed.title",
         schema: z.coerce.number().optional(),

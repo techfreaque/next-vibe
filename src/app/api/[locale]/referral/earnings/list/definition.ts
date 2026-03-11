@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -42,7 +42,7 @@ export const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.form.title",
     description: "get.form.description",
@@ -51,7 +51,7 @@ export const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // Admin override: view another user's referral earnings
-      targetUserId: scopedRequestField(scopedTranslation, {
+      targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.title" as const,
@@ -59,14 +59,14 @@ export const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
       // Request fields
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.form.limit.label",
         description: "get.form.limit.description",
         schema: z.coerce.number().positive().optional(),
       }),
-      offset: scopedRequestField(scopedTranslation, {
+      offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.form.offset.label",
@@ -75,55 +75,55 @@ export const { GET } = createEndpoint({
       }),
 
       // Response fields
-      earnings: scopedResponseArrayFieldNew(scopedTranslation, {
+      earnings: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.id",
               schema: z.string(),
             }),
-            earnerUserId: scopedResponseField(scopedTranslation, {
+            earnerUserId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.earnerUserId",
               schema: z.string(),
             }),
-            sourceUserId: scopedResponseField(scopedTranslation, {
+            sourceUserId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.sourceUserId",
               schema: z.string(),
             }),
-            transactionId: scopedResponseField(scopedTranslation, {
+            transactionId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.transactionId",
               schema: z.string(),
             }),
-            level: scopedResponseField(scopedTranslation, {
+            level: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.level",
               schema: z.coerce.number(),
             }),
-            amountCents: scopedResponseField(scopedTranslation, {
+            amountCents: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.amountCents",
               schema: z.coerce.number(),
             }),
-            currency: scopedResponseField(scopedTranslation, {
+            currency: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.currency",
               schema: z.string(),
             }),
-            status: scopedResponseField(scopedTranslation, {
+            status: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.status",
               schema: z.string(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.earnings.createdAt",
               schema: z.string(),
@@ -131,7 +131,7 @@ export const { GET } = createEndpoint({
           },
         }),
       }),
-      totalCount: scopedResponseField(scopedTranslation, {
+      totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.totalCount",
         schema: z.coerce.number(),

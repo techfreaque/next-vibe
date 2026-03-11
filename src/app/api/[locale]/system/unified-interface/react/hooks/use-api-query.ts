@@ -131,7 +131,14 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       // This ensures we always get the latest value, even when refetch() is called
       // immediately after a store update (before React re-renders)
       const store = useApiStore.getState();
-      const formId = store.getFormId(endpoint);
+      // Use the same key as useApiQueryForm's storageKey so storedParams lookup matches storage
+      const formId = buildKey(
+        "query-form",
+        endpoint,
+        urlPathParams,
+        logger,
+        requestData as CacheKeyRequestData<TEndpoint>,
+      );
       const storedParams = store.getFormQueryParams(formId);
 
       // When urlPathParams are present (e.g. /threads/:threadId/messages), always prefer
@@ -144,15 +151,30 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         typeof urlPathParams === "object" &&
         Object.keys(urlPathParams as FormQueryParams).length > 0;
 
+      // Check if this endpoint has any includeInCacheKey fields — if so, requestData
+      // IS the cache discriminator and must be used directly (storedParams are keyed by
+      // endpoint only and would return stale data when switching e.g. targetUserId).
+      const hasCacheKeyFields =
+        "children" in endpoint.fields &&
+        Object.values(
+          endpoint.fields.children as Record<
+            string,
+            { includeInCacheKey?: boolean }
+          >,
+        ).some((f) => f.includeInCacheKey);
+
       // Use stored params if available and non-empty, and no urlPathParams override,
       // and no custom queryKey (custom keys indicate per-value caching where requestData
       // is already the correct value — using stored params would return stale data from
       // a previous value, e.g. switching root folder tabs).
+      // Also skip stored params when the endpoint uses includeInCacheKey fields, since
+      // requestData already carries the correct discriminating values.
       // Otherwise fall back to the prop value.
       // Deserialize any JSON-stringified nested objects
       const hasStoredParams =
         !hasUrlPathParams &&
         !customQueryKey &&
+        !hasCacheKeyFields &&
         storedParams !== undefined &&
         storedParams !== null &&
         Object.keys(storedParams).length > 0;

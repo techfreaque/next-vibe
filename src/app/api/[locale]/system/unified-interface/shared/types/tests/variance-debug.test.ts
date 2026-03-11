@@ -10,28 +10,27 @@ import type {
 } from "../../../unified-ui/widgets/_shared/types";
 import type { EventSchemas } from "../../../websocket/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
-import { objectField } from "../../field/utils";
-import { requestField } from "../../field/utils-new";
+import { objectFieldNew, requestField } from "../../field/utils-new";
 import type { UnifiedField } from "../../widgets/configs";
 import type { CreateApiEndpointAny } from "../endpoint-base";
 import type { Methods } from "../enums";
 import { FieldDataType, WidgetType } from "../enums";
 
 // Simulate the exact structure from retry/stop endpoints
-const testEndpoint_field = objectField(
-  { type: WidgetType.CONTAINER },
-  { request: "data" },
-  {
+const testEndpoint_field = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  usage: { request: "data" },
+  children: {
     jobId: requestField({
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.UUID,
       label: "Job ID",
       schema: z.string().uuid(),
     }),
-    result: objectField(
-      { type: WidgetType.CONTAINER },
-      { request: "data" },
-      {
+    result: objectFieldNew({
+      type: WidgetType.CONTAINER,
+      usage: { request: "data" },
+      children: {
         success: requestField({
           type: WidgetType.FORM_FIELD,
           fieldType: FieldDataType.BOOLEAN,
@@ -39,9 +38,9 @@ const testEndpoint_field = objectField(
           schema: z.boolean(),
         }),
       },
-    ),
+    }),
   },
-);
+});
 
 type TestEndpoint = CreateApiEndpoint<
   Methods.POST,

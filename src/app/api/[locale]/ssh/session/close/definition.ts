@@ -3,9 +3,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -32,14 +32,14 @@ export const { POST } = createEndpoint({
     render: SessionCloseContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      sessionId: scopedRequestField(scopedTranslation, {
+      sessionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "session.close.post.fields.sessionId.label" as const,
         description: "session.close.post.fields.sessionId.description" as const,
         schema: z.string(),
       }),
-      ok: scopedResponseField(scopedTranslation, {
+      ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.close.post.response.ok.title" as const,
         schema: z.boolean(),

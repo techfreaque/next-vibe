@@ -8,10 +8,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import { graphConfigSchema } from "../../../graph/schema";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -38,7 +38,7 @@ const { PUT } = createEndpoint({
     render: EditGraphWidget,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "put.fields.id.label",
@@ -46,14 +46,14 @@ const { PUT } = createEndpoint({
         hidden: true,
         schema: z.union([z.string().uuid(), z.literal("new")]).optional(),
       }),
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.fields.name.label",
         description: "put.fields.name.description",
         schema: z.string().max(100).optional(),
       }),
-      slug: scopedRequestField(scopedTranslation, {
+      slug: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.fields.slug.label",
@@ -65,21 +65,21 @@ const { PUT } = createEndpoint({
           .regex(/^[a-z0-9-]+$/)
           .optional(),
       }),
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.fields.description.label",
         description: "put.fields.description.description",
         schema: z.string().optional(),
       }),
-      config: scopedRequestField(scopedTranslation, {
+      config: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "put.fields.config.label",
         description: "put.fields.config.description",
         schema: graphConfigSchema,
       }),
-      newId: scopedResponseField(scopedTranslation, {
+      newId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "put.response.newId",
         schema: z.string(),

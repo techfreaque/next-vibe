@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -39,14 +39,14 @@ const { POST } = createEndpoint({
   ],
   aliases: ["generate-all", "gen", "generate"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      rootDir: scopedRequestField(scopedTranslation, {
+      rootDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.rootDir.label",
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      outputDir: scopedRequestField(scopedTranslation, {
+      outputDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.outputDir.label",
@@ -67,7 +67,7 @@ const { POST } = createEndpoint({
           .default("src/app/api/[locale]/system/generated"),
       }),
 
-      verbose: scopedRequestField(scopedTranslation, {
+      verbose: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.verbose.label",
@@ -76,7 +76,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipEndpoints: scopedRequestField(scopedTranslation, {
+      skipEndpoints: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipEndpoints.label",
@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipSeeds: scopedRequestField(scopedTranslation, {
+      skipSeeds: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipSeeds.label",
@@ -94,7 +94,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipTaskIndex: scopedRequestField(scopedTranslation, {
+      skipTaskIndex: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.skipTaskIndex.label",
@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      enableTrpc: scopedRequestField(scopedTranslation, {
+      enableTrpc: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.enableTrpc.label",
@@ -113,25 +113,25 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.title",
         schema: z.boolean(),
       }),
 
-      generationCompleted: scopedResponseField(scopedTranslation, {
+      generationCompleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.generationCompleted.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.output.title",
         schema: z.string(),
       }),
 
-      generationStats: scopedResponseField(scopedTranslation, {
+      generationStats: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.generationStats.title",
         schema: z.object({

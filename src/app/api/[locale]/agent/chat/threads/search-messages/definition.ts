@@ -8,11 +8,11 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -90,7 +90,7 @@ const { GET } = createEndpoint({
     description: "search.get.success.description",
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "search.get.container.title" as const,
     description: "search.get.container.description" as const,
@@ -98,7 +98,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST DATA ===
-      query: scopedRequestField(scopedTranslation, {
+      query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "search.get.query.label" as const,
@@ -107,7 +107,7 @@ const { GET } = createEndpoint({
       }),
 
       // === FILTERS ===
-      filters: scopedObjectFieldNew(scopedTranslation, {
+      filters: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "search.get.sections.filters.title" as const,
         description: "search.get.sections.filters.description" as const,
@@ -115,28 +115,28 @@ const { GET } = createEndpoint({
         columns: 2,
         usage: { request: "data" },
         children: {
-          rootFolderId: scopedRequestField(scopedTranslation, {
+          rootFolderId: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "search.get.rootFolderId.label" as const,
             description: "search.get.rootFolderId.description" as const,
             schema: z.enum(rootFolderIds).optional(),
           }),
-          role: scopedRequestField(scopedTranslation, {
+          role: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "search.get.role.label" as const,
             description: "search.get.role.description" as const,
             schema: z.enum(ChatMessageRoleDB).optional(),
           }),
-          startDate: scopedRequestField(scopedTranslation, {
+          startDate: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "search.get.startDate.label" as const,
             description: "search.get.startDate.description" as const,
             schema: z.string().datetime().optional(),
           }),
-          endDate: scopedRequestField(scopedTranslation, {
+          endDate: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "search.get.endDate.label" as const,
@@ -147,7 +147,7 @@ const { GET } = createEndpoint({
       }),
 
       // === PAGINATION ===
-      pagination: scopedObjectFieldNew(scopedTranslation, {
+      pagination: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "search.get.sections.pagination.title" as const,
         description: "search.get.sections.pagination.description" as const,
@@ -155,14 +155,14 @@ const { GET } = createEndpoint({
         columns: 2,
         usage: { request: "data" },
         children: {
-          page: scopedRequestField(scopedTranslation, {
+          page: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "search.get.page.label" as const,
             description: "search.get.page.description" as const,
             schema: z.coerce.number().min(1).optional().default(1),
           }),
-          limit: scopedRequestField(scopedTranslation, {
+          limit: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "search.get.limit.label" as const,
@@ -173,50 +173,50 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      results: scopedResponseArrayFieldNew(scopedTranslation, {
+      results: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "search.get.response.results.message.title" as const,
           layoutType: LayoutType.STACKED,
           usage: { response: true },
           children: {
-            messageId: scopedResponseField(scopedTranslation, {
+            messageId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "search.get.response.results.message.messageId.content" as const,
               schema: z.uuid(),
             }),
-            threadId: scopedResponseField(scopedTranslation, {
+            threadId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "search.get.response.results.message.threadId.content" as const,
               schema: z.uuid(),
             }),
-            threadTitle: scopedResponseField(scopedTranslation, {
+            threadTitle: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "search.get.response.results.message.threadTitle.content" as const,
               schema: z.string(),
             }),
-            role: scopedResponseField(scopedTranslation, {
+            role: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "search.get.response.results.message.role.content" as const,
               schema: z.enum(ChatMessageRole),
             }),
-            headline: scopedResponseField(scopedTranslation, {
+            headline: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "search.get.response.results.message.headline.content" as const,
               schema: z.string(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "search.get.response.results.message.createdAt.content" as const,
               schema: dateSchema,
             }),
-            rootFolderId: scopedResponseField(scopedTranslation, {
+            rootFolderId: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "search.get.response.results.message.rootFolderId.content" as const,
               schema: z.string(),
@@ -225,13 +225,13 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      total: scopedResponseField(scopedTranslation, {
+      total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "search.get.response.total.content" as const,
         schema: z.coerce.number(),
       }),
 
-      page: scopedResponseField(scopedTranslation, {
+      page: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "search.get.response.page.content" as const,
         schema: z.coerce.number(),

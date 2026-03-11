@@ -52,7 +52,6 @@ interface FlatMessageViewProps {
     content: string,
     attachments: File[],
   ) => Promise<void>;
-  onDeleteMessage: (messageId: string) => void;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
 }
 
@@ -67,7 +66,6 @@ export const FlatMessageView = React.memo(function FlatMessageView({
   onRetryMessage,
   onAnswerAsModel,
   onReplyMessage,
-  onDeleteMessage,
   onVoteMessage,
 }: FlatMessageViewProps): JSX.Element {
   // Get rootFolderId from navigation store (no context dependency)
@@ -192,7 +190,6 @@ export const FlatMessageView = React.memo(function FlatMessageView({
               onRetryMessage={onRetryMessage}
               onAnswerAsModel={onAnswerAsModel}
               onReplyMessage={onReplyMessage}
-              onDeleteMessage={onDeleteMessage}
               onVoteMessage={onVoteMessage}
             />
           </ErrorBoundary>

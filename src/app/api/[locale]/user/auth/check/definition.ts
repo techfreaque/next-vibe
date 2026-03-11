@@ -6,9 +6,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -36,19 +36,19 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "check.get.response.title",
     description: "check.get.response.description",
     layoutType: LayoutType.VERTICAL,
     usage: { response: true },
     children: {
-      authenticated: scopedResponseField(scopedTranslation, {
+      authenticated: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "check.get.response.authenticated",
         schema: z.boolean(),
       }),
-      tokenValid: scopedResponseField(scopedTranslation, {
+      tokenValid: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "check.get.response.tokenValid",
         schema: z.boolean(),

@@ -3,7 +3,7 @@
  * Returns all connections for the logged-in user
  */
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, isNull, ne, or } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -26,7 +26,10 @@ export async function listRemoteConnections(
     .where(
       and(
         eq(userRemoteConnections.userId, user.id),
-        ne(userRemoteConnections.token, "self"),
+        or(
+          isNull(userRemoteConnections.token),
+          ne(userRemoteConnections.token, "self"),
+        ),
       ),
     )
     .orderBy(userRemoteConnections.updatedAt);

@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
     firstCliArgKey: "operation",
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "title" as const,
     description: "description" as const,
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // REQUEST FIELDS
-      operation: scopedRequestField(scopedTranslation, {
+      operation: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "form.fields.operation.label" as const,
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
         schema: z.enum(["check", "install", "listen", "login", "status"]),
       }),
 
-      port: scopedRequestField(scopedTranslation, {
+      port: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "form.fields.port.label" as const,
@@ -97,7 +97,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
-      events: scopedRequestField(scopedTranslation, {
+      events: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "form.fields.events.label" as const,
@@ -133,7 +133,7 @@ const { POST } = createEndpoint({
         schema: z.array(z.string()).optional(),
       }),
 
-      forwardTo: scopedRequestField(scopedTranslation, {
+      forwardTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "form.fields.forwardTo.label" as const,
@@ -143,7 +143,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      skipSslVerify: scopedRequestField(scopedTranslation, {
+      skipSslVerify: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "form.fields.skipSslVerify.label" as const,
@@ -153,43 +153,43 @@ const { POST } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success" as const,
         schema: z.boolean(),
       }),
 
-      installed: scopedResponseField(scopedTranslation, {
+      installed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.installed" as const,
         schema: z.boolean().optional(),
       }),
 
-      version: scopedResponseField(scopedTranslation, {
+      version: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.version" as const,
         schema: z.string().optional(),
       }),
 
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.status" as const,
         schema: z.string().optional(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.output" as const,
         schema: z.string().optional(),
       }),
 
-      instructions: scopedResponseField(scopedTranslation, {
+      instructions: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.instructions" as const,
         schema: z.string().optional(),
       }),
 
-      webhookEndpoint: scopedResponseField(scopedTranslation, {
+      webhookEndpoint: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.webhookEndpoint" as const,
         schema: z.string().optional(),

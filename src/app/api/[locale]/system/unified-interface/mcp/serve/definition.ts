@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     UserRole.CLI_AUTH_BYPASS,
   ] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "serve.post.response.title" as const,
     description: "serve.post.response.description" as const,
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "serve.post.response.title",
         schema: z.string(),

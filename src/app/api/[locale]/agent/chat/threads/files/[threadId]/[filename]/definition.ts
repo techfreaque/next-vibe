@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestUrlPathParamsField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestUrlPathParamsField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   FieldDataType,
   LayoutType,
@@ -38,17 +38,17 @@ const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,
     usage: { request: "urlPathParams" },
     children: {
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         schema: z.uuid(),
       }),
-      filename: scopedRequestUrlPathParamsField(scopedTranslation, {
+      filename: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         schema: z.string().min(1),

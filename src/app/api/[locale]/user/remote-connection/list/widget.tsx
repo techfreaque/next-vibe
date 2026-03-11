@@ -492,7 +492,7 @@ export function RemoteConnectionsListContainer({
   const { push: navigate } = useWidgetNavigation();
 
   const connections = field.value?.connections ?? [];
-  const isCloud = envClient.VIBE_IS_CLOUD;
+  const isCloud = envClient.NEXT_PUBLIC_VIBE_IS_CLOUD;
 
   if (isCloud) {
     return <CloudView connections={connections} navigate={navigate} t={t} />;

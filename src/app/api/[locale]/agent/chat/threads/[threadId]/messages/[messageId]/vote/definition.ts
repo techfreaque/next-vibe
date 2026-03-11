@@ -8,11 +8,11 @@ import { z } from "zod";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title" as const,
     description: "post.container.description" as const,
@@ -95,14 +95,14 @@ const { POST } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMS ===
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.threadId.label" as const,
         description: "post.threadId.description" as const,
         schema: z.uuid(),
       }),
-      messageId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      messageId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.messageId.label" as const,
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.rootFolderId.label" as const,
@@ -119,7 +119,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(DefaultFolderId),
       }),
-      vote: scopedRequestField(scopedTranslation, {
+      vote: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.vote.label" as const,
@@ -142,17 +142,17 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      upvotes: scopedResponseField(scopedTranslation, {
+      upvotes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.upvotes.content" as const,
         schema: z.coerce.number(),
       }),
-      downvotes: scopedResponseField(scopedTranslation, {
+      downvotes: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.downvotes.content" as const,
         schema: z.coerce.number(),
       }),
-      userVote: scopedResponseField(scopedTranslation, {
+      userVote: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.userVote.content" as const,
         schema: z.enum(["up", "down", "none"]),

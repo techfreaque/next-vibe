@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -55,12 +55,12 @@ const { GET } = createEndpoint({
     render: SmtpAccountsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === REQUEST FIELDS (Filters) ===
-      campaignType: scopedRequestField(scopedTranslation, {
+      campaignType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.campaignType.label",
@@ -70,7 +70,7 @@ const { GET } = createEndpoint({
         schema: z.enum(CampaignTypeFilter).default(CampaignTypeFilter.ANY),
       }),
 
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.status.label",
@@ -82,7 +82,7 @@ const { GET } = createEndpoint({
           .default(SmtpAccountStatusFilter.ANY),
       }),
 
-      healthStatus: scopedRequestField(scopedTranslation, {
+      healthStatus: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.healthStatus.label",
@@ -94,7 +94,7 @@ const { GET } = createEndpoint({
           .default(SmtpHealthStatusFilter.ANY),
       }),
 
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.search.label",
@@ -104,7 +104,7 @@ const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      sortBy: scopedRequestField(scopedTranslation, {
+      sortBy: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.sortBy.label",
@@ -114,7 +114,7 @@ const { GET } = createEndpoint({
         schema: z.enum(SmtpAccountSortField).optional(),
       }),
 
-      sortOrder: scopedRequestField(scopedTranslation, {
+      sortOrder: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.sortOrder.label",
@@ -124,7 +124,7 @@ const { GET } = createEndpoint({
         schema: z.enum(SortOrder).optional(),
       }),
 
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.page.label",
@@ -133,7 +133,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number().int().min(1).default(1),
       }),
 
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.limit.label",
@@ -143,9 +143,9 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      accounts: scopedResponseArrayFieldNew(scopedTranslation, {
+      accounts: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "response.account.title",
           description: "response.account.description",
@@ -153,42 +153,42 @@ const { GET } = createEndpoint({
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.account.id",
               schema: z.uuid(),
             }),
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.account.name",
               schema: z.string(),
             }),
-            status: scopedResponseField(scopedTranslation, {
+            status: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.account.status",
               schema: z.enum(SmtpAccountStatus),
             }),
-            healthCheckStatus: scopedResponseField(scopedTranslation, {
+            healthCheckStatus: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.account.healthStatus",
               schema: z.enum(SmtpHealthStatus).nullable(),
             }),
-            priority: scopedResponseField(scopedTranslation, {
+            priority: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.account.priority",
               schema: z.coerce.number().int(),
             }),
-            totalEmailsSent: scopedResponseField(scopedTranslation, {
+            totalEmailsSent: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.account.totalEmailsSent",
               schema: z.coerce.number().int(),
             }),
-            lastUsedAt: scopedResponseField(scopedTranslation, {
+            lastUsedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.account.lastUsedAt",
               schema: dateSchema.nullable(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.account.createdAt",
               schema: dateSchema,
@@ -197,7 +197,7 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      pagination: scopedObjectFieldNew(scopedTranslation, {
+      pagination: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.pagination.title",
         description: "response.pagination.description",
@@ -205,22 +205,22 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          page: scopedResponseField(scopedTranslation, {
+          page: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.page",
             schema: z.coerce.number().int(),
           }),
-          limit: scopedResponseField(scopedTranslation, {
+          limit: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.limit",
             schema: z.coerce.number().int(),
           }),
-          total: scopedResponseField(scopedTranslation, {
+          total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.total",
             schema: z.coerce.number().int(),
           }),
-          totalPages: scopedResponseField(scopedTranslation, {
+          totalPages: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.totalPages",
             schema: z.coerce.number().int(),

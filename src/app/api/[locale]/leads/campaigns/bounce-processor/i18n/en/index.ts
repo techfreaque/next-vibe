@@ -55,4 +55,12 @@ export const translations = {
       description: "Bounce notifications processed successfully",
     },
   },
+  widget: {
+    title: "Run Bounce Processor",
+    description:
+      "Manually scan IMAP inbox for bounce notifications and update affected lead statuses to BOUNCED.",
+    runButton: "Run Now",
+    running: "Running...",
+    done: "Done",
+  },
 };

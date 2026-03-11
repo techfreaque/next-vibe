@@ -8,10 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,12 +46,12 @@ const { POST } = createEndpoint({
     render: ImapFoldersSyncContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === REQUEST FIELDS ===
-      accountId: scopedRequestField(scopedTranslation, {
+      accountId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "accountId.label",
@@ -60,7 +60,7 @@ const { POST } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      folderId: scopedRequestField(scopedTranslation, {
+      folderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "folderId.label",
@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
         schema: z.uuid().optional(),
       }),
 
-      force: scopedRequestField(scopedTranslation, {
+      force: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "force.label",
@@ -78,37 +78,37 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      foldersProcessed: scopedResponseField(scopedTranslation, {
+      foldersProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.foldersProcessed",
         schema: z.coerce.number(),
       }),
 
-      foldersAdded: scopedResponseField(scopedTranslation, {
+      foldersAdded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.foldersAdded",
         schema: z.coerce.number(),
       }),
 
-      foldersUpdated: scopedResponseField(scopedTranslation, {
+      foldersUpdated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.foldersUpdated",
         schema: z.coerce.number(),
       }),
 
-      foldersDeleted: scopedResponseField(scopedTranslation, {
+      foldersDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.foldersDeleted",
         schema: z.coerce.number(),
       }),
 
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.duration",
         schema: z.coerce.number(),
       }),
 
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "response.success",
         schema: z.boolean(),

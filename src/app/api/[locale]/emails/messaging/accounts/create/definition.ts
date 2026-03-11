@@ -7,11 +7,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedRequestField,
-  scopedRequestResponseField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  requestResponseField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -49,11 +49,11 @@ const { POST } = createEndpoint({
     render: MessagingAccountCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
-      name: scopedRequestResponseField(scopedTranslation, {
+      name: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.name.label",
@@ -63,7 +63,7 @@ const { POST } = createEndpoint({
         schema: z.string().min(1),
       }),
 
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "fields.description.label",
@@ -73,7 +73,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      channel: scopedRequestResponseField(scopedTranslation, {
+      channel: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.channel.label",
@@ -83,7 +83,7 @@ const { POST } = createEndpoint({
         schema: z.enum(MessageChannelDB).default(MessageChannel.SMS),
       }),
 
-      provider: scopedRequestResponseField(scopedTranslation, {
+      provider: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.provider.label",
@@ -93,7 +93,7 @@ const { POST } = createEndpoint({
         schema: z.enum(MessagingProviderDB).default(MessagingProvider.TWILIO),
       }),
 
-      fromId: scopedRequestResponseField(scopedTranslation, {
+      fromId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.fromId.label",
@@ -103,7 +103,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      apiToken: scopedRequestField(scopedTranslation, {
+      apiToken: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "fields.apiToken.label",
@@ -113,7 +113,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      apiSecret: scopedRequestField(scopedTranslation, {
+      apiSecret: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
         label: "fields.apiSecret.label",
@@ -123,7 +123,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.priority.label",
@@ -133,19 +133,19 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.id",
         schema: z.uuid(),
       }),
 
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "response.status",
         schema: z.enum(MessagingAccountStatusDB),
       }),
 
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.createdAt",
         schema: dateSchema,

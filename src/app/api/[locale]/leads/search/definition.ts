@@ -7,13 +7,13 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -77,9 +77,11 @@ const { GET } = createEndpoint({
     render: LeadsSearchContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === QUERY PARAMETERS ===
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.search.label",
@@ -88,7 +90,7 @@ const { GET } = createEndpoint({
         placeholder: "get.search.placeholder",
         schema: z.string().optional(),
       }),
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.limit.label",
@@ -96,7 +98,7 @@ const { GET } = createEndpoint({
         columns: 3,
         schema: z.coerce.number().min(1).max(50).default(10),
       }),
-      offset: scopedRequestField(scopedTranslation, {
+      offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.offset.label",
@@ -106,7 +108,7 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      response: scopedObjectFieldNew(scopedTranslation, {
+      response: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.title",
         description: "get.response.description",
@@ -114,23 +116,23 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          leads: scopedResponseArrayFieldNew(scopedTranslation, {
+          leads: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "get.response.leads.title",
-            child: scopedResponseField(scopedTranslation, {
+            child: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.leads.item",
               fieldType: FieldDataType.TEXT,
               schema: leadResponseSchema,
             }),
           }),
-          total: scopedResponseField(scopedTranslation, {
+          total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.total",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          hasMore: scopedResponseField(scopedTranslation, {
+          hasMore: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.hasMore",
             fieldType: FieldDataType.BOOLEAN,

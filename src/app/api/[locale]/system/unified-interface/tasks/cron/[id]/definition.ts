@@ -7,15 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-  scopedSubmitButton,
-  widgetObjectField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseField,
+  submitButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -69,10 +68,12 @@ const { GET } = createEndpoint({
     render: CronTaskDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
       // URL parameter
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.id.label",
@@ -81,7 +82,7 @@ const { GET } = createEndpoint({
       }),
 
       // Response fields
-      task: scopedResponseField(scopedTranslation, {
+      task: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.task.title",
         schema: cronTaskResponseSchema,
@@ -203,20 +204,18 @@ const { PUT } = createEndpoint({
     noFormElement: true,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      actions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { request: "data&urlPathParams", response: true },
-        {
-          backButton: backButton({
+      actions: objectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.INLINE,
+        gap: "2",
+        noCard: true,
+        usage: { request: "data&urlPathParams", response: true },
+        children: {
+          backButton: backButton(scopedTranslation, {
             inline: true,
             usage: { response: true, request: "data&urlPathParams" },
           }),
-          submitButton: scopedSubmitButton(scopedTranslation, {
+          submitButton: submitButton(scopedTranslation, {
             inline: true,
             className: "ml-auto",
             label: "put.submitButton.label",
@@ -224,10 +223,10 @@ const { PUT } = createEndpoint({
             usage: { response: true, request: "data&urlPathParams" },
           }),
         },
-      ),
+      }),
 
       // URL parameter
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.fields.id.label",
@@ -237,7 +236,7 @@ const { PUT } = createEndpoint({
       }),
 
       // Request data fields
-      displayName: scopedRequestField(scopedTranslation, {
+      displayName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.fields.displayName.label",
@@ -247,7 +246,7 @@ const { PUT } = createEndpoint({
         schema: z.string().min(1).optional(),
       }),
 
-      description: scopedRequestField(scopedTranslation, {
+      description: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "put.fields.description.label",
@@ -257,7 +256,7 @@ const { PUT } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      schedule: scopedRequestField(scopedTranslation, {
+      schedule: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.fields.schedule.label",
@@ -267,7 +266,7 @@ const { PUT } = createEndpoint({
         schema: z.string().min(1).optional(),
       }),
 
-      enabled: scopedRequestField(scopedTranslation, {
+      enabled: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "put.fields.enabled.label",
@@ -276,7 +275,7 @@ const { PUT } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "put.fields.priority.label",
@@ -287,7 +286,7 @@ const { PUT } = createEndpoint({
         schema: z.enum(CronTaskPriorityDB).optional(),
       }),
 
-      outputMode: scopedRequestField(scopedTranslation, {
+      outputMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         options: TaskOutputModeOptions,
@@ -297,7 +296,7 @@ const { PUT } = createEndpoint({
         schema: z.enum(TaskOutputModeDB).optional(),
       }),
 
-      timeout: scopedRequestField(scopedTranslation, {
+      timeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "put.fields.timeout.label",
@@ -307,7 +306,7 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
-      retries: scopedRequestField(scopedTranslation, {
+      retries: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "put.fields.retries.label",
@@ -317,7 +316,7 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
-      retryDelay: scopedRequestField(scopedTranslation, {
+      retryDelay: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "put.fields.retryDelay.label",
@@ -327,7 +326,7 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
-      taskInput: scopedRequestField(scopedTranslation, {
+      taskInput: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "put.fields.taskInput.label",
@@ -337,7 +336,7 @@ const { PUT } = createEndpoint({
         schema: taskInputSchema.optional(),
       }),
 
-      runOnce: scopedRequestField(scopedTranslation, {
+      runOnce: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "put.fields.runOnce.label",
@@ -345,7 +344,7 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      targetInstance: scopedRequestField(scopedTranslation, {
+      targetInstance: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "put.fields.targetInstance.label",
@@ -356,13 +355,13 @@ const { PUT } = createEndpoint({
       }),
 
       // Response fields
-      task: scopedResponseField(scopedTranslation, {
+      task: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "put.response.task.title",
         schema: cronTaskResponseSchema,
       }),
 
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "put.response.success.title",
         schema: z.boolean(),
@@ -492,7 +491,7 @@ const { DELETE } = createEndpoint({
     UserRole.ADMIN,
   ],
   tags: ["tags.cron" as const, "tags.scheduling" as const],
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "delete.container.title",
     description: "delete.container.description",
@@ -501,7 +500,7 @@ const { DELETE } = createEndpoint({
     usage: { request: "urlPathParams", response: true },
     children: {
       // URL parameter
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "delete.fields.id.label",
@@ -509,7 +508,7 @@ const { DELETE } = createEndpoint({
         schema: z.string(),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
       }),

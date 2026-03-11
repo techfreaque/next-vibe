@@ -8,11 +8,11 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -57,9 +57,11 @@ const { GET } = createEndpoint({
     render: LeadsExportContainer,
     usage: { response: true, request: "data" } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: backButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === REQUEST FIELDS ===
-      format: scopedRequestField(scopedTranslation, {
+      format: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.format.label",
@@ -69,7 +71,7 @@ const { GET } = createEndpoint({
         schema: z.enum(ExportFormat).default(ExportFormat.CSV),
       }),
 
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.status.label",
@@ -79,7 +81,7 @@ const { GET } = createEndpoint({
         schema: z.enum(LeadStatus).optional(),
       }),
 
-      country: scopedRequestField(scopedTranslation, {
+      country: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.country.label",
@@ -89,7 +91,7 @@ const { GET } = createEndpoint({
         schema: z.enum(Countries).optional(),
       }),
 
-      language: scopedRequestField(scopedTranslation, {
+      language: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.language.label",
@@ -99,7 +101,7 @@ const { GET } = createEndpoint({
         schema: z.enum(Languages).optional(),
       }),
 
-      source: scopedRequestField(scopedTranslation, {
+      source: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.source.label",
@@ -109,7 +111,7 @@ const { GET } = createEndpoint({
         schema: z.enum(LeadSource).optional(),
       }),
 
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.search.label",
@@ -119,7 +121,7 @@ const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      dateFrom: scopedRequestField(scopedTranslation, {
+      dateFrom: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "get.dateFrom.label",
@@ -128,7 +130,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      dateTo: scopedRequestField(scopedTranslation, {
+      dateTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "get.dateTo.label",
@@ -137,7 +139,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      includeMetadata: scopedRequestField(scopedTranslation, {
+      includeMetadata: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "get.includeMetadata.label",
@@ -146,7 +148,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.boolean().default(false),
       }),
 
-      includeEngagementData: scopedRequestField(scopedTranslation, {
+      includeEngagementData: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "get.includeEngagementData.label",
@@ -156,31 +158,31 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      fileName: scopedResponseField(scopedTranslation, {
+      fileName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.fileName",
         schema: z.string(),
       }),
 
-      fileContent: scopedResponseField(scopedTranslation, {
+      fileContent: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.fileContent",
         schema: z.string(),
       }),
 
-      mimeType: scopedResponseField(scopedTranslation, {
+      mimeType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.mimeType",
         schema: z.enum(MimeType),
       }),
 
-      totalRecords: scopedResponseField(scopedTranslation, {
+      totalRecords: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.totalRecords",
         schema: z.coerce.number(),
       }),
 
-      exportedAt: scopedResponseField(scopedTranslation, {
+      exportedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.exportedAt",
         schema: z.coerce.date(),

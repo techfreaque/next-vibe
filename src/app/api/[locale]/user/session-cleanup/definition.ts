@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   tags: ["post.tag"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
     description: "post.container.description",
@@ -41,7 +41,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      sessionRetentionDays: scopedRequestField(scopedTranslation, {
+      sessionRetentionDays: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.sessionRetentionDays.label",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(365).default(30),
       }),
 
-      tokenRetentionDays: scopedRequestField(scopedTranslation, {
+      tokenRetentionDays: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.tokenRetentionDays.label",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(365).default(7),
       }),
 
-      batchSize: scopedRequestField(scopedTranslation, {
+      batchSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.batchSize.label",
@@ -68,7 +68,7 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).max(1000).default(100),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -77,25 +77,25 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      sessionsDeleted: scopedResponseField(scopedTranslation, {
+      sessionsDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.sessionsDeleted",
         schema: z.number(),
       }),
 
-      tokensDeleted: scopedResponseField(scopedTranslation, {
+      tokensDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.tokensDeleted",
         schema: z.number(),
       }),
 
-      totalProcessed: scopedResponseField(scopedTranslation, {
+      totalProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.totalProcessed",
         schema: z.number(),
       }),
 
-      executionTimeMs: scopedResponseField(scopedTranslation, {
+      executionTimeMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.executionTimeMs",
         schema: z.number(),

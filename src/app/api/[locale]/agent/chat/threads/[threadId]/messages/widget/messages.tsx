@@ -55,7 +55,6 @@ import {
   useFullLoadFallback,
   useLazyBranchLoader,
 } from "../hooks/use-lazy-branch-loader";
-import { useMessageDeleteActions } from "../hooks/use-message-delete-actions";
 import { useMessageEditorStore } from "../hooks/use-message-editor-store";
 import { useMessagesSubscription } from "../hooks/use-messages-subscription";
 import { useMessageOperations } from "../hooks/use-operations";
@@ -258,14 +257,8 @@ export function ChatMessages({
     setAttachments,
   });
 
-  const {
-    deleteMessage,
-    retryMessage,
-    branchMessage,
-    answerAsAI,
-    sendMessage,
-    voteMessage,
-  } = messageOps;
+  const { retryMessage, branchMessage, answerAsAI, sendMessage, voteMessage } =
+    messageOps;
 
   // leafMessageId lives in the navigation store — seeded from server URL, updated by branch switches
   const leafMessageId = useChatNavigationStore((s) => s.leafMessageId);
@@ -321,12 +314,6 @@ export function ChatMessages({
   );
 
   const isLoadingBranch = rawIsLoadingBranch || isUpgradingToFullLoad;
-
-  // Message delete actions — register callback in delete dialog store
-  const messageDeleteActions = useMessageDeleteActions({
-    messagesRecord: allMessages,
-    deleteMessage: messageOps.deleteMessage,
-  });
 
   // Streaming state from navigation store
   const startStream = useChatNavigationStore((s) => s.startStream);
@@ -811,7 +798,6 @@ export function ChatMessages({
                   attachments,
                 });
               }}
-              onDeleteMessage={messageDeleteActions.handleDeleteMessage}
               onVoteMessage={voteMessage}
             />
           ) : viewMode === ViewMode.THREADED ? (
@@ -847,7 +833,6 @@ export function ChatMessages({
                     });
                   }}
                   onVoteMessage={voteMessage}
-                  onDeleteMessage={messageDeleteActions.handleDeleteMessage}
                   user={user}
                   ttsAutoplay={effectiveSettings.ttsAutoplay}
                   deductCredits={deductCredits}
@@ -946,7 +931,6 @@ export function ChatMessages({
                     collapseState={collapseState}
                     rootFolderId={currentRootFolderId}
                     subFolderId={currentSubFolderId}
-                    onDeleteMessage={deleteMessage}
                     onRetryMessage={retryMessage}
                     onSwitchBranch={handleSwitchBranch}
                     onBranchMessage={branchMessage}

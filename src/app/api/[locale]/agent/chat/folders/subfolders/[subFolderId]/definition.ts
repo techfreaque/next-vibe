@@ -13,10 +13,10 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestUrlPathParamsField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestUrlPathParamsField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -45,14 +45,14 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.folders" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title" as const,
     description: "get.container.description" as const,
     layoutType: LayoutType.STACKED,
     usage: { request: "urlPathParams", response: true },
     children: {
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      subFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.id.label" as const,
@@ -60,47 +60,47 @@ const { GET } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      name: scopedResponseField(scopedTranslation, {
+      name: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.name.content" as const,
         schema: z.string(),
       }),
-      icon: scopedResponseField(scopedTranslation, {
+      icon: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.icon.content" as const,
         schema: iconSchema.nullable(),
       }),
-      color: scopedResponseField(scopedTranslation, {
+      color: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.color.content" as const,
         schema: z.string().nullable(),
       }),
-      parentId: scopedResponseField(scopedTranslation, {
+      parentId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.parentId.content" as const,
         schema: z.uuid().nullable(),
       }),
-      rootFolderId: scopedResponseField(scopedTranslation, {
+      rootFolderId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.rootFolderId.content" as const,
         schema: z.enum(DefaultFolderId),
       }),
-      expanded: scopedResponseField(scopedTranslation, {
+      expanded: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.expanded.content" as const,
         schema: z.boolean(),
       }),
-      sortOrder: scopedResponseField(scopedTranslation, {
+      sortOrder: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.sortOrder.content" as const,
         schema: z.coerce.number(),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.folder.updatedAt.content" as const,
         schema: dateSchema,
@@ -192,7 +192,7 @@ const { DELETE } = createEndpoint({
     render: DeleteFolderContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      subFolderId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "delete.id.label" as const,
@@ -200,12 +200,12 @@ const { DELETE } = createEndpoint({
         schema: z.uuid(),
       }),
 
-      name: scopedResponseField(scopedTranslation, {
+      name: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.name.content" as const,
         schema: z.string(),
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.updatedAt.content" as const,
         schema: dateSchema,

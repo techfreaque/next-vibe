@@ -923,7 +923,6 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
                   showAuthor
                   platformOverride={Platform.CLI}
                   onAnswerAsModel={null}
-                  onDelete={null}
                   collapseState={null}
                   rootFolderId={DefaultFolderId.PUBLIC}
                   user={{

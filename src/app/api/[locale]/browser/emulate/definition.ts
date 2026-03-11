@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "emulate.form.label",
     description: "emulate.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      networkConditions: scopedRequestField(scopedTranslation, {
+      networkConditions: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "emulate.form.fields.networkConditions.label",
@@ -92,7 +92,7 @@ const { POST } = createEndpoint({
             'Throttle network. Set to "No emulation" to disable. If omitted, conditions remain unchanged.',
           ),
       }),
-      cpuThrottlingRate: scopedRequestField(scopedTranslation, {
+      cpuThrottlingRate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "emulate.form.fields.cpuThrottlingRate.label",
@@ -108,7 +108,7 @@ const { POST } = createEndpoint({
             "Represents the CPU slowdown factor. Set the rate to 1 to disable throttling. If omitted, throttling remains unchanged.",
           ),
       }),
-      geolocation: scopedRequestField(scopedTranslation, {
+      geolocation: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "emulate.form.fields.networkConditions.label",
@@ -133,7 +133,7 @@ const { POST } = createEndpoint({
             "Geolocation to emulate. Set to null to clear the geolocation override.",
           ),
       }),
-      userAgent: scopedRequestField(scopedTranslation, {
+      userAgent: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "emulate.form.fields.networkConditions.label",
@@ -147,7 +147,7 @@ const { POST } = createEndpoint({
             "User agent to emulate. Set to null to clear the user agent override.",
           ),
       }),
-      colorScheme: scopedRequestField(scopedTranslation, {
+      colorScheme: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "emulate.form.fields.networkConditions.label",
@@ -174,7 +174,7 @@ const { POST } = createEndpoint({
             'Emulate the dark or the light mode. Set to "auto" to reset to the default.',
           ),
       }),
-      viewport: scopedRequestField(scopedTranslation, {
+      viewport: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "emulate.form.fields.networkConditions.label",
@@ -216,14 +216,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "emulate.response.success",
         schema: z
           .boolean()
           .describe("Whether the emulation operation succeeded"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "emulate.response.result",
         schema: z
@@ -238,7 +238,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "emulate.response.error",
         schema: z
@@ -246,7 +246,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "emulate.response.executionId",
         schema: z

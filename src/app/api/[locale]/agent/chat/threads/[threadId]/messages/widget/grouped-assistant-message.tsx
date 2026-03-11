@@ -42,7 +42,6 @@ interface GroupedAssistantMessageProps {
   group: MessageGroup;
   locale: CountryLanguage;
   onAnswerAsModel: ((messageId: string) => void) | null;
-  onDelete: ((messageId: string) => void) | null;
   showAuthor: boolean;
   logger: EndpointLogger;
   /** Hide action buttons (copy, TTS, delete). Used for read-only demos. */
@@ -247,6 +246,7 @@ interface MessagesListProps {
   collapseState: CollapseStateStore | null;
   sendMessage: ((params: SendMessageParams) => void) | null;
   platformOverride: Platform | null;
+  rootFolderId: DefaultFolderId;
 }
 
 const MessagesList = memo(function MessagesList({
@@ -260,6 +260,7 @@ const MessagesList = memo(function MessagesList({
   collapseState,
   sendMessage,
   platformOverride,
+  rootFolderId,
 }: MessagesListProps): JSX.Element {
   // Find tools waiting for confirmation
   const toolsWaitingForConfirmation = useMemo(
@@ -495,7 +496,13 @@ const MessagesList = memo(function MessagesList({
         }
 
         if (message.role === "error") {
-          return <ErrorMessageBubble key={message.id} message={message} />;
+          return (
+            <ErrorMessageBubble
+              key={message.id}
+              message={message}
+              rootFolderId={rootFolderId}
+            />
+          );
         }
 
         if (message.role === "assistant") {
@@ -545,10 +552,11 @@ const MessagesList = memo(function MessagesList({
  */
 interface MessageActionsWrapperProps {
   primaryId: string;
+  primaryThreadId: string;
   allMessages: ChatMessage[];
   locale: CountryLanguage;
   onAnswerAsModel: ((messageId: string) => void) | null;
-  onDelete: ((messageId: string) => void) | null;
+  rootFolderId: DefaultFolderId;
   logger: EndpointLogger;
   model: ChatMessage["model"];
   promptTokens: number | null;
@@ -568,10 +576,11 @@ interface MessageActionsWrapperProps {
 
 const MessageActionsWrapper = memo(function MessageActionsWrapper({
   primaryId,
+  primaryThreadId,
   allMessages,
   locale,
   onAnswerAsModel,
-  onDelete,
+  rootFolderId,
   logger,
   model,
   promptTokens,
@@ -646,12 +655,13 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   return (
     <AssistantMessageActions
       messageId={primaryId}
+      threadId={primaryThreadId}
+      rootFolderId={rootFolderId}
       content={allContent}
       contentMarkdown={contentMarkdown}
       contentText={contentText}
       locale={locale}
       onAnswerAsModel={onAnswerAsModel}
-      onDelete={onDelete}
       className={null}
       logger={logger}
       promptTokens={promptTokens}
@@ -734,7 +744,6 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   group,
   locale,
   onAnswerAsModel,
-  onDelete,
   showAuthor,
   logger,
   readOnly,
@@ -837,6 +846,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             collapseState={collapseState}
             sendMessage={sendMessage}
             platformOverride={platformOverride}
+            rootFolderId={rootFolderId}
           />
         </Div>
 
@@ -844,10 +854,11 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
         <Div className="h-10 sm:h-8 flex items-center">
           <MessageActionsWrapper
             primaryId={primary.id}
+            primaryThreadId={primary.threadId}
             allMessages={allMessages}
             locale={locale}
             onAnswerAsModel={onAnswerAsModel}
-            onDelete={onDelete}
+            rootFolderId={rootFolderId}
             logger={logger}
             model={primary.model}
             promptTokens={groupTotals.promptTokens}

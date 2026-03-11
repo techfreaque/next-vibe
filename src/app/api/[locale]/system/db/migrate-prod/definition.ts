@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["migrate-prod", "db:migrate-prod"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      skipSeeding: scopedRequestField(scopedTranslation, {
+      skipSeeding: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipSeeding.title",
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      force: scopedRequestField(scopedTranslation, {
+      force: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.force.title",
@@ -61,7 +61,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.dryRun.title",
@@ -71,43 +71,43 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.title",
         schema: z.string(),
       }),
 
-      environment: scopedResponseField(scopedTranslation, {
+      environment: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.environment.title",
         schema: z.string(),
       }),
 
-      databaseUrl: scopedResponseField(scopedTranslation, {
+      databaseUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.databaseUrl.title",
         schema: z.string(),
       }),
 
-      migrationsGenerated: scopedResponseField(scopedTranslation, {
+      migrationsGenerated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.migrationsGenerated.title",
         schema: z.boolean(),
       }),
 
-      migrationsApplied: scopedResponseField(scopedTranslation, {
+      migrationsApplied: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.migrationsApplied.title",
         schema: z.boolean(),
       }),
 
-      seedingCompleted: scopedResponseField(scopedTranslation, {
+      seedingCompleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.seedingCompleted.title",
         schema: z.boolean(),

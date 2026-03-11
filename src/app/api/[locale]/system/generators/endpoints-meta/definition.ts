@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   FieldDataType,
   Methods,
@@ -32,14 +32,14 @@ const { POST } = createEndpoint({
     // use vibe generate instead
   ],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      outputDir: scopedRequestField(scopedTranslation, {
+      outputDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.outputDir.label",
@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
           .default("src/app/api/[locale]/system/generated/endpoints-meta"),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
@@ -60,27 +60,27 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.title",
         schema: z.boolean(),
       }),
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.message.title",
         schema: z.string(),
       }),
-      endpointsFound: scopedResponseField(scopedTranslation, {
+      endpointsFound: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.endpointsFound.title",
         schema: z.coerce.number(),
       }),
-      filesWritten: scopedResponseField(scopedTranslation, {
+      filesWritten: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.filesWritten.title",
         schema: z.coerce.number(),
       }),
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.duration.title",
         schema: z.coerce.number(),

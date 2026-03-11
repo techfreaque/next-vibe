@@ -9,12 +9,12 @@ import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -85,7 +85,7 @@ const { GET } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get.container.title" as const,
     description: "get.container.description" as const,
@@ -93,7 +93,7 @@ const { GET } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMS ===
-      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
+      threadId: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.threadId.label" as const,
@@ -102,7 +102,7 @@ const { GET } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.rootFolderId.label" as const,
@@ -110,14 +110,14 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.enum(DefaultFolderId),
       }),
-      leafMessageId: scopedRequestField(scopedTranslation, {
+      leafMessageId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.leafMessageId.label" as const,
         description: "get.leafMessageId.description" as const,
         schema: z.string().uuid().optional(),
       }),
-      before: scopedRequestField(scopedTranslation, {
+      before: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.before.label" as const,
@@ -126,124 +126,124 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      messages: scopedResponseArrayFieldNew(scopedTranslation, {
+      messages: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "get.response.messages.message.title" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.id.content" as const,
               schema: z.uuid(),
             }),
-            threadId: scopedResponseField(scopedTranslation, {
+            threadId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.threadId.content" as const,
               schema: z.uuid(),
             }),
-            role: scopedResponseField(scopedTranslation, {
+            role: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.role.content" as const,
               schema: z.enum(ChatMessageRole),
             }),
-            content: scopedResponseField(scopedTranslation, {
+            content: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.content.content" as const,
               schema: z.string().nullable(),
             }),
-            parentId: scopedResponseField(scopedTranslation, {
+            parentId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.parentId.content" as const,
               schema: z.uuid().nullable(),
             }),
-            sequenceId: scopedResponseField(scopedTranslation, {
+            sequenceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.sequenceId.content" as const,
               schema: z.string().uuid().nullable(),
             }),
-            authorId: scopedResponseField(scopedTranslation, {
+            authorId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.authorId.content" as const,
               schema: z.string().nullable(),
             }),
-            authorName: scopedResponseField(scopedTranslation, {
+            authorName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.authorName.content" as const,
               schema: z.string().nullable(),
             }),
-            isAI: scopedResponseField(scopedTranslation, {
+            isAI: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.isAI.content" as const,
               schema: z.boolean(),
             }),
-            model: scopedResponseField(scopedTranslation, {
+            model: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.model.content" as const,
               schema: z.nativeEnum(ModelId).nullable(),
             }),
-            character: scopedResponseField(scopedTranslation, {
+            character: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.character.content" as const,
               schema: z.string().nullable(),
             }),
-            errorType: scopedResponseField(scopedTranslation, {
+            errorType: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.errorType.content" as const,
               schema: z.string().nullable(),
             }),
-            errorMessage: scopedResponseField(scopedTranslation, {
+            errorMessage: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.errorMessage.content" as const,
               schema: z.string().nullable(),
             }),
-            errorCode: scopedResponseField(scopedTranslation, {
+            errorCode: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.errorCode.content" as const,
               schema: z.string().nullable(),
             }),
-            metadata: scopedResponseField(scopedTranslation, {
+            metadata: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.metadata.content" as const,
               schema: z.custom<MessageMetadata>().nullable(),
             }),
-            upvotes: scopedResponseField(scopedTranslation, {
+            upvotes: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               content: "get.response.messages.message.upvotes.content" as const,
               schema: z.number(),
             }),
-            downvotes: scopedResponseField(scopedTranslation, {
+            downvotes: responseField(scopedTranslation, {
               type: WidgetType.STAT,
               content:
                 "get.response.messages.message.downvotes.content" as const,
               schema: z.number(),
             }),
-            searchVector: scopedResponseField(scopedTranslation, {
+            searchVector: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.searchVector.content" as const,
               schema: z.string().nullable(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.createdAt.content" as const,
               schema: dateSchema,
             }),
-            updatedAt: scopedResponseField(scopedTranslation, {
+            updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.updatedAt.content" as const,
@@ -252,32 +252,32 @@ const { GET } = createEndpoint({
           },
         }),
       }),
-      hasOlderHistory: scopedResponseField(scopedTranslation, {
+      hasOlderHistory: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         content: "get.response.hasOlderHistory.content" as const,
         schema: z.boolean(),
       }),
-      hasNewerMessages: scopedResponseField(scopedTranslation, {
+      hasNewerMessages: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         content: "get.response.hasNewerMessages.content" as const,
         schema: z.boolean(),
       }),
-      resolvedLeafMessageId: scopedResponseField(scopedTranslation, {
+      resolvedLeafMessageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.resolvedLeafMessageId.content" as const,
         schema: z.string().uuid().nullable(),
       }),
-      oldestLoadedMessageId: scopedResponseField(scopedTranslation, {
+      oldestLoadedMessageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.oldestLoadedMessageId.content" as const,
         schema: z.string().nullable(),
       }),
-      compactionBoundaryId: scopedResponseField(scopedTranslation, {
+      compactionBoundaryId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.compactionBoundaryId.content" as const,
         schema: z.string().uuid().nullable(),
       }),
-      newerChunkAnchorId: scopedResponseField(scopedTranslation, {
+      newerChunkAnchorId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.newerChunkAnchorId.content" as const,
         schema: z.string().uuid().nullable(),

@@ -10,11 +10,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   responseArrayOptionalField,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -54,7 +54,7 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === PAGINATION ===
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.page.label" as const,
@@ -62,7 +62,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().min(1).optional().default(1),
       }),
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get.limit.label" as const,
@@ -72,7 +72,7 @@ const { GET } = createEndpoint({
       }),
 
       // === FILTERS ===
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.rootFolderId.label" as const,
@@ -113,7 +113,7 @@ const { GET } = createEndpoint({
           ),
         includeInCacheKey: true,
       }),
-      subFolderId: scopedRequestField(scopedTranslation, {
+      subFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.subFolderId.label" as const,
@@ -122,7 +122,7 @@ const { GET } = createEndpoint({
         schema: z.string().uuid().nullish(),
         includeInCacheKey: true,
       }),
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.status.label" as const,
@@ -131,7 +131,7 @@ const { GET } = createEndpoint({
         options: ThreadStatusOptions,
         schema: z.enum(ThreadStatusDB).optional(),
       }),
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.search.label" as const,
@@ -139,7 +139,7 @@ const { GET } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
-      isPinned: scopedRequestField(scopedTranslation, {
+      isPinned: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "get.isPinned.label" as const,
@@ -147,7 +147,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      dateFrom: scopedRequestField(scopedTranslation, {
+      dateFrom: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.dateFrom.label" as const,
@@ -155,7 +155,7 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: dateSchema.optional(),
       }),
-      dateTo: scopedRequestField(scopedTranslation, {
+      dateTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.dateTo.label" as const,
@@ -165,105 +165,95 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      threads: scopedResponseArrayFieldNew(scopedTranslation, {
+      threads: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "get.response.threads.thread.title" as const,
           layoutType: LayoutType.GRID,
           columns: 2,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.id.content" as const,
               schema: z.uuid(),
             }),
-            title: scopedResponseField(scopedTranslation, {
+            title: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.threads.thread.threadTitle.content" as const,
               schema: z.string(),
             }),
-            rootFolderId: scopedResponseField(scopedTranslation, {
+            rootFolderId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.threads.thread.rootFolderId.content" as const,
               schema: z.enum(DefaultFolderId),
             }),
-            folderId: scopedResponseField(scopedTranslation, {
+            folderId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.folderId.content" as const,
               schema: z.uuid().nullable(),
             }),
-            status: scopedResponseField(scopedTranslation, {
+            status: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.threads.thread.status.content" as const,
               schema: z.enum(ThreadStatusDB),
             }),
-            preview: scopedResponseField(scopedTranslation, {
+            preview: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.preview.content" as const,
               schema: z.string().nullable(),
             }),
-            pinned: scopedResponseField(scopedTranslation, {
+            pinned: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.pinned.content" as const,
               schema: z.boolean(),
             }),
-            archived: scopedResponseField(scopedTranslation, {
+            archived: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.archived.content" as const,
               schema: z.boolean(),
             }),
             // Permission roles - nullable arrays (null = inherit, [] = deny, [roles...] = allow)
-            rolesView: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            rolesView: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesEdit: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesEdit: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesPost: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesPost: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesModerate: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesModerate: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
-            rolesAdmin: responseArrayOptionalField(
-              {
-                type: WidgetType.CONTAINER,
-              },
-              scopedResponseField(scopedTranslation, {
+            }),
+            rolesAdmin: responseArrayOptionalField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 schema: z.enum(UserRoleDB),
               }),
-            ),
+            }),
             // Permission flags - computed server-side based on user's roles
-            canEdit: scopedResponseField(scopedTranslation, {
+            canEdit: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.canEdit.content" as const,
               schema: z
@@ -272,7 +262,7 @@ const { GET } = createEndpoint({
                   "Whether the current user can edit this thread (title, settings)",
                 ),
             }),
-            canPost: scopedResponseField(scopedTranslation, {
+            canPost: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.canPost.content" as const,
               schema: z
@@ -281,7 +271,7 @@ const { GET } = createEndpoint({
                   "Whether the current user can post messages in this thread",
                 ),
             }),
-            canModerate: scopedResponseField(scopedTranslation, {
+            canModerate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.threads.thread.canModerate.content" as const,
@@ -291,14 +281,14 @@ const { GET } = createEndpoint({
                   "Whether the current user can moderate/hide messages in this thread",
                 ),
             }),
-            canDelete: scopedResponseField(scopedTranslation, {
+            canDelete: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.canDelete.content" as const,
               schema: z
                 .boolean()
                 .describe("Whether the current user can delete this thread"),
             }),
-            canManagePermissions: scopedResponseField(scopedTranslation, {
+            canManagePermissions: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.threads.thread.canManagePermissions.content" as const,
@@ -308,18 +298,18 @@ const { GET } = createEndpoint({
                   "Whether the current user can manage permissions for this thread",
                 ),
             }),
-            isStreaming: scopedResponseField(scopedTranslation, {
+            isStreaming: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.threads.thread.isStreaming.content" as const,
               schema: z.boolean(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.createdAt.content" as const,
               schema: dateSchema,
             }),
-            updatedAt: scopedResponseField(scopedTranslation, {
+            updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.updatedAt.content" as const,
               schema: dateSchema,
@@ -327,22 +317,22 @@ const { GET } = createEndpoint({
           },
         }),
       }),
-      totalCount: scopedResponseField(scopedTranslation, {
+      totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.totalCount.content" as const,
         schema: z.coerce.number(),
       }),
-      pageCount: scopedResponseField(scopedTranslation, {
+      pageCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.pageCount.content" as const,
         schema: z.coerce.number(),
       }),
-      currentPage: scopedResponseField(scopedTranslation, {
+      currentPage: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.page.content" as const,
         schema: z.coerce.number(),
       }),
-      pageSize: scopedResponseField(scopedTranslation, {
+      pageSize: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.limit.content" as const,
         schema: z.coerce.number(),
@@ -432,7 +422,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.threads" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title" as const,
     description: "post.form.description" as const,
@@ -441,7 +431,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      id: scopedRequestField(scopedTranslation, {
+      id: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.id.label" as const,
@@ -449,7 +439,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().uuid().optional(),
       }),
-      title: scopedRequestField(scopedTranslation, {
+      title: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.threadTitle.label" as const,
@@ -457,7 +447,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).max(255).optional().default("New Chat"),
       }),
-      rootFolderId: scopedRequestField(scopedTranslation, {
+      rootFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "post.rootFolderId.label" as const,
@@ -487,7 +477,7 @@ const { POST } = createEndpoint({
             message: "post.errors.forbidden.incognitoNotAllowed",
           }),
       }),
-      subFolderId: scopedRequestField(scopedTranslation, {
+      subFolderId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "post.subFolderId.label" as const,
@@ -495,7 +485,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().uuid().nullish(),
       }),
-      model: scopedRequestField(scopedTranslation, {
+      model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.defaultModel.label" as const,
@@ -503,7 +493,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(ModelId),
       }),
-      character: scopedRequestField(scopedTranslation, {
+      character: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.defaultTone.label" as const,
@@ -511,7 +501,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional().nullable(),
       }),
-      systemPrompt: scopedRequestField(scopedTranslation, {
+      systemPrompt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "post.systemPrompt.label" as const,
@@ -521,22 +511,22 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      threadId: scopedResponseField(scopedTranslation, {
+      threadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.thread.id.content" as const,
         schema: z.uuid(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "post.response.thread.status.content" as const,
         schema: z.enum(ThreadStatusDB),
       }),
-      createdAt: scopedResponseField(scopedTranslation, {
+      createdAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.thread.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: scopedResponseField(scopedTranslation, {
+      updatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.thread.updatedAt.content" as const,
         schema: dateSchema,

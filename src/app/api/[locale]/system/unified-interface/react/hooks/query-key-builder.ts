@@ -29,7 +29,7 @@ type Normalize<T> = { [K in keyof T]: T[K] };
  * inferred RequestData types — same inference as the full RequestOutput but filtered.
  *
  * Uses Normalize<> on both the parent fields and each child so that intersection
- * types (produced by scopedRequestField etc.) are flattened before pattern matching.
+ * types (produced by requestField etc.) are flattened before pattern matching.
  */
 export type CacheKeyRequestData<TEndpoint extends CreateApiEndpointAny> =
   Normalize<TEndpoint["fields"]> extends { children: infer C }

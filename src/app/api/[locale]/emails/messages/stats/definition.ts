@@ -10,12 +10,12 @@ import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -68,14 +68,14 @@ const { GET } = createEndpoint({
     render: EmailStatsContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === REQUEST FIELDS (Filters) ===
 
       // Time-based filtering
-      timePeriod: scopedRequestField(scopedTranslation, {
+      timePeriod: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.timePeriod.label",
@@ -87,7 +87,7 @@ const { GET } = createEndpoint({
           .default(TimePeriod.day),
       }),
 
-      dateRangePreset: scopedRequestField(scopedTranslation, {
+      dateRangePreset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.dateRangePreset.label",
@@ -99,7 +99,7 @@ const { GET } = createEndpoint({
           .default(DateRangePreset.last_30_days),
       }),
 
-      dateFrom: scopedRequestField(scopedTranslation, {
+      dateFrom: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "get.dateFrom.label",
@@ -108,7 +108,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      dateTo: scopedRequestField(scopedTranslation, {
+      dateTo: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
         label: "get.dateTo.label",
@@ -117,7 +117,7 @@ const { GET } = createEndpoint({
         schema: dateSchema.optional(),
       }),
 
-      chartType: scopedRequestField(scopedTranslation, {
+      chartType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.chartType.label",
@@ -129,7 +129,7 @@ const { GET } = createEndpoint({
           .default(ChartType.line),
       }),
 
-      includeComparison: scopedRequestField(scopedTranslation, {
+      includeComparison: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "get.includeComparison.label",
@@ -139,7 +139,7 @@ const { GET } = createEndpoint({
       }),
 
       // Email-specific filters
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.status.label",
@@ -151,7 +151,7 @@ const { GET } = createEndpoint({
           .default(EmailStatusFilter.ANY),
       }),
 
-      type: scopedRequestField(scopedTranslation, {
+      type: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.type.label",
@@ -163,7 +163,7 @@ const { GET } = createEndpoint({
           .default(EmailTypeFilter.ANY),
       }),
 
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.search.label",
@@ -173,7 +173,7 @@ const { GET } = createEndpoint({
       }),
 
       // Sorting
-      sortBy: scopedRequestField(scopedTranslation, {
+      sortBy: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.sortBy.label",
@@ -185,7 +185,7 @@ const { GET } = createEndpoint({
           .default(EmailSortField.CREATED_AT),
       }),
 
-      sortOrder: scopedRequestField(scopedTranslation, {
+      sortOrder: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.sortOrder.label",
@@ -200,177 +200,177 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
 
       // Current period email metrics
-      totalEmails: scopedResponseField(scopedTranslation, {
+      totalEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.totalEmails",
         schema: z.coerce.number(),
       }),
-      sentEmails: scopedResponseField(scopedTranslation, {
+      sentEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.sentEmails",
         schema: z.coerce.number(),
       }),
-      deliveredEmails: scopedResponseField(scopedTranslation, {
+      deliveredEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.deliveredEmails",
         schema: z.coerce.number(),
       }),
-      openedEmails: scopedResponseField(scopedTranslation, {
+      openedEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.openedEmails",
         schema: z.coerce.number(),
       }),
-      clickedEmails: scopedResponseField(scopedTranslation, {
+      clickedEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.clickedEmails",
         schema: z.coerce.number(),
       }),
-      bouncedEmails: scopedResponseField(scopedTranslation, {
+      bouncedEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.bouncedEmails",
         schema: z.coerce.number(),
       }),
-      failedEmails: scopedResponseField(scopedTranslation, {
+      failedEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.failedEmails",
         schema: z.coerce.number(),
       }),
-      draftEmails: scopedResponseField(scopedTranslation, {
+      draftEmails: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.draftEmails",
         schema: z.coerce.number(),
       }),
 
       // Engagement rates
-      deliveryRate: scopedResponseField(scopedTranslation, {
+      deliveryRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.deliveryRate",
         schema: z.coerce.number(),
       }),
-      openRate: scopedResponseField(scopedTranslation, {
+      openRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.openRate",
         schema: z.coerce.number(),
       }),
-      clickRate: scopedResponseField(scopedTranslation, {
+      clickRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.clickRate",
         schema: z.coerce.number(),
       }),
-      bounceRate: scopedResponseField(scopedTranslation, {
+      bounceRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.bounceRate",
         schema: z.coerce.number(),
       }),
-      failureRate: scopedResponseField(scopedTranslation, {
+      failureRate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.failureRate",
         schema: z.coerce.number(),
       }),
 
       // Provider/template/status/type metrics
-      emailsByProvider: scopedResponseField(scopedTranslation, {
+      emailsByProvider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsByProvider",
         schema: z.record(z.string(), z.coerce.number()),
       }),
-      emailsByTemplate: scopedResponseField(scopedTranslation, {
+      emailsByTemplate: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsByTemplate",
         schema: z.record(z.string(), z.coerce.number()),
       }),
-      emailsByStatus: scopedResponseField(scopedTranslation, {
+      emailsByStatus: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsByStatus",
         schema: z.record(z.string(), z.coerce.number()),
       }),
-      emailsByType: scopedResponseField(scopedTranslation, {
+      emailsByType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsByType",
         schema: z.record(z.enum(EmailType), z.coerce.number()),
       }),
 
       // User association metrics
-      emailsWithUserId: scopedResponseField(scopedTranslation, {
+      emailsWithUserId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsWithUserId",
         schema: z.coerce.number(),
       }),
-      emailsWithoutUserId: scopedResponseField(scopedTranslation, {
+      emailsWithoutUserId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsWithoutUserId",
         schema: z.coerce.number(),
       }),
-      emailsWithLeadId: scopedResponseField(scopedTranslation, {
+      emailsWithLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsWithLeadId",
         schema: z.coerce.number(),
       }),
-      emailsWithoutLeadId: scopedResponseField(scopedTranslation, {
+      emailsWithoutLeadId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsWithoutLeadId",
         schema: z.coerce.number(),
       }),
 
       // Error metrics
-      emailsWithErrors: scopedResponseField(scopedTranslation, {
+      emailsWithErrors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsWithErrors",
         schema: z.coerce.number(),
       }),
-      emailsWithoutErrors: scopedResponseField(scopedTranslation, {
+      emailsWithoutErrors: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsWithoutErrors",
         schema: z.coerce.number(),
       }),
-      averageRetryCount: scopedResponseField(scopedTranslation, {
+      averageRetryCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.averageRetryCount",
         schema: z.coerce.number(),
       }),
-      maxRetryCount: scopedResponseField(scopedTranslation, {
+      maxRetryCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.maxRetryCount",
         schema: z.coerce.number(),
       }),
 
       // Performance metrics
-      averageProcessingTime: scopedResponseField(scopedTranslation, {
+      averageProcessingTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.averageProcessingTime",
         schema: z.coerce.number(),
       }),
-      averageDeliveryTime: scopedResponseField(scopedTranslation, {
+      averageDeliveryTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.averageDeliveryTime",
         schema: z.coerce.number(),
       }),
 
       // Historical data - complex nested structure
-      historicalData: scopedResponseField(scopedTranslation, {
+      historicalData: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.historicalData",
         schema: chartDataSchema,
       }),
 
       // Grouped stats - complex nested structure
-      groupedStats: scopedObjectFieldNew(scopedTranslation, {
+      groupedStats: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.groupedStats",
         usage: { response: true },
         children: {
-          byStatus: scopedResponseArrayFieldNew(scopedTranslation, {
+          byStatus: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               usage: { response: true },
               children: {
-                status: scopedResponseField(scopedTranslation, {
+                status: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.status",
                   schema: z.enum(EmailStatus),
                 }),
-                count: scopedResponseField(scopedTranslation, {
+                count: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.count",
                   schema: z.number(),
@@ -378,18 +378,18 @@ const { GET } = createEndpoint({
               },
             }),
           }),
-          byType: scopedResponseArrayFieldNew(scopedTranslation, {
+          byType: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               usage: { response: true },
               children: {
-                type: scopedResponseField(scopedTranslation, {
+                type: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.type",
                   schema: z.string(),
                 }),
-                count: scopedResponseField(scopedTranslation, {
+                count: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.count",
                   schema: z.number(),
@@ -397,18 +397,18 @@ const { GET } = createEndpoint({
               },
             }),
           }),
-          byProvider: scopedResponseArrayFieldNew(scopedTranslation, {
+          byProvider: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               usage: { response: true },
               children: {
-                provider: scopedResponseField(scopedTranslation, {
+                provider: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.provider",
                   schema: z.string(),
                 }),
-                count: scopedResponseField(scopedTranslation, {
+                count: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.count",
                   schema: z.number(),
@@ -416,18 +416,18 @@ const { GET } = createEndpoint({
               },
             }),
           }),
-          byTemplate: scopedResponseArrayFieldNew(scopedTranslation, {
+          byTemplate: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               usage: { response: true },
               children: {
-                template: scopedResponseField(scopedTranslation, {
+                template: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.template",
                   schema: z.string(),
                 }),
-                count: scopedResponseField(scopedTranslation, {
+                count: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.count",
                   schema: z.number(),
@@ -435,18 +435,18 @@ const { GET } = createEndpoint({
               },
             }),
           }),
-          byEngagement: scopedResponseArrayFieldNew(scopedTranslation, {
+          byEngagement: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               usage: { response: true },
               children: {
-                engagement: scopedResponseField(scopedTranslation, {
+                engagement: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.engagement",
                   schema: z.string(),
                 }),
-                count: scopedResponseField(scopedTranslation, {
+                count: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.count",
                   schema: z.number(),
@@ -454,18 +454,18 @@ const { GET } = createEndpoint({
               },
             }),
           }),
-          byRetryCount: scopedResponseArrayFieldNew(scopedTranslation, {
+          byRetryCount: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               usage: { response: true },
               children: {
-                retryCount: scopedResponseField(scopedTranslation, {
+                retryCount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.retryCount",
                   schema: z.number(),
                 }),
-                count: scopedResponseField(scopedTranslation, {
+                count: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.count",
                   schema: z.number(),
@@ -473,18 +473,18 @@ const { GET } = createEndpoint({
               },
             }),
           }),
-          byUserAssociation: scopedResponseArrayFieldNew(scopedTranslation, {
+          byUserAssociation: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               usage: { response: true },
               children: {
-                association: scopedResponseField(scopedTranslation, {
+                association: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.association",
                   schema: z.string(),
                 }),
-                count: scopedResponseField(scopedTranslation, {
+                count: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.count",
                   schema: z.number(),
@@ -496,23 +496,23 @@ const { GET } = createEndpoint({
       }),
 
       // Metadata
-      generatedAt: scopedResponseField(scopedTranslation, {
+      generatedAt: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.generatedAt",
         schema: z.string(),
       }),
 
-      dataRange: scopedObjectFieldNew(scopedTranslation, {
+      dataRange: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.dataRange",
         usage: { response: true },
         children: {
-          from: scopedResponseField(scopedTranslation, {
+          from: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.dataRange.from",
             schema: z.string(),
           }),
-          to: scopedResponseField(scopedTranslation, {
+          to: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.dataRange.to",
             schema: z.string(),
@@ -521,28 +521,28 @@ const { GET } = createEndpoint({
       }),
 
       // Recent activity
-      recentActivity: scopedResponseArrayFieldNew(scopedTranslation, {
+      recentActivity: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.recentActivity.id",
               schema: z.string(),
             }),
-            action: scopedResponseField(scopedTranslation, {
+            action: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.recentActivity.action",
               schema: z.string(),
             }),
-            timestamp: scopedResponseField(scopedTranslation, {
+            timestamp: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.recentActivity.timestamp",
               schema: z.string(),
             }),
-            details: scopedResponseField(scopedTranslation, {
+            details: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.recentActivity.details",
               schema: z.string().optional(),
@@ -552,48 +552,48 @@ const { GET } = createEndpoint({
       }),
 
       // Top performers
-      topPerformingTemplates: scopedResponseArrayFieldNew(scopedTranslation, {
+      topPerformingTemplates: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            template: scopedResponseField(scopedTranslation, {
+            template: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.template",
               schema: z.string(),
             }),
-            sent: scopedResponseField(scopedTranslation, {
+            sent: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.sent",
               schema: z.number(),
             }),
-            delivered: scopedResponseField(scopedTranslation, {
+            delivered: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.delivered",
               schema: z.number(),
             }),
-            opened: scopedResponseField(scopedTranslation, {
+            opened: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.opened",
               schema: z.number(),
             }),
-            clicked: scopedResponseField(scopedTranslation, {
+            clicked: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.clicked",
               schema: z.number(),
             }),
-            deliveryRate: scopedResponseField(scopedTranslation, {
+            deliveryRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.deliveryRate",
               schema: z.number(),
             }),
-            openRate: scopedResponseField(scopedTranslation, {
+            openRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.openRate",
               schema: z.number(),
             }),
-            clickRate: scopedResponseField(scopedTranslation, {
+            clickRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingTemplates.clickRate",
               schema: z.number(),
@@ -602,48 +602,48 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      topPerformingProviders: scopedResponseArrayFieldNew(scopedTranslation, {
+      topPerformingProviders: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            provider: scopedResponseField(scopedTranslation, {
+            provider: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.provider",
               schema: z.string(),
             }),
-            sent: scopedResponseField(scopedTranslation, {
+            sent: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.sent",
               schema: z.number(),
             }),
-            delivered: scopedResponseField(scopedTranslation, {
+            delivered: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.delivered",
               schema: z.number(),
             }),
-            opened: scopedResponseField(scopedTranslation, {
+            opened: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.opened",
               schema: z.number(),
             }),
-            clicked: scopedResponseField(scopedTranslation, {
+            clicked: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.clicked",
               schema: z.number(),
             }),
-            deliveryRate: scopedResponseField(scopedTranslation, {
+            deliveryRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.deliveryRate",
               schema: z.number(),
             }),
-            openRate: scopedResponseField(scopedTranslation, {
+            openRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.openRate",
               schema: z.number(),
             }),
-            clickRate: scopedResponseField(scopedTranslation, {
+            clickRate: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.topPerformingProviders.clickRate",
               schema: z.number(),

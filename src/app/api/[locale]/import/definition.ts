@@ -8,11 +8,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -52,7 +52,7 @@ const { POST: ImportCsvPost } = createEndpoint({
   category: "app.endpointCategories.dataImport",
   tags: ["tags.csv", "tags.upload", "tags.batch"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "csv.post.form.title",
     description: "csv.post.form.description",
@@ -60,14 +60,14 @@ const { POST: ImportCsvPost } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === FILE UPLOAD SECTION ===
-      fileUploadSection: scopedObjectFieldNew(scopedTranslation, {
+      fileUploadSection: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "csv.post.fileSection.title",
         description: "csv.post.fileSection.description",
         layoutType: LayoutType.STACKED,
         usage: { request: "data" },
         children: {
-          file: scopedRequestField(scopedTranslation, {
+          file: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
             label: "csv.post.file.label",
@@ -76,7 +76,7 @@ const { POST: ImportCsvPost } = createEndpoint({
             schema: z.string().min(1),
           }),
 
-          fileName: scopedRequestField(scopedTranslation, {
+          fileName: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "csv.post.fileName.label",
@@ -85,7 +85,7 @@ const { POST: ImportCsvPost } = createEndpoint({
             schema: z.string().min(1),
           }),
 
-          domain: scopedRequestField(scopedTranslation, {
+          domain: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "csv.post.domain.label",
@@ -98,7 +98,7 @@ const { POST: ImportCsvPost } = createEndpoint({
       }),
 
       // === PROCESSING OPTIONS SECTION ===
-      processingSection: scopedObjectFieldNew(scopedTranslation, {
+      processingSection: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "csv.post.processingSection.title",
         description: "csv.post.processingSection.description",
@@ -106,7 +106,7 @@ const { POST: ImportCsvPost } = createEndpoint({
         columns: 2,
         usage: { request: "data" },
         children: {
-          skipDuplicates: scopedRequestField(scopedTranslation, {
+          skipDuplicates: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "csv.post.skipDuplicates.label",
@@ -114,7 +114,7 @@ const { POST: ImportCsvPost } = createEndpoint({
             schema: z.boolean().default(true),
           }),
 
-          updateExisting: scopedRequestField(scopedTranslation, {
+          updateExisting: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "csv.post.updateExisting.label",
@@ -122,7 +122,7 @@ const { POST: ImportCsvPost } = createEndpoint({
             schema: z.boolean().default(false),
           }),
 
-          useChunkedProcessing: scopedRequestField(scopedTranslation, {
+          useChunkedProcessing: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "csv.post.useChunkedProcessing.label",
@@ -130,7 +130,7 @@ const { POST: ImportCsvPost } = createEndpoint({
             schema: z.boolean().default(false),
           }),
 
-          batchSize: scopedRequestField(scopedTranslation, {
+          batchSize: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "csv.post.batchSize.label",
@@ -142,7 +142,7 @@ const { POST: ImportCsvPost } = createEndpoint({
       }),
 
       // === DEFAULT VALUES SECTION ===
-      defaultsSection: scopedObjectFieldNew(scopedTranslation, {
+      defaultsSection: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "csv.post.defaultsSection.title",
         description: "csv.post.defaultsSection.description",
@@ -150,7 +150,7 @@ const { POST: ImportCsvPost } = createEndpoint({
         columns: 2,
         usage: { request: "data" },
         children: {
-          defaultCountry: scopedRequestField(scopedTranslation, {
+          defaultCountry: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "csv.post.defaultCountry.label",
@@ -160,7 +160,7 @@ const { POST: ImportCsvPost } = createEndpoint({
             schema: z.enum(Countries).default(Countries.GLOBAL),
           }),
 
-          defaultLanguage: scopedRequestField(scopedTranslation, {
+          defaultLanguage: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "csv.post.defaultLanguage.label",
@@ -173,7 +173,7 @@ const { POST: ImportCsvPost } = createEndpoint({
       }),
 
       // === RESPONSE DATA ===
-      importResult: scopedObjectFieldNew(scopedTranslation, {
+      importResult: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "csv.post.response.title",
         description: "csv.post.response.description",
@@ -181,29 +181,29 @@ const { POST: ImportCsvPost } = createEndpoint({
         usage: { response: true },
         children: {
           // === BASIC RESULTS ===
-          basicResults: scopedObjectFieldNew(scopedTranslation, {
+          basicResults: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "csv.post.response.basicResults.title",
             description: "csv.post.response.basicResults.description",
             layoutType: LayoutType.STACKED,
             usage: { response: true },
             children: {
-              batchId: scopedResponseField(scopedTranslation, {
+              batchId: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.batchId.label",
                 schema: z.uuid(),
               }),
-              totalRows: scopedResponseField(scopedTranslation, {
+              totalRows: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.totalRows.label",
                 schema: z.coerce.number(),
               }),
-              isChunkedProcessing: scopedResponseField(scopedTranslation, {
+              isChunkedProcessing: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.isChunkedProcessing.label",
                 schema: z.boolean(),
               }),
-              jobId: scopedResponseField(scopedTranslation, {
+              jobId: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.jobId.label",
                 schema: z.uuid().optional(),
@@ -212,7 +212,7 @@ const { POST: ImportCsvPost } = createEndpoint({
           }),
 
           // === STATISTICS ===
-          statistics: scopedObjectFieldNew(scopedTranslation, {
+          statistics: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "csv.post.response.statistics.title",
             description: "csv.post.response.statistics.description",
@@ -220,22 +220,22 @@ const { POST: ImportCsvPost } = createEndpoint({
             columns: 2,
             usage: { response: true },
             children: {
-              successfulImports: scopedResponseField(scopedTranslation, {
+              successfulImports: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.successfulImports.label",
                 schema: z.coerce.number(),
               }),
-              failedImports: scopedResponseField(scopedTranslation, {
+              failedImports: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.failedImports.label",
                 schema: z.coerce.number(),
               }),
-              duplicateEmails: scopedResponseField(scopedTranslation, {
+              duplicateEmails: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.duplicateEmails.label",
                 schema: z.coerce.number(),
               }),
-              processingTimeMs: scopedResponseField(scopedTranslation, {
+              processingTimeMs: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.processingTimeMs.label",
                 schema: z.coerce.number().optional(),
@@ -244,7 +244,7 @@ const { POST: ImportCsvPost } = createEndpoint({
           }),
 
           // === DETAILED SUMMARY ===
-          summary: scopedObjectFieldNew(scopedTranslation, {
+          summary: objectField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "csv.post.response.summary.title",
             description: "csv.post.response.summary.description",
@@ -252,17 +252,17 @@ const { POST: ImportCsvPost } = createEndpoint({
             columns: 3,
             usage: { response: true },
             children: {
-              newRecords: scopedResponseField(scopedTranslation, {
+              newRecords: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.newRecords.label",
                 schema: z.coerce.number(),
               }),
-              updatedRecords: scopedResponseField(scopedTranslation, {
+              updatedRecords: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.updatedRecords.label",
                 schema: z.coerce.number(),
               }),
-              skippedDuplicates: scopedResponseField(scopedTranslation, {
+              skippedDuplicates: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "csv.post.response.skippedDuplicates.label",
                 schema: z.coerce.number(),
@@ -271,25 +271,25 @@ const { POST: ImportCsvPost } = createEndpoint({
           }),
 
           // === ERROR DETAILS ===
-          errors: scopedResponseArrayFieldNew(scopedTranslation, {
+          errors: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "csv.post.response.errors.title",
               layoutType: LayoutType.STACKED,
               usage: { response: true },
               children: {
-                row: scopedResponseField(scopedTranslation, {
+                row: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "csv.post.response.errors.row.label",
                   schema: z.coerce.number(),
                 }),
-                email: scopedResponseField(scopedTranslation, {
+                email: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "csv.post.response.errors.email.label",
                   schema: z.string().optional(),
                 }),
-                error: scopedResponseField(scopedTranslation, {
+                error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "csv.post.response.errors.error.label",
                   schema: z.string(),
@@ -299,10 +299,10 @@ const { POST: ImportCsvPost } = createEndpoint({
           }),
 
           // === NEXT STEPS ===
-          nextSteps: scopedResponseArrayFieldNew(scopedTranslation, {
+          nextSteps: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "csv.post.response.nextSteps.title",
-            child: scopedResponseField(scopedTranslation, {
+            child: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "csv.post.response.nextSteps.item.label",
               schema: z.string(),
@@ -431,7 +431,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
   category: "app.endpointCategories.dataImport",
   tags: ["tags.jobs", "tags.status", "tags.history"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "jobs.get.form.title",
     description: "jobs.get.form.description",
@@ -440,7 +440,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === FILTER OPTIONS ===
-      status: scopedRequestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "jobs.get.status.label",
@@ -450,7 +450,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
         schema: z.enum(CsvImportJobStatus).optional(),
       }),
 
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "jobs.get.limit.label",
@@ -459,7 +459,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
         schema: z.coerce.number().min(1).max(100).default(20),
       }),
 
-      offset: scopedRequestField(scopedTranslation, {
+      offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "jobs.get.offset.label",
@@ -469,66 +469,66 @@ const { GET: ListImportJobsGet } = createEndpoint({
       }),
 
       // === RESPONSE DATA ===
-      jobs: scopedResponseArrayFieldNew(scopedTranslation, {
+      jobs: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "jobs.get.response.jobs.title",
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "jobs.get.response.job.title",
           layoutType: LayoutType.STACKED,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "jobs.get.response.job.id.label",
               schema: z.uuid(),
             }),
-            fileName: scopedResponseField(scopedTranslation, {
+            fileName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "jobs.get.response.job.fileName.label",
               schema: z.string(),
             }),
-            domain: scopedResponseField(scopedTranslation, {
+            domain: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "jobs.get.response.job.domain.label",
               schema: z.string(),
             }),
-            status: scopedResponseField(scopedTranslation, {
+            status: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "jobs.get.response.job.status.label",
               schema: z.enum(CsvImportJobStatus),
             }),
 
             // === PROGRESS INFORMATION ===
-            progress: scopedObjectFieldNew(scopedTranslation, {
+            progress: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "jobs.get.response.job.progress.title",
               layoutType: LayoutType.GRID,
               columns: 2,
               usage: { response: true },
               children: {
-                totalRows: scopedResponseField(scopedTranslation, {
+                totalRows: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.progress.totalRows.label",
                   schema: z.coerce.number(),
                 }),
-                processedRows: scopedResponseField(scopedTranslation, {
+                processedRows: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.progress.processedRows.label",
                   schema: z.coerce.number(),
                 }),
-                currentBatchStart: scopedResponseField(scopedTranslation, {
+                currentBatchStart: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
                     "jobs.get.response.job.progress.currentBatchStart.label",
                   schema: z.coerce.number(),
                 }),
-                batchSize: scopedResponseField(scopedTranslation, {
+                batchSize: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.progress.batchSize.label",
                   schema: z.coerce.number(),
                 }),
-                percentComplete: scopedResponseField(scopedTranslation, {
+                percentComplete: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
                     "jobs.get.response.job.progress.percentComplete.label",
@@ -538,25 +538,25 @@ const { GET: ListImportJobsGet } = createEndpoint({
             }),
 
             // === RESULTS ===
-            results: scopedObjectFieldNew(scopedTranslation, {
+            results: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "jobs.get.response.job.results.title",
               layoutType: LayoutType.GRID,
               columns: 3,
               usage: { response: true },
               children: {
-                successfulImports: scopedResponseField(scopedTranslation, {
+                successfulImports: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
                     "jobs.get.response.job.results.successfulImports.label",
                   schema: z.coerce.number(),
                 }),
-                failedImports: scopedResponseField(scopedTranslation, {
+                failedImports: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.results.failedImports.label",
                   schema: z.coerce.number(),
                 }),
-                duplicateEmails: scopedResponseField(scopedTranslation, {
+                duplicateEmails: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
                     "jobs.get.response.job.results.duplicateEmails.label",
@@ -566,29 +566,29 @@ const { GET: ListImportJobsGet } = createEndpoint({
             }),
 
             // === TIMING INFORMATION ===
-            timing: scopedObjectFieldNew(scopedTranslation, {
+            timing: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "jobs.get.response.job.timing.title",
               layoutType: LayoutType.GRID,
               columns: 2,
               usage: { response: true },
               children: {
-                createdAt: scopedResponseField(scopedTranslation, {
+                createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.timing.createdAt.label",
                   schema: z.string(),
                 }),
-                updatedAt: scopedResponseField(scopedTranslation, {
+                updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.timing.updatedAt.label",
                   schema: z.string(),
                 }),
-                startedAt: scopedResponseField(scopedTranslation, {
+                startedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.timing.startedAt.label",
                   schema: z.string().nullable(),
                 }),
-                completedAt: scopedResponseField(scopedTranslation, {
+                completedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.timing.completedAt.label",
                   schema: z.string().nullable(),
@@ -597,23 +597,23 @@ const { GET: ListImportJobsGet } = createEndpoint({
             }),
 
             // === ERROR HANDLING ===
-            errorInfo: scopedObjectFieldNew(scopedTranslation, {
+            errorInfo: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "jobs.get.response.job.errorInfo.title",
               layoutType: LayoutType.STACKED,
               usage: { response: true },
               children: {
-                error: scopedResponseField(scopedTranslation, {
+                error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.errorInfo.error.label",
                   schema: z.string().nullable(),
                 }),
-                retryCount: scopedResponseField(scopedTranslation, {
+                retryCount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.errorInfo.retryCount.label",
                   schema: z.coerce.number(),
                 }),
-                maxRetries: scopedResponseField(scopedTranslation, {
+                maxRetries: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "jobs.get.response.job.errorInfo.maxRetries.label",
                   schema: z.coerce.number(),

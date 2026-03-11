@@ -80,4 +80,12 @@ export const translations: typeof enTranslations = {
       description: "Operacja zakończona pomyślnie",
     },
   },
+  widget: {
+    title: "Uruchom kampanie e-mailowe",
+    description:
+      "Ręcznie uruchom przetwarzanie kampanii e-mailowych. Przetwarza oczekujące e-maile na podstawie etapu i harmonogramu leadów.",
+    runButton: "Uruchom teraz",
+    running: "Uruchamianie...",
+    done: "Gotowe",
+  },
 };

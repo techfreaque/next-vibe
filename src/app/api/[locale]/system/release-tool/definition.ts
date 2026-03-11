@@ -17,11 +17,11 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedObjectOptionalField,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  objectOptionalField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -32,8 +32,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
-  scopedRequestDataArrayOptionalField,
-  scopedResponseArrayOptionalField,
+  requestDataArrayOptionalField,
+  responseArrayOptionalField,
 } from "../unified-interface/shared/field/utils";
 import { scopedTranslation } from "./i18n";
 import { ReleaseResultWidget } from "./widget";
@@ -129,7 +129,7 @@ const { POST } = createEndpoint({
       // REQUEST FIELDS - Runtime options at root level for CLI access
       // ========================================================================
 
-      configPath: scopedRequestField(scopedTranslation, {
+      configPath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.configPath.title",
@@ -140,7 +140,7 @@ const { POST } = createEndpoint({
       // ========================================================================
       // Runtime options (CLI flags) - at root level for direct CLI access
       // ========================================================================
-      ci: scopedRequestField(scopedTranslation, {
+      ci: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.ci.title",
@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.dryRun.title",
@@ -156,7 +156,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      verbose: scopedRequestField(scopedTranslation, {
+      verbose: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.verbose.title",
@@ -164,7 +164,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      forceUpdate: scopedRequestField(scopedTranslation, {
+      forceUpdate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.forceUpdate.title",
@@ -173,7 +173,7 @@ const { POST } = createEndpoint({
       }),
 
       // Skip options
-      skipLint: scopedRequestField(scopedTranslation, {
+      skipLint: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipLint.title",
@@ -181,7 +181,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipTypecheck: scopedRequestField(scopedTranslation, {
+      skipTypecheck: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipTypecheck.title",
@@ -189,7 +189,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipBuild: scopedRequestField(scopedTranslation, {
+      skipBuild: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipBuild.title",
@@ -197,7 +197,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipTests: scopedRequestField(scopedTranslation, {
+      skipTests: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipTests.title",
@@ -205,7 +205,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipSnyk: scopedRequestField(scopedTranslation, {
+      skipSnyk: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipSnyk.title",
@@ -213,7 +213,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipChangelog: scopedRequestField(scopedTranslation, {
+      skipChangelog: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipChangelog.title",
@@ -221,7 +221,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipGitTag: scopedRequestField(scopedTranslation, {
+      skipGitTag: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipGitTag.title",
@@ -229,7 +229,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipGitPush: scopedRequestField(scopedTranslation, {
+      skipGitPush: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipGitPush.title",
@@ -237,7 +237,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipInstall: scopedRequestField(scopedTranslation, {
+      skipInstall: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipInstall.title",
@@ -245,7 +245,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      skipClean: scopedRequestField(scopedTranslation, {
+      skipClean: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.skipClean.title",
@@ -254,7 +254,7 @@ const { POST } = createEndpoint({
       }),
 
       // Version options
-      versionIncrement: scopedRequestField(scopedTranslation, {
+      versionIncrement: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.versionIncrement.title",
@@ -293,7 +293,7 @@ const { POST } = createEndpoint({
         schema: VersionIncrementSchema.optional(),
       }),
 
-      prereleaseId: scopedRequestField(scopedTranslation, {
+      prereleaseId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.prereleaseId.title",
@@ -302,7 +302,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      targetPackage: scopedRequestField(scopedTranslation, {
+      targetPackage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.targetPackage.title",
@@ -311,7 +311,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      commitMessage: scopedRequestField(scopedTranslation, {
+      commitMessage: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.commitMessage.title",
@@ -323,7 +323,7 @@ const { POST } = createEndpoint({
       // ========================================================================
       // CONFIG OBJECT - Contains release configuration (not runtime flags)
       // ========================================================================
-      configObject: scopedObjectOptionalField(scopedTranslation, {
+      configObject: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "fields.configObject.title",
         description: "fields.configObject.description",
@@ -332,7 +332,7 @@ const { POST } = createEndpoint({
         optional: true,
         usage: { request: "data" },
         children: {
-          packageManager: scopedRequestField(scopedTranslation, {
+          packageManager: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "fields.packageManager.title",
@@ -362,7 +362,7 @@ const { POST } = createEndpoint({
             schema: PackageManagerSchema.optional().default("bun"),
           }),
 
-          globalVersion: scopedRequestField(scopedTranslation, {
+          globalVersion: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
             label: "fields.globalVersion.title",
@@ -371,7 +371,7 @@ const { POST } = createEndpoint({
             schema: z.string().optional(),
           }),
 
-          parallel: scopedRequestField(scopedTranslation, {
+          parallel: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "fields.parallel.title",
@@ -380,7 +380,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          maxParallelJobs: scopedRequestField(scopedTranslation, {
+          maxParallelJobs: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "fields.maxParallelJobs.title",
@@ -389,7 +389,7 @@ const { POST } = createEndpoint({
             schema: z.coerce.number().optional(),
           }),
 
-          continueOnError: scopedRequestField(scopedTranslation, {
+          continueOnError: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "fields.continueOnError.title",
@@ -398,7 +398,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          verifyGitStatus: scopedRequestField(scopedTranslation, {
+          verifyGitStatus: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "fields.verifyGitStatus.title",
@@ -407,7 +407,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          requireCleanWorkingDir: scopedRequestField(scopedTranslation, {
+          requireCleanWorkingDir: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "fields.requireCleanWorkingDir.title",
@@ -416,7 +416,7 @@ const { POST } = createEndpoint({
             schema: z.boolean().optional(),
           }),
 
-          verifyLockfile: scopedRequestField(scopedTranslation, {
+          verifyLockfile: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
             label: "fields.verifyLockfile.title",
@@ -426,7 +426,7 @@ const { POST } = createEndpoint({
           }),
 
           // Branch configuration
-          branch: scopedObjectOptionalField(scopedTranslation, {
+          branch: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "fields.branch.title",
             description: "fields.branch.description",
@@ -435,26 +435,26 @@ const { POST } = createEndpoint({
             optional: true,
             usage: { request: "data" },
             children: {
-              main: scopedRequestField(scopedTranslation, {
+              main: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "fields.branchMain.title",
                 schema: z.string().optional().default("main"),
               }),
-              develop: scopedRequestField(scopedTranslation, {
+              develop: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "fields.branchDevelop.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              allowNonMain: scopedRequestField(scopedTranslation, {
+              allowNonMain: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.allowNonMain.title",
                 schema: z.boolean().optional().default(false),
               }),
-              protected: scopedRequestField(scopedTranslation, {
+              protected: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "fields.protectedBranches.title",
@@ -465,7 +465,7 @@ const { POST } = createEndpoint({
           }),
 
           // Notifications configuration
-          notifications: scopedObjectOptionalField(scopedTranslation, {
+          notifications: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "fields.notifications.title",
             description: "fields.notifications.description",
@@ -474,20 +474,20 @@ const { POST } = createEndpoint({
             optional: true,
             usage: { request: "data" },
             children: {
-              enabled: scopedRequestField(scopedTranslation, {
+              enabled: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.notificationsEnabled.title",
                 schema: z.boolean().optional().default(false),
               }),
-              webhookUrl: scopedRequestField(scopedTranslation, {
+              webhookUrl: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "fields.webhookUrl.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              type: scopedRequestField(scopedTranslation, {
+              type: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
                 label: "fields.webhookType.title",
@@ -512,26 +512,26 @@ const { POST } = createEndpoint({
                 optional: true,
                 schema: WebhookTypeSchema.optional(),
               }),
-              onSuccess: scopedRequestField(scopedTranslation, {
+              onSuccess: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.onSuccess.title",
                 schema: z.boolean().optional().default(true),
               }),
-              onFailure: scopedRequestField(scopedTranslation, {
+              onFailure: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.onFailure.title",
                 schema: z.boolean().optional().default(true),
               }),
-              messageTemplate: scopedRequestField(scopedTranslation, {
+              messageTemplate: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "fields.messageTemplate.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              includeTimings: scopedRequestField(scopedTranslation, {
+              includeTimings: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.includeTimings.title",
@@ -542,7 +542,7 @@ const { POST } = createEndpoint({
           }),
 
           // Retry configuration
-          retry: scopedObjectOptionalField(scopedTranslation, {
+          retry: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "fields.retry.title",
             description: "fields.retry.description",
@@ -551,25 +551,25 @@ const { POST } = createEndpoint({
             optional: true,
             usage: { request: "data" },
             children: {
-              maxAttempts: scopedRequestField(scopedTranslation, {
+              maxAttempts: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
                 label: "fields.maxAttempts.title",
                 schema: z.coerce.number().optional().default(3),
               }),
-              delayMs: scopedRequestField(scopedTranslation, {
+              delayMs: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
                 label: "fields.delayMs.title",
                 schema: z.coerce.number().optional().default(1000),
               }),
-              backoffMultiplier: scopedRequestField(scopedTranslation, {
+              backoffMultiplier: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
                 label: "fields.backoffMultiplier.title",
                 schema: z.coerce.number().optional().default(2),
               }),
-              maxDelayMs: scopedRequestField(scopedTranslation, {
+              maxDelayMs: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
                 label: "fields.maxDelayMs.title",
@@ -579,7 +579,7 @@ const { POST } = createEndpoint({
           }),
 
           // Rollback configuration
-          rollback: scopedObjectOptionalField(scopedTranslation, {
+          rollback: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "fields.rollback.title",
             description: "fields.rollback.description",
@@ -588,19 +588,19 @@ const { POST } = createEndpoint({
             optional: true,
             usage: { request: "data" },
             children: {
-              enabled: scopedRequestField(scopedTranslation, {
+              enabled: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.rollbackEnabled.title",
                 schema: z.boolean().optional().default(false),
               }),
-              git: scopedRequestField(scopedTranslation, {
+              git: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.rollbackGit.title",
                 schema: z.boolean().optional().default(true),
               }),
-              version: scopedRequestField(scopedTranslation, {
+              version: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
                 label: "fields.rollbackVersion.title",
@@ -610,7 +610,7 @@ const { POST } = createEndpoint({
           }),
 
           // Packages array
-          packages: scopedRequestDataArrayOptionalField(
+          packages: requestDataArrayOptionalField(
             scopedTranslation,
             {
               type: WidgetType.CONTAINER,
@@ -619,27 +619,27 @@ const { POST } = createEndpoint({
               layoutType: LayoutType.GRID,
               optional: true,
             },
-            scopedObjectFieldNew(scopedTranslation, {
+            objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "fields.package.title",
               layoutType: LayoutType.GRID,
               columns: 12,
               usage: { request: "data" },
               children: {
-                directory: scopedRequestField(scopedTranslation, {
+                directory: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.directory.title",
                   schema: z.string(),
                 }),
-                name: scopedRequestField(scopedTranslation, {
+                name: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.name.title",
                   optional: true,
                   schema: z.string().optional(),
                 }),
-                updateDeps: scopedRequestField(scopedTranslation, {
+                updateDeps: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.updateDeps.title",
@@ -649,7 +649,7 @@ const { POST } = createEndpoint({
                     .optional()
                     .default(false),
                 }),
-                clean: scopedRequestField(scopedTranslation, {
+                clean: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.clean.title",
@@ -657,7 +657,7 @@ const { POST } = createEndpoint({
                   optional: true,
                   schema: z.union([z.boolean(), z.string()]).optional(),
                 }),
-                lint: scopedRequestField(scopedTranslation, {
+                lint: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.lint.title",
@@ -667,7 +667,7 @@ const { POST } = createEndpoint({
                     .optional()
                     .default(true),
                 }),
-                typecheck: scopedRequestField(scopedTranslation, {
+                typecheck: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.typecheck.title",
@@ -675,7 +675,7 @@ const { POST } = createEndpoint({
                   optional: true,
                   schema: z.union([z.boolean(), z.string()]).optional(),
                 }),
-                build: scopedRequestField(scopedTranslation, {
+                build: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.build.title",
@@ -685,7 +685,7 @@ const { POST } = createEndpoint({
                     .optional()
                     .default(true),
                 }),
-                test: scopedRequestField(scopedTranslation, {
+                test: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.test.title",
@@ -695,14 +695,14 @@ const { POST } = createEndpoint({
                     .optional()
                     .default(true),
                 }),
-                snyk: scopedRequestField(scopedTranslation, {
+                snyk: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
                   label: "fields.snyk.title",
                   optional: true,
                   schema: z.boolean().optional(),
                 }),
-                install: scopedRequestField(scopedTranslation, {
+                install: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
                   label: "fields.install.title",
@@ -712,7 +712,7 @@ const { POST } = createEndpoint({
                 }),
 
                 // Release options (nested)
-                release: scopedObjectOptionalField(scopedTranslation, {
+                release: objectOptionalField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "fields.release.title",
                   layoutType: LayoutType.GRID,
@@ -720,65 +720,62 @@ const { POST } = createEndpoint({
                   optional: true,
                   usage: { request: "data" },
                   children: {
-                    version: scopedRequestField(scopedTranslation, {
+                    version: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.releaseVersion.title",
                       optional: true,
                       schema: z.string().optional(),
                     }),
-                    tagPrefix: scopedRequestField(scopedTranslation, {
+                    tagPrefix: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.tagPrefix.title",
                       schema: z.string().optional().default("v"),
                     }),
-                    tagSuffix: scopedRequestField(scopedTranslation, {
+                    tagSuffix: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.tagSuffix.title",
                       optional: true,
                       schema: z.string().optional(),
                     }),
-                    prereleaseId: scopedRequestField(scopedTranslation, {
+                    prereleaseId: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.prereleaseId.title",
                       optional: true,
                       schema: z.string().optional(),
                     }),
-                    ciReleaseCommand: scopedObjectOptionalField(
-                      scopedTranslation,
-                      {
-                        type: WidgetType.CONTAINER,
-                        title: "fields.ciReleaseCommand.title",
-                        description: "fields.ciReleaseCommand.description",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                        usage: { request: "data" },
-                        children: {
-                          command: scopedRequestField(scopedTranslation, {
-                            type: WidgetType.FORM_FIELD,
-                            fieldType: FieldDataType.TEXT,
-                            label: "fields.ciCommand.title",
-                            description: "fields.ciCommand.description",
-                            schema: z.array(z.string()),
-                          }),
-                          env: scopedRequestField(scopedTranslation, {
-                            type: WidgetType.FORM_FIELD,
-                            fieldType: FieldDataType.TEXT,
-                            label: "fields.ciEnvMapping.title",
-                            description: "fields.ciEnvMapping.description",
-                            optional: true,
-                            schema: z.record(z.string(), z.string()).optional(),
-                          }),
-                        },
+                    ciReleaseCommand: objectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "fields.ciReleaseCommand.title",
+                      description: "fields.ciReleaseCommand.description",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      usage: { request: "data" },
+                      children: {
+                        command: requestField(scopedTranslation, {
+                          type: WidgetType.FORM_FIELD,
+                          fieldType: FieldDataType.TEXT,
+                          label: "fields.ciCommand.title",
+                          description: "fields.ciCommand.description",
+                          schema: z.array(z.string()),
+                        }),
+                        env: requestField(scopedTranslation, {
+                          type: WidgetType.FORM_FIELD,
+                          fieldType: FieldDataType.TEXT,
+                          label: "fields.ciEnvMapping.title",
+                          description: "fields.ciEnvMapping.description",
+                          optional: true,
+                          schema: z.record(z.string(), z.string()).optional(),
+                        }),
                       },
-                    ),
+                    }),
 
                     // Git operations
-                    git: scopedObjectOptionalField(scopedTranslation, {
+                    git: objectOptionalField(scopedTranslation, {
                       type: WidgetType.CONTAINER,
                       title: "fields.gitOps.title",
                       layoutType: LayoutType.GRID,
@@ -786,49 +783,49 @@ const { POST } = createEndpoint({
                       optional: true,
                       usage: { request: "data" },
                       children: {
-                        skipTag: scopedRequestField(scopedTranslation, {
+                        skipTag: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.skipTag.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        skipPush: scopedRequestField(scopedTranslation, {
+                        skipPush: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.skipPush.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        skipCommit: scopedRequestField(scopedTranslation, {
+                        skipCommit: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.skipCommit.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        commitMessage: scopedRequestField(scopedTranslation, {
+                        commitMessage: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.commitMessage.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        signCommit: scopedRequestField(scopedTranslation, {
+                        signCommit: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.signCommit.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        signTag: scopedRequestField(scopedTranslation, {
+                        signTag: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.signTag.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        remote: scopedRequestField(scopedTranslation, {
+                        remote: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.remote.title",
@@ -839,7 +836,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // NPM publishing
-                    npm: scopedObjectOptionalField(scopedTranslation, {
+                    npm: objectOptionalField(scopedTranslation, {
                       type: WidgetType.CONTAINER,
                       title: "fields.npm.title",
                       layoutType: LayoutType.GRID,
@@ -847,27 +844,27 @@ const { POST } = createEndpoint({
                       optional: true,
                       usage: { request: "data" },
                       children: {
-                        enabled: scopedRequestField(scopedTranslation, {
+                        enabled: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.npmEnabled.title",
                           schema: z.boolean().optional().default(true),
                         }),
-                        registry: scopedRequestField(scopedTranslation, {
+                        registry: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.npmRegistry.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        tag: scopedRequestField(scopedTranslation, {
+                        tag: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.npmTag.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        access: scopedRequestField(scopedTranslation, {
+                        access: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.SELECT,
                           label: "fields.npmAccess.title",
@@ -884,28 +881,28 @@ const { POST } = createEndpoint({
                           optional: true,
                           schema: NpmAccessSchema.optional(),
                         }),
-                        otpEnvVar: scopedRequestField(scopedTranslation, {
+                        otpEnvVar: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.otpEnvVar.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        provenance: scopedRequestField(scopedTranslation, {
+                        provenance: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.provenance.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        ignoreScripts: scopedRequestField(scopedTranslation, {
+                        ignoreScripts: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.ignoreScripts.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        dryRun: scopedRequestField(scopedTranslation, {
+                        dryRun: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.npmDryRun.title",
@@ -916,7 +913,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // JSR publishing
-                    jsr: scopedObjectOptionalField(scopedTranslation, {
+                    jsr: objectOptionalField(scopedTranslation, {
                       type: WidgetType.CONTAINER,
                       title: "fields.jsr.title",
                       layoutType: LayoutType.GRID,
@@ -924,27 +921,27 @@ const { POST } = createEndpoint({
                       optional: true,
                       usage: { request: "data" },
                       children: {
-                        enabled: scopedRequestField(scopedTranslation, {
+                        enabled: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.jsrEnabled.title",
                           schema: z.boolean().optional().default(false),
                         }),
-                        allowSlowTypes: scopedRequestField(scopedTranslation, {
+                        allowSlowTypes: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.allowSlowTypes.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        allowDirty: scopedRequestField(scopedTranslation, {
+                        allowDirty: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.allowDirty.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        dryRun: scopedRequestField(scopedTranslation, {
+                        dryRun: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.jsrDryRun.title",
@@ -955,7 +952,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // Changelog
-                    changelog: scopedObjectOptionalField(scopedTranslation, {
+                    changelog: objectOptionalField(scopedTranslation, {
                       type: WidgetType.CONTAINER,
                       title: "fields.changelog.title",
                       layoutType: LayoutType.GRID,
@@ -963,50 +960,47 @@ const { POST } = createEndpoint({
                       optional: true,
                       usage: { request: "data" },
                       children: {
-                        enabled: scopedRequestField(scopedTranslation, {
+                        enabled: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.changelogEnabled.title",
                           schema: z.boolean().optional().default(false),
                         }),
-                        file: scopedRequestField(scopedTranslation, {
+                        file: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.changelogFile.title",
                           schema: z.string().optional().default("CHANGELOG.md"),
                         }),
-                        header: scopedRequestField(scopedTranslation, {
+                        header: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.changelogHeader.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        compareUrlFormat: scopedRequestField(
-                          scopedTranslation,
-                          {
-                            type: WidgetType.FORM_FIELD,
-                            fieldType: FieldDataType.TEXT,
-                            label: "fields.compareUrlFormat.title",
-                            optional: true,
-                            schema: z.string().optional(),
-                          },
-                        ),
-                        commitUrlFormat: scopedRequestField(scopedTranslation, {
+                        compareUrlFormat: requestField(scopedTranslation, {
+                          type: WidgetType.FORM_FIELD,
+                          fieldType: FieldDataType.TEXT,
+                          label: "fields.compareUrlFormat.title",
+                          optional: true,
+                          schema: z.string().optional(),
+                        }),
+                        commitUrlFormat: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.commitUrlFormat.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        includeBody: scopedRequestField(scopedTranslation, {
+                        includeBody: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.includeBody.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        preset: scopedRequestField(scopedTranslation, {
+                        preset: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.SELECT,
                           label: "fields.changelogPreset.title",
@@ -1040,7 +1034,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // Git release (GitHub/GitLab)
-                    gitRelease: scopedObjectOptionalField(scopedTranslation, {
+                    gitRelease: objectOptionalField(scopedTranslation, {
                       type: WidgetType.CONTAINER,
                       title: "fields.gitRelease.title",
                       layoutType: LayoutType.GRID,
@@ -1048,65 +1042,62 @@ const { POST } = createEndpoint({
                       optional: true,
                       usage: { request: "data" },
                       children: {
-                        enabled: scopedRequestField(scopedTranslation, {
+                        enabled: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.gitReleaseEnabled.title",
                           schema: z.boolean().optional().default(false),
                         }),
-                        title: scopedRequestField(scopedTranslation, {
+                        title: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.releaseTitle.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        generateNotes: scopedRequestField(scopedTranslation, {
+                        generateNotes: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.generateNotes.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        body: scopedRequestField(scopedTranslation, {
+                        body: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.releaseBody.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        draft: scopedRequestField(scopedTranslation, {
+                        draft: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.draft.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        prerelease: scopedRequestField(scopedTranslation, {
+                        prerelease: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
                           label: "fields.prerelease.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        discussionCategory: scopedRequestField(
-                          scopedTranslation,
-                          {
-                            type: WidgetType.FORM_FIELD,
-                            fieldType: FieldDataType.TEXT,
-                            label: "fields.discussionCategory.title",
-                            optional: true,
-                            schema: z.string().optional(),
-                          },
-                        ),
-                        target: scopedRequestField(scopedTranslation, {
+                        discussionCategory: requestField(scopedTranslation, {
+                          type: WidgetType.FORM_FIELD,
+                          fieldType: FieldDataType.TEXT,
+                          label: "fields.discussionCategory.title",
+                          optional: true,
+                          schema: z.string().optional(),
+                        }),
+                        target: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.target.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        assets: scopedRequestField(scopedTranslation, {
+                        assets: requestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
                           label: "fields.assets.title",
@@ -1127,7 +1118,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // Folders to zip for release
-                    foldersToZip: scopedRequestField(scopedTranslation, {
+                    foldersToZip: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.foldersToZip.title",
@@ -1144,7 +1135,7 @@ const { POST } = createEndpoint({
                     }),
 
                     // Version bumper for non-package.json files
-                    versionBumper: scopedRequestField(scopedTranslation, {
+                    versionBumper: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.versionBumper.title",
@@ -1165,7 +1156,7 @@ const { POST } = createEndpoint({
                 }),
 
                 // Package-level hooks
-                hooks: scopedObjectOptionalField(scopedTranslation, {
+                hooks: objectOptionalField(scopedTranslation, {
                   type: WidgetType.CONTAINER,
                   title: "fields.hooks.title",
                   description: "fields.hooks.description",
@@ -1174,7 +1165,7 @@ const { POST } = createEndpoint({
                   optional: true,
                   usage: { request: "data" },
                   children: {
-                    preInstall: scopedRequestField(scopedTranslation, {
+                    preInstall: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.preInstall.title",
@@ -1190,7 +1181,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postInstall: scopedRequestField(scopedTranslation, {
+                    postInstall: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.postInstall.title",
@@ -1206,7 +1197,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preClean: scopedRequestField(scopedTranslation, {
+                    preClean: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.preClean.title",
@@ -1222,7 +1213,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postClean: scopedRequestField(scopedTranslation, {
+                    postClean: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.postClean.title",
@@ -1238,7 +1229,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preLint: scopedRequestField(scopedTranslation, {
+                    preLint: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.preLint.title",
@@ -1254,7 +1245,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postLint: scopedRequestField(scopedTranslation, {
+                    postLint: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.postLint.title",
@@ -1270,7 +1261,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preBuild: scopedRequestField(scopedTranslation, {
+                    preBuild: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.preBuild.title",
@@ -1286,7 +1277,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postBuild: scopedRequestField(scopedTranslation, {
+                    postBuild: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.postBuild.title",
@@ -1302,7 +1293,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preTest: scopedRequestField(scopedTranslation, {
+                    preTest: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.preTest.title",
@@ -1318,7 +1309,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postTest: scopedRequestField(scopedTranslation, {
+                    postTest: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.postTest.title",
@@ -1334,7 +1325,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    prePublish: scopedRequestField(scopedTranslation, {
+                    prePublish: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.prePublish.title",
@@ -1350,7 +1341,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postPublish: scopedRequestField(scopedTranslation, {
+                    postPublish: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.postPublish.title",
@@ -1366,7 +1357,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preRelease: scopedRequestField(scopedTranslation, {
+                    preRelease: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.preRelease.title",
@@ -1382,7 +1373,7 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postRelease: scopedRequestField(scopedTranslation, {
+                    postRelease: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
                       label: "fields.postRelease.title",
@@ -1405,7 +1396,7 @@ const { POST } = createEndpoint({
           ),
 
           // Global hooks
-          hooks: scopedObjectOptionalField(scopedTranslation, {
+          hooks: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             title: "fields.globalHooks.title",
             description: "fields.globalHooks.description",
@@ -1414,7 +1405,7 @@ const { POST } = createEndpoint({
             optional: true,
             usage: { request: "data" },
             children: {
-              preRelease: scopedRequestField(scopedTranslation, {
+              preRelease: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "fields.preRelease.title",
@@ -1430,7 +1421,7 @@ const { POST } = createEndpoint({
                   })
                   .optional(),
               }),
-              postRelease: scopedRequestField(scopedTranslation, {
+              postRelease: requestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
                 label: "fields.postRelease.title",
@@ -1456,121 +1447,110 @@ const { POST } = createEndpoint({
       // ========================================================================
 
       // Summary stats at the top
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.status",
         schema: z.boolean(),
       }),
 
-      duration: scopedResponseField(scopedTranslation, {
+      duration: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.duration",
         schema: z.coerce.number(),
       }),
 
       // Output log
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
         schema: z.string(),
       }),
 
       // Errors displayed prominently if present
-      errors: scopedResponseArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "response.errors",
-          optional: true,
-        },
-        scopedResponseField(scopedTranslation, {
+      errors: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.errors",
+        child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
           schema: z.string(),
         }),
-      ),
+      }),
 
       // Warnings displayed if present
-      warnings: scopedResponseArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "response.warnings",
-          optional: true,
-        },
-        scopedResponseField(scopedTranslation, {
+      warnings: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.warnings",
+        child: responseField(scopedTranslation, {
           type: WidgetType.TEXT,
           schema: z.string(),
         }),
-      ),
+      }),
 
       // Packages table with status highlighting
-      packagesProcessed: scopedResponseArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "response.packages",
-        },
-        scopedObjectFieldNew(scopedTranslation, {
+      packagesProcessed: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.packages",
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.name",
               schema: z.string(),
             }),
-            directory: scopedResponseField(scopedTranslation, {
+            directory: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.directory",
               schema: z.string(),
             }),
-            version: scopedResponseField(scopedTranslation, {
+            version: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.version",
               schema: z.string().optional(),
             }),
-            tag: scopedResponseField(scopedTranslation, {
+            tag: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.tag",
               schema: z.string().optional(),
             }),
-            status: scopedResponseField(scopedTranslation, {
+            status: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               schema: PackageStatusSchema,
             }),
-            message: scopedResponseField(scopedTranslation, {
+            message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.message",
               schema: z.string().optional(),
             }),
           },
         }),
-      ),
+      }),
 
       // Git info displayed as metadata card
-      gitInfo: scopedObjectOptionalField(scopedTranslation, {
+      gitInfo: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.gitInfo",
         usage: { response: true },
         children: {
-          currentBranch: scopedResponseField(scopedTranslation, {
+          currentBranch: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          lastTag: scopedResponseField(scopedTranslation, {
+          lastTag: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          newTag: scopedResponseField(scopedTranslation, {
+          newTag: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          commitsSinceLastTag: scopedResponseField(scopedTranslation, {
+          commitsSinceLastTag: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().nullable(),
           }),
-          hasUncommittedChanges: scopedResponseField(scopedTranslation, {
+          hasUncommittedChanges: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             schema: z.boolean(),
           }),
@@ -1578,32 +1558,32 @@ const { POST } = createEndpoint({
       }),
 
       // CI environment as metadata card
-      ciEnvironment: scopedObjectOptionalField(scopedTranslation, {
+      ciEnvironment: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.ciEnvironment",
         usage: { response: true },
         children: {
-          isCI: scopedResponseField(scopedTranslation, {
+          isCI: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             schema: z.boolean(),
           }),
-          provider: scopedResponseField(scopedTranslation, {
+          provider: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             schema: CIProviderSchema.nullable(),
           }),
-          branch: scopedResponseField(scopedTranslation, {
+          branch: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          commit: scopedResponseField(scopedTranslation, {
+          commit: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          pr: scopedResponseField(scopedTranslation, {
+          pr: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          tag: scopedResponseField(scopedTranslation, {
+          tag: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
@@ -1611,223 +1591,215 @@ const { POST } = createEndpoint({
       }),
 
       // Published packages
-      publishedPackages: scopedResponseArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "response.published",
-        },
-        scopedObjectFieldNew(scopedTranslation, {
+      publishedPackages: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.published",
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.name",
               schema: z.string(),
             }),
-            version: scopedResponseField(scopedTranslation, {
+            version: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "success",
               schema: z.string(),
             }),
-            registry: scopedResponseField(scopedTranslation, {
+            registry: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "info",
               schema: z.string(),
             }),
-            url: scopedResponseField(scopedTranslation, {
+            url: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.url",
               schema: z.string().optional(),
             }),
           },
         }),
-      ),
+      }),
 
       // Timings
-      timings: scopedObjectOptionalField(scopedTranslation, {
+      timings: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.timings",
         usage: { response: true },
         children: {
-          total: scopedResponseField(scopedTranslation, {
+          total: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number(),
           }),
-          validation: scopedResponseField(scopedTranslation, {
+          validation: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          install: scopedResponseField(scopedTranslation, {
+          install: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          clean: scopedResponseField(scopedTranslation, {
+          clean: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          lint: scopedResponseField(scopedTranslation, {
+          lint: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          typecheck: scopedResponseField(scopedTranslation, {
+          typecheck: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          build: scopedResponseField(scopedTranslation, {
+          build: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          test: scopedResponseField(scopedTranslation, {
+          test: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          publish: scopedResponseField(scopedTranslation, {
+          publish: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          changelog: scopedResponseField(scopedTranslation, {
+          changelog: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          gitOperations: scopedResponseField(scopedTranslation, {
+          gitOperations: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
         },
       }),
 
-      rollbackPerformed: scopedResponseField(scopedTranslation, {
+      rollbackPerformed: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "warning",
         schema: z.boolean().optional(),
       }),
 
-      notificationsSent: scopedResponseArrayOptionalField(
-        scopedTranslation,
-        {
-          type: WidgetType.CONTAINER,
-          title: "response.notificationsSent",
-          optional: true,
-        },
-        scopedObjectFieldNew(scopedTranslation, {
+      notificationsSent: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.notificationsSent",
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
           usage: { response: true },
           children: {
-            type: scopedResponseField(scopedTranslation, {
+            type: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "info",
               schema: z.string(),
             }),
-            success: scopedResponseField(scopedTranslation, {
+            success: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               schema: z.boolean(),
             }),
-            message: scopedResponseField(scopedTranslation, {
+            message: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "table.message",
               schema: z.string().optional(),
             }),
           },
         }),
-      ),
+      }),
 
       // ========================================================================
       // INTERNAL TYPES (for repository services - not shown in UI)
       // ========================================================================
 
-      _internal: scopedObjectOptionalField(scopedTranslation, {
+      _internal: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         optional: true,
         usage: { response: true },
         children: {
           // Package.json structure
-          packageJson: scopedObjectOptionalField(scopedTranslation, {
+          packageJson: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              name: scopedResponseField(scopedTranslation, {
+              name: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.string(),
               }),
-              version: scopedResponseField(scopedTranslation, {
+              version: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.version",
                 schema: z.string(),
               }),
-              scripts: scopedResponseField(scopedTranslation, {
+              scripts: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              dependencies: scopedResponseField(scopedTranslation, {
+              dependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              devDependencies: scopedResponseField(scopedTranslation, {
+              devDependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              peerDependencies: scopedResponseField(scopedTranslation, {
+              peerDependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              optionalDependencies: scopedResponseField(scopedTranslation, {
+              optionalDependencies: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              updateIgnoreDependencies: scopedResponseArrayOptionalField(
+              updateIgnoreDependencies: responseArrayOptionalField(
                 scopedTranslation,
                 {
                   type: WidgetType.CONTAINER,
                   title: "fields.name.title",
-                  optional: true,
+                  child: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    schema: z.string(),
+                  }),
                 },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.string(),
-                }),
               ),
-              private: scopedResponseField(scopedTranslation, {
+              private: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
-              publishConfig: scopedObjectOptionalField(scopedTranslation, {
+              publishConfig: objectOptionalField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 optional: true,
                 usage: { response: true },
                 children: {
-                  access: scopedResponseField(scopedTranslation, {
+                  access: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.npmAccess.title",
                     optional: true,
                     schema: z.enum(["public", "restricted"]).optional(),
                   }),
-                  registry: scopedResponseField(scopedTranslation, {
+                  registry: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "table.registry",
                     optional: true,
                     schema: z.string().optional(),
                   }),
-                  tag: scopedResponseField(scopedTranslation, {
+                  tag: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "table.tag",
                     optional: true,
@@ -1835,17 +1807,17 @@ const { POST } = createEndpoint({
                   }),
                 },
               }),
-              repository: scopedObjectOptionalField(scopedTranslation, {
+              repository: objectOptionalField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 optional: true,
                 usage: { response: true },
                 children: {
-                  type: scopedResponseField(scopedTranslation, {
+                  type: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     schema: z.string(),
                   }),
-                  url: scopedResponseField(scopedTranslation, {
+                  url: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "table.url",
                     schema: z.string(),
@@ -1856,22 +1828,22 @@ const { POST } = createEndpoint({
           }),
 
           // Version info
-          versionInfo: scopedObjectOptionalField(scopedTranslation, {
+          versionInfo: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              newVersion: scopedResponseField(scopedTranslation, {
+              newVersion: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.version",
                 schema: z.string(),
               }),
-              lastTag: scopedResponseField(scopedTranslation, {
+              lastTag: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.tag",
                 schema: z.string(),
               }),
-              newTag: scopedResponseField(scopedTranslation, {
+              newTag: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.tag",
                 schema: z.string(),
@@ -1880,39 +1852,39 @@ const { POST } = createEndpoint({
           }),
 
           // Parsed version
-          parsedVersion: scopedObjectOptionalField(scopedTranslation, {
+          parsedVersion: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              major: scopedResponseField(scopedTranslation, {
+              major: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "enums.versionIncrement.major",
                 schema: z.number(),
               }),
-              minor: scopedResponseField(scopedTranslation, {
+              minor: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "enums.versionIncrement.minor",
                 schema: z.number(),
               }),
-              patch: scopedResponseField(scopedTranslation, {
+              patch: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "enums.versionIncrement.patch",
                 schema: z.number(),
               }),
-              prerelease: scopedResponseField(scopedTranslation, {
+              prerelease: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "enums.versionIncrement.prerelease",
                 optional: true,
                 schema: z.string().nullable(),
               }),
-              prereleaseNumber: scopedResponseField(scopedTranslation, {
+              prereleaseNumber: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.prereleaseId.title",
                 optional: true,
                 schema: z.number().nullable(),
               }),
-              buildMetadata: scopedResponseField(scopedTranslation, {
+              buildMetadata: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
@@ -1922,12 +1894,12 @@ const { POST } = createEndpoint({
           }),
 
           // Repo info
-          repoInfo: scopedObjectOptionalField(scopedTranslation, {
+          repoInfo: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              type: scopedResponseField(scopedTranslation, {
+              type: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.enum([
@@ -1938,24 +1910,24 @@ const { POST } = createEndpoint({
                   "other",
                 ]),
               }),
-              url: scopedResponseField(scopedTranslation, {
+              url: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.url",
                 schema: z.string(),
               }),
-              owner: scopedResponseField(scopedTranslation, {
+              owner: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              repo: scopedResponseField(scopedTranslation, {
+              repo: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              defaultBranch: scopedResponseField(scopedTranslation, {
+              defaultBranch: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.branchMain.title",
                 optional: true,
@@ -1965,60 +1937,60 @@ const { POST } = createEndpoint({
           }),
 
           // Commit info
-          commitInfo: scopedObjectOptionalField(scopedTranslation, {
+          commitInfo: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              sha: scopedResponseField(scopedTranslation, {
+              sha: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.string(),
               }),
-              shortSha: scopedResponseField(scopedTranslation, {
+              shortSha: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.string(),
               }),
-              subject: scopedResponseField(scopedTranslation, {
+              subject: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.string(),
               }),
-              body: scopedResponseField(scopedTranslation, {
+              body: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.releaseBody.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              authorName: scopedResponseField(scopedTranslation, {
+              authorName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.string(),
               }),
-              authorEmail: scopedResponseField(scopedTranslation, {
+              authorEmail: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.string(),
               }),
-              timestamp: scopedResponseField(scopedTranslation, {
+              timestamp: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.coerce.date(),
               }),
-              conventionalType: scopedResponseField(scopedTranslation, {
+              conventionalType: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              conventionalScope: scopedResponseField(scopedTranslation, {
+              conventionalScope: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              isBreaking: scopedResponseField(scopedTranslation, {
+              isBreaking: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
@@ -2028,59 +2000,59 @@ const { POST } = createEndpoint({
           }),
 
           // Hook context
-          hookContext: scopedObjectOptionalField(scopedTranslation, {
+          hookContext: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              packageManager: scopedResponseField(scopedTranslation, {
+              packageManager: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.packageManager.title",
                 schema: z.string(),
               }),
-              packageName: scopedResponseField(scopedTranslation, {
+              packageName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              version: scopedResponseField(scopedTranslation, {
+              version: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              directory: scopedResponseField(scopedTranslation, {
+              directory: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.directory.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              previousVersion: scopedResponseField(scopedTranslation, {
+              previousVersion: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              tag: scopedResponseField(scopedTranslation, {
+              tag: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.tag",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              isCI: scopedResponseField(scopedTranslation, {
+              isCI: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.ci.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
-              ciProvider: scopedResponseField(scopedTranslation, {
+              ciProvider: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              dryRun: scopedResponseField(scopedTranslation, {
+              dryRun: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.dryRun.title",
                 optional: true,
@@ -2090,46 +2062,46 @@ const { POST } = createEndpoint({
           }),
 
           // Hook result
-          hookResult: scopedObjectOptionalField(scopedTranslation, {
+          hookResult: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              success: scopedResponseField(scopedTranslation, {
+              success: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.status",
                 schema: z.boolean(),
               }),
-              command: scopedResponseField(scopedTranslation, {
+              command: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.ciCommand.title",
                 schema: z.string(),
               }),
-              exitCode: scopedResponseField(scopedTranslation, {
+              exitCode: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.number().optional(),
               }),
-              stdout: scopedResponseField(scopedTranslation, {
+              stdout: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              stderr: scopedResponseField(scopedTranslation, {
+              stderr: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              duration: scopedResponseField(scopedTranslation, {
+              duration: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.duration",
                 optional: true,
                 schema: z.number().optional(),
               }),
-              message: scopedResponseField(scopedTranslation, {
+              message: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.message",
                 optional: true,
@@ -2139,36 +2111,36 @@ const { POST } = createEndpoint({
           }),
 
           // Security scan result
-          securityScanResult: scopedObjectOptionalField(scopedTranslation, {
+          securityScanResult: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              passed: scopedResponseField(scopedTranslation, {
+              passed: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 schema: z.boolean(),
               }),
-              vulnerabilities: scopedObjectFieldNew(scopedTranslation, {
+              vulnerabilities: objectField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 usage: { response: true },
                 children: {
-                  critical: scopedResponseField(scopedTranslation, {
+                  critical: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     schema: z.number(),
                   }),
-                  high: scopedResponseField(scopedTranslation, {
+                  high: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     schema: z.number(),
                   }),
-                  medium: scopedResponseField(scopedTranslation, {
+                  medium: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     schema: z.number(),
                   }),
-                  low: scopedResponseField(scopedTranslation, {
+                  low: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     schema: z.number(),
@@ -2179,106 +2151,106 @@ const { POST } = createEndpoint({
           }),
 
           // Notification data
-          notificationData: scopedObjectOptionalField(scopedTranslation, {
+          notificationData: objectOptionalField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             optional: true,
             usage: { response: true },
             children: {
-              success: scopedResponseField(scopedTranslation, {
+              success: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.status",
                 schema: z.boolean(),
               }),
-              packageName: scopedResponseField(scopedTranslation, {
+              packageName: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              version: scopedResponseField(scopedTranslation, {
+              version: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              duration: scopedResponseField(scopedTranslation, {
+              duration: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.duration",
                 optional: true,
                 schema: z.number().optional(),
               }),
-              error: scopedResponseField(scopedTranslation, {
+              error: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "response.errors",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              releaseUrl: scopedResponseField(scopedTranslation, {
+              releaseUrl: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.url",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              commitSha: scopedResponseField(scopedTranslation, {
+              commitSha: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              branch: scopedResponseField(scopedTranslation, {
+              branch: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "fields.branch.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              registryUrls: scopedResponseField(scopedTranslation, {
+              registryUrls: responseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content: "table.url",
                 optional: true,
                 schema: z.array(z.string()).optional(),
               }),
-              timings: scopedObjectOptionalField(scopedTranslation, {
+              timings: objectOptionalField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 optional: true,
                 usage: { response: true },
                 children: {
-                  total: scopedResponseField(scopedTranslation, {
+                  total: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "response.duration",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  version: scopedResponseField(scopedTranslation, {
+                  version: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "table.version",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  quality: scopedResponseField(scopedTranslation, {
+                  quality: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  publish: scopedResponseField(scopedTranslation, {
+                  publish: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  git: scopedResponseField(scopedTranslation, {
+                  git: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  changelog: scopedResponseField(scopedTranslation, {
+                  changelog: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.changelog.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  notification: scopedResponseField(scopedTranslation, {
+                  notification: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "fields.name.title",
                     optional: true,

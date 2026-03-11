@@ -29,7 +29,6 @@ interface UserMessageBubbleProps {
   deductCredits: ((creditCost: number, feature: string) => void) | null;
   onBranch?: (messageId: string) => void;
   onRetry?: (message: ChatMessage) => Promise<void>;
-  onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
   rootFolderId: DefaultFolderId;
   currentUserId?: string;
@@ -43,7 +42,6 @@ export function UserMessageBubble({
   deductCredits,
   onBranch,
   onRetry,
-  onDelete,
   showAuthor,
   rootFolderId,
   currentUserId,
@@ -110,7 +108,7 @@ export function UserMessageBubble({
             deductCredits={deductCredits}
             onBranch={onBranch}
             onRetry={onRetry}
-            onDelete={onDelete}
+            rootFolderId={rootFolderId}
           />
         </Div>
       </Div>

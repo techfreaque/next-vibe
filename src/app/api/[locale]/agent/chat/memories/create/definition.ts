@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-  scopedSubmitButton,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseField,
+  submitButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -99,7 +99,7 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title" as const,
     description: "post.container.description" as const,
@@ -107,7 +107,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST ===
-      content: scopedRequestField(scopedTranslation, {
+      content: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "post.content.label" as const,
@@ -115,7 +115,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1).max(5000),
       }),
-      tags: scopedRequestField(scopedTranslation, {
+      tags: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TAGS,
         label: "post.tags.label" as const,
@@ -123,7 +123,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.array(z.string()).optional(),
       }),
-      priority: scopedRequestField(scopedTranslation, {
+      priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.priority.label" as const,
@@ -131,7 +131,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().min(0).max(100).optional(),
       }),
-      isPublic: scopedRequestField(scopedTranslation, {
+      isPublic: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.isPublic.label" as const,
@@ -139,7 +139,7 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
-      isShared: scopedRequestField(scopedTranslation, {
+      isShared: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "post.isShared.label" as const,
@@ -149,7 +149,7 @@ const { POST } = createEndpoint({
       }),
 
       // Back button
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         label: "post.backButton.label" as const,
         className: "ml-auto",
         inline: true,
@@ -157,14 +157,14 @@ const { POST } = createEndpoint({
       }),
 
       // Submit button
-      submitButton: scopedSubmitButton(scopedTranslation, {
+      submitButton: submitButton(scopedTranslation, {
         label: "post.submitButton.label" as const,
         inline: true,
         usage: { request: "data" },
       }),
 
       // === RESPONSE ===
-      id: scopedResponseField(scopedTranslation, {
+      id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number().int(),
       }),

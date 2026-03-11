@@ -15,12 +15,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
   objectFieldNew,
   requestField,
   responseArrayField,
   responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { InferSchemaFromField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
@@ -150,11 +149,11 @@ const _testNewAssign2: TestNewUsageOnly_Assignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test usage parameter preservation alone (OLD API)
-const testUsageOnly = objectField(
-  { type: WidgetType.CONTAINER },
-  { request: "data" } as const,
-  {},
-);
+const testUsageOnly = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  usage: { request: "data" } as const,
+  children: {},
+});
 type TestUsageOnly_Usage = typeof testUsageOnly.usage;
 // Debug: What does the usage actually look like?
 type TestUsageOnly_HasRequest = TestUsageOnly_Usage extends { request: infer R }
@@ -200,11 +199,11 @@ const _debugAssignable2: TestUsageOnly_Assignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test request+response usage
-const testDualUsage = objectField(
-  { type: WidgetType.CONTAINER },
-  { request: "data", response: true } as const,
-  {},
-);
+const testDualUsage = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  usage: { request: "data", response: true } as const,
+  children: {},
+});
 type TestDualUsage_Usage = typeof testDualUsage.usage;
 type TestDualUsage_IsAssignable1 = TestDualUsage_Usage extends {
   request: "data";
@@ -227,11 +226,11 @@ const _testDualAssign2: TestDualUsage_IsAssignable2 = "YES";
 // >;
 
 // INCREMENTAL TEST: Test response-only usage
-const testResponseOnly = objectField(
-  { type: WidgetType.CONTAINER },
-  { response: true } as const,
-  {},
-);
+const testResponseOnly = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  usage: { response: true } as const,
+  children: {},
+});
 type TestResponseOnly_Usage = typeof testResponseOnly.usage;
 type TestResponseOnly_IsAssignable1 = TestResponseOnly_Usage extends {
   response: true;
@@ -251,13 +250,14 @@ const _testResponseAssign2: TestResponseOnly_IsAssignable2 = "YES";
 // >;
 
 // Test Field 4: objectField with single request child
-const field4_objectWithRequestChild = objectField(
-  { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-  { request: "data" } as const,
-  {
+const field4_objectWithRequestChild = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  layoutType: LayoutType.STACKED,
+  usage: { request: "data" } as const,
+  children: {
     planId: field1_requestLiteral,
   },
-);
+});
 
 // Debug: Check the structure of the objectField
 type Field4_Type = typeof field4_objectWithRequestChild;
@@ -446,14 +446,15 @@ const _field4_reverse: AssertAssignable<
 };
 
 // Test Field 5: objectField with multiple request children
-const field5_objectWithMultipleRequestChildren = objectField(
-  { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-  { request: "data" },
-  {
+const field5_objectWithMultipleRequestChildren = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  layoutType: LayoutType.STACKED,
+  usage: { request: "data" },
+  children: {
     planId: field1_requestLiteral,
     interval: field2_requestEnum,
   },
-);
+});
 
 // Test Field 5: Check schema inference
 type Field5_Schema = InferSchemaFromField<
@@ -472,13 +473,14 @@ const _field5_reverse: AssertAssignable<
 > = { planId: "test-plan", interval: "yearly" };
 
 // Test Field 6: objectField with response child
-const field6_objectWithResponseChild = objectField(
-  { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-  { response: true },
-  {
+const field6_objectWithResponseChild = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  layoutType: LayoutType.STACKED,
+  usage: { response: true },
+  children: {
     message: field3_responseString,
   },
-);
+});
 
 // Test Field 6: Check schema inference
 type Field6_Schema = InferSchemaFromField<
@@ -495,13 +497,11 @@ const _field6_reverse: AssertAssignable<{ message: string }, Field6_Output> = {
 };
 
 // Test Field 7: nested objectField like brave-search (request + response)
-const field7_nestedObjectLikeBraveSearch = objectField(
-  {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-  },
-  { request: "data", response: true },
-  {
+const field7_nestedObjectLikeBraveSearch = objectFieldNew({
+  type: WidgetType.CONTAINER,
+  layoutType: LayoutType.STACKED,
+  usage: { request: "data", response: true },
+  children: {
     query: requestField({
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
@@ -512,23 +512,21 @@ const field7_nestedObjectLikeBraveSearch = objectField(
       {
         type: WidgetType.CONTAINER,
       },
-      objectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
+      objectFieldNew({
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
           title: responseField({
             type: WidgetType.TEXT,
             content: "Title" as TranslationKey,
             schema: z.string(),
           }),
         },
-      ),
+      }),
     ),
   },
-);
+});
 
 // Check field7 request inference
 type Field7_RequestSchema = InferSchemaFromField<
@@ -577,10 +575,11 @@ const testSingleRequestLiteral = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { request: "data" },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data" },
+    children: {
       planId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -588,7 +587,7 @@ const testSingleRequestLiteral = createEndpoint({
         schema: z.literal("test-plan"),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -662,10 +661,11 @@ const testSingleRequestEnum = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { request: "data" },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data" },
+    children: {
       interval: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -673,7 +673,7 @@ const testSingleRequestEnum = createEndpoint({
         schema: z.enum(["monthly", "yearly"]),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -747,17 +747,18 @@ const testSingleResponseString = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { response: true },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { response: true },
+    children: {
       message: responseField({
         type: WidgetType.TEXT,
         content: "test" as TranslationKey,
         schema: z.string(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -831,10 +832,11 @@ const testMultipleRequestFields = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { request: "data" },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data" },
+    children: {
       planId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -854,7 +856,7 @@ const testMultipleRequestFields = createEndpoint({
         schema: z.string(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -932,17 +934,18 @@ const testPublicEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { response: true },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { response: true },
+    children: {
       message: responseField({
         type: WidgetType.TEXT,
         content: "test" as const,
         schema: z.string(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -1001,17 +1004,18 @@ const testAdminEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { response: true },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { response: true },
+    children: {
       status: responseField({
         type: WidgetType.TEXT,
         content: "test" as const,
         schema: z.string(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -1090,10 +1094,11 @@ const testResponseEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { response: true },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { response: true },
+    children: {
       userId: responseField({
         type: WidgetType.TEXT,
         content: "test" as TranslationKey,
@@ -1105,7 +1110,7 @@ const testResponseEndpoint = createEndpoint({
         schema: z.number(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,
@@ -1186,10 +1191,11 @@ const testRequestEndpoint = createEndpoint({
   scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
-  fields: objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.STACKED },
-    { request: "data", response: true },
-    {
+  fields: objectFieldNew({
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data", response: true },
+    children: {
       planId: requestField({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -1208,7 +1214,7 @@ const testRequestEndpoint = createEndpoint({
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "test" as any,

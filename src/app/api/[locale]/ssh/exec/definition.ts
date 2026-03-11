@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,7 +46,7 @@ export const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      connectionId: scopedRequestField(scopedTranslation, {
+      connectionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.connectionId.label",
@@ -54,7 +54,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
-      command: scopedRequestField(scopedTranslation, {
+      command: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.command.label",
@@ -62,7 +62,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.command.placeholder",
         schema: z.string().min(1).max(10000),
       }),
-      workingDir: scopedRequestField(scopedTranslation, {
+      workingDir: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "post.fields.workingDir.label",
@@ -70,7 +70,7 @@ export const { POST } = createEndpoint({
         placeholder: "post.fields.workingDir.placeholder",
         schema: z.string().optional(),
       }),
-      timeoutMs: scopedRequestField(scopedTranslation, {
+      timeoutMs: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "post.fields.timeoutMs.label",
@@ -80,37 +80,37 @@ export const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      stdout: scopedResponseField(scopedTranslation, {
+      stdout: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.stdout.title",
         schema: z.string(),
       }),
-      stderr: scopedResponseField(scopedTranslation, {
+      stderr: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.stderr.title",
         schema: z.string(),
       }),
-      exitCode: scopedResponseField(scopedTranslation, {
+      exitCode: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.exitCode.title",
         schema: z.number(),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.status.title",
         schema: z.enum(SshCommandStatusDB),
       }),
-      durationMs: scopedResponseField(scopedTranslation, {
+      durationMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.durationMs.title",
         schema: z.number(),
       }),
-      backend: scopedResponseField(scopedTranslation, {
+      backend: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.backend.title",
         schema: z.enum(ExecBackendDB),
       }),
-      truncated: scopedResponseField(scopedTranslation, {
+      truncated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.truncated.title",
         schema: z.boolean().optional(),

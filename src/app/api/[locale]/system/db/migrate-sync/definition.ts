@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["migrate-sync", "db:migrate-sync"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.form.title",
     description: "post.form.description",
@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      force: scopedRequestField(scopedTranslation, {
+      force: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.force.title",
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
-      dryRun: scopedRequestField(scopedTranslation, {
+      dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.dryRun.title",
@@ -62,43 +62,43 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.output.title",
         schema: z.string(),
       }),
 
-      trackingCleared: scopedResponseField(scopedTranslation, {
+      trackingCleared: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.trackingCleared.title",
         schema: z.boolean(),
       }),
 
-      trackingFilesCreated: scopedResponseField(scopedTranslation, {
+      trackingFilesCreated: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.trackingFilesCreated.title",
         schema: z.boolean(),
       }),
 
-      drizzleMigrationRun: scopedResponseField(scopedTranslation, {
+      drizzleMigrationRun: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.drizzleMigrationRun.title",
         schema: z.boolean(),
       }),
 
-      originalFilesRestored: scopedResponseField(scopedTranslation, {
+      originalFilesRestored: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.originalFilesRestored.title",
         schema: z.boolean(),
       }),
 
-      migrationsProcessed: scopedResponseField(scopedTranslation, {
+      migrationsProcessed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.migrationsProcessed.title",
         schema: z.coerce.number(),

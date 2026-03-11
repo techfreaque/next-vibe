@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,14 +46,14 @@ export const { POST } = createEndpoint({
   aliases: ["trpc-validate", "validate-trpc"],
   method: Methods.POST,
   path: ["system", "generators", "generate-trpc-router", "validation"],
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 1,
     usage: { request: "data", response: true },
     children: {
       // === REQUEST ===
-      operations: scopedRequestField(scopedTranslation, {
+      operations: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.operation.label",
@@ -66,7 +66,7 @@ export const { POST } = createEndpoint({
           .min(1)
           .describe("TRPC validation operations to execute"),
       }),
-      filePath: scopedRequestField(scopedTranslation, {
+      filePath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.filePath.label",
@@ -78,7 +78,7 @@ export const { POST } = createEndpoint({
           .optional()
           .describe("Specific route file path to validate"),
       }),
-      options: scopedRequestField(scopedTranslation, {
+      options: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "fields.options.label",
@@ -104,21 +104,21 @@ export const { POST } = createEndpoint({
           .optional(),
       }),
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success.label",
         schema: z
           .boolean()
           .describe("Whether the TRPC validation was successful"),
       }),
-      operation: scopedResponseField(scopedTranslation, {
+      operation: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.operation.label",
         schema: z
           .string()
           .describe("The validation operation that was executed"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.result.label",
         schema: z

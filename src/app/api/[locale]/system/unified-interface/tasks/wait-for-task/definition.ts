@@ -17,10 +17,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -53,14 +53,14 @@ const { POST } = createEndpoint({
   ] as const,
   aliases: ["wait-for-task"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // Request
-      taskId: scopedRequestField(scopedTranslation, {
+      taskId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
@@ -68,16 +68,16 @@ const { POST } = createEndpoint({
       }),
 
       // Response
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.enum(CronTaskStatusDB),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         schema: z.unknown().optional(),
       }),
-      waiting: scopedResponseField(scopedTranslation, {
+      waiting: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
       }),

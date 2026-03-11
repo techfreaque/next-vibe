@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   tags: ["errorMonitor.tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "errorMonitor.cleanup.post.container.title",
     description: "errorMonitor.cleanup.post.container.description",
@@ -41,12 +41,12 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { response: true },
     children: {
-      deletedCount: scopedResponseField(scopedTranslation, {
+      deletedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "errorMonitor.cleanup.post.response.deletedCount",
         schema: z.number(),
       }),
-      retentionDays: scopedResponseField(scopedTranslation, {
+      retentionDays: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "errorMonitor.cleanup.post.response.retentionDays",
         schema: z.number(),

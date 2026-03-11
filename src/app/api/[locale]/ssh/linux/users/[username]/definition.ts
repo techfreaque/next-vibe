@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,14 +37,14 @@ export const { DELETE } = createEndpoint({
     render: LinuxUserDeleteContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      removeHome: scopedRequestField(scopedTranslation, {
+      removeHome: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "delete.fields.removeHome.label",
         description: "delete.fields.removeHome.description",
         schema: z.boolean().optional(),
       }),
-      ok: scopedResponseField(scopedTranslation, {
+      ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "delete.response.ok.title",
         schema: z.boolean(),

@@ -19,10 +19,10 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -51,14 +51,14 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.ai",
   tags: ["tags.ai", "tags.chat"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
     columns: 12,
     usage: { request: "data", response: true },
     children: {
       // ── Required: thread to continue ────────────────────────────────────
-      threadId: scopedRequestField(scopedTranslation, {
+      threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Favorite shortcut (loads model + character in one shot) ─────────
-      favoriteId: scopedRequestField(scopedTranslation, {
+      favoriteId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
       }),
 
       // ── Explicit model / character (override or use instead of favorite) ─
-      modelId: scopedRequestField(scopedTranslation, {
+      modelId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         columns: 6,
@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         schema: z.enum(ModelId).optional(),
       }),
 
-      characterId: scopedRequestField(scopedTranslation, {
+      characterId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -96,7 +96,7 @@ const { POST } = createEndpoint({
       // Named wakeUpToolMessageId (not toolMessageId) to avoid being picked up
       // by the cron executor's generic completion handler which reads taskInput.toolMessageId
       // and would overwrite the original wakeUp tool message with the resume-stream result.
-      wakeUpToolMessageId: scopedRequestField(scopedTranslation, {
+      wakeUpToolMessageId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
@@ -107,14 +107,14 @@ const { POST } = createEndpoint({
       // wakeUpTaskId: the originating wakeUp cron task
       // resumeTaskId: this resume-stream task itself
       // Both are deleted after the revival AI message is written.
-      wakeUpTaskId: scopedRequestField(scopedTranslation, {
+      wakeUpTaskId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      resumeTaskId: scopedRequestField(scopedTranslation, {
+      resumeTaskId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -122,12 +122,12 @@ const { POST } = createEndpoint({
       }),
 
       // ── Response ────────────────────────────────────────────────────────
-      resumed: scopedResponseField(scopedTranslation, {
+      resumed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
       }),
 
-      lastAiMessageId: scopedResponseField(scopedTranslation, {
+      lastAiMessageId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().uuid().nullable(),
       }),

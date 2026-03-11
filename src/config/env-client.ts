@@ -80,13 +80,13 @@ export const {
     value: process.env.NEXT_PUBLIC_DEBUG_PRODUCTION,
     example: "false",
   },
-  VIBE_IS_CLOUD: {
+  NEXT_PUBLIC_VIBE_IS_CLOUD: {
     schema: z
       .string()
       .optional()
       .default("false")
       .transform((v) => v === "true"),
-    value: process.env.VIBE_IS_CLOUD,
+    value: process.env.NEXT_PUBLIC_VIBE_IS_CLOUD,
     example: "false",
   },
 });

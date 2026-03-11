@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "get-network-request.form.label",
     description: "get-network-request.form.description",
@@ -45,7 +45,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      reqid: scopedRequestField(scopedTranslation, {
+      reqid: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "get-network-request.form.fields.reqid.label",
@@ -59,7 +59,7 @@ const { POST } = createEndpoint({
             "The reqid of the network request. If omitted returns the currently selected request in the DevTools Network panel.",
           ),
       }),
-      requestFilePath: scopedRequestField(scopedTranslation, {
+      requestFilePath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get-network-request.form.fields.reqid.label",
@@ -72,7 +72,7 @@ const { POST } = createEndpoint({
             "The absolute or relative path to save the request body to. If omitted, the body is returned inline.",
           ),
       }),
-      responseFilePath: scopedRequestField(scopedTranslation, {
+      responseFilePath: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get-network-request.form.fields.reqid.label",
@@ -87,7 +87,7 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get-network-request.response.success",
         schema: z
@@ -96,7 +96,7 @@ const { POST } = createEndpoint({
             "Whether the network request retrieval operation succeeded",
           ),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get-network-request.response.result",
         schema: z
@@ -111,7 +111,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("MCP content blocks returned by the tool"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get-network-request.response.error",
         schema: z
@@ -119,7 +119,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: scopedResponseField(scopedTranslation, {
+      executionId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get-network-request.response.executionId",
         schema: z

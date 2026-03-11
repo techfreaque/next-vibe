@@ -80,4 +80,12 @@ export const translations: typeof enTranslations = {
       description: "Vorgang erfolgreich abgeschlossen",
     },
   },
+  widget: {
+    title: "E-Mail-Kampagnen ausführen",
+    description:
+      "E-Mail-Kampagnenverarbeitung manuell auslösen. Verarbeitet ausstehende E-Mails basierend auf Lead-Phase und Timing.",
+    runButton: "Jetzt ausführen",
+    running: "Wird ausgeführt...",
+    done: "Fertig",
+  },
 };

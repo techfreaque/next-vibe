@@ -8,12 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedBackButton,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -56,12 +56,12 @@ const { GET } = createEndpoint({
     render: ImapFoldersListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: scopedBackButton(scopedTranslation, {
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
       }),
 
       // === URL PARAMETERS ===
-      page: scopedRequestField(scopedTranslation, {
+      page: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "page.label",
@@ -70,7 +70,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number().min(1).default(1),
       }),
 
-      limit: scopedRequestField(scopedTranslation, {
+      limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "limit.label",
@@ -79,7 +79,7 @@ const { GET } = createEndpoint({
         schema: z.coerce.number().min(1).max(100).default(20),
       }),
 
-      accountId: scopedRequestField(scopedTranslation, {
+      accountId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "accountId.label",
@@ -91,7 +91,7 @@ const { GET } = createEndpoint({
         ),
       }),
 
-      search: scopedRequestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "search.label",
@@ -100,7 +100,7 @@ const { GET } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      specialUseType: scopedRequestField(scopedTranslation, {
+      specialUseType: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "specialUseType.label",
@@ -110,7 +110,7 @@ const { GET } = createEndpoint({
         schema: z.array(z.enum(ImapSpecialUseType)).optional(),
       }),
 
-      syncStatus: scopedRequestField(scopedTranslation, {
+      syncStatus: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "syncStatus.label",
@@ -120,7 +120,7 @@ const { GET } = createEndpoint({
         schema: z.array(z.enum(ImapSyncStatus)).optional(),
       }),
 
-      sortBy: scopedRequestField(scopedTranslation, {
+      sortBy: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "sortBy.label",
@@ -130,7 +130,7 @@ const { GET } = createEndpoint({
         schema: z.enum(ImapFolderSortField).default(ImapFolderSortField.NAME),
       }),
 
-      sortOrder: scopedRequestField(scopedTranslation, {
+      sortOrder: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "sortOrder.label",
@@ -141,11 +141,11 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      folders: scopedResponseArrayFieldNew(scopedTranslation, {
+      folders: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         sortBy: "name",
         columns: 12,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "response.folder.title",
           description: "response.folder.description",
@@ -153,57 +153,57 @@ const { GET } = createEndpoint({
           columns: 12,
           usage: { response: true },
           children: {
-            id: scopedResponseField(scopedTranslation, {
+            id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.folder.id",
               schema: z.uuid(),
             }),
-            name: scopedResponseField(scopedTranslation, {
+            name: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.folder.name",
               schema: z.string(),
             }),
-            displayName: scopedResponseField(scopedTranslation, {
+            displayName: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.folder.displayName",
               schema: z.string().nullable(),
             }),
-            path: scopedResponseField(scopedTranslation, {
+            path: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.folder.path",
               schema: z.string(),
             }),
-            isSelectable: scopedResponseField(scopedTranslation, {
+            isSelectable: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.folder.isSelectable",
               schema: z.boolean(),
             }),
-            hasChildren: scopedResponseField(scopedTranslation, {
+            hasChildren: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.folder.hasChildren",
               schema: z.boolean(),
             }),
-            specialUseType: scopedResponseField(scopedTranslation, {
+            specialUseType: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.folder.specialUseType",
               schema: z.enum(ImapSpecialUseType).nullable(),
             }),
-            messageCount: scopedResponseField(scopedTranslation, {
+            messageCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.folder.messageCount",
               schema: z.coerce.number(),
             }),
-            unseenCount: scopedResponseField(scopedTranslation, {
+            unseenCount: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.folder.unseenCount",
               schema: z.coerce.number(),
             }),
-            syncStatus: scopedResponseField(scopedTranslation, {
+            syncStatus: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "response.folder.syncStatus",
               schema: z.enum(ImapSyncStatus),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "response.folder.createdAt",
               schema: z.string(),
@@ -212,7 +212,7 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      pagination: scopedObjectFieldNew(scopedTranslation, {
+      pagination: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.pagination.title",
         description: "response.pagination.description",
@@ -220,22 +220,22 @@ const { GET } = createEndpoint({
         columns: 12,
         usage: { response: true },
         children: {
-          page: scopedResponseField(scopedTranslation, {
+          page: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.page",
             schema: z.coerce.number().int(),
           }),
-          limit: scopedResponseField(scopedTranslation, {
+          limit: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.limit",
             schema: z.coerce.number().int(),
           }),
-          total: scopedResponseField(scopedTranslation, {
+          total: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.total",
             schema: z.coerce.number().int(),
           }),
-          totalPages: scopedResponseField(scopedTranslation, {
+          totalPages: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.pagination.totalPages",
             schema: z.coerce.number().int(),

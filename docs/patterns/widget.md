@@ -82,7 +82,7 @@ const { POST } = createEndpoint({
     render: CharacterCreateContainer, // ← component reference
     usage: { request: "data", response: true } as const,
     children: {
-      name: scopedRequestField(scopedTranslation, {
+      name: requestField(scopedTranslation, {
         schema: z.string().min(2).max(100),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -90,7 +90,7 @@ const { POST } = createEndpoint({
         columns: 6,
         order: 0,
       }),
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.ALERT,
       }),
@@ -385,7 +385,7 @@ Many endpoints don't need a custom widget at all. If the auto-rendered form is s
 const { GET } = createEndpoint({
   scopedTranslation,
   fields: {
-    name: scopedRequestField(scopedTranslation, {
+    name: requestField(scopedTranslation, {
       schema: z.string(),
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.TEXT,
@@ -393,7 +393,7 @@ const { GET } = createEndpoint({
       order: 0,
       columns: 6,
     }),
-    result: scopedResponseField(scopedTranslation, {
+    result: responseField(scopedTranslation, {
       schema: z.string(),
       type: WidgetType.TEXT,
       content: "get.result.content" as const,

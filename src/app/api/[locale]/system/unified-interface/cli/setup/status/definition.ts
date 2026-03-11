@@ -8,9 +8,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   LayoutType,
@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.title",
     description: "post.description",
@@ -56,31 +56,31 @@ const { POST } = createEndpoint({
     usage: { response: true },
     children: {
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.success",
         schema: z.boolean(),
       }),
 
-      installed: scopedResponseField(scopedTranslation, {
+      installed: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.installed",
         schema: z.boolean(),
       }),
 
-      version: scopedResponseField(scopedTranslation, {
+      version: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.version",
         schema: z.string().optional(),
       }),
 
-      path: scopedResponseField(scopedTranslation, {
+      path: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.path",
         schema: z.string().optional(),
       }),
 
-      message: scopedResponseField(scopedTranslation, {
+      message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.fields.message",
         schema: z.string(),

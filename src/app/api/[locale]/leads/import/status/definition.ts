@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-  scopedWidgetField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  backButton,
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+  widgetField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -51,12 +51,12 @@ const { GET } = createEndpoint({
     render: ImportStatusContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({
+      backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
         inline: true,
       }),
 
-      submitButton: scopedWidgetField(scopedTranslation, {
+      submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "status.get.actions.refresh",
         loadingText: "status.get.actions.refreshing",
@@ -68,7 +68,7 @@ const { GET } = createEndpoint({
       }),
 
       // === QUERY PARAMETERS ===
-      filters: scopedObjectFieldNew(scopedTranslation, {
+      filters: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "status.get.filters.title",
         description: "status.get.filters.description",
@@ -76,7 +76,7 @@ const { GET } = createEndpoint({
         columns: 3,
         usage: { request: "data" },
         children: {
-          status: scopedRequestField(scopedTranslation, {
+          status: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
             label: "status.get.status.label",
@@ -86,7 +86,7 @@ const { GET } = createEndpoint({
             options: CsvImportJobStatusOptions,
             schema: z.enum(CsvImportJobStatusDB).optional(),
           }),
-          limit: scopedRequestField(scopedTranslation, {
+          limit: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "status.get.limit.label",
@@ -95,7 +95,7 @@ const { GET } = createEndpoint({
             columns: 4,
             schema: z.coerce.number().min(1).max(100).default(50).optional(),
           }),
-          offset: scopedRequestField(scopedTranslation, {
+          offset: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "status.get.offset.label",
@@ -108,19 +108,19 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      jobs: scopedObjectFieldNew(scopedTranslation, {
+      jobs: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "status.get.response.title",
         description: "status.get.response.description",
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
-          items: scopedResponseArrayFieldNew(scopedTranslation, {
+          items: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             groupBy: "status",
             title: "status.get.response.items.title",
             description: "status.get.response.items.title",
-            child: scopedObjectFieldNew(scopedTranslation, {
+            child: objectField(scopedTranslation, {
               type: WidgetType.CONTAINER,
               title: "status.get.response.items.title",
               layoutType: LayoutType.GRID,
@@ -128,95 +128,95 @@ const { GET } = createEndpoint({
               usage: { response: true },
               children: {
                 // Job Identity
-                id: scopedResponseField(scopedTranslation, {
+                id: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.uuid(),
                 }),
-                fileName: scopedResponseField(scopedTranslation, {
+                fileName: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.string(),
                 }),
-                status: scopedResponseField(scopedTranslation, {
+                status: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "status.get.response.items.title",
                   schema: z.enum(CsvImportJobStatusDB),
                 }),
 
                 // Progress Tracking
-                totalRows: scopedResponseField(scopedTranslation, {
+                totalRows: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number().nullable(),
                 }),
-                processedRows: scopedResponseField(scopedTranslation, {
+                processedRows: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                successfulImports: scopedResponseField(scopedTranslation, {
+                successfulImports: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                failedImports: scopedResponseField(scopedTranslation, {
+                failedImports: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                duplicateEmails: scopedResponseField(scopedTranslation, {
+                duplicateEmails: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Batch Processing
-                currentBatchStart: scopedResponseField(scopedTranslation, {
+                currentBatchStart: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                batchSize: scopedResponseField(scopedTranslation, {
+                batchSize: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Error Handling
-                error: scopedResponseField(scopedTranslation, {
+                error: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
-                retryCount: scopedResponseField(scopedTranslation, {
+                retryCount: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                maxRetries: scopedResponseField(scopedTranslation, {
+                maxRetries: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Timestamps
-                createdAt: scopedResponseField(scopedTranslation, {
+                createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.string(),
                 }),
-                updatedAt: scopedResponseField(scopedTranslation, {
+                updatedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.string(),
                 }),
-                startedAt: scopedResponseField(scopedTranslation, {
+                startedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
-                completedAt: scopedResponseField(scopedTranslation, {
+                completedAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "status.get.response.items.title",
                   schema: z.string().nullable(),

@@ -10,12 +10,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedRequestUrlPathParamsField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  requestUrlPathParamsField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -46,7 +46,7 @@ const { GET } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true } as const,
     noFormElement: true,
     children: {
-      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+      id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.fields.id.label",
@@ -54,7 +54,7 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.string().uuid(),
       }),
-      resolution: scopedRequestField(scopedTranslation, {
+      resolution: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.resolution.label",
@@ -62,7 +62,7 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.enum(GraphResolutionDB).default(GraphResolution.ONE_DAY),
       }),
-      cursor: scopedRequestField(scopedTranslation, {
+      cursor: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "get.fields.cursor.label",
@@ -70,75 +70,75 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.string().optional(),
       }),
-      graph: scopedObjectFieldNew(scopedTranslation, {
+      graph: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         usage: { response: true },
         children: {
-          id: scopedResponseField(scopedTranslation, {
+          id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.id",
             schema: z.string(),
           }),
-          slug: scopedResponseField(scopedTranslation, {
+          slug: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.slug",
             schema: z.string(),
           }),
-          name: scopedResponseField(scopedTranslation, {
+          name: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.name",
             schema: z.string(),
           }),
-          description: scopedResponseField(scopedTranslation, {
+          description: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.description",
             schema: z.string().nullable(),
           }),
-          ownerType: scopedResponseField(scopedTranslation, {
+          ownerType: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.ownerType",
             schema: z.string(),
           }),
-          isActive: scopedResponseField(scopedTranslation, {
+          isActive: responseField(scopedTranslation, {
             type: WidgetType.BADGE,
             content: "get.response.graph.isActive",
             schema: z.boolean(),
           }),
-          createdAt: scopedResponseField(scopedTranslation, {
+          createdAt: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.createdAt",
             schema: z.string(),
           }),
-          config: scopedResponseField(scopedTranslation, {
+          config: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "get.response.graph.config",
             schema: graphConfigSchema,
           }),
         },
       }),
-      series: scopedResponseArrayFieldNew(scopedTranslation, {
+      series: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            nodeId: scopedResponseField(scopedTranslation, {
+            nodeId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.series.nodeId",
               schema: z.string(),
             }),
-            points: scopedResponseArrayFieldNew(scopedTranslation, {
+            points: responseArrayField(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              child: scopedObjectFieldNew(scopedTranslation, {
+              child: objectField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 usage: { response: true },
                 children: {
-                  timestamp: scopedResponseField(scopedTranslation, {
+                  timestamp: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "get.response.series.timestamp",
                     schema: z.string(),
                   }),
-                  value: scopedResponseField(scopedTranslation, {
+                  value: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "get.response.series.value",
                     schema: z.number(),
@@ -149,29 +149,29 @@ const { GET } = createEndpoint({
           },
         }),
       }),
-      signals: scopedResponseArrayFieldNew(scopedTranslation, {
+      signals: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            nodeId: scopedResponseField(scopedTranslation, {
+            nodeId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.signals.nodeId",
               schema: z.string(),
             }),
-            events: scopedResponseArrayFieldNew(scopedTranslation, {
+            events: responseArrayField(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              child: scopedObjectFieldNew(scopedTranslation, {
+              child: objectField(scopedTranslation, {
                 type: WidgetType.CONTAINER,
                 usage: { response: true },
                 children: {
-                  timestamp: scopedResponseField(scopedTranslation, {
+                  timestamp: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "get.response.signals.timestamp",
                     schema: z.string(),
                   }),
-                  fired: scopedResponseField(scopedTranslation, {
+                  fired: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     content: "get.response.signals.fired",
                     schema: z.boolean(),

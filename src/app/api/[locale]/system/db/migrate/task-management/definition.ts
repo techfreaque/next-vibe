@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -130,7 +130,7 @@ const { POST } = createEndpoint({
       },
     },
   },
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "container.title",
     description: "container.description",
@@ -139,7 +139,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      operation: scopedRequestField(scopedTranslation, {
+      operation: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.operation.label",
@@ -152,7 +152,7 @@ const { POST } = createEndpoint({
           .min(1)
           .describe("Migration task operations to execute"),
       }),
-      taskName: scopedRequestField(scopedTranslation, {
+      taskName: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.taskName.label",
@@ -164,7 +164,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Specific migration task name to operate on"),
       }),
-      options: scopedRequestField(scopedTranslation, {
+      options: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
         label: "fields.options.label",
@@ -194,26 +194,26 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: scopedResponseField(scopedTranslation, {
+      success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.success.label",
         schema: z
           .boolean()
           .describe("Whether the migration task operation was successful"),
       }),
-      taskExecuted: scopedResponseField(scopedTranslation, {
+      taskExecuted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.taskExecuted.label",
         schema: z
           .string()
           .describe("Name of the migration task that was operated on"),
       }),
-      status: scopedResponseField(scopedTranslation, {
+      status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.status.label",
         schema: z.string().describe("Current status of the migration task"),
       }),
-      output: scopedResponseField(scopedTranslation, {
+      output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.output.label",
         schema: z
@@ -221,7 +221,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Migration task execution output"),
       }),
-      error: scopedResponseField(scopedTranslation, {
+      error: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.error.label",
         schema: z
@@ -229,7 +229,7 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Error message if migration task failed"),
       }),
-      result: scopedResponseField(scopedTranslation, {
+      result: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.result.label",
         schema: z

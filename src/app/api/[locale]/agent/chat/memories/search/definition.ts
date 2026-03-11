@@ -8,11 +8,11 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
-  scopedRequestField,
-  scopedResponseArrayFieldNew,
-  scopedResponseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+  objectField,
+  requestField,
+  responseArrayField,
+  responseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -69,7 +69,7 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.memories" as const],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
+  fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "search.get.container.title" as const,
     description: "search.get.container.description" as const,
@@ -77,21 +77,21 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST DATA ===
-      query: scopedRequestField(scopedTranslation, {
+      query: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "search.get.query.label" as const,
         description: "search.get.query.description" as const,
         schema: z.string().min(1),
       }),
-      includeArchived: scopedRequestField(scopedTranslation, {
+      includeArchived: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "search.get.includeArchived.label" as const,
         description: "search.get.includeArchived.description" as const,
         schema: z.boolean().optional().default(false),
       }),
-      tags: scopedRequestField(scopedTranslation, {
+      tags: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TAGS,
         label: "search.get.tags.label" as const,
@@ -100,43 +100,43 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      results: scopedResponseArrayFieldNew(scopedTranslation, {
+      results: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
+        child: objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
           title: "search.get.response.results.memory.title" as const,
           layoutType: LayoutType.STACKED,
           usage: { response: true },
           children: {
-            memoryNumber: scopedResponseField(scopedTranslation, {
+            memoryNumber: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "search.get.response.results.memory.memoryNumber.text" as const,
               schema: z.coerce.number().int(),
             }),
-            content: scopedResponseField(scopedTranslation, {
+            content: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "search.get.response.results.memory.content.content" as const,
               schema: z.string(),
             }),
-            tags: scopedResponseArrayFieldNew(scopedTranslation, {
+            tags: responseArrayField(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              child: scopedResponseField(scopedTranslation, {
+              child: responseField(scopedTranslation, {
                 type: WidgetType.BADGE,
                 schema: z.string(),
               }),
             }),
-            priority: scopedResponseField(scopedTranslation, {
+            priority: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "search.get.response.results.memory.priority.text" as const,
               schema: z.coerce.number(),
             }),
-            isArchived: scopedResponseField(scopedTranslation, {
+            isArchived: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "search.get.response.results.memory.isArchived.text" as const,
               schema: z.boolean(),
             }),
-            createdAt: scopedResponseField(scopedTranslation, {
+            createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "search.get.response.results.memory.createdAt.content" as const,
@@ -146,7 +146,7 @@ const { GET } = createEndpoint({
         }),
       }),
 
-      total: scopedResponseField(scopedTranslation, {
+      total: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "search.get.response.total.content" as const,
         schema: z.coerce.number(),
