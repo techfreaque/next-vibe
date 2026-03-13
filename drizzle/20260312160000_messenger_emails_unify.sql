@@ -40,6 +40,10 @@ CREATE INDEX IF NOT EXISTS "emails_uid_idx" ON "emails" ("uid");--> statement-br
 CREATE INDEX IF NOT EXISTS "emails_message_id_idx" ON "emails" ("message_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "emails_folder_id_idx" ON "emails" ("folder_id");--> statement-breakpoint
 
+-- Clean up orphaned account_id/folder_id values before adding FK constraints
+UPDATE "emails" SET "account_id" = NULL WHERE "account_id" IS NOT NULL AND "account_id" NOT IN (SELECT "id" FROM "messenger_accounts");--> statement-breakpoint
+UPDATE "emails" SET "folder_id" = NULL WHERE "folder_id" IS NOT NULL AND "folder_id" NOT IN (SELECT "id" FROM "messenger_folders");--> statement-breakpoint
+
 -- Add FK constraints
 ALTER TABLE "emails" ADD CONSTRAINT "emails_folder_id_messenger_folders_id_fk" FOREIGN KEY ("folder_id") REFERENCES "public"."messenger_folders"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "emails" ADD CONSTRAINT "emails_account_id_messenger_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."messenger_accounts"("id") ON DELETE set null ON UPDATE no action;
