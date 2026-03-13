@@ -696,18 +696,22 @@ export const translations: typeof enTranslations = {
     },
     cleanup: {
       name: "error-logs-cleanup",
-      description: "Bereinigt Fehlerprotokolle älter als 7 Tage",
+      description:
+        "Bereinigt Fehlerprotokolle älter als 6 Monate und begrenzt auf 100K Einträge",
       post: {
         title: "Fehlerprotokoll-Bereinigung",
         description:
-          "Alte Fehlerprotokolleinträge löschen um die Datenbank schlank zu halten",
+          "Alte Fehlerprotokolleinträge löschen (zeitbasiert + anzahlbasiert) um die Datenbank schlank zu halten",
         container: {
           title: "Bereinigungsergebnisse",
           description: "Anzahl gelöschter Fehlerprotokolle",
         },
         response: {
           deletedCount: "Gelöschte Einträge",
+          deletedByTime: "Gelöscht nach Zeit",
+          deletedByCount: "Gelöscht nach Anzahlgrenze",
           retentionDays: "Aufbewahrungstage",
+          maxRows: "Maximale Einträge",
         },
         success: {
           title: "Bereinigung abgeschlossen",

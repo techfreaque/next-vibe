@@ -25,12 +25,7 @@ import {
   type SignalEvent,
 } from "../shared/fields";
 import { GraphResolution } from "../enum";
-import {
-  fillGaps,
-  needsScaleUp,
-  scaleUpSeries,
-  trimSeries,
-} from "../shared/range";
+import { needsScaleUp, scaleUpSeries, trimSeries } from "../shared/range";
 import { writeDatapoints, readDatapoints } from "../store/datapoints";
 import { writeSignals } from "../store/signals";
 import type { GraphNodeConfig } from "../graph/schema";
@@ -201,11 +196,6 @@ export async function executeNode(
     }
     const trimmed = trimSeries(points, requestedRange);
     ctx.resolvedSeries.set(nodeId, maybeScaleUp(trimmed, resolution, ctx));
-  } else if (incomingEdges.length === 0) {
-    // Source node returned empty data — zero-fill so downstream nodes get a
-    // valid (all-zeros) time series instead of undefined.
-    const filled = fillGaps([], requestedRange, resolution);
-    ctx.resolvedSeries.set(nodeId, filled);
   } else if (nodeConfig.outputField !== undefined) {
     // Scalar output — store single datapoint at range end
     const scalar = response[nodeConfig.outputField];

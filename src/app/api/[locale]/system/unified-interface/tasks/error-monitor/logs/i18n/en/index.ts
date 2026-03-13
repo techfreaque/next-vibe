@@ -16,12 +16,19 @@ export const translations = {
       source: {
         label: "Source",
         description: "Filter by error source",
-        placeholder: "backend, task, chat",
+        options: {
+          backend: "Backend",
+          task: "Task",
+          chat: "Chat",
+        },
       },
       level: {
         label: "Level",
         description: "Filter by error level",
-        placeholder: "error, warn",
+        options: {
+          error: "Error",
+          warn: "Warning",
+        },
       },
       endpoint: {
         label: "Endpoint",
@@ -32,6 +39,10 @@ export const translations = {
         label: "Error Type",
         description: "Filter by error type classification",
         placeholder: "e.g. INTERNAL_ERROR",
+      },
+      fingerprint: {
+        label: "Fingerprint",
+        description: "Filter by error group fingerprint",
       },
       startDate: {
         label: "From",
@@ -128,6 +139,7 @@ export const translations = {
       stackTrace: "Stack Trace",
       metadata: "Metadata",
       collapse: "Collapse",
+      resolved: "Resolved",
     },
     pagination: {
       info: "Page {{page}} of {{totalPages}} ({{total}} total)",

@@ -686,18 +686,22 @@ export const translations: typeof enTranslations = {
     },
     cleanup: {
       name: "error-logs-cleanup",
-      description: "Usuwa logi błędów starsze niż 7 dni",
+      description:
+        "Usuwa logi błędów starsze niż 6 miesięcy i ogranicza do 100K wpisów",
       post: {
         title: "Czyszczenie logów błędów",
         description:
-          "Usuwanie starych wpisów logów błędów aby utrzymać bazę danych w dobrej kondycji",
+          "Usuwanie starych wpisów logów błędów (czasowo + ilościowo) aby utrzymać bazę danych w dobrej kondycji",
         container: {
           title: "Wyniki czyszczenia",
           description: "Liczba usuniętych logów błędów",
         },
         response: {
           deletedCount: "Usunięte wpisy",
+          deletedByTime: "Usunięte czasowo",
+          deletedByCount: "Usunięte przez limit ilości",
           retentionDays: "Dni przechowywania",
+          maxRows: "Maksymalna liczba wpisów",
         },
         success: {
           title: "Czyszczenie zakończone",

@@ -21,13 +21,11 @@ export function computeRatio(a: TimeSeries, b: TimeSeries): TimeSeries {
     bMap.set(p.timestamp.getTime(), p.value);
   }
 
-  return a
-    .map((p): DataPoint | null => {
-      const bVal = bMap.get(p.timestamp.getTime());
-      if (bVal === undefined || bVal === 0) {
-        return null;
-      }
-      return { timestamp: p.timestamp, value: p.value / bVal };
-    })
-    .filter((p): p is DataPoint => p !== null);
+  return a.map((p): DataPoint => {
+    const bVal = bMap.get(p.timestamp.getTime());
+    if (bVal === undefined || bVal === 0) {
+      return { timestamp: p.timestamp, value: 0 };
+    }
+    return { timestamp: p.timestamp, value: p.value / bVal };
+  });
 }

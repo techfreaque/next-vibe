@@ -95,30 +95,30 @@ const { POST } = createEndpoint({
           .transform((val) => val.replace(/\/+$/, "")) // strip trailing slashes
           .default(envClient.NEXT_PUBLIC_PROJECT_URL),
       }),
-      // email and password are NOT sent to the local backend.
-      // The widget POSTs credentials directly from the browser to the remote server,
-      // extracts the token from the Set-Cookie response, and passes only the token here.
-      token: requestField(scopedTranslation, {
+      email: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.token.label" as const,
-        description: "post.token.description" as const,
-        columns: 12,
+        fieldType: FieldDataType.EMAIL,
+        label: "post.email.label" as const,
+        description: "post.email.description" as const,
+        placeholder: "post.email.placeholder" as const,
+        columns: 6,
         theme: { style: "none" },
-        hidden: true,
         schema: z
-          .string()
-          .min(1, { message: "post.token.validation.required" }),
+          .string({ error: "post.email.validation.required" })
+          .min(1, { message: "post.email.validation.required" })
+          .email({ message: "post.email.validation.invalid" }),
       }),
-      leadId: requestField(scopedTranslation, {
+      password: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.leadId.label" as const,
-        description: "post.leadId.description" as const,
-        columns: 12,
+        fieldType: FieldDataType.PASSWORD,
+        label: "post.password.label" as const,
+        description: "post.password.description" as const,
+        placeholder: "post.password.placeholder" as const,
+        columns: 6,
         theme: { style: "none" },
-        hidden: true,
-        schema: z.string().optional(),
+        schema: z
+          .string({ error: "post.password.validation.required" })
+          .min(1, { message: "post.password.validation.required" }),
       }),
       formAlert: widgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
@@ -240,8 +240,8 @@ const { POST } = createEndpoint({
         instanceId: defaultInstanceId,
         friendlyName: "My Laptop",
         remoteUrl: envClient.NEXT_PUBLIC_PROJECT_URL,
-        token: "<jwt-from-remote-login>",
-        leadId: "<lead-id-from-remote>",
+        email: "you@example.com",
+        password: "your-password",
       },
     },
     responses: {

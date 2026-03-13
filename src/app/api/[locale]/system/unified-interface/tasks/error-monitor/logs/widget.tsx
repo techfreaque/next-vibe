@@ -8,6 +8,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
@@ -25,6 +26,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 
@@ -108,6 +110,14 @@ function ErrorLogCard({
         >
           {log.source}
         </Span>
+
+        {/* Resolved badge */}
+        {log.resolved && (
+          <Span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+            <Check className="h-3 w-3" />
+            {t("widget.detail.resolved")}
+          </Span>
+        )}
 
         {/* Message + meta */}
         <Div className="flex flex-col gap-0.5 flex-1 min-w-0">
@@ -257,8 +267,8 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
       {/* ── Filters ── */}
       <Div className="flex flex-col gap-2 px-4 py-3 border-b">
         <Div className="grid grid-cols-2 gap-2">
-          <TextFieldWidget fieldName={"source"} field={children.source} />
-          <TextFieldWidget fieldName={"level"} field={children.level} />
+          <SelectFieldWidget fieldName={"source"} field={children.source} />
+          <SelectFieldWidget fieldName={"level"} field={children.level} />
         </Div>
         <Div className="grid grid-cols-2 gap-2">
           <TextFieldWidget fieldName={"endpoint"} field={children.endpoint} />

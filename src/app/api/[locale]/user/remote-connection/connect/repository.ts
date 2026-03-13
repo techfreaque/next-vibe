@@ -1,16 +1,16 @@
 /**
  * Remote Connection Connect Repository
  *
- * Credentials are handled entirely client-side (browser → remote directly).
- * This server receives only the token extracted by the widget, never the password.
+ * Server-side login: receives email + password, logs into the remote,
+ * extracts the token, and stores only the token locally.
  *
  * Flow:
- * 1. Local collision check — instanceId must not already exist locally
- * 2. Register this instance on the remote (cloud-side collision check)
- * 3. Store connection locally (only if remote registration succeeded)
+ * 1. SSRF guard on remoteUrl
+ * 2. Login to remote server (email + password → token)
+ * 3. Local collision check — instanceId must not already exist locally
+ * 4. Register this instance on the remote (cloud-side collision check)
+ * 5. Store connection locally (only if remote registration succeeded)
  */
-
-/* eslint-disable i18next/no-literal-string */
 
 import "server-only";
 
@@ -30,6 +30,9 @@ import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import { defaultLocale } from "@/i18n/core/config";
 
+import loginEndpoints, {
+  type LoginPostResponseOutput,
+} from "../../public/login/definition";
 import { userRemoteConnections } from "../db";
 import registerEndpoints from "../register/definition";
 import {
@@ -148,15 +151,16 @@ function validateRemoteUrl(rawUrl: string): string | null {
 
 /**
  * Connect to a remote instance.
- * Credentials are handled entirely client-side — this server receives only
- * the token that the browser extracted from the remote login response.
+ * Server-side login: receives email + password, logs into the remote,
+ * extracts the token, and stores only the token locally.
  *
  * Steps:
  * 1. SSRF guard on remoteUrl
- * 2. Local collision check
- * 3. Register this instance on the remote (cloud-side collision check)
- * 4. Store connection locally
- * 5. Write default remote tools to user's allowedTools setting
+ * 2. Login to remote server (email + password → token)
+ * 3. Local collision check
+ * 4. Register this instance on the remote (cloud-side collision check)
+ * 5. Store connection locally
+ * 6. Write default remote tools to user's allowedTools setting
  */
 export async function connectRemote(
   data: RemoteConnectPostRequestInput,
@@ -164,10 +168,9 @@ export async function connectRemote(
   logger: EndpointLogger,
   t: RemoteConnectT,
 ): Promise<ResponseType<{ remoteUrlResult: string; isConnected: boolean }>> {
-  const { token, friendlyName } = data;
+  const { email, password, friendlyName } = data;
   const remoteUrl = data.remoteUrl ?? "";
   const instanceId = data.instanceId ?? "";
-  const effectiveLeadId = data.leadId ?? "";
 
   // ── Step 1: SSRF guard — reject private/loopback URLs ──────────────────────
   const urlError = validateRemoteUrl(remoteUrl);
@@ -182,7 +185,67 @@ export async function connectRemote(
     });
   }
 
-  // ── Step 2: Local collision check (ignore self-record with token="self") ───
+  // ── Step 2: Login to remote server ─────────────────────────────────────────
+  let token: string;
+  let effectiveLeadId: string;
+  try {
+    const loginUrl = `${remoteUrl}/api/${defaultLocale}/${loginEndpoints.POST.path.join("/")}`;
+    const loginResponse = await fetch(loginUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, rememberMe: true }),
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (!loginResponse.ok) {
+      if (loginResponse.status === 401) {
+        return fail({
+          message: t("post.errors.unauthorized.title"),
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
+      }
+      if (loginResponse.status === 403) {
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+      if (loginResponse.status === 404) {
+        return fail({
+          message: t("post.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const loginBody = (await loginResponse.json()) as {
+      success?: boolean;
+      data?: LoginPostResponseOutput;
+    };
+
+    if (!loginBody.data?.token) {
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    token = loginBody.data.token;
+    effectiveLeadId = loginBody.data.leadId ?? "";
+    logger.info("[CONNECT] Successfully logged into remote", { remoteUrl });
+  } catch (err) {
+    logger.error("[CONNECT] Remote login error", { error: String(err) });
+    return fail({
+      message: t("post.errors.network.title"),
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    });
+  }
+
+  // ── Step 3: Local collision check (ignore self-record with token="self") ───
   const [localExisting] = await db
     .select({ id: userRemoteConnections.id })
     .from(userRemoteConnections)

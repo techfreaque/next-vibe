@@ -683,17 +683,22 @@ export const translations = {
     },
     cleanup: {
       name: "error-logs-cleanup",
-      description: "Prunes error logs older than 7 days",
+      description:
+        "Prunes error logs older than 6 months and caps total rows at 100K",
       post: {
         title: "Error Logs Cleanup",
-        description: "Delete old error log entries to keep the database lean",
+        description:
+          "Delete old error log entries (time-based + count-based) to keep the database lean",
         container: {
           title: "Cleanup Results",
           description: "Number of error logs deleted",
         },
         response: {
           deletedCount: "Deleted Count",
+          deletedByTime: "Deleted by Time",
+          deletedByCount: "Deleted by Count Cap",
           retentionDays: "Retention Days",
+          maxRows: "Max Rows",
         },
         success: {
           title: "Cleanup Complete",

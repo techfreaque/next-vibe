@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import {
   customWidgetObject,
   requestField,
@@ -24,6 +25,20 @@ import { ErrorLogLevelDB, ErrorLogSourceDB } from "../db";
 import { ERROR_LOGS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { ErrorLogsContainer } from "./widget";
+
+const { options: ErrorLogSourceOptions } = createEnumOptions(
+  scopedTranslation,
+  {
+    backend: "get.fields.source.options.backend",
+    task: "get.fields.source.options.task",
+    chat: "get.fields.source.options.chat",
+  },
+);
+
+const { options: ErrorLogLevelOptions } = createEnumOptions(scopedTranslation, {
+  error: "get.fields.level.options.error",
+  warn: "get.fields.level.options.warn",
+});
 
 export const { GET } = createEndpoint({
   scopedTranslation,
@@ -44,18 +59,18 @@ export const { GET } = createEndpoint({
       // === REQUEST FIELDS ===
       source: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "get.fields.source.label",
         description: "get.fields.source.description",
-        placeholder: "get.fields.source.placeholder",
+        options: ErrorLogSourceOptions,
         schema: z.enum(ErrorLogSourceDB).optional(),
       }),
       level: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "get.fields.level.label",
         description: "get.fields.level.description",
-        placeholder: "get.fields.level.placeholder",
+        options: ErrorLogLevelOptions,
         schema: z.enum(ErrorLogLevelDB).optional(),
       }),
       endpoint: requestField(scopedTranslation, {
@@ -72,6 +87,13 @@ export const { GET } = createEndpoint({
         label: "get.fields.errorType.label",
         description: "get.fields.errorType.description",
         placeholder: "get.fields.errorType.placeholder",
+        schema: z.string().optional(),
+      }),
+      fingerprint: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.fingerprint.label",
+        description: "get.fields.fingerprint.description",
         schema: z.string().optional(),
       }),
       startDate: requestField(scopedTranslation, {
@@ -122,6 +144,9 @@ export const { GET } = createEndpoint({
             errorCode: z.string().nullable(),
             stackTrace: z.string().nullable(),
             metadata: z.record(z.string(), z.any()).nullable(),
+            fingerprint: z.string(),
+            occurrences: z.number(),
+            resolved: z.boolean(),
             createdAt: z.string(),
           }),
         ),

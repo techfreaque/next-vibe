@@ -12,16 +12,18 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import definitions from "./definition";
 import { queryMessengerClicked } from "./repository";
+import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async ({ data }) => {
       const { resolution, range, lookback } = data;
-      const result = await queryMessengerClicked({
+      const raw = await queryMessengerClicked({
         timeRange: range,
         resolution: resolution,
       });
+      const result = fillGaps(raw, range, resolution);
       return success({
         result,
         meta: {

@@ -19,12 +19,19 @@ export const translations: typeof en = {
       source: {
         label: "Quelle",
         description: "Nach Fehlerquelle filtern",
-        placeholder: "backend, task, chat",
+        options: {
+          backend: "Backend",
+          task: "Aufgabe",
+          chat: "Chat",
+        },
       },
       level: {
         label: "Stufe",
         description: "Nach Fehlerstufe filtern",
-        placeholder: "error, warn",
+        options: {
+          error: "Fehler",
+          warn: "Warnung",
+        },
       },
       endpoint: {
         label: "Endpunkt",
@@ -35,6 +42,10 @@ export const translations: typeof en = {
         label: "Fehlertyp",
         description: "Nach Fehlertypklassifizierung filtern",
         placeholder: "z.B. INTERNAL_ERROR",
+      },
+      fingerprint: {
+        label: "Fingerabdruck",
+        description: "Nach Fehlergruppen-Fingerabdruck filtern",
       },
       startDate: {
         label: "Von",
@@ -131,6 +142,7 @@ export const translations: typeof en = {
       stackTrace: "Stack-Trace",
       metadata: "Metadaten",
       collapse: "Einklappen",
+      resolved: "Gelöst",
     },
     pagination: {
       info: "Seite {{page}} von {{totalPages}} ({{total}} gesamt)",

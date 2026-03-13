@@ -73,6 +73,15 @@ function extractMessage(
   return truncate(fullMessage, MAX_MESSAGE_LENGTH);
 }
 
+/** Compute a deterministic fingerprint for error grouping/deduplication */
+function computeFingerprint(
+  errorType: string | null | undefined,
+  message: string,
+): string {
+  const key = `${errorType ?? "unknown"}:${message.slice(0, 100)}`;
+  return Bun.hash(key).toString(36);
+}
+
 /**
  * Persist an error log to the database (fire-and-forget).
  * Never throws — all errors are silently caught.
@@ -92,18 +101,39 @@ export function persistErrorLog(
       // Dynamic import to avoid circular dependencies and module-level DB init
       const { db } = await import("@/app/api/[locale]/system/db");
 
+      const { sql } = await import("drizzle-orm");
+
+      const errorType = extractErrorType(error) ?? null;
+      const truncatedMessage = extractMessage(message, error);
+      const fingerprint = computeFingerprint(errorType, truncatedMessage);
+
       const row: NewErrorLog = {
         source,
         level: context?.level ?? "error",
-        message: extractMessage(message, error),
+        message: truncatedMessage,
         endpoint: context?.endpoint ?? null,
-        errorType: extractErrorType(error) ?? null,
+        errorType,
         errorCode: null,
         stackTrace: extractStack(error) ?? null,
         metadata: {},
+        fingerprint,
+        occurrences: 1,
+        resolved: false,
       };
 
-      await db.insert(errorLogs).values(row);
+      // Upsert: if same fingerprint exists, increment occurrences and update timestamp
+      await db
+        .insert(errorLogs)
+        .values(row)
+        .onConflictDoUpdate({
+          target: errorLogs.fingerprint,
+          set: {
+            occurrences: sql`${errorLogs.occurrences} + 1`,
+            stackTrace: row.stackTrace,
+            resolved: false,
+            createdAt: sql`now()`,
+          },
+        });
     } catch {
       // Silently swallow — logging persistence must never cascade
     }

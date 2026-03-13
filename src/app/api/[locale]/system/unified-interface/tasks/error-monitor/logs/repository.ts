@@ -51,6 +51,9 @@ export class ErrorLogsRepository {
       if (data?.errorType) {
         conditions.push(ilike(errorLogs.errorType, `%${data.errorType}%`));
       }
+      if (data?.fingerprint) {
+        conditions.push(eq(errorLogs.fingerprint, data.fingerprint));
+      }
       if (data?.startDate) {
         conditions.push(gte(errorLogs.createdAt, new Date(data.startDate)));
       }
@@ -71,6 +74,9 @@ export class ErrorLogsRepository {
           errorCode: errorLogs.errorCode,
           stackTrace: errorLogs.stackTrace,
           metadata: errorLogs.metadata,
+          fingerprint: errorLogs.fingerprint,
+          occurrences: errorLogs.occurrences,
+          resolved: errorLogs.resolved,
           createdAt: errorLogs.createdAt,
         })
         .from(errorLogs)
@@ -102,6 +108,9 @@ export class ErrorLogsRepository {
             string,
             string | number | boolean
           > | null,
+          fingerprint: row.fingerprint,
+          occurrences: row.occurrences,
+          resolved: row.resolved,
           createdAt: row.createdAt.toISOString(),
         })),
         totalCount,

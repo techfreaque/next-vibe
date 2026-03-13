@@ -46,9 +46,24 @@ const { POST } = createEndpoint({
         content: "errorMonitor.cleanup.post.response.deletedCount",
         schema: z.number(),
       }),
+      deletedByTime: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.deletedByTime",
+        schema: z.number(),
+      }),
+      deletedByCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.deletedByCount",
+        schema: z.number(),
+      }),
       retentionDays: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "errorMonitor.cleanup.post.response.retentionDays",
+        schema: z.number(),
+      }),
+      maxRows: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "errorMonitor.cleanup.post.response.maxRows",
         schema: z.number(),
       }),
     },
@@ -102,11 +117,16 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         deletedCount: 142,
-        retentionDays: 7,
+        deletedByTime: 120,
+        deletedByCount: 22,
+        retentionDays: 180,
+        maxRows: 100_000,
       },
     },
   },
 });
+
+export type CleanupPostResponseOutput = typeof POST.types.ResponseOutput;
 
 const definitions = { POST };
 export default definitions;

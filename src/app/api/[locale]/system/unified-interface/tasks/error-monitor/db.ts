@@ -1,16 +1,19 @@
 /**
  * Error Logs Database Schema
- * Stores truncated backend error logs for monitoring.
+ * Single table for all error monitoring — groups are inferred via GROUP BY fingerprint.
  * Privacy-first: messages and stack traces are truncated on write.
- * Cleaned up by a daily task (7-day retention).
+ * Cleaned up by a daily task (6-month / 100K row retention).
  */
 
 import {
+  boolean,
   index,
+  integer,
   jsonb,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -52,7 +55,9 @@ interface ErrorLogMetadata {
 
 /**
  * Error Logs Table
- * Stores truncated backend errors for monitoring and pattern detection.
+ * One row per unique error (fingerprint). Occurrences are counted, not duplicated.
+ * On write: upsert by fingerprint — increment occurrences, update timestamp.
+ * Resolve/reopen: flip the resolved flag on the single row.
  */
 export const errorLogs = pgTable(
   "error_logs",
@@ -83,6 +88,15 @@ export const errorLogs = pgTable(
     /** Structured metadata — no PII, just classification data */
     metadata: jsonb("metadata").$type<ErrorLogMetadata>().default({}),
 
+    /** Deduplication fingerprint — hash of errorType + message prefix (unique) */
+    fingerprint: text("fingerprint").notNull().unique(),
+
+    /** Number of occurrences this row represents (>1 after dedup merges) */
+    occurrences: integer("occurrences").notNull().default(1),
+
+    /** Whether this error's group has been resolved/acknowledged */
+    resolved: boolean("resolved").notNull().default(false),
+
     /** When the error occurred */
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -91,6 +105,10 @@ export const errorLogs = pgTable(
     sourceIdx: index("error_logs_source_idx").on(table.source),
     endpointIdx: index("error_logs_endpoint_idx").on(table.endpoint),
     errorTypeIdx: index("error_logs_error_type_idx").on(table.errorType),
+    fingerprintIdx: uniqueIndex("error_logs_fingerprint_idx").on(
+      table.fingerprint,
+    ),
+    resolvedIdx: index("error_logs_resolved_idx").on(table.resolved),
   }),
 );
 
