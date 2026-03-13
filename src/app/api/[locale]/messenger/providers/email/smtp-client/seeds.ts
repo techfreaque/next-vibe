@@ -226,10 +226,11 @@ export function test(logger: EndpointLogger): void {
 }
 
 /**
- * Production seed data
+ * Production seed data — same as dev, upserts SMTP accounts from env vars
  */
-export function prod(logger: EndpointLogger): void {
-  logger.debug("🌱 Skipping production SMTP accounts seeding");
+export async function prod(logger: EndpointLogger): Promise<void> {
+  logger.debug("🌱 Seeding production SMTP accounts...");
+  await dev(logger);
 }
 
 // Export priority for seed manager
