@@ -140,6 +140,14 @@ export const translations = {
       description: "Bounce-Prozessor-Konfiguration gespeichert",
     },
   },
+  priority: {
+    critical: "Kritisch",
+    high: "Hoch",
+    medium: "Mittel",
+    low: "Niedrig",
+    background: "Hintergrund",
+  },
+
   widget: {
     title: "Bounce-Prozessor-Konfiguration",
     titleSaved: "Konfiguration gespeichert",

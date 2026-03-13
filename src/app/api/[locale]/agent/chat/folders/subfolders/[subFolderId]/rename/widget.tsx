@@ -15,7 +15,6 @@ interface RenameWidgetProps {
   field: {
     value: RenameDefinition["types"]["ResponseOutput"] | null | undefined;
   } & RenameDefinition["fields"];
-  fieldName: string;
 }
 
 export function FolderRenameContainer({

@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "bar-chart-2",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.analytics",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
@@ -60,6 +60,7 @@ const { GET } = createEndpoint({
         label: "get.fields.resolution.label",
         description: "get.fields.resolution.description",
         hidden: true,
+        includeInCacheKey: true,
         schema: z.enum(GraphResolutionDB).default(GraphResolution.ONE_DAY),
       }),
       cursor: requestField(scopedTranslation, {
@@ -68,6 +69,7 @@ const { GET } = createEndpoint({
         label: "get.fields.cursor.label",
         description: "get.fields.cursor.description",
         hidden: true,
+        includeInCacheKey: true,
         schema: z.string().optional(),
       }),
       graph: objectField(scopedTranslation, {

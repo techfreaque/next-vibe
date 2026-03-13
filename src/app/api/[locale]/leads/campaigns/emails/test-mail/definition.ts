@@ -8,7 +8,7 @@ import { z } from "zod";
 import {
   CampaignType,
   CampaignTypeOptions,
-} from "@/app/api/[locale]/emails/smtp-client/enum";
+} from "@/app/api/[locale]/messenger/accounts/enum";
 import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
@@ -55,7 +55,7 @@ const { POST } = createEndpoint({
   path: ["leads", "campaigns", "emails", "test-mail"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.leads",
+  category: "app.endpointCategories.leadsCampaigns",
   tags: ["tags.campaigns", "tags.leads"],
   allowedRoles: [UserRole.ADMIN],
   icon: "send",

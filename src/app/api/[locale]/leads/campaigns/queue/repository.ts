@@ -20,7 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import {
   CampaignTypeFilter,
   mapCampaignTypeFilter,
-} from "../../../emails/smtp-client/enum";
+} from "../../../messenger/accounts/enum";
 import { emailCampaigns, leads } from "../../db";
 import { LeadStatus } from "../../enum";
 import type {

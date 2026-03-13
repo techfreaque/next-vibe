@@ -64,7 +64,6 @@ interface CustomWidgetProps {
   field: {
     value: UserListResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 function UserRow({
@@ -185,7 +184,6 @@ function UserRow({
 
 export function UsersListContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
@@ -437,7 +435,7 @@ export function UsersListContainer({
       {/* Search */}
       <Div className="px-4 pt-3 pb-1">
         <TextFieldWidget
-          fieldName={`${fieldName}.searchFilters.search`}
+          fieldName={"searchFilters.search"}
           field={children.searchFilters.children.search}
         />
       </Div>

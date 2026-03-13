@@ -42,7 +42,6 @@ interface CustomWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 function formatFileSize(base64Length: number): string {

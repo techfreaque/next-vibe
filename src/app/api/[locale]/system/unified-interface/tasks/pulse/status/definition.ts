@@ -33,7 +33,7 @@ const pulseStatusEndpoint = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "activity",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemTasks",
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
   aliases: [PULSE_STATUS_ALIAS, "pulse:status"],
   tags: ["tags.status"],

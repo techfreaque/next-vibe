@@ -1,7 +1,5 @@
 import type { translations as enTranslations } from "../en";
 
-import { journeysTranslations } from "./journeys";
-
 export const translations: typeof enTranslations = {
   emailJourneys: {
     components: {
@@ -79,9 +77,6 @@ export const translations: typeof enTranslations = {
             "Kampania reaktywacyjna skierowana do użytkowników, którzy stali się nieaktywni lub zrezygnowali",
         },
       },
-    },
-    leads: {
-      journeys: journeysTranslations,
     },
   },
 };

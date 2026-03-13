@@ -159,11 +159,20 @@ export function MultiSelectFieldWidget<
                     labelParams?: Record<string, string | number>;
                     disabled?: boolean;
                     icon?: string;
-                  }) => ({
-                    value: String(opt.value),
-                    label: tField(opt.label, opt.labelParams),
-                    disabled: opt.disabled,
-                  }),
+                  }) => {
+                    const translated = tField(opt.label, opt.labelParams);
+                    return {
+                      value: String(opt.value),
+                      label:
+                        translated === opt.label
+                          ? globalT(
+                              opt.label as Parameters<typeof globalT>[0],
+                              opt.labelParams,
+                            )
+                          : translated,
+                      disabled: opt.disabled,
+                    };
+                  },
                 )}
                 value={multiselectValue}
                 onChange={(newValue) => {

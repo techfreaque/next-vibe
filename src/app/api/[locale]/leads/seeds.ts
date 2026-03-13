@@ -9,11 +9,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, Languages } from "@/i18n/core/config";
 
-import { EmailStatus } from "../emails/messages/enum";
+import { MessageStatus } from "../messenger/messages/enum";
 import {
   CampaignType,
   type CampaignTypeValue,
-} from "../emails/smtp-client/enum";
+} from "../messenger/accounts/enum";
 import {
   emailCampaigns,
   emailJourneyVariants,
@@ -593,7 +593,8 @@ async function generateEmailCampaigns(
           templateNames[Math.floor(Math.random() * templateNames.length)],
         scheduledAt: getRandomPastDate(365),
         sentAt: Math.random() > 0.2 ? getRandomPastDate(300) : null,
-        status: Math.random() > 0.2 ? EmailStatus.SENT : EmailStatus.PENDING,
+        status:
+          Math.random() > 0.2 ? MessageStatus.SENT : MessageStatus.PENDING,
         openedAt: Math.random() > 0.6 ? getRandomPastDate(270) : null,
         clickedAt: Math.random() > 0.8 ? getRandomPastDate(270) : null,
         metadata: {
@@ -982,7 +983,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       templateName: "welcome-email",
       scheduledAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       sentAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      status: EmailStatus.SENT,
+      status: MessageStatus.SENT,
       metadata: {
         test: true,
         campaign_type: "welcome",
@@ -998,7 +999,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
       templateName: "followup-general",
       scheduledAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
       sentAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      status: EmailStatus.OPENED,
+      status: MessageStatus.OPENED,
       openedAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
       metadata: {
         test: true,

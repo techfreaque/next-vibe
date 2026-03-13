@@ -1,0 +1,51 @@
+export const translations = {
+  tags: { vibeSense: "vibe-sense" },
+  post: {
+    title: "Crossover",
+    description: "Fires when series A crosses above series B",
+    fields: {
+      seriesA: { label: "Series A", description: "First input time series" },
+      seriesB: { label: "Series B", description: "Second input time series" },
+      resolution: { label: "Resolution", description: "Computation timeframe" },
+      range: { label: "Range", description: "Time range to evaluate" },
+      lookback: {
+        label: "Lookback",
+        description: "Extra bars before range start for warm-up",
+      },
+      signals: { label: "Signals", description: "Output signal events" },
+    },
+    success: {
+      title: "Crossover evaluated",
+      description: "Signal events returned",
+    },
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      forbidden: { title: "Forbidden", description: "Admin access required" },
+      server: {
+        title: "Server error",
+        description: "Crossover evaluation failed",
+      },
+      unknown: {
+        title: "Unknown error",
+        description: "An unexpected error occurred",
+      },
+      validation: {
+        title: "Validation failed",
+        description: "Invalid request parameters",
+      },
+      notFound: { title: "Not found", description: "Not found" },
+      conflict: { title: "Conflict", description: "Conflict" },
+      network: {
+        title: "Network error",
+        description: "Network request failed",
+      },
+      unsavedChanges: {
+        title: "Unsaved changes",
+        description: "Save changes first",
+      },
+    },
+  },
+};

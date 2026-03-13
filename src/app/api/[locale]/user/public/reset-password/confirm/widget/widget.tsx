@@ -37,7 +37,6 @@ interface CustomWidgetProps {
   field: {
     value: ResetPasswordConfirmPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 /**

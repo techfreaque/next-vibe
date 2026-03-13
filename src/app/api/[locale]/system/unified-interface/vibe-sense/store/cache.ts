@@ -16,7 +16,7 @@ import { eq, lt } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 
 import { pipelineSnapshots } from "../db";
-import type { DataPoint, TimeRange, Resolution } from "../indicators/types";
+import type { DataPoint, TimeRange, Resolution } from "../shared/fields";
 
 // ─── Cache Key ────────────────────────────────────────────────────────────────
 

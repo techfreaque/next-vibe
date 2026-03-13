@@ -49,7 +49,7 @@ const { POST: ImportCsvPost } = createEndpoint({
   title: "csv.post.title",
   description: "csv.post.description",
   icon: "upload" as const,
-  category: "app.endpointCategories.dataImport",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tags.csv", "tags.upload", "tags.batch"],
 
   fields: objectField(scopedTranslation, {
@@ -428,7 +428,7 @@ const { GET: ListImportJobsGet } = createEndpoint({
   title: "jobs.get.title",
   description: "jobs.get.description",
   icon: "file-text" as const,
-  category: "app.endpointCategories.dataImport",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tags.jobs", "tags.status", "tags.history"],
 
   fields: objectField(scopedTranslation, {

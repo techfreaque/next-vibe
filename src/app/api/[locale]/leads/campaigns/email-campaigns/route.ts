@@ -1,17 +1,16 @@
 /**
  * Email Campaigns Route Handler
- * Called by cron to process email campaigns
+ * Called by cron or manually from admin UI to process email campaigns
  */
 
 import "server-only";
 
-import { fail, success } from "next-vibe/shared/types/response.schema";
+import { success } from "next-vibe/shared/types/response.schema";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { EmailCampaignStage } from "../../enum";
-import { getDefaultConfig } from "./config";
 import definitions from "./definition";
 import { emailCampaignsRepository } from "./repository";
 import { createEmptyEmailCampaignResult } from "./types";
@@ -26,34 +25,23 @@ const STAGE_PRIORITIES: Record<string, number> = {
   [EmailCampaignStage.REACTIVATION]: 6,
 };
 
+const ENABLED_STAGES = [
+  EmailCampaignStage.INITIAL,
+  EmailCampaignStage.FOLLOWUP_1,
+  EmailCampaignStage.FOLLOWUP_2,
+  EmailCampaignStage.FOLLOWUP_3,
+  EmailCampaignStage.NURTURE,
+  EmailCampaignStage.REACTIVATION,
+];
+
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
     handler: async ({ data, logger, t }) => {
-      const config = getDefaultConfig();
-      // Override from request data
-      const batchSize = data.batchSize ?? config.batchSize;
-      const maxEmailsPerRun = data.maxEmailsPerRun ?? config.maxEmailsPerRun;
-      const dryRun = data.dryRun ?? config.dryRun;
-
-      const now = new Date();
-      const currentHour = now.getUTCHours();
-      const currentDay = now.getUTCDay();
-
-      // Check time window
-      if (
-        currentHour < config.enabledHours.start ||
-        currentHour > config.enabledHours.end ||
-        !config.enabledDays.includes(currentDay)
-      ) {
-        return success({
-          emailsScheduled: 0,
-          emailsSent: 0,
-          emailsFailed: 0,
-          leadsProcessed: 0,
-        });
-      }
+      const batchSize = data.batchSize;
+      const maxEmailsPerRun = data.maxEmailsPerRun;
+      const dryRun = data.dryRun;
 
       // Bootstrap pending leads
       await emailCampaignsRepository.bootstrapPendingLeads(
@@ -63,7 +51,7 @@ export const { POST, tools } = endpointsHandler({
       );
 
       // Process stages by priority
-      const stagesToProcess = config.enabledStages.toSorted((a, b) => {
+      const stagesToProcess = ENABLED_STAGES.toSorted((a, b) => {
         return (STAGE_PRIORITIES[a] ?? 999) - (STAGE_PRIORITIES[b] ?? 999);
       });
 
@@ -83,7 +71,12 @@ export const { POST, tools } = endpointsHandler({
         );
 
         if (!stageResult.success) {
-          return fail(stageResult);
+          // Log but don't abort — return partial results
+          logger.error("Stage processing failed", {
+            stage,
+            error: stageResult.message,
+          });
+          break;
         }
 
         globalResult.emailsScheduled += stageResult.data.emailsScheduled;

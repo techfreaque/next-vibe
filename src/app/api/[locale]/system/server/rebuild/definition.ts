@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   path: ["system", "server", "rebuild"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tags.rebuild"],
   icon: "refresh-cw",
   allowedRoles: [

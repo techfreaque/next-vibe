@@ -74,8 +74,9 @@ interface CustomWidgetProps {
   field: {
     value: FavoritesListResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
+
+const FAVORITES_FIELD = "favorites";
 
 /**
  * Character group — favorites grouped by characterId
@@ -149,7 +150,6 @@ function flattenGroups(groups: CharacterGroup[]): FavoriteCard[] {
 const FullCard = React.memo(function FullCard({
   item,
   index,
-  fieldName,
   fieldChildren,
   handleSelectFavorite,
   navigate,
@@ -162,7 +162,6 @@ const FullCard = React.memo(function FullCard({
 }: {
   item: FavoriteCard;
   index: number;
-  fieldName: string;
   fieldChildren: (typeof definition.GET)["fields"]["children"];
   handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
@@ -200,7 +199,7 @@ const FullCard = React.memo(function FullCard({
             item.icon,
             item,
           )}
-          fieldName={arrayFieldPath(fieldName, index, "icon")}
+          fieldName={arrayFieldPath(FAVORITES_FIELD, index, "icon")}
         />
       </Div>
       <Div className="flex-1 min-w-0">
@@ -212,7 +211,7 @@ const FullCard = React.memo(function FullCard({
                 item.name,
                 item,
               )}
-              fieldName={arrayFieldPath(fieldName, index, "name")}
+              fieldName={arrayFieldPath(FAVORITES_FIELD, index, "name")}
             />
           </Span>
           <TextWidget
@@ -221,7 +220,7 @@ const FullCard = React.memo(function FullCard({
               item.tagline,
               item,
             )}
-            fieldName={arrayFieldPath(fieldName, index, "tagline")}
+            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "tagline")}
           />
           <BadgeWidget
             field={withValue(
@@ -229,7 +228,7 @@ const FullCard = React.memo(function FullCard({
               item.activeBadge,
               item,
             )}
-            fieldName={arrayFieldPath(fieldName, index, "activeBadge")}
+            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "activeBadge")}
           />
         </Div>
         <TextWidget
@@ -238,7 +237,7 @@ const FullCard = React.memo(function FullCard({
             item.description,
             item,
           )}
-          fieldName={arrayFieldPath(fieldName, index, "description")}
+          fieldName={arrayFieldPath(FAVORITES_FIELD, index, "description")}
         />
         <Div className="flex items-center gap-1 text-xs text-muted-foreground mt-2">
           <IconWidget
@@ -247,7 +246,7 @@ const FullCard = React.memo(function FullCard({
               item.modelIcon,
               item,
             )}
-            fieldName={arrayFieldPath(fieldName, index, "modelIcon")}
+            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelIcon")}
           />
           <TextWidget
             field={withValue(
@@ -255,11 +254,11 @@ const FullCard = React.memo(function FullCard({
               item.modelInfo,
               item,
             )}
-            fieldName={arrayFieldPath(fieldName, index, "modelInfo")}
+            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelInfo")}
           />
           <TextWidget
             field={fieldChildren.favorites.child.children.separator1}
-            fieldName={arrayFieldPath(fieldName, index, "separator1")}
+            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "separator1")}
           />
           <TextWidget
             field={withValue(
@@ -267,11 +266,11 @@ const FullCard = React.memo(function FullCard({
               item.modelProvider,
               item,
             )}
-            fieldName={arrayFieldPath(fieldName, index, "modelProvider")}
+            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelProvider")}
           />
           <TextWidget
             field={fieldChildren.favorites.child.children.separator2}
-            fieldName={arrayFieldPath(fieldName, index, "separator2")}
+            fieldName={arrayFieldPath(FAVORITES_FIELD, index, "separator2")}
           />
           {item.modelId && (
             <ModelCreditDisplay
@@ -339,7 +338,6 @@ const FullCard = React.memo(function FullCard({
 const SortableVariantRow = React.memo(function SortableVariantRow({
   item,
   index,
-  fieldName,
   fieldChildren,
   handleSelectFavorite,
   navigate,
@@ -348,7 +346,6 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
 }: {
   item: FavoriteCard;
   index: number;
-  fieldName: string;
   fieldChildren: (typeof definition.GET)["fields"]["children"];
   handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
@@ -393,7 +390,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
             item.modelIcon,
             item,
           )}
-          fieldName={arrayFieldPath(fieldName, index, "modelIcon")}
+          fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelIcon")}
         />
 
         {/* Two-line model info */}
@@ -411,7 +408,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
                   item.modelInfo,
                   item,
                 )}
-                fieldName={arrayFieldPath(fieldName, index, "modelInfo")}
+                fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelInfo")}
               />
             </Span>
             <BadgeWidget
@@ -420,7 +417,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
                 item.activeBadge,
                 item,
               )}
-              fieldName={arrayFieldPath(fieldName, index, "activeBadge")}
+              fieldName={arrayFieldPath(FAVORITES_FIELD, index, "activeBadge")}
             />
           </Div>
           <Div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -430,13 +427,21 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
                 item.modelProvider,
                 item,
               )}
-              fieldName={arrayFieldPath(fieldName, index, "modelProvider")}
+              fieldName={arrayFieldPath(
+                FAVORITES_FIELD,
+                index,
+                "modelProvider",
+              )}
             />
             {item.modelId ? (
               <>
                 <TextWidget
                   field={fieldChildren.favorites.child.children.separator2}
-                  fieldName={arrayFieldPath(fieldName, index, "separator2")}
+                  fieldName={arrayFieldPath(
+                    FAVORITES_FIELD,
+                    index,
+                    "separator2",
+                  )}
                 />
                 <ModelCreditDisplay
                   modelId={item.modelId}
@@ -499,7 +504,6 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
 const SortableGroup = React.memo(function SortableGroup({
   group,
   allFavorites,
-  fieldName,
   fieldChildren,
   handleSelectFavorite,
   navigate,
@@ -511,7 +515,6 @@ const SortableGroup = React.memo(function SortableGroup({
 }: {
   group: CharacterGroup;
   allFavorites: FavoriteCard[];
-  fieldName: string;
   fieldChildren: (typeof definition.GET)["fields"]["children"];
   handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
@@ -569,7 +572,6 @@ const SortableGroup = React.memo(function SortableGroup({
         <FullCard
           item={item}
           index={globalIndex}
-          fieldName={fieldName}
           fieldChildren={fieldChildren}
           handleSelectFavorite={handleSelectFavorite}
           navigate={navigate}
@@ -666,7 +668,6 @@ const SortableGroup = React.memo(function SortableGroup({
                     key={item.id}
                     item={item}
                     index={globalIndex}
-                    fieldName={fieldName}
                     fieldChildren={fieldChildren}
                     handleSelectFavorite={handleSelectFavorite}
                     navigate={navigate}
@@ -692,7 +693,6 @@ const SortableGroup = React.memo(function SortableGroup({
  */
 export function FavoritesListContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { push: navigate } = useWidgetNavigation();
@@ -870,7 +870,6 @@ export function FavoritesListContainer({
                     key={group.id}
                     group={group}
                     allFavorites={favoritesList}
-                    fieldName={fieldName}
                     fieldChildren={children}
                     handleSelectFavorite={handleSelectFavorite}
                     navigate={navigate}

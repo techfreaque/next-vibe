@@ -402,6 +402,16 @@ export class CharactersRepository {
         });
       }
 
+      // Guard: custom characters use UUID IDs; non-UUID strings are unknown IDs
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(characterId)) {
+        return fail({
+          message: t("id.get.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
       // Check custom characters
       // Return character if:
       // 1. User owns it (any ownershipType)

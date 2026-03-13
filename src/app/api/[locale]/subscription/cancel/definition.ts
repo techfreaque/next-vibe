@@ -31,7 +31,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "package-x",
-  category: "app.endpointCategories.credits",
+  category: "app.endpointCategories.payments",
   tags: ["tags.subscription" as const, "tags.cancel" as const],
   allowedRoles: [
     UserRole.CUSTOMER,

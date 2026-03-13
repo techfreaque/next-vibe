@@ -17,7 +17,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { pipelineGraphs } from "../db";
-import { initializeRegistry } from "../indicators/registry";
 import { getLatestRun } from "../store/runs";
 import { runGraph } from "./runner";
 
@@ -48,25 +47,23 @@ export async function runDueGraphs(
     );
 
   // Filter to cron-triggered graphs
-  const cronGraphs = graphs.filter((g) => {
+  const scheduledGraphs = graphs.filter((g) => {
     return g.config.trigger.type === "cron";
   });
-
-  await initializeRegistry();
 
   let executed = 0;
   const errors: SchedulerResult["errors"] = [];
 
-  for (const graph of cronGraphs) {
+  for (const graph of scheduledGraphs) {
     try {
       const { config } = graph;
       if (config.trigger.type !== "cron") {
         continue;
       }
-
-      // Single lastRun fetch — used for both due-check and range computation
       const lastRun = await getLatestRun(graph.id);
+
       const isDue = checkIfDue(lastRun, config.trigger.schedule);
+
       if (!isDue) {
         continue;
       }
@@ -86,7 +83,7 @@ export async function runDueGraphs(
   }
 
   return {
-    graphsChecked: cronGraphs.length,
+    graphsChecked: scheduledGraphs.length,
     graphsExecuted: executed,
     errors,
   };

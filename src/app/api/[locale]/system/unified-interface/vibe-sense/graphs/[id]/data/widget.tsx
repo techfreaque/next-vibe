@@ -1,10 +1,18 @@
 /**
  * Vibe Sense — Graph Chart View Widget
  *
- * Resolution selector + lightweight-charts line chart.
+ * Multi-pane resolution selector + lightweight-charts line chart.
  * Panning left loads older history via cursor-based pagination.
  * Data pages are accumulated client-side across fetches.
- * Each series has its own Y-axis scale (auto-scaled per range).
+ * Features:
+ *   - Multi-pane layout (series grouped by node config `pane` field)
+ *   - Color-based scale groups (same color = same price scale within a pane)
+ *   - Crosshair tooltip overlay (all series values at cursor)
+ *   - Floating series legend with last values
+ *   - Time scale + crosshair sync across panes
+ *   - Loading shimmer
+ *   - Pan-back toast
+ *   - Dark/light theme support
  */
 
 "use client";
@@ -12,6 +20,7 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Archive } from "next-vibe-ui/ui/icons/Archive";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
@@ -19,27 +28,52 @@ import { Edit } from "next-vibe-ui/ui/icons/Edit";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Grip } from "next-vibe-ui/ui/icons/Grip";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { cn } from "next-vibe/shared/utils";
 
 import {
   useWidgetEndpointMutations,
-  useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
-import type { UTCTimestamp } from "lightweight-charts";
+import type {
+  IChartApi,
+  ISeriesApi,
+  SeriesDefinition,
+  SeriesType,
+  Time,
+  UTCTimestamp,
+} from "lightweight-charts";
 
 import { GraphResolution } from "../../../enum";
-import type { Resolution } from "../../../indicators/types";
+import {
+  RESOLUTION_MS,
+  type Resolution,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
+import definitions from "./definition";
 import type definition from "./definition";
+import type { GraphNodeConfig } from "../../../graph/schema";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
 
@@ -47,12 +81,11 @@ interface WidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-const LINE_COLORS = [
+const DEFAULT_LINE_COLORS = [
   "#2563eb",
   "#16a34a",
   "#9333ea",
@@ -64,13 +97,74 @@ const LINE_COLORS = [
 ];
 
 const RESOLUTION_OPTIONS = [
+  { label: "1m", value: GraphResolution.ONE_MINUTE },
+  { label: "3m", value: GraphResolution.THREE_MINUTES },
+  { label: "5m", value: GraphResolution.FIVE_MINUTES },
+  { label: "15m", value: GraphResolution.FIFTEEN_MINUTES },
+  { label: "30m", value: GraphResolution.THIRTY_MINUTES },
   { label: "1H", value: GraphResolution.ONE_HOUR },
   { label: "4H", value: GraphResolution.FOUR_HOURS },
   { label: "1D", value: GraphResolution.ONE_DAY },
   { label: "1W", value: GraphResolution.ONE_WEEK },
+  { label: "1M", value: GraphResolution.ONE_MONTH },
 ] as const;
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Resolution → time scale config ──────────────────────────────────────────
+
+const RESOLUTION_BAR_SPACING: Record<Resolution, number> = {
+  [GraphResolution.ONE_MINUTE]: 4,
+  [GraphResolution.THREE_MINUTES]: 5,
+  [GraphResolution.FIVE_MINUTES]: 6,
+  [GraphResolution.FIFTEEN_MINUTES]: 7,
+  [GraphResolution.THIRTY_MINUTES]: 8,
+  [GraphResolution.ONE_HOUR]: 10,
+  [GraphResolution.FOUR_HOURS]: 14,
+  [GraphResolution.ONE_DAY]: 20,
+  [GraphResolution.ONE_WEEK]: 30,
+  [GraphResolution.ONE_MONTH]: 40,
+};
+
+function makeTickFormatter(
+  resolution: Resolution,
+): (utcSeconds: number) => string {
+  const ms = RESOLUTION_MS[resolution];
+  return (utcSeconds: number): string => {
+    const d = new Date(utcSeconds * 1000);
+    if (ms >= 30 * 24 * 3600_000) {
+      return d.toLocaleDateString(undefined, {
+        month: "short",
+        year: "2-digit",
+      });
+    }
+    if (ms >= 7 * 24 * 3600_000) {
+      return d.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      });
+    }
+    if (ms >= 24 * 3600_000) {
+      return d.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      });
+    }
+    if (ms >= 3600_000) {
+      return d.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+    }
+    return d.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+  };
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function timestampToISO(utcSeconds: number): string {
   return new Date(utcSeconds * 1000).toISOString();
@@ -90,6 +184,23 @@ function deduplicatePoints(
   return [...map.entries()]
     .map(([time, value]) => ({ time, value }))
     .toSorted((a, b) => a.time - b.time);
+}
+
+function humanizeNodeId(nodeId: string): string {
+  return nodeId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatValue(v: number): string {
+  if (Math.abs(v) < 1 && v !== 0) {
+    return v.toFixed(4);
+  }
+  if (Math.abs(v) >= 1_000_000) {
+    return `${(v / 1_000_000).toFixed(2)}M`;
+  }
+  if (Math.abs(v) >= 1_000) {
+    return `${(v / 1_000).toFixed(1)}k`;
+  }
+  return v.toFixed(2);
 }
 
 // ─── Merge accumulated series ─────────────────────────────────────────────────
@@ -144,259 +255,649 @@ function mergeSignals(prev: SignalItem[], next: SignalItem[]): SignalItem[] {
   return [...map.values()];
 }
 
-// ─── Scale Grouping ──────────────────────────────────────────────────────────
+// ─── Node Display Config ────────────────────────────────────────────────────
 
-/**
- * Group series into two Y-axis scales: "right" (counts/large values) and
- * "left" (rates/fractions 0–1). lightweight-charts v5 only supports two
- * labeled axes ("left" and "right") — custom IDs become invisible overlays.
- *
- * Series with max value ≤ 1 go on the left axis (rates/fractions).
- * Everything else goes on the right axis (counts, totals, etc.).
- */
-function computeScaleGroups(series: SeriesItem[]): Map<string, string> {
-  const result = new Map<string, string>();
+interface NodeDisplayConfig {
+  pane: number;
+  color: string;
+  visible: boolean;
+  scale?: "left" | "right";
+}
 
+/** Extract display config from graph node configs for all series */
+function getNodeDisplayConfigs(
+  series: SeriesItem[],
+  nodeConfigs: Record<string, GraphNodeConfig> | undefined,
+): Map<string, NodeDisplayConfig> {
+  const result = new Map<string, NodeDisplayConfig>();
+  let colorIdx = 0;
   for (const s of series) {
-    if (s.points.length === 0) {
-      result.set(s.nodeId, "right");
-      continue;
-    }
-    let max = 0;
-    for (const p of s.points) {
-      const abs = Math.abs(p.value);
-      if (abs > max) {
-        max = abs;
-      }
-    }
-    // Rates/fractions (0–1 range) → left axis; counts → right axis
-    result.set(s.nodeId, max <= 1 ? "left" : "right");
+    const nc = nodeConfigs?.[s.nodeId];
+    result.set(s.nodeId, {
+      pane: nc?.pane ?? 0,
+      color:
+        nc?.color ??
+        DEFAULT_LINE_COLORS[colorIdx % DEFAULT_LINE_COLORS.length] ??
+        "#888",
+      visible: nc?.visible !== false,
+      scale: nc?.scale,
+    });
+    colorIdx++;
   }
   return result;
 }
 
-// ─── Chart Renderer ───────────────────────────────────────────────────────────
-
-// Minimal lightweight-charts series interface for in-place updates
-interface LwcSeries {
-  setData: (data: Array<{ time: UTCTimestamp; value: number }>) => void;
+/** Group series by pane number */
+function groupByPane(
+  series: SeriesItem[],
+  displayConfigs: Map<string, NodeDisplayConfig>,
+): Map<number, SeriesItem[]> {
+  const panes = new Map<number, SeriesItem[]>();
+  for (const s of series) {
+    const cfg = displayConfigs.get(s.nodeId);
+    if (cfg && !cfg.visible) {
+      continue; // Skip hidden series
+    }
+    const pane = cfg?.pane ?? 0;
+    const arr = panes.get(pane) ?? [];
+    arr.push(s);
+    panes.set(pane, arr);
+  }
+  return panes;
 }
 
-function useChartRenderer(
+/**
+ * Compute scale groups within a pane: series sharing the same color share a price scale.
+ * This lets users control scale grouping via the color picker in the editor.
+ * Max 2 visible scales per pane (right + left). 3rd+ color groups go on "right".
+ * Explicit `scale` config on a node overrides the color-based assignment.
+ */
+function computeScaleGroups(
+  paneSeries: SeriesItem[],
+  displayConfigs: Map<string, NodeDisplayConfig>,
+): Map<string, string> {
+  const result = new Map<string, string>();
+
+  const colorToScale = new Map<string, string>();
+  let scaleCounter = 0;
+
+  for (const s of paneSeries) {
+    const cfg = displayConfigs.get(s.nodeId);
+
+    // Explicit scale from config takes priority
+    if (cfg?.scale) {
+      result.set(s.nodeId, cfg.scale);
+      continue;
+    }
+
+    const color = cfg?.color ?? "#888";
+    let scaleId = colorToScale.get(color);
+    if (!scaleId) {
+      if (scaleCounter === 0) {
+        scaleId = "right";
+      } else if (scaleCounter === 1) {
+        scaleId = "left";
+      } else {
+        // 3rd+ color groups merge into "right" to avoid hidden uncontrollable scales
+        scaleId = "right";
+      }
+      colorToScale.set(color, scaleId);
+      scaleCounter++;
+    }
+    result.set(s.nodeId, scaleId);
+  }
+  return result;
+}
+
+// ─── Crosshair overlay types ──────────────────────────────────────────────────
+
+interface CrosshairPoint {
+  nodeId: string;
+  value: number;
+  color: string;
+}
+
+interface CrosshairState {
+  x: number;
+  y: number;
+  time: string;
+  points: CrosshairPoint[];
+}
+
+// ─── Theme Colors ────────────────────────────────────────────────────────────
+
+/** Resolve CSS custom properties to computed color strings for canvas use */
+function getChartColors(): {
+  textColor: string;
+  borderColor: string;
+  bgColor: string;
+} {
+  const style = getComputedStyle(document.documentElement);
+  const fg = style.getPropertyValue("--foreground").trim();
+  const border = style.getPropertyValue("--border").trim();
+  return {
+    textColor: fg ? `hsl(${fg})` : "#888",
+    borderColor: border ? `hsl(${border})` : "#333",
+    bgColor: "transparent",
+  };
+}
+
+// ─── Chart Renderer (Multi-Pane) ─────────────────────────────────────────────
+
+type LwcSeries = ISeriesApi<SeriesType, Time>;
+
+interface PaneState {
+  chart: IChartApi;
+  container: HTMLDivElement;
+  seriesMap: Map<string, LwcSeries>;
+}
+
+/** Render series data into chart panes — used both by chart setup and data effect */
+function renderSeriesData(
+  series: SeriesItem[],
+  signals: SignalItem[],
+  panesRef: React.RefObject<Map<number, PaneState>>,
+  LineSeriesCtorRef: React.RefObject<SeriesDefinition<"Line"> | null>,
+  displayConfigsRef: React.RefObject<Map<string, NodeDisplayConfig>>,
+  onLastValuesRef: React.RefObject<(values: Map<string, number>) => void>,
+  oldestLoadedRef: React.MutableRefObject<number | null>,
+  didFitContentRef: React.MutableRefObject<boolean>,
+): void {
+  if (!series.length || panesRef.current.size === 0) {
+    return;
+  }
+
+  // Track oldest point
+  let oldest: number | null = null;
+  for (const s of series) {
+    for (const p of s.points) {
+      const t = new Date(p.timestamp).getTime();
+      if (oldest === null || t < oldest) {
+        oldest = t;
+      }
+    }
+  }
+  oldestLoadedRef.current = oldest;
+
+  // Emit last values
+  const lastVals = new Map<string, number>();
+  for (const s of series) {
+    if (s.points.length > 0) {
+      const last = s.points[s.points.length - 1];
+      if (last) {
+        lastVals.set(s.nodeId, last.value);
+      }
+    }
+  }
+  onLastValuesRef.current(lastVals);
+
+  // Group series by pane and render
+  const paneGroups = groupByPane(series, displayConfigsRef.current);
+
+  for (const [paneNum, paneSeries] of paneGroups) {
+    const paneState = panesRef.current.get(paneNum);
+    if (!paneState || !LineSeriesCtorRef.current) {
+      continue;
+    }
+
+    const scaleGroups = computeScaleGroups(
+      paneSeries,
+      displayConfigsRef.current,
+    );
+
+    for (const s of paneSeries) {
+      if (s.points.length === 0) {
+        continue;
+      }
+      const rawPoints = s.points.map((p) => ({
+        time: toChartTime(p.timestamp),
+        value: p.value,
+      }));
+      const existing = paneState.seriesMap.get(s.nodeId);
+      if (existing) {
+        existing.setData(deduplicatePoints(rawPoints));
+      } else {
+        const cfg = displayConfigsRef.current.get(s.nodeId);
+        const color = cfg?.color ?? "#888";
+        const priceScaleId = scaleGroups.get(s.nodeId) ?? "right";
+        const lwcSeries = paneState.chart.addSeries(LineSeriesCtorRef.current, {
+          color,
+          lineWidth: 2,
+          title: humanizeNodeId(s.nodeId),
+          priceScaleId,
+          lastValueVisible: true,
+          priceLineVisible: false,
+        });
+        lwcSeries.setData(deduplicatePoints(rawPoints));
+        paneState.seriesMap.set(s.nodeId, lwcSeries);
+
+        const signalForNode = signals.find((sig) => sig.nodeId === s.nodeId);
+        if (signalForNode && signalForNode.events.length > 0) {
+          void import("lightweight-charts").then(({ createSeriesMarkers }) => {
+            const markers = signalForNode.events
+              .filter((e) => e.fired)
+              .map((e) => ({
+                time: toChartTime(e.timestamp),
+                position: "aboveBar" as const,
+                color,
+                shape: "arrowDown" as const,
+                text: "\u25CF",
+              }));
+            if (markers.length > 0) {
+              createSeriesMarkers(
+                lwcSeries,
+                markers.toSorted(
+                  (a, b) => (a.time as number) - (b.time as number),
+                ),
+              );
+            }
+            return undefined;
+          });
+        }
+      }
+    }
+
+    // Show left scale only if a series in this pane uses it
+    const usedScaleIds = new Set(scaleGroups.values());
+    paneState.chart.priceScale("left").applyOptions({
+      visible: usedScaleIds.has("left"),
+    });
+  }
+
+  // Fit content on first load (all panes)
+  if (!didFitContentRef.current) {
+    didFitContentRef.current = true;
+    for (const [, pane] of panesRef.current) {
+      pane.chart.timeScale().fitContent();
+    }
+  }
+}
+
+/** Sync price scale widths across panes so chart areas align vertically.
+ *  When ANY pane has a visible left scale, ALL panes show it for alignment.
+ *  Returns the max left/right widths for legend positioning. */
+function syncScaleWidths(
+  panesRef: React.RefObject<Map<number, PaneState>>,
+  onWidths?: (widths: { left: number; right: number }) => void,
+): void {
+  let maxRight = 0;
+  let maxLeft = 0;
+  let anyLeftVisible = false;
+
+  for (const [, pane] of panesRef.current) {
+    if (pane.seriesMap.size === 0) {
+      continue;
+    }
+    const rw = pane.chart.priceScale("right").width();
+    const lw = pane.chart.priceScale("left").width();
+    if (rw > 0) {
+      maxRight = Math.max(maxRight, rw);
+    }
+    if (lw > 0) {
+      maxLeft = Math.max(maxLeft, lw);
+      anyLeftVisible = true;
+    }
+  }
+
+  if (panesRef.current.size > 1) {
+    for (const [, pane] of panesRef.current) {
+      if (maxRight > 0) {
+        pane.chart.priceScale("right").applyOptions({ minimumWidth: maxRight });
+      }
+      if (anyLeftVisible) {
+        // If any pane has a visible left scale, force all panes to show it
+        // so chart areas align vertically across panes
+        pane.chart.priceScale("left").applyOptions({
+          visible: true,
+          minimumWidth: Math.max(maxLeft, 60),
+        });
+      } else {
+        // No pane uses left scale — ensure all panes hide it consistently
+        pane.chart.priceScale("left").applyOptions({
+          visible: false,
+          minimumWidth: 0,
+        });
+      }
+    }
+  }
+  // Report widths for legend positioning
+  onWidths?.({
+    left: anyLeftVisible ? Math.max(maxLeft, 60) : 0,
+    right: maxRight || 60,
+  });
+}
+
+function useMultiPaneRenderer(
   series: SeriesItem[],
   signals: SignalItem[],
   hiddenSeries: Set<string>,
+  resolution: Resolution,
+  displayConfigs: Map<string, NodeDisplayConfig>,
   onPanBack: (oldestVisibleISO: string) => void,
-): { chartContainerRef: React.RefObject<HTMLDivElement | null> } {
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<{
-    remove: () => void;
-    timeScale: () => {
-      subscribeVisibleTimeRangeChange: (
-        cb: (r: { from: number; to: number } | null) => void,
-      ) => void;
-      getVisibleRange: () => { from: number; to: number } | null;
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- lightweight-charts api
-    addSeries: (...args: any[]) => LwcSeries;
-    applyOptions: (opts: { width: number }) => void;
-  } | null>(null);
-  // Map nodeId → lightweight-charts series instance for in-place updates
-  const seriesMapRef = useRef<Map<string, LwcSeries>>(new Map());
-  // Cached LineSeries constructor (set after first dynamic import)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- lightweight-charts api
-  const LineSeriesCtorRef = useRef<any>(null);
-  const observerRef = useRef<{
-    disconnect: () => void;
-    observe: (el: Element) => void;
-  } | null>(null);
+  onCrosshairMove: (state: CrosshairState | null) => void,
+  onLastValues: (values: Map<string, number>) => void,
+): {
+  paneContainerRef: React.RefObject<HTMLDivElement | null>;
+  panesRef: React.RefObject<Map<number, PaneState>>;
+  paneNumbers: number[];
+  scaleWidths: { left: number; right: number };
+} {
+  const paneContainerRef = useRef<HTMLDivElement>(null);
+  const [chartKey, setChartKey] = useState(0);
+  // Counter instead of boolean to ensure the data effect re-runs after each chart setup
+  const [chartReadyGen, setChartReadyGen] = useState(0);
+  const [scaleWidths, setScaleWidths] = useState({ left: 60, right: 60 });
+
+  const panesRef = useRef<Map<number, PaneState>>(new Map());
+  const LineSeriesCtorRef = useRef<SeriesDefinition<"Line"> | null>(null);
+  const themeObserverRef = useRef<MutationObserver | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const onPanBackRef = useRef(onPanBack);
   onPanBackRef.current = onPanBack;
+  const onCrosshairMoveRef = useRef(onCrosshairMove);
+  onCrosshairMoveRef.current = onCrosshairMove;
+  const onLastValuesRef = useRef(onLastValues);
+  onLastValuesRef.current = onLastValues;
+  const displayConfigsRef = useRef(displayConfigs);
+  displayConfigsRef.current = displayConfigs;
 
-  // Pan debounce timer
   const panTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Timer to delay enabling pan-back after chart renders
   const enableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Track oldest loaded data timestamp (ms) to avoid redundant fetches
   const oldestLoadedRef = useRef<number | null>(null);
-  // Whether the chart has finished initial render and pan-back is enabled
   const panEnabledRef = useRef(false);
+  const didFitContentRef = useRef(false);
+  const resolutionRef = useRef<Resolution>(resolution);
+  resolutionRef.current = resolution;
+  // Guard to prevent recursive syncing
+  const syncingRef = useRef(false);
+
+  // Derive pane numbers from display configs (not from effect state)
+  // Stabilized as a string key to avoid recreating charts on color-only config changes
+  const paneKey = useMemo((): string => {
+    const paneSet = new Set<number>();
+    for (const [, cfg] of displayConfigs) {
+      if (cfg.visible) {
+        paneSet.add(cfg.pane);
+      }
+    }
+    if (paneSet.size === 0) {
+      paneSet.add(0);
+    }
+    return [...paneSet].toSorted((a, b) => a - b).join(",");
+  }, [displayConfigs]);
+
+  const paneNumbers = useMemo(
+    (): number[] => paneKey.split(",").map(Number),
+    [paneKey],
+  );
+
+  // ── Resolution change → bump chartKey to recreate charts ──────────────
 
   useEffect(() => {
-    const sm = seriesMapRef.current;
-    return (): void => {
-      observerRef.current?.disconnect();
-      observerRef.current = null;
-      chartRef.current?.remove();
-      chartRef.current = null;
-      sm.clear();
-      if (panTimerRef.current) {
-        clearTimeout(panTimerRef.current);
-        panTimerRef.current = null;
-      }
-      if (enableTimerRef.current) {
-        clearTimeout(enableTimerRef.current);
-        enableTimerRef.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!series.length || !chartContainerRef.current) {
-      return;
-    }
-
-    // Track oldest point across all series
-    let oldest: number | null = null;
-    for (const s of series) {
-      for (const p of s.points) {
-        const t = new Date(p.timestamp).getTime();
-        if (oldest === null || t < oldest) {
-          oldest = t;
-        }
-      }
-    }
-    oldestLoadedRef.current = oldest;
-
-    // If chart already exists, update series data in place without rebuilding
-    if (chartRef.current) {
-      const scaleGroups = computeScaleGroups(series);
-      for (let i = 0; i < series.length; i++) {
-        const s = series[i];
-        if (!s || s.points.length === 0 || hiddenSeries.has(s.nodeId)) {
-          continue;
-        }
-        const rawPoints = s.points.map((p) => ({
-          time: toChartTime(p.timestamp),
-          value: p.value,
-        }));
-        const existing = seriesMapRef.current.get(s.nodeId);
-        if (existing) {
-          // In-place update — no flicker, preserves scroll position
-          existing.setData(deduplicatePoints(rawPoints));
-        } else if (LineSeriesCtorRef.current) {
-          // New node appeared after initial build — add to existing chart
-          const color = LINE_COLORS[i % LINE_COLORS.length];
-          const priceScaleId = scaleGroups.get(s.nodeId) ?? "right";
-          const lwcSeries = chartRef.current.addSeries(
-            LineSeriesCtorRef.current,
-            {
-              color,
-              lineWidth: 2,
-              title: s.nodeId,
-              priceScaleId,
-              lastValueVisible: true,
-              priceLineVisible: false,
-            },
-          );
-          lwcSeries.setData(deduplicatePoints(rawPoints));
-          seriesMapRef.current.set(s.nodeId, lwcSeries);
-        }
-      }
-      return;
-    }
-
-    observerRef.current?.disconnect();
-    observerRef.current = null;
-    seriesMapRef.current.clear();
-
-    // Disable pan-back during rebuild
+    onCrosshairMoveRef.current(null);
     panEnabledRef.current = false;
+    didFitContentRef.current = false;
+    setChartReadyGen(0);
+    setChartKey((k) => k + 1);
+  }, [resolution]);
+
+  // ── Chart setup — runs on mount and chartKey changes ─────────────────────
+
+  useEffect(() => {
+    const outerContainer = paneContainerRef.current;
+    if (!outerContainer) {
+      return;
+    }
 
     let cancelled = false;
 
     const asyncSetup = async (): Promise<void> => {
-      const { createChart, createSeriesMarkers, ColorType, LineSeries } =
+      const { createChart, ColorType, LineSeries } =
         await import("lightweight-charts");
 
       if (cancelled) {
         return;
       }
-      // Cache constructor for in-place updates after chart is built
       LineSeriesCtorRef.current = LineSeries;
-      const container = chartContainerRef.current;
-      if (!container) {
-        return;
-      }
 
-      const chart = createChart(container, {
-        width: container.clientWidth,
-        height: Math.max(container.clientHeight, 300),
-        layout: {
-          background: { type: ColorType.Solid, color: "transparent" },
-          textColor: "hsl(var(--foreground))",
-        },
-        grid: {
-          vertLines: { color: "hsl(var(--border))" },
-          horzLines: { color: "hsl(var(--border))" },
-        },
-        timeScale: { borderColor: "hsl(var(--border))" },
-        // Right = counts/totals, Left = rates/fractions (0–1)
-        rightPriceScale: {
-          visible: true,
-          borderColor: "hsl(var(--border))",
-          scaleMargins: { top: 0.08, bottom: 0.08 },
-        },
-        leftPriceScale: {
-          visible: true,
-          borderColor: "hsl(var(--border))",
-          scaleMargins: { top: 0.08, bottom: 0.08 },
-        },
-      });
+      const sortedPanes = paneNumbers;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- lightweight-charts types vary by version
-      chartRef.current = chart as any;
+      const res = resolutionRef.current;
+      const resMs = RESOLUTION_MS[res];
+      const showTime = resMs < 24 * 3600_000;
+      const barSpacing =
+        RESOLUTION_BAR_SPACING[res] ??
+        RESOLUTION_BAR_SPACING[GraphResolution.ONE_HOUR];
+      const tickFmt = makeTickFormatter(res);
+      const colors = getChartColors();
 
-      // Compute scale groups: "right" for counts, "left" for rates 0–1
-      const scaleGroups = computeScaleGroups(series);
+      // Create a chart per pane
+      const paneCount = sortedPanes.length;
+      const allCharts: IChartApi[] = [];
 
-      for (let i = 0; i < series.length; i++) {
-        const s = series[i];
-        if (!s || s.points.length === 0 || hiddenSeries.has(s.nodeId)) {
+      for (let pi = 0; pi < paneCount; pi++) {
+        const paneNum = sortedPanes[pi];
+        if (paneNum === undefined) {
+          continue;
+        }
+        const containerEl = outerContainer.querySelector<HTMLDivElement>(
+          `#vs-pane-${String(paneNum)}`,
+        );
+        if (!containerEl || cancelled) {
           continue;
         }
 
-        const color = LINE_COLORS[i % LINE_COLORS.length];
-        const priceScaleId = scaleGroups.get(s.nodeId) ?? "right";
-        const lineSeries = chart.addSeries(LineSeries, {
-          color,
-          lineWidth: 2,
-          title: s.nodeId,
-          priceScaleId,
-          lastValueVisible: true,
-          priceLineVisible: false,
+        // Pane 0 (main) gets more height, others share the rest
+        const isMainPane = pi === 0;
+        const chart = createChart(containerEl, {
+          width: containerEl.clientWidth,
+          height: Math.max(containerEl.clientHeight, isMainPane ? 200 : 150),
+          layout: {
+            background: { type: ColorType.Solid, color: colors.bgColor },
+            textColor: colors.textColor,
+          },
+          grid: {
+            vertLines: { color: colors.borderColor },
+            horzLines: { color: colors.borderColor },
+          },
+          crosshair: {
+            mode: 1,
+          },
+          timeScale: {
+            borderColor: colors.borderColor,
+            timeVisible: showTime,
+            secondsVisible: false,
+            barSpacing,
+            tickMarkFormatter: tickFmt,
+            shiftVisibleRangeOnNewBar: false,
+            // Hide time axis on all panes except the last
+            visible: pi === paneCount - 1,
+          },
+          rightPriceScale: {
+            visible: true,
+            borderColor: colors.borderColor,
+            scaleMargins: { top: 0.08, bottom: 0.08 },
+            minimumWidth: 60,
+          },
+          leftPriceScale: {
+            visible: false,
+            borderColor: colors.borderColor,
+            scaleMargins: { top: 0.08, bottom: 0.08 },
+            minimumWidth: 60,
+          },
         });
 
-        const rawPoints = s.points.map((p) => ({
-          time: toChartTime(p.timestamp),
-          value: p.value,
-        }));
-        lineSeries.setData(deduplicatePoints(rawPoints));
-        seriesMapRef.current.set(s.nodeId, lineSeries);
+        allCharts.push(chart);
+        panesRef.current.set(paneNum, {
+          chart,
+          container: containerEl,
+          seriesMap: new Map(),
+        });
 
-        const signalForNode = signals.find((sig) => sig.nodeId === s.nodeId);
-        if (signalForNode && signalForNode.events.length > 0) {
-          const markers = signalForNode.events
-            .filter((e) => e.fired)
-            .map((e) => ({
-              time: toChartTime(e.timestamp),
-              position: "aboveBar" as const,
-              color,
-              shape: "arrowDown" as const,
-              text: "●",
-            }));
-          if (markers.length > 0) {
-            createSeriesMarkers(
-              lineSeries,
-              markers.toSorted(
-                (a, b) => (a.time as number) - (b.time as number),
-              ),
-            );
+        // Crosshair move → tooltip
+        chart.subscribeCrosshairMove((param) => {
+          if (
+            !param ||
+            !param.point ||
+            param.point.x < 0 ||
+            param.point.y < 0
+          ) {
+            onCrosshairMoveRef.current(null);
+            // Clear crosshair on all panes when mouse leaves
+            if (!syncingRef.current) {
+              syncingRef.current = true;
+              for (const [, otherPane] of panesRef.current) {
+                otherPane.chart.clearCrosshairPosition();
+              }
+              syncingRef.current = false;
+            }
+            return;
           }
-        }
+          // Collect values from ALL panes, not just the hovered one
+          const crosshairPoints: CrosshairPoint[] = [];
+          for (const [, paneState] of panesRef.current) {
+            for (const [nodeId, lwcS] of paneState.seriesMap) {
+              const d = param.seriesData?.get(lwcS);
+              const val =
+                d !== undefined && "value" in d && typeof d.value === "number"
+                  ? d.value
+                  : undefined;
+              if (val !== undefined) {
+                const cfg = displayConfigsRef.current.get(nodeId);
+                crosshairPoints.push({
+                  nodeId,
+                  value: val,
+                  color: cfg?.color ?? "#888",
+                });
+              }
+            }
+          }
+          const timeVal =
+            typeof param.time === "number" ? param.time : undefined;
+          const timeStr =
+            timeVal !== undefined
+              ? new Date(timeVal * 1000).toLocaleString()
+              : "";
+          onCrosshairMoveRef.current({
+            x: param.point.x,
+            y: param.point.y,
+            time: timeStr,
+            points: crosshairPoints,
+          });
+
+          // Sync crosshair vertical line to other panes via setCrosshairPosition.
+          // Using NaN for price shows only the time line (no horizontal price line).
+          if (!syncingRef.current && param.time !== undefined) {
+            syncingRef.current = true;
+            for (const [otherPaneNum, otherPane] of panesRef.current) {
+              if (otherPaneNum !== paneNum) {
+                const firstSeries = otherPane.seriesMap.values().next().value as
+                  | LwcSeries
+                  | undefined;
+                if (firstSeries) {
+                  otherPane.chart.setCrosshairPosition(
+                    NaN,
+                    param.time,
+                    firstSeries,
+                  );
+                }
+              }
+            }
+            syncingRef.current = false;
+          }
+        });
       }
 
-      // Enable pan-back after a short delay to avoid triggering on initial render
+      // Sync time scales across panes
+      for (let pi = 0; pi < allCharts.length; pi++) {
+        const chart = allCharts[pi];
+        if (!chart) {
+          continue;
+        }
+        chart.timeScale().subscribeVisibleLogicalRangeChange((logicalRange) => {
+          if (syncingRef.current || !logicalRange) {
+            return;
+          }
+          syncingRef.current = true;
+          for (let oi = 0; oi < allCharts.length; oi++) {
+            if (oi === pi) {
+              continue;
+            }
+            const other = allCharts[oi];
+            if (other) {
+              other.timeScale().setVisibleLogicalRange(logicalRange);
+            }
+          }
+          syncingRef.current = false;
+        });
+      }
+
+      // Pan-back detection on the first chart's time scale
+      const firstChart = allCharts[0];
+      if (firstChart) {
+        firstChart.timeScale().subscribeVisibleTimeRangeChange((range) => {
+          if (!range || !panEnabledRef.current) {
+            return;
+          }
+          if (panTimerRef.current) {
+            clearTimeout(panTimerRef.current);
+          }
+          panTimerRef.current = setTimeout(() => {
+            const visibleFrom = range.from as number;
+            const oldestLoaded = oldestLoadedRef.current;
+            if (oldestLoaded === null) {
+              return;
+            }
+            const oldestLoadedSec = oldestLoaded / 1000;
+            const visibleSpan = (range.to as number) - visibleFrom;
+            const threshold = oldestLoadedSec + visibleSpan * 0.2;
+            if (visibleFrom < threshold) {
+              onPanBackRef.current(timestampToISO(oldestLoadedSec));
+            }
+          }, 300);
+        });
+      }
+
+      // Theme observer (shared for all panes)
+      const themeObserver = new MutationObserver(() => {
+        const updated = getChartColors();
+        for (const [, pane] of panesRef.current) {
+          pane.chart.applyOptions({
+            layout: {
+              background: { type: ColorType.Solid, color: updated.bgColor },
+              textColor: updated.textColor,
+            },
+            grid: {
+              vertLines: { color: updated.borderColor },
+              horzLines: { color: updated.borderColor },
+            },
+            timeScale: { borderColor: updated.borderColor },
+            rightPriceScale: { borderColor: updated.borderColor },
+            leftPriceScale: { borderColor: updated.borderColor },
+          });
+        }
+      });
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class", "style", "data-theme"],
+      });
+      themeObserverRef.current = themeObserver;
+
+      // Resize observer
+      const resizeObserver = new ResizeObserver(() => {
+        for (const [, pane] of panesRef.current) {
+          pane.chart.applyOptions({
+            width: pane.container.clientWidth,
+            height: pane.container.clientHeight,
+          });
+        }
+      });
+      resizeObserver.observe(outerContainer);
+      for (const [, pane] of panesRef.current) {
+        resizeObserver.observe(pane.container);
+      }
+      resizeObserverRef.current = resizeObserver;
+
       if (enableTimerRef.current) {
         clearTimeout(enableTimerRef.current);
       }
@@ -406,157 +907,646 @@ function useChartRenderer(
         }
       }, 800);
 
-      // Subscribe to visible range changes — trigger load when user pans to older data
-      chart.timeScale().subscribeVisibleTimeRangeChange((range) => {
-        if (!range || !panEnabledRef.current) {
-          return;
-        }
-        if (panTimerRef.current) {
-          clearTimeout(panTimerRef.current);
-        }
-        panTimerRef.current = setTimeout(() => {
-          const visibleFrom = range.from as number;
-          const oldestLoaded = oldestLoadedRef.current;
-          if (oldestLoaded === null) {
-            return;
-          }
-          const oldestLoadedSec = oldestLoaded / 1000;
-          // If the user has panned to within 20% of the oldest loaded point, load more
-          const visibleSpan = (range.to as number) - visibleFrom;
-          const threshold = oldestLoadedSec + visibleSpan * 0.2;
-          if (visibleFrom < threshold) {
-            onPanBackRef.current(timestampToISO(oldestLoadedSec));
-          }
-        }, 300);
-      });
+      // Render any already-available data immediately (avoids race with data effect)
+      renderSeriesData(
+        series,
+        signals,
+        panesRef,
+        LineSeriesCtorRef,
+        displayConfigsRef,
+        onLastValuesRef,
+        oldestLoadedRef,
+        didFitContentRef,
+      );
 
-      const observer = new ResizeObserver(() => {
-        if (container) {
-          chart.applyOptions({ width: container.clientWidth });
-        }
-      });
-      observer.observe(container);
-      observerRef.current = observer;
+      setChartReadyGen((g) => g + 1);
     };
 
     void asyncSetup();
 
+    // Snapshot refs so cleanup doesn't access stale .current
+    const themeObs = themeObserverRef;
+    const resizeObs = resizeObserverRef;
+    const panes = panesRef;
+    const panTimer = panTimerRef;
+    const enableTimer = enableTimerRef;
+
     return (): void => {
       cancelled = true;
+      themeObs.current?.disconnect();
+      themeObs.current = null;
+      resizeObs.current?.disconnect();
+      resizeObs.current = null;
+      for (const [, pane] of panes.current) {
+        pane.chart.remove();
+        pane.seriesMap.clear();
+      }
+      panes.current.clear();
+      setChartReadyGen(0);
+      panEnabledRef.current = false;
+      didFitContentRef.current = false;
+      if (panTimer.current) {
+        clearTimeout(panTimer.current);
+        panTimer.current = null;
+      }
+      if (enableTimer.current) {
+        clearTimeout(enableTimer.current);
+        enableTimer.current = null;
+      }
     };
-  }, [series, signals, hiddenSeries]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chartKey + paneKey are the intentional triggers
+  }, [chartKey, paneKey]);
 
-  return { chartContainerRef };
+  // ── Data rendering ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!chartReadyGen || !series.length || panesRef.current.size === 0) {
+      return;
+    }
+    renderSeriesData(
+      series,
+      signals,
+      panesRef,
+      LineSeriesCtorRef,
+      displayConfigsRef,
+      onLastValuesRef,
+      oldestLoadedRef,
+      didFitContentRef,
+    );
+    // Defer scale sync until after the browser has laid out the new series
+    const rafId = requestAnimationFrame(() => {
+      syncScaleWidths(panesRef, setScaleWidths);
+    });
+    return (): void => cancelAnimationFrame(rafId);
+  }, [chartReadyGen, series, signals]);
+
+  // ── Visibility toggling ─────────────────────────────────────────────────
+
+  useEffect(() => {
+    for (const [, pane] of panesRef.current) {
+      for (const [nodeId, lwcSeries] of pane.seriesMap) {
+        lwcSeries.applyOptions({ visible: !hiddenSeries.has(nodeId) });
+      }
+    }
+  }, [hiddenSeries]);
+
+  return { paneContainerRef, panesRef, paneNumbers, scaleWidths };
 }
 
-// ─── Indicator Toggles ───────────────────────────────────────────────────────
+// ─── Loading Shimmer ──────────────────────────────────────────────────────────
 
-function IndicatorToggles({
+const SHIMMER_HEIGHTS = [
+  "h-[40%]",
+  "h-[60%]",
+  "h-[35%]",
+  "h-[80%]",
+  "h-[55%]",
+  "h-[70%]",
+  "h-[45%]",
+  "h-[90%]",
+  "h-[65%]",
+  "h-[50%]",
+  "h-[75%]",
+  "h-[85%]",
+  "h-[60%]",
+  "h-[70%]",
+  "h-[55%]",
+] as const;
+
+function ChartShimmer(): React.JSX.Element {
+  return (
+    <Div className="flex-1 flex flex-col gap-2 p-4 animate-pulse">
+      <Div className="flex items-end gap-1 h-full">
+        {SHIMMER_HEIGHTS.map((h, i) => (
+          <Div key={i} className={cn("flex-1 bg-muted rounded-sm", h)} />
+        ))}
+      </Div>
+    </Div>
+  );
+}
+
+// ─── Series Legend ────────────────────────────────────────────────────────────
+
+function PaneLegend({
+  paneNum,
   series,
   hiddenSeries,
-  onToggle,
+  lastValues,
+  crosshair,
+  displayConfigs,
+  leftOffset = 60,
+  rightOffset = 60,
+  onToggleSeries,
 }: {
+  paneNum: number;
   series: SeriesItem[];
   hiddenSeries: Set<string>;
-  onToggle: (nodeId: string) => void;
+  lastValues: Map<string, number>;
+  crosshair: CrosshairState | null;
+  displayConfigs: Map<string, NodeDisplayConfig>;
+  leftOffset?: number;
+  rightOffset?: number;
+  onToggleSeries: (nodeId: string) => void;
 }): React.JSX.Element {
+  const paneSeries = series.filter((s) => {
+    const cfg = displayConfigs.get(s.nodeId);
+    return cfg?.visible !== false && (cfg?.pane ?? 0) === paneNum;
+  });
+
+  const legendId = `vs-legend-${String(paneNum)}`;
+  useEffect(() => {
+    const el = document.getElementById(legendId);
+    if (!el) {
+      return;
+    }
+    el.style.left = `${String(leftOffset + 4)}px`;
+    el.style.right = `${String(rightOffset + 4)}px`;
+  }, [legendId, leftOffset, rightOffset]);
+
   return (
-    <Div className="flex flex-wrap gap-1.5">
-      {series.map((s, i) => {
+    <Div
+      id={legendId}
+      className="absolute top-1 z-20 flex flex-col gap-0.5 pointer-events-none max-h-[80%] overflow-y-auto"
+    >
+      {paneSeries.map((s) => {
         const isHidden = hiddenSeries.has(s.nodeId);
-        const lineColor = LINE_COLORS[i % LINE_COLORS.length];
+        const cfg = displayConfigs.get(s.nodeId);
+        const color = cfg?.color ?? "#888";
+        const displayValue =
+          crosshair?.points.find((p) => p.nodeId === s.nodeId)?.value ??
+          lastValues.get(s.nodeId);
+
         return (
-          <Button
+          <Div
             key={s.nodeId}
-            variant="ghost"
-            size="sm"
-            onClick={() => onToggle(s.nodeId)}
             className={cn(
-              "h-6 px-2 text-[11px] gap-1.5 rounded-full border",
-              isHidden ? "opacity-40" : "",
+              "flex items-center gap-1.5 bg-background/80 backdrop-blur-sm px-1.5 py-0.5 rounded border border-border/30 cursor-pointer pointer-events-auto",
+              isHidden && "opacity-40",
             )}
+            onClick={() => onToggleSeries(s.nodeId)}
           >
             <Div
               style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
+                width: "10px",
+                height: "3px",
+                borderRadius: "1px",
+                backgroundColor: isHidden ? "#888" : color,
                 flexShrink: 0,
-                backgroundColor: lineColor,
-                opacity: isHidden ? 0.3 : 1,
               }}
             />
-            {s.nodeId}
-            {s.points.length > 0 && (
-              <Span className="text-[10px] text-muted-foreground">
-                ({s.points.length})
+            <Span
+              className={cn(
+                "text-[9px] font-mono truncate",
+                isHidden && "line-through text-muted-foreground",
+              )}
+            >
+              {humanizeNodeId(s.nodeId)}
+            </Span>
+            {displayValue !== undefined && !isHidden && (
+              <Span className="text-[9px] font-semibold tabular-nums text-foreground shrink-0">
+                {formatValue(displayValue)}
               </Span>
             )}
-          </Button>
+          </Div>
         );
       })}
     </Div>
   );
 }
 
-// ─── Main Widget ─────────────────────────────────────────────────────────────
+/** Small collapse button positioned at top-right of each pane (next to right scale) */
+function PaneCollapseButton({
+  paneNum,
+  rightOffset,
+  onCollapse,
+}: {
+  paneNum: number;
+  rightOffset: number;
+  onCollapse: () => void;
+}): React.JSX.Element {
+  const btnId = `vs-collapse-${String(paneNum)}`;
+  useEffect(() => {
+    const el = document.getElementById(btnId);
+    if (!el) {
+      return;
+    }
+    el.style.right = `${String(rightOffset + 6)}px`;
+  }, [btnId, rightOffset]);
+
+  return (
+    <Div
+      id={btnId}
+      className="absolute top-0.5 z-20 h-5 w-5 flex items-center justify-center rounded cursor-pointer text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent/50 transition-colors pointer-events-auto"
+      onClick={onCollapse}
+      title={`Collapse pane ${String(paneNum)}`}
+    >
+      <ChevronUp className="h-3 w-3" />
+    </Div>
+  );
+}
+
+/** Collapsed pane header bar — click to expand */
+function CollapsedPaneBar({
+  paneNum,
+  seriesCount,
+  onExpand,
+}: {
+  paneNum: number;
+  seriesCount: number;
+  onExpand: () => void;
+}): React.JSX.Element {
+  return (
+    <Div className="h-6 shrink-0 flex items-center px-2 gap-1 bg-muted/30 border-b border-border/30 cursor-pointer hover:bg-muted/50 transition-colors">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onExpand}
+        className="h-5 px-1.5 text-[9px] text-muted-foreground gap-1"
+      >
+        <ChevronRight className="h-3 w-3" />
+        {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
+        <Span>{`P${String(paneNum)} (${String(seriesCount)})`}</Span>
+      </Button>
+    </Div>
+  );
+}
+
+// ─── Crosshair Tooltip ────────────────────────────────────────────────────────
+
+function CrosshairTooltip({
+  crosshair,
+  containerRef,
+}: {
+  crosshair: CrosshairState;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+}): React.JSX.Element | null {
+  if (!crosshair.points.length || !containerRef.current) {
+    return null;
+  }
+  const containerWidth = containerRef.current.clientWidth;
+  const tooltipWidth = 180;
+  // Position tooltip offset from cursor — 40px right, flip left if overflows
+  const left =
+    crosshair.x + tooltipWidth + 40 > containerWidth
+      ? crosshair.x - tooltipWidth - 16
+      : crosshair.x + 40;
+  // Fixed at top of chart area to avoid obscuring crosshair
+  const top = 8;
+
+  return (
+    <Div
+      style={{
+        position: "absolute",
+        zIndex: 30,
+        left,
+        top,
+        minWidth: tooltipWidth,
+        pointerEvents: "none",
+      }}
+    >
+      <Div className="bg-popover/95 backdrop-blur-sm border border-border shadow-lg rounded-lg px-2.5 py-2">
+        <P className="text-[10px] text-muted-foreground mb-1.5 font-medium">
+          {crosshair.time}
+        </P>
+        <Div className="flex flex-col gap-0.5">
+          {crosshair.points.map((p) => (
+            <Div
+              key={p.nodeId}
+              className="flex items-center justify-between gap-3"
+            >
+              <Div className="flex items-center gap-1 min-w-0">
+                <Div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    backgroundColor: p.color,
+                    flexShrink: 0,
+                  }}
+                />
+                <Span className="text-[10px] font-mono truncate text-muted-foreground">
+                  {humanizeNodeId(p.nodeId)}
+                </Span>
+              </Div>
+              <Span className="text-[10px] font-semibold tabular-nums shrink-0">
+                {formatValue(p.value)}
+              </Span>
+            </Div>
+          ))}
+        </Div>
+      </Div>
+    </Div>
+  );
+}
+
+// ─── Pane Drag Handle ────────────────────────────────────────────────────────
+
+function PaneDragHandle({
+  paneAbove,
+  paneBelow,
+  containerRef,
+  panesRef,
+}: {
+  paneAbove: number;
+  paneBelow: number;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  panesRef: React.RefObject<Map<number, PaneState>>;
+}): React.JSX.Element {
+  const handleElRef = useRef<HTMLDivElement>(null);
+
+  // Attach mousedown via ref to avoid DivProps type constraint
+  useEffect(() => {
+    const el = handleElRef.current;
+    if (!el) {
+      return;
+    }
+    const handler = (e: MouseEvent): void => {
+      e.preventDefault();
+      const container = containerRef.current;
+      if (!container) {
+        return;
+      }
+      // Find the pane wrapper divs (parent of the vs-pane-N divs)
+      const aboveChart = container.querySelector<HTMLDivElement>(
+        `#vs-pane-${String(paneAbove)}`,
+      );
+      const belowChart = container.querySelector<HTMLDivElement>(
+        `#vs-pane-${String(paneBelow)}`,
+      );
+      const aboveEl = aboveChart?.parentElement as HTMLDivElement | null;
+      const belowEl = belowChart?.parentElement as HTMLDivElement | null;
+      if (!aboveEl || !belowEl) {
+        return;
+      }
+
+      const startY = e.clientY;
+      const startAboveH = aboveEl.clientHeight;
+      const startBelowH = belowEl.clientHeight;
+      const minH = 120;
+
+      const onMouseMove = (ev: MouseEvent): void => {
+        const dy = ev.clientY - startY;
+        const newAbove = Math.max(minH, startAboveH + dy);
+        const newBelow = Math.max(minH, startBelowH - dy);
+        if (newAbove >= minH && newBelow >= minH) {
+          aboveEl.style.flex = "none";
+          belowEl.style.flex = "none";
+          aboveEl.style.height = `${String(newAbove)}px`;
+          belowEl.style.height = `${String(newBelow)}px`;
+          const abovePane = panesRef.current.get(paneAbove);
+          const belowPane = panesRef.current.get(paneBelow);
+          abovePane?.chart.applyOptions({
+            width: aboveChart?.clientWidth ?? aboveEl.clientWidth,
+            height: newAbove,
+          });
+          belowPane?.chart.applyOptions({
+            width: belowChart?.clientWidth ?? belowEl.clientWidth,
+            height: newBelow,
+          });
+        }
+      };
+
+      const onMouseUp = (): void => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        // Force time scale visible on the last pane (it may have been hidden by lwc during resize)
+        // Find the highest pane number (last in the layout) and force its time scale visible
+        let lastPaneNum = -1;
+        for (const [pNum] of panesRef.current) {
+          if (pNum > lastPaneNum) {
+            lastPaneNum = pNum;
+          }
+        }
+        for (const [pNum, pane] of panesRef.current) {
+          pane.chart
+            .timeScale()
+            .applyOptions({ visible: pNum === lastPaneNum });
+        }
+        // Re-sync scale widths after drag
+        syncScaleWidths(panesRef);
+      };
+
+      document.body.style.cursor = "row-resize";
+      document.body.style.userSelect = "none";
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    };
+    el.addEventListener("mousedown", handler);
+    return (): void => el.removeEventListener("mousedown", handler);
+  }, [containerRef, panesRef, paneAbove, paneBelow]);
+
+  return (
+    <Div
+      ref={handleElRef}
+      role="separator"
+      className="h-[6px] shrink-0 cursor-row-resize flex items-center justify-center hover:bg-accent/50 transition-colors group"
+    >
+      <Grip className="h-3 w-3 text-muted-foreground/40 group-hover:text-muted-foreground/80 transition-colors" />
+    </Div>
+  );
+}
+
+// ─── Responsive Resolution Picker ────────────────────────────────────────────
+
+const PILLS_MIN_WIDTH = 200;
+
+function ResolutionPicker({
+  value,
+  onChange,
+}: {
+  value: Resolution;
+  onChange: (r: Resolution) => void;
+}): React.JSX.Element {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect((): (() => void) => {
+    const el = containerRef.current;
+    if (!el) {
+      return (): void => undefined;
+    }
+    const obs = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? PILLS_MIN_WIDTH + 1;
+      setCollapsed(width < PILLS_MIN_WIDTH);
+    });
+    obs.observe(el);
+    return (): void => obs.disconnect();
+  }, []);
+
+  useEffect((): (() => void) => {
+    if (!open) {
+      return (): void => undefined;
+    }
+    const handler = (e: MouseEvent): void => {
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return (): void => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const selected = RESOLUTION_OPTIONS.find((o) => o.value === value);
+
+  return (
+    <Div ref={containerRef} className="shrink-0">
+      {collapsed ? (
+        /* Dropdown mode */
+        <Div className="relative">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setOpen((p) => !p)}
+            className="h-7 px-2 text-[11px] font-medium gap-1"
+          >
+            {selected?.label ?? value}
+            <ChevronDown className="h-3 w-3 opacity-60" />
+          </Button>
+          {open && (
+            <Div className="absolute right-0 top-8 z-50 bg-popover border border-border rounded-lg shadow-lg overflow-hidden flex flex-col min-w-[80px]">
+              {RESOLUTION_OPTIONS.map((opt) => (
+                <Button
+                  key={opt.value}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "rounded-none h-8 px-3 text-[11px] justify-start font-medium",
+                    value === opt.value
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </Div>
+          )}
+        </Div>
+      ) : (
+        /* Pill group mode */
+        <Div className="flex items-center gap-0 border rounded-lg overflow-hidden bg-muted/30">
+          {RESOLUTION_OPTIONS.map((opt) => (
+            <Button
+              key={opt.value}
+              variant="ghost"
+              size="sm"
+              onClick={() => onChange(opt.value)}
+              className={cn(
+                "h-7 px-2.5 text-[11px] font-medium rounded-none border-0 border-r last:border-0",
+                value === opt.value
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent",
+              )}
+            >
+              {opt.label}
+            </Button>
+          ))}
+        </Div>
+      )}
+    </Div>
+  );
+}
+
+// ─── Main Widget ──────────────────────────────────────────────────────────────
 
 export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const outerMutations = useWidgetEndpointMutations();
-  const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
 
   const [resolution, setResolution] = useState<Resolution>(
     GraphResolution.ONE_DAY,
   );
   const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set());
-  const [isFetching, setIsFetching] = useState(false);
+  const [showLegend, setShowLegend] = useState(true);
+  const [collapsedPanes, setCollapsedPanes] = useState<Set<number>>(new Set());
+  const [panBackVisible, setPanBackVisible] = useState(false);
+  const [crosshair, setCrosshair] = useState<CrosshairState | null>(null);
+  const [lastValues, setLastValues] = useState<Map<string, number>>(new Map());
 
-  // Accumulate data pages — reset when resolution changes
   const [accSeries, setAccSeries] = useState<SeriesItem[]>([]);
   const [accSignals, setAccSignals] = useState<SignalItem[]>([]);
-  // Track what cursor we last requested to avoid duplicate fetches
   const lastCursorRef = useRef<string | undefined>(undefined);
-  // Track resolution that was last submitted to avoid setting same value
   const lastResolutionRef = useRef<Resolution>(GraphResolution.ONE_DAY);
+  const panBackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const graph = field.value?.graph;
-  const isLoading = (outerMutations?.read?.isLoading ?? false) || isFetching;
 
-  // Fetch data page directly — bypasses framework form which ignores stored
-  // params when urlPathParams are present (see use-api-query.ts:hasUrlPathParams)
-  const fetchPage = useCallback(
-    (graphId: string, res: Resolution, cursor?: string): void => {
-      setIsFetching(true);
-      const params = new URLSearchParams({ id: graphId, resolution: res });
-      if (cursor) {
-        params.set("cursor", cursor);
-      }
-      const url = `/api/${locale}/system/unified-interface/vibe-sense/graphs/${graphId}/data?${params.toString()}`;
-      void fetch(url, { credentials: "include" })
-        .then(
-          (r) =>
-            r.json() as Promise<{ success: boolean; data: GetResponseOutput }>,
-        )
-        .then((json) => {
-          if (json.success && json.data) {
-            setAccSeries((prev) => mergeSeries(prev, json.data.series ?? []));
-            setAccSignals((prev) =>
-              mergeSignals(prev, json.data.signals ?? []),
-            );
-          }
-          setIsFetching(false);
-          return json;
-        })
-        .catch(() => {
-          setIsFetching(false);
-        });
-    },
-    [locale],
+  // Node display configs from graph config
+  const displayConfigs = useMemo(
+    () => getNodeDisplayConfigs(accSeries, graph?.config?.nodes),
+    [accSeries, graph?.config?.nodes],
   );
 
-  // When field.value changes (initial framework load), merge into accumulated data
+  // ── Pagination query state ────────────────────────────────────────────────
+  const [pageQuery, setPageQuery] = useState<{
+    id: string;
+    resolution: Resolution;
+    cursor?: string;
+  } | null>(null);
+
+  const pageOptions = useMemo(
+    () =>
+      pageQuery
+        ? {
+            read: {
+              urlPathParams: { id: pageQuery.id },
+              initialState: {
+                resolution: pageQuery.resolution,
+                cursor: pageQuery.cursor,
+              },
+              queryOptions: {
+                enabled: true,
+                refetchOnWindowFocus: false,
+                staleTime: 0,
+              },
+            },
+          }
+        : {
+            read: {
+              urlPathParams: { id: "" },
+              initialState: {
+                resolution: GraphResolution.ONE_DAY,
+                cursor: undefined,
+              },
+              queryOptions: { enabled: false, refetchOnWindowFocus: false },
+            },
+          },
+    [pageQuery],
+  );
+
+  const pageEndpoint = useEndpoint(definitions, pageOptions, logger, user);
+
+  const isLoading =
+    (outerMutations?.read?.isLoading ?? false) ||
+    (pageEndpoint.read?.isFetching ?? false);
+
+  // Merge newly-fetched page into accumulated series/signals
+  useEffect(() => {
+    const data = pageEndpoint.read?.data;
+    if (!data) {
+      return;
+    }
+    setAccSeries((prev) => mergeSeries(prev, data.series ?? []));
+    setAccSignals((prev) => mergeSignals(prev, data.signals ?? []));
+  }, [pageEndpoint.read?.data]);
+
+  const fetchPage = useCallback(
+    (graphId: string, res: Resolution, cursor?: string): void => {
+      setPageQuery({ id: graphId, resolution: res, cursor });
+    },
+    [],
+  );
+
   useEffect(() => {
     if (!field.value) {
       return;
@@ -566,7 +1556,6 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only run when field.value reference changes
   }, [field.value]);
 
-  // When resolution changes, clear accumulated data and fetch first page
   const handleResolutionChange = useCallback(
     (res: Resolution): void => {
       if (res === lastResolutionRef.current || !graph) {
@@ -582,24 +1571,49 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     [graph, fetchPage],
   );
 
-  // When user pans back, fetch older page at current resolution
   const handlePanBack = useCallback(
     (oldestVisibleISO: string): void => {
       if (lastCursorRef.current === oldestVisibleISO || !graph) {
         return;
       }
       lastCursorRef.current = oldestVisibleISO;
+
+      setPanBackVisible(true);
+      if (panBackTimerRef.current) {
+        clearTimeout(panBackTimerRef.current);
+      }
+      panBackTimerRef.current = setTimeout(() => {
+        setPanBackVisible(false);
+      }, 2500);
+
       fetchPage(graph.id, lastResolutionRef.current, oldestVisibleISO);
     },
     [graph, fetchPage],
   );
 
-  const { chartContainerRef } = useChartRenderer(
-    accSeries,
-    accSignals,
-    hiddenSeries,
-    handlePanBack,
-  );
+  const { paneContainerRef, panesRef, paneNumbers, scaleWidths } =
+    useMultiPaneRenderer(
+      accSeries,
+      accSignals,
+      hiddenSeries,
+      resolution,
+      displayConfigs,
+      handlePanBack,
+      setCrosshair,
+      setLastValues,
+    );
+
+  // ── Toggle lwc built-in labels when legend visibility changes ───────────
+  useEffect(() => {
+    for (const [, pane] of panesRef.current) {
+      for (const [nodeId, lwcSeries] of pane.seriesMap) {
+        lwcSeries.applyOptions({
+          lastValueVisible: showLegend,
+          title: showLegend ? humanizeNodeId(nodeId) : "",
+        });
+      }
+    }
+  }, [showLegend, panesRef]);
 
   // ── Navigation handlers ──────────────────────────────────────────────────
 
@@ -679,58 +1693,104 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     });
   }, []);
 
-  // ── Loading / not found states ───────────────────────────────────────────
+  const handlePaneCollapse = useCallback((paneNum: number): void => {
+    setCollapsedPanes((prev) => {
+      const next = new Set(prev);
+      if (next.has(paneNum)) {
+        next.delete(paneNum);
+      } else {
+        next.add(paneNum);
+      }
+      return next;
+    });
+  }, []);
 
-  if (!field.value && accSeries.length === 0) {
-    return (
-      <Div className="flex flex-col items-center justify-center h-[600px] gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <P className="text-sm text-muted-foreground">
-          {t("get.widget.loading")}
-        </P>
-      </Div>
-    );
-  }
+  // When panes collapse/expand, resize visible charts to fill space
+  useEffect(() => {
+    // Give DOM time to apply hidden/visible classes
+    const rafId = requestAnimationFrame(() => {
+      // Reset inline flex/height styles on visible pane wrappers so flex layout works
+      for (const [paneNum, pane] of panesRef.current) {
+        const wrapper = pane.container.parentElement;
+        if (!wrapper) {
+          continue;
+        }
+        if (collapsedPanes.has(paneNum)) {
+          continue;
+        }
+        // Clear any inline styles set by drag handle so flex layout takes over
+        wrapper.style.flex = "";
+        wrapper.style.height = "";
+      }
 
-  if (!graph && accSeries.length === 0) {
-    return (
-      <Div className="flex flex-col items-center justify-center h-[600px] gap-4">
-        <P className="text-sm text-muted-foreground">
-          {t("get.errors.notFound.title")}
-        </P>
-        <Button variant="outline" size="sm" onClick={handleBack}>
-          {t("get.widget.back")}
-        </Button>
-      </Div>
-    );
-  }
+      // Use a second rAF to let the browser recalculate layout after style reset
+      requestAnimationFrame(() => {
+        for (const [paneNum, pane] of panesRef.current) {
+          if (collapsedPanes.has(paneNum)) {
+            continue;
+          }
+          const el = pane.container;
+          if (el.clientHeight > 0) {
+            pane.chart.applyOptions({
+              width: el.clientWidth,
+              height: el.clientHeight,
+            });
+            // Fit content so chart lines reappear after expand
+            pane.chart.timeScale().fitContent();
+          }
+        }
+        // Ensure time scale is visible on the last non-collapsed pane
+        const visiblePanes = paneNumbers.filter((p) => !collapsedPanes.has(p));
+        const lastVisible = visiblePanes[visiblePanes.length - 1];
+        for (const paneNum of paneNumbers) {
+          const pane = panesRef.current.get(paneNum);
+          if (pane) {
+            pane.chart.timeScale().applyOptions({
+              visible: paneNum === lastVisible,
+            });
+          }
+        }
+        syncScaleWidths(panesRef);
+      });
+    });
+    return (): void => cancelAnimationFrame(rafId);
+  }, [collapsedPanes, paneNumbers, panesRef]);
 
+  const isInitialLoading = !field.value && accSeries.length === 0;
+  const isNotFound = !isInitialLoading && !graph && accSeries.length === 0;
   const hasData = accSeries.some((s) => s.points.length > 0);
 
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <Div className="flex flex-col h-[calc(100vh-120px)] min-h-[500px] border rounded-lg overflow-hidden bg-background">
+    <Div className="flex flex-col h-[calc(100vh-120px)] min-h-[500px] border rounded-xl overflow-hidden bg-background shadow-sm">
       {/* Toolbar */}
-      <Div className="flex items-center gap-2 px-3 h-10 border-b bg-background shrink-0 overflow-hidden">
-        {/* Left: back + name */}
+      <Div className="flex items-center gap-2 px-3 h-11 border-b bg-background/95 shrink-0 overflow-hidden">
+        {/* Back */}
         <Button
           variant="ghost"
           size="sm"
           onClick={handleBack}
-          className="h-7 gap-1 px-2 shrink-0"
+          className="h-7 gap-1.5 px-2 shrink-0 text-xs"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {t("get.widget.back")}
         </Button>
+
+        {/* Graph name + status */}
         {graph && (
           <>
+            <Div className="h-4 w-px bg-border shrink-0" />
             <Span className="font-semibold text-sm truncate min-w-0 shrink">
               {graph.name}
             </Span>
             <Badge
               variant={graph.isActive ? "default" : "secondary"}
-              className="text-[10px] px-1.5 py-0 h-5 shrink-0"
+              className={cn(
+                "text-[10px] px-1.5 py-0 h-5 shrink-0",
+                graph.isActive &&
+                  "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 dark:text-emerald-400",
+              )}
             >
               {graph.isActive
                 ? t("get.widget.active")
@@ -741,27 +1801,13 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
 
         <Div className="flex-1" />
 
-        {/* Resolution selector */}
-        <Div className="flex items-center gap-0.5 border rounded-md px-0.5 py-0.5 bg-muted/30 shrink-0">
-          {RESOLUTION_OPTIONS.map((opt) => (
-            <Button
-              key={opt.value}
-              variant="ghost"
-              size="sm"
-              onClick={() => handleResolutionChange(opt.value as Resolution)}
-              className={cn(
-                "h-6 px-2 text-[11px] font-medium rounded-sm",
-                resolution === opt.value
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {opt.label}
-            </Button>
-          ))}
-        </Div>
+        {/* Resolution picker */}
+        <ResolutionPicker
+          value={resolution}
+          onChange={handleResolutionChange}
+        />
 
-        {/* Action buttons — icon only to save space */}
+        {/* Action buttons */}
         <Div className="flex items-center gap-0.5 shrink-0">
           {isLoading && (
             <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground mr-1" />
@@ -769,20 +1815,38 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => setShowLegend((v) => !v)}
+            className={cn(
+              "h-7 px-2 text-xs",
+              !showLegend && "text-muted-foreground",
+            )}
+            title="Toggle legend"
+          >
+            {showLegend ? (
+              <Eye className="h-3.5 w-3.5" />
+            ) : (
+              <EyeOff className="h-3.5 w-3.5" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleBacktest}
-            className="h-7 w-7 p-0"
+            className="h-7 gap-1.5 px-2 text-xs"
             title={t("get.widget.backtest")}
           >
             <RotateCcw className="h-3.5 w-3.5" />
+            <Span className="hidden sm:inline">{t("get.widget.backtest")}</Span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleEdit}
-            className="h-7 w-7 p-0"
+            className="h-7 gap-1.5 px-2 text-xs"
             title={t("get.widget.edit")}
           >
             <Edit className="h-3.5 w-3.5" />
+            <Span className="hidden sm:inline">{t("get.widget.edit")}</Span>
           </Button>
           {graph?.ownerType !== "system" && (
             <>
@@ -790,19 +1854,25 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                 variant="ghost"
                 size="sm"
                 onClick={handlePromote}
-                className="h-7 w-7 p-0"
+                className="h-7 gap-1.5 px-2 text-xs"
                 title={t("get.widget.promote")}
               >
                 <Shield className="h-3.5 w-3.5" />
+                <Span className="hidden md:inline">
+                  {t("get.widget.promote")}
+                </Span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleArchive}
-                className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-destructive"
                 title={t("get.widget.archive")}
               >
                 <Archive className="h-3.5 w-3.5" />
+                <Span className="hidden md:inline">
+                  {t("get.widget.archive")}
+                </Span>
               </Button>
             </>
           )}
@@ -810,29 +1880,135 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
       </Div>
 
       {/* Chart area */}
-      <Div className="flex-1 min-h-0 flex flex-col">
-        {!hasData && isLoading ? (
-          <Div className="flex-1 flex items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <Div className="flex-1 min-h-0 flex flex-col relative">
+        {/* Multi-pane chart container */}
+        <Div ref={paneContainerRef} className="flex-1 min-h-0 flex flex-col">
+          {paneNumbers.map((paneNum, idx) => {
+            const isCollapsed = collapsedPanes.has(paneNum);
+            const seriesInPane = accSeries.filter((s) => {
+              const cfg = displayConfigs.get(s.nodeId);
+              return cfg?.visible !== false && (cfg?.pane ?? 0) === paneNum;
+            }).length;
+
+            return (
+              <React.Fragment key={paneNum}>
+                {/* Drag handle between panes (not before first pane) */}
+                {idx > 0 && (
+                  <PaneDragHandle
+                    paneAbove={paneNumbers[idx - 1] ?? 0}
+                    paneBelow={paneNum}
+                    containerRef={paneContainerRef}
+                    panesRef={panesRef}
+                  />
+                )}
+                {/* Collapsed pane bar — shown when pane is collapsed */}
+                {isCollapsed && (
+                  <CollapsedPaneBar
+                    paneNum={paneNum}
+                    seriesCount={seriesInPane}
+                    onExpand={() => handlePaneCollapse(paneNum)}
+                  />
+                )}
+                {/* Pane wrapper — always in DOM so lwc chart stays attached.
+                    Hidden via h-0 overflow-hidden when collapsed. */}
+                <Div
+                  className={cn(
+                    "relative",
+                    isCollapsed
+                      ? "h-0 min-h-0 overflow-hidden"
+                      : idx === 0
+                        ? "flex-[3] min-h-[200px]"
+                        : "flex-[2] min-h-[150px]",
+                  )}
+                >
+                  {/* Chart canvas target */}
+                  <Div
+                    id={`vs-pane-${String(paneNum)}`}
+                    className="absolute inset-0"
+                  />
+                  {/* Per-pane legend */}
+                  {!isCollapsed && hasData && showLegend && (
+                    <PaneLegend
+                      paneNum={paneNum}
+                      series={accSeries}
+                      hiddenSeries={hiddenSeries}
+                      lastValues={lastValues}
+                      crosshair={crosshair}
+                      displayConfigs={displayConfigs}
+                      leftOffset={scaleWidths.left}
+                      rightOffset={scaleWidths.right}
+                      onToggleSeries={handleToggle}
+                    />
+                  )}
+                  {/* Pane collapse button — separate from legend to avoid confusion */}
+                  {!isCollapsed && paneNumbers.length > 1 && (
+                    <PaneCollapseButton
+                      paneNum={paneNum}
+                      rightOffset={scaleWidths.right}
+                      onCollapse={() => handlePaneCollapse(paneNum)}
+                    />
+                  )}
+                </Div>
+              </React.Fragment>
+            );
+          })}
+        </Div>
+
+        {/* Initial loading */}
+        {isInitialLoading && (
+          <Div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <P className="text-sm text-muted-foreground">
+              {t("get.widget.loading")}
+            </P>
           </Div>
-        ) : !hasData ? (
-          <Div className="flex-1 flex flex-col items-center justify-center gap-3">
-            <BarChart2 className="h-10 w-10 text-muted-foreground/40" />
+        )}
+
+        {/* Not found */}
+        {isNotFound && (
+          <Div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4">
+            <P className="text-sm text-muted-foreground">
+              {t("get.errors.notFound.title")}
+            </P>
+            <Button variant="outline" size="sm" onClick={handleBack}>
+              {t("get.widget.back")}
+            </Button>
+          </Div>
+        )}
+
+        {/* Shimmer */}
+        {!isInitialLoading && !hasData && isLoading && (
+          <Div className="absolute inset-0 z-10">
+            <ChartShimmer />
+          </Div>
+        )}
+
+        {/* Empty state */}
+        {!isInitialLoading && !hasData && !isLoading && (
+          <Div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
+            <BarChart2 className="h-10 w-10 text-muted-foreground/30" />
             <P className="text-sm text-muted-foreground">
               {t("get.widget.noData")}
             </P>
           </Div>
-        ) : (
-          <>
-            <Div ref={chartContainerRef} className="flex-1 min-h-[400px]" />
-            <Div className="px-3 py-2 border-t bg-muted/20">
-              <IndicatorToggles
-                series={accSeries}
-                hiddenSeries={hiddenSeries}
-                onToggle={handleToggle}
-              />
-            </Div>
-          </>
+        )}
+
+        {/* Crosshair tooltip */}
+        {crosshair && crosshair.points.length > 0 && (
+          <CrosshairTooltip
+            crosshair={crosshair}
+            containerRef={paneContainerRef}
+          />
+        )}
+
+        {/* Pan-back toast */}
+        {panBackVisible && (
+          <Div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-background/90 backdrop-blur-sm border border-border shadow-md rounded-lg px-3 py-1.5 flex items-center gap-2">
+            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+            <Span className="text-xs text-muted-foreground">
+              {t("get.widget.loadingEarlierData")}
+            </Span>
+          </Div>
         )}
       </Div>
     </Div>

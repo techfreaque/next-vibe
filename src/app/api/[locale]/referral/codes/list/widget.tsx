@@ -29,7 +29,6 @@ interface CustomWidgetProps {
   field: {
     value: CodesListGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

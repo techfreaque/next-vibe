@@ -18,16 +18,16 @@ import {
   FEATURED_MODELS,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { contactClientRepository } from "../contact/repository-client";
-import { EmailTemplate } from "../emails/smtp-client/components/template.email";
+import { EmailTemplate } from "../messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
-} from "../emails/smtp-client/components/tracking_context.email";
+} from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
 import {
   scopedTranslation as subscriptionScopedTranslation,

@@ -11,7 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { env } from "@/config/env";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 
-import { createTrackingContext } from "../../../../emails/smtp-client/components/tracking_context.email";
+import { createTrackingContext } from "../../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import {
   EmailCampaignStage,
   EmailJourneyVariant,

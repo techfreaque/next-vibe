@@ -1,0 +1,95 @@
+export const translations = {
+  category: "Konta Messenger",
+  tag: "konta-messenger",
+  enums: {
+    channel: {
+      email: "E-mail",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "Wszystkie kanały",
+    },
+    provider: {
+      smtp: "SMTP",
+      resend: "Resend",
+      ses: "Amazon SES",
+      mailgun: "Mailgun",
+      sendgrid: "SendGrid",
+      mailjet: "Mailjet",
+      postmark: "Postmark",
+      twilio: "Twilio",
+      awsSns: "AWS SNS",
+      messagebird: "MessageBird",
+      http: "HTTP",
+      whatsappBusiness: "WhatsApp Business",
+      telegramBot: "Bot Telegram",
+    },
+    providerFilter: {
+      any: "Wszyscy dostawcy",
+    },
+    status: {
+      active: "Aktywny",
+      inactive: "Nieaktywny",
+      error: "Błąd",
+      testing: "Testowanie",
+    },
+    statusFilter: {
+      any: "Wszystkie statusy",
+    },
+    healthStatus: {
+      healthy: "Zdrowy",
+      degraded: "Obniżony",
+      unhealthy: "Niezdrowy",
+      unknown: "Nieznany",
+    },
+    healthStatusFilter: {
+      any: "Wszystkie stany zdrowia",
+    },
+    securityType: {
+      none: "Brak",
+      tls: "TLS",
+      ssl: "SSL",
+      starttls: "STARTTLS",
+    },
+    imapAuthMethod: {
+      plain: "Zwykły",
+      oauth2: "OAuth2",
+      xoauth2: "XOAUTH2",
+    },
+    sortField: {
+      name: "Nazwa",
+      channel: "Kanał",
+      provider: "Dostawca",
+      status: "Status",
+      priority: "Priorytet",
+      messagesSentTotal: "Wysłanych wiadomości",
+      lastUsedAt: "Ostatnio używany",
+      createdAt: "Data utworzenia",
+    },
+    sortOrder: {
+      asc: "Rosnąco",
+      desc: "Malejąco",
+    },
+    campaignType: {
+      leadCampaign: "Kampania leadów",
+      newsletter: "Newsletter",
+      signupNurture: "Pielęgnacja rejestracji",
+      retention: "Retencja",
+      winback: "Odzyskanie",
+      transactional: "Transakcyjny",
+      notification: "Powiadomienie",
+      system: "System",
+    },
+    campaignTypeFilter: {
+      all: "Wszystkie kampanie",
+    },
+    loadBalancingStrategy: {
+      roundRobin: "Round Robin",
+      weighted: "Ważony",
+      priority: "Priorytet",
+      leastUsed: "Najmniej używany",
+    },
+  },
+};

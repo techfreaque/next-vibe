@@ -486,6 +486,10 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           const W = RangeSliderFieldWidgetInk as AnyInkWidget;
           return <W fieldName={fieldName} field={field} />;
         }
+        case FieldDataType.TIME_SERIES: {
+          const W = JsonFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
         default:
           const _exhaustiveCheck: never = field;
           return _exhaustiveCheck;

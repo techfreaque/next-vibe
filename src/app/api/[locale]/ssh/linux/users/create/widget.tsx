@@ -25,7 +25,6 @@ interface CustomWidgetProps {
   field: {
     value: LinuxUserCreateResponseOutput | null | undefined;
   } & (typeof endpoints.POST)["fields"];
-  fieldName: string;
 }
 
 export function LinuxUserCreateContainer({

@@ -7,6 +7,10 @@ export const translations: typeof enTranslations = {
     name: "Vibe Sense Bereinigung",
     description: "Löscht alte Datenpunkte und läuft Snapshot-Cache ab",
   },
+  graphRunner: {
+    name: "Vibe Sense Graph Runner",
+    description: "Führt alle fälligen Cron-gesteuerten Pipeline-Graphen aus",
+  },
   post: {
     title: "Vibe Sense Bereinigung",
     description:

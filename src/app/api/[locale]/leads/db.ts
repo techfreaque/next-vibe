@@ -20,8 +20,11 @@ import type { z } from "zod";
 
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
-import { EmailStatus, EmailStatusDB } from "../emails/messages/enum";
-import { CampaignType, CampaignTypeDB } from "../emails/smtp-client/enum";
+import {
+  MessageStatus as EmailStatus,
+  MessageStatusDB as EmailStatusDB,
+} from "../messenger/messages/enum";
+import { CampaignType, CampaignTypeDB } from "../messenger/accounts/enum";
 import { users } from "../user/db";
 import {
   DeviceTypeDB,

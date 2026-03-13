@@ -52,7 +52,6 @@ interface WidgetProps {
   field: {
     value: TaskExecuteResponseOutput | null | undefined;
   } & (typeof endpoints.POST)["fields"];
-  fieldName: string;
 }
 
 interface EndpointMethods {

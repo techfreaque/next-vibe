@@ -127,12 +127,24 @@ export function addErrorMessageToChat(
   sequenceId: string | null = null,
 ): void {
   const { parentId } = getLastMessageForErrorParent(threadId);
-  useChatStore.getState().addMessage({
+  const chatStore = useChatStore.getState();
+
+  // Revert the optimistic user message.
+  let errorParentId = parentId;
+  if (parentId) {
+    const leafMsg = chatStore.messages[parentId];
+    if (leafMsg?.role === ChatMessageRole.USER) {
+      errorParentId = leafMsg.parentId;
+      chatStore.deleteMessage(parentId);
+    }
+  }
+
+  chatStore.addMessage({
     id: crypto.randomUUID(),
     threadId,
     role: ChatMessageRole.ERROR,
     content,
-    parentId,
+    parentId: errorParentId,
     sequenceId,
     authorId: "system",
     authorName: null,
@@ -181,10 +193,23 @@ function handleMessageCreated(
   const isUserRole = e.role === ChatMessageRole.USER;
   const isAssistantOrTool =
     e.role === ChatMessageRole.ASSISTANT || e.role === ChatMessageRole.TOOL;
-  const shouldAddToStore = isUserRole || isAssistantOrTool || incognito;
+  const isErrorRole = e.role === ChatMessageRole.ERROR;
+  const shouldAddToStore =
+    isUserRole || isAssistantOrTool || isErrorRole || incognito;
 
   if (!shouldAddToStore) {
     return;
+  }
+
+  // For server-emitted error messages: revert the optimistic user message first.
+  if (isErrorRole) {
+    const { parentId: leafId } = getLastMessageForErrorParent(e.threadId);
+    if (leafId) {
+      const leafMsg = useChatStore.getState().messages[leafId];
+      if (leafMsg?.role === ChatMessageRole.USER) {
+        useChatStore.getState().deleteMessage(leafId);
+      }
+    }
   }
 
   const serverMetadata = {
@@ -193,16 +218,24 @@ function handleMessageCreated(
     ...(isUserRole && e.content ? { isTranscribing: false } : {}),
   };
 
+  const existingMessage = isUserRole
+    ? useChatStore.getState().messages[e.messageId]
+    : undefined;
+  // If the message was already replaced by an error (stream failed before MESSAGE_CREATED arrived),
+  // skip the update — the error message is the correct final state.
   const existingOptimistic =
-    isUserRole && useChatStore.getState().messages[e.messageId];
+    existingMessage?.role === ChatMessageRole.USER
+      ? existingMessage
+      : undefined;
 
   if (existingOptimistic) {
     useChatStore.getState().updateMessage(e.messageId, {
       parentId: e.parentId,
       content: e.content || "",
       metadata: serverMetadata,
+      sequenceId: e.sequenceId ?? null,
     });
-  } else {
+  } else if (!existingMessage) {
     useChatStore.getState().addMessage({
       id: e.messageId,
       threadId: e.threadId,
@@ -618,7 +651,6 @@ function handleError(
   threadId: string,
   logger: EndpointLogger,
 ): void {
-  const errorMessageId = crypto.randomUUID();
   const { parentId } = getLastMessageForErrorParent(threadId);
 
   const errorMessage = e.message ?? "Unknown error";
@@ -627,12 +659,49 @@ function handleError(
     ? String(e.errorType.errorCode)
     : null;
 
-  useChatStore.getState().addMessage({
+  const chatStore = useChatStore.getState();
+
+  // If the HTTP error path already added an error message (same userMessageId),
+  // the leaf is now an ERROR role message — update it in place instead of adding a duplicate.
+  if (parentId) {
+    const leafMsg = chatStore.messages[parentId];
+    if (leafMsg?.role === ChatMessageRole.ERROR) {
+      chatStore.updateMessage(parentId, {
+        content: errorMessage,
+        errorType,
+        errorMessage,
+        errorCode,
+      });
+      logger.info("Updated existing error message from WS ERROR event", {
+        messageId: parentId,
+        threadId,
+      });
+      return;
+    }
+  }
+
+  const errorMessageId = crypto.randomUUID();
+
+  // Revert the optimistic user message — it was never persisted by the server.
+  let errorParentId = parentId;
+  if (parentId) {
+    const leafMsg = chatStore.messages[parentId];
+    if (leafMsg?.role === ChatMessageRole.USER) {
+      errorParentId = leafMsg.parentId;
+      chatStore.deleteMessage(parentId);
+      logger.info("Reverted optimistic user message on stream error", {
+        messageId: parentId,
+        threadId,
+      });
+    }
+  }
+
+  chatStore.addMessage({
     id: errorMessageId,
     threadId,
     role: ChatMessageRole.ERROR,
     content: errorMessage,
-    parentId,
+    parentId: errorParentId,
     sequenceId: null,
     authorId: "system",
     authorName: null,

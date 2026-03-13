@@ -101,5 +101,14 @@ export const translations = {
       noConnectionsYet: "No connections yet.",
       connectionsTitle: "Linked Connections",
     },
+    // Sync settings (admin only)
+    syncSettings: {
+      title: "Auto-Sync",
+      description:
+        "Sync tasks and memories with all connected instances every minute",
+      enabledBadge: "Active",
+      disabledBadge: "Inactive",
+      toggleLabel: "Toggle auto-sync",
+    },
   },
 };

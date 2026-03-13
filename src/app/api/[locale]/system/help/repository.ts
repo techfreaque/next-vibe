@@ -291,9 +291,8 @@ function serializeMeta(
   includeExamples = false,
   platforms?: string[],
 ): ToolItem {
-  const callName = tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
-    name: callName,
+    name: tool.toolName,
     title: tool.title,
     id: tool.toolName,
     tags: tool.tags,
@@ -313,9 +312,8 @@ function serializeMetaMinimal(
   tool: EndpointMeta,
   platforms?: string[],
 ): ToolItem {
-  const callName = tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
-    name: callName,
+    name: tool.toolName,
     title: tool.title,
     id: tool.toolName,
     tags: tool.tags,
@@ -508,7 +506,7 @@ export class HelpRepository {
       categoryMap.set(tool.category, (categoryMap.get(tool.category) ?? 0) + 1);
     }
     const categories = [...categoryMap.entries()]
-      .toSorted((a, b) => b[1] - a[1])
+      .toSorted((a, b) => a[0].localeCompare(b[0]))
       .map(([name, count]) => ({ name, count }));
 
     const adminMeta = isAdmin
@@ -542,10 +540,7 @@ export class HelpRepository {
       const parameters = endpoint
         ? (getParameterSchema(endpoint, locale) ?? undefined)
         : undefined;
-      const callAs =
-        matchedTool.aliases.length > 0
-          ? matchedTool.aliases[0]
-          : matchedTool.toolName;
+      const callAs = matchedTool.toolName;
       return success({
         tools: [
           serializeMeta(
@@ -557,7 +552,7 @@ export class HelpRepository {
         ],
         totalCount,
         matchedCount: 1,
-        hint: `Call as: execute-tool toolName="${callAs}"${matchedTool.aliases.length > 1 ? ` (aliases: ${matchedTool.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
+        hint: `Call as: execute-tool toolName="${callAs}"${matchedTool.aliases.length > 0 ? ` (aliases: ${matchedTool.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
         ...adminMeta,
       });
     }
@@ -583,10 +578,7 @@ export class HelpRepository {
         const parameters = endpoint
           ? (getParameterSchema(endpoint, locale) ?? undefined)
           : undefined;
-        const callAs =
-          exactMatch.aliases.length > 0
-            ? exactMatch.aliases[0]
-            : exactMatch.toolName;
+        const callAs = exactMatch.toolName;
         return success({
           tools: [
             serializeMeta(
@@ -598,7 +590,7 @@ export class HelpRepository {
           ],
           totalCount,
           matchedCount: 1,
-          hint: `Call as: execute-tool toolName="${callAs}"${exactMatch.aliases.length > 1 ? ` (aliases: ${exactMatch.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
+          hint: `Call as: execute-tool toolName="${callAs}"${exactMatch.aliases.length > 0 ? ` (aliases: ${exactMatch.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
           ...adminMeta,
         });
       }
@@ -625,6 +617,15 @@ export class HelpRepository {
         m.category?.toLowerCase().includes(category),
       );
     }
+
+    // Sort by category (A-Z), then by tool name (A-Z) within each category
+    filtered.sort((a, b) => {
+      const catCmp = a.category.localeCompare(b.category);
+      if (catCmp !== 0) {
+        return catCmp;
+      }
+      return a.toolName.localeCompare(b.toolName);
+    });
 
     const matchedCount = filtered.length;
     const totalPages = Math.ceil(matchedCount / effectivePageSize);

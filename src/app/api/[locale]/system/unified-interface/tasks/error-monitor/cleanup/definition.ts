@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   aliases: [ERROR_LOGS_CLEANUP_ALIAS],
   title: "errorMonitor.cleanup.post.title",
   description: "errorMonitor.cleanup.post.description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemTasks",
   icon: "trash",
   tags: ["errorMonitor.tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],

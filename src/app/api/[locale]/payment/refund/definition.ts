@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
 
   title: "title" as const,
   description: "description" as const,
-  category: "app.endpointCategories.credits",
+  category: "app.endpointCategories.payments",
   icon: "refresh-ccw" as const,
   tags: ["tags.refund" as const, "tags.transaction" as const],
 

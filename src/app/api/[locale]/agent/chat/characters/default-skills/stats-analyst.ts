@@ -1,4 +1,4 @@
-import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/emails/messages/stats/constants";
+import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/messenger/messages/stats/constants";
 import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/constants";
 import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/constants";
 import { REFERRAL_STATS_ALIAS } from "@/app/api/[locale]/referral/stats/constants";

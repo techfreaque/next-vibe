@@ -56,7 +56,6 @@ interface PatchWidgetProps {
   field: {
     value: FavoriteUpdateResponseOutput | null | undefined;
   } & (typeof definitionPatch.PATCH)["fields"];
-  fieldName: string;
 }
 
 /**

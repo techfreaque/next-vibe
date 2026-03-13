@@ -5,10 +5,10 @@
 
 import type { JSX } from "react";
 
-import type { CampaignTypeValue } from "@/app/api/[locale]/emails/smtp-client/enum";
+import type { CampaignTypeValue } from "@/app/api/[locale]/messenger/accounts/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { TrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
+import type { TrackingContext } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,

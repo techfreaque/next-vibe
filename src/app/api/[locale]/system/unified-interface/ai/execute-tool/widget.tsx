@@ -57,7 +57,6 @@ interface CustomWidgetProps {
   field: {
     value: RouteExecuteResponseInput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {

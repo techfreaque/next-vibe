@@ -31,7 +31,6 @@ interface CustomWidgetProps {
   field: {
     value: BacktestResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

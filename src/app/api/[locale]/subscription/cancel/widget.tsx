@@ -29,7 +29,6 @@ interface CustomWidgetProps {
   field: {
     value: SubscriptionCancelDeleteResponseOutput | null | undefined;
   } & (typeof definition.DELETE)["fields"];
-  fieldName: string;
 }
 
 /**

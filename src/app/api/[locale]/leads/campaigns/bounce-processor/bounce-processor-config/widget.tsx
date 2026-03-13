@@ -38,7 +38,6 @@ interface CustomWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.PUT)["fields"];
-  fieldName: string;
 }
 
 export function BounceProcessorConfigWidget({

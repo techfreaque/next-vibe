@@ -30,7 +30,7 @@ const { POST } = createEndpoint({
   aliases: [ERROR_MONITOR_ALIAS],
   title: "errorMonitor.post.title",
   description: "errorMonitor.post.description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemTasks",
   icon: "alert-triangle",
   tags: ["errorMonitor.tag" as const],
   allowedRoles: [UserRole.ADMIN],

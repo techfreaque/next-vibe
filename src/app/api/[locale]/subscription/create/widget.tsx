@@ -67,7 +67,6 @@ interface CustomWidgetProps {
   field: {
     value: SubscriptionCreatePostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 /**

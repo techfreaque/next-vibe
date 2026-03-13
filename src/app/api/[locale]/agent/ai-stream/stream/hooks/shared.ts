@@ -229,11 +229,9 @@ export async function createAndSendUserMessage(
     });
 
     if (!streamStarted) {
-      // Revert optimistic user message — server rejected the request.
-      // Input is intentionally left untouched so the user can retry.
-      if (newMessageId) {
-        chatStore.deleteMessage(newMessageId);
-      }
+      // addErrorMessageToChat (called inside startStream on failure) already
+      // reverts the optimistic user message and adds an error message in its place.
+      // Nothing to clean up here.
       return false;
     }
 

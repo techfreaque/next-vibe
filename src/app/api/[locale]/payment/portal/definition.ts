@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   path: ["payment", "portal"],
   title: "post.title" as const,
   description: "post.description" as const,
-  category: "app.endpointCategories.credits",
+  category: "app.endpointCategories.payments",
   icon: "settings" as const,
   tags: ["post.title" as const, "post.title" as const, "post.title" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],

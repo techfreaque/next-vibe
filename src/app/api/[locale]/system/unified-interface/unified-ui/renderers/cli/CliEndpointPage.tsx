@@ -192,10 +192,11 @@ export function InkEndpointPage<
     }
   }, [shouldAutoFetch, onSubmit, response, handleSubmit, initialData]);
 
-  // Quit handler
+  // Quit handler — Escape only (not "q" which would fire while typing in text fields)
   useInput(
-    (input, key) => {
-      if (input === "q" || key.escape) {
+    // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
+    (_, key) => {
+      if (key.escape) {
         exit();
       }
     },
@@ -303,7 +304,7 @@ export function InkEndpointPage<
       <Box marginTop={1}>
         <Text dimColor>
           {response
-            ? `${cliT("response.success")} | enter: re-submit | q/esc: exit`
+            ? `${cliT("response.success")} | enter: re-submit | esc: exit`
             : cliT(
                 "vibe.endpoints.renderers.cliUi.widgets.common.hints.tabNextField",
               )}

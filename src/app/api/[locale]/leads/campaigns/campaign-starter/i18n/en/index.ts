@@ -21,6 +21,10 @@ export const translations = {
         label: "Dry Run",
         description: "Run without making changes",
       },
+      force: {
+        label: "Force",
+        description: "Bypass day/hour schedule restrictions",
+      },
     },
     response: {
       leadsProcessed: "Leads Processed",

@@ -69,7 +69,7 @@ const { POST } = createEndpoint({
     return undefined;
   },
   icon: "sparkle" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatCharacters",
   tags: ["tags.characters" as const],
 
   aliases: [CHARACTER_CREATE_ALIAS],

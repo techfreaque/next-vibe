@@ -160,6 +160,14 @@ export const translations = {
     },
   },
 
+  priority: {
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    background: "Background",
+  },
+
   widget: {
     title: "Email Campaigns Configuration",
     titleSaved: "Configuration Saved",

@@ -34,7 +34,7 @@ const { GET } = createEndpoint({
   title: "list.title",
   description: "list.description",
   icon: "git-branch",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.analytics",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
@@ -148,7 +148,7 @@ const { POST } = createEndpoint({
   title: "create.title",
   description: "create.description",
   icon: "plus",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.analytics",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

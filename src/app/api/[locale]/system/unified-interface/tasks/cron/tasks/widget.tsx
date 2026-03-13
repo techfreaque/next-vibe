@@ -13,6 +13,7 @@ import { Circle } from "next-vibe-ui/ui/icons/Circle";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Eye } from "next-vibe-ui/ui/icons/Eye";
 import { History } from "next-vibe-ui/ui/icons/History";
+import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Play } from "next-vibe-ui/ui/icons/Play";
@@ -63,7 +64,6 @@ interface WidgetProps {
   field: {
     value: CronTaskListResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -698,6 +698,13 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     })();
   }, [navigate]);
 
+  const handleNavigateQueue = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const m = await import("../queue/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
+
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {
       const m = await import("./definition");
@@ -861,6 +868,16 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           >
             <BarChart3 className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">{t("widget.header.stats")}</Span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2.5 gap-1.5 text-xs"
+            onClick={handleNavigateQueue}
+          >
+            <Layers className="h-3.5 w-3.5" />
+            <Span className="hidden sm:inline">{t("widget.header.queue")}</Span>
           </Button>
           <Button
             type="button"

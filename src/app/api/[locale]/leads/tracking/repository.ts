@@ -24,7 +24,7 @@ import {
   getLanguageFromLocale,
 } from "@/i18n/core/language-utils";
 
-import { emails } from "../../emails/messages/db";
+import { emails } from "../../messenger/messages/db";
 import { ReferralRepository } from "../../referral/repository";
 import type { JwtPayloadType } from "../../user/auth/types";
 import { LeadAuthRepository } from "../auth/repository";

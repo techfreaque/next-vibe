@@ -34,7 +34,6 @@ interface WidgetProps {
   field: {
     value: SshExecResponseOutput | null | undefined;
   } & (typeof endpoints.POST)["fields"];
-  fieldName: string;
 }
 
 interface HistoryEntry {

@@ -47,7 +47,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "brain" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMemories",
   tags: ["tags.memories" as const],
 
   options: {
@@ -215,7 +215,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "brain",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMemories",
   tags: ["tags.memories" as const],
 
   options: {

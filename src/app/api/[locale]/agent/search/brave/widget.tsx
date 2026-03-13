@@ -28,7 +28,6 @@ interface CustomWidgetProps {
   field: {
     value: BraveSearchGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

@@ -14,7 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { EmailStatus } from "@/app/api/[locale]/emails/messages/enum";
+import { MessageStatus } from "@/app/api/[locale]/messenger/messages/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -46,15 +46,15 @@ export class HaltAllCampaignsRepository {
       const [pendingEmailsRow] = await db
         .select({ count: count() })
         .from(emailCampaigns)
-        .where(eq(emailCampaigns.status, EmailStatus.PENDING));
+        .where(eq(emailCampaigns.status, MessageStatus.PENDING));
 
       const emailsCancelled = pendingEmailsRow?.count ?? 0;
 
       if (emailsCancelled > 0) {
         await db
           .update(emailCampaigns)
-          .set({ status: EmailStatus.FAILED })
-          .where(eq(emailCampaigns.status, EmailStatus.PENDING));
+          .set({ status: MessageStatus.FAILED })
+          .where(eq(emailCampaigns.status, MessageStatus.PENDING));
       }
 
       // Count and halt all leads with active campaigns

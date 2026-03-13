@@ -155,6 +155,14 @@ export const translations = {
     },
   },
 
+  priority: {
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    background: "Background",
+  },
+
   widget: {
     title: "Bounce Processor Configuration",
     titleSaved: "Configuration Saved",

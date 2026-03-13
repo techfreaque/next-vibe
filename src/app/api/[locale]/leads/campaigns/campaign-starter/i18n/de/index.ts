@@ -22,6 +22,10 @@ export const translations: typeof enTranslations = {
         label: "Testlauf",
         description: "Ausführen ohne Änderungen vorzunehmen",
       },
+      force: {
+        label: "Erzwingen",
+        description: "Tages-/Stunden-Zeitplaneinschränkungen umgehen",
+      },
     },
     response: {
       leadsProcessed: "Verarbeitete Leads",

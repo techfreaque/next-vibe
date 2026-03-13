@@ -32,7 +32,7 @@ const { POST } = createEndpoint({
   aliases: [ELECTRON_BUILD_ALIAS],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tags.electronBuild"],
   icon: "package",
   allowedRoles: [

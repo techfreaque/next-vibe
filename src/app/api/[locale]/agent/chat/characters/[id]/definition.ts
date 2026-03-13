@@ -85,7 +85,7 @@ const { DELETE } = createEndpoint({
     return undefined;
   },
   icon: "trash" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatCharacters",
   tags: ["tags.characters" as const],
 
   aliases: [CHARACTER_DELETE_ALIAS],
@@ -283,7 +283,7 @@ const { PATCH } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatCharacters",
   tags: ["tags.characters" as const],
 
   aliases: [CHARACTER_UPDATE_ALIAS],
@@ -688,7 +688,7 @@ const { GET } = createEndpoint({
     return undefined;
   },
   icon: "sparkles" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatCharacters",
   tags: ["tags.characters" as const],
 
   aliases: [CHARACTER_GET_ALIAS],

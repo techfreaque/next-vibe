@@ -6,6 +6,49 @@ export const translations = {
     repositoryInternalError: "An internal error occurred",
   },
 
+  widget: {
+    title: "Campaign Monitoring",
+    refresh: "Refresh",
+    health: {
+      healthy: "Healthy",
+      warning: "Warning",
+      critical: "Critical",
+    },
+    stats: {
+      totalTasks: "Total Tasks",
+      enabled: "Enabled",
+      disabled: "Disabled",
+      successRate: "Success Rate (24h)",
+      failed24h: "Failed (24h)",
+    },
+    task: {
+      lastRun: "Last run",
+      nextRun: "Next run",
+      never: "Never",
+      executions: "Executions",
+      avgDuration: "Avg",
+      noHistory: "No executions yet",
+      runNow: "Run now",
+    },
+    status: {
+      running: "Running",
+      completed: "Completed",
+      failed: "Failed",
+      error: "Error",
+      timeout: "Timeout",
+      pending: "Pending",
+      scheduled: "Scheduled",
+      cancelled: "Cancelled",
+      unknown: "Unknown",
+    },
+    alerts: {
+      title: "Alerts",
+      failures: "consecutive failures",
+    },
+    empty: "No campaign tasks found",
+    loading: "Loading monitoring data...",
+  },
+
   get: {
     tags: {
       tasks: "Tasks",

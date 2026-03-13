@@ -29,7 +29,7 @@ const { POST } = createEndpoint({
   path: ["system", "guard", "stop"],
   title: "title",
   description: "description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tag"],
   icon: "shield",
   allowedRoles: [

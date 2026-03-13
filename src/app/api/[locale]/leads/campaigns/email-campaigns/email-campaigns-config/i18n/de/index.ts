@@ -145,6 +145,14 @@ export const translations = {
       description: "E-Mail-Kampagnen-Konfiguration gespeichert",
     },
   },
+  priority: {
+    critical: "Kritisch",
+    high: "Hoch",
+    medium: "Mittel",
+    low: "Niedrig",
+    background: "Hintergrund",
+  },
+
   widget: {
     title: "E-Mail-Kampagnen-Konfiguration",
     titleSaved: "Konfiguration gespeichert",

@@ -138,7 +138,13 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   // Form state management — initialized with merged defaults
   const [formValues, setFormValues] =
     useState<Partial<TEndpoint["types"]["RequestOutput"]>>(mergedDefaults);
-  const [formErrors] = useState<Record<string, string>>({});
+  const [formErrors, setFormErrors] = useState<
+    Record<string, string | undefined>
+  >({});
+
+  // Keep a ref to latest formValues so async submit always reads current state
+  const formValuesRef = useRef(formValues);
+  formValuesRef.current = formValues;
 
   // Notify parent of initial defaults (once on mount)
   const hasNotifiedInitial = useRef(false);
@@ -155,8 +161,19 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     setValue: <TValue,>(name: string, value: TValue) => {
       setFormValues((prev) => {
         const next = { ...prev, [name]: value };
+        // Sync the ref immediately so async submit reads latest values
+        formValuesRef.current = next;
         onFormChangeRef.current?.(next);
         return next;
+      });
+      // Clear field error when user changes value
+      setFormErrors((prev) => {
+        if (prev[name]) {
+          const next = { ...prev };
+          delete next[name];
+          return next;
+        }
+        return prev;
       });
     },
     getValue: <TValue,>(name: string): TValue | undefined => {
@@ -170,22 +187,89 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   // Create navigation for CLI
   const navigation = useCliNavigation();
 
-  // Handle submit
-  const handleSubmit = (): void => {
-    if (onSubmit) {
-      void onSubmit(formValues as TEndpoint["types"]["RequestOutput"]);
+  // preSubmitRef: widgets can set an async hook that runs before submit.
+  // If it returns false, submit is aborted.
+  const preSubmitRef = useRef<(() => Promise<boolean>) | undefined>(undefined);
+
+  // Handle submit — awaits preSubmit hook if set.
+  // Reads formValuesRef.current so async preSubmit mutations are visible.
+  const handleSubmit = useCallback((): void => {
+    logger.debug("[InkEndpointRenderer] handleSubmit called", {
+      hasOnSubmit: !!onSubmit,
+      isSubmitting,
+    });
+    if (!onSubmit || isSubmitting) {
+      return;
     }
-  };
+    const doSubmit = async (): Promise<void> => {
+      // Clear previous validation errors
+      setFormErrors({});
+
+      const preSubmit = preSubmitRef.current;
+      logger.debug("[InkEndpointRenderer] doSubmit", {
+        hasPreSubmit: !!preSubmit,
+        formKeys: Object.keys(formValuesRef.current ?? {}),
+      });
+      if (preSubmit) {
+        try {
+          const proceed = await preSubmit();
+          logger.debug("[InkEndpointRenderer] preSubmit result", { proceed });
+          if (!proceed) {
+            return;
+          }
+        } catch (err) {
+          logger.error("[InkEndpointRenderer] preSubmit error", {
+            error: String(err),
+          });
+          return;
+        }
+      }
+      // Validate form values against Zod schema before submitting
+      const validationResult = endpoint.requestSchema.safeParse(
+        formValuesRef.current,
+      );
+      if (!validationResult.success) {
+        const fieldErrors: Record<string, string | undefined> = {};
+        for (const issue of validationResult.error.issues) {
+          const fieldPath = issue.path.join(".");
+          if (fieldPath && !fieldErrors[fieldPath]) {
+            fieldErrors[fieldPath] = issue.message;
+          }
+        }
+        logger.debug("[InkEndpointRenderer] validation failed", {
+          fieldErrors,
+        });
+        setFormErrors(fieldErrors);
+        return;
+      }
+
+      logger.debug("[InkEndpointRenderer] calling onSubmit", {
+        formValues: JSON.stringify(formValuesRef.current).slice(0, 200),
+      });
+      await onSubmit(validationResult.data);
+    };
+    void doSubmit();
+  }, [onSubmit, isSubmitting, logger, endpoint.requestSchema]);
 
   // Focus management — extract request field names for tab navigation
   // Keep request fields focusable even after response (for re-filtering/re-submitting)
+  // Excludes hidden fields (e.g. token, leadId) that have no visible UI
   const requestFieldNames = useMemo(() => {
     if (responseOnly) {
       return [];
     }
     const fields = extractAllFields(endpoint.fields);
     return fields
-      .filter(([, field]) => !isResponseField(field))
+      .filter(([, field]) => {
+        if (isResponseField(field)) {
+          return false;
+        }
+        // Skip hidden fields — they have no visible input to focus
+        if ("hidden" in field && field.hidden === true) {
+          return false;
+        }
+        return true;
+      })
       .map(([fieldName]) => fieldName);
   }, [endpoint.fields, responseOnly]);
 
@@ -217,8 +301,15 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       if (key.tab) {
         moveFocus(key.shift ? "prev" : "next");
       }
-      if (key.return && onSubmit && !isSubmitting) {
-        handleSubmit();
+      if (key.return) {
+        logger.debug("[InkEndpointRenderer] Enter pressed", {
+          hasOnSubmit: !!onSubmit,
+          isSubmitting,
+          focusedField,
+        });
+        if (onSubmit && !isSubmitting) {
+          handleSubmit();
+        }
       }
     },
     { isActive: requestFieldNames.length > 0 && !responseOnly },
@@ -244,6 +335,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     isSubmitting,
     focusedField,
     moveFocus,
+    preSubmitRef,
   };
 
   // Check if root is a container/array widget that should render directly
@@ -259,6 +351,8 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     isRootContainer,
     responseOnly,
     hasData: !!data,
+    requestFieldNames,
+    focusedField,
     dataKeys:
       data && typeof data === "object" && !Array.isArray(data)
         ? Object.keys(data)

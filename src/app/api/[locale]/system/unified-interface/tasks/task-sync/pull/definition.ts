@@ -20,6 +20,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../../i18n";
+import { TASK_SYNC_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -28,9 +29,9 @@ const { POST } = createEndpoint({
   title: "taskSync.pull.post.title" as const,
   description: "taskSync.pull.post.description" as const,
   icon: "download",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
-  aliases: ["sync-pull", "task-pull"] as const,
+  aliases: [TASK_SYNC_ALIAS] as const,
   allowedRoles: [UserRole.ADMIN],
 
   fields: objectField(scopedTranslation, {

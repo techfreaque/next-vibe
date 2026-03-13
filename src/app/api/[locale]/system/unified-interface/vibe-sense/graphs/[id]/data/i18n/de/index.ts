@@ -28,7 +28,11 @@ export const translations: typeof enTranslations = {
         createdAt: "Erstellt am",
         config: "Konfiguration",
       },
-      series: { nodeId: "Knoten-ID", timestamp: "Zeitstempel", value: "Wert" },
+      series: {
+        nodeId: "Knoten-ID",
+        timestamp: "Zeitstempel",
+        value: "Wert",
+      },
       signals: {
         nodeId: "Knoten-ID",
         timestamp: "Zeitstempel",
@@ -48,6 +52,7 @@ export const translations: typeof enTranslations = {
       promote: "Promote",
       signal: "Signal",
       noData: "Keine Daten in diesem Bereich",
+      loadingEarlierData: "Aeltere Daten werden geladen\u2026",
     },
     success: {
       title: "Graph geladen",

@@ -95,7 +95,8 @@ export function PasswordFieldWidgetInk<
     <Box flexDirection="column" marginBottom={1}>
       {field.label && (
         <Box marginBottom={0}>
-          <Text bold>
+          <Text bold color={isFocused ? "cyan" : undefined}>
+            {isFocused ? "> " : "  "}
             {t(field.label)}
             {isRequired && <Text color="blue"> *</Text>}
           </Text>
@@ -104,9 +105,7 @@ export function PasswordFieldWidgetInk<
       )}
 
       <Box>
-        <Text dimColor>
-          {field.placeholder ? `${t(field.placeholder)}: ` : "> "}
-        </Text>
+        <Text dimColor>{isFocused ? "> " : "  "}</Text>
         <TextInput
           value={inputValue}
           focus={isFocused}

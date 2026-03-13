@@ -116,6 +116,10 @@ export function SubscriptionPageClient({
             locale={locale}
             endpointOptions={{
               read: {
+                initialState: {
+                  targetUserId: undefined,
+                  targetLeadId: undefined,
+                },
                 initialData: initialHistory || undefined,
               },
             }}

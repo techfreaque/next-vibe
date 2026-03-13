@@ -6,9 +6,9 @@
 
 import React from "react";
 
-import { CampaignEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/campaign_email_layout.email";
-import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
-import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
+import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
+import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 import { simpleT } from "@/i18n/core/shared";
 
 import { EmailCampaignStage } from "../../../enum";
@@ -17,7 +17,7 @@ import type {
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./retention/i18n";
 
 /**
  * Retention - Initial Contact
@@ -32,28 +32,18 @@ export const retentionInitialEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.retention.initial.previewText",
-      )}
+      previewText={t("initial.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.retention.initial.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("initial.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.initial.thankYou")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.thankYou")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.initial.valueSummary")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.valueSummary")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.initial.whatIsNext")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.whatIsNext")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -62,15 +52,13 @@ export const retentionInitialEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.retention.initial.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("initial.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.retention.initial.subject"),
+    subject: t("initial.subject"),
     jsx: emailContent,
   };
 };
@@ -88,28 +76,18 @@ export const retentionFollowup1Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.retention.followup1.previewText",
-      )}
+      previewText={t("followup1.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.retention.followup1.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup1.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.followup1.newFeature")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.newFeature")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.followup1.howToUse")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.howToUse")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.followup1.encouragement")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.encouragement")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -118,15 +96,13 @@ export const retentionFollowup1Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.retention.followup1.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup1.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.retention.followup1.subject"),
+    subject: t("followup1.subject"),
     jsx: emailContent,
   };
 };
@@ -145,24 +121,16 @@ export const retentionFollowup2Email: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.retention.followup2.previewText",
-      )}
+      previewText={t("followup2.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.retention.followup2.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup2.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.followup2.milestone")}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.milestone")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.followup2.insiderTip")}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.insiderTip")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -171,15 +139,13 @@ export const retentionFollowup2Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.retention.followup2.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup2.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.retention.followup2.subject"),
+    subject: t("followup2.subject"),
     jsx: emailContent,
   };
 };
@@ -198,24 +164,16 @@ export const retentionFollowup3Email: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.retention.followup3.previewText",
-      )}
+      previewText={t("followup3.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.retention.followup3.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup3.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.followup3.roadmap")}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.roadmap")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.followup3.feedback")}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.feedback")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -224,15 +182,13 @@ export const retentionFollowup3Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.retention.followup3.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup3.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.retention.followup3.subject"),
+    subject: t("followup3.subject"),
     jsx: emailContent,
   };
 };
@@ -251,24 +207,16 @@ export const retentionNurtureEmail: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.retention.nurture.previewText",
-      )}
+      previewText={t("nurture.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.retention.nurture.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("nurture.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.nurture.appreciation")}
-      </HumanText>
+      <HumanText variant="body">{t("nurture.appreciation")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.nurture.exclusiveContent")}
-      </HumanText>
+      <HumanText variant="body">{t("nurture.exclusiveContent")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -277,15 +225,13 @@ export const retentionNurtureEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.retention.nurture.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("nurture.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.retention.nurture.subject"),
+    subject: t("nurture.subject"),
     jsx: emailContent,
   };
 };
@@ -304,24 +250,16 @@ export const retentionReactivationEmail: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.retention.reactivation.previewText",
-      )}
+      previewText={t("reactivation.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.retention.reactivation.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("reactivation.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.reactivation.loyalty")}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.loyalty")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.retention.reactivation.bigUpdate")}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.bigUpdate")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -330,15 +268,13 @@ export const retentionReactivationEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.retention.reactivation.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("reactivation.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.retention.reactivation.subject"),
+    subject: t("reactivation.subject"),
     jsx: emailContent,
   };
 };

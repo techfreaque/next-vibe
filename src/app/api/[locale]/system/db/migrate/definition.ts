@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["system", "db", "migrate"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDatabase",
   tags: ["tag"],
   icon: "arrow-right",
   allowedRoles: [

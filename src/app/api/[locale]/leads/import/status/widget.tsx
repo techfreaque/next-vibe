@@ -43,7 +43,6 @@ interface CustomWidgetProps {
   field: {
     value: ImportJobsStatusGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 type TFunc = ReturnType<typeof useWidgetTranslation>;

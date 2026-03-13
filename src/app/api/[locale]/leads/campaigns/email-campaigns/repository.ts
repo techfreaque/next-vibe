@@ -16,9 +16,9 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { CampaignType } from "@/app/api/[locale]/emails/smtp-client/enum";
-import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/emails/smtp-client/i18n";
-import { SmtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sending/repository";
+import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
+import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
+import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";

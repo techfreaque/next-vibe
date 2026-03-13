@@ -35,7 +35,7 @@ const { PATCH } = createEndpoint({
 
   title: "patch.title" as const,
   description: "patch.description" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatThreads",
   tags: ["tags.folders" as const],
   icon: "folder-pen" as const,
 

@@ -16,7 +16,7 @@ import type {
 } from "next-vibe/shared/types/response.schema";
 import type { z } from "zod";
 
-import type imapAccountsListDefinition from "@/app/api/[locale]/emails/imap-client/accounts/list/definition";
+import type imapAccountsListDefinition from "@/app/api/[locale]/messenger/accounts/list/definition";
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import {
   objectFieldNew,

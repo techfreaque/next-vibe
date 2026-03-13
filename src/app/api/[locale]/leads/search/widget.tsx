@@ -46,7 +46,6 @@ interface CustomWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 // ─── Colour maps ──────────────────────────────────────────────────────────────

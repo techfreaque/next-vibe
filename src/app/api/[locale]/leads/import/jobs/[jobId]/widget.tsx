@@ -41,7 +41,6 @@ interface ImportJobStatusWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 export function ImportJobStatusContainer({
@@ -364,7 +363,6 @@ interface ImportJobRetryWidgetProps {
   field: {
     value: RetryResponseOutput | null | undefined;
   } & (typeof retryDefinition.POST)["fields"];
-  fieldName: string;
 }
 
 export function ImportJobRetryContainer({
@@ -501,7 +499,6 @@ interface ImportJobStopWidgetProps {
   field: {
     value: StopResponseOutput | null | undefined;
   } & (typeof stopDefinition.POST)["fields"];
-  fieldName: string;
 }
 
 export function ImportJobStopContainer({

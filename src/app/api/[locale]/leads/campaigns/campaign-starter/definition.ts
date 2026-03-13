@@ -26,9 +26,10 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["leads", "campaigns", "campaign-starter"],
+  aliases: ["campaign-starter"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.leads",
+  category: "app.endpointCategories.leadsCampaigns",
   icon: "play",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
@@ -42,6 +43,14 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.BOOLEAN,
         label: "post.fields.dryRun.label",
         description: "post.fields.dryRun.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
+      force: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.force.label",
+        description: "post.fields.force.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
@@ -117,7 +126,7 @@ const { POST } = createEndpoint({
   },
 
   examples: {
-    requests: { default: { dryRun: false } },
+    requests: { default: { dryRun: false, force: false } },
     responses: {
       default: {
         leadsProcessed: 0,

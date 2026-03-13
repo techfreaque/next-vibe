@@ -43,7 +43,7 @@ const { POST } = createEndpoint({
   title: "waitForTask.post.title",
   description: "waitForTask.post.description",
   icon: "clock",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
   allowedRoles: [
     UserRole.ADMIN,

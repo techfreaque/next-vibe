@@ -30,7 +30,8 @@ export function UserViewPageClient({
         locale={locale}
         endpointOptions={{
           read: {
-            initialState: userId ? { userId } : undefined,
+            initialState: { userId: userId ?? "" },
+            queryOptions: { enabled: !!userId },
           },
         }}
       />

@@ -279,6 +279,7 @@ export const translations = {
     header: {
       stats: "Stats",
       history: "History",
+      queue: "Queue",
       refresh: "Refresh",
       create: "New Task",
     },

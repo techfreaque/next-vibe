@@ -15,8 +15,8 @@ import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
-import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
+import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { env } from "@/config/env";
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
 import { translations as configTranslations } from "@/config/i18n/en";
@@ -40,8 +40,8 @@ import type {
 import {
   createTrackingContext,
   type TrackingContext,
-} from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
-import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
+} from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
+import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
 import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================

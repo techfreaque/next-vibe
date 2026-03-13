@@ -31,7 +31,6 @@ interface CustomWidgetProps {
   field: {
     value: ArchiveResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function ArchiveWidget({ field }: CustomWidgetProps): React.JSX.Element {

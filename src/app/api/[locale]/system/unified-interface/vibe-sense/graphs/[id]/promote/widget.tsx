@@ -31,7 +31,6 @@ interface CustomWidgetProps {
   field: {
     value: PromoteResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function PromoteWidget({ field }: CustomWidgetProps): React.JSX.Element {

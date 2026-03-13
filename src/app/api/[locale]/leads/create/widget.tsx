@@ -39,7 +39,6 @@ interface CustomWidgetProps {
   field: {
     value: PostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 const STATUS_COLORS: Record<string, string> = {

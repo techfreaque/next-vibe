@@ -43,7 +43,6 @@ interface WidgetProps {
   field: {
     value: PulseHistoryResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -346,7 +345,6 @@ function ExecutionCard({
 
 export function PulseHistoryContainer({
   field,
-  fieldName,
 }: WidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const children = field.children;
@@ -522,14 +520,8 @@ export function PulseHistoryContainer({
       {/* ── Filters ── */}
       <Div className="flex flex-col gap-2 px-4 py-3 border-b">
         <Div className="grid grid-cols-2 gap-2">
-          <DateFieldWidget
-            fieldName={`${fieldName}.startDate`}
-            field={children.startDate}
-          />
-          <DateFieldWidget
-            fieldName={`${fieldName}.endDate`}
-            field={children.endDate}
-          />
+          <DateFieldWidget fieldName={"startDate"} field={children.startDate} />
+          <DateFieldWidget fieldName={"endDate"} field={children.endDate} />
         </Div>
 
         {/* Status filter chips */}

@@ -39,14 +39,12 @@ interface GetWidgetProps {
   field: {
     value: PublicCapGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 interface PostWidgetProps {
   field: {
     value: PublicCapPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 function usageColor(percent: number): string {

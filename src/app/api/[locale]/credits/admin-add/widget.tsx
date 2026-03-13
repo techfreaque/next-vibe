@@ -34,7 +34,6 @@ interface CustomWidgetProps {
   field: {
     value: AdminAddCreditsPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function AdminAddCreditsContainer({

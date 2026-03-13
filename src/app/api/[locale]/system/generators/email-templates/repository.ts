@@ -30,6 +30,7 @@ import {
   writeGeneratedFile,
 } from "../shared/utils";
 import type { scopedTranslation } from "./i18n";
+import type { TemplateCachedMetadata } from "@/app/api/[locale]/messenger/registry/template";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -47,8 +48,6 @@ interface EmailTemplateResponseType {
   outputFile?: string;
   clientOutputFile?: string;
 }
-
-import type { TemplateCachedMetadata } from "@/app/api/[locale]/emails/registry/types";
 
 interface TemplateInfo {
   id: string;
@@ -350,7 +349,7 @@ import type {
   AnyTemplateConstraint,
   TemplateCachedMetadata,
   TranslatedPreviewFieldConfig,
-} from "./types";
+} from "./template";
 
 /**
  * Union type of all email template definitions
@@ -615,7 +614,7 @@ ${descriptionStr}
 
 "use client";
 
-import type { TemplateCachedMetadata } from "./types";
+import type { TemplateCachedMetadata } from "./template";
 
 /**
  * Template metadata cache for fast lookups

@@ -25,7 +25,6 @@ interface WidgetProps {
   field: {
     value: FilesWriteResponseOutput | null | undefined;
   } & (typeof endpoints.POST)["fields"];
-  fieldName: string;
 }
 
 export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {

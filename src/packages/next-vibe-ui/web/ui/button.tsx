@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX, ReactNode } from "react";
 import React from "react";
 
+import type { DivDragEvent } from "./div";
 import type { StyleType } from "../utils/style-type";
 
 export const buttonVariants = cva(
@@ -99,6 +100,8 @@ export type ButtonProps = {
   tabIndex?: number;
   asChild?: boolean;
   key?: React.Key;
+  draggable?: boolean;
+  onDragStart?: (e: DivDragEvent) => void;
   "data-tour"?: string;
 } & StyleType;
 
@@ -112,6 +115,8 @@ export function Button({
   onClick,
   onMouseEnter,
   onMouseLeave,
+  draggable,
+  onDragStart,
   ...props
 }: ButtonProps): JSX.Element {
   const Comp = asChild ? Slot : "button";
@@ -136,6 +141,8 @@ export function Button({
       {...(onClick ? { onClick: handleClick } : {})}
       {...(onMouseEnter ? { onMouseEnter } : {})}
       {...(onMouseLeave ? { onMouseLeave } : {})}
+      {...(draggable !== undefined ? { draggable } : {})}
+      {...(onDragStart ? { onDragStart } : {})}
       {...props}
     />
   );

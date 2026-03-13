@@ -13,5 +13,5 @@ export default async function LeadsEmailsPage({
 }: LeadsEmailsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   await requireAdminUser(locale, `/${locale}/admin/leads/emails`);
-  redirect(`/${locale}/admin/email-campaigns/journeys`);
+  redirect(`/${locale}/admin/messenger/campaigns/journeys`);
 }

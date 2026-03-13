@@ -929,7 +929,7 @@ export class CreditRepository {
           // Free credits can ONLY exist in lead wallets
           // User wallets contain ONLY paid credits from purchases
 
-          logger.info("Created new user wallet", {
+          logger.debug("Created new user wallet", {
             userId,
             walletId: wallet.id,
             initialCredits: 0,
@@ -2125,18 +2125,6 @@ export class CreditRepository {
 
             const deduction = Math.min(pack.remaining, remaining);
 
-            if (deduction === pack.remaining) {
-              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
-            } else {
-              await tx
-                .update(creditPacks)
-                .set({
-                  remaining: pack.remaining - deduction,
-                  updatedAt: new Date(),
-                })
-                .where(eq(creditPacks.id, pack.id));
-            }
-
             // Update wallet balance
             await tx
               .update(creditWallets)
@@ -2158,7 +2146,7 @@ export class CreditRepository {
               .from(creditWallets)
               .where(eq(creditWallets.id, pack.walletId));
 
-            // Record transaction
+            // Record transaction before modifying/deleting pack (FK constraint)
             await tx.insert(creditTransactions).values({
               walletId: pack.walletId,
               amount: -deduction,
@@ -2176,6 +2164,19 @@ export class CreditRepository {
                 packCreditsUsed: deduction,
               },
             });
+
+            // Delete or update pack after transaction is recorded
+            if (deduction === pack.remaining) {
+              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+            } else {
+              await tx
+                .update(creditPacks)
+                .set({
+                  remaining: pack.remaining - deduction,
+                  updatedAt: new Date(),
+                })
+                .where(eq(creditPacks.id, pack.id));
+            }
 
             remaining -= deduction;
           }
@@ -2203,18 +2204,6 @@ export class CreditRepository {
 
             const deduction = Math.min(pack.remaining, remaining);
 
-            if (deduction === pack.remaining) {
-              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
-            } else {
-              await tx
-                .update(creditPacks)
-                .set({
-                  remaining: pack.remaining - deduction,
-                  updatedAt: new Date(),
-                })
-                .where(eq(creditPacks.id, pack.id));
-            }
-
             // Update wallet balance
             await tx
               .update(creditWallets)
@@ -2236,7 +2225,7 @@ export class CreditRepository {
               .from(creditWallets)
               .where(eq(creditWallets.id, pack.walletId));
 
-            // Record transaction
+            // Record transaction before modifying/deleting pack (FK constraint)
             await tx.insert(creditTransactions).values({
               walletId: pack.walletId,
               amount: -deduction,
@@ -2254,6 +2243,19 @@ export class CreditRepository {
                 packCreditsUsed: deduction,
               },
             });
+
+            // Delete or update pack after transaction is recorded
+            if (deduction === pack.remaining) {
+              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+            } else {
+              await tx
+                .update(creditPacks)
+                .set({
+                  remaining: pack.remaining - deduction,
+                  updatedAt: new Date(),
+                })
+                .where(eq(creditPacks.id, pack.id));
+            }
 
             remaining -= deduction;
           }
@@ -2285,18 +2287,6 @@ export class CreditRepository {
 
             const deduction = Math.min(pack.remaining, remaining);
 
-            if (deduction === pack.remaining) {
-              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
-            } else {
-              await tx
-                .update(creditPacks)
-                .set({
-                  remaining: pack.remaining - deduction,
-                  updatedAt: new Date(),
-                })
-                .where(eq(creditPacks.id, pack.id));
-            }
-
             // Update wallet balance
             await tx
               .update(creditWallets)
@@ -2318,7 +2308,7 @@ export class CreditRepository {
               .from(creditWallets)
               .where(eq(creditWallets.id, pack.walletId));
 
-            // Record transaction
+            // Record transaction before modifying/deleting pack (FK constraint)
             await tx.insert(creditTransactions).values({
               walletId: pack.walletId,
               amount: -deduction,
@@ -2336,6 +2326,19 @@ export class CreditRepository {
                 packCreditsUsed: deduction,
               },
             });
+
+            // Delete or update pack after transaction is recorded
+            if (deduction === pack.remaining) {
+              await tx.delete(creditPacks).where(eq(creditPacks.id, pack.id));
+            } else {
+              await tx
+                .update(creditPacks)
+                .set({
+                  remaining: pack.remaining - deduction,
+                  updatedAt: new Date(),
+                })
+                .where(eq(creditPacks.id, pack.id));
+            }
 
             remaining -= deduction;
           }

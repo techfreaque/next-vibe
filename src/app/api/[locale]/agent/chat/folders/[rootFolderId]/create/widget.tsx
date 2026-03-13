@@ -20,7 +20,6 @@ interface CustomWidgetProps {
   field: {
     value: FolderCreateResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function FolderCreateContainer({

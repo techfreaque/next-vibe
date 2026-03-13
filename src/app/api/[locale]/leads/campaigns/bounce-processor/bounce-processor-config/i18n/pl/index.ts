@@ -134,6 +134,14 @@ export const translations = {
       description: "Konfiguracja procesora odrzuceń zapisana pomyślnie",
     },
   },
+  priority: {
+    critical: "Krytyczny",
+    high: "Wysoki",
+    medium: "Średni",
+    low: "Niski",
+    background: "Tło",
+  },
+
   widget: {
     title: "Konfiguracja procesora odrzuceń",
     titleSaved: "Konfiguracja zapisana",

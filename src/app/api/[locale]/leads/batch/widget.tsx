@@ -42,14 +42,12 @@ interface PatchWidgetProps {
   field: {
     value: PatchResponseOutput | null | undefined;
   } & (typeof definition.PATCH)["fields"];
-  fieldName: string;
 }
 
 interface DeleteWidgetProps {
   field: {
     value: DeleteResponseOutput | null | undefined;
   } & (typeof definition.DELETE)["fields"];
-  fieldName: string;
 }
 
 export function LeadsBatchUpdateContainer({

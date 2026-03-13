@@ -18,11 +18,11 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { EmailStatus } from "../../../../emails/messages/enum";
+import { MessageStatus } from "../../../../messenger/messages/enum";
 import {
   CampaignType,
   type CampaignTypeValue,
-} from "../../../../emails/smtp-client/enum";
+} from "../../../../messenger/accounts/enum";
 import { emailCampaigns, leads } from "../../../db";
 import type {
   EmailCampaignStageValues,
@@ -138,7 +138,7 @@ export class CampaignSchedulerService {
   ): Promise<string | null> {
     try {
       const campaignType = options.campaignType ?? CampaignType.LEAD_CAMPAIGN;
-      logger.info("campaign.schedule.initial.start", {
+      logger.debug("campaign.schedule.initial.start", {
         leadId,
         campaignType,
         options,
@@ -158,7 +158,7 @@ export class CampaignSchedulerService {
 
       // Check if lead is eligible for this campaign type
       if (!this.isLeadEligibleForCampaign(lead, campaignType)) {
-        logger.info("campaign.schedule.initial.skip.ineligible", {
+        logger.debug("campaign.schedule.initial.skip.ineligible", {
           leadId,
           status: lead.status,
           convertedAt: lead.convertedAt?.toISOString() || null,
@@ -284,7 +284,7 @@ export class CampaignSchedulerService {
           subject: `${journeyVariant}_${stage}`,
           templateName: `${journeyVariant}_${stage}`,
           scheduledAt,
-          status: EmailStatus.PENDING,
+          status: MessageStatus.PENDING,
           metadata,
         })
         .returning();
@@ -387,7 +387,7 @@ export class CampaignSchedulerService {
         .innerJoin(leads, eq(emailCampaigns.leadId, leads.id))
         .where(
           and(
-            eq(emailCampaigns.status, EmailStatus.PENDING),
+            eq(emailCampaigns.status, MessageStatus.PENDING),
             lt(emailCampaigns.scheduledAt, now),
             isNull(emailCampaigns.sentAt),
             // Only process leads with email addresses
@@ -444,7 +444,7 @@ export class CampaignSchedulerService {
       const [sent] = await db
         .update(emailCampaigns)
         .set({
-          status: EmailStatus.SENT,
+          status: MessageStatus.SENT,
           sentAt: now,
           externalId,
           emailProvider,
@@ -507,26 +507,26 @@ export class CampaignSchedulerService {
         ? and(
             eq(emailCampaigns.leadId, leadId),
             eq(emailCampaigns.campaignType, campaignType),
-            eq(emailCampaigns.status, EmailStatus.PENDING),
+            eq(emailCampaigns.status, MessageStatus.PENDING),
             isNull(emailCampaigns.sentAt),
           )
         : and(
             eq(emailCampaigns.leadId, leadId),
-            eq(emailCampaigns.status, EmailStatus.PENDING),
+            eq(emailCampaigns.status, MessageStatus.PENDING),
             isNull(emailCampaigns.sentAt),
           );
 
       const result = await db
         .update(emailCampaigns)
         .set({
-          status: EmailStatus.FAILED,
+          status: MessageStatus.FAILED,
           error: reason,
           updatedAt: now,
         })
         .where(emailConditions);
 
       const cancelledCount = result.rowCount ?? 0;
-      logger.info("campaign.halt", {
+      logger.debug("campaign.halt", {
         leadId,
         campaignType: campaignType ?? "all",
         reason,
@@ -638,7 +638,7 @@ export class CampaignSchedulerService {
         await db
           .update(emailCampaigns)
           .set({
-            status: EmailStatus.FAILED,
+            status: MessageStatus.FAILED,
             error: `Max retries exceeded. Last error: ${errorMessage}`,
             updatedAt: new Date(),
           })
@@ -714,12 +714,12 @@ export class CampaignSchedulerService {
       const stats = await db
         .select({
           total: count(),
-          pending: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.PENDING} then 1 end)`,
-          sent: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.SENT} then 1 end)`,
-          delivered: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.DELIVERED} then 1 end)`,
-          opened: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.OPENED} then 1 end)`,
-          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.CLICKED} then 1 end)`,
-          failed: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.FAILED} then 1 end)`,
+          pending: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.PENDING} then 1 end)`,
+          sent: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.SENT} then 1 end)`,
+          delivered: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.DELIVERED} then 1 end)`,
+          opened: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.OPENED} then 1 end)`,
+          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.CLICKED} then 1 end)`,
+          failed: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.FAILED} then 1 end)`,
         })
         .from(emailCampaigns)
         .where(

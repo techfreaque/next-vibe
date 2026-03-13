@@ -27,7 +27,6 @@ interface CustomWidgetProps {
   field: {
     value: ConnectionCreateResponseOutput | null | undefined;
   } & (typeof endpoints.POST)["fields"];
-  fieldName: string;
 }
 
 export function ConnectionCreateContainer({

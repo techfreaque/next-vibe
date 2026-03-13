@@ -22,6 +22,10 @@ export const translations: typeof enTranslations = {
         label: "Próbny przebieg",
         description: "Uruchom bez wprowadzania zmian",
       },
+      force: {
+        label: "Wymuś",
+        description: "Pomiń ograniczenia harmonogramu dni/godzin",
+      },
     },
     response: {
       leadsProcessed: "Przetworzone leady",

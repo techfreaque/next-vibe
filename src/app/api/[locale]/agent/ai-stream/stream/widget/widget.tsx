@@ -71,7 +71,6 @@ interface CustomWidgetProps {
   field: {
     value: AiStreamPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 // ─── Main Widget ─────────────────────────────────────────────────────────────

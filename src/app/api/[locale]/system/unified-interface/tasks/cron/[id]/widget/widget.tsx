@@ -66,7 +66,6 @@ interface WidgetProps {
   field: {
     value: CronTaskGetResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -443,7 +442,6 @@ interface EditWidgetProps {
   field: {
     value: WidgetData | null | undefined;
   } & (typeof endpoints.PUT)["fields"];
-  fieldName: string;
 }
 
 export function CronTaskEditContainer({

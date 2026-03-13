@@ -8,6 +8,49 @@ export const translations: typeof enTranslations = {
     repositoryInternalError: "Ein interner Fehler ist aufgetreten",
   },
 
+  widget: {
+    title: "Kampagnen-Monitoring",
+    refresh: "Aktualisieren",
+    health: {
+      healthy: "Gesund",
+      warning: "Warnung",
+      critical: "Kritisch",
+    },
+    stats: {
+      totalTasks: "Gesamtaufgaben",
+      enabled: "Aktiviert",
+      disabled: "Deaktiviert",
+      successRate: "Erfolgsrate (24h)",
+      failed24h: "Fehlgeschlagen (24h)",
+    },
+    task: {
+      lastRun: "Letzter Lauf",
+      nextRun: "Nächster Lauf",
+      never: "Nie",
+      executions: "Ausführungen",
+      avgDuration: "Ø",
+      noHistory: "Noch keine Ausführungen",
+      runNow: "Jetzt ausführen",
+    },
+    status: {
+      running: "Läuft",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+      error: "Fehler",
+      timeout: "Zeitüberschreitung",
+      pending: "Ausstehend",
+      scheduled: "Geplant",
+      cancelled: "Abgebrochen",
+      unknown: "Unbekannt",
+    },
+    alerts: {
+      title: "Warnungen",
+      failures: "aufeinanderfolgende Fehler",
+    },
+    empty: "Keine Kampagnenaufgaben gefunden",
+    loading: "Überwachungsdaten laden...",
+  },
+
   get: {
     tags: {
       tasks: "Aufgaben",

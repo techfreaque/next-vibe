@@ -49,21 +49,18 @@ interface GetWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 interface PutWidgetProps {
   field: {
     value: PutResponseOutput | null | undefined;
   } & (typeof definition.PUT)["fields"];
-  fieldName: string;
 }
 
 interface DeleteWidgetProps {
   field: {
     value: DeleteResponseOutput | null | undefined;
   } & (typeof definition.DELETE)["fields"];
-  fieldName: string;
 }
 
 const ROLE_COLORS: Record<string, string> = {
@@ -451,7 +448,6 @@ export function UserDetailContainer({
 
 export function UserEditContainer({
   field,
-  fieldName,
 }: PutWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = field.value;
@@ -673,17 +669,14 @@ export function UserEditContainer({
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               {t("id.put.sections.basicInfo.title")}
             </Span>
-            <EmailFieldWidget
-              fieldName={`${fieldName}.email`}
-              field={children.email}
-            />
+            <EmailFieldWidget fieldName={"email"} field={children.email} />
             <Div className="grid grid-cols-2 gap-3">
               <TextFieldWidget
-                fieldName={`${fieldName}.privateName`}
+                fieldName={"privateName"}
                 field={children.privateName}
               />
               <TextFieldWidget
-                fieldName={`${fieldName}.publicName`}
+                fieldName={"publicName"}
                 field={children.publicName}
               />
             </Div>
@@ -696,18 +689,15 @@ export function UserEditContainer({
             </Span>
             <Div className="grid grid-cols-2 gap-3">
               <BooleanFieldWidget
-                fieldName={`${fieldName}.isActive`}
+                fieldName={"isActive"}
                 field={children.isActive}
               />
               <BooleanFieldWidget
-                fieldName={`${fieldName}.emailVerified`}
+                fieldName={"emailVerified"}
                 field={children.emailVerified}
               />
             </Div>
-            <UuidFieldWidget
-              fieldName={`${fieldName}.leadId`}
-              field={children.leadId}
-            />
+            <UuidFieldWidget fieldName={"leadId"} field={children.leadId} />
           </Div>
 
           {/* Submit */}

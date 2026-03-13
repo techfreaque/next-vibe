@@ -12,7 +12,6 @@ interface DeleteFolderWidgetProps {
   field: {
     value: FolderDeleteResponseOutput | null | undefined;
   } & (typeof definition.DELETE)["fields"];
-  fieldName: string;
 }
 
 export function DeleteFolderContainer({

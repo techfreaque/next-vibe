@@ -32,7 +32,6 @@ interface WidgetProps {
   field: {
     value: LinuxUsersListResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 export function LinuxUsersListContainer({

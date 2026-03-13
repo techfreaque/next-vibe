@@ -58,7 +58,6 @@ interface CustomWidgetProps {
   field: {
     value: SignupPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 /**

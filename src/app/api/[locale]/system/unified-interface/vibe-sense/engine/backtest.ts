@@ -12,8 +12,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 
 import type { GraphConfig } from "../graph/types";
-import type { TimeRange, Resolution } from "../indicators/types";
-import { getIndicator } from "../indicators/registry";
+import type { TimeRange, Resolution } from "../shared/fields";
 import { pipelineDatapoints } from "../db";
 import {
   createBacktestRun,
@@ -31,8 +30,7 @@ export interface BacktestResult {
 }
 
 /**
- * Check if all source indicators in the graph have persist:always data
- * covering the requested range.
+ * Check if all source indicators in the graph have persisted datapoints.
  */
 async function checkEligibility(
   config: GraphConfig,
@@ -40,23 +38,15 @@ async function checkEligibility(
   const ineligibleNodeIds: string[] = [];
 
   for (const [nodeId, nodeConfig] of Object.entries(config.nodes)) {
-    if (nodeConfig.type !== "indicator") {
+    // Only check nodes that persist data (explicitly or by default)
+    if (nodeConfig.persist === "never") {
       continue;
     }
-
-    const indicator = getIndicator(nodeConfig.indicatorId);
-    if (!indicator || indicator.persist !== "always") {
-      ineligibleNodeIds.push(nodeId);
-      continue;
-    }
-
-    // Check if any persisted data exists for this indicator
     const rows = await db
       .select({ id: pipelineDatapoints.id })
       .from(pipelineDatapoints)
-      .where(eq(pipelineDatapoints.nodeId, nodeConfig.indicatorId))
+      .where(eq(pipelineDatapoints.nodeId, nodeId))
       .limit(1);
-
     if (rows.length === 0) {
       ineligibleNodeIds.push(nodeId);
     }

@@ -10,6 +10,7 @@ import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Frame } from "next-vibe-ui/ui/icons/Frame";
 import { Home } from "next-vibe-ui/ui/icons/Home";
@@ -81,9 +82,9 @@ export function AdminLayoutClient({
     },
     {
       name: t("app.admin.components.navigation.emailCampaigns"),
-      href: `/${locale}/admin/email-campaigns` as const,
+      href: `/${locale}/admin/messenger/campaigns` as const,
       icon: Send,
-      current: pathname.startsWith(`/${locale}/admin/email-campaigns`),
+      current: pathname.startsWith(`/${locale}/admin/messenger/campaigns`),
       hidden: envClient.NEXT_PUBLIC_LOCAL_MODE,
     },
     {
@@ -95,9 +96,9 @@ export function AdminLayoutClient({
     },
     {
       name: t("app.admin.components.navigation.emails"),
-      href: `/${locale}/admin/emails` as const,
+      href: `/${locale}/admin/messenger` as const,
       icon: Mail,
-      current: pathname.startsWith(`/${locale}/admin/emails`),
+      current: pathname.startsWith(`/${locale}/admin/messenger`),
       hidden: false,
     },
     {
@@ -140,6 +141,13 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/vibe-frame` as const,
       icon: Frame,
       current: pathname.startsWith(`/${locale}/admin/vibe-frame`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.errorMonitor"),
+      href: `/${locale}/admin/error-monitor` as const,
+      icon: AlertTriangle,
+      current: pathname.startsWith(`/${locale}/admin/error-monitor`),
       hidden: false,
     },
   ];

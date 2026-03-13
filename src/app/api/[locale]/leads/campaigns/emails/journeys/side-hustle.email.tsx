@@ -6,9 +6,9 @@
 
 import React from "react";
 
-import { CampaignEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/campaign_email_layout.email";
-import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
-import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
+import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
+import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 import { simpleT } from "@/i18n/core/shared";
 
 import { EmailCampaignStage } from "../../../enum";
@@ -17,7 +17,7 @@ import type {
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./side-hustle/i18n";
 
 /**
  * Side Hustle - Initial Contact
@@ -32,32 +32,20 @@ export const sideHustleInitialEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.sideHustle.initial.previewText",
-      )}
+      previewText={t("initial.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.sideHustle.initial.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("initial.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.initial.opening")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.opening")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.initial.myStory")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.myStory")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.initial.affiliateHonesty")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.affiliateHonesty")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.initial.proof")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.proof")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -66,19 +54,15 @@ export const sideHustleInitialEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.sideHustle.initial.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("initial.signature")}</HumanText>
 
-      <HumanText variant="ps">
-        {t("emailJourneys.leads.journeys.sideHustle.initial.postScript")}
-      </HumanText>
+      <HumanText variant="ps">{t("initial.postScript")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.sideHustle.initial.subject"),
+    subject: t("initial.subject"),
     jsx: emailContent,
   };
 };
@@ -96,28 +80,18 @@ export const sideHustleFollowup1Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.sideHustle.followup1.previewText",
-      )}
+      previewText={t("followup1.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.sideHustle.followup1.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup1.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup1.thisWeek")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.thisWeek")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup1.clientWork")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.clientWork")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup1.howYouCanToo")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.howYouCanToo")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -126,15 +100,13 @@ export const sideHustleFollowup1Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.sideHustle.followup1.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup1.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.sideHustle.followup1.subject"),
+    subject: t("followup1.subject"),
     jsx: emailContent,
   };
 };
@@ -152,28 +124,18 @@ export const sideHustleFollowup2Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.sideHustle.followup2.previewText",
-      )}
+      previewText={t("followup2.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.sideHustle.followup2.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup2.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup2.anotherUseCase")}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.anotherUseCase")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup2.passiveIncome")}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.passiveIncome")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup2.callToAction")}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.callToAction")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -182,19 +144,15 @@ export const sideHustleFollowup2Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.sideHustle.followup2.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup2.signature")}</HumanText>
 
-      <HumanText variant="ps">
-        {t("emailJourneys.leads.journeys.sideHustle.followup2.postScript")}
-      </HumanText>
+      <HumanText variant="ps">{t("followup2.postScript")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.sideHustle.followup2.subject"),
+    subject: t("followup2.subject"),
     jsx: emailContent,
   };
 };
@@ -212,24 +170,16 @@ export const sideHustleFollowup3Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.sideHustle.followup3.previewText",
-      )}
+      previewText={t("followup3.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.sideHustle.followup3.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup3.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup3.monthlyEarnings")}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.monthlyEarnings")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.followup3.noHardSell")}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.noHardSell")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -238,15 +188,13 @@ export const sideHustleFollowup3Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.sideHustle.followup3.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup3.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.sideHustle.followup3.subject"),
+    subject: t("followup3.subject"),
     jsx: emailContent,
   };
 };
@@ -264,24 +212,16 @@ export const sideHustleNurtureEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.sideHustle.nurture.previewText",
-      )}
+      previewText={t("nurture.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.sideHustle.nurture.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("nurture.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.nurture.tip")}
-      </HumanText>
+      <HumanText variant="body">{t("nurture.tip")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.nurture.freeValue")}
-      </HumanText>
+      <HumanText variant="body">{t("nurture.freeValue")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -290,15 +230,13 @@ export const sideHustleNurtureEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.sideHustle.nurture.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("nurture.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.sideHustle.nurture.subject"),
+    subject: t("nurture.subject"),
     jsx: emailContent,
   };
 };
@@ -316,26 +254,16 @@ export const sideHustleReactivationEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.sideHustle.reactivation.previewText",
-      )}
+      previewText={t("reactivation.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.sideHustle.reactivation.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("reactivation.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.sideHustle.reactivation.update")}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.update")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.sideHustle.reactivation.newOpportunity",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.newOpportunity")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -344,15 +272,13 @@ export const sideHustleReactivationEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.sideHustle.reactivation.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("reactivation.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.sideHustle.reactivation.subject"),
+    subject: t("reactivation.subject"),
     jsx: emailContent,
   };
 };

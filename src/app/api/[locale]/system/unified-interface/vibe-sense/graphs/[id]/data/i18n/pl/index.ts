@@ -52,6 +52,7 @@ export const translations: typeof enTranslations = {
       promote: "Promote",
       signal: "Sygnal",
       noData: "Brak danych w tym zakresie",
+      loadingEarlierData: "Ladowanie starszych danych\u2026",
     },
     success: {
       title: "Graf zaladowany",

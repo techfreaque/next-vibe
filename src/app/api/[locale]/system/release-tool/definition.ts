@@ -109,7 +109,7 @@ const { POST } = createEndpoint({
   path: ["system", "release-tool"],
   title: "title",
   description: "description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tags.release"],
   icon: "rocket",
   allowedRoles: [
@@ -117,6 +117,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
     UserRole.MCP_OFF,
+    UserRole.CLI_AUTH_BYPASS,
     UserRole.PRODUCTION_OFF,
   ] as const,
   aliases: ["release", "pub", "publish"],

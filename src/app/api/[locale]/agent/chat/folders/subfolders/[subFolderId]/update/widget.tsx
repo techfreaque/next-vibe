@@ -15,7 +15,6 @@ interface UpdateFolderWidgetProps {
   field: {
     value: FolderUpdateResponseOutput | null | undefined;
   } & (typeof definition.PATCH)["fields"];
-  fieldName: string;
 }
 
 export function UpdateFolderContainer({

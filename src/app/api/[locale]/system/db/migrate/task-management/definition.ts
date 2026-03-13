@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   title: "title",
   description: "description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDatabase",
   tags: ["tags.migration", "tags.tasks"],
   icon: "arrow-right",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],

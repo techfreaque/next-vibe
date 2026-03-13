@@ -21,6 +21,6 @@ export default async function LeadsEmailPreviewPage({
     `/${locale}/admin/leads/emails/${journeyVariant}/${stage}`,
   );
   redirect(
-    `/${locale}/admin/email-campaigns/journeys/${journeyVariant}/${stage}`,
+    `/${locale}/admin/messenger/campaigns/journeys/${journeyVariant}/${stage}`,
   );
 }

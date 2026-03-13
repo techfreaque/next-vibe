@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
   title: "search.get.title" as const,
   description: "search.get.description" as const,
   icon: "search",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatThreads",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {

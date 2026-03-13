@@ -22,7 +22,6 @@ interface CustomWidgetProps {
   field: {
     value: typeof definition.POST.types.ResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 function formatDuration(ms: number): string {

@@ -224,3 +224,20 @@ export function useInkWidgetTranslation<
   );
   return t;
 }
+
+/**
+ * Hook to get the preSubmitRef from Ink context.
+ * Widgets can assign an async callback that runs before submit.
+ * Return false from the callback to abort the submit.
+ */
+export function useInkWidgetPreSubmitRef(): InkWidgetContext<CreateApiEndpointAny>["preSubmitRef"] {
+  const store = useInkWidgetContextStore();
+  return store(
+    (
+      state: WidgetContextStore<
+        CreateApiEndpointAny,
+        InkWidgetContext<CreateApiEndpointAny>
+      >,
+    ) => state.context.preSubmitRef,
+  );
+}

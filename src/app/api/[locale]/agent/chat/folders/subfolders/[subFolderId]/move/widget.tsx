@@ -30,7 +30,6 @@ interface MoveWidgetProps {
   field: {
     value: MoveDefinition["types"]["ResponseOutput"] | null | undefined;
   } & MoveDefinition["fields"];
-  fieldName: string;
 }
 
 export function FolderMoveContainer({ field }: MoveWidgetProps): JSX.Element {

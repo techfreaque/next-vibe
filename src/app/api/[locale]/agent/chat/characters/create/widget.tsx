@@ -36,7 +36,6 @@ interface CustomWidgetProps {
   field: {
     value: CharacterCreateResponseOutput | null | undefined;
   } & (typeof defintion.POST)["fields"];
-  fieldName: string;
 }
 
 /**

@@ -143,14 +143,12 @@ interface GetWidgetProps {
   field: {
     value: LeadGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 interface PatchWidgetProps {
   field: {
     value: LeadPatchResponseOutput | null | undefined;
   } & (typeof definition.PATCH)["fields"];
-  fieldName: string;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────

@@ -31,7 +31,6 @@ interface CustomWidgetProps {
   field: {
     value: KagiSearchGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

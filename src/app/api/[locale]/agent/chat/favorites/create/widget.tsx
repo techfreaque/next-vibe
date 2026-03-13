@@ -42,7 +42,6 @@ interface CustomWidgetProps {
   field: {
     value: FavoriteCreateResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 /**

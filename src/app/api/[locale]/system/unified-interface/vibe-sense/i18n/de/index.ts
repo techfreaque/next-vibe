@@ -16,61 +16,21 @@ export const translations: typeof enTranslations = {
       "1M": "1 Monat",
     },
   },
+  fields: {
+    source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
+    resolution: { label: "Auflösung", description: "Berechnungszeitraum" },
+    range: { label: "Bereich", description: "Zu berechnender Zeitraum" },
+    lookback: {
+      label: "Rückblick",
+      description: "Zusätzliche Balken vor dem Bereichsstart",
+    },
+    result: { label: "Ergebnis", description: "Ausgabe-Zeitreihe" },
+    meta: { label: "Meta", description: "Knoten-Ausführungsmetadaten" },
+  },
   tags: {
     vibeSense: "vibe-sense",
     analytics: "analytics",
     pipeline: "pipeline",
-  },
-  registry: {
-    get: {
-      title: "Indikator-Registry",
-      description:
-        "Alle registrierten Indikatoren für den Graph-Builder auflisten",
-      container: {
-        title: "Indikatoren",
-        description: "Alle registrierten Indikatoren",
-      },
-      response: { indicators: "Indikatoren" },
-      success: {
-        title: "Registry geladen",
-        description: "Indikator-Registry erfolgreich abgerufen",
-      },
-      errors: {
-        unauthorized: {
-          title: "Nicht autorisiert",
-          description: "Authentifizierung erforderlich",
-        },
-        forbidden: {
-          title: "Verboten",
-          description: "Admin-Zugriff erforderlich",
-        },
-        server: {
-          title: "Serverfehler",
-          description: "Registry konnte nicht geladen werden",
-        },
-        unknown: {
-          title: "Unbekannter Fehler",
-          description: "Ein unerwarteter Fehler ist aufgetreten",
-        },
-        validation: {
-          title: "Validierung fehlgeschlagen",
-          description: "Ungültige Anfrage",
-        },
-        notFound: {
-          title: "Nicht gefunden",
-          description: "Registry nicht gefunden",
-        },
-        conflict: { title: "Konflikt", description: "Ressourcenkonflikt" },
-        network: {
-          title: "Netzwerkfehler",
-          description: "Netzwerkanfrage fehlgeschlagen",
-        },
-        unsavedChanges: {
-          title: "Ungespeicherte Änderungen",
-          description: "Änderungen zuerst speichern",
-        },
-      },
-    },
   },
   graphs: {
     list: {
@@ -499,6 +459,437 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  indicators: {
+    ema: {
+      description: "Exponentieller gleitender Durchschnitt",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "EMA" } },
+      params: {
+        period: {
+          label: "Periode",
+          description: "Anzahl der Perioden (1–500)",
+        },
+      },
+    },
+    rsi: {
+      description: "Relativer Stärke-Index — Momentum-Oszillator (0–100)",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "RSI" } },
+      params: {
+        period: { label: "Periode", description: "Rückblickperioden (2–100)" },
+      },
+    },
+    bollinger: {
+      description:
+        "Bollinger-Bänder — Volatilitätshülle um einen gleitenden Durchschnitt",
+      input: { source: { label: "Quelle" } },
+      output: {
+        upper: { label: "Oberes Band" },
+        middle: { label: "Mittleres Band" },
+        lower: { label: "Unteres Band" },
+      },
+      params: {
+        period: {
+          label: "Periode",
+          description: "Periode des gleitenden Durchschnitts",
+        },
+        stdDev: {
+          label: "Std. Abw.",
+          description: "Standardabweichungs-Multiplikator",
+        },
+      },
+    },
+    macd: {
+      description: "MACD — trendfolgendes Momentum-Indikator",
+      input: { source: { label: "Quelle" } },
+      output: {
+        macd: { label: "MACD" },
+        signal: { label: "Signal" },
+        histogram: { label: "Histogramm" },
+      },
+      params: {
+        fastPeriod: {
+          label: "Schnelle Periode",
+          description: "Schnelle EMA-Periode",
+        },
+        slowPeriod: {
+          label: "Langsame Periode",
+          description: "Langsame EMA-Periode",
+        },
+        signalPeriod: {
+          label: "Signalperiode",
+          description: "Signal-EMA-Periode",
+        },
+      },
+    },
+    ratio: {
+      description: "A / B pro Zeitstempel berechnen",
+      input: { a: { label: "Zähler" }, b: { label: "Nenner" } },
+      output: { value: { label: "Verhältnis" } },
+    },
+    delta: {
+      description: "Periode-über-Periode-Änderung",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Delta" } },
+    },
+    clamp: {
+      description: "Werte auf [min, max] begrenzen",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Begrenzt" } },
+      params: {
+        min: { label: "Min", description: "Untere Grenze" },
+        max: { label: "Max", description: "Obere Grenze" },
+      },
+    },
+    windowAvg: {
+      description: "Rollender Durchschnitt über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Durchschn." } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+    windowSum: {
+      description: "Rollende Summe über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Summe" } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+    windowMin: {
+      description: "Rollendes Minimum über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Min" } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+    windowMax: {
+      description: "Rollendes Maximum über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Max" } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+  },
+
+  dataSources: {
+    leadsCreated: {
+      description: "Anzahl neuer Leads pro Minute",
+      output: { value: { label: "Neue Leads" } },
+    },
+    leadsConverted: {
+      description: "Anzahl konvertierter Leads pro Minute",
+      output: { value: { label: "Konvertierte Leads" } },
+    },
+    leadsActive: {
+      description: "Gesamtzahl aktiver Leads (Snapshot pro Tag)",
+      output: { value: { label: "Aktive Leads" } },
+    },
+    leadsBounced: {
+      description: "Anzahl der E-Mail-Bounces pro Minute",
+      output: { value: { label: "Gebouncte Leads" } },
+    },
+    leadsEngagements: {
+      description: "Gesamte Engagement-Events (Öffnungen + Klicks) pro Minute",
+      output: { value: { label: "Lead-Engagements" } },
+    },
+    leadsEmailsSent: {
+      description: "Anzahl versendeter Kampagnen-E-Mails pro Minute",
+      output: { value: { label: "Versendete E-Mails" } },
+    },
+    leadsUnsubscribed: {
+      description: "Anzahl abgemeldeter Leads pro Minute",
+      output: { value: { label: "Abgemeldete Leads" } },
+    },
+    leadsEmailOpens: {
+      description: "Anzahl getrackter E-Mail-Öffnungen pro Minute",
+      output: { value: { label: "E-Mail-Öffnungen" } },
+    },
+    leadsEmailClicks: {
+      description: "Anzahl getrackter E-Mail-Link-Klicks pro Minute",
+      output: { value: { label: "E-Mail-Klicks" } },
+    },
+    leadsNewsletterSubscribers: {
+      description:
+        "Gesamtzahl Leads mit bestätigtem Newsletter-Abo (Snapshot pro Tag)",
+      output: { value: { label: "Newsletter-Abonnenten" } },
+    },
+    leadsWebsiteUsers: {
+      description:
+        "Gesamtzahl Leads mit Website-Nutzerstatus (Snapshot pro Tag)",
+      output: { value: { label: "Website-Nutzer" } },
+    },
+    leadsCampaignRunning: {
+      description:
+        "Gesamtzahl Leads in aktiver E-Mail-Kampagne (Snapshot pro Tag)",
+      output: { value: { label: "In Kampagne" } },
+    },
+    leadsInContact: {
+      description: "Gesamtzahl Leads im Kontaktstatus (Snapshot pro Tag)",
+      output: { value: { label: "In Kontakt" } },
+    },
+    leadsWebsiteVisits: {
+      description: "Anzahl Website-Besuchs-Events pro Minute",
+      output: { value: { label: "Website-Besuche" } },
+    },
+    leadsFormSubmits: {
+      description: "Anzahl Formular-Einsendungs-Events pro Minute",
+      output: { value: { label: "Formular-Einsendungen" } },
+    },
+    usersRegistered: {
+      description: "Anzahl neuer Nutzerregistrierungen pro Minute",
+      output: { value: { label: "Registrierte Nutzer" } },
+    },
+    usersActiveTotal: {
+      description: "Gesamtzahl aktiver verifizierter Nutzer (Snapshot pro Tag)",
+      output: { value: { label: "Aktive Nutzer" } },
+    },
+    usersBanned: {
+      description: "Anzahl gesperrter Nutzer pro Minute (näherungsweise)",
+      output: { value: { label: "Gesperrte Nutzer" } },
+    },
+    usersEmailVerified: {
+      description:
+        "Gesamtzahl Nutzer mit verifizierter E-Mail (Snapshot pro Tag)",
+      output: { value: { label: "E-Mail verifiziert" } },
+    },
+    usersMarketingConsent: {
+      description:
+        "Gesamtzahl Nutzer mit Marketing-Einwilligung (Snapshot pro Tag)",
+      output: { value: { label: "Marketing-Einwilligung" } },
+    },
+    usersWithStripe: {
+      description: "Gesamtzahl Nutzer mit Stripe-Konto (Snapshot pro Tag)",
+      output: { value: { label: "Stripe-Nutzer" } },
+    },
+    usersTwoFaEnabled: {
+      description: "Gesamtzahl Nutzer mit aktivierter 2FA (Snapshot pro Tag)",
+      output: { value: { label: "2FA aktiviert" } },
+    },
+    usersLoginAttemptsTotal: {
+      description: "Gesamte Anmeldeversuche pro Minute",
+      output: { value: { label: "Anmeldeversuche" } },
+    },
+    usersLoginAttemptsFailed: {
+      description: "Fehlgeschlagene Anmeldeversuche pro Minute",
+      output: { value: { label: "Fehlgeschlagene Anmeldungen" } },
+    },
+    creditsSpentTotal: {
+      description: "Gesamte ausgegebene Credits pro Minute",
+      output: { value: { label: "Ausgegebene Credits" } },
+    },
+    creditsSpentByUsers: {
+      description: "Von Nutzern ausgegebene Credits pro Minute",
+      output: { value: { label: "Credits (Nutzer)" } },
+    },
+    creditsSpentByLeads: {
+      description: "Von Leads ausgegebene Gratis-Credits pro Minute",
+      output: { value: { label: "Credits (Leads)" } },
+    },
+    creditsPurchased: {
+      description: "Gekaufte oder per Abo hinzugefügte Credits pro Minute",
+      output: { value: { label: "Gekaufte Credits" } },
+    },
+    creditsFreeGrants: {
+      description: "Gratis-Credits für Leads pro Minute",
+      output: { value: { label: "Gratis-Credits" } },
+    },
+    creditsEarned: {
+      description: "Per Empfehlung verdiente Credits pro Minute",
+      output: { value: { label: "Verdiente Credits" } },
+    },
+    creditsExpired: {
+      description: "Abgelaufene Credits pro Minute",
+      output: { value: { label: "Abgelaufene Credits" } },
+    },
+    creditsRefunded: {
+      description: "Erstattete Credits pro Minute",
+      output: { value: { label: "Erstattete Credits" } },
+    },
+    creditsBalanceTotal: {
+      description: "Gesamtguthaben aller Nutzer-Wallets (Snapshot pro Tag)",
+      output: { value: { label: "Gesamtguthaben" } },
+    },
+    creditsSubscriptionRevenue: {
+      description: "Credits aus Abo-Paketen pro Minute",
+      output: { value: { label: "Abo-Einnahmen" } },
+    },
+    creditsTransferVolume: {
+      description: "Kreditübertragungsvolumen zwischen Wallets pro Minute",
+      output: { value: { label: "Übertragungsvolumen" } },
+    },
+    creditsFreePoolUtilization: {
+      description:
+        "Prozentualer Verbrauch des Gratis-Kredit-Pools (Snapshot pro Tag)",
+      output: { value: { label: "Gratis-Pool-Auslastung" } },
+    },
+  },
+
+  evaluators: {
+    threshold: {
+      description:
+        "Löst aus, wenn ein Reihenwert einen Vergleich mit einer Konstante erfüllt",
+      input: {
+        series: { label: "Reihe" },
+      },
+      output: {
+        signal: { label: "Signal" },
+      },
+      params: {
+        op: {
+          label: "Operator",
+          description: "Vergleichsoperator",
+        },
+        value: {
+          label: "Wert",
+          description: "Konstante zum Vergleichen",
+        },
+      },
+    },
+    and: {
+      description:
+        "Löst aus, wenn alle Eingangssignale zum gleichen Zeitpunkt feuern",
+      input: { signals: { label: "Signale" } },
+      output: { signal: { label: "Signal" } },
+    },
+    or: {
+      description:
+        "Löst aus, wenn eines der Eingangssignale zu einem Zeitpunkt feuert",
+      input: { signals: { label: "Signale" } },
+      output: { signal: { label: "Signal" } },
+    },
+    not: {
+      description: "Invertiert einen Signalstrom",
+      input: { signal: { label: "Signal" } },
+      output: { signal: { label: "Invertiert" } },
+    },
+    crossover: {
+      description: "Löst aus, wenn Reihe A Reihe B von unten kreuzt",
+      input: {
+        seriesA: { label: "Reihe A" },
+        seriesB: { label: "Reihe B" },
+      },
+      output: { signal: { label: "Signal" } },
+    },
+    script: {
+      description:
+        "Sandboxierter benutzerdefinierter Evaluator — erhält Eingangsreihen, gibt Signalereignisse zurück",
+      input: { inputs: { label: "Eingaben" } },
+      output: { signal: { label: "Signal" } },
+      params: {
+        fn: {
+          label: "Funktion",
+          description:
+            "JS-Funktionskörper, der Eingangsreihenarrays empfängt und Signalereignisse zurückgibt",
+        },
+      },
+    },
+  },
+
+  transformers: {
+    merge: {
+      description: "Zwei Reihen zu passenden Zeitstempeln summieren",
+      input: {
+        a: { label: "Reihe A" },
+        b: { label: "Reihe B" },
+      },
+      output: { value: { label: "Zusammengeführt" } },
+    },
+    ratio: {
+      description: "A / B pro Zeitstempel berechnen",
+      input: {
+        a: { label: "Zähler" },
+        b: { label: "Nenner" },
+      },
+      output: { value: { label: "Verhältnis" } },
+    },
+    delta: {
+      description: "Periode-über-Periode-Änderung",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Delta" } },
+    },
+    clamp: {
+      description: "Werte auf [min, max] begrenzen",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Begrenzt" } },
+      params: {
+        min: { label: "Min", description: "Untere Grenze" },
+        max: { label: "Max", description: "Obere Grenze" },
+      },
+    },
+    windowAvg: {
+      description: "Rollender Durchschnitt über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Durchschn." } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+    windowSum: {
+      description: "Rollende Summe über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Summe" } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+    windowMin: {
+      description: "Rollendes Minimum über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Min" } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+    windowMax: {
+      description: "Rollendes Maximum über N Perioden",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Max" } },
+      params: {
+        size: { label: "Fenster", description: "Anzahl der Perioden (1–500)" },
+      },
+    },
+    fieldPick: {
+      description:
+        "Ein benanntes Feld aus einer mehrwertigen Reihe extrahieren",
+      input: { source: { label: "Mehrwertig" } },
+      output: { value: { label: "Feld" } },
+      params: {
+        field: {
+          label: "Feldname",
+          description: "Name des zu extrahierenden Feldes",
+        },
+      },
+    },
+    jsonPath: {
+      description:
+        "Einen Wert über Punktnotationspfad aus DataPoint-Meta extrahieren",
+      input: { source: { label: "Quelle" } },
+      output: { value: { label: "Wert" } },
+      params: {
+        path: {
+          label: "Pfad",
+          description: "Punktnotationspfad, z. B. data.stats.total",
+        },
+      },
+    },
+    script: {
+      description: "Benutzerdefinierte Sandbox-Skript-Transformation",
+      input: { inputs: { label: "Eingaben" } },
+      output: { value: { label: "Ergebnis" } },
+      params: {
+        fn: {
+          label: "Funktion",
+          description:
+            "JS-Pfeilfunktion, die Eingangsreihenarrays empfängt und DataPoint[] zurückgibt",
+        },
+      },
+    },
+  },
+
   cleanup: {
     post: {
       title: "Vibe Sense Bereinigung",

@@ -107,5 +107,13 @@ export const translations: typeof enTranslations = {
       noConnectionsYet: "Brak połączeń.",
       connectionsTitle: "Połączone instancje",
     },
+    syncSettings: {
+      title: "Auto-synchronizacja",
+      description:
+        "Synchronizuj zadania i wspomnienia co minutę ze wszystkimi połączonymi instancjami",
+      enabledBadge: "Aktywna",
+      disabledBadge: "Nieaktywna",
+      toggleLabel: "Przełącz auto-synchronizację",
+    },
   },
 };

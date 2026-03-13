@@ -201,8 +201,12 @@ function EndpointsPageInternal<
     // (useEndpointCreate will do that merge)
     const callerMutationOptions = endpointOptions?.create?.mutationOptions;
 
-    // For POST endpoints, wrap to add navigation AFTER onSuccess
-    if (isMutationEndpoint && endpoint.POST && finalNavigation) {
+    // For POST/PUT endpoints, wrap to add navigation AFTER onSuccess
+    if (
+      isMutationEndpoint &&
+      (endpoint.POST ?? endpoint.PUT) &&
+      finalNavigation
+    ) {
       const callerOnSuccess = callerMutationOptions?.onSuccess as
         | ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
         | undefined;
@@ -267,6 +271,7 @@ function EndpointsPageInternal<
   }, [
     isMutationEndpoint,
     endpoint.POST,
+    endpoint.PUT,
     endpointOptions?.create?.mutationOptions,
     finalNavigation,
   ]);
@@ -1004,7 +1009,10 @@ function StackEntryLayer({
           endpointOptions={{
             delete: {
               urlPathParams: entry.params.urlPathParams,
-              autoPrefillData: entry.params.urlPathParams,
+              autoPrefillData: {
+                ...entry.params.urlPathParams,
+                ...entry.params.data,
+              },
               mutationOptions: extractMutationOptions(entry.endpoint),
             },
           }}

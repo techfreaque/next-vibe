@@ -43,7 +43,6 @@ interface CustomWidgetProps {
   field: {
     value: MemoriesListResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

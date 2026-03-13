@@ -35,7 +35,6 @@ interface CustomWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 const variantColorMap: Record<
@@ -139,7 +138,6 @@ function BarChartSection({
 
 export function UsersStatsContainer({
   field,
-  fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
@@ -253,43 +251,43 @@ export function UsersStatsContainer({
           </Span>
           <Div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <TextFieldWidget
-              fieldName={`${fieldName}.basicFilters.search`}
+              fieldName={"basicFilters.search"}
               field={children.basicFilters.children.search}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.basicFilters.status`}
+              fieldName={"basicFilters.status"}
               field={children.basicFilters.children.status}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.basicFilters.role`}
+              fieldName={"basicFilters.role"}
               field={children.basicFilters.children.role}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.subscriptionFilters.subscriptionStatus`}
+              fieldName={"subscriptionFilters.subscriptionStatus"}
               field={children.subscriptionFilters.children.subscriptionStatus}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.subscriptionFilters.paymentMethod`}
+              fieldName={"subscriptionFilters.paymentMethod"}
               field={children.subscriptionFilters.children.paymentMethod}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.locationFilters.country`}
+              fieldName={"locationFilters.country"}
               field={children.locationFilters.children.country}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.locationFilters.language`}
+              fieldName={"locationFilters.language"}
               field={children.locationFilters.children.language}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.timePeriodOptions.timePeriod`}
+              fieldName={"timePeriodOptions.timePeriod"}
               field={children.timePeriodOptions.children.timePeriod}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.timePeriodOptions.dateRangePreset`}
+              fieldName={"timePeriodOptions.dateRangePreset"}
               field={children.timePeriodOptions.children.dateRangePreset}
             />
             <SelectFieldWidget
-              fieldName={`${fieldName}.timePeriodOptions.chartType`}
+              fieldName={"timePeriodOptions.chartType"}
               field={children.timePeriodOptions.children.chartType}
             />
           </Div>

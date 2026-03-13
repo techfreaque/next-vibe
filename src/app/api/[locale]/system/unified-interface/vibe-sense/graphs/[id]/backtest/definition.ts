@@ -20,7 +20,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { GraphResolutionDB, GraphResolutionOptions } from "../../../enum";
+import {
+  GraphResolution,
+  GraphResolutionDB,
+  GraphResolutionOptions,
+} from "../../../enum";
 import { scopedTranslation } from "./i18n";
 import { BacktestWidget } from "./widget";
 
@@ -38,7 +42,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "wind",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.analytics",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 
@@ -147,7 +151,7 @@ const { POST } = createEndpoint({
       default: {
         rangeFrom: "2024-01-01T00:00:00Z",
         rangeTo: "2024-03-31T23:59:59Z",
-        resolution: GraphResolutionDB[6], // 1d
+        resolution: GraphResolution.ONE_DAY,
       },
     },
     responses: {

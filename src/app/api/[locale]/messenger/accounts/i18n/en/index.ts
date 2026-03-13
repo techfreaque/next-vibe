@@ -1,0 +1,95 @@
+export const translations = {
+  category: "Messenger Accounts",
+  tag: "messenger-accounts",
+  enums: {
+    channel: {
+      email: "Email",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "All Channels",
+    },
+    provider: {
+      smtp: "SMTP",
+      resend: "Resend",
+      ses: "Amazon SES",
+      mailgun: "Mailgun",
+      sendgrid: "SendGrid",
+      mailjet: "Mailjet",
+      postmark: "Postmark",
+      twilio: "Twilio",
+      awsSns: "AWS SNS",
+      messagebird: "MessageBird",
+      http: "HTTP",
+      whatsappBusiness: "WhatsApp Business",
+      telegramBot: "Telegram Bot",
+    },
+    providerFilter: {
+      any: "All Providers",
+    },
+    status: {
+      active: "Active",
+      inactive: "Inactive",
+      error: "Error",
+      testing: "Testing",
+    },
+    statusFilter: {
+      any: "All Statuses",
+    },
+    healthStatus: {
+      healthy: "Healthy",
+      degraded: "Degraded",
+      unhealthy: "Unhealthy",
+      unknown: "Unknown",
+    },
+    healthStatusFilter: {
+      any: "All Health Statuses",
+    },
+    securityType: {
+      none: "None",
+      tls: "TLS",
+      ssl: "SSL",
+      starttls: "STARTTLS",
+    },
+    imapAuthMethod: {
+      plain: "Plain",
+      oauth2: "OAuth2",
+      xoauth2: "XOAUTH2",
+    },
+    sortField: {
+      name: "Name",
+      channel: "Channel",
+      provider: "Provider",
+      status: "Status",
+      priority: "Priority",
+      messagesSentTotal: "Messages Sent",
+      lastUsedAt: "Last Used",
+      createdAt: "Created At",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+    campaignType: {
+      leadCampaign: "Lead Campaign",
+      newsletter: "Newsletter",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
+      transactional: "Transactional",
+      notification: "Notification",
+      system: "System",
+    },
+    campaignTypeFilter: {
+      all: "All Campaigns",
+    },
+    loadBalancingStrategy: {
+      roundRobin: "Round Robin",
+      weighted: "Weighted",
+      priority: "Priority",
+      leastUsed: "Least Used",
+    },
+  },
+};

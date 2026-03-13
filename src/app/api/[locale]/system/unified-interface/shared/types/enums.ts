@@ -137,6 +137,8 @@ export enum FieldDataType {
   // Complex data types
   ARRAY = "array",
   OBJECT = "object",
+  TIME_SERIES = "time_series",
+  SIGNALS = "signals",
 
   // Response display types
   BADGE = "badge",

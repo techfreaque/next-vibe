@@ -46,7 +46,6 @@ interface WidgetProps {
   field: {
     value: CronHistoryResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -353,7 +352,6 @@ function ExecutionCard({
 
 export function CronHistoryContainer({
   field,
-  fieldName,
 }: WidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const children = field.children;
@@ -563,21 +561,12 @@ export function CronHistoryContainer({
       {/* ── Filters ── */}
       <Div className="flex flex-col gap-2 px-4 py-3 border-b">
         {/* Task name search */}
-        <TextFieldWidget
-          fieldName={`${fieldName}.taskName`}
-          field={children.taskName}
-        />
+        <TextFieldWidget fieldName={"taskName"} field={children.taskName} />
 
         {/* Date range */}
         <Div className="grid grid-cols-2 gap-2">
-          <DateFieldWidget
-            fieldName={`${fieldName}.startDate`}
-            field={children.startDate}
-          />
-          <DateFieldWidget
-            fieldName={`${fieldName}.endDate`}
-            field={children.endDate}
-          />
+          <DateFieldWidget fieldName={"startDate"} field={children.startDate} />
+          <DateFieldWidget fieldName={"endDate"} field={children.endDate} />
         </Div>
 
         {/* Status filter chips */}

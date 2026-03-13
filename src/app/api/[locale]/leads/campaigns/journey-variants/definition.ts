@@ -25,7 +25,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   CampaignTypeDB,
   CampaignTypeOptions,
-} from "../../../emails/smtp-client/enum";
+} from "../../../messenger/accounts/enum";
 import { scopedTranslation } from "./i18n";
 import { JourneyVariantsWidget } from "./widget";
 
@@ -103,7 +103,7 @@ const { GET } = createEndpoint({
   path: ["leads", "campaigns", "journey-variants"],
   title: "get.title",
   description: "get.description",
-  category: "app.endpointCategories.leads",
+  category: "app.endpointCategories.leadsCampaigns",
   icon: "git-branch",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
@@ -187,7 +187,7 @@ const { POST } = createEndpoint({
   path: ["leads", "campaigns", "journey-variants"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.leads",
+  category: "app.endpointCategories.leadsCampaigns",
   icon: "plus",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],
@@ -350,7 +350,7 @@ const { PATCH } = createEndpoint({
   path: ["leads", "campaigns", "journey-variants"],
   title: "patch.title",
   description: "patch.description",
-  category: "app.endpointCategories.leads",
+  category: "app.endpointCategories.leadsCampaigns",
   icon: "edit",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],

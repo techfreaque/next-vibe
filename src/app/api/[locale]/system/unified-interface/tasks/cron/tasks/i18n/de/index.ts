@@ -288,6 +288,7 @@ export const translations: typeof enTranslations = {
     header: {
       stats: "Statistiken",
       history: "Verlauf",
+      queue: "Warteschlange",
       refresh: "Aktualisieren",
       create: "Neue Aufgabe",
     },

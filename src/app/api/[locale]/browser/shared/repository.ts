@@ -13,10 +13,6 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type {
-  BrowserRequestOutput,
-  BrowserResponseOutput,
-} from "../definition";
 import type { BrowserTool } from "../enum";
 import type { BrowserT } from "../i18n";
 import { browserRepository } from "../repository";

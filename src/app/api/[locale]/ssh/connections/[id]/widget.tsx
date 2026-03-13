@@ -23,7 +23,6 @@ interface CustomWidgetProps {
   field: {
     value: ConnectionDetailResponseOutput | null | undefined;
   } & (typeof endpoints.PATCH)["fields"];
-  fieldName: string;
 }
 
 export function ConnectionDetailContainer({

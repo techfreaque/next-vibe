@@ -61,7 +61,6 @@ interface CustomWidgetProps {
   field: {
     value: CharacterListResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

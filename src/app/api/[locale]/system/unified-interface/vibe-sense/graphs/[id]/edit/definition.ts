@@ -30,7 +30,7 @@ const { PUT } = createEndpoint({
   title: "put.title",
   description: "put.description",
   icon: "edit",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.analytics",
   tags: ["tags.vibeSense" as const],
   allowedRoles: [UserRole.ADMIN],
 

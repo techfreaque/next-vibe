@@ -80,6 +80,11 @@ export const translations: typeof enTranslations = {
     empty: "Noch keine Graphen. Erstellen Sie Ihren ersten Pipeline-Graphen.",
     error: "Graphen konnten nicht geladen werden. Bitte erneut versuchen.",
     archive: "Archivieren",
+    searchPlaceholder: "Nach Name, Slug oder Beschreibung suchen\u2026",
+    noMatchTitle: "Keine passenden Graphen",
+    noMatchHint: "Anderen Suchbegriff versuchen",
+    clearSearch: "Suche leeren",
+    searchResults: "Ergebnisse fuer",
     stats: {
       total: "Gesamt",
       active: "Aktiv",

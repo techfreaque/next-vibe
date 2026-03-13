@@ -13,11 +13,11 @@ import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
 import type {
   EmailFunctionType,
   EmailTemplateReturnType,
-} from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+} from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import type {
   ErrorResponseType,
   SuccessResponseType,
@@ -51,8 +51,8 @@ import {
 import {
   createTrackingContext,
   type TrackingContext,
-} from "../../../emails/smtp-client/components/tracking_context.email";
-import { EmailTemplate } from "../../../emails/smtp-client/components/template.email";
+} from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
+import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================

@@ -136,6 +136,9 @@ export type DivProps = {
   onMouseLeave?: (e: DivMouseEvent) => void;
   onTouchStart?: () => void;
   onTouchEnd?: () => void;
+  draggable?: boolean;
+  onDragStart?: (e: DivDragEvent) => void;
+  onDragEnd?: (e: DivDragEvent) => void;
   onDrop?: (e: DivDragEvent) => void;
   onDragOver?: (e: DivDragEvent) => void;
   onDragLeave?: () => void;
@@ -161,6 +164,9 @@ export const Div = React.forwardRef<DivRefObject, DivProps>(
       onMouseLeave,
       onTouchStart,
       onTouchEnd,
+      draggable,
+      onDragStart,
+      onDragEnd,
       onDrop,
       onDragOver,
       onDragLeave,
@@ -187,6 +193,9 @@ export const Div = React.forwardRef<DivRefObject, DivProps>(
         onMouseLeave={onMouseLeave}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
+        draggable={draggable}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}

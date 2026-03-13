@@ -79,7 +79,6 @@ interface CustomWidgetProps {
   field: {
     value: AiStreamRunPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 // ─── Hook to read thread ID from navigation store ────────────────────────────
@@ -632,10 +631,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
 
 // ─── Main Widget (entry point) ───────────────────────────────────────────────
 
-export function AiRunWidget({
-  field,
-  fieldName,
-}: CustomWidgetProps): JSX.Element {
+export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
   const threadId = field.value?.threadId ?? null;
   return (
     <ChatNavigationProvider
@@ -644,7 +640,7 @@ export function AiRunWidget({
       currentSubFolderId={null}
       leafMessageId={null}
     >
-      <AiRunFormView field={field} fieldName={fieldName} />
+      <AiRunFormView field={field} />
     </ChatNavigationProvider>
   );
 }

@@ -46,7 +46,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "message-square",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatThreads",
   tags: ["tags.threads" as const],
 
   fields: customWidgetObject({
@@ -419,7 +419,7 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "message-square-plus" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatThreads",
   tags: ["tags.threads" as const],
 
   fields: objectField(scopedTranslation, {

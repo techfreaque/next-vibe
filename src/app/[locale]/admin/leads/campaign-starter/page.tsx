@@ -13,5 +13,5 @@ export default async function LeadsCampaignStarterPage({
 }: LeadsCampaignStarterPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   await requireAdminUser(locale, `/${locale}/admin/leads/campaign-starter`);
-  redirect(`/${locale}/admin/email-campaigns`);
+  redirect(`/${locale}/admin/messenger/campaigns`);
 }

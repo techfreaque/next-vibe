@@ -16,7 +16,6 @@ interface WidgetProps {
   field: {
     value: SessionOpenResponseOutput | null | undefined;
   } & (typeof endpoints.POST)["fields"];
-  fieldName: string;
 }
 
 export function SessionOpenContainer({

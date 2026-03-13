@@ -41,7 +41,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "message-circle",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMessages",
   tags: ["tags.messages" as const],
 
   errorTypes: {
@@ -206,7 +206,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "message-circle",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMessages",
   tags: ["tags.messages" as const],
 
   errorTypes: {
@@ -360,8 +360,39 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "message-circle",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMessages",
   tags: ["tags.messages" as const],
+
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const messagesDefinition = await import("../definition");
+
+        apiClient.updateEndpointData(
+          messagesDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+            return {
+              success: true,
+              data: {
+                messages: oldData.data.messages.filter(
+                  (msg) => msg.id !== data.pathParams.messageId,
+                ),
+              },
+            };
+          },
+          {
+            urlPathParams: { threadId: data.pathParams.threadId },
+          },
+        );
+      },
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {

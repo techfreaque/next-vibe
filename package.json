@@ -282,6 +282,7 @@
     "rehype-highlight": "7.0.2",
     "remark-breaks": "4.0.0",
     "remark-gfm": "4.0.1",
+    "resend": "^6.9.3",
     "semver": "7.7.4",
     "server-only": "0.0.1",
     "simple-git": "^3.33.0",

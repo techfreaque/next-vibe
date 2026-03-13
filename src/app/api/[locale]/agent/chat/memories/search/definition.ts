@@ -66,7 +66,7 @@ const { GET } = createEndpoint({
     };
   },
   icon: "search",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMemories",
   tags: ["tags.memories" as const],
 
   fields: objectField(scopedTranslation, {

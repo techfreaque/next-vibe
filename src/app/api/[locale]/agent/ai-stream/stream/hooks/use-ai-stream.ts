@@ -121,12 +121,13 @@ export function useAIStream(): UseAIStreamReturn {
             serializeError(failResult),
             "HTTP_ERROR",
             null,
+            null,
           );
         }
 
         toast({
           title: t("error.title"),
-          description: t(failResult.message, failResult.messageParams),
+          description: failResult.message,
           variant: "destructive",
           duration: Infinity,
         });
@@ -147,12 +148,13 @@ export function useAIStream(): UseAIStreamReturn {
             serializeError(result),
             "HTTP_ERROR",
             null,
+            null,
           );
         }
 
         toast({
           title: t("error.title"),
-          description: t(result.message, result.messageParams),
+          description: result.message,
           variant: "destructive",
           duration: Infinity,
         });

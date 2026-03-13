@@ -49,7 +49,6 @@ interface CustomWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.PUT)["fields"];
-  fieldName: string;
 }
 
 export function CampaignStarterConfigContainer({
@@ -203,22 +202,19 @@ export function CampaignStarterConfigContainer({
                     type="number"
                     min={1}
                     className="w-32"
-                    value={String(leadsPerWeek[loc] ?? "")}
+                    value={leadsPerWeek[loc] ?? 0}
                     onChange={(e) => {
-                      const raw = e.target.value;
+                      const num = e.target.value;
                       const current = form?.getValues("leadsPerWeek") ?? {};
-                      if (raw === "") {
+                      if (Number.isNaN(num) || num < 1) {
                         const updated = { ...current };
                         delete updated[loc];
                         form?.setValue("leadsPerWeek", updated);
                       } else {
-                        const num = parseInt(raw, 10);
-                        if (!Number.isNaN(num) && num >= 1) {
-                          form?.setValue("leadsPerWeek", {
-                            ...current,
-                            [loc]: num,
-                          });
-                        }
+                        form?.setValue("leadsPerWeek", {
+                          ...current,
+                          [loc]: num,
+                        });
                       }
                     }}
                   />

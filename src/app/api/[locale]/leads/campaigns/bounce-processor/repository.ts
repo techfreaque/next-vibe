@@ -6,6 +6,7 @@
 
 import "server-only";
 
+import Imap from "imap";
 import { and, eq, isNull, like, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -15,7 +16,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { emails } from "@/app/api/[locale]/emails/messages/db";
+import { imapFolders } from "@/app/api/[locale]/messenger/providers/email/imap-client/db";
+import { messengerAccounts as imapAccounts } from "@/app/api/[locale]/messenger/accounts/db";
+import { ImapSpecialUseType } from "@/app/api/[locale]/messenger/providers/email/imap-client/enum";
+import { emails } from "@/app/api/[locale]/messenger/messages/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -38,6 +42,10 @@ const BOUNCE_SENDER_PATTERNS = [
   "postmaster@%",
   "MAILER-DAEMON@%",
   "Mail Delivery Subsystem<%",
+  "%mailer-daemon@%",
+  "%MAILER-DAEMON@%",
+  "%Mail Delivery System%",
+  "%Mail Delivery Subsystem%",
 ] as const;
 
 /**
@@ -61,6 +69,129 @@ function extractEmailsFromText(text: string): string[] {
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
   const matches = text.match(emailRegex);
   return matches ? [...new Set(matches.map((e) => e.toLowerCase()))] : [];
+}
+
+/**
+ * Move an IMAP message to the trash folder, then delete from DB.
+ * Falls back to direct DB delete if IMAP move fails.
+ */
+async function moveToImapTrash(
+  emailId: string,
+  imapUid: number | null | undefined,
+  imapFolderId: string | null | undefined,
+  imapAccountId: string | null | undefined,
+  logger: EndpointLogger,
+): Promise<void> {
+  // Always clean up DB record at the end
+  const deleteFromDb = async (): Promise<void> => {
+    await db.delete(emails).where(eq(emails.id, emailId));
+  };
+
+  if (!imapUid || !imapFolderId || !imapAccountId) {
+    await deleteFromDb();
+    return;
+  }
+
+  try {
+    // Look up account credentials and source folder path
+    const [account] = await db
+      .select()
+      .from(imapAccounts)
+      .where(eq(imapAccounts.id, imapAccountId))
+      .limit(1);
+
+    const [sourceFolder] = await db
+      .select({ path: imapFolders.path })
+      .from(imapFolders)
+      .where(eq(imapFolders.id, imapFolderId))
+      .limit(1);
+
+    const [trashFolder] = await db
+      .select({ path: imapFolders.path })
+      .from(imapFolders)
+      .where(
+        and(
+          eq(imapFolders.accountId, imapAccountId),
+          eq(imapFolders.specialUseType, ImapSpecialUseType.TRASH),
+        ),
+      )
+      .limit(1);
+
+    if (!account || !sourceFolder || !trashFolder) {
+      logger.warn("bounce.processor.imap.trash.missing_data", {
+        emailId,
+        hasAccount: Boolean(account),
+        hasSourceFolder: Boolean(sourceFolder),
+        hasTrashFolder: Boolean(trashFolder),
+      });
+      await deleteFromDb();
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      const imap = new Imap({
+        user: account.imapUsername ?? "",
+        password: account.imapPassword ?? "",
+        host: account.imapHost ?? "",
+        port: account.imapPort ?? 993,
+        tls: account.imapSecure ?? false,
+        tlsOptions: { rejectUnauthorized: false },
+        connTimeout: 10000,
+        authTimeout: 5000,
+      });
+
+      imap.once("ready", () => {
+        imap.openBox(sourceFolder.path, false, (openErr) => {
+          if (openErr) {
+            logger.warn("bounce.processor.imap.trash.open_failed", {
+              emailId,
+              folder: sourceFolder.path,
+              error: openErr.message,
+            });
+            imap.end();
+            resolve();
+            return;
+          }
+
+          imap.move([imapUid], trashFolder.path, (moveErr) => {
+            if (moveErr) {
+              logger.warn("bounce.processor.imap.trash.move_failed", {
+                emailId,
+                imapUid,
+                trashFolder: trashFolder.path,
+                error: moveErr.message,
+              });
+            } else {
+              logger.debug("bounce.processor.imap.trash.moved", {
+                emailId,
+                imapUid,
+                trashFolder: trashFolder.path,
+              });
+            }
+            imap.end();
+            resolve();
+          });
+        });
+      });
+
+      imap.once("error", (err: Error) => {
+        logger.warn("bounce.processor.imap.trash.connect_failed", {
+          emailId,
+          error: err.message,
+        });
+        resolve();
+      });
+
+      imap.connect();
+    });
+  } catch (err) {
+    logger.warn("bounce.processor.imap.trash.error", {
+      emailId,
+      ...parseError(err),
+    });
+  }
+
+  await deleteFromDb();
 }
 
 /**
@@ -103,14 +234,17 @@ export class BounceProcessorRepository {
           subject: emails.subject,
           bodyText: emails.bodyText,
           recipientEmail: emails.recipientEmail,
+          uid: emails.uid,
+          folderId: emails.folderId,
+          accountId: emails.accountId,
         })
         .from(emails)
         .where(
           and(
             // Not yet processed as bounce
             isNull(emails.bouncedAt),
-            // Only IMAP-synced inbound messages (have imapAccountId)
-            sql`${emails.imapAccountId} IS NOT NULL`,
+            // Only IMAP-synced inbound messages (have accountId)
+            sql`${emails.accountId} IS NOT NULL`,
             or(
               ...BOUNCE_SENDER_PATTERNS.map((pattern) =>
                 like(emails.senderEmail, pattern),
@@ -128,12 +262,15 @@ export class BounceProcessorRepository {
           subject: emails.subject,
           bodyText: emails.bodyText,
           recipientEmail: emails.recipientEmail,
+          uid: emails.uid,
+          folderId: emails.folderId,
+          accountId: emails.accountId,
         })
         .from(emails)
         .where(
           and(
             isNull(emails.bouncedAt),
-            sql`${emails.imapAccountId} IS NOT NULL`,
+            sql`${emails.accountId} IS NOT NULL`,
             or(
               ...BOUNCE_SUBJECT_KEYWORDS.map(
                 (kw) =>
@@ -179,19 +316,17 @@ export class BounceProcessorRepository {
             subject: msg.subject,
             candidateEmails,
           });
-          // Mark as processed even in dry run to avoid re-scanning
-          await db
-            .update(emails)
-            .set({ bouncedAt: new Date() })
-            .where(eq(emails.id, msg.id));
           continue;
         }
 
-        // Mark the bounce email as processed
-        await db
-          .update(emails)
-          .set({ bouncedAt: new Date() })
-          .where(eq(emails.id, msg.id));
+        // Move bounce email to IMAP trash, then delete from DB
+        await moveToImapTrash(
+          msg.id,
+          msg.uid,
+          msg.folderId,
+          msg.accountId,
+          logger,
+        );
 
         // Find leads matching any of the extracted emails
         for (const bouncedEmail of candidateEmails) {

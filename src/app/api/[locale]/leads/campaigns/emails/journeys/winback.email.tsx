@@ -6,9 +6,9 @@
 
 import React from "react";
 
-import { CampaignEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/campaign_email_layout.email";
-import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
-import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
+import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
+import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 import { simpleT } from "@/i18n/core/shared";
 
 import { EmailCampaignStage } from "../../../enum";
@@ -17,7 +17,7 @@ import type {
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./winback/i18n";
 
 /**
  * Winback - Initial Contact
@@ -32,28 +32,18 @@ export const winbackInitialEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.winback.initial.previewText",
-      )}
+      previewText={t("initial.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.winback.initial.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("initial.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.initial.noticed")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.noticed")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.initial.whatChanged")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.whatChanged")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.initial.noHardFeelings")}
-      </HumanText>
+      <HumanText variant="body">{t("initial.noHardFeelings")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -62,15 +52,13 @@ export const winbackInitialEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.winback.initial.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("initial.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.winback.initial.subject"),
+    subject: t("initial.subject"),
     jsx: emailContent,
   };
 };
@@ -88,28 +76,18 @@ export const winbackFollowup1Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.winback.followup1.previewText",
-      )}
+      previewText={t("followup1.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.winback.followup1.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup1.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.followup1.improvements")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.improvements")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.followup1.specificChange")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.specificChange")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.followup1.openDoor")}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.openDoor")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -118,15 +96,13 @@ export const winbackFollowup1Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.winback.followup1.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup1.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.winback.followup1.subject"),
+    subject: t("followup1.subject"),
     jsx: emailContent,
   };
 };
@@ -145,24 +121,16 @@ export const winbackFollowup2Email: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.winback.followup2.previewText",
-      )}
+      previewText={t("followup2.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.winback.followup2.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup2.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.followup2.specialOffer")}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.specialOffer")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.followup2.offerDetails")}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.offerDetails")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -171,15 +139,13 @@ export const winbackFollowup2Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.winback.followup2.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup2.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.winback.followup2.subject"),
+    subject: t("followup2.subject"),
     jsx: emailContent,
   };
 };
@@ -198,24 +164,16 @@ export const winbackFollowup3Email: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.winback.followup3.previewText",
-      )}
+      previewText={t("followup3.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.winback.followup3.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup3.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.followup3.lastAttempt")}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.lastAttempt")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.followup3.honesty")}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.honesty")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -224,15 +182,13 @@ export const winbackFollowup3Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.winback.followup3.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("followup3.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.winback.followup3.subject"),
+    subject: t("followup3.subject"),
     jsx: emailContent,
   };
 };
@@ -251,24 +207,16 @@ export const winbackNurtureEmail: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.winback.nurture.previewText",
-      )}
+      previewText={t("nurture.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.winback.nurture.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("nurture.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.nurture.majorUpdate")}
-      </HumanText>
+      <HumanText variant="body">{t("nurture.majorUpdate")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.nurture.gentleInvite")}
-      </HumanText>
+      <HumanText variant="body">{t("nurture.gentleInvite")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -277,15 +225,13 @@ export const winbackNurtureEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.winback.nurture.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("nurture.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.winback.nurture.subject"),
+    subject: t("nurture.subject"),
     jsx: emailContent,
   };
 };
@@ -304,24 +250,16 @@ export const winbackReactivationEmail: EmailTemplateFunction = ({
 
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.winback.reactivation.previewText",
-      )}
+      previewText={t("reactivation.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.winback.reactivation.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("reactivation.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.reactivation.longTime")}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.longTime")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.winback.reactivation.finalOffer")}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.finalOffer")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -330,15 +268,13 @@ export const winbackReactivationEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t("emailJourneys.leads.journeys.winback.reactivation.signature")}
-      </HumanText>
+      <HumanText variant="signature">{t("reactivation.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t("emailJourneys.leads.journeys.winback.reactivation.subject"),
+    subject: t("reactivation.subject"),
     jsx: emailContent,
   };
 };

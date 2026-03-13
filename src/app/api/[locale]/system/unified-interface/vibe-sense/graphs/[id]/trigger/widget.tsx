@@ -27,7 +27,6 @@ interface CustomWidgetProps {
   field: {
     value: TriggerResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

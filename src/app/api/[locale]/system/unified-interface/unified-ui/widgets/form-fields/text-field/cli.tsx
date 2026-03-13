@@ -119,9 +119,7 @@ export function TextFieldWidgetInk<
 
       {/* Input field */}
       <Box>
-        <Text dimColor>
-          {field.placeholder ? `${t(field.placeholder)}: ` : "> "}
-        </Text>
+        <Text dimColor>{isFocused ? "> " : "  "}</Text>
         <TextInput
           value={inputValue}
           focus={isFocused}

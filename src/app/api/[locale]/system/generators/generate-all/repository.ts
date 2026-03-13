@@ -390,7 +390,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               await emailTemplateGeneratorRepository.generateEmailTemplates(
                 {
                   outputFile:
-                    "src/app/api/[locale]/emails/registry/generated.ts",
+                    "src/app/api/[locale]/messenger/registry/generated.ts",
                   dryRun: false,
                 },
                 logger,
@@ -499,42 +499,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
       );
 
-      // 8. Indicator Index Generator
-      generatorPromises.push(
-        (async (): Promise<string | null> => {
-          try {
-            outputLines.push("📊 Generating indicator index...");
-            const { indicatorIndexGeneratorRepository } =
-              await import("../indicator-index/repository");
-
-            const result =
-              await indicatorIndexGeneratorRepository.generateIndicatorIndex(
-                {
-                  outputFile:
-                    "src/app/api/[locale]/system/generated/indicator-index.ts",
-                  dryRun: false,
-                },
-                logger,
-              );
-
-            if (result.success) {
-              outputLines.push("✅ Indicator index generated successfully");
-              generatorsRun++;
-              return "indicator-index";
-            }
-            outputLines.push(
-              `❌ Indicator index generation failed: ${result.message}`,
-            );
-            return null;
-          } catch (error) {
-            outputLines.push(
-              `❌ Indicator index generator failed: ${parseError(error).message}`,
-            );
-            return null;
-          }
-        })(),
-      );
-
       // 9. Graph Seeds Index Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
@@ -590,7 +554,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 10,
+          totalGenerators: 9,
           generatorsRun,
           generatorsSkipped,
           outputDirectory:
@@ -811,7 +775,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
             const { t } = i18n.scopedT(locale);
             await emailTemplateGeneratorRepository.generateEmailTemplates(
               {
-                outputFile: "src/app/api/[locale]/emails/registry/generated.ts",
+                outputFile:
+                  "src/app/api/[locale]/messenger/registry/generated.ts",
                 dryRun: false,
               },
               logger,
@@ -829,34 +794,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       );
     } else {
       skipped.push("email-templates");
-    }
-
-    if (dirty.indicatorIndex) {
-      generatorPromises.push(
-        (async (): Promise<void> => {
-          try {
-            const { indicatorIndexGeneratorRepository } =
-              await import("../indicator-index/repository");
-            await indicatorIndexGeneratorRepository.generateIndicatorIndex(
-              {
-                outputFile:
-                  "src/app/api/[locale]/system/generated/indicator-index.ts",
-                dryRun: false,
-              },
-              logger,
-              liveIndex,
-            );
-            ran.push("indicator-index");
-          } catch (error) {
-            logger.error(
-              "indicator-index failed",
-              new Error(parseError(error).message),
-            );
-          }
-        })(),
-      );
-    } else {
-      skipped.push("indicator-index");
     }
 
     if (dirty.graphSeedsIndex) {

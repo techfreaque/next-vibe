@@ -29,7 +29,6 @@ interface CustomWidgetProps {
   field: {
     value: LoginPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function LoginFormContainer({

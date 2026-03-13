@@ -45,7 +45,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "star" as const,
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatFavorites",
   tags: ["tags.favorites" as const],
 
   aliases: [FAVORITES_LIST_ALIAS],

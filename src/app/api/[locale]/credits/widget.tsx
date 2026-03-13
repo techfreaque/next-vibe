@@ -46,7 +46,6 @@ interface CustomWidgetProps {
   field: {
     value: CreditsGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

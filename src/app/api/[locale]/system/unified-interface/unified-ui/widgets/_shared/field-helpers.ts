@@ -113,7 +113,7 @@ export function getTranslatorFromEndpoint<
  *      arrayFieldPath("", 0)      → "[0]"
  */
 export function arrayFieldPath(
-  parentPath: string,
+  parentPath: string | undefined,
   index: number,
   childPath: string,
 ): string {

@@ -19,15 +19,15 @@ import {
   envSchema as env_envSchema,
 } from "../../../../../config/env";
 import { agentEnv, agentEnvSchema } from "../../agent/env";
-import { emailEnv, emailEnvSchema } from "../../emails/env";
-import {
-  imapClientEnv,
-  imapClientEnvSchema,
-} from "../../emails/imap-client/env";
 import {
   leadsCampaignsEnv,
   leadsCampaignsEnvSchema,
 } from "../../leads/campaigns/env";
+import { messengerEnv, messengerEnvSchema } from "../../messenger/env";
+import {
+  imapClientEnv,
+  imapClientEnvSchema,
+} from "../../messenger/providers/email/imap-client/env";
 import { paymentEnv, paymentEnvSchema } from "../../payment/env";
 import { smsEnv, smsEnvSchema } from "../../sms/env";
 import { serverSystemEnv, serverSystemEnvSchema } from "../server/env";
@@ -43,9 +43,9 @@ const platform = {
 export const envModules = {
   env: { env: env_env, schema: env_envSchema },
   agent: { env: agentEnv, schema: agentEnvSchema },
-  email: { env: emailEnv, schema: emailEnvSchema },
-  imap: { env: imapClientEnv, schema: imapClientEnvSchema },
   leadsCampaigns: { env: leadsCampaignsEnv, schema: leadsCampaignsEnvSchema },
+  messenger: { env: messengerEnv, schema: messengerEnvSchema },
+  imap: { env: imapClientEnv, schema: imapClientEnvSchema },
   payment: { env: paymentEnv, schema: paymentEnvSchema },
   sms: { env: smsEnv, schema: smsEnvSchema },
   serverSystem: { env: serverSystemEnv, schema: serverSystemEnvSchema },
@@ -54,9 +54,9 @@ export const envModules = {
 // Combined schema using merge
 export const envSchema = env_envSchema
   .merge(agentEnvSchema)
-  .merge(emailEnvSchema)
-  .merge(imapClientEnvSchema)
   .merge(leadsCampaignsEnvSchema)
+  .merge(messengerEnvSchema)
+  .merge(imapClientEnvSchema)
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
   .merge(serverSystemEnvSchema);

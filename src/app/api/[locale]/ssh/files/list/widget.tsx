@@ -31,7 +31,6 @@ interface WidgetProps {
   field: {
     value: FilesListResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 function formatSize(size: number | null): string {

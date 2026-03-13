@@ -12,24 +12,32 @@ import { and, between, eq, lt, sql } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 
 import { pipelineDatapoints, pipelineRetentionConfig } from "../db";
-import type { DataPoint, TimeRange } from "../indicators/types";
+import type { DataPoint, TimeRange } from "../shared/fields";
 
 // ─── Write ────────────────────────────────────────────────────────────────────
 
 /**
  * Write datapoints for a node.
  * Upserts by (nodeId, graphId, timestamp) to handle re-runs.
+ *
+ * @param options.skipZero - When true, filters out zero-valued points before writing.
+ *   Use for sparse event indicators where zero means "no events" — gaps are implicit.
+ *   Do NOT use for snapshot indicators where zero is meaningful (e.g. balance = 0).
  */
 export async function writeDatapoints(
   nodeId: string,
   graphId: string | null,
   points: DataPoint[],
+  options?: { skipZero?: boolean },
 ): Promise<void> {
-  if (points.length === 0) {
+  const toWrite =
+    options?.skipZero === true ? points.filter((p) => p.value !== 0) : points;
+
+  if (toWrite.length === 0) {
     return;
   }
 
-  const rows = points.map((p) => ({
+  const rows = toWrite.map((p) => ({
     nodeId,
     graphId: graphId ?? null,
     timestamp: p.timestamp,

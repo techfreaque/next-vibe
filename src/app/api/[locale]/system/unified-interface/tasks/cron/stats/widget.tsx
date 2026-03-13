@@ -40,7 +40,6 @@ interface WidgetProps {
   field: {
     value: CronStatsGetResponseOutput | null | undefined;
   } & (typeof statsEndpoints.GET)["fields"];
-  fieldName: string;
 }
 
 // ─── Format Helpers ───────────────────────────────────────────────────────────

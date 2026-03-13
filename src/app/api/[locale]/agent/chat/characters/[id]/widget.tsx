@@ -82,7 +82,6 @@ interface PatchWidgetProps {
   field: {
     value: CharacterUpdateResponseOutput | null | undefined;
   } & (typeof definitionPatch.PATCH)["fields"];
-  fieldName: string;
 }
 
 /**
@@ -92,7 +91,6 @@ interface GetWidgetProps {
   field: {
     value: CharacterGetResponseOutput | null | undefined;
   } & (typeof definitionGet.GET)["fields"];
-  fieldName: string;
 }
 
 /**

@@ -6,9 +6,9 @@
 
 import React from "react";
 
-import { CampaignEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/campaign_email_layout.email";
-import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
-import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+import { CampaignEmailLayout } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/campaign_email_layout.email";
+import { HumanCTAButton } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_cta_button.email";
+import { HumanText } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/human_text.email";
 import { simpleT } from "@/i18n/core/shared";
 
 import { EmailCampaignStage } from "../../../enum";
@@ -17,7 +17,7 @@ import type {
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
-import { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./quiet-recommendation/i18n";
 
 /**
  * Quiet Recommendation - Initial Contact
@@ -32,34 +32,18 @@ export const quietRecommendationInitialEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.quietRecommendation.initial.previewText",
-      )}
+      previewText={t("initial.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.quietRecommendation.initial.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("initial.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.initial.howIFoundIt",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("initial.howIFoundIt")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.initial.whatItDoesDifferently",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("initial.whatItDoesDifferently")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.initial.affiliateNote",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("initial.affiliateNote")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -68,19 +52,13 @@ export const quietRecommendationInitialEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.initial.signature",
-        )}
-      </HumanText>
+      <HumanText variant="signature">{t("initial.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "emailJourneys.leads.journeys.quietRecommendation.initial.subject",
-    ),
+    subject: t("initial.subject"),
     jsx: emailContent,
   };
 };
@@ -98,30 +76,16 @@ export const quietRecommendationFollowup1Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.quietRecommendation.followup1.previewText",
-      )}
+      previewText={t("followup1.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup1.greeting",
-        )}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup1.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup1.specificThing",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.specificThing")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup1.builtWith",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("followup1.builtWith")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -130,19 +94,13 @@ export const quietRecommendationFollowup1Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup1.signature",
-        )}
-      </HumanText>
+      <HumanText variant="signature">{t("followup1.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "emailJourneys.leads.journeys.quietRecommendation.followup1.subject",
-    ),
+    subject: t("followup1.subject"),
     jsx: emailContent,
   };
 };
@@ -160,30 +118,16 @@ export const quietRecommendationFollowup2Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.quietRecommendation.followup2.previewText",
-      )}
+      previewText={t("followup2.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup2.greeting",
-        )}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup2.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup2.comparison",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.comparison")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup2.honestTake",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("followup2.honestTake")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -192,19 +136,13 @@ export const quietRecommendationFollowup2Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup2.signature",
-        )}
-      </HumanText>
+      <HumanText variant="signature">{t("followup2.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "emailJourneys.leads.journeys.quietRecommendation.followup2.subject",
-    ),
+    subject: t("followup2.subject"),
     jsx: emailContent,
   };
 };
@@ -222,30 +160,16 @@ export const quietRecommendationFollowup3Email: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.quietRecommendation.followup3.previewText",
-      )}
+      previewText={t("followup3.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup3.greeting",
-        )}
-      </HumanText>
+      <HumanText variant="greeting">{t("followup3.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup3.lastOne",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.lastOne")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup3.stayInTouch",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("followup3.stayInTouch")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -254,19 +178,13 @@ export const quietRecommendationFollowup3Email: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.followup3.signature",
-        )}
-      </HumanText>
+      <HumanText variant="signature">{t("followup3.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "emailJourneys.leads.journeys.quietRecommendation.followup3.subject",
-    ),
+    subject: t("followup3.subject"),
     jsx: emailContent,
   };
 };
@@ -284,20 +202,14 @@ export const quietRecommendationNurtureEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.quietRecommendation.nurture.previewText",
-      )}
+      previewText={t("nurture.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t("emailJourneys.leads.journeys.quietRecommendation.nurture.greeting")}
-      </HumanText>
+      <HumanText variant="greeting">{t("nurture.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t("emailJourneys.leads.journeys.quietRecommendation.nurture.update")}
-      </HumanText>
+      <HumanText variant="body">{t("nurture.update")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -306,19 +218,13 @@ export const quietRecommendationNurtureEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.nurture.signature",
-        )}
-      </HumanText>
+      <HumanText variant="signature">{t("nurture.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "emailJourneys.leads.journeys.quietRecommendation.nurture.subject",
-    ),
+    subject: t("nurture.subject"),
     jsx: emailContent,
   };
 };
@@ -336,30 +242,16 @@ export const quietRecommendationReactivationEmail: EmailTemplateFunction = ({
   const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
-      previewText={t(
-        "emailJourneys.leads.journeys.quietRecommendation.reactivation.previewText",
-      )}
+      previewText={t("reactivation.previewText")}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
       tracking={tracking}
     >
-      <HumanText variant="greeting">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.reactivation.greeting",
-        )}
-      </HumanText>
+      <HumanText variant="greeting">{t("reactivation.greeting")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.reactivation.checkIn",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.checkIn")}</HumanText>
 
-      <HumanText variant="body">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.reactivation.whatChanged",
-        )}
-      </HumanText>
+      <HumanText variant="body">{t("reactivation.whatChanged")}</HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
@@ -368,19 +260,13 @@ export const quietRecommendationReactivationEmail: EmailTemplateFunction = ({
         tracking={tracking}
       />
 
-      <HumanText variant="signature">
-        {t(
-          "emailJourneys.leads.journeys.quietRecommendation.reactivation.signature",
-        )}
-      </HumanText>
+      <HumanText variant="signature">{t("reactivation.signature")}</HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "emailJourneys.leads.journeys.quietRecommendation.reactivation.subject",
-    ),
+    subject: t("reactivation.subject"),
     jsx: emailContent,
   };
 };

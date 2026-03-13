@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["browser", "close-page"],
   title: "close-page.title",
   description: "close-page.description",
-  category: "app.endpointCategories.browserAutomation",
+  category: "app.endpointCategories.browser",
   icon: "x-square",
   tags: ["close-page.tags.browserAutomation", "close-page.tags.chromeDevTools"],
 

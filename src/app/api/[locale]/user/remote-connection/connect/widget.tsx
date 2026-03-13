@@ -54,7 +54,6 @@ import { scopedTranslation } from "./i18n";
 
 interface ConnectWidgetProps {
   field: (typeof definitions.POST)["fields"];
-  fieldName: string;
 }
 
 export function RemoteConnectWidget({

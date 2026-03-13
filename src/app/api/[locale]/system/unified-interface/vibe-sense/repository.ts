@@ -20,8 +20,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { GraphConfig } from "./graph/types";
-import { getAllIndicatorMeta, initializeRegistry } from "./indicators/registry";
-import type { IndicatorMeta, Resolution } from "./indicators/types";
+import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { runBacktest } from "./engine/backtest";
 import { runGraph } from "./engine/runner";
 import { runDueGraphs } from "./engine/scheduler";
@@ -30,32 +30,6 @@ import { runAllRetentionCleanup } from "./store/datapoints";
 import { cleanupOldSignals } from "./store/signals";
 import { pipelineDatapoints, pipelineGraphs } from "./db";
 import type { VibeSenseT } from "./i18n";
-
-// ─── Registry ─────────────────────────────────────────────────────────────────
-
-export interface RegistryResponse {
-  indicators: IndicatorMeta[];
-}
-
-export class VibeSenseRegistryRepository {
-  static async getRegistry(
-    logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<RegistryResponse>> {
-    try {
-      await initializeRegistry();
-      const indicators = getAllIndicatorMeta();
-      logger.debug(`[vibe-sense] Registry: ${indicators.length} indicators`);
-      return success({ indicators });
-    } catch (error) {
-      logger.error("[vibe-sense] Failed to load registry", parseError(error));
-      return fail({
-        message: t("registry.get.errors.server.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-}
 
 // ─── Graph CRUD ───────────────────────────────────────────────────────────────
 
@@ -151,17 +125,17 @@ export interface CleanupResponse {
 }
 
 /**
- * Downsample a raw 1D (or finer) series into buckets of `bucketMs` width.
+ * Downsample a raw (typically 1-minute) series into buckets of `bucketMs` width.
  * Each bucket timestamp = floor of first point in bucket.
  * Bucket value = average of all points that fall within the bucket.
- * If bucketMs <= ONE_DAY_MS the original points are returned unchanged.
+ * If bucketMs < the smallest stored interval (1 minute) the original points are returned unchanged.
  */
 function downsampleToResolution(
   points: Array<{ timestamp: Date; value: number }>,
   bucketMs: number,
 ): Array<{ timestamp: Date; value: number }> {
-  const ONE_DAY_MS = 86_400_000;
-  if (bucketMs <= ONE_DAY_MS || points.length === 0) {
+  const ONE_MINUTE_MS = 60_000;
+  if (bucketMs <= ONE_MINUTE_MS || points.length === 0) {
     return points;
   }
 
@@ -599,7 +573,6 @@ export class VibeSenseRepository {
         to: new Date(data.rangeTo),
       };
 
-      await initializeRegistry();
       const result = await runGraph(graph.id, graph.config, range);
 
       return success({
@@ -652,7 +625,6 @@ export class VibeSenseRepository {
         to: new Date(data.rangeTo),
       };
 
-      await initializeRegistry();
       const result = await runBacktest(
         graph.id,
         graph.id, // version id = graph id (current version)
@@ -706,27 +678,18 @@ export class VibeSenseRepository {
         });
       }
 
-      // Derive time range from resolution + cursor (backwards pagination)
-      // Page size: 200 buckets per resolution
-      const PAGE_BUCKETS = 200;
-      const { RESOLUTION_MS } = await import("./indicators/types");
+      // Fetch a fixed number of bars (~300) at the requested resolution.
+      // This keeps the query size proportional regardless of resolution.
       const resMs = RESOLUTION_MS[data.resolution];
+      const TARGET_BARS = 300;
       const rangeTo = data.cursor ? new Date(data.cursor) : new Date();
-      const rangeFrom = new Date(rangeTo.getTime() - PAGE_BUCKETS * resMs);
+      const rangeFrom = new Date(rangeTo.getTime() - TARGET_BARS * resMs);
 
-      // For coarser resolutions (>1D), always fetch full stored history so we
-      // have enough raw 1D points to aggregate into weekly/monthly buckets.
-      const ONE_DAY_MS = 86_400_000;
-      const fetchFrom =
-        resMs > ONE_DAY_MS
-          ? new Date(rangeTo.getTime() - 730 * ONE_DAY_MS) // 2 years max
-          : rangeFrom;
+      const range = { from: rangeFrom, to: rangeTo };
 
-      const range = { from: fetchFrom, to: rangeTo };
-
-      await initializeRegistry();
       const result = await runGraph(graph.id, graph.config, range, undefined, {
         readOnly: true,
+        displayResolution: data.resolution,
       });
 
       const series = [...result.series.entries()].map(([nodeId, points]) => ({
@@ -887,7 +850,7 @@ export class VibeSenseRepository {
           cleanupOldSignals(90), // 90-day signal retention
         ]);
 
-      logger.info(
+      logger.debug(
         `[vibe-sense] Cleanup: ${retention.nodesProcessed} nodes, ` +
           `${retention.totalDeleted} rows deleted, ` +
           `${snapshots.deleted} snapshots evicted, ` +

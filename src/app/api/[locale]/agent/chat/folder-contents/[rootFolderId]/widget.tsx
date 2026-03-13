@@ -75,7 +75,10 @@ import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetContext,
+  useWidgetForm,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTouchDevice } from "@/hooks/use-touch-device";
@@ -1311,11 +1314,12 @@ export function FolderContentsWidget({
     [foldersEndpoint.read?.response, activeRootFolderId],
   );
 
-  const currentSubFolderId = useChatNavigationStore(
-    (s) => s.currentSubFolderId,
-  );
+  // Use the widget's own subFolderId request param (not the global nav store),
+  // so child instances rendered inside a folder correctly see themselves as non-root.
+  const form = useWidgetForm<typeof definitions.GET>();
+  const widgetSubFolderId = form.watch("subFolderId");
   const isPublicRootLevel =
-    activeRootFolderId === DefaultFolderId.PUBLIC && !currentSubFolderId;
+    activeRootFolderId === DefaultFolderId.PUBLIC && !widgetSubFolderId;
 
   const grouped = useMemo(() => {
     const rawItems: FolderContentsItem[] = fieldItems ?? [];

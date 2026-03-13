@@ -50,6 +50,7 @@ export const translations = {
       promote: "Promote",
       signal: "Signal",
       noData: "No data in this range",
+      loadingEarlierData: "Loading earlier data\u2026",
     },
     success: {
       title: "Graph loaded",

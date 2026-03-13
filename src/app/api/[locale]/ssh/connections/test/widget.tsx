@@ -13,7 +13,6 @@ interface WidgetProps {
   field: {
     value: ConnectionTestResponseOutput | null | undefined;
   } & (typeof endpoints.POST)["fields"];
-  fieldName: string;
 }
 
 export function ConnectionTestContainer({

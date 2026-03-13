@@ -18,7 +18,6 @@ import { allGraphSeeds } from "@/app/api/[locale]/system/generated/graph-seeds-i
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { pipelineDatapoints, pipelineGraphs } from "./db";
-import { initializeRegistry } from "./indicators/registry";
 import { runGraph } from "./engine/runner";
 
 /**
@@ -123,8 +122,6 @@ async function backfillGraphHistory(logger: EndpointLogger): Promise<void> {
     logger.debug("[vibe-sense] No active system graphs to backfill");
     return;
   }
-
-  await initializeRegistry();
 
   const BACKFILL_DAYS = 365;
   const CHUNK_DAYS = 7; // Run in weekly chunks to avoid huge single queries

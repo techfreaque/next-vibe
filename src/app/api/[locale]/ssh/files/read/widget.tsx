@@ -25,7 +25,6 @@ interface WidgetProps {
   field: {
     value: FilesReadResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {

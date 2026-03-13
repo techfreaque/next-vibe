@@ -17,9 +17,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as sendScopedTranslation } from "../../emails/send/i18n";
-import { smsServiceRepository } from "../../emails/sms-service/repository";
-import { CampaignType } from "../../emails/smtp-client/enum";
+import { scopedTranslation as sendScopedTranslation } from "../../messenger/send/i18n";
+import { smsServiceRepository } from "../../messenger/sms-service/repository";
+import { CampaignType } from "../../messenger/accounts/enum";
 import { smsEnv } from "../../sms/env";
 import { scopedTranslation } from "../i18n";
 import type { SubscribePostRequestOutput as NewsletterSubscriptionType } from "./definition";

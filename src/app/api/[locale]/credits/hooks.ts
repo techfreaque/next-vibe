@@ -187,6 +187,7 @@ export function useCreditHistory(
     historyDefinitions,
     {
       read: {
+        initialState: { targetUserId: undefined, targetLeadId: undefined },
         queryOptions: {
           enabled: true,
           refetchOnWindowFocus: false,

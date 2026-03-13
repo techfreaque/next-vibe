@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "message-circle",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMessages",
   tags: ["tags.messages" as const],
 
   // WebSocket events for real-time message streaming.
@@ -441,7 +441,7 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "message-circle",
-  category: "app.endpointCategories.chat",
+  category: "app.endpointCategories.chatMessages",
   tags: ["tags.messages" as const],
 
   errorTypes: {

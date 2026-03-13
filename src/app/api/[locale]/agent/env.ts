@@ -12,69 +12,60 @@ import { z } from "zod";
 
 import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 
-// In LOCAL_MODE all AI keys are optional - the app starts without them
-// and shows setup instructions instead of errors when features are used.
-const isLocalMode = process.env.NEXT_PUBLIC_LOCAL_MODE !== "false";
-
-const requiredOrOptionalString = (
-  required: boolean,
-): z.ZodString | z.ZodDefault<z.ZodOptional<z.ZodString>> =>
-  required ? z.string().min(1) : z.string().optional().default("");
-
 // Base fields shared by both storage types
 const baseFields = {
   OPENROUTER_API_KEY: {
-    schema: requiredOrOptionalString(!isLocalMode),
+    schema: z.string().optional(),
     example: "sk-or-v1-...",
     comment: "OpenRouter API key - get yours at https://openrouter.ai/keys",
     commented: true,
   },
   UNCENSORED_AI_API_KEY: {
-    schema: z.string().optional().default(""),
+    schema: z.string().optional(),
     example: "your-uncensored-ai-key",
     comment: "Uncensored AI API key",
     commented: true,
   },
   FREEDOMGPT_API_KEY: {
-    schema: z.string().optional().default(""),
+    schema: z.string().optional(),
     example: "your-freedomgpt-key",
     comment: "FreedomGPT API key",
     commented: true,
   },
   GAB_AI_API_KEY: {
-    schema: z.string().optional().default(""),
+    schema: z.string().optional(),
     example: "your-gab-ai-key",
     comment: "Gab AI API key",
     commented: true,
   },
   VENICE_AI_API_KEY: {
-    schema: z.string().optional().default(""),
+    schema: z.string().optional(),
     example: "your-venice-ai-key",
     comment: "Venice AI API key - get yours at https://venice.ai",
     commented: true,
   },
   EDEN_AI_API_KEY: {
-    schema: requiredOrOptionalString(!isLocalMode),
+    schema: z.string().optional(),
     example: "your-eden-ai-key",
     comment:
       "Eden AI API key (voice/TTS) - get yours at https://app.edenai.run/user/settings#api",
     commented: true,
   },
   BRAVE_SEARCH_API_KEY: {
-    schema: z.string().optional().default(""),
+    schema: z.string().optional(),
     example: "your-brave-search-key",
     comment:
       "Brave Search API key - get yours at https://api.search.brave.com/app/keys",
     commented: true,
   },
   KAGI_API_KEY: {
-    schema: z.string().optional().default(""),
+    schema: z.string().optional(),
     example: "your-kagi-api-key",
     comment: "Kagi API key - get yours at https://kagi.com/settings?p=api",
     commented: true,
   },
   SCRAPPEY_API_KEY: {
-    schema: z.string().optional().default(""),
+    schema: z.string().optional(),
     example: "your-scrappey-key",
     comment: "Scrappey API key",
     commented: true,

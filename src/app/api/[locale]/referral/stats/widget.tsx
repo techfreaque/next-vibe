@@ -23,7 +23,6 @@ interface CustomWidgetProps {
   field: {
     value: StatsGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

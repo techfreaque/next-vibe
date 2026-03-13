@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
   path: ["payment", "checkout"],
   title: "title" as const,
   description: "description" as const,
-  category: "app.endpointCategories.credits",
+  category: "app.endpointCategories.payments",
   icon: "credit-card" as const,
   tags: [
     "tags.subscription" as const,

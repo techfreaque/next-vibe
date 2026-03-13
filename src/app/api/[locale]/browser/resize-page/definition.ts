@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["browser", "resize-page"],
   title: "resize-page.title",
   description: "resize-page.description",
-  category: "app.endpointCategories.browserAutomation",
+  category: "app.endpointCategories.browser",
   icon: "maximize",
   tags: [
     "resize-page.tags.browserAutomation",

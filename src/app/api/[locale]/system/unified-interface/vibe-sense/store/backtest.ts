@@ -11,9 +11,12 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 
 import { pipelineBacktestResults, pipelineBacktestRuns } from "../db";
-import type { TimeRange, DataPoint } from "../indicators/types";
-import type { Resolution } from "../indicators/types";
-import type { SignalEvent } from "./signals";
+import type {
+  TimeRange,
+  DataPoint,
+  Resolution,
+  SignalEvent,
+} from "../shared/fields";
 
 // ─── Create Run ───────────────────────────────────────────────────────────────
 

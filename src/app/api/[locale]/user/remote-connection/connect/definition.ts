@@ -203,7 +203,7 @@ const { POST } = createEndpoint({
           data.logger,
           (prev) => {
             if (!prev?.success) {
-              return prev;
+              return undefined;
             }
             const newConn = {
               instanceId: data.requestData.instanceId,
@@ -220,6 +220,7 @@ const { POST } = createEndpoint({
             return {
               success: true,
               data: {
+                ...prev.data,
                 connections: exists
                   ? prev.data.connections.map((c) =>
                       c.instanceId === newConn.instanceId ? newConn : c,

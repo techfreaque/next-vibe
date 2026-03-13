@@ -51,8 +51,8 @@ const vibeSenseGraphRunnerTask = createCronTask(
   cleanupTools.POST,
   {
     id: "vibe-sense-graph-runner",
-    name: "cleanup.name",
-    description: "cleanup.description",
+    name: "graphRunner.name",
+    description: "graphRunner.description",
     schedule: CRON_SCHEDULES.EVERY_5_MINUTES,
     category: TaskCategory.MONITORING,
     enabled: true,

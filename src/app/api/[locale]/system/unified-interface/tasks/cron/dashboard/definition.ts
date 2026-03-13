@@ -23,6 +23,7 @@ import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
 import { cronTaskResponseSchema } from "../tasks/definition";
 import { CRON_DASHBOARD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+import { CronDashboardContainer } from "./widget";
 
 /* eslint-disable i18next/no-literal-string */
 
@@ -68,7 +69,7 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "clock",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemTasks",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -78,6 +79,7 @@ const { GET } = createEndpoint({
   tags: ["get.tags.tasks" as const, "get.tags.monitoring" as const],
 
   fields: customWidgetObject({
+    render: CronDashboardContainer,
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===

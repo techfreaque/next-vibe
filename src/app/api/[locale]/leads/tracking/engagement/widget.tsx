@@ -36,7 +36,6 @@ interface PostWidgetProps {
   field: {
     value: PostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 function MetadataRow({
@@ -293,7 +292,6 @@ interface GetWidgetProps {
   field: {
     value: GetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 export function LeadClickTrackingContainer({

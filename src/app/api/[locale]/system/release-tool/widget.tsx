@@ -24,7 +24,6 @@ interface CustomWidgetProps {
   field: {
     value: ReleaseResponseType | null | undefined;
   };
-  fieldName: string;
 }
 
 function formatDuration(ms: number): string {

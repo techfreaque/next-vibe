@@ -26,7 +26,6 @@ interface CustomWidgetProps {
   field: {
     value: SubscriptionUpdatePutResponseOutput | null | undefined;
   } & (typeof definition.PUT)["fields"];
-  fieldName: string;
 }
 
 /**

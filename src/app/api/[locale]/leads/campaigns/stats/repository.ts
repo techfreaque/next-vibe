@@ -14,7 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { EmailStatus } from "@/app/api/[locale]/emails/messages/enum";
+import { MessageStatus } from "@/app/api/[locale]/messenger/messages/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -50,12 +50,12 @@ export class CampaignStatsRepository {
       const [overall] = await db
         .select({
           total: count(),
-          pending: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.PENDING} then 1 end)`,
-          sent: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.SENT} then 1 end)`,
-          delivered: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.DELIVERED} then 1 end)`,
-          opened: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.OPENED} then 1 end)`,
-          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.CLICKED} then 1 end)`,
-          failed: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.FAILED} then 1 end)`,
+          pending: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.PENDING} then 1 end)`,
+          sent: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.SENT} then 1 end)`,
+          delivered: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.DELIVERED} then 1 end)`,
+          opened: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.OPENED} then 1 end)`,
+          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.CLICKED} then 1 end)`,
+          failed: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.FAILED} then 1 end)`,
         })
         .from(emailCampaigns)
         .where(variantFilter);
@@ -96,10 +96,10 @@ export class CampaignStatsRepository {
         .select({
           stage: emailCampaigns.stage,
           total: count(),
-          sent: sql<number>`count(case when ${emailCampaigns.status} in (${EmailStatus.SENT}, ${EmailStatus.DELIVERED}, ${EmailStatus.OPENED}, ${EmailStatus.CLICKED}) then 1 end)`,
-          opened: sql<number>`count(case when ${emailCampaigns.status} in (${EmailStatus.OPENED}, ${EmailStatus.CLICKED}) then 1 end)`,
-          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.CLICKED} then 1 end)`,
-          failed: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.FAILED} then 1 end)`,
+          sent: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.SENT}, ${MessageStatus.DELIVERED}, ${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
+          opened: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
+          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.CLICKED} then 1 end)`,
+          failed: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.FAILED} then 1 end)`,
         })
         .from(emailCampaigns)
         .where(variantFilter)
@@ -119,9 +119,9 @@ export class CampaignStatsRepository {
         .select({
           variant: emailCampaigns.journeyVariant,
           total: count(),
-          sent: sql<number>`count(case when ${emailCampaigns.status} in (${EmailStatus.SENT}, ${EmailStatus.DELIVERED}, ${EmailStatus.OPENED}, ${EmailStatus.CLICKED}) then 1 end)`,
-          opened: sql<number>`count(case when ${emailCampaigns.status} in (${EmailStatus.OPENED}, ${EmailStatus.CLICKED}) then 1 end)`,
-          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${EmailStatus.CLICKED} then 1 end)`,
+          sent: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.SENT}, ${MessageStatus.DELIVERED}, ${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
+          opened: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
+          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.CLICKED} then 1 end)`,
         })
         .from(emailCampaigns)
         .where(variantFilter)

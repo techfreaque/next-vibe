@@ -26,7 +26,6 @@ import { scopedTranslation } from "./i18n";
 
 interface RegisterWidgetProps {
   field: (typeof definitions.POST)["fields"];
-  fieldName: string;
 }
 
 export function RemoteRegisterWidget({

@@ -30,7 +30,6 @@ interface BounceProcessorWidgetProps {
   field: {
     value: PostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function BounceProcessorWidget({

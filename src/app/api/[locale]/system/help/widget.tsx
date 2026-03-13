@@ -68,7 +68,6 @@ interface CustomWidgetProps {
   field: {
     value: HelpGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 // ─── Label helpers ──────────────────────────────────────────────────────────

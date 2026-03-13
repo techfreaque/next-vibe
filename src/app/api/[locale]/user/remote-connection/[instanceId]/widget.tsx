@@ -44,7 +44,6 @@ interface RemoteConnectionByIdWidgetProps {
     urlPathParams?: { instanceId?: string };
     children: (typeof definitions.GET)["fields"]["children"];
   };
-  fieldName: string;
 }
 
 export function RemoteConnectionByIdWidget({

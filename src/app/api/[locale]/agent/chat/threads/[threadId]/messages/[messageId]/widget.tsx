@@ -8,7 +8,6 @@ import { useEffect } from "react";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useWidgetForm,
-  useWidgetIsSubmitting,
   useWidgetPlatform,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -30,10 +29,8 @@ export function DeleteMessageWidget({
   const platform = useWidgetPlatform();
   const t = useWidgetTranslation<typeof definitions.DELETE>();
   const form = useWidgetForm();
-  const isSubmitting = useWidgetIsSubmitting();
   const children = field.children;
   const isWeb = platform === Platform.NEXT_PAGE;
-  const isSubmitted = form?.formState.isSubmitSuccessful;
 
   useEffect(() => {
     if (!isWeb || !form) {
@@ -49,16 +46,14 @@ export function DeleteMessageWidget({
       <FormAlertWidget field={{}} />
 
       {isWeb ? (
-        !isSubmitting && !isSubmitted ? (
-          <Div className="flex flex-col gap-1">
-            <Span className="text-base font-semibold text-foreground">
-              {t("delete.confirmTitle")}
-            </Span>
-            <Span className="text-sm text-muted-foreground">
-              {t("delete.confirmText")}
-            </Span>
-          </Div>
-        ) : null
+        <Div className="flex flex-col gap-1">
+          <Span className="text-base font-semibold text-foreground">
+            {t("delete.confirmTitle")}
+          </Span>
+          <Span className="text-sm text-muted-foreground">
+            {t("delete.confirmText")}
+          </Span>
+        </Div>
       ) : (
         <>
           <TextFieldWidget fieldName="threadId" field={children.threadId} />

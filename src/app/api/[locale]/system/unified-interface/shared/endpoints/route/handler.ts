@@ -12,8 +12,8 @@ import type { z } from "zod";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
-import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type { EmailHandleRequestOutput } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
+import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import {
   ErrorResponseTypes,
@@ -513,7 +513,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     if (email?.afterHandlerEmails) {
       const { emailHandlingRepository } =
-        await import("@/app/api/[locale]/emails/smtp-client/email-handling/repository");
+        await import("@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/repository");
       await emailHandlingRepository.handleEmails<
         T["types"]["RequestOutput"],
         T["types"]["ResponseOutput"],

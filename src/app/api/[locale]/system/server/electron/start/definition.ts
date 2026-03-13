@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   aliases: [ELECTRON_ALIAS, ELECTRON_START_ALIAS, ELECTRON_START_DEV_ALIAS],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tags.electronStart"],
   icon: "monitor",
   allowedRoles: [

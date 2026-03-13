@@ -73,6 +73,8 @@ import type { TextFieldWidgetConfig } from "../../unified-ui/widgets/form-fields
 import type { TextareaFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/textarea-field/types";
 import type { TimeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-field/types";
 import type { TimeRangeFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-range-field/types";
+import type { SignalsFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/signals-field/types";
+import type { TimeSeriesFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/time-series-field/types";
 import type { TimezoneFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/timezone-field/types";
 import type { UrlFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/url-field/types";
 import type { UuidFieldWidgetConfig } from "../../unified-ui/widgets/form-fields/uuid-field/types";
@@ -264,6 +266,18 @@ export type FormFieldWidgetConfig<
       TUsage
     >
   | TextArrayFieldWidgetConfig<
+      TKey,
+      // @ts-expect-error - TSchema constraint mismatch
+      TSchema,
+      TUsage
+    >
+  | TimeSeriesFieldWidgetConfig<
+      TKey,
+      // @ts-expect-error - TSchema constraint mismatch
+      TSchema,
+      TUsage
+    >
+  | SignalsFieldWidgetConfig<
       TKey,
       // @ts-expect-error - TSchema constraint mismatch
       TSchema,

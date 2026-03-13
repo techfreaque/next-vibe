@@ -21,8 +21,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
-import { scopedTranslation as smtpScopedTranslation } from "../../../emails/smtp-client/i18n";
-import { SmtpRepository } from "../../../emails/smtp-client/repository";
+import { scopedTranslation as smtpScopedTranslation } from "../../../messenger/providers/email/smtp-client/i18n";
+import { SmtpRepository } from "../../../messenger/providers/email/smtp-client/repository";
 import { leads } from "../../db";
 import {
   EmailCampaignStage,
@@ -427,8 +427,7 @@ export class CampaignStarterRepository {
   }
 
   static async run(
-    // oxlint-disable-next-line no-unused-vars
-    _data: CampaignStarterPostRequestOutput,
+    data: CampaignStarterPostRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<CampaignStarterPostResponseOutput>> {
@@ -454,7 +453,8 @@ export class CampaignStarterRepository {
       });
     }
 
-    const config = configResult.data;
+    // Allow request dryRun to override config dryRun
+    const config = { ...configResult.data, dryRun: data.dryRun };
 
     if (!config.enabled) {
       logger.debug("Campaign starter is disabled in configuration");
@@ -468,28 +468,40 @@ export class CampaignStarterRepository {
 
     const startTime = Date.now();
     const now = new Date();
-    const currentDay = now.getUTCDay() || 7;
-    const currentHour = now.getUTCHours();
 
-    if (!config.enabledDays.includes(currentDay)) {
-      return success({
-        leadsProcessed: 0,
-        leadsStarted: 0,
-        leadsSkipped: 0,
-        executionTimeMs: Date.now() - startTime,
-      });
-    }
+    // Skip day/hour checks when force=true (manual UI trigger)
+    if (!data.force) {
+      const currentDay = now.getUTCDay() || 7;
+      const currentHour = now.getUTCHours();
 
-    if (
-      currentHour < config.enabledHours.start ||
-      currentHour > config.enabledHours.end
-    ) {
-      return success({
-        leadsProcessed: 0,
-        leadsStarted: 0,
-        leadsSkipped: 0,
-        executionTimeMs: Date.now() - startTime,
-      });
+      if (!config.enabledDays.includes(currentDay)) {
+        logger.debug("Campaign starter skipped: not an enabled day", {
+          currentDay,
+          enabledDays: config.enabledDays,
+        });
+        return success({
+          leadsProcessed: 0,
+          leadsStarted: 0,
+          leadsSkipped: 0,
+          executionTimeMs: Date.now() - startTime,
+        });
+      }
+
+      if (
+        currentHour < config.enabledHours.start ||
+        currentHour > config.enabledHours.end
+      ) {
+        logger.debug("Campaign starter skipped: outside enabled hours", {
+          currentHour,
+          enabledHours: config.enabledHours,
+        });
+        return success({
+          leadsProcessed: 0,
+          leadsStarted: 0,
+          leadsSkipped: 0,
+          executionTimeMs: Date.now() - startTime,
+        });
+      }
     }
 
     const result: CampaignStarterResultType = {

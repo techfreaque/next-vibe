@@ -73,7 +73,7 @@ const { POST } = createEndpoint({
   path: ["system", "builder"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["tags.build", "tags.npm", "tags.vite"],
   icon: "package",
   allowedRoles: [

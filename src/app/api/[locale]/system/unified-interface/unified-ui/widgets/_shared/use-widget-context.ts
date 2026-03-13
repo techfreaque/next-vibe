@@ -12,7 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { UseNavigationStackReturn } from "../../../react/hooks/use-navigation-stack";
+import { type UseNavigationStackReturn } from "../../../react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { ReactWidgetContext } from "./react-types";
 import type { BaseWidgetContext } from "./types";

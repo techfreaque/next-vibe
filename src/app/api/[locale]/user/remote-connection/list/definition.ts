@@ -50,6 +50,10 @@ export const { GET } = createEndpoint({
           }),
         ),
       }),
+      syncEnabled: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.boolean().nullable(),
+      }),
     },
   }),
 
@@ -109,6 +113,7 @@ export const { GET } = createEndpoint({
             hasToken: true,
           },
         ],
+        syncEnabled: false,
       },
     },
   },

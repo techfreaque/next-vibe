@@ -24,7 +24,6 @@ interface WidgetProps {
   field: {
     value: ConnectionsListResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 export function ConnectionsListContainer({

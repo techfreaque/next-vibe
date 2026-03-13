@@ -5,7 +5,8 @@
  * Deduplicates shared indicator nodes across multiple graphs.
  */
 
-import type { GraphConfig, GraphNodeConfig } from "../graph/types";
+import type { GraphConfig } from "../graph/types";
+import type { GraphNodeConfig } from "../graph/schema";
 
 // ─── Topological Sort ─────────────────────────────────────────────────────────
 
@@ -96,28 +97,25 @@ export function getNodeOutputIds(
 // ─── Deduplication Across Graphs ──────────────────────────────────────────────
 
 export interface SharedNodeKey {
-  indicatorId: string;
+  endpointPath: string;
   graphId: string;
 }
 
 /**
- * Given multiple graph configs, returns a deduplicated set of indicator node IDs.
- * Indicator nodes with the same indicatorId can share computed results.
+ * Given multiple graph configs, returns a deduplicated set of endpoint node paths.
+ * Nodes with the same endpointPath can share computed results across graphs.
  */
-export function collectSharedIndicatorIds(
+export function collectSharedEndpointPaths(
   graphs: Array<{ graphId: string; config: GraphConfig }>,
 ): Map<string, SharedNodeKey[]> {
   const shared = new Map<string, SharedNodeKey[]>();
 
   for (const { graphId, config } of graphs) {
     for (const node of Object.values(config.nodes)) {
-      if (node.type !== "indicator") {
-        continue;
-      }
-      const indicatorId = node.indicatorId;
-      const existing = shared.get(indicatorId) ?? [];
-      existing.push({ indicatorId, graphId });
-      shared.set(indicatorId, existing);
+      const endpointPath = node.endpointPath;
+      const existing = shared.get(endpointPath) ?? [];
+      existing.push({ endpointPath, graphId });
+      shared.set(endpointPath, existing);
     }
   }
 
@@ -139,4 +137,51 @@ export function getNodeConfig(
   config: GraphConfig,
 ): GraphNodeConfig | undefined {
   return config.nodes[nodeId];
+}
+
+// ─── Cron Pruning ─────────────────────────────────────────────────────────────
+
+/**
+ * Returns the set of node IDs that have a path to at least one sink node
+ * (evaluator or endpoint type). Used by the runner to skip chart-only nodes
+ * during scheduled cron runs — those nodes are computed on-demand when charting.
+ *
+ * A node is "sink-reachable" if it IS a sink OR any of its descendants is a sink.
+ * Nodes that are NOT sink-reachable are pure chart nodes — no action depends on them.
+ */
+export function getSinkReachableNodeIds(config: GraphConfig): Set<string> {
+  // Build reverse adjacency: child → parents (who feeds into child)
+  const reverseAdj = new Map<string, string[]>();
+  for (const nodeId of Object.keys(config.nodes)) {
+    reverseAdj.set(nodeId, []);
+  }
+  for (const edge of config.edges) {
+    if (reverseAdj.has(edge.to)) {
+      reverseAdj.get(edge.to)!.push(edge.from);
+    }
+  }
+
+  // Find all sink nodes (evaluators produce signals; identified by path containing "evaluator")
+  const reachable = new Set<string>();
+  const queue: string[] = [];
+
+  for (const [nodeId, nodeConfig] of Object.entries(config.nodes)) {
+    if (nodeConfig.endpointPath.includes("evaluator")) {
+      queue.push(nodeId);
+      reachable.add(nodeId);
+    }
+  }
+
+  // BFS backwards through the graph — mark all ancestors of sinks
+  while (queue.length > 0) {
+    const nodeId = queue.shift()!;
+    for (const parentId of reverseAdj.get(nodeId) ?? []) {
+      if (!reachable.has(parentId)) {
+        reachable.add(parentId);
+        queue.push(parentId);
+      }
+    }
+  }
+
+  return reachable;
 }

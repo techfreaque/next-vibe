@@ -5,6 +5,10 @@ export const translations = {
     name: "Vibe Sense Cleanup",
     description: "Prunes old datapoints and expires snapshot cache",
   },
+  graphRunner: {
+    name: "Vibe Sense Graph Runner",
+    description: "Executes all cron-triggered pipeline graphs that are due",
+  },
   post: {
     title: "Vibe Sense Cleanup",
     description: "Run retention cleanup for datapoints and expire snapshots",

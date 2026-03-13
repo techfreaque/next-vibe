@@ -62,7 +62,6 @@ interface CustomWidgetProps {
   field: {
     value: UserViewResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 type TabId = "overview" | "credits" | "referrals" | "earnings";

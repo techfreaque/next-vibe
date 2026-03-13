@@ -5,6 +5,7 @@
  * Mirrors React widget architecture for consistency.
  */
 
+import type { MutableRefObject } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import type z from "zod";
 
@@ -48,6 +49,13 @@ export type InkWidgetContext<TEndpoint extends CreateApiEndpointAny> =
     focusedField?: string;
     /** Move focus to the next/previous field */
     moveFocus?: (direction: "next" | "prev") => void;
+    /**
+     * Async hook called before submit. If set, the renderer awaits this
+     * before calling onSubmit. Widget.cli.tsx uses this to e.g. do a
+     * remote login and inject a token before validation runs.
+     * Return false to abort the submit.
+     */
+    preSubmitRef?: MutableRefObject<(() => Promise<boolean>) | undefined>;
   };
 
 /**

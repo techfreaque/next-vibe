@@ -138,7 +138,11 @@ export class BraveSearchRepository {
         freshness: options.freshness,
       };
 
-      const results = await this.fetchResults(query, config);
+      const results = await this.fetchResults(
+        query,
+        config,
+        agentEnv.BRAVE_SEARCH_API_KEY,
+      );
 
       return success({
         results,
@@ -172,6 +176,7 @@ export class BraveSearchRepository {
   private static async fetchResults(
     query: string,
     config: SearchConfig,
+    apiKey: string,
   ): Promise<SearchResult[]> {
     const params = new URLSearchParams({
       q: query,
@@ -197,7 +202,7 @@ export class BraveSearchRepository {
         headers: {
           Accept: "application/json",
           "Accept-Encoding": "gzip",
-          "X-Subscription-Token": agentEnv.BRAVE_SEARCH_API_KEY,
+          "X-Subscription-Token": apiKey,
         },
         signal: controller.signal,
       });

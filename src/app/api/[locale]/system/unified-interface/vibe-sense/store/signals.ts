@@ -12,15 +12,9 @@ import { and, between, eq, lt, sql } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 
 import { pipelineSignals } from "../db";
-import type { TimeRange } from "../indicators/types";
+import type { SignalEvent, TimeRange } from "../shared/fields";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface SignalEvent {
-  timestamp: Date;
-  fired: boolean;
-  meta?: Record<string, string | number | boolean | null>;
-}
+export type { SignalEvent };
 
 // ─── Write ────────────────────────────────────────────────────────────────────
 

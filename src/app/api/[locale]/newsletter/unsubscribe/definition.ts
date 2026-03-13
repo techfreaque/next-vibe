@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   path: ["newsletter", "unsubscribe"],
   title: "post.title",
   description: "post.description",
-  category: "app.endpointCategories.newsletter",
+  category: "app.endpointCategories.leadsCampaigns",
   icon: "bell-off",
   tags: ["tags.newsletter" as const],
   allowedRoles: [

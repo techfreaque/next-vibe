@@ -68,7 +68,6 @@ interface CustomWidgetProps {
   field: {
     value: CreditsPurchasePostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 /**

@@ -38,7 +38,6 @@ interface CustomWidgetProps {
   field: {
     value: SubscriptionGetResponseOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 /**

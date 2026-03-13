@@ -18,7 +18,6 @@ interface CustomWidgetProps {
   field: {
     value: TypecheckResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function CheckResultWidget({

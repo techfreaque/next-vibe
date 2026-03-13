@@ -24,8 +24,8 @@ import type { z } from "zod";
 
 import { users } from "@/app/api/[locale]/user/db";
 import type { GraphConfig } from "./graph/types";
-import type { DataPoint } from "./indicators/types";
-import { ResolutionValues } from "./indicators/types";
+import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { ResolutionValues } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 

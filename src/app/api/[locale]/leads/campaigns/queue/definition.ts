@@ -25,7 +25,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   CampaignTypeFilterDB,
   CampaignTypeFilterOptions,
-} from "../../../emails/smtp-client/enum";
+} from "../../../messenger/accounts/enum";
 import { scopedTranslation } from "./i18n";
 import { CampaignQueueWidget } from "./widget";
 
@@ -35,7 +35,7 @@ const { GET } = createEndpoint({
   path: ["leads", "campaigns", "queue"],
   title: "get.title",
   description: "get.description",
-  category: "app.endpointCategories.leads",
+  category: "app.endpointCategories.leadsCampaigns",
   icon: "list",
   tags: ["title"],
   allowedRoles: [UserRole.ADMIN],

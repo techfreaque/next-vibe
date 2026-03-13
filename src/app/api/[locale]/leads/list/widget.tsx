@@ -69,7 +69,6 @@ interface CustomWidgetProps {
   field: {
     value: LeadListGetResponseTypeOutput | null | undefined;
   } & (typeof definition.GET)["fields"];
-  fieldName: string;
 }
 
 const STATUS_COLORS: Record<string, string> = {

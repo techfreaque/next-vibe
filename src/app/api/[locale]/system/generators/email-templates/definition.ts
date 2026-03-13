@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "generators", "email-templates"],
   title: "post.title" as const,
   description: "post.description" as const,
-  category: "app.endpointCategories.system",
+  category: "app.endpointCategories.systemDevTools",
   tags: ["post.title" as const],
   icon: "mail",
   allowedRoles: [
@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z
           .string()
-          .default("src/app/api/[locale]/emails/registry/generated.ts"),
+          .default("src/app/api/[locale]/messenger/registry/generated.ts"),
       }),
 
       dryRun: requestField(scopedTranslation, {

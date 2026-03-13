@@ -10,7 +10,7 @@ import type {
   SuccessResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import type { EmailTemplateReturnType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type { EmailTemplateReturnType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {

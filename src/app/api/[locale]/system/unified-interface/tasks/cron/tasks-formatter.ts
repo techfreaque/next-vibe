@@ -10,6 +10,7 @@ import { CronTaskStatus } from "../enum";
 import { CRON_DELETE_ALIAS, CRON_UPDATE_ALIAS } from "./[id]/constants";
 import { CRON_DASHBOARD_ALIAS } from "./dashboard/constants";
 import { CRON_HISTORY_ALIAS } from "./history/constants";
+import { CRON_QUEUE_ALIAS } from "./queue/constants";
 import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./tasks/constants";
 
 export interface RecentExecution {
@@ -233,7 +234,7 @@ export function formatTasksSummary(tasks: TaskSummaryItem[]): string {
   const recentBlock = formatRecentActivity(sorted);
 
   const header = `## Scheduled Tasks (${tasks.length})`;
-  const footer = `\nTools: \`${CRON_DASHBOARD_ALIAS}\` (overview) · \`${CRON_LIST_ALIAS}\` (list) · \`${CRON_CREATE_ALIAS}\` (create) · \`${CRON_UPDATE_ALIAS}\` (edit/disable) · \`${CRON_DELETE_ALIAS}\` (delete) · \`${CRON_HISTORY_ALIAS}\` (history)\n\n**Self-management:** After completing the user's request, review these tasks. Fix errors, disable/delete stale ones, and briefly mention what you changed.`;
+  const footer = `\nTools: \`${CRON_DASHBOARD_ALIAS}\` (overview) · \`${CRON_LIST_ALIAS}\` (list) · \`${CRON_QUEUE_ALIAS}\` (queue/next runs) · \`${CRON_CREATE_ALIAS}\` (create) · \`${CRON_UPDATE_ALIAS}\` (edit/disable) · \`${CRON_DELETE_ALIAS}\` (delete) · \`${CRON_HISTORY_ALIAS}\` (history)\n\n**Self-management:** After completing the user's request, review these tasks. Fix errors, disable/delete stale ones, and briefly mention what you changed.`;
 
   // Reserve space for all sections
   const reserved =

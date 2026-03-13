@@ -15,6 +15,7 @@ import React from "react";
 
 import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
@@ -29,7 +30,6 @@ interface CampaignStarterWidgetProps {
   field: {
     value: PostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
-  fieldName: string;
 }
 
 export function CampaignStarterWidget({
@@ -38,8 +38,14 @@ export function CampaignStarterWidget({
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const form = useWidgetForm<typeof definition.POST>();
   const isSubmitting = endpointMutations?.create?.isSubmitting;
   const response = field.value;
+
+  // Always force=true from UI so manual runs bypass the day/hour schedule
+  React.useEffect(() => {
+    form?.setValue("force", true);
+  }, [form]);
 
   return (
     <Div className="flex flex-col gap-3 p-4 border-green-200 dark:border-green-800">

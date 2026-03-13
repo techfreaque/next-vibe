@@ -1,5 +1,3 @@
-import { journeysTranslations } from "./journeys";
-
 export const translations = {
   emailJourneys: {
     components: {
@@ -75,9 +73,6 @@ export const translations = {
             "Re-activation campaign targeting users who have gone quiet or cancelled",
         },
       },
-    },
-    leads: {
-      journeys: journeysTranslations,
     },
   },
 };

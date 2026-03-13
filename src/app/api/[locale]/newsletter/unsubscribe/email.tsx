@@ -14,17 +14,17 @@ import React from "react";
 import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
-import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
+import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
+import { EmailTemplate } from "../../messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
-} from "../../emails/smtp-client/components/tracking_context.email";
+} from "../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import type {
   UnsubscribePostRequestOutput as NewsletterUnsubscribeType,
   UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,

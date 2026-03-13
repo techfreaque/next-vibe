@@ -264,11 +264,12 @@ const { PATCH } = createEndpoint({
           data.logger,
           (prev) => {
             if (!prev?.success) {
-              return prev;
+              return undefined;
             }
             return {
               success: true,
               data: {
+                ...prev.data,
                 connections: prev.data.connections.map((c) =>
                   c.instanceId === data.pathParams.instanceId
                     ? { ...c, friendlyName: data.requestData.friendlyName }
@@ -284,7 +285,7 @@ const { PATCH } = createEndpoint({
           data.logger,
           (prev) => {
             if (!prev?.success) {
-              return prev;
+              return undefined;
             }
             return {
               success: true,
@@ -413,11 +414,12 @@ const { DELETE } = createEndpoint({
           data.logger,
           (prev) => {
             if (!prev?.success) {
-              return prev;
+              return undefined;
             }
             return {
               success: true,
               data: {
+                ...prev.data,
                 connections: prev.data.connections.filter(
                   (c) => c.instanceId !== data.pathParams.instanceId,
                 ),
@@ -431,7 +433,7 @@ const { DELETE } = createEndpoint({
           data.logger,
           (prev) => {
             if (!prev?.success) {
-              return prev;
+              return undefined;
             }
             return {
               success: true,

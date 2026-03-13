@@ -25,20 +25,26 @@ import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { SiGithub } from "next-vibe-ui/ui/icons/SiGithub";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { WifiOff } from "next-vibe-ui/ui/icons/WifiOff";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
+import { Switch } from "next-vibe-ui/ui/switch";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
 import {
+  useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { envClient } from "@/config/env-client";
 
 import type endpoints from "./definition";
@@ -48,7 +54,6 @@ interface WidgetProps {
   field: {
     value: RemoteConnectionsListResponseOutput | null | undefined;
   } & (typeof endpoints.GET)["fields"];
-  fieldName: string;
 }
 
 type Connection = RemoteConnectionsListResponseOutput["connections"][number];
@@ -398,14 +403,97 @@ function CloudView({
   );
 }
 
+// ─── Sync settings card (admin only, local only) ──────────────────────────────
+
+function SyncSettingsCard({
+  syncEnabled,
+  t,
+}: {
+  syncEnabled: boolean;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+}): JSX.Element {
+  const [isToggling, setIsToggling] = useState(false);
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+
+  const handleToggle = async (): Promise<void> => {
+    setIsToggling(true);
+    try {
+      const defs =
+        await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/settings/definition");
+      const listDef = await import("./definition");
+      const newValue = !syncEnabled;
+      await apiClient.mutate(
+        defs.default.PATCH,
+        logger,
+        user,
+        { syncEnabled: newValue },
+        undefined,
+        locale,
+      );
+      apiClient.updateEndpointData(listDef.GET, logger, (prev) => {
+        if (!prev?.success) {
+          return prev;
+        }
+        return { success: true, data: { ...prev.data, syncEnabled: newValue } };
+      });
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
+  return (
+    <Card className="rounded-none border-0 border-b shadow-none">
+      <CardHeader className="pb-3">
+        <Div className="flex items-center justify-between gap-3">
+          <Div className="flex flex-col gap-1">
+            <Div className="flex items-center gap-2">
+              {isToggling ? (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              ) : (
+                <RefreshCw
+                  className={`h-4 w-4 ${syncEnabled ? "text-primary" : "text-muted-foreground"}`}
+                />
+              )}
+              <CardTitle className="text-sm">
+                {t("widget.syncSettings.title")}
+              </CardTitle>
+              <Badge
+                variant={syncEnabled ? "default" : "outline"}
+                className="text-[10px]"
+              >
+                {syncEnabled
+                  ? t("widget.syncSettings.enabledBadge")
+                  : t("widget.syncSettings.disabledBadge")}
+              </Badge>
+            </Div>
+            <CardDescription className="text-xs">
+              {t("widget.syncSettings.description")}
+            </CardDescription>
+          </Div>
+          <Switch
+            checked={syncEnabled}
+            onCheckedChange={() => void handleToggle()}
+            disabled={isToggling}
+            aria-label={t("widget.syncSettings.toggleLabel")}
+          />
+        </Div>
+      </CardHeader>
+    </Card>
+  );
+}
+
 // ─── Local view: pitch + connection list ──────────────────────────────────────
 
 function LocalView({
   connections,
+  syncEnabled,
   navigate,
   t,
 }: {
   connections: Connection[];
+  syncEnabled: boolean | null;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): JSX.Element {
@@ -445,6 +533,11 @@ function LocalView({
           />
         </CardContent>
       </Card>
+
+      {/* Sync settings (admin only) */}
+      {syncEnabled !== null && (
+        <SyncSettingsCard syncEnabled={syncEnabled} t={t} />
+      )}
 
       {/* Connection list */}
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
@@ -492,11 +585,19 @@ export function RemoteConnectionsListContainer({
   const { push: navigate } = useWidgetNavigation();
 
   const connections = field.value?.connections ?? [];
+  const syncEnabled = field.value?.syncEnabled ?? null;
   const isCloud = envClient.NEXT_PUBLIC_VIBE_IS_CLOUD;
 
   if (isCloud) {
     return <CloudView connections={connections} navigate={navigate} t={t} />;
   }
 
-  return <LocalView connections={connections} navigate={navigate} t={t} />;
+  return (
+    <LocalView
+      connections={connections}
+      syncEnabled={syncEnabled}
+      navigate={navigate}
+      t={t}
+    />
+  );
 }
