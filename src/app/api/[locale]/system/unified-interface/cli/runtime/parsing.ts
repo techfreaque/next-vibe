@@ -811,5 +811,6 @@ export interface CliRequestData {
     | number[]
     | boolean[]
     | CliRequestData
-    | CliRequestData[];
+    | CliRequestData[]
+    | CliRequestData[][];
 }

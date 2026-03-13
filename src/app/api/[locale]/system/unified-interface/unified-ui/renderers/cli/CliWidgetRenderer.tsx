@@ -490,6 +490,10 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           const W = JsonFieldWidgetInk as AnyInkWidget;
           return <W fieldName={fieldName} field={field} />;
         }
+        case FieldDataType.SIGNALS: {
+          const W = JsonFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
         default:
           const _exhaustiveCheck: never = field;
           return _exhaustiveCheck;

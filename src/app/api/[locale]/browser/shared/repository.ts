@@ -84,7 +84,7 @@ export async function executeMCPTool<T>(
 ): Promise<ResponseType<T>> {
   try {
     // Prepare request data for main browser repository
-    const requestData: BrowserRequestOutput = {
+    const requestData: { tool: string; arguments?: string } = {
       tool: params.toolName as (typeof BrowserTool)[keyof typeof BrowserTool],
       arguments: JSON.stringify(params.args),
     };
@@ -115,7 +115,7 @@ export async function executeMCPTool<T>(
 // Type-Safe Wrapper Functions
 // ============================================================================
 
-export function executeClick<T = BrowserResponseOutput>(
+export function executeClick<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
@@ -123,7 +123,7 @@ export function executeClick<T = BrowserResponseOutput>(
   return executeMCPTool<T>(params, t, logger);
 }
 
-export function executeClosePage<T = BrowserResponseOutput>(
+export function executeClosePage<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
@@ -131,7 +131,7 @@ export function executeClosePage<T = BrowserResponseOutput>(
   return executeMCPTool<T>(params, t, logger);
 }
 
-export function executeDrag<T = BrowserResponseOutput>(
+export function executeDrag<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
@@ -139,7 +139,7 @@ export function executeDrag<T = BrowserResponseOutput>(
   return executeMCPTool<T>(params, t, logger);
 }
 
-export function executeFill<T = BrowserResponseOutput>(
+export function executeFill<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
@@ -179,7 +179,7 @@ export function executeGetConsoleMessage(
   return executeMCPTool(params, t, logger);
 }
 
-export function executeGetNetworkRequest<T = BrowserResponseOutput>(
+export function executeGetNetworkRequest<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
@@ -191,83 +191,83 @@ export function executeHandleDialog(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executeHover(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executeListConsoleMessages(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executeListNetworkRequests(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executeListPages(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executeNavigatePage(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executeNewPage(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executePerformanceAnalyzeInsight(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executePerformanceStartTrace(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
 export function executePerformanceStopTrace(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserResponseOutput>> {
-  return executeMCPTool<BrowserResponseOutput>(params, t, logger);
+): Promise<ResponseType<BrowserToolResponse>> {
+  return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
-export function executePressKey<T = BrowserResponseOutput>(
+export function executePressKey<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
@@ -275,7 +275,7 @@ export function executePressKey<T = BrowserResponseOutput>(
   return executeMCPTool<T>(params, t, logger);
 }
 
-export function executeResizePage<T = BrowserResponseOutput>(
+export function executeResizePage<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
@@ -283,7 +283,7 @@ export function executeResizePage<T = BrowserResponseOutput>(
   return executeMCPTool<T>(params, t, logger);
 }
 
-export function executeSelectPage<T = BrowserResponseOutput>(
+export function executeSelectPage<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,

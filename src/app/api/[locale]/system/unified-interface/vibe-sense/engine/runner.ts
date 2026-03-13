@@ -15,7 +15,10 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { GraphConfig } from "../graph/types";
+import type { GraphNodeConfig } from "../graph/schema";
 import type { DataPoint, Resolution, TimeRange } from "../shared/fields";
+import { RESOLUTION_MS } from "../shared/fields";
+import { GraphResolution } from "../enum";
 import { resolveExecutionOrder, getSinkReachableNodeIds } from "./walker";
 import { executeNode, type ExecutionContext } from "./executor";
 import type { SignalEvent } from "../store/signals";
@@ -24,11 +27,88 @@ import { completeRun, createRun } from "../store/runs";
 // ─── Lookback Pre-Pass ────────────────────────────────────────────────────────
 
 /**
- * Walk the graph and compute the extended fetch range for each source node.
- * Without registry, returns an empty Map (no lookback pre-pass).
+ * Infer the lookback periods a node needs from its params (period, size)
+ * or explicit lookback config.
  */
-function computeNodeRanges(): Map<string, TimeRange> {
-  return new Map();
+function inferLookback(node: GraphNodeConfig): number {
+  if (node.lookback && node.lookback > 0) {
+    return node.lookback;
+  }
+  const p = node.params;
+  if (!p) {
+    return 0;
+  }
+  // EMA uses "period", window-avg/min/max/sum uses "size"
+  const val = p["period"] ?? p["size"];
+  if (typeof val === "number" && val > 0) {
+    return val;
+  }
+  return 0;
+}
+
+/**
+ * Walk the graph backwards and compute extended fetch ranges for each node.
+ * Nodes that feed into indicators/transformers with lookback requirements
+ * get their range extended so upstream data includes warm-up periods.
+ */
+function computeNodeRanges(
+  config: GraphConfig,
+  requestedRange: TimeRange,
+  graphResolution?: Resolution,
+): Map<string, TimeRange> {
+  const result = new Map<string, TimeRange>();
+  const resolution = graphResolution ?? GraphResolution.ONE_DAY;
+  const periodMs = RESOLUTION_MS[resolution];
+
+  // Build reverse adjacency: child → parents
+  const reverseAdj = new Map<string, string[]>();
+  for (const nodeId of Object.keys(config.nodes)) {
+    reverseAdj.set(nodeId, []);
+  }
+  for (const edge of config.edges) {
+    reverseAdj.get(edge.to)?.push(edge.from);
+  }
+
+  // For each node with a lookback, propagate extended range to its ancestors
+  // Use max lookback when multiple paths converge
+  const extraPeriods = new Map<string, number>();
+
+  for (const [nodeId, nodeConfig] of Object.entries(config.nodes)) {
+    const lb = inferLookback(nodeConfig);
+    if (lb <= 0) {
+      continue;
+    }
+    // BFS backwards — extend all ancestors by this node's lookback
+    const queue = reverseAdj.get(nodeId) ?? [];
+    const visited = new Set<string>();
+    for (const parentId of queue) {
+      if (visited.has(parentId)) {
+        continue;
+      }
+      visited.add(parentId);
+      const current = extraPeriods.get(parentId) ?? 0;
+      extraPeriods.set(parentId, Math.max(current, lb));
+      // Also propagate further upstream
+      for (const grandparent of reverseAdj.get(parentId) ?? []) {
+        if (!visited.has(grandparent)) {
+          queue.push(grandparent);
+        }
+      }
+    }
+  }
+
+  // Convert extra periods into extended ranges
+  for (const [nodeId, periods] of extraPeriods) {
+    const nodeConfig = config.nodes[nodeId];
+    const nodeResolution = nodeConfig?.resolution ?? resolution;
+    const nodePeriodMs = RESOLUTION_MS[nodeResolution] ?? periodMs;
+    result.set(nodeId, {
+      from: new Date(requestedRange.from.getTime() - periods * nodePeriodMs),
+      to: requestedRange.to,
+    });
+  }
+
+  return result;
 }
 
 export interface GraphRunResult {
@@ -69,7 +149,8 @@ export async function runGraph(
   }
 
   // Pre-compute extended fetch ranges for source nodes based on downstream lookbacks
-  const nodeRanges = computeNodeRanges();
+  const graphResolution = options?.displayResolution ?? config.resolution;
+  const nodeRanges = computeNodeRanges(config, range, graphResolution);
 
   const ctx: ExecutionContext = {
     requestedRange: range,
@@ -80,7 +161,7 @@ export async function runGraph(
     resolvedSeries: new Map(),
     resolvedSignals: new Map(),
     nodeResolutions: new Map(),
-    graphResolution: options?.displayResolution ?? config.resolution,
+    graphResolution,
     logger,
     backtestRunId,
     readOnly,

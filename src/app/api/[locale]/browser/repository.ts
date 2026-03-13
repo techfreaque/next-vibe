@@ -21,7 +21,6 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { getChromeMCPConfig } from "./config";
-import type { BrowserRequestOutput, BrowserResponseOutput } from "./definition";
 import { BrowserTool, BrowserToolStatus } from "./enum";
 import type { BrowserT } from "./i18n";
 
@@ -58,21 +57,29 @@ const TOOL_NAME_MAP: Record<string, string> = {
 };
 
 /**
+ * MCP bridge response — the shape executeTool always returns
+ */
+export interface MCPBridgeResponse {
+  success: boolean;
+  result: Array<{
+    type: string;
+    text?: string;
+    data?: string;
+    mimeType?: string;
+  }>;
+  status: string[];
+  executionId: string;
+}
+
+/**
  * Browser repository interface
  */
 export interface BrowserRepository {
-  /**
-   * Execute a Chrome DevTools MCP tool
-   * @param data - Request data (tool and arguments)
-   * @param t - Translation function for i18n messages
-   * @param logger - Logger instance for debugging and monitoring
-   * @returns Tool execution result
-   */
   executeTool(
-    data: BrowserRequestOutput,
+    data: { tool: string; arguments?: string },
     t: BrowserT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BrowserResponseOutput> | ContentResponse>;
+  ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse>;
 }
 
 /**
@@ -120,10 +127,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
    * Execute a Chrome DevTools MCP tool
    */
   async executeTool(
-    data: BrowserRequestOutput,
+    data: { tool: string; arguments?: string },
     t: BrowserT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BrowserResponseOutput> | ContentResponse> {
+  ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse> {
     logger.info("[Browser Repository] Executing Chrome DevTools tool", {
       tool: data.tool,
       hasArguments: !!data.arguments,
