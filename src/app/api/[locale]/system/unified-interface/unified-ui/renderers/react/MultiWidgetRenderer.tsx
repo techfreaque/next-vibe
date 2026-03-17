@@ -20,7 +20,10 @@ import type {
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../widgets/_shared/types";
-import { useWidgetForm } from "../../widgets/_shared/use-widget-context";
+import {
+  useWidgetForm,
+  useWidgetUser,
+} from "../../widgets/_shared/use-widget-context";
 import {
   ChildrenDataRenderer,
   type ProcessedChildren,
@@ -169,6 +172,7 @@ export function ObjectChildrenRenderer<
   defaultColumns,
 }: ObjectChildrenRendererProps<TKey, TUsage, TChildren>): JSX.Element {
   const form = useWidgetForm();
+  const user = useWidgetUser();
 
   // Check if any child has a hidden function (request fields need form data)
   const hasRequestFields =
@@ -179,7 +183,7 @@ export function ObjectChildrenRenderer<
 
   // Watch entire form root to get all form data
   const formDataRoot = useWatch({
-    control: form?.control,
+    control: form.control,
     disabled: !form || !hasRequestFields,
   });
 
@@ -199,6 +203,7 @@ export function ObjectChildrenRenderer<
     const extracted = ChildrenDataRenderer.extractChildren(
       childrenSchema,
       mergedValue,
+      { userRoles: user.roles },
     );
     const sorted = ChildrenDataRenderer.sortChildren(extracted);
     const groupResult = ChildrenDataRenderer.groupInlineFields(sorted);
@@ -207,7 +212,7 @@ export function ObjectChildrenRenderer<
       inlineGroups: groupResult.groups,
       inlineGroupMembers: groupResult.members,
     };
-  }, [childrenSchema, mergedValue]);
+  }, [childrenSchema, mergedValue, user.roles]);
 
   if (!processed || processed.children.length === 0) {
     return <></>;

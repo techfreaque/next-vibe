@@ -152,7 +152,7 @@ function EditButton({
     e.stopPropagation();
     setIsLoading(true);
     try {
-      const defs = await import("../[instanceId]/definition");
+      const defs = await import("../[instanceId]/rename/definition");
       navigate(defs.default.PATCH, {
         urlPathParams: { instanceId: conn.instanceId },
         data: { friendlyName: conn.friendlyName },
@@ -193,7 +193,7 @@ function DisconnectButton({
     e.stopPropagation();
     setIsLoading(true);
     try {
-      const defs = await import("../[instanceId]/definition");
+      const defs = await import("../[instanceId]/disconnect/definition");
       navigate(defs.default.DELETE, {
         urlPathParams: { instanceId: conn.instanceId },
         renderInModal: true,
@@ -488,11 +488,15 @@ function SyncSettingsCard({
 
 function LocalView({
   connections,
+  selfInstanceId,
+  selfFriendlyName,
   syncEnabled,
   navigate,
   t,
 }: {
   connections: Connection[];
+  selfInstanceId: string | null;
+  selfFriendlyName: string | null;
   syncEnabled: boolean | null;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
@@ -533,6 +537,33 @@ function LocalView({
           />
         </CardContent>
       </Card>
+
+      {/* Self-identity */}
+      {selfInstanceId && (
+        <Card className="rounded-none border-0 border-b shadow-none">
+          <CardHeader className="pb-3">
+            <Div className="flex items-center justify-between gap-3">
+              <Div className="flex flex-col gap-1">
+                <Div className="flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm">
+                    {t("widget.selfIdentity.title")}
+                  </CardTitle>
+                  <Badge variant="secondary" className="font-mono text-[10px]">
+                    {selfInstanceId}
+                  </Badge>
+                </Div>
+                <CardDescription className="text-xs">
+                  {selfFriendlyName && selfFriendlyName !== selfInstanceId
+                    ? `${selfFriendlyName} — `
+                    : ""}
+                  {t("widget.selfIdentity.description")}
+                </CardDescription>
+              </Div>
+            </Div>
+          </CardHeader>
+        </Card>
+      )}
 
       {/* Sync settings (admin only) */}
       {syncEnabled !== null && (
@@ -585,6 +616,8 @@ export function RemoteConnectionsListContainer({
   const { push: navigate } = useWidgetNavigation();
 
   const connections = field.value?.connections ?? [];
+  const selfInstanceId = field.value?.selfInstanceId ?? null;
+  const selfFriendlyName = field.value?.selfFriendlyName ?? null;
   const syncEnabled = field.value?.syncEnabled ?? null;
   const isCloud = envClient.NEXT_PUBLIC_VIBE_IS_CLOUD;
 
@@ -595,6 +628,8 @@ export function RemoteConnectionsListContainer({
   return (
     <LocalView
       connections={connections}
+      selfInstanceId={selfInstanceId}
+      selfFriendlyName={selfFriendlyName}
       syncEnabled={syncEnabled}
       navigate={navigate}
       t={t}

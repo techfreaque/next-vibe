@@ -11,12 +11,14 @@ import {
   backButton,
   navigateButtonField,
   objectField,
+  requestField,
   responseArrayField,
   responseField,
   widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -60,8 +62,27 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: MemoriesListContainer,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      // === REQUEST FIELDS ===
+      search: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.search.label" as const,
+        description: "get.fields.search.description" as const,
+        placeholder: "get.fields.search.placeholder" as const,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      tag: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.tag.label" as const,
+        description: "get.fields.tag.description" as const,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+
       // Top action buttons
       backButton: backButton(scopedTranslation, {
         usage: { response: true },
@@ -191,6 +212,11 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      default: {},
+      search: { search: "python" },
+      tagFilter: { tag: "skills" },
+    },
     responses: {
       list: {
         memories: [

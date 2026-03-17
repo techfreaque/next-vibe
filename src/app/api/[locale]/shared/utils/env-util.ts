@@ -1,6 +1,7 @@
 import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { validateData } from "./validation";
@@ -47,6 +48,7 @@ export function validateEnv<TSchema extends z.ZodType>(
     envSchema,
     logger,
     locale,
+    Platform.NEXT_API,
   );
   if (!validationResult.success) {
     const errors = validationResult.messageParams?.["error"] as

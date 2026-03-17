@@ -27,7 +27,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { DefaultFolderId, isDefaultFolderId } from "../config";
 import threadsDefinition from "../threads/definition";
-import { useChatStore } from "./store";
 
 /**
  * Navigation state shape
@@ -110,11 +109,6 @@ function createChatNavigationStore(opts?: {
           url.searchParams.delete("message");
         }
         window.history.pushState(null, "", url.toString());
-      }
-      // Mirror to global chat store so non-React code (send-message, event-handlers) can read it
-      const { activeThreadId } = get();
-      if (activeThreadId && leafMessageId) {
-        useChatStore.getState().setLeafMessageId(activeThreadId, leafMessageId);
       }
     },
     setNavigation: (state): void => set(state),

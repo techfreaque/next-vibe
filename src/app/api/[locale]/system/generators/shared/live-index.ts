@@ -35,6 +35,10 @@ export interface FileClass {
   indicatorIndex?: boolean;
   /** graph-seeds.ts — affects graph-seeds-index generator */
   graphSeedsIndex?: boolean;
+  /** system-prompt/prompt.ts — affects prompt-fragments generator */
+  promptFragments?: boolean;
+  /** skill.ts anywhere in api/ — affects skills-index generator */
+  skillsIndex?: boolean;
 }
 
 /** Dirty flags — which generator groups need to run */
@@ -46,6 +50,8 @@ export interface DirtyFlags {
   emailTemplates: boolean;
   indicatorIndex: boolean;
   graphSeedsIndex: boolean;
+  promptFragments: boolean;
+  skillsIndex: boolean;
 }
 
 /**
@@ -75,6 +81,12 @@ export interface LiveIndex {
 
   // --- Graph-seeds-index generator ---
   graphSeedFiles: Set<string>;
+
+  // --- Prompt-fragments generator ---
+  promptFragmentFiles: Set<string>;
+
+  // --- Skills-index generator ---
+  defaultSkillFiles: Set<string>;
 
   /**
    * Per-definition HTTP method cache.
@@ -193,6 +205,15 @@ export function classifyFile(filename: string): FileClass | null {
   if (base === "graph-seeds.ts") {
     return { graphSeedsIndex: true };
   }
+  // system-prompt/prompt.ts — the fragment definition file
+  if (base === "prompt.ts" && filename.includes("/system-prompt/")) {
+    return { promptFragments: true };
+  }
+
+  // skill.ts anywhere in api/ (default-skills or module-level)
+  if (base === "skill.ts") {
+    return { skillsIndex: true };
+  }
 
   return null;
 }
@@ -244,6 +265,12 @@ export function buildLiveIndex(): LiveIndex {
   const graphSeedFiles = new Set(
     findFilesRecursively(apiDir, "graph-seeds.ts"),
   );
+  const promptFragmentFiles = new Set(
+    findFilesRecursively(apiDir, "prompt.ts").filter((f) =>
+      f.includes("/system-prompt/"),
+    ),
+  );
+  const defaultSkillFiles = new Set(findFilesRecursively(apiDir, "skill.ts"));
 
   // Build method cache for all definition files
   const methodCache = new Map<string, string[]>();
@@ -259,6 +286,8 @@ export function buildLiveIndex(): LiveIndex {
     emailTemplates: true,
     indicatorIndex: true,
     graphSeedsIndex: true,
+    promptFragments: true,
+    skillsIndex: true,
   };
 
   return {
@@ -271,6 +300,8 @@ export function buildLiveIndex(): LiveIndex {
     emailFiles,
     indicatorFiles,
     graphSeedFiles,
+    promptFragmentFiles,
+    defaultSkillFiles,
     methodCache,
     dirty,
   };
@@ -400,6 +431,26 @@ export function updateLiveIndex(
       index.graphSeedFiles.delete(absPath);
     }
     index.dirty.graphSeedsIndex = true;
+    return;
+  }
+
+  if (base === "prompt.ts" && absPath.includes("/system-prompt/")) {
+    if (fileExists) {
+      index.promptFragmentFiles.add(absPath);
+    } else {
+      index.promptFragmentFiles.delete(absPath);
+    }
+    index.dirty.promptFragments = true;
+    return;
+  }
+
+  if (base === "skill.ts") {
+    if (fileExists) {
+      index.defaultSkillFiles.add(absPath);
+    } else {
+      index.defaultSkillFiles.delete(absPath);
+    }
+    index.dirty.skillsIndex = true;
   }
 }
 
@@ -414,4 +465,6 @@ export function clearDirtyFlags(index: LiveIndex): void {
   index.dirty.emailTemplates = false;
   index.dirty.indicatorIndex = false;
   index.dirty.graphSeedsIndex = false;
+  index.dirty.promptFragments = false;
+  index.dirty.skillsIndex = false;
 }

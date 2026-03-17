@@ -6,7 +6,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { searchMemories } from "../repository";
+import { MemoriesRepository } from "../repository";
 import definitions from "./definition";
 
 export const { GET, tools } = endpointsHandler({
@@ -14,7 +14,7 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: ({ data, user, logger }) =>
-      searchMemories({
+      MemoriesRepository.searchMemories({
         userId: user.id,
         query: data.query,
         includeArchived: data.includeArchived,

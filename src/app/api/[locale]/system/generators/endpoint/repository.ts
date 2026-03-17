@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import { join } from "node:path";
-
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -77,9 +75,7 @@ class EndpointGeneratorRepositoryImpl {
         definitionFiles = [...liveIndex.definitionFiles];
         routeFiles = [...liveIndex.routeFiles];
       } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        const apiCorePath = ["src", "app", "api", "[locale]"];
-        const startDir = join(process.cwd(), ...apiCorePath);
+        const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
         logger.debug("Discovering definition files");
         definitionFiles = findFilesRecursively(startDir, "definition.ts");

@@ -3,7 +3,7 @@
  * Standalone reusable component for editing per-slot tool overrides.
  * Used in: character edit, favorite edit.
  *
- * Value format matches allowedTools/pinnedTools fields:
+ * Value format matches availableTools/pinnedTools fields:
  *   null = inherit from higher-level (character → settings)
  *   array = explicit override
  *
@@ -56,7 +56,7 @@ export interface ToolEntry {
 }
 
 export interface ToolsConfigValue {
-  allowedTools: ToolEntry[] | null;
+  availableTools: ToolEntry[] | null;
   pinnedTools: ToolEntry[] | null;
 }
 
@@ -69,28 +69,28 @@ export interface ToolsConfigEditProps {
   label?: string;
   className?: string;
   /**
-   * Character's tool configuration — fallback when value is null (inherited).
+   * Skill's tool configuration — fallback when value is null (inherited).
    * Ensures the display reflects the actual resolved character defaults.
    */
-  characterAllowedTools?: ToolEntry[] | null;
-  characterPinnedTools?: ToolEntry[] | null;
+  skillAvailableTools?: ToolEntry[] | null;
+  skillPinnedTools?: ToolEntry[] | null;
 }
 
 // ─── Conversion helpers ─────────────────────────────────────────────────────
 
 function toEnabledTools(
-  allowedTools: ToolEntry[] | null,
+  availableTools: ToolEntry[] | null,
   pinnedTools: ToolEntry[] | null,
 ): EnabledTool[] | null {
-  if (allowedTools === null && pinnedTools === null) {
+  if (availableTools === null && pinnedTools === null) {
     return null; // null = inherit default
   }
   const allIds = new Set([
-    ...(allowedTools ?? []).map((t) => t.toolId),
+    ...(availableTools ?? []).map((t) => t.toolId),
     ...(pinnedTools ?? []).map((t) => t.toolId),
   ]);
   return [...allIds].map((id) => {
-    const allowed = allowedTools?.find((t) => t.toolId === id);
+    const allowed = availableTools?.find((t) => t.toolId === id);
     const pinned = pinnedTools?.find((t) => t.toolId === id);
     return {
       id,
@@ -104,10 +104,10 @@ function toEnabledTools(
 
 function fromEnabledTools(tools: EnabledTool[] | null): ToolsConfigValue {
   if (tools === null) {
-    return { allowedTools: null, pinnedTools: null };
+    return { availableTools: null, pinnedTools: null };
   }
   return {
-    allowedTools: tools.map(({ id, requiresConfirmation }) => ({
+    availableTools: tools.map(({ id, requiresConfirmation }) => ({
       toolId: id,
       requiresConfirmation,
     })),
@@ -162,8 +162,8 @@ export function ToolsConfigEdit({
   logger,
   label,
   className,
-  characterAllowedTools,
-  characterPinnedTools,
+  skillAvailableTools,
+  skillPinnedTools,
 }: ToolsConfigEditProps): JSX.Element {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -193,20 +193,17 @@ export function ToolsConfigEdit({
 
   // Convert stored value → EnabledTool[] for UI
   const enabledTools = useMemo(
-    () => toEnabledTools(value.allowedTools, value.pinnedTools),
-    [value.allowedTools, value.pinnedTools],
+    () => toEnabledTools(value.availableTools, value.pinnedTools),
+    [value.availableTools, value.pinnedTools],
   );
 
-  // Character's tool config as EnabledTool[] (fallback when value is inherited)
-  const characterEnabledTools = useMemo(
+  // Skill's tool config as EnabledTool[] (fallback when value is inherited)
+  const skillEnabledTools = useMemo(
     () =>
-      characterAllowedTools !== undefined || characterPinnedTools !== undefined
-        ? toEnabledTools(
-            characterAllowedTools ?? null,
-            characterPinnedTools ?? null,
-          )
+      skillAvailableTools !== undefined || skillPinnedTools !== undefined
+        ? toEnabledTools(skillAvailableTools ?? null, skillPinnedTools ?? null)
         : null,
-    [characterAllowedTools, characterPinnedTools],
+    [skillAvailableTools, skillPinnedTools],
   );
 
   // Effective tools for display (null = all default)
@@ -214,9 +211,9 @@ export function ToolsConfigEdit({
     if (enabledTools !== null) {
       return enabledTools;
     }
-    // Fall back to character's resolved tool config when inherited
-    if (characterEnabledTools !== null) {
-      return characterEnabledTools;
+    // Fall back to skill's resolved tool config when inherited
+    if (skillEnabledTools !== null) {
+      return skillEnabledTools;
     }
     const defaultPinnedSet = new Set<string>(getDefaultToolIds());
     return availableTools.map((tool) => ({
@@ -224,7 +221,7 @@ export function ToolsConfigEdit({
       requiresConfirmation: tool.requiresConfirmation ?? false,
       pinned: defaultPinnedSet.has(tool.id),
     }));
-  }, [enabledTools, characterEnabledTools, availableTools]);
+  }, [enabledTools, skillEnabledTools, availableTools]);
 
   const isInherited = enabledTools === null;
 

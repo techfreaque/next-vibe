@@ -39,9 +39,20 @@ export const {
     commented: true,
   },
   NOWPAYMENTS_API_URL: {
-    schema: z.string().url().default("https://api-sandbox.nowpayments.io/v1"),
+    schema: z
+      .enum([
+        "https://api-sandbox.nowpayments.io/v1",
+        "https://api.nowpayments.io/v1",
+      ])
+      .default("https://api-sandbox.nowpayments.io/v1"),
     example: "https://api-sandbox.nowpayments.io/v1",
-    comment: "Use https://api.nowpayments.io/v1 for production",
+    comment:
+      "NOWPayments API endpoint — sandbox for testing, production for live payments",
     commented: true,
+    fieldType: "select" as const,
+    options: [
+      "https://api-sandbox.nowpayments.io/v1",
+      "https://api.nowpayments.io/v1",
+    ] as const,
   },
 });

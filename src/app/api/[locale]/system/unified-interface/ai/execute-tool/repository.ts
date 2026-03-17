@@ -14,7 +14,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, sql as drizzleSql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -28,9 +28,11 @@ import {
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { formatValidationErrorDetails } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
 import { getPreferredName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
   cronTaskExecutions,
@@ -47,8 +49,9 @@ import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/task
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { buildRemoteUrl } from "@/app/api/[locale]/system/unified-interface/remote/remote-call";
+
 import type { scopedTranslation } from "../i18n";
-import type { TaskRoutingContext } from "./constants";
 import { CallbackMode } from "./constants";
 import type {
   RouteExecuteRequestOutput,
@@ -56,6 +59,63 @@ import type {
 } from "./definition";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
+/**
+ * Execute a tool directly on a remote instance via HTTP.
+ * Used when isDirectlyAccessible=true — skips task-queue, gets result in ms.
+ * Returns the parsed JSON response body (tool result) or null on network error.
+ *
+ * The tool's route path is derived from its toolName (which IS the routeId / path).
+ * Auth: Bearer token from the stored connection.
+ *
+ * For wait/endLoop: blocking — caller awaits the result.
+ * For detach/wakeUp: caller ignores the returned promise (fire-and-forget).
+ */
+async function executeRemoteDirect(params: {
+  remoteUrl: string;
+  token: string;
+  toolName: string;
+  input: Record<string, JsonValue> | null;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+}): Promise<Record<string, JsonValue> | null> {
+  const { remoteUrl, token, toolName, input, locale, logger } = params;
+  // Build URL from the execute-tool definition so the path is always in sync.
+  const executeDefinition = (await import("./definition")).default;
+  const url = buildRemoteUrl(remoteUrl, locale, executeDefinition.POST, {
+    toolName,
+    input: (input ?? {}) as Parameters<typeof buildRemoteUrl>[3]["input"],
+  });
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ toolName, input: input ?? {} }),
+      signal: AbortSignal.timeout(90_000),
+    });
+    if (!resp.ok) {
+      logger.warn("[RouteExecute] Direct HTTP call failed", {
+        toolName,
+        status: resp.status,
+      });
+      return null;
+    }
+    const body = (await resp.json()) as {
+      data?: Record<string, JsonValue>;
+      success?: boolean;
+    };
+    return body.data ?? null;
+  } catch (err) {
+    logger.warn("[RouteExecute] Direct HTTP call error", {
+      toolName,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return null;
+  }
+}
 
 export class RouteExecuteRepository {
   static async execute(
@@ -67,20 +127,6 @@ export class RouteExecuteRepository {
     streamContext: ToolExecutionContext,
   ): Promise<ResponseType<RouteExecuteResponseInput>> {
     try {
-      // Wait for stream-part-handler to set currentToolMessageId.
-      // execute() starts concurrently with stream-part-handler's tool-call processing —
-      // poll up to 200ms to let stream-part-handler catch up and set the field.
-      if (streamContext && !streamContext.currentToolMessageId) {
-        for (let i = 0; i < 40; i++) {
-          await new Promise<void>((resolve) => {
-            setTimeout(resolve, 5);
-          });
-          if (streamContext.currentToolMessageId) {
-            break;
-          }
-        }
-      }
-
       // Bail out immediately if the stream was cancelled before tool execution started.
       // The abort signal fires when StreamRegistry.cancel() is called — any DB writes
       // or network calls after this point would create orphaned rows.
@@ -108,11 +154,61 @@ export class RouteExecuteRepository {
       const { input } = data;
 
       // Remote execution path — create a one-shot task for the target instance
+      // Circuit breaker: headless streams (resume-stream revival) must not create
+      // new remote WAIT tasks — this causes an infinite loop where each revival
+      // calls execute-tool, creates a task, waits, resume-streams again, etc.
+      if (instanceId && streamContext?.headless) {
+        const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
+        if (callbackMode === CallbackMode.WAIT) {
+          logger.warn(
+            "[RouteExecute] Blocking remote WAIT call from headless stream (loop prevention)",
+            { toolName, instanceId },
+          );
+          return fail({
+            message: t("executeTool.post.errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+      }
       if (instanceId && !user.isPublic) {
+        // Strip instanceId from input — the remote instance executes the tool locally.
+        // If we leave it in, endpoints like tool-help interpret it as "proxy to another
+        // remote instance" and enter a self-referential lookup returning unfiltered results.
+        // eslint-disable-next-line no-unused-vars
+        const { instanceId: _stripInstanceId, ...remoteInput } = input ?? {};
+        const strippedInput =
+          Object.keys(remoteInput).length > 0 ? remoteInput : null;
         // Normalize incoming toolName to preferred name (alias > canonical).
         // Capabilities are stored using the preferred name so both alias and
         // full-path forms resolve to the same snapshot entry.
         toolName = getPreferredName(toolName);
+
+        // Deduplication: if a remote task for this toolMessageId already exists
+        // (created by the first stream before the user confirmed), skip creation.
+        // The caller (tool-confirmation-handler) will poll for its completion.
+        if (streamContext?.callerToolCallId) {
+          const { sql: sqlFn } = await import("drizzle-orm");
+          const [existing] = await db
+            .select({
+              id: cronTasks.id,
+              lastExecutionStatus: cronTasks.lastExecutionStatus,
+            })
+            .from(cronTasks)
+            .where(
+              sqlFn`${cronTasks.taskInput}->>'toolMessageId' = ${streamContext?.callerToolCallId}`,
+            )
+            .limit(1);
+
+          if (existing) {
+            logger.info(
+              "[RouteExecute] Remote task already exists for toolMessageId — skipping duplicate creation",
+              { toolName, instanceId, existingTaskId: existing.id },
+            );
+            return success({
+              status: CronTaskStatus.PENDING,
+            });
+          }
+        }
 
         logger.info("[RouteExecute] Creating remote task", {
           toolName,
@@ -164,23 +260,128 @@ export class RouteExecuteRepository {
 
         const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
 
-        // Get threadId and tool message ID from streamContext (set by the calling AI stream)
+        // Get threadId and tool message ID from streamContext (set by the calling AI stream).
+        // tools-loader injects currentToolMessageId from pendingToolMessages before execute() runs.
         const effectiveThreadId = streamContext?.threadId;
-        // currentToolMessageId is the TOOL call message DB row ID (set by stream-part-handler
-        // after tool-call event, before execute() runs). Falls back to aiMessageId if not set.
         const effectiveToolMessageId =
           streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
 
-        const taskId = `remote-${instanceId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        // ── Direct HTTP transport ──────────────────────────────────────────────
+        // If the remote instance is directly accessible (no NAT, no queue wait),
+        // call it via HTTP instead of going through the task-queue. This drops
+        // latency from ~1 min to milliseconds.
+        //
+        // wait / endLoop: blocking call — await result, return inline to AI.
+        //   If direct call fails (network error), fall through to task-queue.
+        // detach / wakeUp: fire-and-forget — return pending immediately.
+        //   Result arrives via /report when the remote finishes (same as queue path).
+        // approve: not applicable here (handled above before this block).
+        if (connInfo.isDirectlyAccessible && connInfo.token) {
+          if (
+            callbackMode === CallbackMode.WAIT ||
+            callbackMode === CallbackMode.END_LOOP
+          ) {
+            logger.info("[RouteExecute] Remote direct HTTP (blocking)", {
+              toolName,
+              instanceId,
+              callbackMode,
+            });
+            const directResult = await executeRemoteDirect({
+              remoteUrl: connInfo.remoteUrl,
+              token: connInfo.token,
+              toolName,
+              input: strippedInput as Record<string, JsonValue> | null,
+              locale,
+              logger,
+            });
+            if (directResult !== null) {
+              // Result returned inline — loop continues normally (wait/endLoop).
+              return success({ result: directResult });
+            }
+            // Direct call failed — fall through to task-queue path below.
+            logger.warn(
+              "[RouteExecute] Direct HTTP failed — falling back to task-queue",
+              { toolName, instanceId },
+            );
+          } else if (
+            callbackMode === CallbackMode.DETACH ||
+            callbackMode === CallbackMode.WAKE_UP
+          ) {
+            // Fire-and-forget: return pending immediately, handle completion async.
+            const directTaskId = `remote-direct-${instanceId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            logger.info("[RouteExecute] Remote direct HTTP (fire-and-forget)", {
+              toolName,
+              instanceId,
+              callbackMode,
+              directTaskId,
+            });
 
-        // Capture model + character + favoriteId from the originating stream so
-        // resume-stream can restart the AI turn with the same context.
-        const streamModelId = streamContext?.modelId;
-        const streamCharacterId = streamContext?.characterId;
-        const streamFavoriteId = streamContext?.favoriteId;
+            const capturedToken = connInfo.token;
+            const capturedRemoteUrl = connInfo.remoteUrl;
+
+            void (async (): Promise<void> => {
+              const directResult = await executeRemoteDirect({
+                remoteUrl: capturedRemoteUrl,
+                token: capturedToken,
+                toolName,
+                input: strippedInput as Record<string, JsonValue> | null,
+                locale,
+                logger,
+              });
+
+              if (directResult === null) {
+                logger.warn(
+                  "[RouteExecute] Remote direct async call failed — no completion fired",
+                  { toolName, instanceId, callbackMode, directTaskId },
+                );
+                return;
+              }
+
+              if (
+                callbackMode === CallbackMode.WAKE_UP &&
+                effectiveToolMessageId &&
+                effectiveThreadId
+              ) {
+                await handleTaskCompletion({
+                  toolMessageId: effectiveToolMessageId,
+                  threadId: effectiveThreadId,
+                  callbackMode: CallbackMode.WAKE_UP,
+                  status: CronTaskStatus.COMPLETED,
+                  output: directResult,
+                  taskId: directTaskId,
+                  modelId: streamContext?.modelId ?? null,
+                  skillId: streamContext?.skillId ?? null,
+                  favoriteId: streamContext?.favoriteId ?? null,
+                  leafMessageId: streamContext?.leafMessageId ?? null,
+                  userId: user.id,
+                  logger,
+                  directResumeUser: user,
+                  directResumeLocale: locale,
+                });
+              }
+            })();
+
+            return success({
+              ...(callbackMode === CallbackMode.DETACH
+                ? { taskId: directTaskId }
+                : {}),
+              status: CronTaskStatus.PENDING,
+              ...(callbackMode === CallbackMode.DETACH
+                ? {
+                    hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
+                  }
+                : {
+                    hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
+                  }),
+            });
+          }
+        }
+
+        const taskId = `remote-${instanceId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
         await db.insert(cronTasks).values({
           id: taskId,
+          shortId: taskId,
           routeId: toolName,
           displayName: `Remote: ${toolName}`,
           category: TaskCategory.SYSTEM,
@@ -188,21 +389,16 @@ export class RouteExecuteRepository {
           priority: CronTaskPriority.HIGH,
           enabled: true,
           runOnce: true,
-          taskInput: {
-            ...(input ?? {}),
-            // Routing context — read by handleTaskCompletion on completion.
-            ...({
-              callbackMode,
-              ...(effectiveThreadId ? { threadId: effectiveThreadId } : {}),
-              ...(effectiveToolMessageId
-                ? { toolMessageId: effectiveToolMessageId }
-                : {}),
-              // Resume context — used by handleTaskCompletion to spawn resume-stream task.
-              ...(streamModelId ? { modelId: streamModelId } : {}),
-              ...(streamCharacterId ? { characterId: streamCharacterId } : {}),
-              ...(streamFavoriteId ? { favoriteId: streamFavoriteId } : {}),
-            } satisfies TaskRoutingContext),
-          },
+          // Tool execution input only — no routing context mixed in.
+          taskInput: strippedInput ?? {},
+          // Revival context in typed columns — read by handleTaskCompletion on completion.
+          wakeUpCallbackMode: callbackMode,
+          wakeUpThreadId: effectiveThreadId ?? null,
+          wakeUpToolMessageId: effectiveToolMessageId ?? null,
+          wakeUpModelId: streamContext?.modelId ?? null,
+          wakeUpSkillId: streamContext?.skillId ?? null,
+          wakeUpFavoriteId: streamContext?.favoriteId ?? null,
+          wakeUpLeafMessageId: streamContext?.leafMessageId ?? null,
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
           tags: ["remote", instanceId],
@@ -210,29 +406,156 @@ export class RouteExecuteRepository {
           userId: user.id,
         });
 
-        // Signal the stream to pause and wait when callbackMode=wait.
-        // finish-step-handler aborts after this tool step; /report resumes
-        // via headless stream when the remote result arrives.
-        if (callbackMode === CallbackMode.WAIT && streamContext) {
-          streamContext.waitingForRemoteResult = true;
+        // ── Push-first: if local is directly accessible, push the task now ──
+        // Instead of waiting for the local instance's next cron pull (~1 min),
+        // POST the task directly to local's task-sync endpoint immediately.
+        // Fire-and-forget: if push fails, the cron fallback picks it up on next pulse.
+        if (
+          connInfo.isDirectlyAccessible &&
+          connInfo.localUrl &&
+          connInfo.token
+        ) {
+          const capturedToken = connInfo.token;
+          const capturedLocalUrl = connInfo.localUrl;
+          const capturedTaskId = taskId;
+          void (async (): Promise<void> => {
+            try {
+              const { endpoints: syncEndpoints } =
+                await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/definition");
+              const syncUrl = `${capturedLocalUrl.replace(/\/$/, "")}/api/${locale}/${syncEndpoints.POST.path.join("/")}`;
+              // Push a minimal sync payload that includes just this task
+              // Local's syncTasks handler already knows how to upsert inbound tasks.
+              const pushBody: Record<string, string> = {
+                instanceId: effectiveTargetInstance,
+                memoriesHash: "",
+                capabilitiesVersion: "none",
+                taskCursor: new Date(0).toISOString(),
+                outboundTasks: JSON.stringify([
+                  {
+                    id: capturedTaskId,
+                    routeId: toolName,
+                    displayName: `Remote: ${toolName}`,
+                    category: "system",
+                    schedule: "* * * * *",
+                    priority: "high",
+                    enabled: true,
+                    runOnce: true,
+                    taskInput: {
+                      ...(strippedInput ?? {}),
+                      callbackMode,
+                      ...(effectiveThreadId
+                        ? { threadId: effectiveThreadId }
+                        : {}),
+                      ...(effectiveToolMessageId
+                        ? { toolMessageId: effectiveToolMessageId }
+                        : {}),
+                      ...(streamContext?.leafMessageId
+                        ? { leafMessageId: streamContext.leafMessageId }
+                        : {}),
+                    },
+                    outputMode: "store_only",
+                    notificationTargets: [],
+                    tags: ["remote", instanceId],
+                    targetInstance: effectiveTargetInstance,
+                    description: null,
+                    version: "1",
+                    timezone: null,
+                    timeout: null,
+                    retries: null,
+                    retryDelay: null,
+                  },
+                ]),
+              };
+              const resp = await fetch(syncUrl, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${capturedToken}`,
+                },
+                body: JSON.stringify(pushBody),
+                signal: AbortSignal.timeout(10_000),
+              });
+              if (resp.ok) {
+                logger.info(
+                  "[RouteExecute] Push-first: task pushed to local successfully",
+                  {
+                    taskId: capturedTaskId,
+                    toolName,
+                    instanceId,
+                  },
+                );
+              } else {
+                logger.warn(
+                  "[RouteExecute] Push-first: push failed (cron fallback active)",
+                  {
+                    taskId: capturedTaskId,
+                    status: resp.status,
+                  },
+                );
+              }
+            } catch (pushErr) {
+              logger.warn(
+                "[RouteExecute] Push-first: push error (cron fallback active)",
+                {
+                  taskId: capturedTaskId,
+                  error:
+                    pushErr instanceof Error
+                      ? pushErr.message
+                      : String(pushErr),
+                },
+              );
+            }
+          })();
         }
 
-        // All remote calls are async — return pending immediately.
-        // /report backfills the result into the tool message and starts a headless
-        // stream if callbackMode=wakeUp. TASK_COMPLETED WS event notifies the UI.
+        // callbackMode=WAIT: pause the stream after all parallel tool calls finish.
+        // Set pendingTimeoutMs so finish-step-handler starts the 90s abort timer.
+        // handleTaskCompletion (via /report) backfills the real result and schedules
+        // resume-stream to revive the thread. Clean abort — no error shown to user.
+        if (callbackMode === CallbackMode.WAIT && streamContext) {
+          streamContext.waitingForRemoteResult = true;
+          streamContext.pendingTimeoutMs = 90_000;
+        }
+
+        // Return pending status.
+        // WAIT mode: omit taskId so the AI can't call wait-for-task.
+        // The stream pauses at finish-step, resume-stream backfills the real result.
+        // Other modes: include taskId so the AI can use wait-for-task if needed.
         return success({
           result: undefined,
-          taskId,
+          ...(callbackMode !== CallbackMode.WAIT ? { taskId } : {}),
           status: CronTaskStatus.PENDING,
           ...(callbackMode === CallbackMode.DETACH
             ? {
                 hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
               }
-            : {}),
+            : callbackMode === CallbackMode.WAKE_UP
+              ? {
+                  hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
+                }
+              : {}),
         });
       }
 
       const callbackMode = data.callbackMode ?? null;
+
+      // APPROVE: return immediately — the stream-part-handler already set
+      // stepHasToolsAwaitingConfirmation=true which aborts at finish-step.
+      // This result is a placeholder; the real result is injected by resume-stream
+      // after the user confirms/cancels (which could be days later).
+      // The stream fully ends after finish-step abort — no lingering state.
+      if (callbackMode === CallbackMode.APPROVE) {
+        logger.info(
+          "[RouteExecute] APPROVE mode — returning placeholder (stream aborts at finish-step)",
+          { toolName },
+        );
+        return success({
+          result: { status: "waiting_for_confirmation", toolName } as Record<
+            string,
+            JsonValue
+          >,
+        });
+      }
 
       // Local background: execute inline, store result in task execution history,
       // return { taskId, status: "pending" } to AI. handleTaskCompletion emits
@@ -248,11 +571,13 @@ export class RouteExecuteRepository {
         });
 
         const effectiveThreadId = streamContext.threadId;
+        // tools-loader injects currentToolMessageId from pendingToolMessages before execute() is called
         const effectiveToolMessageId =
           streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
 
         await db.insert(cronTasks).values({
           id: taskId,
+          shortId: taskId,
           routeId: toolName,
           displayName: `Background: ${toolName}`,
           category: TaskCategory.SYSTEM,
@@ -260,14 +585,11 @@ export class RouteExecuteRepository {
           priority: CronTaskPriority.HIGH,
           enabled: false,
           runOnce: true,
-          taskInput: {
-            ...(input ?? {}),
-            callbackMode: CallbackMode.DETACH,
-            ...(effectiveThreadId ? { threadId: effectiveThreadId } : {}),
-            ...(effectiveToolMessageId
-              ? { toolMessageId: effectiveToolMessageId }
-              : {}),
-          },
+          taskInput: input ?? {},
+          // Revival context in typed columns.
+          wakeUpCallbackMode: CallbackMode.DETACH,
+          wakeUpThreadId: effectiveThreadId ?? null,
+          wakeUpToolMessageId: effectiveToolMessageId ?? null,
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
           tags: ["detach", "local"],
@@ -284,16 +606,16 @@ export class RouteExecuteRepository {
           logger,
           platform: Platform.MCP,
           streamContext: {
-            rootFolderId: DefaultFolderId.CRON,
-            threadId: undefined,
-            aiMessageId: undefined,
+            ...streamContext,
+            // Reset per-call fields — detach goroutine is independent of parent stream
             currentToolMessageId: undefined,
-            characterId: undefined,
-            modelId: undefined,
-            favoriteId: undefined,
-            headless: undefined,
+            callerToolCallId: undefined,
+            pendingToolMessages: undefined,
+            pendingTimeoutMs: undefined,
             waitingForRemoteResult: undefined,
+            // Do NOT inherit parent abortSignal — detach goroutine must outlive parent stream
             abortSignal: undefined,
+            escalateToTask: undefined,
           },
         });
 
@@ -319,105 +641,8 @@ export class RouteExecuteRepository {
         });
 
         // detach: result stays in task history only — never injected into thread.
-        // Delete the cron task row immediately — nobody needs to poll it.
-        // Emit TASK_COMPLETED WS so UI bubble updates, but no deferred message.
-        await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
-
-        if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
-          await handleTaskCompletion({
-            toolMessageId: effectiveToolMessageId,
-            threadId: effectiveThreadId,
-            callbackMode: null, // null = WS event + backfill only, no deferred message
-            status: finalStatus,
-            output: null, // no result injected into thread
-            taskId,
-            taskInput: null,
-            userId: user.id,
-            logger,
-          });
-        }
-
-        return success({
-          taskId,
-          hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
-        });
-      }
-
-      // Local wakeUp: execute inline, backfill tool message + schedule resume-stream.
-      // Stream is NOT paused — AI continues naturally with the result.
-      // resume-stream is scheduled as a safety net: if the stream is still alive it
-      // no-ops (isStreaming=true check); if it has died (e.g. HTTP timeout, next turn
-      // was the last), interactive stream revives the thread when the async side signals done.
-      if (callbackMode === CallbackMode.WAKE_UP) {
-        const taskId = `local-wu-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        const executionId = `exec-${taskId}`;
-        const startedAt = new Date();
-
-        logger.info("[RouteExecute] Executing local wakeUp route", {
-          toolName,
-          taskId,
-        });
-
-        await db.insert(cronTasks).values({
-          id: taskId,
-          routeId: toolName,
-          displayName: `WakeUp: ${toolName}`,
-          category: TaskCategory.SYSTEM,
-          schedule: "* * * * *",
-          priority: CronTaskPriority.HIGH,
-          enabled: false,
-          runOnce: true,
-          taskInput: input ?? {},
-          outputMode: TaskOutputMode.STORE_ONLY,
-          notificationTargets: [],
-          tags: ["wakeup", "local"],
-          userId: user.id,
-        });
-
-        const result = await RouteExecutionExecutor.executeGenericHandler<
-          Record<string, JsonValue>
-        >({
-          toolName,
-          data: input ?? {},
-          user,
-          locale,
-          logger,
-          platform: Platform.MCP,
-          streamContext: {
-            rootFolderId: DefaultFolderId.CRON,
-            threadId: undefined,
-            aiMessageId: undefined,
-            currentToolMessageId: undefined,
-            characterId: undefined,
-            modelId: undefined,
-            favoriteId: undefined,
-            headless: undefined,
-            waitingForRemoteResult: undefined,
-            abortSignal: undefined,
-          },
-        });
-
-        const completedAt = new Date();
-        const finalStatus = result.success
-          ? CronTaskStatus.COMPLETED
-          : CronTaskStatus.FAILED;
-        const finalResult =
-          result.success && result.data !== undefined ? result.data : null;
-
-        await db.insert(cronTaskExecutions).values({
-          taskId,
-          taskName: toolName,
-          executionId,
-          status: finalStatus,
-          priority: CronTaskPriority.HIGH,
-          startedAt,
-          completedAt,
-          durationMs: completedAt.getTime() - startedAt.getTime(),
-          result: finalResult ?? undefined,
-          triggeredBy: "wakeup",
-          config: {},
-        });
-
+        // Keep the task row (disabled + completed) so wait-for-task can find the result
+        // if the AI later decides to block on it. Emit TASK_COMPLETED WS for UI bubble.
         await db
           .update(cronTasks)
           .set({
@@ -429,40 +654,240 @@ export class RouteExecuteRepository {
           })
           .where(eq(cronTasks.id, taskId));
 
-        const effectiveThreadId = streamContext?.threadId;
-        const effectiveToolMessageId =
-          streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
+        if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
+          // Re-read the task row to pick up any callbackMode upgrade written by wait-for-task.
+          // If the AI called wait-for-task(taskId) while the task was running, it upgrades
+          // the typed wakeUp* columns on the task row. Re-reading ensures handleTaskCompletion
+          // fires revival instead of a plain WS event.
+          const [latestTask] = await db
+            .select({
+              wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
+              wakeUpThreadId: cronTasks.wakeUpThreadId,
+              wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+              wakeUpModelId: cronTasks.wakeUpModelId,
+              wakeUpSkillId: cronTasks.wakeUpSkillId,
+              wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
+              wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+            })
+            .from(cronTasks)
+            .where(eq(cronTasks.id, taskId))
+            .limit(1);
 
-        if (effectiveThreadId && effectiveToolMessageId && user.id) {
+          const upgradedCallbackMode = latestTask?.wakeUpCallbackMode ?? null;
+          const upgradedThreadId =
+            latestTask?.wakeUpThreadId ?? effectiveThreadId;
+          const upgradedToolMessageId =
+            latestTask?.wakeUpToolMessageId ?? effectiveToolMessageId;
+
           await handleTaskCompletion({
-            toolMessageId: effectiveToolMessageId,
-            threadId: effectiveThreadId,
-            callbackMode: CallbackMode.WAKE_UP,
+            toolMessageId: upgradedToolMessageId,
+            threadId: upgradedThreadId,
+            callbackMode:
+              upgradedCallbackMode === CallbackMode.WAKE_UP
+                ? CallbackMode.WAKE_UP
+                : null,
             status: finalStatus,
-            output: finalResult,
+            output:
+              upgradedCallbackMode === CallbackMode.WAKE_UP
+                ? finalResult
+                : null,
             taskId,
-            taskInput: {
-              ...(streamContext?.modelId
-                ? { modelId: streamContext.modelId }
-                : {}),
-              ...(streamContext?.characterId
-                ? { characterId: streamContext.characterId }
-                : {}),
-              ...(streamContext?.favoriteId
-                ? { favoriteId: streamContext.favoriteId }
-                : {}),
-            },
+            modelId: latestTask?.wakeUpModelId ?? null,
+            skillId: latestTask?.wakeUpSkillId ?? null,
+            favoriteId: latestTask?.wakeUpFavoriteId ?? null,
+            leafMessageId: latestTask?.wakeUpLeafMessageId ?? null,
             userId: user.id,
             logger,
+            directResumeUser: user,
+            directResumeLocale: locale,
           });
         }
 
-        // wakeUp: return taskId + hint only — result is delivered via resume-stream
-        // which injects a tool result message into the loop (live or revived).
-        // Args are suppressed from AI context on revival (callbackMode stored on tool message).
         return success({
           taskId,
-          hint: "Task running. Result will be injected into this thread when ready.",
+          status: CronTaskStatus.PENDING,
+          hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
+        });
+      }
+
+      // Local wakeUp: create task row in RUNNING state (so pulse never picks it up),
+      // fire execution fire-and-forget, return {taskId, status: "pending"} to the AI.
+      // AI completes its current turn. In the background: execute → handleTaskCompletion
+      // (schedules resume-stream enabled cron task) → delete task row.
+      // resume-stream fires on next pulse, checks isStreaming=false, revives thread.
+      if (callbackMode === CallbackMode.WAKE_UP) {
+        const taskId = `local-wu-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+        const effectiveThreadId = streamContext?.threadId;
+        // Resolve tool message ID for this specific parallel tool call.
+        // Priority: (1) DB lookup by toolCallId (authoritative, avoids race with stream-part-handler)
+        //           (2) pendingToolMessages map (set by tools-loader before execute() if no race)
+        //           (3) currentToolMessageId (set by stream-part-handler, may have timing issues)
+        //           (4) aiMessageId (placeholder assistant — last resort, almost always wrong for wakeUp)
+        // The DB lookup is safe because tool-call-handler writes the tool message row before
+        // returning, and execute() is called asynchronously after that write.
+        const pendingEntry = streamContext?.callerToolCallId
+          ? streamContext?.pendingToolMessages?.get(
+              streamContext?.callerToolCallId,
+            )
+          : undefined;
+
+        let resolvedToolMessageId: string | undefined =
+          pendingEntry?.messageId ?? streamContext?.currentToolMessageId;
+        let resolvedLeafMessageId: string | null =
+          pendingEntry?.toolCallData?.parentId ??
+          streamContext?.leafMessageId ??
+          null;
+
+        // DB fallback: if in-memory lookup missed (race between execute() and stream-part-handler),
+        // query the tool message row directly using toolCallId stored in metadata JSONB + threadId.
+        if (
+          !resolvedToolMessageId &&
+          streamContext?.callerToolCallId &&
+          effectiveThreadId
+        ) {
+          const { chatMessages } =
+            await import("@/app/api/[locale]/agent/chat/db");
+          const [row] = await db
+            .select({ id: chatMessages.id, parentId: chatMessages.parentId })
+            .from(chatMessages)
+            .where(
+              and(
+                eq(chatMessages.threadId, effectiveThreadId),
+                drizzleSql`(${chatMessages.metadata}->'toolCall'->>'toolCallId') = ${streamContext?.callerToolCallId}`,
+              ),
+            )
+            .limit(1);
+          if (row) {
+            resolvedToolMessageId = row.id;
+            resolvedLeafMessageId = resolvedLeafMessageId ?? row.parentId;
+          }
+        }
+
+        const effectiveToolMessageId =
+          resolvedToolMessageId ?? streamContext?.aiMessageId;
+        const effectiveLeafMessageId = resolvedLeafMessageId;
+
+        logger.info("[RouteExecute] Creating local wakeUp task (RUNNING)", {
+          toolName,
+          taskId,
+          effectiveThreadId,
+          effectiveToolMessageId,
+        });
+
+        // Insert as RUNNING so cron pulse never picks it up.
+        // Revival context in typed columns — taskInput holds only tool execution input.
+        await db.insert(cronTasks).values({
+          id: taskId,
+          shortId: taskId,
+          routeId: toolName,
+          displayName: `WakeUp: ${toolName}`,
+          category: TaskCategory.SYSTEM,
+          schedule: "* * * * *",
+          priority: CronTaskPriority.HIGH,
+          enabled: false,
+          runOnce: true,
+          lastExecutionStatus: CronTaskStatus.RUNNING,
+          taskInput: input ?? {},
+          wakeUpCallbackMode: CallbackMode.WAKE_UP,
+          wakeUpThreadId: effectiveThreadId ?? null,
+          wakeUpToolMessageId: effectiveToolMessageId ?? null,
+          wakeUpModelId: streamContext?.modelId ?? null,
+          wakeUpSkillId: streamContext?.skillId ?? null,
+          wakeUpFavoriteId: streamContext?.favoriteId ?? null,
+          wakeUpLeafMessageId: effectiveLeafMessageId,
+          outputMode: TaskOutputMode.STORE_ONLY,
+          notificationTargets: [],
+          tags: ["wakeup", "local"],
+          userId: user.id,
+        });
+
+        // Fire-and-forget: execute the tool, call handleTaskCompletion, then self-delete.
+        // handleTaskCompletion schedules resume-stream which revives the thread once
+        // the stream is no longer active.
+        void (async (): Promise<void> => {
+          const startedAt = new Date();
+          try {
+            const result = await RouteExecutionExecutor.executeGenericHandler<
+              Record<string, JsonValue>
+            >({
+              toolName,
+              data: input ?? {},
+              user,
+              locale,
+              logger,
+              platform: Platform.MCP,
+              streamContext: {
+                ...streamContext,
+                // Reset per-call fields — wakeUp goroutine is independent of parent stream
+                currentToolMessageId: undefined,
+                callerToolCallId: undefined,
+                pendingToolMessages: undefined,
+                pendingTimeoutMs: undefined,
+                waitingForRemoteResult: undefined,
+                // Do NOT inherit parent abortSignal — wakeUp goroutine must outlive parent stream
+                abortSignal: undefined,
+                escalateToTask: undefined,
+              },
+            });
+
+            const completedAt = new Date();
+            const finalStatus = result.success
+              ? CronTaskStatus.COMPLETED
+              : CronTaskStatus.FAILED;
+            const finalResult =
+              result.success && result.data !== undefined ? result.data : null;
+
+            logger.info("[RouteExecute] wakeUp task finished", {
+              taskId,
+              toolName,
+              finalStatus,
+              durationMs: completedAt.getTime() - startedAt.getTime(),
+            });
+
+            if (effectiveToolMessageId && effectiveThreadId && user.id) {
+              await handleTaskCompletion({
+                toolMessageId: effectiveToolMessageId,
+                threadId: effectiveThreadId ?? null,
+                callbackMode: CallbackMode.WAKE_UP,
+                status: finalStatus,
+                output: finalResult,
+                taskId,
+                modelId: streamContext?.modelId ?? null,
+                skillId: streamContext?.skillId ?? null,
+                favoriteId: streamContext?.favoriteId ?? null,
+                leafMessageId: streamContext?.leafMessageId ?? null,
+                userId: user.id,
+                logger,
+                directResumeUser: user,
+                directResumeLocale: locale,
+              });
+            }
+          } catch (err) {
+            logger.error("[RouteExecute] wakeUp task execution failed", {
+              taskId,
+              toolName,
+              error: err instanceof Error ? err.message : String(err),
+            });
+          } finally {
+            // Self-delete: task was ephemeral, clean it up.
+            try {
+              await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
+            } catch (delErr) {
+              logger.warn("[RouteExecute] wakeUp task self-delete failed", {
+                taskId,
+                error:
+                  delErr instanceof Error ? delErr.message : String(delErr),
+              });
+            }
+          }
+        })();
+
+        // Return taskId immediately — AI completes current turn while task runs in background.
+        return success({
+          taskId,
+          status: CronTaskStatus.PENDING,
+          hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
         });
       }
 
@@ -480,16 +905,34 @@ export class RouteExecuteRepository {
           threadId: undefined,
           aiMessageId: undefined,
           currentToolMessageId: undefined,
-          characterId: undefined,
+          pendingToolMessages: undefined,
+          pendingTimeoutMs: undefined,
+          leafMessageId: undefined,
+          skillId: undefined,
           modelId: undefined,
           favoriteId: undefined,
           headless: undefined,
           waitingForRemoteResult: undefined,
           abortSignal: undefined,
+          escalateToTask: undefined,
         },
       });
 
       if (!result.success) {
+        const endpoint = await getEndpoint(toolName);
+        const validationDetails = formatValidationErrorDetails(
+          result.messageParams as Record<string, string | number> | undefined,
+          endpoint,
+        );
+        if (validationDetails) {
+          return {
+            ...result,
+            messageParams: {
+              ...result.messageParams,
+              formattedError: validationDetails,
+            },
+          };
+        }
         return result;
       }
 

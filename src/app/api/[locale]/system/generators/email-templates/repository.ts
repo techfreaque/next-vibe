@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import { join } from "node:path";
-
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -89,9 +87,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
         logger.debug("Using live index for file discovery");
         templateFiles = [...liveIndex.emailFiles];
       } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        const apiPath = ["src", "app", "api", "[locale]"];
-        const startDir = join(process.cwd(), ...apiPath);
+        const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
         logger.debug(`Discovering email template files in: ${startDir}`);
 

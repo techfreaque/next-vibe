@@ -18,6 +18,7 @@ export const {
     example: "leads@example.com",
     comment: "Lead campaigns SMTP",
     commented: true,
+    fieldType: "email",
   },
   LEADS_EMAIL_HOST: {
     schema: z.string(),
@@ -28,11 +29,13 @@ export const {
     schema: z.coerce.number(),
     example: "587",
     commented: true,
+    fieldType: "number",
   },
   LEADS_EMAIL_SECURE: {
     schema: z.string().transform((v) => v === "true"),
     example: "true",
     commented: true,
+    fieldType: "boolean",
   },
   LEADS_EMAIL_USER: {
     schema: z.string(),

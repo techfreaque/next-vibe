@@ -23,9 +23,13 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Archive } from "next-vibe-ui/ui/icons/Archive";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
+import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
 import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
 import { Edit } from "next-vibe-ui/ui/icons/Edit";
+import { History } from "next-vibe-ui/ui/icons/History";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Eye } from "next-vibe-ui/ui/icons/Eye";
@@ -47,6 +51,7 @@ import { cn } from "next-vibe/shared/utils";
 
 import {
   useWidgetEndpointMutations,
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -69,9 +74,13 @@ import {
   type Resolution,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
-import definitions from "./definition";
 import type definition from "./definition";
+import definitions from "./definition";
 import type { GraphNodeConfig } from "../../../graph/schema";
+import type { GraphConfig } from "../../../graph/types";
+
+import editDefinitions from "../edit/definition";
+import versionsDefinitions from "../versions/definition";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1035,8 +1044,9 @@ function PaneLegend({
   crosshair,
   displayConfigs,
   leftOffset = 60,
-  rightOffset = 60,
   onToggleSeries,
+  collapsed,
+  onToggleCollapse,
 }: {
   paneNum: number;
   series: SeriesItem[];
@@ -1045,8 +1055,9 @@ function PaneLegend({
   crosshair: CrosshairState | null;
   displayConfigs: Map<string, NodeDisplayConfig>;
   leftOffset?: number;
-  rightOffset?: number;
   onToggleSeries: (nodeId: string) => void;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
 }): React.JSX.Element {
   const paneSeries = series.filter((s) => {
     const cfg = displayConfigs.get(s.nodeId);
@@ -1060,113 +1071,262 @@ function PaneLegend({
       return;
     }
     el.style.left = `${String(leftOffset + 4)}px`;
-    el.style.right = `${String(rightOffset + 4)}px`;
-  }, [legendId, leftOffset, rightOffset]);
+  }, [legendId, leftOffset]);
 
   return (
-    <Div
-      id={legendId}
-      className="absolute top-1 z-20 flex flex-col gap-0.5 pointer-events-none max-h-[80%] overflow-y-auto"
-    >
-      {paneSeries.map((s) => {
-        const isHidden = hiddenSeries.has(s.nodeId);
-        const cfg = displayConfigs.get(s.nodeId);
-        const color = cfg?.color ?? "#888";
-        const displayValue =
-          crosshair?.points.find((p) => p.nodeId === s.nodeId)?.value ??
-          lastValues.get(s.nodeId);
-
-        return (
-          <Div
-            key={s.nodeId}
-            className={cn(
-              "flex items-center gap-1.5 bg-background/80 backdrop-blur-sm px-1.5 py-0.5 rounded border border-border/30 cursor-pointer pointer-events-auto",
-              isHidden && "opacity-40",
+    <Div id={legendId} className="absolute top-1 z-20 pointer-events-none">
+      <Div className="inline-flex flex-col gap-0.5">
+        {/* Legend collapse toggle */}
+        <Div
+          className="flex items-center gap-1 pointer-events-auto cursor-pointer"
+          onClick={onToggleCollapse}
+          title={collapsed ? "Expand legend" : "Collapse legend"}
+        >
+          <Div className="flex items-center gap-1 bg-background/80 backdrop-blur-sm px-2 py-1 rounded border border-border/30 text-muted-foreground/60 hover:text-muted-foreground hover:bg-background/95 hover:border-border/70 transition-all">
+            {collapsed ? (
+              <ChevronRight className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronDown className="h-3.5 w-3.5" />
             )}
-            onClick={() => onToggleSeries(s.nodeId)}
-          >
-            <Div
-              style={{
-                width: "10px",
-                height: "3px",
-                borderRadius: "1px",
-                backgroundColor: isHidden ? "#888" : color,
-                flexShrink: 0,
-              }}
-            />
-            <Span
-              className={cn(
-                "text-[9px] font-mono truncate",
-                isHidden && "line-through text-muted-foreground",
-              )}
-            >
-              {humanizeNodeId(s.nodeId)}
+            <Span className="text-[10px] font-mono leading-none">
+              {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
+              L
             </Span>
-            {displayValue !== undefined && !isHidden && (
-              <Span className="text-[9px] font-semibold tabular-nums text-foreground shrink-0">
-                {formatValue(displayValue)}
-              </Span>
-            )}
           </Div>
-        );
-      })}
+        </Div>
+        {/* Series items */}
+        {!collapsed &&
+          paneSeries.map((s) => {
+            const isHidden = hiddenSeries.has(s.nodeId);
+            const cfg = displayConfigs.get(s.nodeId);
+            const color = cfg?.color ?? "#888";
+            const displayValue =
+              crosshair?.points.find((p) => p.nodeId === s.nodeId)?.value ??
+              lastValues.get(s.nodeId);
+
+            return (
+              <Div
+                key={s.nodeId}
+                className={cn(
+                  "flex items-center gap-2 bg-background/85 backdrop-blur-sm px-2 py-1 rounded border border-border/40 cursor-pointer pointer-events-auto whitespace-nowrap",
+                  isHidden && "opacity-40",
+                )}
+                onClick={() => onToggleSeries(s.nodeId)}
+              >
+                <Div
+                  style={{
+                    width: "12px",
+                    height: "3px",
+                    borderRadius: "1.5px",
+                    backgroundColor: isHidden ? "#888" : color,
+                    flexShrink: 0,
+                  }}
+                />
+                <Span
+                  className={cn(
+                    "text-[11px] font-mono",
+                    isHidden && "line-through text-muted-foreground",
+                  )}
+                >
+                  {humanizeNodeId(s.nodeId)}
+                </Span>
+                {displayValue !== undefined && !isHidden && (
+                  <Span className="text-[11px] font-semibold tabular-nums text-foreground shrink-0">
+                    {formatValue(displayValue)}
+                  </Span>
+                )}
+              </Div>
+            );
+          })}
+      </Div>
     </Div>
   );
 }
 
-/** Small collapse button positioned at top-right of each pane (next to right scale) */
-function PaneCollapseButton({
+/**
+ * Hover-only pill cluster of pane actions: collapse/expand, move up/down, maximize/restore.
+ * Shown on the right side of the pane. Hidden on non-touch devices until hover.
+ */
+function PaneActions({
   paneNum,
   rightOffset,
+  isCollapsed,
+  isFirst,
+  isLast,
+  isSinglePane,
+  isMaximized,
+  isSaving,
   onCollapse,
+  onMoveUp,
+  onMoveDown,
+  onMaximize,
 }: {
   paneNum: number;
   rightOffset: number;
+  isCollapsed: boolean;
+  isFirst: boolean;
+  isLast: boolean;
+  isSinglePane: boolean;
+  isMaximized: boolean;
+  isSaving: boolean;
   onCollapse: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onMaximize: () => void;
 }): React.JSX.Element {
-  const btnId = `vs-collapse-${String(paneNum)}`;
+  const actionsId = `vs-pane-actions-${String(paneNum)}`;
   useEffect(() => {
-    const el = document.getElementById(btnId);
+    const el = document.getElementById(actionsId);
     if (!el) {
       return;
     }
-    el.style.right = `${String(rightOffset + 6)}px`;
-  }, [btnId, rightOffset]);
+    el.style.right = `${String(rightOffset + 4)}px`;
+  }, [actionsId, rightOffset]);
 
   return (
     <Div
-      id={btnId}
-      className="absolute top-0.5 z-20 h-5 w-5 flex items-center justify-center rounded cursor-pointer text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent/50 transition-colors pointer-events-auto"
-      onClick={onCollapse}
-      title={`Collapse pane ${String(paneNum)}`}
+      id={actionsId}
+      className={cn(
+        "absolute top-1 z-20 pointer-events-auto",
+        // Hide on hover-capable devices until hovered; always visible on touch
+        "opacity-0 [@media(hover:none)]:opacity-100",
+        // Parent pane wrapper must have class `group/pane` for this to work
+        "group-hover/pane:opacity-100",
+        "transition-opacity duration-150",
+      )}
     >
-      <ChevronUp className="h-3 w-3" />
+      <Div className="flex items-center gap-0 bg-background/85 backdrop-blur-sm rounded border border-border/30 overflow-hidden shadow-sm">
+        {isSaving && (
+          <Div className="px-2 py-1">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground/60" />
+          </Div>
+        )}
+        {!isSinglePane && !isFirst && (
+          <Div
+            className="px-2 py-1 text-muted-foreground/60 hover:text-muted-foreground hover:bg-accent/60 cursor-pointer transition-colors"
+            onClick={onMoveUp}
+            title={`Move pane ${String(paneNum)} up`}
+          >
+            <ArrowUp className="h-3.5 w-3.5" />
+          </Div>
+        )}
+        {!isSinglePane && !isLast && (
+          <Div
+            className="px-2 py-1 text-muted-foreground/60 hover:text-muted-foreground hover:bg-accent/60 cursor-pointer transition-colors"
+            onClick={onMoveDown}
+            title={`Move pane ${String(paneNum)} down`}
+          >
+            <ArrowDown className="h-3.5 w-3.5" />
+          </Div>
+        )}
+        {!isSinglePane && (
+          <Div
+            className="px-2 py-1 text-muted-foreground/60 hover:text-muted-foreground hover:bg-accent/60 cursor-pointer transition-colors"
+            onClick={onMaximize}
+            title={isMaximized ? "Restore pane" : "Maximize pane"}
+          >
+            <Maximize className="h-3.5 w-3.5" />
+          </Div>
+        )}
+        <Div
+          className="px-2 py-1 text-muted-foreground/60 hover:text-muted-foreground hover:bg-accent/60 cursor-pointer transition-colors"
+          onClick={onCollapse}
+          title={isCollapsed ? "Expand pane" : "Collapse pane"}
+        >
+          {isCollapsed ? (
+            <ChevronDown className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronUp className="h-3.5 w-3.5" />
+          )}
+        </Div>
+      </Div>
     </Div>
   );
 }
 
-/** Collapsed pane header bar — click to expand */
+/** Collapsed pane header bar — shows first series + count on left, hover actions on right */
 function CollapsedPaneBar({
   paneNum,
   seriesCount,
+  firstSeriesName,
+  firstSeriesColor,
+  isFirst,
+  isLast,
+  isSinglePane,
+  isSaving,
   onExpand,
+  onMoveUp,
+  onMoveDown,
 }: {
   paneNum: number;
   seriesCount: number;
+  firstSeriesName: string;
+  firstSeriesColor: string;
+  isFirst: boolean;
+  isLast: boolean;
+  isSinglePane: boolean;
+  isSaving: boolean;
   onExpand: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 }): React.JSX.Element {
   return (
-    <Div className="h-6 shrink-0 flex items-center px-2 gap-1 bg-muted/30 border-b border-border/30 cursor-pointer hover:bg-muted/50 transition-colors">
-      <Button
-        variant="ghost"
-        size="sm"
+    <Div className="h-8 shrink-0 flex items-center px-3 gap-2 border-b border-border/30 group/collapsed hover:bg-accent/10 transition-colors">
+      {/* Left: expand + series info */}
+      <Div
+        className="flex items-center gap-2 cursor-pointer flex-1 min-w-0"
         onClick={onExpand}
-        className="h-5 px-1.5 text-[9px] text-muted-foreground gap-1"
       >
-        <ChevronRight className="h-3 w-3" />
-        {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
-        <Span>{`P${String(paneNum)} (${String(seriesCount)})`}</Span>
-      </Button>
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+        <Div
+          style={{
+            width: "10px",
+            height: "3px",
+            borderRadius: "1.5px",
+            backgroundColor: firstSeriesColor,
+            flexShrink: 0,
+          }}
+        />
+        <Span className="text-[11px] font-mono text-muted-foreground/80 truncate">
+          {firstSeriesName}
+        </Span>
+        {seriesCount > 1 && (
+          <Span className="text-[11px] text-muted-foreground/50 shrink-0">
+            {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
+            {`+${String(seriesCount - 1)}`}
+          </Span>
+        )}
+      </Div>
+      {/* Right: hover-only move actions */}
+      <Div className="flex items-center gap-0.5 opacity-0 [@media(hover:none)]:opacity-100 group-hover/collapsed:opacity-100 transition-opacity shrink-0">
+        {isSaving && (
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground/50 mr-0.5" />
+        )}
+        {!isSinglePane && !isFirst && (
+          <Div
+            className="px-1.5 py-1 text-muted-foreground/50 hover:text-muted-foreground hover:bg-accent/60 rounded cursor-pointer transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveUp();
+            }}
+            title={`Move pane ${String(paneNum)} up`}
+          >
+            <ArrowUp className="h-3.5 w-3.5" />
+          </Div>
+        )}
+        {!isSinglePane && !isLast && (
+          <Div
+            className="px-1.5 py-1 text-muted-foreground/50 hover:text-muted-foreground hover:bg-accent/60 rounded cursor-pointer transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveDown();
+            }}
+            title={`Move pane ${String(paneNum)} down`}
+          >
+            <ArrowDown className="h-3.5 w-3.5" />
+          </Div>
+        )}
+      </Div>
     </Div>
   );
 }
@@ -1462,13 +1622,23 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
   const outerMutations = useWidgetEndpointMutations();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
+  const locale = useWidgetLocale();
 
   const [resolution, setResolution] = useState<Resolution>(
     GraphResolution.ONE_DAY,
   );
   const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set());
   const [showLegend, setShowLegend] = useState(true);
+  const [collapsedLegends, setCollapsedLegends] = useState<Set<number>>(
+    new Set(),
+  );
   const [collapsedPanes, setCollapsedPanes] = useState<Set<number>>(new Set());
+  const [maximizedPane, setMaximizedPane] = useState<number | null>(null);
+  // Optimistic pane config override (applied immediately before server confirms)
+  const [optimisticConfig, setOptimisticConfig] = useState<GraphConfig | null>(
+    null,
+  );
+  const [isSavingLayout, setIsSavingLayout] = useState(false);
   const [panBackVisible, setPanBackVisible] = useState(false);
   const [crosshair, setCrosshair] = useState<CrosshairState | null>(null);
   const [lastValues, setLastValues] = useState<Map<string, number>>(new Map());
@@ -1481,10 +1651,82 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
 
   const graph = field.value?.graph;
 
-  // Node display configs from graph config
+  // Effective node config: optimistic override when a pane move is in flight
+  const effectiveNodeConfig = optimisticConfig?.nodes ?? graph?.config?.nodes;
+
+  // ── Versions endpoint: DB ancestor chain for prev/next version nav ─────────
+  const versionsOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { id: graph?.id ?? "" },
+        queryOptions: {
+          enabled: !!graph?.id,
+          refetchOnWindowFocus: false,
+          staleTime: 60_000,
+        },
+      },
+    }),
+    [graph?.id],
+  );
+  const versionsEndpoint = useEndpoint(
+    versionsDefinitions,
+    versionsOptions,
+    logger,
+    user,
+  );
+  const versionChain = versionsEndpoint.read?.data?.versions ?? [];
+  const currentVersionIndex = versionChain.findIndex((v) => v.id === graph?.id);
+  const prevVersionId =
+    currentVersionIndex > 0
+      ? versionChain[currentVersionIndex - 1]?.id
+      : undefined;
+  const nextVersionId =
+    currentVersionIndex >= 0 && currentVersionIndex < versionChain.length - 1
+      ? versionChain[currentVersionIndex + 1]?.id
+      : undefined;
+
+  /**
+   * Save an updated graph config optimistically — update local state immediately,
+   * fire `apiClient.mutate` in background, navigate to the new version ID on success.
+   */
+  const saveLayoutConfig = useCallback(
+    (newConfig: GraphConfig): void => {
+      if (!graph) {
+        return;
+      }
+      setOptimisticConfig(newConfig);
+      setIsSavingLayout(true);
+      void (async (): Promise<void> => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const result = await apiClient.mutate(
+          editDefinitions.PUT,
+          logger,
+          user,
+          { config: newConfig },
+          { id: graph.id },
+          locale,
+        );
+        setIsSavingLayout(false);
+        if (result.success) {
+          setOptimisticConfig(null);
+          const dataDef = await import("./definition");
+          navigation.push(dataDef.default.GET, {
+            urlPathParams: { id: result.data.newId },
+          });
+        } else {
+          // Revert optimistic config on failure
+          setOptimisticConfig(null);
+        }
+      })();
+    },
+    [graph, logger, user, locale, navigation],
+  );
+
+  // Node display configs from graph config (uses optimistic config when in-flight)
   const displayConfigs = useMemo(
-    () => getNodeDisplayConfigs(accSeries, graph?.config?.nodes),
-    [accSeries, graph?.config?.nodes],
+    () => getNodeDisplayConfigs(accSeries, effectiveNodeConfig),
+    [accSeries, effectiveNodeConfig],
   );
 
   // ── Pagination query state ────────────────────────────────────────────────
@@ -1705,6 +1947,75 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
     });
   }, []);
 
+  /** Swap the pane numbers of two adjacent panes (persists to new version) */
+  const handlePaneMoveUp = useCallback(
+    (paneNum: number): void => {
+      if (!graph?.config) {
+        return;
+      }
+      const prevPane = paneNum - 1;
+      const updatedNodes: GraphConfig["nodes"] = {};
+      for (const [nodeId, nodeConfig] of Object.entries(graph.config.nodes)) {
+        const p = nodeConfig.pane ?? 0;
+        updatedNodes[nodeId] = {
+          ...nodeConfig,
+          pane: p === paneNum ? prevPane : p === prevPane ? paneNum : p,
+        };
+      }
+      saveLayoutConfig({ ...graph.config, nodes: updatedNodes });
+    },
+    [graph, saveLayoutConfig],
+  );
+
+  const handlePaneMoveDown = useCallback(
+    (paneNum: number): void => {
+      if (!graph?.config) {
+        return;
+      }
+      const nextPane = paneNum + 1;
+      const updatedNodes: GraphConfig["nodes"] = {};
+      for (const [nodeId, nodeConfig] of Object.entries(graph.config.nodes)) {
+        const p = nodeConfig.pane ?? 0;
+        updatedNodes[nodeId] = {
+          ...nodeConfig,
+          pane: p === paneNum ? nextPane : p === nextPane ? paneNum : p,
+        };
+      }
+      saveLayoutConfig({ ...graph.config, nodes: updatedNodes });
+    },
+    [graph, saveLayoutConfig],
+  );
+
+  /** Toggle maximize for a pane (client-side visual only) */
+  const handlePaneMaximize = useCallback((paneNum: number): void => {
+    setMaximizedPane((prev) => (prev === paneNum ? null : paneNum));
+  }, []);
+
+  /** Version chain navigation (prev = older ancestor, next = newer descendant) */
+  const handleVersionPrev = useCallback((): void => {
+    if (!prevVersionId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const dataDef = await import("./definition");
+      navigation.push(dataDef.default.GET, {
+        urlPathParams: { id: prevVersionId },
+      });
+    })();
+  }, [prevVersionId, navigation]);
+
+  const handleVersionNext = useCallback((): void => {
+    if (!nextVersionId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const dataDef = await import("./definition");
+      navigation.push(dataDef.default.GET, {
+        urlPathParams: { id: nextVersionId },
+      });
+    })();
+  }, [nextVersionId, navigation]);
+
   // When panes collapse/expand, resize visible charts to fill space
   useEffect(() => {
     // Give DOM time to apply hidden/visible classes
@@ -1796,6 +2107,44 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                 ? t("get.widget.active")
                 : t("get.widget.inactive")}
             </Badge>
+          </>
+        )}
+
+        {/* Version prev/next navigation */}
+        {versionChain.length > 1 && (
+          <>
+            <Div className="h-4 w-px bg-border shrink-0" />
+            <Div className="flex items-center gap-0" title="Version history">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleVersionPrev}
+                disabled={!prevVersionId}
+                className="h-7 w-7 p-0"
+                title="Older version"
+              >
+                <ChevronUp className="h-3.5 w-3.5" />
+              </Button>
+              <Div className="flex items-center gap-0.5 px-1">
+                <History className="h-3 w-3 text-muted-foreground/50" />
+                <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
+                  {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
+                  {currentVersionIndex >= 0
+                    ? `${String(currentVersionIndex + 1)}/${String(versionChain.length)}`
+                    : `?/${String(versionChain.length)}`}
+                </Span>
+              </Div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleVersionNext}
+                disabled={!nextVersionId}
+                className="h-7 w-7 p-0"
+                title="Newer version"
+              >
+                <ChevronDown className="h-3.5 w-3.5" />
+              </Button>
+            </Div>
           </>
         )}
 
@@ -1902,23 +2251,53 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                   />
                 )}
                 {/* Collapsed pane bar — shown when pane is collapsed */}
-                {isCollapsed && (
-                  <CollapsedPaneBar
-                    paneNum={paneNum}
-                    seriesCount={seriesInPane}
-                    onExpand={() => handlePaneCollapse(paneNum)}
-                  />
-                )}
+                {isCollapsed &&
+                  (() => {
+                    const paneSeries = accSeries.filter((s) => {
+                      const cfg = displayConfigs.get(s.nodeId);
+                      return (
+                        cfg?.visible !== false && (cfg?.pane ?? 0) === paneNum
+                      );
+                    });
+                    const firstSeries = paneSeries[0];
+                    const firstSeriesName = firstSeries
+                      ? humanizeNodeId(firstSeries.nodeId)
+                      : `Pane ${String(paneNum)}`;
+                    const firstSeriesColor = firstSeries
+                      ? (displayConfigs.get(firstSeries.nodeId)?.color ??
+                        "#888")
+                      : "#888";
+                    return (
+                      <CollapsedPaneBar
+                        paneNum={paneNum}
+                        seriesCount={seriesInPane}
+                        firstSeriesName={firstSeriesName}
+                        firstSeriesColor={firstSeriesColor}
+                        isFirst={idx === 0}
+                        isLast={idx === paneNumbers.length - 1}
+                        isSinglePane={paneNumbers.length === 1}
+                        isSaving={isSavingLayout}
+                        onExpand={() => handlePaneCollapse(paneNum)}
+                        onMoveUp={() => handlePaneMoveUp(paneNum)}
+                        onMoveDown={() => handlePaneMoveDown(paneNum)}
+                      />
+                    );
+                  })()}
                 {/* Pane wrapper — always in DOM so lwc chart stays attached.
-                    Hidden via h-0 overflow-hidden when collapsed. */}
+                    Hidden via h-0 overflow-hidden when collapsed.
+                    group/pane enables hover-only pane action visibility. */}
                 <Div
                   className={cn(
-                    "relative",
+                    "relative group/pane",
                     isCollapsed
                       ? "h-0 min-h-0 overflow-hidden"
-                      : idx === 0
-                        ? "flex-[3] min-h-[200px]"
-                        : "flex-[2] min-h-[150px]",
+                      : maximizedPane !== null
+                        ? maximizedPane === paneNum
+                          ? "flex-1 min-h-[200px]"
+                          : "hidden"
+                        : idx === 0
+                          ? "flex-[3] min-h-[200px]"
+                          : "flex-[2] min-h-[150px]",
                   )}
                 >
                   {/* Chart canvas target */}
@@ -1936,18 +2315,36 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                       crosshair={crosshair}
                       displayConfigs={displayConfigs}
                       leftOffset={scaleWidths.left}
-                      rightOffset={scaleWidths.right}
                       onToggleSeries={handleToggle}
+                      collapsed={collapsedLegends.has(paneNum)}
+                      onToggleCollapse={() => {
+                        setCollapsedLegends((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(paneNum)) {
+                            next.delete(paneNum);
+                          } else {
+                            next.add(paneNum);
+                          }
+                          return next;
+                        });
+                      }}
                     />
                   )}
-                  {/* Pane collapse button — separate from legend to avoid confusion */}
-                  {!isCollapsed && paneNumbers.length > 1 && (
-                    <PaneCollapseButton
-                      paneNum={paneNum}
-                      rightOffset={scaleWidths.right}
-                      onCollapse={() => handlePaneCollapse(paneNum)}
-                    />
-                  )}
+                  {/* Pane action buttons — hover-only on pointer devices */}
+                  <PaneActions
+                    paneNum={paneNum}
+                    rightOffset={scaleWidths.right}
+                    isCollapsed={isCollapsed}
+                    isFirst={idx === 0}
+                    isLast={idx === paneNumbers.length - 1}
+                    isSinglePane={paneNumbers.length === 1}
+                    isMaximized={maximizedPane === paneNum}
+                    isSaving={isSavingLayout}
+                    onCollapse={() => handlePaneCollapse(paneNum)}
+                    onMoveUp={() => handlePaneMoveUp(paneNum)}
+                    onMoveDown={() => handlePaneMoveDown(paneNum)}
+                    onMaximize={() => handlePaneMaximize(paneNum)}
+                  />
                 </Div>
               </React.Fragment>
             );

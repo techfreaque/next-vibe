@@ -7,7 +7,7 @@
  *
  * Use this from CLI to get tool results fed into an AI prompt in one shot:
  *   vibe agent_ai-stream_run_POST --model=claude-haiku-4-5-20251001 \
- *     --character=default --prompt="Summarise these characters"
+ *     --skill=default --prompt="Summarise these skills"
  */
 
 import { z } from "zod";
@@ -17,6 +17,7 @@ import {
   ModelId,
   ModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
+import { DEFAULT_SKILL_IDS } from "@/app/api/[locale]/system/generated/skills-index";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -62,8 +63,8 @@ const { POST } = createEndpoint({
       const modelName = request.model
         ? getModelById(request.model).name
         : undefined;
-      const character = request.character ?? undefined;
-      const suffix = [modelName, character].filter(Boolean).join(" · ");
+      const skill = request.skill ?? undefined;
+      const suffix = [modelName, skill].filter(Boolean).join(" · ");
       return {
         message: "run.post.dynamicTitle" as const,
         messageParams: { prompt, suffix: suffix ? ` (${suffix})` : "" },
@@ -96,7 +97,7 @@ const { POST } = createEndpoint({
           .transform((v) => (v === "" ? undefined : v)),
       }),
 
-      // ── Model & character ───────────────────────────────────────────────
+      // ── Model & skill ───────────────────────────────────────────────
       model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -107,14 +108,16 @@ const { POST } = createEndpoint({
         schema: z.enum(ModelId).optional(),
       }),
 
-      character: requestField(scopedTranslation, {
+      skill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "run.post.fields.character.label",
-        description: "run.post.fields.character.description",
-        placeholder: "run.post.fields.character.placeholder",
+        label: "run.post.fields.skill.label",
+        description: "run.post.fields.skill.description",
+        placeholder: "run.post.fields.skill.placeholder",
         columns: 6,
-        schema: z.string().optional(),
+        schema: z
+          .union([z.enum(DEFAULT_SKILL_IDS), z.string().uuid()])
+          .optional(),
       }),
 
       // ── User prompt ─────────────────────────────────────────────────────
@@ -177,15 +180,15 @@ const { POST } = createEndpoint({
       ),
 
       // ── Tool controls (mirrors regular ai-stream) ────────────────────────
-      // allowedTools: null = all tools permitted; array = restrict to listed tools
-      allowedTools: requestDataArrayOptionalField(
+      // availableTools: null = all tools permitted; array = restrict to listed tools
+      availableTools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
-          title: "run.post.fields.allowedTools.label",
-          description: "run.post.fields.allowedTools.description",
+          title: "run.post.fields.availableTools.label",
+          description: "run.post.fields.availableTools.description",
         },
         objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
@@ -196,32 +199,33 @@ const { POST } = createEndpoint({
             toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "run.post.fields.allowedTools.toolId.label",
-              description: "run.post.fields.allowedTools.toolId.description",
+              label: "run.post.fields.availableTools.toolId.label",
+              description: "run.post.fields.availableTools.toolId.description",
               columns: 6,
               schema: z.string(),
             }),
             requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label: "run.post.fields.allowedTools.requiresConfirmation.label",
+              label:
+                "run.post.fields.availableTools.requiresConfirmation.label",
               description:
-                "run.post.fields.allowedTools.requiresConfirmation.description",
+                "run.post.fields.availableTools.requiresConfirmation.description",
               columns: 6,
               schema: z.boolean().default(false),
             }),
           },
         }),
       ),
-      // tools: null = no tools visible to model; array = these tools are in context
-      tools: requestDataArrayOptionalField(
+      // pinnedTools: null = no tools pinned to model context; array = these tools are in context
+      pinnedTools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
           layoutType: LayoutType.GRID,
           columns: 12,
-          title: "run.post.fields.tools.label",
-          description: "run.post.fields.tools.description",
+          title: "run.post.fields.pinnedTools.label",
+          description: "run.post.fields.pinnedTools.description",
         },
         objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
@@ -232,17 +236,17 @@ const { POST } = createEndpoint({
             toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "run.post.fields.tools.toolId.label",
-              description: "run.post.fields.tools.toolId.description",
+              label: "run.post.fields.pinnedTools.toolId.label",
+              description: "run.post.fields.pinnedTools.toolId.description",
               columns: 6,
               schema: z.string(),
             }),
             requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label: "run.post.fields.tools.requiresConfirmation.label",
+              label: "run.post.fields.pinnedTools.requiresConfirmation.label",
               description:
-                "run.post.fields.tools.requiresConfirmation.description",
+                "run.post.fields.pinnedTools.requiresConfirmation.description",
               columns: 6,
               schema: z.boolean().default(false),
             }),
@@ -456,7 +460,7 @@ const { POST } = createEndpoint({
 
   examples: {
     requests: {
-      // Simple: just prompt — no pre-calls, default character
+      // Simple: just prompt — no pre-calls, default skill
       simple: {
         model: ModelId["CLAUDE_HAIKU_4_5"],
         prompt: "Write a 3-sentence summary of what unbottled.ai is.",
@@ -464,7 +468,7 @@ const { POST } = createEndpoint({
         maxTurns: 1,
         rootFolderId: DefaultFolderId.CRON,
       },
-      // Recommended: use a favorite to load character + model + tools in one shot
+      // Recommended: use a favorite to load skill + model + tools in one shot
       withFavorite: {
         favoriteId: "550e8400-e29b-41d4-a716-446655440000",
         prompt: "Analyse last week's signups and write a brief report.",
@@ -472,9 +476,9 @@ const { POST } = createEndpoint({
         maxTurns: 1,
         rootFolderId: DefaultFolderId.CRON,
       },
-      // Use a dedicated character with custom system prompt
-      withCharacter: {
-        character: "uuid-of-your-character",
+      // Use a dedicated skill with custom system prompt
+      withSkill: {
+        skill: "uuid-of-your-skill",
         prompt: "Analyse last week's signups and write a brief report.",
         instructions: "Use bullet points. Max 5 items.",
         maxTurns: 1,
@@ -484,25 +488,25 @@ const { POST } = createEndpoint({
       withPreCall: {
         model: ModelId["CLAUDE_HAIKU_4_5"],
         prompt:
-          "Summarise the available characters. Which is most suitable for customer support?",
+          "Summarise the available skills. Which is most suitable for customer support?",
         instructions: "One paragraph max.",
-        preCalls: [{ routeId: "agent_chat_characters_GET", args: {} }],
+        preCalls: [{ routeId: "agent_chat_skills_GET", args: {} }],
         maxTurns: 1,
       },
       // Agentic: give AI tools and let it reason across multiple turns
       agentic: {
         model: ModelId["CLAUDE_SONNET_4_6"],
-        character: "uuid-of-research-character",
+        skill: "uuid-of-research-skill",
         prompt:
           "Search for the latest news about AI assistants and write a brief report.",
-        allowedTools: [{ toolId: "web-search", requiresConfirmation: false }],
+        availableTools: [{ toolId: "web-search", requiresConfirmation: false }],
         maxTurns: 3,
         rootFolderId: DefaultFolderId.CRON,
       },
       // Public bot: exclude memories so the bot doesn't inherit personal context
       publicBot: {
         model: ModelId["CLAUDE_HAIKU_4_5"],
-        character: "uuid-of-public-bot-character",
+        skill: "uuid-of-public-bot-skill",
         prompt: "Answer this forum question concisely.",
         excludeMemories: true,
         maxTurns: 1,
@@ -518,7 +522,7 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        text: "There are 3 characters available: ...",
+        text: "There are 3 skills available: ...",
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         lastAiMessageId: "660e8400-e29b-41d4-a716-446655440001",
         threadTitle: "Agent run 2026-02-23",
@@ -526,7 +530,7 @@ const { POST } = createEndpoint({
         promptTokens: 412,
         completionTokens: 87,
         preCallResults: [
-          { routeId: "agent_chat_characters_GET", success: true, error: null },
+          { routeId: "agent_chat_skills_GET", success: true, error: null },
         ],
       },
     },

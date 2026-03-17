@@ -18,51 +18,26 @@ import {
   chatShadows,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import { useDebugSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/hook";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { DebugSystemPromptParts } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/hook";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
 
 interface DebugProps {
   locale: CountryLanguage;
-  rootFolderId: DefaultFolderId;
-  subFolderId?: string | null;
-  characterId?: string | null;
-  selectedModel?: string;
-  user: JwtPayloadType;
-  logger: EndpointLogger;
+  parts: DebugSystemPromptParts;
 }
 
 /**
  * Debug card shown BEFORE the message history.
  * Displays only the leading system prompt (the static cacheable `system` param sent to the AI).
  */
-export function DebugSystemPrompt({
-  locale,
-  rootFolderId,
-  subFolderId,
-  characterId,
-  selectedModel,
-  user,
-  logger,
-}: DebugProps): JSX.Element {
+export function DebugSystemPrompt({ locale, parts }: DebugProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [copied, setCopied] = useState(false);
   const [showMarkdown, setShowMarkdown] = useState(true);
 
-  const { systemPrompt, trailingSystemMessage, contextLine } =
-    useDebugSystemPrompt({
-      locale,
-      rootFolderId,
-      subFolderId,
-      characterId,
-      selectedModel,
-      user,
-      logger,
-    });
+  const { systemPrompt, trailingSystemMessage, contextLine } = parts;
 
   // Copy copies the full context (all 3 parts) for convenience
   const fullText = [
@@ -76,12 +51,10 @@ export function DebugSystemPrompt({
       await navigator.clipboard.writeText(fullText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      logger.error("Failed to copy system prompt", {
-        error: error instanceof Error ? error.message : String(error),
-      });
+    } catch {
+      // clipboard write failed — ignore silently
     }
-  }, [fullText, logger]);
+  }, [fullText]);
 
   return (
     <Div className={cn(chatAnimations.slideIn, "mb-4")}>
@@ -133,8 +106,7 @@ export function DebugSystemPrompt({
 
         {/* Leading system prompt only — trailing and context appear after history */}
         <Div className="mb-1 text-xs font-mono text-purple-400/60 uppercase tracking-wide">
-          {/* eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-i18n/no-literal-string -- debug-only label */}
-          system prompt · leading · cached
+          {t("debugView.systemPromptLabel")}
         </Div>
         {showMarkdown ? (
           <Div className={cn(chatProse.all, "text-sm")}>
@@ -158,24 +130,12 @@ export function DebugSystemPrompt({
  */
 export function DebugTrailingContext({
   locale,
-  rootFolderId,
-  subFolderId,
-  characterId,
-  selectedModel,
-  user,
-  logger,
+  parts,
 }: DebugProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   const [showMarkdown, setShowMarkdown] = useState(true);
 
-  const { trailingSystemMessage, contextLine } = useDebugSystemPrompt({
-    locale,
-    rootFolderId,
-    subFolderId,
-    characterId,
-    selectedModel,
-    user,
-    logger,
-  });
+  const { trailingSystemMessage, contextLine } = parts;
 
   return (
     <Div className={cn(chatAnimations.slideIn, "mt-4")}>
@@ -229,8 +189,7 @@ export function DebugTrailingContext({
         )}
       >
         <Div className="mb-1 text-xs font-mono text-blue-400/60 uppercase tracking-wide">
-          {/* eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-i18n/no-literal-string -- debug-only label */}
-          upcoming assistant context · last message
+          {t("debugView.upcomingContextLabel")}
         </Div>
         <Div className="text-sm font-mono text-blue-300/80">{contextLine}</Div>
       </Div>

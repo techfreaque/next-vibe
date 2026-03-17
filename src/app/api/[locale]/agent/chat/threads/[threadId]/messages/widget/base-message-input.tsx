@@ -113,8 +113,7 @@ export function BaseMessageInput({
   );
   const defaults = ChatSettingsRepositoryClient.getDefaults();
   const selectedModel = settings?.selectedModel ?? defaults.selectedModel;
-  const selectedCharacter =
-    settings?.selectedCharacter ?? defaults.selectedCharacter;
+  const selectedSkill = settings?.selectedSkill ?? defaults.selectedSkill;
   const ttsAutoplay = settings?.ttsAutoplay ?? defaults.ttsAutoplay;
 
   const { t } = scopedTranslation.scopedT(locale);
@@ -209,7 +208,7 @@ export function BaseMessageInput({
           {/* Left: Selector + Tools + File Upload */}
           <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 @md:gap-1.5 flex-1 min-w-0">
             <Selector
-              characterId={selectedCharacter}
+              skillId={selectedSkill}
               modelId={selectedModel}
               locale={locale}
               buttonClassName="px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9"

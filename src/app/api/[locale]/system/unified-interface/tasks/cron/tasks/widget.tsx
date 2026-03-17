@@ -1,11 +1,23 @@
 /**
  * Cron Tasks Widget
- * Full task management list with status filters, search, sort, and CRUD navigation
+ * Full task management list with status filters, search, sort, bulk selection, and CRUD navigation
  */
 
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "next-vibe-ui/ui/alert-dialog";
 import { Button } from "next-vibe-ui/ui/button";
+import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
@@ -34,26 +46,35 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 
-import type { CronTaskPriorityDB, TaskCategoryDB } from "../../enum";
+import type {
+  CronTaskPriorityDB,
+  TaskCategoryDB,
+  CronTaskPriorityFilterValue,
+} from "../../enum";
 import {
   CronTaskEnabledFilter,
   CronTaskHiddenFilter,
   CronTaskPriority,
   CronTaskPriorityOptions,
   CronTaskStatus,
+  type CronTaskStatusValue,
   TaskCategoryOptions,
 } from "../../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
+import bulkEndpoints from "../bulk/definition";
 import type endpoints from "./definition";
 import type { CronTaskListResponseOutput } from "./definition";
 import type { CronTasksTranslationKey } from "./i18n";
@@ -199,6 +220,8 @@ function HiddenBadge({
 
 function TaskRow({
   task,
+  selected,
+  onToggleSelect,
   onView,
   onEdit,
   onDelete,
@@ -209,6 +232,8 @@ function TaskRow({
   isTouch,
 }: {
   task: Task;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
   onView: (task: Task) => void;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
@@ -228,7 +253,21 @@ function TaskRow({
     : "";
 
   return (
-    <Div className="group flex items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors border-b last:border-b-0">
+    <Div
+      className={cn(
+        "group flex items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors border-b last:border-b-0",
+        selected && "bg-primary/5",
+      )}
+    >
+      {/* Checkbox */}
+      <Div className="flex-shrink-0 mt-1">
+        <Checkbox
+          checked={selected}
+          onCheckedChange={() => onToggleSelect(task.id)}
+          aria-label={`Select ${task.displayName}`}
+        />
+      </Div>
+
       {/* Enabled indicator dot */}
       <Div className="flex-shrink-0 mt-1.5">
         <EnabledDot enabled={task.enabled} />
@@ -442,6 +481,150 @@ function FilterTab({
 }
 
 // ---------------------------------------------------------------------------
+// Bulk action toolbar
+// ---------------------------------------------------------------------------
+
+function BulkToolbar({
+  selectedCount,
+  totalCount,
+  allSelected,
+  isBulkLoading,
+  onSelectAll,
+  onClearSelection,
+  onBulkEnable,
+  onBulkDisable,
+  onBulkRun,
+  onBulkDelete,
+  t,
+}: {
+  selectedCount: number;
+  totalCount: number;
+  allSelected: boolean;
+  isBulkLoading: boolean;
+  onSelectAll: () => void;
+  onClearSelection: () => void;
+  onBulkEnable: () => void;
+  onBulkDisable: () => void;
+  onBulkRun: () => void;
+  onBulkDelete: () => void;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+}): React.JSX.Element {
+  return (
+    <Div className="flex items-center gap-2 px-4 py-2 border-b bg-primary/5 flex-wrap">
+      {/* Checkbox + count */}
+      <Div className="flex items-center gap-2">
+        <Checkbox
+          checked={allSelected}
+          onCheckedChange={allSelected ? onClearSelection : onSelectAll}
+          aria-label={
+            allSelected
+              ? t("widget.bulk.clearSelection")
+              : t("widget.bulk.selectAll")
+          }
+        />
+        <Span className="text-xs font-medium text-primary">
+          {t("widget.bulk.selected").replace("{count}", String(selectedCount))}
+        </Span>
+        <Span className="text-xs text-muted-foreground">/ {totalCount}</Span>
+      </Div>
+
+      <Div className="w-px bg-border self-stretch mx-1" />
+
+      {/* Action buttons */}
+      <Div className="flex items-center gap-1 flex-wrap">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-7 px-2.5 text-xs gap-1.5"
+          onClick={onBulkEnable}
+          disabled={isBulkLoading}
+        >
+          {t("widget.bulk.enable")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-7 px-2.5 text-xs gap-1.5"
+          onClick={onBulkDisable}
+          disabled={isBulkLoading}
+        >
+          {t("widget.bulk.disable")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-7 px-2.5 text-xs gap-1.5 text-green-600 hover:text-green-700 border-green-200 hover:border-green-300"
+          onClick={onBulkRun}
+          disabled={isBulkLoading}
+        >
+          <Play className="h-3 w-3" />
+          {t("widget.bulk.runNow")}
+        </Button>
+
+        {/* Delete with AlertDialog confirmation */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 px-2.5 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:border-destructive/50"
+              disabled={isBulkLoading}
+            >
+              <Trash2 className="h-3 w-3" />
+              {t("widget.bulk.delete")}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("widget.bulk.confirmDeleteTitle")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("widget.bulk.confirmDelete").replace(
+                  "{count}",
+                  String(selectedCount),
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("widget.bulk.cancel")}</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                onClick={onBulkDelete}
+              >
+                {t("widget.bulk.delete")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </Div>
+
+      {/* Loading indicator */}
+      {isBulkLoading && (
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-auto" />
+      )}
+
+      {/* Clear selection */}
+      {!isBulkLoading && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs text-muted-foreground ml-auto"
+          onClick={onClearSelection}
+        >
+          {t("widget.bulk.clearSelection")}
+        </Button>
+      )}
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main widget
 // ---------------------------------------------------------------------------
 
@@ -457,18 +640,27 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
 
   const isLoading = endpointMutations?.read?.isLoading;
   const isTouch = useTouchDevice();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
 
   const tasks: Task[] = useMemo(() => data?.tasks ?? [], [data?.tasks]);
   const totalTasks = data?.totalTasks ?? 0;
+  const countsByStatus = data?.countsByStatus;
 
-  // ── Local state: search + sort (client-side only) ─────────────────────
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("name_asc");
+  // ── Bulk selection state ──────────────────────────────────────────────────
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // ── Bulk mutation ─────────────────────────────────────────────────────────
+  const bulkMutation = useApiMutation(bulkEndpoints.POST, logger, user);
+
+  // ── Search + sort from form state ─────────────────────────────────────
+  const search = form.watch("search") ?? "";
+  const sort = form.watch("sort") ?? "name_asc";
 
   // ── Derive active tab from form state ──────────────────────────────────
-  const enabledValue = form?.watch("enabled");
-  const serverStatusRaw = form?.watch("status");
-  const serverStatus: string[] = useMemo(
+  const enabledValue = form.watch("enabled");
+  const serverStatusRaw = form.watch("status");
+  const serverStatus: (typeof CronTaskStatusValue)[] = useMemo(
     () => serverStatusRaw ?? [],
     [serverStatusRaw],
   );
@@ -507,61 +699,143 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     return "ALL";
   }, [enabledValue, serverStatus]);
 
-  // ── Tab counts — show counts from returned tasks (server-filtered) ───────
+  // ── Tab counts — from server response (accurate across full DB) ──────────
   const counts = useMemo(() => {
     return {
-      all: tasks.length,
-      running: tasks.filter(
-        (task) => task.lastExecutionStatus === CronTaskStatus.RUNNING,
-      ).length,
-      completed: tasks.filter(
-        (task) => task.lastExecutionStatus === CronTaskStatus.COMPLETED,
-      ).length,
-      failed: tasks.filter(
-        (task) =>
-          task.lastExecutionStatus === CronTaskStatus.FAILED ||
-          task.lastExecutionStatus === CronTaskStatus.ERROR,
-      ).length,
-      pending: tasks.filter(
-        (task) => task.lastExecutionStatus === CronTaskStatus.PENDING,
-      ).length,
-      disabled: tasks.filter((task) => !task.enabled).length,
+      all: countsByStatus?.all ?? totalTasks,
+      running: countsByStatus?.running ?? 0,
+      completed: countsByStatus?.completed ?? 0,
+      failed: countsByStatus?.failed ?? 0,
+      pending: countsByStatus?.pending ?? 0,
+      disabled: countsByStatus?.disabled ?? 0,
     };
-  }, [tasks]);
+  }, [countsByStatus, totalTasks]);
 
-  // ── Client-side search + sort only (status/enabled filtered server-side) ──
-  const filteredTasks = useMemo(() => {
-    let result = tasks;
+  // ── All filtering is server-side; tasks from server are already filtered ──
+  const filteredTasks = tasks;
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (task) =>
-          task.displayName.toLowerCase().includes(q) ||
-          task.routeId.toLowerCase().includes(q) ||
-          (task.description?.toLowerCase().includes(q) ?? false) ||
-          task.category.toLowerCase().includes(q),
-      );
-    }
+  // ── Derived selection state ───────────────────────────────────────────────
+  const allFilteredSelected =
+    filteredTasks.length > 0 &&
+    filteredTasks.every((task) => selectedIds.has(task.id));
 
-    const sorted = [...result];
-    if (sort === "name_asc") {
-      sorted.sort((a, b) => a.displayName.localeCompare(b.displayName));
-    } else if (sort === "name_desc") {
-      sorted.sort((a, b) => b.displayName.localeCompare(a.displayName));
-    } else if (sort === "schedule") {
-      sorted.sort((a, b) => a.schedule.localeCompare(b.schedule));
-    } else if (sort === "last_run_desc") {
-      sorted.sort((a, b) => {
-        const aTime = a.lastExecutedAt ?? "";
-        const bTime = b.lastExecutedAt ?? "";
-        return bTime.localeCompare(aTime);
-      });
-    } else if (sort === "executions_desc") {
-      sorted.sort((a, b) => b.executionCount - a.executionCount);
-    }
-    return sorted;
-  }, [tasks, search, sort]);
+  // ── Bulk selection handlers ───────────────────────────────────────────────
+  const handleToggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    setSelectedIds(new Set(filteredTasks.map((task) => task.id)));
+  }, [filteredTasks]);
+
+  const handleClearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  // ── Bulk action executor ──────────────────────────────────────────────────
+  const executeBulkAction = useCallback(
+    (action: "enable" | "disable" | "run" | "delete") => {
+      const ids = [...selectedIds];
+      void bulkMutation
+        .mutateAsync({ requestData: { ids, action } })
+        .then(async () => {
+          handleClearSelection();
+          // Update caches optimistically — no refetch needed
+          const { apiClient } =
+            await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          const tasksDef = await import("./definition");
+          const queueDef = await import("../queue/definition");
+          if (action === "delete") {
+            apiClient.updateEndpointData(
+              tasksDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.filter(
+                      (task) => !ids.includes(task.id),
+                    ),
+                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
+                  },
+                };
+              },
+            );
+            apiClient.updateEndpointData(
+              queueDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.filter(
+                      (task) => !ids.includes(task.id),
+                    ),
+                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
+                  },
+                };
+              },
+            );
+          } else if (action === "enable" || action === "disable") {
+            const enabled = action === "enable";
+            apiClient.updateEndpointData(
+              tasksDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.map((task) =>
+                      ids.includes(task.id) ? { ...task, enabled } : task,
+                    ),
+                  },
+                };
+              },
+            );
+            apiClient.updateEndpointData(
+              queueDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.map((task) =>
+                      ids.includes(task.id) ? { ...task, enabled } : task,
+                    ),
+                  },
+                };
+              },
+            );
+          }
+          return undefined;
+        });
+    },
+    [selectedIds, bulkMutation, handleClearSelection, logger],
+  );
 
   // ── Helper: update form fields the same way FormField/Controller widgets do ─
   const patchForm = useCallback(
@@ -624,13 +898,14 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           status: statusMap[key],
         });
       }
+      handleClearSelection();
     },
-    [patchForm],
+    [patchForm, handleClearSelection],
   );
 
   // ── Priority filter handler ──────────────────────────────────────────────
-  const priorityValue = form?.watch("priority");
-  const activePriority: string = useMemo(
+  const priorityValue = form.watch("priority");
+  const activePriority: typeof CronTaskPriorityFilterValue | "" = useMemo(
     () =>
       Array.isArray(priorityValue) && priorityValue.length === 1
         ? (priorityValue[0] ?? "")
@@ -645,8 +920,8 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   );
 
   // ── Category filter handler ──────────────────────────────────────────────
-  const categoryValue = form?.watch("category");
-  const activeCategory: string = useMemo(
+  const categoryValue = form.watch("category");
+  const activeCategory: (typeof TaskCategoryDB)[number] | "" = useMemo(
     () =>
       Array.isArray(categoryValue) && categoryValue.length === 1
         ? (categoryValue[0] ?? "")
@@ -661,7 +936,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   );
 
   // ── Hidden filter handler ────────────────────────────────────────────────
-  const hiddenValue = form?.watch("hidden");
+  const hiddenValue = form.watch("hidden");
   const activeHiddenFilter = hiddenValue ?? CronTaskHiddenFilter.VISIBLE;
   const handleHiddenFilterChange = useCallback(
     (
@@ -708,7 +983,9 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {
       const m = await import("./definition");
-      navigate(m.default.POST, {});
+      navigate(m.default.POST, {
+        popNavigationOnSuccess: 1,
+      });
     })();
   }, [navigate]);
 
@@ -733,10 +1010,12 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             description: task.description ?? undefined,
             schedule: task.schedule,
             enabled: task.enabled,
+            hidden: task.hidden,
             priority: task.priority,
             outputMode: task.outputMode,
             timeout: task.timeout ?? undefined,
             retries: task.retries ?? undefined,
+            retryDelay: task.retryDelay ?? undefined,
           },
           popNavigationOnSuccess: 1,
         });
@@ -778,6 +1057,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         navigate(m.default.POST, {
           data: { taskId: task.id },
           renderInModal: true,
+          popNavigationOnSuccess: 1,
         });
       })();
     },
@@ -785,21 +1065,29 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   );
 
   const handleClearFilters = useCallback((): void => {
-    setSearch("");
-    setSort("name_asc");
-    patchForm({
-      status: [],
-      priority: [],
-      category: [],
-      enabled: CronTaskEnabledFilter.ALL,
-    });
     if (form) {
+      form.setValue("search", "", {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+      form.setValue("sort", "name_asc", {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
       form.setValue("hidden", CronTaskHiddenFilter.VISIBLE, {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
       });
     }
+    patchForm({
+      status: [],
+      priority: [],
+      category: [],
+      enabled: CronTaskEnabledFilter.ALL,
+    });
   }, [form, patchForm]);
 
   // ── Tab definitions ───────────────────────────────────────────────────────
@@ -952,7 +1240,15 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
 
       {/* ── Filters + Sort row ──────────────────────────────────────── */}
       <Div className="flex items-center gap-2 px-4 py-2 border-b flex-wrap">
-        {/* Search (local client-side — no server search field) */}
+        {/* Select-all checkbox */}
+        <Checkbox
+          checked={allFilteredSelected}
+          onCheckedChange={
+            allFilteredSelected ? handleClearSelection : handleSelectAll
+          }
+        />
+
+        {/* Search */}
         <Div className="relative flex-1 min-w-[140px]">
           <Div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
             <Search className="h-3.5 w-3.5 text-muted-foreground" />
@@ -960,7 +1256,13 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           <Input
             type="text"
             value={search}
-            onChangeText={setSearch}
+            onChangeText={(val) =>
+              form.setValue("search", val, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+              })
+            }
             placeholder={t("widget.search.placeholder")}
             className="pl-8 h-8 text-sm"
           />
@@ -1014,8 +1316,17 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           </SelectContent>
         </Select>
 
-        {/* Sort (client-side — no server sort field) */}
-        <Select value={sort} onValueChange={setSort}>
+        {/* Sort */}
+        <Select
+          value={sort}
+          onValueChange={(val) =>
+            form.setValue("sort", val, {
+              shouldValidate: true,
+              shouldDirty: true,
+              shouldTouch: true,
+            })
+          }
+        >
           <SelectTrigger className="h-8 w-auto min-w-[120px] text-xs">
             <SelectValue />
           </SelectTrigger>
@@ -1041,6 +1352,23 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         </Select>
       </Div>
 
+      {/* ── Bulk action toolbar (visible when any selected) ─────────── */}
+      {selectedIds.size > 0 && (
+        <BulkToolbar
+          selectedCount={selectedIds.size}
+          totalCount={filteredTasks.length}
+          allSelected={allFilteredSelected}
+          isBulkLoading={bulkMutation.isPending}
+          onSelectAll={handleSelectAll}
+          onClearSelection={handleClearSelection}
+          onBulkEnable={() => executeBulkAction("enable")}
+          onBulkDisable={() => executeBulkAction("disable")}
+          onBulkRun={() => executeBulkAction("run")}
+          onBulkDelete={() => executeBulkAction("delete")}
+          t={t}
+        />
+      )}
+
       {/* ── Loading state ───────────────────────────────────────────── */}
       {isLoading && (
         <Div className="flex flex-col items-center justify-center gap-3 py-16">
@@ -1058,6 +1386,8 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             <TaskRow
               key={task.id}
               task={task}
+              selected={selectedIds.has(task.id)}
+              onToggleSelect={handleToggleSelect}
               onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}

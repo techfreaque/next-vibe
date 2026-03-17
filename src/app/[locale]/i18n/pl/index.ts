@@ -375,6 +375,7 @@ export const translations: typeof enTranslations = {
       boundary: {
         stackTrace: "Ślad stosu",
         componentStack: "Stos komponentów",
+        componentStackFull: "Stos komponentów (pełny)",
         errorDetails: "Szczegóły błędu",
         name: "Nazwa:",
         errorMessage: "Wiadomość:",
@@ -392,7 +393,7 @@ export const translations: typeof enTranslations = {
     analyticsTransformers: "Analityka: Transformatory",
     browser: "Przeglądarka",
     browserDevTools: "Przeglądarka: DevTools",
-    chatCharacters: "Czat: Postacie",
+    chatSkills: "Czat: Postacie",
     chatFavorites: "Czat: Ulubione",
     chatMemories: "Czat: Wspomnienia",
     chatMessages: "Czat: Wiadomości",

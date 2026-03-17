@@ -190,10 +190,9 @@ const { GET } = createEndpoint({
               content: "get.response.messages.message.model.content" as const,
               schema: z.nativeEnum(ModelId).nullable(),
             }),
-            character: responseField(scopedTranslation, {
+            skill: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "get.response.messages.message.character.content" as const,
+              content: "get.response.messages.message.skill.content" as const,
               schema: z.string().nullable(),
             }),
             errorType: responseField(scopedTranslation, {
@@ -317,7 +316,7 @@ const { GET } = createEndpoint({
             authorName: null,
             isAI: false,
             model: null,
-            character: null,
+            skill: null,
             errorType: null,
             errorMessage: null,
             errorCode: null,

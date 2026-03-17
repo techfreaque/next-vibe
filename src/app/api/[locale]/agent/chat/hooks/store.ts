@@ -5,17 +5,14 @@
 
 import { create } from "zustand";
 
-import type { ChatFolder, ChatMessage, ChatThread } from "../db";
-import {
-  saveMessage as saveIncognitoMessage,
-  saveThread as saveIncognitoThread,
-} from "../incognito/storage";
+import type { ChatFolder, ChatThread } from "../db";
+import { saveThread as saveIncognitoThread } from "../incognito/storage";
 
-export type { ChatFolder, ChatMessage, ChatThread };
+export type { ChatFolder, ChatThread };
 
 /**
  * UI tool model — used by the tool selection modal.
- * Converted to/from allowedTools/pinnedTools when persisting to settings.
+ * Converted to/from availableTools/pinnedTools when persisting to settings.
  */
 export interface EnabledTool {
   id: string;
@@ -30,21 +27,14 @@ export interface EnabledTool {
 interface ChatState {
   // Data
   threads: Record<string, ChatThread>;
-  messages: Record<string, ChatMessage>;
   folders: Record<string, ChatFolder>;
 
   // UI state
   isLoading: boolean;
-  isDataLoaded: boolean;
 
   // Tracks threads created this session that haven't been persisted to server yet.
   // Prevents useLazyBranchLoader from fetching messages for brand-new threads (404).
   pendingNewThreadIds: Set<string>;
-
-  // Active leaf message per thread — written by navigation store's setLeafMessageId.
-  // Non-React code (send-message, event-handlers) reads this to find the active branch leaf.
-  leafMessageIds: Record<string, string>;
-  setLeafMessageId: (threadId: string, leafMessageId: string) => void;
 
   // Lazy loading state - tracks whether a thread's messages are fully or partially loaded
   // 'full' = all messages loaded (original behavior), 'partial' = only active branch path
@@ -54,12 +44,6 @@ interface ChatState {
   addThread: (thread: ChatThread) => void;
   updateThread: (threadId: string, updates: Partial<ChatThread>) => void;
   deleteThread: (threadId: string) => void;
-
-  // Message actions
-  addMessage: (message: ChatMessage) => void;
-  updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
-  deleteMessage: (messageId: string) => void;
-  getThreadMessages: (threadId: string) => ChatMessage[];
 
   // Folder actions
   addFolder: (folder: ChatFolder) => void;
@@ -71,7 +55,6 @@ interface ChatState {
 
   // Loading state
   setLoading: (loading: boolean) => void;
-  setDataLoaded: (loaded: boolean) => void;
 
   // Pending new threads
   markThreadPendingCreate: (threadId: string) => void;
@@ -88,11 +71,8 @@ interface ChatState {
 export const useChatStore = create<ChatState>((set, get) => ({
   // Initial state
   threads: {},
-  messages: {},
   folders: {},
   isLoading: false,
-  isDataLoaded: false,
-  leafMessageIds: {},
   threadLoadMode: {},
   pendingNewThreadIds: new Set<string>(),
 
@@ -159,113 +139,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       };
     }),
 
-  // Message actions
-  addMessage: (message: ChatMessage): void => {
-    set((state) => {
-      // Check if this message belongs to an incognito thread
-      const thread = state.threads[message.threadId];
-      const isIncognito = thread?.rootFolderId === "incognito";
-
-      // Only save to localStorage for incognito messages
-      if (isIncognito) {
-        void saveIncognitoMessage(message);
-      }
-
-      return {
-        messages: {
-          ...state.messages,
-          [message.id]: message,
-        },
-      };
-    });
-  },
-
-  updateMessage: (messageId: string, updates: Partial<ChatMessage>): void =>
-    set((state) => {
-      const message = state.messages[messageId];
-      if (!message) {
-        return state;
-      }
-
-      const updatedMessage = {
-        ...message,
-        ...updates,
-        // Merge metadata instead of replacing it
-        metadata: updates.metadata
-          ? { ...message.metadata, ...updates.metadata }
-          : message.metadata,
-        updatedAt: new Date(),
-      };
-
-      // Check if this message belongs to an incognito thread
-      const thread = state.threads[message.threadId];
-      const isIncognito = thread?.rootFolderId === "incognito";
-
-      // Only save to localStorage for incognito messages
-      if (isIncognito) {
-        void saveIncognitoMessage(updatedMessage);
-      }
-
-      return {
-        messages: {
-          ...state.messages,
-          [messageId]: updatedMessage,
-        },
-      };
-    }),
-
-  deleteMessage: (messageId: string): void =>
-    set((state) => {
-      const message = state.messages[messageId];
-
-      // If incognito message, also delete from localStorage
-      if (message) {
-        const thread = state.threads[message.threadId];
-        if (thread?.rootFolderId === "incognito") {
-          void import("../incognito/storage")
-            .then(({ deleteMessage }) => {
-              return deleteMessage(messageId);
-            })
-            .catch(() => {
-              // Silently fail - localStorage cleanup is not critical
-            });
-        }
-      }
-
-      // Re-parent children to the deleted message's parent so the
-      // conversation tree stays connected (e.g. deleting a compacting
-      // message keeps the AI response visible).
-      const updatedMessages = { ...state.messages };
-      delete updatedMessages[messageId];
-
-      if (message) {
-        for (const msg of Object.values(updatedMessages)) {
-          if (msg.parentId === messageId) {
-            updatedMessages[msg.id] = {
-              ...msg,
-              parentId: message.parentId,
-            };
-          }
-        }
-      }
-
-      return {
-        messages: updatedMessages,
-      };
-    }),
-
-  getThreadMessages: (threadId: string): ChatMessage[] => {
-    const state = get();
-    return Object.values(state.messages)
-      .filter((msg) => msg.threadId === threadId)
-      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  },
-
-  setLeafMessageId: (threadId: string, leafMessageId: string): void =>
-    set((state) => ({
-      leafMessageIds: { ...state.leafMessageIds, [threadId]: leafMessageId },
-    })),
-
   // Thread load mode
   setThreadLoadMode: (threadId: string, mode: "full" | "partial"): void =>
     set((state) => ({
@@ -318,11 +191,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       isLoading: loading,
     }),
 
-  setDataLoaded: (loaded: boolean): void =>
-    set({
-      isDataLoaded: loaded,
-    }),
-
   // Pending new threads
   markThreadPendingCreate: (threadId: string): void =>
     set((state) => ({
@@ -343,10 +211,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
   reset: (): void => {
     set({
       threads: {},
-      messages: {},
       folders: {},
       isLoading: false,
-      isDataLoaded: false,
       threadLoadMode: {},
     });
   },

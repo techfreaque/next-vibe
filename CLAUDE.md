@@ -57,24 +57,27 @@ src/app/api/[locale]/<category>/<feature>/
 
 ## Pattern Reference — Read Before You Write
 
-| File you're working on   | Read this first                      |
-| ------------------------ | ------------------------------------ |
-| `definition.ts`          | `docs/patterns/definition.md`        |
-| `repository.ts`          | `docs/patterns/repository.md`        |
-| `route.ts`               | `docs/patterns/route.md`             |
-| `i18n/` files            | `docs/patterns/i18n.md`              |
-| `enum.ts`                | `docs/patterns/enum.md`              |
-| `db.ts` / schema         | `docs/patterns/database.md`          |
-| `seeds.ts`               | `docs/patterns/seeds.md`             |
-| `tasks/` (cron)          | `docs/patterns/tasks.md`             |
-| Logger usage             | `docs/patterns/logger.md`            |
-| Email sending            | `docs/patterns/email.md`             |
-| `widget.tsx` / `widget/` | `docs/patterns/widget.md`            |
-| `widget.cli.tsx`         | `docs/patterns/widget.cli.md`        |
-| `hooks.ts` / `hooks/`    | `docs/patterns/hooks.md`             |
-| `repository.native.ts`   | `docs/patterns/repository.native.md` |
-| `repository-client.ts`   | `docs/patterns/repository.client.md` |
-| `route-client.ts`        | `docs/patterns/repository.client.md` |
+| File you're working on      | Read this first                          |
+| --------------------------- | ---------------------------------------- |
+| `definition.ts`             | `docs/patterns/definition.md`            |
+| `repository.ts`             | `docs/patterns/repository.md`            |
+| `route.ts`                  | `docs/patterns/route.md`                 |
+| `i18n/` files               | `docs/patterns/i18n.md`                  |
+| `enum.ts`                   | `docs/patterns/enum.md`                  |
+| `db.ts` / schema            | `docs/patterns/database.md`              |
+| `seeds.ts`                  | `docs/patterns/seeds.md`                 |
+| `tasks/` (cron)             | `docs/patterns/tasks.md`                 |
+| Logger usage                | `docs/patterns/logger.md`                |
+| Email sending               | `docs/patterns/email.md`                 |
+| `widget.tsx` / `widget/`    | `docs/patterns/widget.md`                |
+| `widget.cli.tsx`            | `docs/patterns/widget.cli.md`            |
+| `hooks.ts` / `hooks/`       | `docs/patterns/hooks.md`                 |
+| `repository.native.ts`      | `docs/patterns/repository.native.md`     |
+| `repository-client.ts`      | `docs/patterns/repository.client.md`     |
+| `route-client.ts`           | `docs/patterns/repository.client.md`     |
+| `skill.ts` (default-skills) | `docs/patterns/skill.md`                 |
+| `system-prompt/` folder     | `docs/patterns/system-prompt.md`         |
+| Vibe Sense data source      | `docs/patterns/vibe-sense-datasource.md` |
 
 All paths relative to project root.
 

@@ -5,7 +5,7 @@ export const translations = {
     folders: "Folders",
     files: "Files",
     messages: "Messages",
-    characters: "Characters",
+    characters: "Skills",
     memories: "Memories",
     favorites: "Favorites",
     credits: "Credits",
@@ -217,8 +217,8 @@ export const translations = {
     modelOnly: "Model Only",
     editModelSettings: "Edit model settings",
     editSettings: "Edit settings",
-    switchCharacter: "Switch Character",
-    editCharacter: "Edit Character",
+    switchSkill: "Switch Skill",
+    editSkill: "Edit Skill",
     delete: "Delete",
     autoSelectedModel: "AUTO-SELECTED",
     manualSelectedModel: "MANUALLY SELECTED",
@@ -244,16 +244,16 @@ export const translations = {
     saveAsDefault: "Add to favorites",
     deleteSetup: "Delete Setup",
     content: "Search content...",
-    characterSetup: "Character Setup",
+    characterSetup: "Skill Setup",
     noResults: "No results",
     add: "Add to favorites",
     added: "Added",
     addNew: "Add New",
-    searchCharacters: "Search characters...",
+    searchSkills: "Search characters...",
     createCustom: "Create Custom",
     customizeSettings: "Customize Settings",
     requirements: {
-      characterConflict: "Character requirement conflicts",
+      characterConflict: "Skill requirement conflicts",
       tooLow: "too low",
       tooHigh: "too high",
       min: "min",
@@ -305,7 +305,7 @@ export const translations = {
         byCategory: "By Category",
         sourceLabels: {
           builtIn: "Built-in",
-          my: "My Characters",
+          my: "My Skills",
           community: "Community",
         },
         sourceIcons: {
@@ -315,7 +315,7 @@ export const translations = {
         },
       },
       addDialog: {
-        title: "Create Custom Character",
+        title: "Create Custom Skill",
         fields: {
           name: {
             label: "Name",
@@ -339,7 +339,7 @@ export const translations = {
         },
         createCategory: "Create Category",
         cancel: "Cancel",
-        create: "Create Character",
+        create: "Create Skill",
       },
       addCategoryDialog: {
         title: "Create Category",

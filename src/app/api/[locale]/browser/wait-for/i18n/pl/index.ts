@@ -19,6 +19,11 @@ export const translations: typeof enTranslations = {
           "Maksymalny czas oczekiwania w milisekundach. Jeśli ustawione na 0, zostanie użyty domyślny limit",
         placeholder: "Wprowadź limit czasu (ms)",
       },
+      captureSnapshot: {
+        label: "Przechwyć snapshot",
+        description:
+          "Gdy włączone, dołącza pełny snapshot dostępności do odpowiedzi. Domyślnie wyłączone.",
+      },
     },
   },
 

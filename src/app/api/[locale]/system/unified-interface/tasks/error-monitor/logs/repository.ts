@@ -1,6 +1,7 @@
 /**
  * Error Logs Repository
- * Data access layer for browsing error logs
+ * Data access layer for browsing error logs and toggling resolved status.
+ * Each fingerprint = one row (dedup on write), so no GROUP BY needed.
  */
 
 import "server-only";
@@ -19,9 +20,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { errorLogs } from "../db";
 import type {
+  ErrorLogsPatchRequestOutput,
+  ErrorLogsPatchResponseOutput,
   ErrorLogsRequestOutput,
   ErrorLogsResponseOutput,
 } from "./definition";
+import { ErrorLogStatusFilter } from "./enum";
 import type { scopedTranslation } from "./i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -39,20 +43,18 @@ export class ErrorLogsRepository {
 
       const conditions = [];
 
-      if (data?.source) {
-        conditions.push(eq(errorLogs.source, data.source));
+      // Status filter (default ACTIVE = unresolved only)
+      if (data?.status === ErrorLogStatusFilter.ACTIVE) {
+        conditions.push(eq(errorLogs.resolved, false));
+      } else if (data?.status === ErrorLogStatusFilter.RESOLVED) {
+        conditions.push(eq(errorLogs.resolved, true));
       }
-      if (data?.level) {
-        conditions.push(eq(errorLogs.level, data.level));
-      }
-      if (data?.endpoint) {
-        conditions.push(ilike(errorLogs.endpoint, `%${data.endpoint}%`));
+
+      if (data?.search) {
+        conditions.push(ilike(errorLogs.message, `%${data.search}%`));
       }
       if (data?.errorType) {
         conditions.push(ilike(errorLogs.errorType, `%${data.errorType}%`));
-      }
-      if (data?.fingerprint) {
-        conditions.push(eq(errorLogs.fingerprint, data.fingerprint));
       }
       if (data?.startDate) {
         conditions.push(gte(errorLogs.createdAt, new Date(data.startDate)));
@@ -66,17 +68,15 @@ export class ErrorLogsRepository {
       const rows = await db
         .select({
           id: errorLogs.id,
-          source: errorLogs.source,
-          level: errorLogs.level,
           message: errorLogs.message,
-          endpoint: errorLogs.endpoint,
           errorType: errorLogs.errorType,
-          errorCode: errorLogs.errorCode,
           stackTrace: errorLogs.stackTrace,
           metadata: errorLogs.metadata,
           fingerprint: errorLogs.fingerprint,
           occurrences: errorLogs.occurrences,
           resolved: errorLogs.resolved,
+          level: errorLogs.level,
+          firstSeen: errorLogs.firstSeen,
           createdAt: errorLogs.createdAt,
         })
         .from(errorLogs)
@@ -97,21 +97,16 @@ export class ErrorLogsRepository {
       const response: ErrorLogsResponseOutput = {
         logs: rows.map((row) => ({
           id: row.id,
-          source: row.source,
-          level: row.level,
           message: row.message,
-          endpoint: row.endpoint,
           errorType: row.errorType,
-          errorCode: row.errorCode,
           stackTrace: row.stackTrace,
-          metadata: row.metadata as Record<
-            string,
-            string | number | boolean
-          > | null,
+          metadata: row.metadata,
           fingerprint: row.fingerprint,
           occurrences: row.occurrences,
           resolved: row.resolved,
+          firstSeen: row.firstSeen.toISOString(),
           createdAt: row.createdAt.toISOString(),
+          level: row.level,
         })),
         totalCount,
         hasMore: totalCount > offset + limit,
@@ -126,6 +121,43 @@ export class ErrorLogsRepository {
 
       return fail({
         message: t("errors.fetchErrorLogs"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          error: parsedError.message,
+        },
+      });
+    }
+  }
+
+  static async updateStatus(
+    data: ErrorLogsPatchRequestOutput,
+    t: ModuleT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<ErrorLogsPatchResponseOutput>> {
+    try {
+      const result = await db
+        .update(errorLogs)
+        .set({ resolved: data.resolved })
+        .where(eq(errorLogs.fingerprint, data.fingerprint))
+        .returning({ id: errorLogs.id });
+
+      logger.debug(
+        `Updated ${result.length.toString()} rows for fingerprint ${data.fingerprint}`,
+      );
+
+      return success({
+        responseFingerprint: data.fingerprint,
+        responseResolved: data.resolved,
+        affectedRows: result.length,
+      });
+    } catch (error) {
+      const parsedError = parseError(error);
+      logger.error("Failed to update error log status", {
+        error: parsedError.message,
+      });
+
+      return fail({
+        message: t("errors.updateErrorLog"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

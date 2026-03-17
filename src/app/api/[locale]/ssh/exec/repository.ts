@@ -16,6 +16,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
@@ -26,6 +27,7 @@ import {
 } from "../client";
 import { ExecBackend, SshCommandStatus } from "../enum";
 import type { SshExecRequestOutput, SshExecResponseOutput } from "./definition";
+import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { scopedTranslation } from "./i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -64,12 +66,17 @@ function capOutput(
   };
 }
 
+// Threshold above which we escalate to a wakeUp task instead of blocking the stream.
+// Anything >90s risks the stream dying before the command returns.
+const ESCALATE_THRESHOLD_MS = 89_000;
+
 export class SshExecRepository {
   static async exec(
     data: SshExecRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
     t: ModuleT,
+    streamContext?: ToolExecutionContext,
   ): Promise<ResponseType<SshExecResponseOutput>> {
     const timeoutMs = data.timeoutMs ?? LOCAL_DEFAULT_TIMEOUT_MS;
     const command = data.command;
@@ -79,6 +86,45 @@ export class SshExecRepository {
       return fail({
         message: t("errors.invalidWorkingDir"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    // Escalate long-running commands to a wakeUp task so the stream doesn't time out.
+    // Only applies in streaming contexts where escalateToTask is available.
+    if (timeoutMs > ESCALATE_THRESHOLD_MS && streamContext?.escalateToTask) {
+      const { taskId, onComplete } = await streamContext.escalateToTask();
+      logger.info("[SshExec] Escalated long-running command to wakeUp task", {
+        taskId,
+        timeoutMs,
+        command: command.slice(0, 200),
+      });
+
+      void (async (): Promise<void> => {
+        const result = await SshExecRepository.exec(
+          data,
+          logger,
+          user,
+          t,
+          // No streamContext — run inline without escalation loop
+        );
+        await onComplete({
+          success: result.success,
+          data: result.success
+            ? (result.data as Record<string, JsonValue>)
+            : undefined,
+          message: result.success ? undefined : result.message,
+        });
+      })();
+
+      // Return immediately — AI will receive the real result via wakeUp revival.
+      return success({
+        stdout: `[Task escalated — result will be injected when complete. taskId=${taskId}]`,
+        stderr: "",
+        exitCode: 0,
+        status: SshCommandStatus.SUCCESS,
+        durationMs: 0,
+        backend: data.connectionId ? ExecBackend.SSH : ExecBackend.LOCAL,
+        truncated: false,
       });
     }
 

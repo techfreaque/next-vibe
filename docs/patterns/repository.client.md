@@ -118,23 +118,18 @@ For incognito mode, localStorage operations often go through a dedicated `incogn
 When widgets or hooks need shared computation that has no server equivalent — model scoring, display formatting, filtering logic — it lives in `repository-client.ts` as a static class and is **imported directly**, not via the route system.
 
 ```typescript
-// characters/repository-client.ts
-export class CharactersRepositoryClient {
+// skills/repository-client.ts
+export class SkillsRepositoryClient {
   /**
    * Get the single best model for a favorite given user permissions
    */
   static getBestModelForFavorite(
     favoriteSelection: FavoriteGetModelSelection | null,
-    characterSelection:
-      | FiltersModelSelection
-      | ManualModelSelection
-      | undefined,
+    skillSelection: FiltersModelSelection | ManualModelSelection | undefined,
     user: JwtPayloadType,
   ): ModelOption | null {
     // pure computation — no storage, no HTTP
-    const models = this.getFilteredModels(
-      favoriteSelection ?? characterSelection,
-    );
+    const models = this.getFilteredModels(favoriteSelection ?? skillSelection);
     return models[0] ?? null;
   }
 
@@ -152,11 +147,11 @@ Imported directly in widgets and hooks:
 
 ```typescript
 // favorites/repository-client.ts (uses it)
-import { CharactersRepositoryClient } from "../characters/repository-client";
+import { SkillsRepositoryClient } from "../skills/repository-client";
 
-const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
+const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
   stored.modelSelection,
-  character?.modelSelection,
+  skill?.modelSelection,
   user,
 );
 ```

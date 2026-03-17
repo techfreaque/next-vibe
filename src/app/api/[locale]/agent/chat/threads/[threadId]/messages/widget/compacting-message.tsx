@@ -120,8 +120,8 @@ export function CompactingMessage({
       {/* Expandable content */}
       {!isStreaming && (
         <Div
-          className={`transition-all duration-300 ease-in-out overflow-hidden ${
-            isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          className={`transition-all duration-300 ease-in-out ${
+            isExpanded ? "opacity-100" : "max-h-0 opacity-0 overflow-hidden"
           }`}
         >
           <Div className="px-4 pb-4 pt-0 border-t border-purple-500/10">

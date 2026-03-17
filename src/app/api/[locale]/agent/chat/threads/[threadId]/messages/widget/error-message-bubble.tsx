@@ -17,7 +17,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
@@ -33,7 +32,7 @@ export function ErrorMessageBubble({
   message,
   rootFolderId,
 }: ErrorMessageBubbleProps): JSX.Element {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const { t: ts } = scopedTranslation.scopedT(locale);
   const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
   const { push: navigate } = useWidgetNavigation();
@@ -63,7 +62,7 @@ export function ErrorMessageBubble({
     const parsed = JSON.parse(message.content || "{}") as ErrorResponseType;
     if (parsed && typeof parsed === "object" && "message" in parsed) {
       errorData = parsed;
-      displayContent = t(parsed.message, parsed.messageParams);
+      displayContent = parsed.message;
 
       // Also translate the error type if available
       if (parsed.errorType?.errorKey) {
@@ -72,7 +71,7 @@ export function ErrorMessageBubble({
 
       // Handle nested causes
       if (parsed.cause) {
-        const causeMessage = translateErrorRecursive(parsed.cause, t);
+        const causeMessage = translateErrorRecursive(parsed.cause);
         displayContent = `${displayContent}\n\nCause: ${causeMessage}`;
       }
     } else {
@@ -143,14 +142,11 @@ export function ErrorMessageBubble({
 /**
  * Recursively translate error causes
  */
-function translateErrorRecursive(
-  error: ErrorResponseType,
-  t: (key: TranslationKey, params?: Record<string, string | number>) => string,
-): string {
-  const mainMessage = t(error.message, error.messageParams);
+function translateErrorRecursive(error: ErrorResponseType): string {
+  const mainMessage = error.message;
 
   if (error.cause) {
-    const causeMessage = translateErrorRecursive(error.cause, t);
+    const causeMessage = translateErrorRecursive(error.cause);
     return `${mainMessage}\n\nCause: ${causeMessage}`;
   }
 

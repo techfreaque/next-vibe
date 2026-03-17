@@ -6,7 +6,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import * as repository from "../repository";
+import { MemoriesRepository } from "../repository";
 import definitions from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ user, data, logger }) =>
-      repository.addMemory({
+      MemoriesRepository.addMemory({
         userId: user.id,
         content: data.content,
         tags: data.tags,

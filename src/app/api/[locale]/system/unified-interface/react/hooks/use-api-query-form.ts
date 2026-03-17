@@ -147,7 +147,10 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     throw new Error("Endpoint is required");
   }
   const { locale } = useTranslation();
-  const { t: hooksT } = hooksScopedTranslation.scopedT(locale);
+  const { t: hooksT } = useMemo(
+    () => hooksScopedTranslation.scopedT(locale),
+    [locale],
+  );
   const {
     autoSubmit = true,
     debounceMs = 500,

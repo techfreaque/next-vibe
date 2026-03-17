@@ -8,7 +8,7 @@
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { useCallback } from "react";
 
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { useEndpointCreate } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint-create";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -72,18 +72,14 @@ export function useTTSAudio({
   // Use voice from props (set by chat settings)
   const voicePreference = voice ?? DEFAULT_TTS_VOICE;
 
-  // Use endpoint for type-safe API calls
-  const endpoint = useEndpoint(
-    textToSpeechDefinitions,
-    {
-      read: {
-        queryOptions: {
-          enabled: false, // Manual control
-        },
-      },
-    },
+  // Use endpoint create directly — avoids shared instance key problem that causes
+  // infinite re-renders when multiple messages each call useTTSAudio simultaneously.
+  const ttsForm = useEndpointCreate(
+    textToSpeechDefinitions.POST,
     logger,
     user,
+    locale,
+    {},
   );
 
   // Cancel loading (interrupt API request and playback)
@@ -147,7 +143,7 @@ export function useTTSAudio({
       chunkIndex: number,
       chunkText: string,
     ): Promise<HTMLAudioElement | null> => {
-      if (!endpoint.create) {
+      if (!ttsForm) {
         return Promise.resolve(null);
       }
 
@@ -165,11 +161,11 @@ export function useTTSAudio({
 
       return new Promise((resolve) => {
         // Set form values for this chunk
-        endpoint.create!.form.setValue("text", chunkText);
-        endpoint.create!.form.setValue("voice", voicePreference);
+        ttsForm.form.setValue("text", chunkText);
+        ttsForm.form.setValue("voice", voicePreference);
 
         // Submit form
-        void endpoint.create!.submitForm({
+        void ttsForm.submitForm({
           onSuccess: ({ responseData }) => {
             const audioDataUrl = responseData.audioUrl;
             logger.debug(`TTS: Got audio for chunk ${chunkIndex + 1}`, {
@@ -210,7 +206,7 @@ export function useTTSAudio({
       });
     },
     [
-      endpoint,
+      ttsForm,
       logger,
       messageId,
       t,
@@ -379,7 +375,7 @@ export function useTTSAudio({
       return;
     }
 
-    if (!endpoint.create) {
+    if (!ttsForm) {
       const errorMsg = t("app.chat.hooks.tts.endpoint-not-available");
       logger.error("TTS: Endpoint not available", errorMsg);
       setStore(messageId, { error: errorMsg });
@@ -447,7 +443,7 @@ export function useTTSAudio({
     }
   }, [
     text,
-    endpoint,
+    ttsForm,
     logger,
     messageId,
     t,

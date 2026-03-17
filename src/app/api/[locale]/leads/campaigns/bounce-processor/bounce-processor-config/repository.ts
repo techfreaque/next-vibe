@@ -120,6 +120,7 @@ export class BounceProcessorConfigRepository {
 
       const cronData: NewCronTask = {
         id: TASK_ID,
+        shortId: TASK_ID,
         routeId: ROUTE_ID,
         displayName: "Bounce Processor",
         description:

@@ -33,6 +33,8 @@ interface ConnectionState {
   wildcardListeners: Set<EventHandler<WsWireMessage>>;
   reconnectTimer: ReturnType<typeof setTimeout> | null;
   reconnectAttempts: number;
+  /** Set to true by disconnectChannel to prevent handleClose from reconnecting */
+  destroyed: boolean;
 }
 
 const connections = new Map<string, ConnectionState>();
@@ -49,6 +51,7 @@ function getOrCreateConnection(channel: string): ConnectionState {
     wildcardListeners: new Set(),
     reconnectTimer: null,
     reconnectAttempts: 0,
+    destroyed: false,
   };
   connections.set(channel, state);
 
@@ -98,6 +101,9 @@ function connect(channel: string, state: ConnectionState): void {
 
   const handleClose = (): void => {
     state.ws = null;
+    if (state.destroyed) {
+      return;
+    }
     // Exponential backoff: 1s, 2s, 4s, 8s, max 30s
     const delay = Math.min(1000 * Math.pow(2, state.reconnectAttempts), 30000);
     state.reconnectAttempts++;
@@ -183,8 +189,10 @@ export function disconnectChannel(channel: string): void {
   if (!state) {
     return;
   }
+  state.destroyed = true;
   if (state.reconnectTimer) {
     clearTimeout(state.reconnectTimer);
+    state.reconnectTimer = null;
   }
   if (state.ws) {
     state.ws.close();

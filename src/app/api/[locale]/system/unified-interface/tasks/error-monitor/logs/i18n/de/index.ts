@@ -6,6 +6,14 @@ export const translations: typeof en = {
   errors: {
     repositoryInternalError: "Ein interner Fehler ist aufgetreten",
     fetchErrorLogs: "Fehlerprotokolle konnten nicht abgerufen werden",
+    updateErrorLog:
+      "Der Status des Fehlerprotokolls konnte nicht aktualisiert werden",
+  },
+
+  statusFilter: {
+    all: "Alle",
+    active: "Aktiv",
+    resolved: "Gelöst",
   },
 
   get: {
@@ -16,36 +24,19 @@ export const translations: typeof en = {
       monitoring: "Überwachung",
     },
     fields: {
-      source: {
-        label: "Quelle",
-        description: "Nach Fehlerquelle filtern",
-        options: {
-          backend: "Backend",
-          task: "Aufgabe",
-          chat: "Chat",
-        },
+      status: {
+        label: "Status",
+        description: "Nach Lösungsstatus filtern",
       },
-      level: {
-        label: "Stufe",
-        description: "Nach Fehlerstufe filtern",
-        options: {
-          error: "Fehler",
-          warn: "Warnung",
-        },
-      },
-      endpoint: {
-        label: "Endpunkt",
-        description: "Nach Endpunkt filtern (Teilübereinstimmung)",
-        placeholder: "Endpunkt eingeben",
+      search: {
+        label: "Suche",
+        description: "In Fehlermeldungen suchen",
+        placeholder: "Meldungen durchsuchen...",
       },
       errorType: {
         label: "Fehlertyp",
         description: "Nach Fehlertypklassifizierung filtern",
         placeholder: "z.B. INTERNAL_ERROR",
-      },
-      fingerprint: {
-        label: "Fingerabdruck",
-        description: "Nach Fehlergruppen-Fingerabdruck filtern",
       },
       startDate: {
         label: "Von",
@@ -122,6 +113,80 @@ export const translations: typeof en = {
     },
   },
 
+  patch: {
+    title: "Fehlerprotokoll aktualisieren",
+    description:
+      "Ein Fehlerprotokoll nach Fingerprint lösen oder wieder öffnen",
+    tags: {
+      monitoring: "Überwachung",
+    },
+    fields: {
+      fingerprint: {
+        label: "Fingerprint",
+        description: "Der Fingerprint des Fehlerprotokolls",
+        placeholder: "Fingerprint eingeben",
+      },
+      resolved: {
+        label: "Gelöst",
+        description: "Auf wahr setzen zum Lösen, falsch zum Wieder-Öffnen",
+      },
+    },
+    response: {
+      fingerprint: {
+        title: "Fingerprint",
+      },
+      resolved: {
+        title: "Gelöst",
+      },
+      affectedRows: {
+        title: "Betroffene Zeilen",
+      },
+    },
+    success: {
+      title: "Protokoll aktualisiert",
+      description: "Status des Fehlerprotokolls erfolgreich aktualisiert",
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff verweigert",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Fehlerprotokoll nicht gefunden",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Ein Netzwerkfehler ist aufgetreten",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Fehlerprotokoll konnte nicht aktualisiert werden",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        titleChanges: "Ungespeicherte Änderungen",
+        title: "Ungespeicherte Änderungen",
+        description: "Sie haben ungespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Ein Datenkonflikt ist aufgetreten",
+      },
+    },
+  },
+
   widget: {
     title: "Fehlerprotokolle",
     loading: "Protokolle werden geladen...",
@@ -129,14 +194,23 @@ export const translations: typeof en = {
     header: {
       refresh: "Aktualisieren",
       runScan: "Scan starten",
+      back: "Zurück",
+      activeCount: "aktiv",
     },
     col: {
-      level: "Stufe",
-      source: "Quelle",
       message: "Nachricht",
-      endpoint: "Endpunkt",
       errorType: "Fehlertyp",
-      createdAt: "Zeit",
+      occurrences: "Vorkommen",
+      firstSeen: "Erstmals aufgetreten",
+      createdAt: "Zuletzt aufgetreten",
+    },
+    status: {
+      active: "Aktiv",
+      resolved: "Gelöst",
+    },
+    action: {
+      resolve: "Lösen",
+      reopen: "Wieder öffnen",
     },
     detail: {
       stackTrace: "Stack-Trace",

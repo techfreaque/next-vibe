@@ -22,6 +22,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { envClient } from "@/config/env-client";
 import { UserRole } from "../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 import { CheckResultWidget } from "./widget";
@@ -38,9 +39,8 @@ const { POST } = createEndpoint({
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,
-    UserRole.PRODUCTION_OFF,
     UserRole.AI_TOOL_OFF,
-    UserRole.MCP_VISIBLE,
+    ...(envClient.NODE_ENV !== "production" ? [UserRole.MCP_VISIBLE] : []),
     UserRole.CLI_AUTH_BYPASS,
   ],
   aliases: ["check", "c"],

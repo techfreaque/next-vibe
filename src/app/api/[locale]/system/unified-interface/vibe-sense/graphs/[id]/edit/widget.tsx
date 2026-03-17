@@ -52,6 +52,9 @@ import {
 } from "next-vibe-ui/ui/dialog";
 import { Div, type DivDragEvent } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { History } from "next-vibe-ui/ui/icons/History";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { Database } from "next-vibe-ui/ui/icons/Database";
@@ -111,6 +114,7 @@ import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
 
 import parentDefinitions from "../data/definition";
+import versionsDefinitions from "../versions/definition";
 import type definition from "./definition";
 import type { GraphNodeConfig } from "../../../graph/schema";
 
@@ -1470,8 +1474,39 @@ function EditFormInner({
   );
   const [paletteSearch, setPaletteSearch] = useState("");
 
-  const graphId = form?.getValues("id") ?? "";
+  const graphId = form.getValues("id") ?? "";
   const isNewGraph = !graphId || graphId === "new";
+
+  // ── Version chain for undo/redo ──
+  const versionsOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { id: graphId },
+        queryOptions: {
+          enabled: !isNewGraph,
+          refetchOnWindowFocus: false,
+          staleTime: 60_000,
+        },
+      },
+    }),
+    [graphId, isNewGraph],
+  );
+  const versionsEndpoint = useEndpoint(
+    versionsDefinitions,
+    versionsOptions,
+    logger,
+    user,
+  );
+  const versionChain = versionsEndpoint.read?.data?.versions ?? [];
+  const currentVersionIndex = versionChain.findIndex((v) => v.id === graphId);
+  const prevVersionId =
+    currentVersionIndex > 0
+      ? versionChain[currentVersionIndex - 1]?.id
+      : undefined;
+  const nextVersionId =
+    currentVersionIndex >= 0 && currentVersionIndex < versionChain.length - 1
+      ? versionChain[currentVersionIndex + 1]?.id
+      : undefined;
 
   // Register dirty callback for edge delete button
   useEffect((): (() => void) => {
@@ -1571,9 +1606,12 @@ function EditFormInner({
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
   const loadingRef = useRef(true);
+  const dirtyRef = useRef(false);
+  dirtyRef.current = dirty;
 
+  // Full reset from server config — only when NOT dirty (no unsaved local changes)
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !dirtyRef.current) {
       loadingRef.current = true;
       const flow = configToFlow(graphConfig, endpointInfoMap);
       setNodes(flow.nodes);
@@ -1587,8 +1625,33 @@ function EditFormInner({
         }, 300);
       }, 100);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync after load or when endpoint info resolves
-  }, [graphConfig, isLoading, endpointInfoMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync only on server config change
+  }, [graphConfig, isLoading]);
+
+  // When endpointInfoMap resolves new entries (e.g. after adding a node),
+  // patch handles/category in-place without wiping unsaved local state.
+  useEffect(() => {
+    if (endpointInfoMap.size === 0) {
+      return;
+    }
+    setNodes((prev) =>
+      prev.map((node) => {
+        const info = endpointInfoMap.get(node.data.label);
+        if (!info) {
+          return node;
+        }
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            handles: info.handles,
+            category: info.category,
+          },
+        };
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- patch handles only when map changes
+  }, [endpointInfoMap]);
 
   const selectedNodeConfig = selectedNodeId
     ? workingNodes[selectedNodeId]
@@ -1840,6 +1903,30 @@ function EditFormInner({
     }
   }, [navigation, dirty]);
 
+  const handleVersionUndo = useCallback((): void => {
+    if (!prevVersionId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const editDef = await import("./definition");
+      navigation.push(editDef.default.PUT, {
+        urlPathParams: { id: prevVersionId },
+      });
+    })();
+  }, [prevVersionId, navigation]);
+
+  const handleVersionRedo = useCallback((): void => {
+    if (!nextVersionId) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const editDef = await import("./definition");
+      navigation.push(editDef.default.PUT, {
+        urlPathParams: { id: nextVersionId },
+      });
+    })();
+  }, [nextVersionId, navigation]);
+
   const handleConfirmLeave = useCallback((): void => {
     setConfirmBackOpen(false);
     if (navigation.canGoBack) {
@@ -1949,6 +2036,44 @@ function EditFormInner({
           )}
         </Button>
         <Div className="flex-1" />
+        {/* Version history navigation */}
+        {versionChain.length > 1 && (
+          <>
+            <Div
+              className="flex items-center gap-0 shrink-0"
+              title="Version history"
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleVersionUndo}
+                disabled={!prevVersionId}
+                className="h-7 w-7 p-0"
+                title="Undo to previous version"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              <Div className="flex items-center gap-0.5 px-1">
+                <History className="h-3 w-3 text-muted-foreground/50" />
+                <Span className="text-[10px] text-muted-foreground/70 tabular-nums">
+                  {/* eslint-disable-next-line i18n/no-literal-string -- UI label */}
+                  {`${String(currentVersionIndex + 1)}/${String(versionChain.length)}`}
+                </Span>
+              </Div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleVersionRedo}
+                disabled={!nextVersionId}
+                className="h-7 w-7 p-0"
+                title="Redo to next version"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </Div>
+            <Div className="h-4 w-px bg-border shrink-0" />
+          </>
+        )}
         {dirty && (
           <Badge
             variant="outline"

@@ -36,7 +36,7 @@ import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
-import { CronTaskStatus } from "../../enum";
+import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
 import type endpoints from "./definition";
 import type { CronHistoryResponseOutput } from "./definition";
 
@@ -363,8 +363,9 @@ export function CronHistoryContainer({
   // expandedId: "<executionId>:<section>"
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const statusFilter: string = form?.watch("status") ?? "ALL";
-  const offset = Number(form?.watch("offset") ?? 0);
+  const statusFilter: typeof CronTaskStatusValue | "ALL" =
+    form.watch("status") ?? "ALL";
+  const offset = form.watch("offset") ?? 0;
 
   const value = field.value;
   const summary = value?.summary;
@@ -412,7 +413,7 @@ export function CronHistoryContainer({
 
   const handlePageChange = useCallback(
     (newOffset: number): void => {
-      form?.setValue("offset", newOffset);
+      form.setValue("offset", newOffset);
       if (onSubmit) {
         onSubmit();
       } else {
@@ -450,7 +451,7 @@ export function CronHistoryContainer({
   const handleStatusFilterChange = useCallback(
     (filter: StatusFilter): void => {
       const statusValue = filter === "ALL" ? "" : CronTaskStatus[filter];
-      form?.setValue("status", statusValue);
+      form.setValue("status", statusValue);
       setExpandedId(null);
       endpointMutations?.read?.refetch?.();
     },
@@ -607,9 +608,13 @@ export function CronHistoryContainer({
             </Div>
           ) : (
             executions.map((execution) => {
-              const key = expandedId?.startsWith(execution.id)
-                ? (expandedId.split(":")[1] as "error" | "result")
-                : null;
+              const expandedSection = expandedId?.startsWith(execution.id)
+                ? expandedId.split(":")[1]
+                : undefined;
+              const key: "error" | "result" | null =
+                expandedSection === "error" || expandedSection === "result"
+                  ? expandedSection
+                  : null;
               return (
                 <ExecutionCard
                   key={execution.id}

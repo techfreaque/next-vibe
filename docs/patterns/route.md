@@ -45,12 +45,12 @@ export const { GET, POST, tools } = endpointsHandler({
 
       // ❌ Business logic doesn't belong here
       if (userId) {
-        const characters = await repository.getAllCharacters(userId);
-        return success({ characters });
+        const skills = await repository.getAllSkills(userId);
+        return success({ skills });
       }
 
-      const defaultCharacters = repository.getDefaultCharacters();
-      return success({ characters: defaultCharacters });
+      const defaultSkills = repository.getDefaultSkills();
+      return success({ skills: defaultSkills });
     },
   },
 });

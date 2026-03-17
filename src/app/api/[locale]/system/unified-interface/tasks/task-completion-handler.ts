@@ -17,10 +17,9 @@ import "server-only";
 import type { JSONValue } from "ai";
 import { eq } from "drizzle-orm";
 
-import {
-  type ResumeStreamRequestInput,
-  resumeStreamRequestSchema,
-} from "@/app/api/[locale]/agent/ai-stream/resume-stream/definition";
+import { ResumeStreamRepository } from "@/app/api/[locale]/agent/ai-stream/resume-stream/repository";
+import { resumeStreamRequestSchema } from "@/app/api/[locale]/agent/ai-stream/resume-stream/definition";
+import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type {
   ToolCall,
   ToolCallResult,
@@ -36,8 +35,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import { cronTasks, taskInputSchema } from "./cron/db";
+import { cronTasks } from "./cron/db";
 import {
   CronTaskPriority,
   CronTaskStatus,
@@ -86,17 +87,29 @@ function sortObjectKeys(obj: JSONValue): JSONValue {
 }
 
 export async function handleTaskCompletion(params: {
+  /** Typed revival context — read from cron_tasks wakeUp* columns (not from taskInput JSON) */
   toolMessageId: string;
   threadId: string | null;
   callbackMode: CallbackModeValue | null;
   status: string;
   output: ToolCallResult | null;
   taskId: string;
-  /** taskInput from the originating cron task — carries modelId and characterId for resume-stream */
-  taskInput?: Record<string, JsonValue> | null;
+  /** Revival routing — typed columns from the cron task row */
+  modelId?: string | null;
+  skillId?: string | null;
+  favoriteId?: string | null;
+  /** Branch leaf message ID at tool-call time — typed column wakeUpLeafMessageId */
+  leafMessageId?: string | null;
   /** userId of the task owner — resume-stream cron task must run as this user */
   userId: string;
   logger: EndpointLogger;
+  /**
+   * When provided, fire resume-stream directly (fire-and-forget) instead of waiting
+   * for the cron pulse. Always provided for local wakeUp/wait flows. Falls back to
+   * the cron task as a safety net (no-op if already claimed by direct fire).
+   */
+  directResumeUser?: JwtPayloadType;
+  directResumeLocale?: CountryLanguage;
 }): Promise<void> {
   const {
     toolMessageId,
@@ -105,9 +118,14 @@ export async function handleTaskCompletion(params: {
     status,
     output,
     taskId,
-    taskInput,
+    modelId,
+    skillId,
+    favoriteId,
+    leafMessageId,
     userId,
     logger,
+    directResumeUser,
+    directResumeLocale,
   } = params;
 
   const toolStatus =
@@ -117,7 +135,7 @@ export async function handleTaskCompletion(params: {
         ? "failed"
         : "failed";
 
-  // Holds the deferred result message inserted for background/noLoop modes.
+  // Holds the deferred result message inserted for endLoop mode.
   // Populated in step 1, consumed in step 2 (TASK_COMPLETED WS event).
   let deferredMessageForEvent:
     | {
@@ -130,7 +148,7 @@ export async function handleTaskCompletion(params: {
     | undefined;
 
   // 1. Backfill result into the originating tool call message (cache-stable).
-  //    For background/noLoop: also insert a deferred second message so the result
+  //    For endLoop: also insert a deferred second message so the result
   //    is visible even if the original was compacted. The deferred message carries
   //    a new unique toolCallId and copies args from the original.
   if (toolMessageId) {
@@ -154,32 +172,43 @@ export async function handleTaskCompletion(params: {
               ) as ToolCallResult)
             : undefined;
 
-        await db
-          .update(chatMessages)
-          .set({
-            metadata: {
-              ...existing.metadata,
-              toolCall: toolCall
-                ? {
-                    ...toolCall,
-                    status: toolStatus,
-                    result: stableResult,
-                  }
-                : undefined,
-            },
-            updatedAt: new Date(),
-          })
-          .where(eq(chatMessages.id, toolMessageId));
+        // wakeUp: do NOT touch the original tool message at all. The original stays
+        // exactly as the AI saw it ({taskId, hint, status: pending}). The real result
+        // is inserted as a completely separate deferred TOOL message by resume-stream.
+        if (callbackMode !== CallbackMode.WAKE_UP) {
+          await db
+            .update(chatMessages)
+            .set({
+              metadata: {
+                ...existing.metadata,
+                toolCall: toolCall
+                  ? {
+                      ...toolCall,
+                      status: toolStatus,
+                      result: stableResult,
+                    }
+                  : undefined,
+              },
+              updatedAt: new Date(),
+            })
+            .where(eq(chatMessages.id, toolMessageId));
 
-        logger.info("[TaskCompletion] Backfilled tool message with result", {
-          toolMessageId,
-          toolStatus,
-          taskId,
-        });
+          logger.info("[TaskCompletion] Backfilled tool message with result", {
+            toolMessageId,
+            toolStatus,
+            taskId,
+          });
+        } else {
+          logger.info(
+            "[TaskCompletion] wakeUp — original untouched, deferred handled by resume-stream",
+            { toolMessageId, taskId },
+          );
+        }
 
         // For endLoop: insert a deferred result message so the result is visible
         // in UI and AI context even if the original is later compacted.
-        // detach never injects into the thread — result is only in task history.
+        // wakeUp: deferred insertion is handled by resume-stream (after stream dies).
+        // detach: never injects into the thread — result is only in task history.
         // Uses a new unique toolCallId; originalToolCallId links back to the original.
         const effectiveThreadId = threadId ?? existing.threadId;
         if (
@@ -211,7 +240,7 @@ export async function handleTaskCompletion(params: {
             sequenceId: null,
             isAI: true,
             model: null,
-            character: null,
+            skill: null,
             metadata: {
               toolCall: deferredToolCall,
             },
@@ -271,8 +300,11 @@ export async function handleTaskCompletion(params: {
   }
 
   // 3. Schedule a resume-stream one-shot cron task for wakeUp or wait modes.
-  //    resume-stream checks isStreaming and either no-ops (live loop picks up the
-  //    backfilled result naturally) or runs a headless stream to continue the thread.
+  //    When directResumeUser/directResumeLocale are provided (local flows), fire
+  //    resume-stream directly instead of waiting for the cron pulse.
+  //    resume-stream checks isStreaming:
+  //      isStreaming=true  → emit TOOL_RESULT WS, live loop picks up result naturally
+  //      isStreaming=false → insert deferred msg pair + fire headless revival stream
   if (
     (callbackMode === CallbackMode.WAKE_UP ||
       callbackMode === CallbackMode.WAIT) &&
@@ -281,19 +313,37 @@ export async function handleTaskCompletion(params: {
     try {
       const resumeTaskId = `resume-stream-${taskId}-${Date.now()}`;
 
-      // Parse resume-stream input via the route's own schema — types flow from definition.
+      // Build resume-stream input from typed columns only — never from raw taskInput JSON.
       const resumeInput = resumeStreamRequestSchema.parse({
-        ...(taskInput ?? {}),
         threadId,
-        // For wakeUp: pass the tool message ID so resume-stream can inject
-        // a deferred result message into the thread before headless append.
-        ...(callbackMode === CallbackMode.WAKE_UP && toolMessageId
-          ? { wakeUpToolMessageId: toolMessageId }
-          : {}),
+        callbackMode,
+        // Revival routing — from typed wakeUp* columns on the cron task row.
+        ...(modelId ? { modelId } : {}),
+        ...(skillId ? { skillId } : {}),
+        ...(favoriteId ? { favoriteId } : {}),
+        // Pass the tool message ID so resume-stream can find the original tool call metadata.
+        ...(toolMessageId ? { wakeUpToolMessageId: toolMessageId } : {}),
+        // Branch leaf from typed column — resume-stream appends to the correct branch.
+        ...(leafMessageId ? { leafMessageId } : {}),
+        // wakeUp: pass the task result so resume-stream can create the deferred TOOL message
+        // without touching the original. Stored as object in taskInput JSONB.
+        // Only pass wakeUpResult when output is a non-null object (z.record schema rejects null).
+        ...(callbackMode === CallbackMode.WAKE_UP &&
+        output !== undefined &&
+        output !== null &&
+        typeof output === "object" &&
+        !Array.isArray(output)
+          ? {
+              wakeUpResult: output as Record<string, ToolCallResult>,
+              wakeUpStatus: toolStatus,
+            }
+          : callbackMode === CallbackMode.WAKE_UP
+            ? { wakeUpStatus: toolStatus }
+            : {}),
         // Cleanup: pass both task IDs so resume-stream can delete them after revival.
         wakeUpTaskId: taskId,
         resumeTaskId,
-      } satisfies ResumeStreamRequestInput);
+      });
 
       logger.info("[TaskCompletion] Scheduling resume-stream task", {
         threadId,
@@ -305,6 +355,7 @@ export async function handleTaskCompletion(params: {
 
       await db.insert(cronTasks).values({
         id: resumeTaskId,
+        shortId: resumeTaskId,
         routeId: "resume-stream",
         displayName: `Resume stream for ${taskId}`,
         category: TaskCategory.SYSTEM,
@@ -312,7 +363,10 @@ export async function handleTaskCompletion(params: {
         priority: CronTaskPriority.HIGH,
         enabled: true,
         runOnce: true,
-        taskInput: taskInputSchema.parse(resumeInput),
+        taskInput: JSON.parse(JSON.stringify(resumeInput)) as Record<
+          string,
+          JsonValue
+        >,
         outputMode: TaskOutputMode.STORE_ONLY,
         notificationTargets: [],
         tags: ["resume-stream", taskId],
@@ -324,6 +378,33 @@ export async function handleTaskCompletion(params: {
         threadId,
         taskId,
       });
+
+      // Direct fire: when user + locale are available (local flows), fire resume-stream
+      // immediately instead of waiting for the cron pulse. The cron task above serves
+      // as a safety net — resume-stream's atomic isStreaming claim prevents double-firing.
+      if (directResumeUser && directResumeLocale) {
+        const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
+        void ResumeStreamRepository.resume(
+          resumeInput,
+          directResumeUser,
+          directResumeLocale,
+          logger,
+          t,
+        ).catch((fireErr) => {
+          logger.warn(
+            "[TaskCompletion] Direct resume-stream fire failed (cron fallback active)",
+            {
+              resumeTaskId,
+              error:
+                fireErr instanceof Error ? fireErr.message : String(fireErr),
+            },
+          );
+        });
+        logger.info("[TaskCompletion] Fired resume-stream directly", {
+          resumeTaskId,
+          threadId,
+        });
+      }
     } catch (err) {
       logger.error("[TaskCompletion] Failed to schedule resume-stream task", {
         threadId,

@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       label: "Ohne Speichern verwenden",
       loadingText: "Anwenden...",
     },
-    characterId: {
+    skillId: {
       label: "Charakter",
       description: "Wählen Sie den Charakter für diesen Favoriten",
     },
@@ -150,7 +150,7 @@ export const translations: typeof enTranslations = {
       description:
         "Token-Anzahl für automatische Gesprächskomprimierung. Null = Charakter oder globaler Standard.",
     },
-    allowedTools: {
+    availableTools: {
       label: "Erlaubte Tools",
       description:
         "Tools für diesen Slot. Jeder Eintrag benötigt eine toolId. Null = Charakter oder globale Einstellungen.",
@@ -210,10 +210,10 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Favorit erfolgreich erstellt",
     },
-    changeCharacter: {
+    changeSkill: {
       label: "Charakter ändern",
     },
-    modifyCharacter: {
+    modifySkill: {
       label: "Charakter bearbeiten",
     },
     character: {

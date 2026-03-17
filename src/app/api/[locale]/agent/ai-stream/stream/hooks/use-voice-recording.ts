@@ -4,7 +4,7 @@
  * Used by both ChatInput and MessageEditor
  */
 
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import { useEdenAISpeech } from "@/app/api/[locale]/agent/speech-to-text/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -77,6 +77,32 @@ export function useVoiceRecording({
   // Track which voice mode was used when starting recording
   const voiceModeRef = useRef<VoiceInputMode>("toInput");
 
+  // Stable ref for currentValue — avoids onTranscript depending on it
+  const currentValueRef = useRef(currentValue);
+  currentValueRef.current = currentValue;
+
+  // Stable callbacks for useEdenAISpeech — must not be inline arrows
+  const onTranscript = useCallback(
+    (text: string) => {
+      const mode = voiceModeRef.current;
+      if (mode === "directSubmit" && onSubmitText) {
+        void onSubmitText(text);
+      } else {
+        const cur = currentValueRef.current;
+        const newValue = cur ? `${cur}\n${text}` : text;
+        onValueChange(newValue);
+      }
+    },
+    [onValueChange, onSubmitText],
+  );
+
+  const onError = useCallback(
+    (err: string) => {
+      logger.error("Voice input error", err);
+    },
+    [logger],
+  );
+
   // STT hook
   const {
     isRecording,
@@ -91,20 +117,8 @@ export function useVoiceRecording({
     clearError,
     startRecording: startSTT,
   } = useEdenAISpeech({
-    onTranscript: (text: string) => {
-      const mode = voiceModeRef.current;
-      if (mode === "directSubmit" && onSubmitText) {
-        // Direct submit mode: submit the transcribed text
-        void onSubmitText(text);
-      } else {
-        // To input mode: append text to existing content
-        const newValue = currentValue ? `${currentValue}\n${text}` : text;
-        onValueChange(newValue);
-      }
-    },
-    onError: (err: string) => {
-      logger.error("Voice input error", err);
-    },
+    onTranscript,
+    onError,
     locale,
     user,
     logger,
@@ -154,18 +168,36 @@ export function useVoiceRecording({
     cancelSTT();
   }, [cancelSTT]);
 
-  return {
-    isRecording,
-    isPaused,
-    isProcessing,
-    error,
-    stream,
-    startRecording,
-    transcribeToInput,
-    submitAudioDirectly,
-    cancelRecording,
-    togglePause,
-    clearError,
-    hasExistingInput: currentValue.trim().length > 0,
-  };
+  const hasExistingInput = currentValue.trim().length > 0;
+
+  return useMemo(
+    () => ({
+      isRecording,
+      isPaused,
+      isProcessing,
+      error,
+      stream,
+      startRecording,
+      transcribeToInput,
+      submitAudioDirectly,
+      cancelRecording,
+      togglePause,
+      clearError,
+      hasExistingInput,
+    }),
+    [
+      isRecording,
+      isPaused,
+      isProcessing,
+      error,
+      stream,
+      startRecording,
+      transcribeToInput,
+      submitAudioDirectly,
+      cancelRecording,
+      togglePause,
+      clearError,
+      hasExistingInput,
+    ],
+  );
 }

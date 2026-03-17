@@ -35,7 +35,7 @@ import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
 
 import { COMPACT_TRIGGER } from "@/app/api/[locale]/agent/ai-stream/repository/core/constants";
-import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import {
   getModelById,
   type ModelId,
@@ -86,7 +86,7 @@ function getModelContextWindow(
 
   // Use the same resolution logic as getBestModelForFavorite:
   // favorite override → character default → MAX_ABSOLUTE
-  const best = CharactersRepositoryClient.getBestModelForFavorite(
+  const best = SkillsRepositoryClient.getBestModelForFavorite(
     (modelSelection as FiltersModelSelection | ManualModelSelection | null) ??
       null,
     characterModelSelection ?? undefined,
@@ -208,7 +208,7 @@ export interface CompactTriggerEditProps {
     | ModelId
     | null;
   /**
-   * Character's model selection — fallback when favoriteModelSelection is null.
+   * Skill's model selection — fallback when favoriteModelSelection is null.
    * Ensures the slider cap reflects the actual resolved model.
    */
   characterModelSelection?: FiltersModelSelection | ManualModelSelection | null;

@@ -2,6 +2,11 @@ import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import {
+  isAgentPlatform,
+  isCliPlatform,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { type CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as sharedScopedTranslation } from "../i18n";
@@ -23,6 +28,7 @@ export function validateData<TSchema extends z.ZodType>(
   schema: TSchema,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  platform: Platform,
 ): ResponseType<z.infer<TSchema>> {
   const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
   if (isEmptyObjectSchema(schema)) {
@@ -41,20 +47,19 @@ export function validateData<TSchema extends z.ZodType>(
     if (!result.success) {
       const formattedErrors = formatZodErrors(result.error);
       const errorCount = result.error.issues?.length || 0;
-      logger.error("Validation error details", undefined, {
+      const isQuietPlatform =
+        isCliPlatform(platform) || isAgentPlatform(platform);
+      const logValidationDetails = isQuietPlatform
+        ? logger.debug.bind(logger)
+        : logger.error.bind(logger);
+      logValidationDetails("Validation error details", {
         errorCount,
         errors: result.error.issues?.slice(0, 3).map((e: ZodIssue) => ({
           path: e.path.join("."),
           message: e.message,
           code: e.code,
         })),
-        allErrors: JSON.stringify(result.error.issues),
         formattedErrors,
-        errorType: typeof result.error,
-        errorConstructor: result.error?.constructor?.name,
-        hasIssues: "issues" in result.error,
-        fullError: JSON.stringify(result.error, null, 2),
-        receivedData: JSON.stringify(data)?.slice(0, 500),
       });
       return fail({
         message: sharedT("errorTypes.validation_error"),

@@ -52,7 +52,7 @@ export interface MessageCreatedEventData {
   parentId: string | null;
   content: string | null;
   model: ModelId | null;
-  character: string | null;
+  skill: string | null;
   sequenceId?: string | null; // Links messages in the same AI response sequence
   toolCall?: ToolCall; // Tool call for TOOL role messages (singular - each TOOL message has exactly one tool call)
   metadata?: MessageMetadata; // Message metadata including attachments, tokens, etc.
@@ -270,7 +270,7 @@ export interface TaskCompletedEventData {
   status: "completed" | "failed" | "cancelled" | "timeout";
   /** Last assistant message ID — client uses this as parentId for resume */
   lastMessageId: string | null;
-  /** For background/noLoop: the deferred result message to add to the store */
+  /** For endLoop: the deferred result message to add to the store */
   deferredMessage?: {
     id: string;
     threadId: string;

@@ -42,12 +42,8 @@ import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/resu
 import { createMockUser, getCliUser } from "../auth/cli-user";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import { CliTarget, type CliTargetValue } from "../types/cli-target";
-import {
-  CliInputParser,
-  type CliObject,
-  type CliRequestData,
-  type CliUrlParams,
-} from "./parsing";
+import type { CliRequestData } from "./cli-request-data";
+import { CliInputParser, type CliObject, type CliUrlParams } from "./parsing";
 
 interface CliResponseData {
   [key: string]:
@@ -114,6 +110,9 @@ export interface RouteExecutionResult {
 
   /** Error parameters for translation */
   errorParams?: TParams;
+
+  /** Original input data provided by the user (for --interactive hint pre-fill) */
+  inputData?: Record<string, string>;
 
   /** CLI-specific metadata */
   metadata?: {
@@ -267,13 +266,18 @@ export class RouteDelegationHandler {
                   rootFolderId: DefaultFolderId.CRON,
                   threadId: undefined,
                   aiMessageId: undefined,
-                  characterId: undefined,
+                  skillId: undefined,
                   modelId: undefined,
                   headless: undefined,
                   currentToolMessageId: undefined,
+                  callerToolCallId: undefined,
+                  pendingToolMessages: undefined,
+                  pendingTimeoutMs: undefined,
+                  leafMessageId: undefined,
                   waitingForRemoteResult: undefined,
                   favoriteId: undefined,
                   abortSignal: undefined,
+                  escalateToTask: undefined,
                 },
               });
             return result;
@@ -412,13 +416,18 @@ export class RouteDelegationHandler {
             rootFolderId: DefaultFolderId.CRON,
             threadId: undefined,
             aiMessageId: undefined,
-            characterId: undefined,
+            skillId: undefined,
             modelId: undefined,
             headless: undefined,
             currentToolMessageId: undefined,
+            callerToolCallId: undefined,
+            pendingToolMessages: undefined,
+            pendingTimeoutMs: undefined,
+            leafMessageId: undefined,
             waitingForRemoteResult: undefined,
             favoriteId: undefined,
             abortSignal: undefined,
+            escalateToTask: undefined,
           },
         });
 
@@ -428,6 +437,9 @@ export class RouteDelegationHandler {
         data: result.success ? result.data : undefined,
         error: result.success ? undefined : result.message,
         errorParams: result.success ? undefined : result.messageParams,
+        inputData: result.success
+          ? undefined
+          : (inputData.data as Record<string, string> | undefined),
         metadata: {
           executionTime: Date.now() - startTime,
           endpointPath: resolvedCommand,

@@ -88,6 +88,10 @@ export const translations = {
         description:
           "Filter to tools from a specific remote instance. Returns tools from the stored capability snapshot for that instance.",
       },
+      statsFilter: {
+        label: "Tool Filter",
+        description: "Show all tools, only pinned tools, or only allowed tools",
+      },
     },
     success: {
       title: "Tools fetched successfully",
@@ -308,12 +312,20 @@ export const translations = {
       confirmOn: "Asks for confirmation — click to disable",
       confirmOff: "Runs automatically — click to require confirmation",
     },
+
     platformFilter: {
       all: "All Platforms",
       cli: "CLI",
+      cliPackage: "CLI Pkg",
       mcp: "MCP",
       ai: "AI",
       web: "Web",
+      cron: "Cron",
+      electron: "Desktop",
+      frame: "Frame",
+      skill: "Skill",
+      nextPage: "Next Page",
+      nextApi: "Next API",
     },
     envFilter: {
       development: "Development",

@@ -12,6 +12,8 @@ import { agentEnv } from "./env";
 export interface AgentEnvAvailability {
   /** Main LLM routing - most models require this */
   openRouter: boolean;
+  /** Claude Code provider — auto-detected from `claude` CLI or set via CLAUDE_CODE_ENABLED */
+  claudeCode: boolean;
   /** Voice / Text-to-Speech via Eden AI */
   voice: boolean;
   /** Brave web search */
@@ -42,6 +44,7 @@ export function getAgentEnvAvailability(): AgentEnvAvailability {
 
   return {
     openRouter: Boolean(agentEnv.OPENROUTER_API_KEY),
+    claudeCode: agentEnv.CLAUDE_CODE_ENABLED === true,
     voice: Boolean(agentEnv.EDEN_AI_API_KEY),
     braveSearch,
     kagiSearch,
@@ -63,6 +66,11 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "OPENROUTER_API_KEY",
     url: "https://openrouter.ai/keys",
     label: "OpenRouter",
+  },
+  claudeCode: {
+    envKey: "CLAUDE_CODE_ENABLED",
+    url: "https://claude.ai/code",
+    label: "Claude Code",
   },
   voice: {
     envKey: "EDEN_AI_API_KEY",

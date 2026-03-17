@@ -142,6 +142,7 @@ const { GET } = createEndpoint({
       default: {
         task: {
           id: "task-123",
+          shortId: "task-123",
           routeId: "system_unified-interface_tasks_cron_stats_GET",
           displayName: "Example Task",
           description: "An example cron task",
@@ -336,6 +337,15 @@ const { PUT } = createEndpoint({
         schema: taskInputSchema.optional(),
       }),
 
+      hidden: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "put.fields.hidden.label",
+        description: "put.fields.hidden.description",
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+
       runOnce: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -411,6 +421,64 @@ const { PUT } = createEndpoint({
     title: "put.success.updated.title",
     description: "put.success.updated.description",
   },
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ responseData, pathParams, logger }) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const tasksDef = await import("../tasks/definition");
+        const queueDef = await import("../queue/definition");
+        const updatedTask = responseData.task;
+
+        // Update the task in the tasks list cache
+        apiClient.updateEndpointData(tasksDef.default.GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return {
+            success: true as const,
+            data: {
+              ...old.data,
+              tasks: old.data.tasks.map((t) =>
+                t.id === pathParams.id ? { ...t, ...updatedTask } : t,
+              ),
+            },
+          };
+        });
+
+        // Update the task in the queue cache
+        apiClient.updateEndpointData(queueDef.default.GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return {
+            success: true as const,
+            data: {
+              ...old.data,
+              tasks: old.data.tasks.map((t) =>
+                t.id === pathParams.id ? { ...t, ...updatedTask } : t,
+              ),
+            },
+          };
+        });
+
+        // Update the individual task GET cache
+        const idDef = await import("./definition");
+        apiClient.updateEndpointData(
+          idDef.default.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            return { success: true as const, data: { task: updatedTask } };
+          },
+          { urlPathParams: { id: pathParams.id } },
+        );
+      },
+    },
+  },
+
   examples: {
     urlPathParams: {
       default: {
@@ -433,6 +501,7 @@ const { PUT } = createEndpoint({
       default: {
         task: {
           id: "task-123",
+          shortId: "task-123",
           routeId: "system_unified-interface_tasks_cron_stats_GET",
           displayName: "Updated Task",
           description: "An updated cron task",
@@ -557,6 +626,46 @@ const { DELETE } = createEndpoint({
     title: "delete.success.deleted.title",
     description: "delete.success.deleted.description",
   },
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ pathParams, logger }) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const tasksDef = await import("../tasks/definition");
+        const queueDef = await import("../queue/definition");
+
+        // Remove from tasks list cache
+        apiClient.updateEndpointData(tasksDef.default.GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return {
+            success: true as const,
+            data: {
+              ...old.data,
+              tasks: old.data.tasks.filter((t) => t.id !== pathParams.id),
+              totalTasks: Math.max(0, old.data.totalTasks - 1),
+            },
+          };
+        });
+
+        // Remove from queue cache
+        apiClient.updateEndpointData(queueDef.default.GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return {
+            success: true as const,
+            data: {
+              ...old.data,
+              tasks: old.data.tasks.filter((t) => t.id !== pathParams.id),
+            },
+          };
+        });
+      },
+    },
+  },
+
   examples: {
     urlPathParams: {
       default: {

@@ -9,7 +9,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
+import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
@@ -17,6 +17,8 @@ import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum"
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { UseAIStreamReturn } from "./use-ai-stream";
+
+export type StartStreamFn = UseAIStreamReturn["startStream"];
 
 export interface CreateMessageParams {
   content: string;
@@ -36,19 +38,17 @@ export interface CreateMessageParams {
 
 export interface MessageOperationDeps {
   logger: EndpointLogger;
-  aiStream: UseAIStreamReturn;
+  startStream: StartStreamFn;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
   settings: {
     selectedModel: ModelId;
-    selectedCharacter: string;
-    allowedTools: ToolConfigItem[] | null;
+    selectedSkill: string;
+    availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
-  setInput?: (input: string) => void;
-  setAttachments?: (attachments: File[] | ((prev: File[]) => File[])) => void;
   /** Called immediately after the optimistic user message is added — switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
 }
@@ -63,12 +63,10 @@ export async function createAndSendUserMessage(
 ): Promise<boolean> {
   const {
     logger,
-    aiStream,
+    startStream,
     currentRootFolderId,
     currentSubFolderId,
     settings,
-    setInput,
-    setAttachments,
     setLeafMessageId,
   } = deps;
 
@@ -86,9 +84,6 @@ export async function createAndSendUserMessage(
     hasAttachments: !!attachments,
     attachmentCount: attachments?.length || 0,
   });
-
-  const chatStore = useChatStore.getState();
-  chatStore.setLoading(true);
 
   try {
     // For tool confirmations, we don't create a new user message
@@ -153,7 +148,7 @@ export async function createAndSendUserMessage(
         authorName: null,
         isAI: false,
         model: settings.selectedModel,
-        character: settings.selectedCharacter,
+        skill: settings.selectedSkill,
         errorType: null,
         errorMessage: null,
         errorCode: null,
@@ -165,7 +160,12 @@ export async function createAndSendUserMessage(
         searchVector: null,
       };
 
-      chatStore.addMessage(optimisticUserMessage);
+      upsertMessage(
+        threadId,
+        currentRootFolderId,
+        logger,
+        optimisticUserMessage,
+      );
 
       // Immediately switch the visible branch to the new message.
       // The auto-switch in useBranchManagement only fires when parentId === currentLeaf,
@@ -186,11 +186,11 @@ export async function createAndSendUserMessage(
     // Get user's timezone from browser
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // allowedTools = permission layer (null = all tools allowed)
+    // availableTools = permission layer (null = all tools allowed)
     // pinnedTools = context window layer (tools loaded into AI SDK context window)
     // Both stored in settings in the same format as ai-stream expects
-    const allowedToolsPayload =
-      settings.allowedTools?.map((t) => ({
+    const availableToolsPayload =
+      settings.availableTools?.map((t) => ({
         toolId: t.toolId,
         requiresConfirmation: t.requiresConfirmation ?? false,
       })) ?? null;
@@ -207,7 +207,7 @@ export async function createAndSendUserMessage(
 
     // Start AI stream (same for all operations)
     // POST is fire-and-forget — WS events handled by useMessagesSubscription
-    const streamStarted = await aiStream.startStream({
+    const streamStarted = await startStream({
       operation,
       rootFolderId: currentRootFolderId,
       subFolderId: currentSubFolderId ?? null,
@@ -217,9 +217,9 @@ export async function createAndSendUserMessage(
       content,
       role: ChatMessageRole.USER,
       model: settings.selectedModel,
-      character: settings.selectedCharacter ?? null,
-      allowedTools: allowedToolsPayload,
-      tools: pinnedToolsPayload,
+      skill: settings.selectedSkill ?? null,
+      availableTools: availableToolsPayload,
+      pinnedTools: pinnedToolsPayload,
       toolConfirmations: params.toolConfirmations ?? null,
       messageHistory: messageHistory ?? [],
       attachments: attachments && attachments.length > 0 ? attachments : null,
@@ -235,16 +235,12 @@ export async function createAndSendUserMessage(
       return false;
     }
 
-    // Clear input after POST succeeds (server accepted the message)
-    if (operation === "send") {
-      setInput?.("");
-      setAttachments?.([]);
-    }
+    // Input is cleared when the server-emitted USER MESSAGE_CREATED event arrives
+    // (handled in event-handlers.ts). This ensures input is only cleared once the
+    // message is confirmed persisted (or saved to incognito localStorage).
     return true;
   } catch (error) {
     logger.error(`Failed to ${operation} message`, parseError(error));
     return false;
-  } finally {
-    chatStore.setLoading(false);
   }
 }

@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, eq, ilike, inArray, isNull, or } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -24,6 +24,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "../db";
+import { fetchLastExecutionSummaries } from "../repository";
 import {
   CronTaskHiddenFilter,
   CronTaskPriority,
@@ -76,7 +77,7 @@ function formatQueueTask(
     outputMode: task.outputMode ?? TaskOutputMode.STORE_ONLY,
     lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
     lastExecutionStatus: task.lastExecutionStatus ?? null,
-    lastExecutionError: task.lastExecutionError ?? null,
+    lastExecutionError: null, // populated by caller from execution history
     lastExecutionDuration: task.lastExecutionDuration ?? null,
     nextExecutionAt,
     executionCount: task.executionCount,
@@ -180,11 +181,27 @@ class CronQueueRepositoryImpl implements ICronQueueRepository {
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
+      // Server-side search filter
+      const searchTerm = data.search?.trim();
+      const searchCondition = searchTerm
+        ? or(
+            ilike(cronTasks.displayName, `%${searchTerm}%`),
+            ilike(cronTasks.routeId, `%${searchTerm}%`),
+            ilike(cronTasks.description, `%${searchTerm}%`),
+            ilike(cronTasks.category, `%${searchTerm}%`),
+          )
+        : undefined;
+
+      const fullWhereClause =
+        whereClause && searchCondition
+          ? and(whereClause, searchCondition)
+          : (searchCondition ?? whereClause);
+
       // Count
       const [countRow] = await db
         .select({ total: count(cronTasks.id) })
         .from(cronTasks)
-        .where(whereClause);
+        .where(fullWhereClause);
       const totalTasks = countRow?.total ?? 0;
 
       // Fetch all enabled tasks — we sort in-memory by nextExecutionAt after computing it
@@ -192,14 +209,20 @@ class CronQueueRepositoryImpl implements ICronQueueRepository {
       const rows = await db
         .select()
         .from(cronTasks)
-        .where(whereClause)
+        .where(fullWhereClause)
         .limit(limit)
         .offset(offset);
+
+      // Batch-load last execution summaries
+      const summaries = await fetchLastExecutionSummaries(
+        rows.map((r) => r.id),
+      );
 
       // Format + compute nextExecutionAt for each
       const formatted = await Promise.all(
         rows.map(async (row) => {
           const task = formatQueueTask(row, logger);
+          task.lastExecutionError = summaries.get(row.id) ?? null;
           return translateQueueTask(task, locale);
         }),
       );

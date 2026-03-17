@@ -23,12 +23,13 @@ import {
   DefaultFolderId,
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
+import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { db } from "@/app/api/[locale]/system/db";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -111,18 +112,19 @@ export class AiStreamRunRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: AiStreamT,
+    streamContext?: ToolExecutionContext,
   ): Promise<ResponseType<AiStreamRunPostResponseOutput>> {
     try {
       const {
         prompt,
         model,
-        character,
+        skill,
         favoriteId,
         preCalls,
         instructions,
         maxTurns,
-        allowedTools,
-        tools,
+        availableTools,
+        pinnedTools,
         appendThreadId,
         rootFolderId: rootFolderIdRaw,
         subFolderId,
@@ -157,12 +159,17 @@ export class AiStreamRunRepository {
               threadId: undefined,
               aiMessageId: undefined,
               currentToolMessageId: undefined,
-              characterId: undefined,
+              callerToolCallId: undefined,
+              pendingToolMessages: undefined,
+              pendingTimeoutMs: undefined,
+              leafMessageId: undefined,
+              skillId: undefined,
               modelId: undefined,
               favoriteId: undefined,
               headless: undefined,
               waitingForRemoteResult: undefined,
               abortSignal: undefined,
+              escalateToTask: undefined,
             },
           );
           preCallResults.push({
@@ -189,18 +196,18 @@ export class AiStreamRunRepository {
       }));
 
       // ── Step 2: Resolve tool config from favorite if needed ────────────
-      // When favoriteId is set and tools/allowedTools are NOT provided in the request,
-      // load the favorite's tool config (activeTools/visibleTools) as defaults.
-      let resolvedTools = tools;
-      let resolvedAllowedTools = allowedTools;
+      // When favoriteId is set and pinnedTools/availableTools are NOT provided in the request,
+      // load the favorite's tool config as defaults.
+      let resolvedPinnedTools = pinnedTools;
+      let resolvedAvailableTools = availableTools;
 
-      if (favoriteId && (!tools || !allowedTools)) {
+      if (favoriteId && (!pinnedTools || !availableTools)) {
         const userId = user.isPublic ? undefined : user.id;
         if (userId) {
           const [favorite] = await db
             .select({
-              activeTools: chatFavorites.activeTools,
-              visibleTools: chatFavorites.visibleTools,
+              availableTools: chatFavorites.availableTools,
+              pinnedTools: chatFavorites.pinnedTools,
             })
             .from(chatFavorites)
             .where(
@@ -212,14 +219,14 @@ export class AiStreamRunRepository {
             .limit(1);
 
           if (favorite) {
-            if (!tools && favorite.visibleTools) {
-              resolvedTools = favorite.visibleTools.map((entry) => ({
+            if (!pinnedTools && favorite.pinnedTools) {
+              resolvedPinnedTools = favorite.pinnedTools.map((entry) => ({
                 toolId: entry.toolId,
                 requiresConfirmation: entry.requiresConfirmation ?? false,
               }));
             }
-            if (!allowedTools && favorite.activeTools) {
-              resolvedAllowedTools = favorite.activeTools.map((entry) => ({
+            if (!availableTools && favorite.availableTools) {
+              resolvedAvailableTools = favorite.availableTools.map((entry) => ({
                 toolId: entry.toolId,
                 requiresConfirmation: entry.requiresConfirmation ?? false,
               }));
@@ -235,16 +242,61 @@ export class AiStreamRunRepository {
         requiresConfirmation: false,
       }));
 
+      // ── Sub-agent favorite override ──────────────────────────────────────
+      // When called from within an active stream (via execute-tool), check if
+      // the invoking favorite has a subAgentFavoriteId set. If so, the sub-agent
+      // inherits that favorite's model + tool config instead of being isolated.
+      // null = task isolation (default); set = power-user override.
+      let effectiveFavoriteId = favoriteId;
+      if (streamContext?.favoriteId) {
+        const userId = user.isPublic ? undefined : user.id;
+        if (userId) {
+          const [invokingFavorite] = await db
+            .select({ subAgentFavoriteId: chatFavorites.subAgentFavoriteId })
+            .from(chatFavorites)
+            .where(
+              and(
+                eq(chatFavorites.id, streamContext.favoriteId),
+                eq(chatFavorites.userId, userId),
+              ),
+            )
+            .limit(1);
+
+          if (invokingFavorite?.subAgentFavoriteId) {
+            effectiveFavoriteId = invokingFavorite.subAgentFavoriteId;
+          }
+        }
+      }
+
+      // ── Companion soul injection ─────────────────────────────────────────
+      // When ai-run is called from within an active AI stream (via execute-tool),
+      // streamContext.skillId holds the calling companion's skill ID.
+      // If that companion has a companionPrompt set, prepend it to instructions
+      // so the sub-agent inherits the companion's soul fragment.
+      // Works at any nesting depth: each level's streamContext.skillId is the
+      // immediate caller, so the soul always travels one hop at a time.
+      let effectiveInstructions = instructions;
+      if (streamContext?.skillId) {
+        const companionPrompt = await SkillsRepository.getCompanionPrompt(
+          streamContext.skillId,
+        );
+        if (companionPrompt) {
+          effectiveInstructions = effectiveInstructions
+            ? `${companionPrompt}\n\n${effectiveInstructions}`
+            : companionPrompt;
+        }
+      }
+
       // ── Step 3: Run headless AI stream ──────────────────────────────────
       // Pre-call results are injected as proper tool messages in the thread
       const streamResult = await runHeadlessAiStream({
-        favoriteId,
+        favoriteId: effectiveFavoriteId,
         model,
-        character,
+        skill,
         prompt,
-        availableTools: resolvedTools ?? defaultTools, // default: base tools; null = all tools
-        allowedTools: resolvedAllowedTools ?? null, // null = all tools permitted
-        headlessInstructions: instructions,
+        pinnedTools: resolvedPinnedTools ?? defaultTools, // default: base tools; null = all tools
+        availableTools: resolvedAvailableTools ?? null, // null = all tools permitted
+        headlessInstructions: effectiveInstructions,
         maxTurns: maxTurns ?? 1,
         threadMode: headlessThreadMode,
         threadId: appendThreadId,

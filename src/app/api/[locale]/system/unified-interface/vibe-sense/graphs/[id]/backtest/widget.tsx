@@ -85,7 +85,7 @@ export function BacktestWidget({
             onChangeText={(v) => {
               setLocalFrom(v);
               if (v) {
-                form?.setValue("rangeFrom", new Date(v).toISOString());
+                form.setValue("rangeFrom", new Date(v).toISOString());
               }
             }}
           />
@@ -100,7 +100,7 @@ export function BacktestWidget({
             onChangeText={(v) => {
               setLocalTo(v);
               if (v) {
-                form?.setValue("rangeTo", new Date(v).toISOString());
+                form.setValue("rangeTo", new Date(v).toISOString());
               }
             }}
           />

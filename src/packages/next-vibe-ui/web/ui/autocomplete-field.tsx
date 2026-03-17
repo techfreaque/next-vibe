@@ -154,47 +154,48 @@ export function AutocompleteField({
   return (
     <div className={cn("relative", className)}>
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            aria-controls="autocomplete-listbox"
-            className={cn(
-              "w-full justify-between h-10 font-normal",
-              !value && "text-muted-foreground",
-              disabled && "cursor-not-allowed opacity-50",
-            )}
-            disabled={disabled}
-          >
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              {isCustomValue && (
-                <Badge variant="secondary" className="text-xs">
-                  {globalT("app.common.customValue")}
-                </Badge>
+        <div className="relative w-full">
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              aria-controls="autocomplete-listbox"
+              className={cn(
+                "w-full justify-between h-10 font-normal",
+                !value && "text-muted-foreground",
+                disabled && "cursor-not-allowed opacity-50",
+                value && !disabled && "pr-14",
               )}
-              <span className="truncate">
-                {value ? displayValue : (placeholder ?? "")}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              {value && !disabled && (
-                <button
-                  type="button"
-                  className="h-4 w-4 p-0 rounded-sm hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearValue();
-                  }}
-                  title="Clear value"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              )}
+              disabled={disabled}
+            >
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                {isCustomValue && (
+                  <Badge variant="secondary" className="text-xs">
+                    {globalT("app.common.customValue")}
+                  </Badge>
+                )}
+                <span className="truncate">
+                  {value ? displayValue : (placeholder ?? "")}
+                </span>
+              </div>
               <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-            </div>
-          </Button>
-        </PopoverTrigger>
+            </Button>
+          </PopoverTrigger>
+          {value && !disabled && (
+            <button
+              type="button"
+              className="absolute right-8 top-1/2 -translate-y-1/2 h-4 w-4 p-0 rounded-sm hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                clearValue();
+              }}
+              title="Clear value"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
         <PopoverContent className="w-full p-0" align="start">
           <Command id="autocomplete-listbox">
             <div className="flex items-center border-b px-3">

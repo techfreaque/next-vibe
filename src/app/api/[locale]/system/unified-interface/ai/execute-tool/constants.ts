@@ -30,8 +30,11 @@ export interface TaskRoutingContext {
   threadId?: string;
   toolMessageId?: string;
   modelId?: string;
-  characterId?: string;
+  skillId?: string;
   favoriteId?: string;
+  /** Branch leaf message ID at tool-call time. Stored so resume-stream can append
+   * the deferred result to the correct branch even if the user switches branches. */
+  leafMessageId?: string;
 }
 
 /** DB-safe tuple for text() enum constraint */

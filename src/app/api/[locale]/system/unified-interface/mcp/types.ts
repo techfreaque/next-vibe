@@ -9,7 +9,7 @@ import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { CliRequestData } from "../cli/runtime/parsing";
+import type { CliRequestData } from "../cli/runtime/cli-request-data";
 import type { BaseExecutionContext } from "../shared/endpoints/route/executor";
 import type { WidgetData } from "../shared/widgets/widget-data";
 

@@ -1,0 +1,1 @@
+ALTER TABLE "remote_connections" ADD COLUMN "is_directly_accessible" boolean DEFAULT false NOT NULL;

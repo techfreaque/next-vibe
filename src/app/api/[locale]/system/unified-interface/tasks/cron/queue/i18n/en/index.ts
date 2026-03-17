@@ -30,6 +30,11 @@ export const translations = {
           "Include hidden tasks (default: all tasks including hidden)",
         placeholder: "All tasks",
       },
+      search: {
+        label: "Search",
+        description: "Filter tasks by name, route, or category",
+        placeholder: "Search queue...",
+      },
       limit: {
         label: "Limit",
         description: "Maximum number of tasks to return",
@@ -130,6 +135,8 @@ export const translations = {
     header: {
       tasks: "All Tasks",
       history: "History",
+      stats: "Stats",
+      create: "New Task",
       refresh: "Refresh",
     },
     filter: {
@@ -163,6 +170,19 @@ export const translations = {
       history: "View history",
       edit: "Edit task",
       run: "Run now",
+    },
+    bulk: {
+      selected: "{count} selected",
+      selectAll: "Select all",
+      clearSelection: "Clear selection",
+      enable: "Enable",
+      disable: "Disable",
+      runNow: "Run now",
+      delete: "Delete",
+      confirmDeleteTitle: "Delete tasks?",
+      confirmDelete: "Delete {count} task(s)? This cannot be undone.",
+      cancel: "Cancel",
+      success: "{succeeded} succeeded, {failed} failed",
     },
     empty: {
       noTasks: "Queue is empty",

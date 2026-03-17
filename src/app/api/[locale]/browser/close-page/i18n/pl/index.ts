@@ -75,6 +75,6 @@ export const translations: typeof enTranslations = {
   category: "Browser",
   tags: {
     browserAutomation: "Automatyzacja przeglądarki",
-    chromeDevTools: "Chrome DevTools",
+    navigationAutomation: "Automatyzacja nawigacji",
   },
 };

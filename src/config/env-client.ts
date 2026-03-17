@@ -13,7 +13,7 @@ const isBrowser = !isServer && typeof document !== "undefined";
 
 export const platform = { isServer, isReactNative: false, isBrowser };
 
-export const requireEnvs = true as const;
+export const requireEnvs = false as const;
 
 // Helper to create properly typed schemas based on requireEnvs
 type RequireEnvs = typeof requireEnvs;
@@ -41,7 +41,10 @@ export const {
     example: "development",
   },
   NEXT_PUBLIC_APP_URL: {
-    schema: createSchema(z.string().url(), z.string().optional()),
+    schema: createSchema(
+      z.string().url(),
+      z.string().url().default("http://localhost:3000"),
+    ),
     value: process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",
   },

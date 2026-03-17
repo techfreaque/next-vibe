@@ -10,6 +10,7 @@ import "server-only";
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
+import type { EnvExample } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -17,20 +18,35 @@ import { defaultLocale } from "@/i18n/core/config";
 import {
   env as env_env,
   envSchema as env_envSchema,
+  envExamples,
 } from "../../../../../config/env";
-import { agentEnv, agentEnvSchema } from "../../agent/env";
+import { agentEnv, agentEnvSchema, agentEnvExamples } from "../../agent/env";
 import {
   leadsCampaignsEnv,
   leadsCampaignsEnvSchema,
+  leadsCampaignsEnvExamples,
 } from "../../leads/campaigns/env";
-import { messengerEnv, messengerEnvSchema } from "../../messenger/env";
+import {
+  messengerEnv,
+  messengerEnvSchema,
+  messengerEnvExamples,
+} from "../../messenger/env";
 import {
   imapClientEnv,
   imapClientEnvSchema,
+  imapClientEnvExamples,
 } from "../../messenger/providers/email/imap-client/env";
-import { paymentEnv, paymentEnvSchema } from "../../payment/env";
-import { smsEnv, smsEnvSchema } from "../../sms/env";
-import { serverSystemEnv, serverSystemEnvSchema } from "../server/env";
+import {
+  paymentEnv,
+  paymentEnvSchema,
+  paymentEnvExamples,
+} from "../../payment/env";
+import { smsEnv, smsEnvSchema, smsEnvExamples } from "../../sms/env";
+import {
+  serverSystemEnv,
+  serverSystemEnvSchema,
+  serverSystemEnvExamples,
+} from "../server/env";
 
 // Platform detection
 const platform = {
@@ -40,16 +56,43 @@ const platform = {
 };
 
 // Module registry for introspection
-export const envModules = {
-  env: { env: env_env, schema: env_envSchema },
-  agent: { env: agentEnv, schema: agentEnvSchema },
-  leadsCampaigns: { env: leadsCampaignsEnv, schema: leadsCampaignsEnvSchema },
-  messenger: { env: messengerEnv, schema: messengerEnvSchema },
-  imap: { env: imapClientEnv, schema: imapClientEnvSchema },
-  payment: { env: paymentEnv, schema: paymentEnvSchema },
-  sms: { env: smsEnv, schema: smsEnvSchema },
-  serverSystem: { env: serverSystemEnv, schema: serverSystemEnvSchema },
-} as const;
+export const envModules: Record<
+  string,
+  {
+    env: Record<string, unknown>;
+    schema: z.ZodObject<Record<string, z.ZodTypeAny>>;
+    examples: EnvExample[];
+  }
+> = {
+  env: { env: env_env, schema: env_envSchema, examples: envExamples },
+  agent: { env: agentEnv, schema: agentEnvSchema, examples: agentEnvExamples },
+  leadsCampaigns: {
+    env: leadsCampaignsEnv,
+    schema: leadsCampaignsEnvSchema,
+    examples: leadsCampaignsEnvExamples,
+  },
+  messenger: {
+    env: messengerEnv,
+    schema: messengerEnvSchema,
+    examples: messengerEnvExamples,
+  },
+  imap: {
+    env: imapClientEnv,
+    schema: imapClientEnvSchema,
+    examples: imapClientEnvExamples,
+  },
+  payment: {
+    env: paymentEnv,
+    schema: paymentEnvSchema,
+    examples: paymentEnvExamples,
+  },
+  sms: { env: smsEnv, schema: smsEnvSchema, examples: smsEnvExamples },
+  serverSystem: {
+    env: serverSystemEnv,
+    schema: serverSystemEnvSchema,
+    examples: serverSystemEnvExamples,
+  },
+};
 
 // Combined schema using merge
 export const envSchema = env_envSchema

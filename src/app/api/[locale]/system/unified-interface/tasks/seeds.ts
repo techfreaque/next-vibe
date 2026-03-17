@@ -42,6 +42,8 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   const taskRows: NewCronTask[] = cronTaskDefs.map((task) => ({
     // id: stable identity — multiple tasks can share the same routeId (endpoint)
     id: task.id,
+    // shortId: system tasks mirror their id (already a short slug like "db-health")
+    shortId: task.id,
     // routeId: which endpoint to call — first alias or canonical path
     routeId: getPreferredToolName(task.definition),
     displayName: task.name,
@@ -72,6 +74,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
         target: [cronTasks.id],
         set: {
           routeId: sql`excluded.route_id`,
+          shortId: sql`excluded.short_id`,
           displayName: sql`COALESCE(NULLIF(${cronTasks.displayName}, ''), excluded.display_name)`,
           description: sql`excluded.description`,
           category: sql`excluded.category`,

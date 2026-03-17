@@ -164,7 +164,7 @@ export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
       return pluginPath;
     }
 
-    const absolutePath = resolve(process.cwd(), pluginPath);
+    const absolutePath = `${process.cwd()}/${pluginPath}`;
     return existsSync(absolutePath) ? absolutePath : pluginPath;
   }
 
@@ -554,7 +554,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     config: CheckConfig,
     locale: CountryLanguage,
   ): Promise<{ success: boolean; settingsPath: string; error?: string }> {
-    const settingsPath = resolve(process.cwd(), ".vscode", "settings.json");
+    const settingsPath = `${process.cwd()}/.vscode/settings.json`;
 
     try {
       // Check if VSCode integration is enabled
@@ -700,7 +700,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     logger: EndpointLogger,
     path: string,
   ): Promise<{ success: boolean; mcpConfigPath: string; error?: string }> {
-    const mcpConfigPath = resolve(process.cwd(), path);
+    const mcpConfigPath = `${process.cwd()}/${path}`;
 
     try {
       const mcpConfig = {
@@ -795,10 +795,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       // Check oxlint config if enabled
       if (config.oxlint.enabled) {
-        const oxlintConfigPath = resolve(
-          process.cwd(),
-          config.oxlint.configPath,
-        );
+        const oxlintConfigPath = `${process.cwd()}/${config.oxlint.configPath}`;
         if (!existsSync(oxlintConfigPath)) {
           return { needsRegeneration: true };
         }
@@ -840,7 +837,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     logger: EndpointLogger,
     oxlintConfig: CheckConfig["oxlint"] & { enabled: true },
   ): Promise<string> {
-    const configPath = resolve(process.cwd(), oxlintConfig.configPath);
+    const configPath = `${process.cwd()}/${oxlintConfig.configPath}`;
     await fs.mkdir(dirname(configPath), { recursive: true });
 
     // Convert jsPlugins to array of paths for .oxlintrc.json
@@ -910,7 +907,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     logger: EndpointLogger,
     prettierConfig: CheckConfig["prettier"] & { enabled: true },
   ): Promise<string> {
-    const configPath = resolve(process.cwd(), prettierConfig.configPath);
+    const configPath = `${process.cwd()}/${prettierConfig.configPath}`;
     await fs.mkdir(dirname(configPath), { recursive: true });
 
     const oxfmtConfig = ConfigRepositoryImpl.buildOxfmtConfig(prettierConfig);
@@ -928,7 +925,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     logger: EndpointLogger,
     eslintConfig: CheckConfig["eslint"] & { enabled: true },
   ): Promise<string> {
-    const configPath = resolve(process.cwd(), eslintConfig.configPath);
+    const configPath = `${process.cwd()}/${eslintConfig.configPath}`;
     await fs.mkdir(dirname(configPath), { recursive: true });
 
     await fs.writeFile(

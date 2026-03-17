@@ -6,6 +6,8 @@
 
 import "server-only";
 
+import { nanoid } from "nanoid";
+
 import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -223,6 +225,7 @@ export async function upsertRemoteTasks(params: {
             : (definitionFields.runOnce ?? remoteTask.runOnce);
         await db.insert(cronTasks).values({
           id: remoteTask.id,
+          shortId: nanoid(8),
           routeId: remoteTask.routeId,
           displayName: definitionFields.displayName ?? remoteTask.routeId,
           category: definitionFields.category ?? remoteTask.category,
@@ -301,7 +304,7 @@ export async function pullFromRemote(
   try {
     const {
       getAllActiveConnectionsForSync,
-      getLocalInstanceId,
+      deriveDefaultSelfInstanceId,
       computeAndStoreMemoriesHash,
     } = await import("@/app/api/[locale]/user/remote-connection/repository");
 
@@ -311,7 +314,22 @@ export async function pullFromRemote(
     }
 
     const { endpoints: syncEndpoints } = await import("./definition");
-    const localInstanceId = (await getLocalInstanceId()) ?? "unknown";
+    const localInstanceId = deriveDefaultSelfInstanceId();
+
+    // Get our local friendly name for bidirectional name sync
+    let localFriendlyName: string | undefined;
+    try {
+      const { instanceIdentities: identitiesTable } =
+        await import("@/app/api/[locale]/user/remote-connection/db");
+      const [selfIdentity] = await db
+        .select({ friendlyName: identitiesTable.friendlyName })
+        .from(identitiesTable)
+        .where(eq(identitiesTable.isDefault, true))
+        .limit(1);
+      localFriendlyName = selfIdentity?.friendlyName;
+    } catch {
+      // Non-fatal
+    }
 
     // Get local capabilities version (build-time constant)
     const { CAPABILITIES_VERSION } =
@@ -406,6 +424,7 @@ export async function pullFromRemote(
           memoriesHash: localMemoriesHash,
           capabilitiesVersion: conn.capabilitiesVersion ?? "none",
           taskCursor,
+          ...(localFriendlyName ? { friendlyName: localFriendlyName } : {}),
         };
         if (capabilitiesJson !== undefined) {
           body.capabilitiesJson = capabilitiesJson;
@@ -469,6 +488,7 @@ export async function pullFromRemote(
             capabilities?: string | null;
             tasks?: string;
             memoriesSynced?: number;
+            remoteFriendlyName?: string | null;
             serverTime: string;
           };
         };
@@ -509,6 +529,10 @@ export async function pullFromRemote(
             capabilities: caps,
             remoteMemoriesHash: data.remoteMemoriesHash,
             taskCursor: newTaskCursor,
+            // Store remote's friendly name for display
+            ...(data.remoteFriendlyName
+              ? { remoteFriendlyName: data.remoteFriendlyName }
+              : {}),
             // capabilitiesVersion on local side = last LOCAL version we sent to cloud.
             // After a successful send, record our LOCAL version so next pulse detects
             // changes (new local deploy → re-send). Don't store cloud's version here.
@@ -521,6 +545,10 @@ export async function pullFromRemote(
           await touchSync(conn.userId, conn.instanceId, {
             remoteMemoriesHash: data.remoteMemoriesHash,
             taskCursor: newTaskCursor,
+            // Store remote's friendly name for display
+            ...(data.remoteFriendlyName
+              ? { remoteFriendlyName: data.remoteFriendlyName }
+              : {}),
             // If we sent caps, mark local version as sent regardless of cloud response
             ...(sendCapabilities
               ? { capabilitiesVersion: CAPABILITIES_VERSION }
@@ -540,6 +568,36 @@ export async function pullFromRemote(
               logger,
             });
             totalPulled += upsertResult.success ? upsertResult.data.synced : 0;
+          }
+        }
+
+        // Re-check direct accessibility on each sync cycle.
+        // If previously accessible but now unreachable (or vice versa), update the flag.
+        // This is cloud-side: conn.localUrl is the local instance's reachable URL.
+        if (conn.localUrl) {
+          const { checkDirectAccessibility } =
+            await import("@/app/api/[locale]/user/remote-connection/register/repository");
+          const { remoteConnections: connTable } =
+            await import("@/app/api/[locale]/user/remote-connection/db");
+          const nowAccessible = await checkDirectAccessibility(
+            conn.localUrl,
+            logger,
+          );
+          if (nowAccessible !== conn.isDirectlyAccessible) {
+            await db
+              .update(connTable)
+              .set({
+                isDirectlyAccessible: nowAccessible,
+                updatedAt: new Date(),
+              })
+              .where(eq(connTable.userId, conn.userId));
+            logger.info(
+              "[TaskSync] Updated isDirectlyAccessible for connection",
+              {
+                instanceId: conn.instanceId,
+                isDirectlyAccessible: nowAccessible,
+              },
+            );
           }
         }
       } catch (error) {
@@ -886,7 +944,7 @@ export async function syncTasks(
 
   const { computeAndStoreMemoriesHash, touchLastSynced } =
     await import("@/app/api/[locale]/user/remote-connection/repository");
-  const { userRemoteConnections: connTable } =
+  const { remoteConnections: connTable } =
     await import("@/app/api/[locale]/user/remote-connection/db");
 
   // Find the connection record for this user (the local that is calling us).
@@ -906,6 +964,13 @@ export async function syncTasks(
     .limit(1);
 
   const instanceId = connRow?.instanceId ?? data.instanceId ?? "unknown";
+
+  // ── 0. Exchange friendly names (bidirectional name sync) ──────────────────
+  if (data.friendlyName && connRow) {
+    await touchLastSynced(user.id, instanceId, {
+      remoteFriendlyName: data.friendlyName,
+    });
+  }
 
   // ── 1. Process incoming capability snapshot (only if version changed) ──────
   let memoriesSynced = 0;
@@ -1040,6 +1105,26 @@ export async function syncTasks(
 
   const tasks = pendingTasks.map(serializeForSync);
 
+  // ── 6. Get our own friendly name for bidirectional sync ─────────────────────
+  let ownFriendlyName: string | null = null;
+  try {
+    const { instanceIdentities: identitiesTable } =
+      await import("@/app/api/[locale]/user/remote-connection/db");
+    const [selfIdentity] = await db
+      .select({ friendlyName: identitiesTable.friendlyName })
+      .from(identitiesTable)
+      .where(
+        and(
+          eq(identitiesTable.userId, user.id),
+          eq(identitiesTable.isDefault, true),
+        ),
+      )
+      .limit(1);
+    ownFriendlyName = selfIdentity?.friendlyName ?? null;
+  } catch {
+    // Non-fatal — identity may not exist yet
+  }
+
   return success({
     remoteMemoriesHash: ourMemoriesHash,
     memories: memoriesPayload,
@@ -1047,6 +1132,7 @@ export async function syncTasks(
     capabilities: capabilitiesPayload,
     tasks: JSON.stringify(tasks),
     memoriesSynced,
+    remoteFriendlyName: ownFriendlyName,
     serverTime,
   });
 }

@@ -58,10 +58,11 @@ export class StdioTransport implements IMCPTransport {
       void this.handleIncomingMessage(line);
     });
 
-    // Handle close
+    // Handle close — stdin closed means the MCP client disconnected; exit cleanly
     this.readlineInterface.on("close", () => {
-      this.logger.info("[MCP Transport] STDIO closed");
+      this.logger.info("[MCP Transport] STDIO closed, exiting");
       this.running = false;
+      process.exit(0);
     });
 
     // Handle errors

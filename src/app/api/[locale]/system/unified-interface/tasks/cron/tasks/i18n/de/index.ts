@@ -56,6 +56,16 @@ export const translations: typeof enTranslations = {
           "Nach Sichtbarkeitsstatus filtern (Standard: nur sichtbare)",
         placeholder: "Sichtbare Aufgaben",
       },
+      search: {
+        label: "Suche",
+        description:
+          "Aufgaben nach Name, Route, Beschreibung oder Kategorie filtern",
+        placeholder: "Aufgaben suchen...",
+      },
+      sort: {
+        label: "Sortierung",
+        description: "Sortierreihenfolge der Aufgabenliste",
+      },
       limit: {
         label: "Limit",
         description: "Maximale Anzahl der zurückzugebenden Aufgaben",
@@ -205,6 +215,11 @@ export const translations: typeof enTranslations = {
         label: "Aktiviert",
         description: "Aufgabe aktivieren oder deaktivieren",
       },
+      hidden: {
+        label: "Versteckt",
+        description:
+          "Diese Aufgabe in KI-System-Prompts und Standard-Aufgabenlisten ausblenden",
+      },
       timeout: {
         label: "Zeitüberschreitung (ms)",
         description: "Maximale Ausführungszeit in Millisekunden",
@@ -339,6 +354,20 @@ export const translations: typeof enTranslations = {
       edit: "Aufgabe bearbeiten",
       delete: "Aufgabe löschen",
       runNow: "Jetzt ausführen",
+    },
+    bulk: {
+      selected: "{count} ausgewählt",
+      selectAll: "Alle auswählen",
+      clearSelection: "Auswahl aufheben",
+      enable: "Aktivieren",
+      disable: "Deaktivieren",
+      runNow: "Jetzt ausführen",
+      delete: "Löschen",
+      confirmDeleteTitle: "Aufgaben löschen?",
+      confirmDelete:
+        "{count} Aufgabe(n) löschen? Dies kann nicht rückgängig gemacht werden.",
+      cancel: "Abbrechen",
+      success: "{succeeded} erfolgreich, {failed} fehlgeschlagen",
     },
     empty: {
       noTasks: "Keine Cron-Aufgaben",

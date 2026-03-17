@@ -210,7 +210,17 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
     setLocalError(error);
   }, []);
 
-  // Return enhanced mutation result with stable references
+  // Return enhanced mutation result with stable references.
+  // Only include deps that have real functional impact on consumers:
+  // - mutate/mutateAsync: the callable functions (stable useCallbacks from RQ)
+  // - status/isPending/isError/isSuccess: primitive state flags
+  // - data/error: the actual result values
+  // - reset: stable function from RQ
+  // Intentionally excluded from deps: variables, context, failureReason, failureCount
+  // — these are object references RQ recreates every render even when idle (always undefined),
+  // which would cause the memo to fire every render and make streamMutation/cancelMutation
+  // unstable, cascading into startStream/cancelStream re-creation on every render.
+  // These fields are still returned (reading from closure is fine), just not depended on.
   return useMemo(
     () => ({
       mutate: mutation.mutate,
@@ -228,6 +238,19 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
       failureReason: mutation.failureReason,
       context: mutation.context,
     }),
-    [mutation, localError, setErrorType],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      mutation.mutate,
+      mutation.mutateAsync,
+      mutation.isPending,
+      mutation.isError,
+      mutation.error,
+      mutation.isSuccess,
+      mutation.data,
+      mutation.reset,
+      mutation.status,
+      localError,
+      setErrorType,
+    ],
   );
 }

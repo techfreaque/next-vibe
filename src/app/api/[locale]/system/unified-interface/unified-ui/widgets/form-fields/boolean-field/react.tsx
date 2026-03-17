@@ -189,7 +189,7 @@ export function BooleanFieldWidget<
             {fieldState.error && (
               <Div className="flex items-center gap-2 text-sm text-destructive">
                 <AlertCircle className="h-4 w-4" />
-                <FormMessage />
+                <FormMessage t={t} />
               </Div>
             )}
           </FormItem>

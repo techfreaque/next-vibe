@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "cron", "queue"],
-  aliases: [CRON_QUEUE_ALIAS, "cron-queue", "task-queue"],
+  aliases: [CRON_QUEUE_ALIAS, "task-queue"],
   title: "get.title",
   description: "get.description",
   icon: "clock",
@@ -101,6 +101,15 @@ const { GET } = createEndpoint({
           .optional()
           // Queue shows ALL by default (including hidden tasks)
           .default(CronTaskHiddenFilter.ALL),
+      }),
+      search: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.search.label",
+        description: "get.fields.search.description",
+        placeholder: "get.fields.search.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
       }),
       limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

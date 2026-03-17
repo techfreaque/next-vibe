@@ -5,7 +5,6 @@
 
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -119,7 +118,8 @@ export class ValidationService {
       return success();
     }
 
-    const lockfilePath = join(cwd, lockfileName);
+    // Use template string to prevent Turbopack from statically tracing paths
+    const lockfilePath = `${cwd}/${lockfileName}`;
 
     if (!existsSync(lockfilePath)) {
       logger.warn(MESSAGES.LOCKFILE_MISSING, { expected: lockfileName });

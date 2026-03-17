@@ -141,6 +141,7 @@ export class LeadsImportProcessRepository {
             .insert(cronTasks)
             .values({
               id: nextTaskId,
+              shortId: nextTaskId,
               routeId: "leads_import_process_POST",
               displayName: "Process pending import jobs",
               category: TaskCategory.MAINTENANCE,

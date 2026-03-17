@@ -81,8 +81,8 @@ export function PaginationWidget<
 
   const pagination = field.value;
 
-  const page = form?.watch(`${fieldName}.page`) || 1;
-  const limit = form?.watch(`${fieldName}.limit`) || 50;
+  const page = form.watch(`${fieldName}.page`) || 1;
+  const limit = form.watch(`${fieldName}.limit`) || 50;
   const total =
     typeof pagination.totalCount === "number" ? pagination.totalCount : 0;
   const totalPages =

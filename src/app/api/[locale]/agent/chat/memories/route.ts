@@ -8,14 +8,14 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import { DefaultFolderId } from "../config";
 import definitions from "./definition";
-import * as repository from "./repository";
+import { MemoriesRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: async ({ user, logger, streamContext }) => {
-      const result = await repository.getMemories({
+      const result = await MemoriesRepository.getMemories({
         userId: user.id,
         logger,
         rootFolderId: streamContext.rootFolderId ?? DefaultFolderId.PRIVATE,

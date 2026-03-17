@@ -24,7 +24,7 @@ import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CliRequestData } from "../../../cli/runtime/parsing";
+import type { CliRequestData } from "../../../cli/runtime/cli-request-data";
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
 import type { JsonValue } from "../../../tasks/unified-runner/types";
 import type { EndpointLogger } from "../../logger/endpoint";

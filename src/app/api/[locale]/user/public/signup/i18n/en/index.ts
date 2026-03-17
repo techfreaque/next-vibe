@@ -346,7 +346,7 @@ export const translations = {
     upgrade: {
       title: "Want more?",
       desc: "€8/month gets you 800 credits - that's 40× more. Plus you can buy extra credit packs that never expire. Perfect if you use AI daily.",
-      cta: "See Unlimited Plan",
+      cta: "Upgrade to Pro",
     },
     signoff: "Happy chatting,\nThe {{appName}} Team",
     ps: "P.S. Use Incognito mode to keep conversations on your device only - we never store them on our servers.",

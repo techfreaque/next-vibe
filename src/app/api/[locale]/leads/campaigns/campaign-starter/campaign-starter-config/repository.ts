@@ -148,6 +148,7 @@ export class CampaignStarterConfigRepository {
 
     const cronData: NewCronTask = {
       id: "campaign-starter",
+      shortId: "campaign-starter",
       routeId: "campaign-starter",
       displayName: "campaign-starter",
 

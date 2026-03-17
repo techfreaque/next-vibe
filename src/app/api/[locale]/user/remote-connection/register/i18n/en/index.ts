@@ -24,6 +24,15 @@ export const translations = {
         invalid: "Please enter a valid URL",
       },
     },
+    reverseToken: {
+      label: "Reverse Token",
+      description:
+        "JWT token for the remote to authenticate back to this instance",
+    },
+    reverseLeadId: {
+      label: "Reverse Lead ID",
+      description: "Lead ID for the reverse connection",
+    },
     errors: {
       validation: {
         title: "Validation Error",

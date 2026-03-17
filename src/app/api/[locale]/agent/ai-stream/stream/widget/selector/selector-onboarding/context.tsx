@@ -5,7 +5,7 @@ import { createContext, useContext } from "react";
 
 interface SelectorOnboardingContextValue {
   isOnboarding: boolean;
-  companionCharacterId: string | null;
+  companionSkillId: string | null;
 }
 
 const SelectorOnboardingContext =
@@ -14,17 +14,17 @@ const SelectorOnboardingContext =
 interface SelectorOnboardingProviderProps {
   children: ReactNode;
   isOnboarding?: boolean;
-  companionCharacterId?: string | null;
+  companionSkillId?: string | null;
 }
 
 export function SelectorOnboardingProvider({
   children,
   isOnboarding = true,
-  companionCharacterId = null,
+  companionSkillId = null,
 }: SelectorOnboardingProviderProps): React.JSX.Element {
   return (
     <SelectorOnboardingContext.Provider
-      value={{ isOnboarding, companionCharacterId }}
+      value={{ isOnboarding, companionSkillId }}
     >
       {children}
     </SelectorOnboardingContext.Provider>
@@ -42,7 +42,7 @@ export function useSelectorOnboarding(): boolean {
 }
 
 /**
- * Hook to get full onboarding context including companion character info
+ * Hook to get full onboarding context including companion skill info
  */
 export function useSelectorOnboardingContext(): SelectorOnboardingContextValue {
   const context = useContext(SelectorOnboardingContext);
@@ -50,7 +50,7 @@ export function useSelectorOnboardingContext(): SelectorOnboardingContextValue {
   return (
     context ?? {
       isOnboarding: false,
-      companionCharacterId: null,
+      companionSkillId: null,
     }
   );
 }

@@ -55,6 +55,7 @@ import type {
   CronTaskGetResponseOutput,
   CronTaskPutRequestOutput,
 } from "../definition";
+import { ScheduleAutocomplete } from "./schedule-autocomplete";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -357,9 +358,7 @@ function TaskInputEditSection({
   );
 
   // Get current taskInput value from parent form
-  const currentTaskInput = parentForm?.watch(
-    "taskInput" as keyof CronTaskPutRequestOutput,
-  ) as Record<string, WidgetData> | undefined;
+  const currentTaskInput = parentForm?.watch("taskInput");
 
   // Create inner form for editing the endpoint's fields
   const innerForm = useForm<FieldValues>({
@@ -374,8 +373,8 @@ function TaskInputEditSection({
 
     const subscription = innerForm.watch((values) => {
       parentForm.setValue(
-        "taskInput" as keyof CronTaskPutRequestOutput,
-        values as CronTaskPutRequestOutput[keyof CronTaskPutRequestOutput],
+        "taskInput",
+        values as CronTaskPutRequestOutput["taskInput"],
         {
           shouldDirty: true,
           shouldTouch: true,
@@ -434,6 +433,57 @@ function TaskInputEditSection({
 }
 
 // ---------------------------------------------------------------------------
+// ScheduleField — wraps ScheduleAutocomplete with react-hook-form integration
+// ---------------------------------------------------------------------------
+
+function ScheduleField({
+  field,
+}: {
+  field: (typeof endpoints.PUT)["fields"]["children"]["schedule"];
+}): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const form = useWidgetForm<typeof endpoints.PUT>();
+  const t = useWidgetTranslation<typeof endpoints.PUT>();
+
+  const value = form.watch("schedule");
+
+  const handleChange = useCallback(
+    (newValue: string): void => {
+      form.setValue("schedule", newValue, {
+        shouldDirty: true,
+        shouldValidate: true,
+        shouldTouch: true,
+      });
+    },
+    [form],
+  );
+
+  const handleBlur = useCallback((): void => {
+    form.trigger("schedule");
+  }, [form]);
+
+  return (
+    <Div className="flex flex-col gap-1.5">
+      <Div className="text-sm font-medium">
+        {t(field.label as Parameters<typeof t>[0])}
+      </Div>
+      <ScheduleAutocomplete
+        value={value ?? ""}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        placeholder={t(field.placeholder as Parameters<typeof t>[0])}
+        locale={locale}
+      />
+      {field.description && (
+        <Div className="text-xs text-muted-foreground">
+          {t(field.description as Parameters<typeof t>[0])}
+        </Div>
+      )}
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // CronTaskEditContainer — root custom widget for PUT form
 // Renders all form fields + dynamic task input section
 // ---------------------------------------------------------------------------
@@ -475,7 +525,7 @@ export function CronTaskEditContainer({
           />
         </Div>
         <Div className="col-span-6">
-          <TextFieldWidget field={children.schedule} fieldName="schedule" />
+          <ScheduleField field={children.schedule} />
         </Div>
         <Div className="col-span-6">
           <BooleanFieldWidget field={children.enabled} fieldName="enabled" />
@@ -494,6 +544,15 @@ export function CronTaskEditContainer({
         </Div>
         <Div className="col-span-6">
           <NumberFieldWidget field={children.retries} fieldName="retries" />
+        </Div>
+        <Div className="col-span-6">
+          <NumberFieldWidget
+            field={children.retryDelay}
+            fieldName="retryDelay"
+          />
+        </Div>
+        <Div className="col-span-6">
+          <BooleanFieldWidget field={children.hidden} fieldName="hidden" />
         </Div>
         <Div className="col-span-6">
           <BooleanFieldWidget field={children.runOnce} fieldName="runOnce" />
@@ -527,6 +586,11 @@ export function CronTaskDetailContainer({
   const isLoading = endpointMutations?.read?.isLoading;
   const task: Task | null | undefined = field.value?.task;
 
+  // ── Refresh ──
+  const handleRefresh = useCallback((): void => {
+    endpointMutations?.read?.refetch?.();
+  }, [endpointMutations]);
+
   // ── Navigation: edit task ──
   const handleEdit = useCallback((): void => {
     if (!task?.id) {
@@ -540,9 +604,10 @@ export function CronTaskDetailContainer({
         prefillFromGet: true,
         getEndpoint: m.default.GET,
         popNavigationOnSuccess: 1,
+        onSuccessCallback: handleRefresh,
       });
     })();
-  }, [navigate, task]);
+  }, [navigate, task, handleRefresh]);
 
   // ── Navigation: delete task ──
   const handleDelete = useCallback((): void => {
@@ -554,10 +619,11 @@ export function CronTaskDetailContainer({
       navigate(m.default.DELETE, {
         urlPathParams: { id: task.id },
         renderInModal: true,
-        popNavigationOnSuccess: 1,
+        popNavigationOnSuccess: 2,
+        onSuccessCallback: handleRefresh,
       });
     })();
-  }, [navigate, task]);
+  }, [navigate, task, handleRefresh]);
 
   // ── Navigation: history ──
   const handleHistory = useCallback((): void => {
@@ -582,14 +648,11 @@ export function CronTaskDetailContainer({
       navigate(m.default.POST, {
         data: { taskId: task.id },
         renderInModal: true,
+        popNavigationOnSuccess: 1,
+        onSuccessCallback: handleRefresh,
       });
     })();
-  }, [navigate, task]);
-
-  // ── Refresh ──
-  const handleRefresh = useCallback((): void => {
-    endpointMutations?.read?.refetch?.();
-  }, [endpointMutations]);
+  }, [navigate, task, handleRefresh]);
 
   // ── Loading state ──
   if (isLoading) {

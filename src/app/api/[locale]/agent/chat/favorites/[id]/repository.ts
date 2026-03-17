@@ -20,8 +20,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_TTS_VOICE } from "../../../text-to-speech/enum";
-import { scopedTranslation as charactersScopedTranslation } from "../../characters/i18n";
-import { CharactersRepository } from "../../characters/repository";
+import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
+import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
   FavoriteDeleteResponseOutput,
@@ -84,16 +84,16 @@ export class SingleFavoriteRepository {
         });
       }
 
-      const characterResult = await CharactersRepository.getCharacterById(
-        { id: favorite.characterId },
+      const characterResult = await SkillsRepository.getSkillById(
+        { id: favorite.skillId },
         user,
         logger,
         locale,
       );
 
       if (!characterResult.success) {
-        logger.error("Character not found for favorite", {
-          characterId: favorite.characterId,
+        logger.error("Skill not found for favorite", {
+          skillId: favorite.skillId,
           favoriteId: urlPathParams.id,
           userId,
         });
@@ -110,9 +110,9 @@ export class SingleFavoriteRepository {
       if (!character?.modelSelection) {
         logger.error("No character modelSelection found", {
           favoriteId: urlPathParams.id,
-          characterId: favorite.characterId,
+          skillId: favorite.skillId,
           hasFavoriteModelSelection: !!favorite.modelSelection,
-          hasCharacterModelSelection: !!character?.modelSelection,
+          hasSkillModelSelection: !!character?.modelSelection,
         });
         return fail({
           message: t("get.errors.server.title"),
@@ -133,20 +133,21 @@ export class SingleFavoriteRepository {
 
       // Flattened response
       return success<FavoriteGetResponseOutput>({
-        characterId: favorite.characterId,
+        skillId: favorite.skillId,
         icon: displayIcon,
-        name: character?.name ?? charactersT("characters.default.name"),
-        tagline:
-          character?.tagline ?? charactersT("characters.default.tagline"),
+        name: character?.name ?? charactersT("skills.default.name"),
+        tagline: character?.tagline ?? charactersT("skills.default.tagline"),
         description:
-          character?.description ??
-          charactersT("characters.default.description"),
+          character?.description ?? charactersT("skills.default.description"),
         voice,
         modelSelection,
         characterModelSelection,
         compactTrigger: favorite.compactTrigger ?? null,
-        allowedTools: favorite.activeTools ?? null,
-        pinnedTools: favorite.visibleTools ?? null,
+        availableTools: favorite.availableTools ?? null,
+        pinnedTools: favorite.pinnedTools ?? null,
+        deniedTools: favorite.deniedTools ?? null,
+        promptAppend: favorite.promptAppend ?? null,
+        memoryLimit: favorite.memoryLimit ?? null,
       });
     } catch (error) {
       logger.error("Failed to fetch favorite", parseError(error));
@@ -181,8 +182,8 @@ export class SingleFavoriteRepository {
       const favoriteId = urlPathParams.id;
       logger.debug("Updating favorite", { userId, favoriteId });
 
-      // Validate characterId if provided
-      if (data.characterId && data.characterId.trim() === "") {
+      // Validate skillId if provided
+      if (data.skillId && data.skillId.trim() === "") {
         return fail({
           message: t("patch.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -210,9 +211,9 @@ export class SingleFavoriteRepository {
 
       // Get character to compare defaults
       let character = null;
-      if (data.characterId ?? existing.characterId) {
-        const characterResult = await CharactersRepository.getCharacterById(
-          { id: data.characterId ?? existing.characterId },
+      if (data.skillId ?? existing.skillId) {
+        const characterResult = await SkillsRepository.getSkillById(
+          { id: data.skillId ?? existing.skillId },
           user,
           logger,
           locale,
@@ -236,13 +237,16 @@ export class SingleFavoriteRepository {
       const [updated] = await db
         .update(chatFavorites)
         .set({
-          characterId: data.characterId,
+          skillId: data.skillId,
           customIcon: customIconToStore,
           voice: voiceToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
-          activeTools: data.allowedTools ?? null,
-          visibleTools: data.pinnedTools ?? null,
+          availableTools: data.availableTools ?? null,
+          pinnedTools: data.pinnedTools ?? null,
+          deniedTools: data.deniedTools ?? null,
+          promptAppend: data.promptAppend ?? null,
+          memoryLimit: data.memoryLimit !== undefined ? data.memoryLimit : null,
           updatedAt: new Date(),
         })
         .where(
@@ -261,21 +265,20 @@ export class SingleFavoriteRepository {
       }
 
       // Fetch character data for response
-      const updatedCharacterResult =
-        await CharactersRepository.getCharacterById(
-          { id: updated.characterId },
-          user,
-          logger,
-          locale,
-        );
+      const updatedSkillResult = await SkillsRepository.getSkillById(
+        { id: updated.skillId },
+        user,
+        logger,
+        locale,
+      );
 
-      const updatedCharacter = updatedCharacterResult.success
-        ? updatedCharacterResult.data
+      const updatedSkill = updatedSkillResult.success
+        ? updatedSkillResult.data
         : null;
 
-      if (!updatedCharacter) {
-        logger.error("Character not found after update", {
-          characterId: updated.characterId,
+      if (!updatedSkill) {
+        logger.error("Skill not found after update", {
+          skillId: updated.skillId,
           favoriteId,
           userId,
         });
@@ -337,7 +340,7 @@ export class SingleFavoriteRepository {
 
       const deleted = result[0];
       return success({
-        characterId: deleted.characterId,
+        skillId: deleted.skillId,
         voice: deleted.voice,
         modelSelection: deleted.modelSelection,
         createdAt: deleted.createdAt,

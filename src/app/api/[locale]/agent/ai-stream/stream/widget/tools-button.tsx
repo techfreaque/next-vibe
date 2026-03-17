@@ -45,16 +45,16 @@ export function ToolsButton({
 
   // Compute enabledTools from settings (same logic as the old useChat hook)
   const computedEnabledTools = React.useMemo((): EnabledTool[] | null => {
-    const { allowedTools, pinnedTools } = effectiveSettings;
-    if (allowedTools === null && pinnedTools === null) {
+    const { availableTools, pinnedTools } = effectiveSettings;
+    if (availableTools === null && pinnedTools === null) {
       return null;
     }
     const allIds = new Set([
-      ...(allowedTools ?? []).map((t) => t.toolId),
+      ...(availableTools ?? []).map((t) => t.toolId),
       ...(pinnedTools ?? []).map((t) => t.toolId),
     ]);
     return [...allIds].map((id) => {
-      const allowed = allowedTools?.find((t) => t.toolId === id);
+      const allowed = availableTools?.find((t) => t.toolId === id);
       const pinned = pinnedTools?.find((t) => t.toolId === id);
       return {
         id,

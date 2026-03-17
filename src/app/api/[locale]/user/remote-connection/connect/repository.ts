@@ -14,7 +14,7 @@
 
 import "server-only";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -24,19 +24,22 @@ import {
 import { DEFAULT_REMOTE_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
-import { defaultLocale } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "../../public/login/definition";
-import { userRemoteConnections } from "../db";
+import { remoteConnections } from "../db";
 import registerEndpoints from "../register/definition";
 import {
+  deriveDefaultSelfInstanceId,
   invalidateInstanceIdCache,
+  upsertInstanceIdentity,
   upsertRemoteConnection,
 } from "../repository";
 import type { RemoteConnectPostRequestInput } from "./definition";
@@ -51,15 +54,30 @@ async function registerOnRemote(params: {
   token: string;
   leadId: string;
   instanceId: string;
+  locale: CountryLanguage;
+  friendlyName?: string;
+  reverseToken?: string;
+  reverseLeadId?: string;
   logger: EndpointLogger;
 }): Promise<{
   ok: boolean;
   conflict: boolean;
   remoteInstanceId: string | null;
+  remoteFriendlyName: string | null;
 }> {
-  const { remoteUrl, token, leadId, instanceId, logger } = params;
+  const {
+    remoteUrl,
+    token,
+    leadId,
+    instanceId,
+    locale,
+    friendlyName,
+    reverseToken,
+    reverseLeadId,
+    logger,
+  } = params;
   const localUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
-  const registerUrl = `${remoteUrl}/api/${defaultLocale}/${registerEndpoints.POST.path.join("/")}`;
+  const registerUrl = `${remoteUrl}/api/${locale}/${registerEndpoints.POST.path.join("/")}`;
 
   try {
     const headers: Record<string, string> = {
@@ -73,7 +91,13 @@ async function registerOnRemote(params: {
     const response = await fetch(registerUrl, {
       method: "POST",
       headers,
-      body: JSON.stringify({ instanceId, localUrl }),
+      body: JSON.stringify({
+        instanceId,
+        localUrl,
+        friendlyName,
+        ...(reverseToken ? { reverseToken } : {}),
+        ...(reverseLeadId ? { reverseLeadId } : {}),
+      }),
       signal: AbortSignal.timeout(15000),
     });
 
@@ -81,7 +105,12 @@ async function registerOnRemote(params: {
       logger.warn("[CONNECT] Instance ID already registered on remote", {
         instanceId,
       });
-      return { ok: false, conflict: true, remoteInstanceId: null };
+      return {
+        ok: false,
+        conflict: true,
+        remoteInstanceId: null,
+        remoteFriendlyName: null,
+      };
     }
 
     if (!response.ok) {
@@ -89,20 +118,31 @@ async function registerOnRemote(params: {
         status: response.status,
         instanceId,
       });
-      return { ok: false, conflict: false, remoteInstanceId: null };
+      return {
+        ok: false,
+        conflict: false,
+        remoteInstanceId: null,
+        remoteFriendlyName: null,
+      };
     }
 
     const body = (await response.json()) as {
-      data?: { remoteInstanceId?: string };
+      data?: { remoteInstanceId?: string; remoteFriendlyName?: string };
     };
     return {
       ok: true,
       conflict: false,
       remoteInstanceId: body.data?.remoteInstanceId ?? null,
+      remoteFriendlyName: body.data?.remoteFriendlyName ?? null,
     };
   } catch (error) {
     logger.error(`[CONNECT] Remote registration error: ${String(error)}`);
-    return { ok: false, conflict: false, remoteInstanceId: null };
+    return {
+      ok: false,
+      conflict: false,
+      remoteInstanceId: null,
+      remoteFriendlyName: null,
+    };
   }
 }
 
@@ -140,8 +180,12 @@ function validateRemoteUrl(rawUrl: string): string | null {
     return "Remote URL must use http or https";
   }
   const host = parsed.hostname;
-  // Allow loopback/private addresses in development (for local-to-local testing)
-  if (envClient.NODE_ENV !== "development" && env.NODE_ENV !== "development") {
+  // Allow loopback/private addresses in development or preview mode (for local-to-local testing)
+  const isDev =
+    envClient.NODE_ENV === "development" ||
+    env.NODE_ENV === "development" ||
+    env.IS_PREVIEW_MODE === true;
+  if (!isDev) {
     if (PRIVATE_IP_PATTERNS.some((re) => re.test(host))) {
       return "Remote URL must not point to a private or loopback address";
     }
@@ -160,13 +204,14 @@ function validateRemoteUrl(rawUrl: string): string | null {
  * 3. Local collision check
  * 4. Register this instance on the remote (cloud-side collision check)
  * 5. Store connection locally
- * 6. Write default remote tools to user's allowedTools setting
+ * 6. Write default remote tools to user's availableTools setting
  */
 export async function connectRemote(
   data: RemoteConnectPostRequestInput,
   user: JwtPrivatePayloadType,
   logger: EndpointLogger,
   t: RemoteConnectT,
+  locale: CountryLanguage,
 ): Promise<ResponseType<{ remoteUrlResult: string; isConnected: boolean }>> {
   const { email, password, friendlyName } = data;
   const remoteUrl = data.remoteUrl ?? "";
@@ -189,7 +234,7 @@ export async function connectRemote(
   let token: string;
   let effectiveLeadId: string;
   try {
-    const loginUrl = `${remoteUrl}/api/${defaultLocale}/${loginEndpoints.POST.path.join("/")}`;
+    const loginUrl = `${remoteUrl}/api/${locale}/${loginEndpoints.POST.path.join("/")}`;
     const loginResponse = await fetch(loginUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -245,15 +290,19 @@ export async function connectRemote(
     });
   }
 
-  // ── Step 3: Local collision check (ignore self-record with token="self") ───
+  // ── Step 3: Local collision check ──────────────────────────────────────────
+
+  // 3a: Derive our self-identity (used later in step 5b)
+  const selfInstanceId = deriveDefaultSelfInstanceId();
+
+  // 3b: Reject if instanceId already used for another connection
   const [localExisting] = await db
-    .select({ id: userRemoteConnections.id })
-    .from(userRemoteConnections)
+    .select({ id: remoteConnections.id })
+    .from(remoteConnections)
     .where(
       and(
-        eq(userRemoteConnections.userId, user.id),
-        eq(userRemoteConnections.instanceId, instanceId),
-        ne(userRemoteConnections.token, "self"),
+        eq(remoteConnections.userId, user.id),
+        eq(remoteConnections.instanceId, instanceId),
       ),
     )
     .limit(1);
@@ -269,29 +318,43 @@ export async function connectRemote(
     });
   }
 
-  // ── Step 3: Register this instance on the remote ───────────────────────────
+  // ── Step 3c: Generate reverse token for bidirectional auth ────────────────
+  // The remote needs a JWT signed by OUR secret to call our /report endpoint.
+  // This enables the remote to push task completion status back to us.
+  let reverseToken: string | undefined;
+  const reverseTokenResult = await AuthRepository.signJwt(user, logger, locale);
+  if (reverseTokenResult.success) {
+    reverseToken = reverseTokenResult.data;
+  } else {
+    logger.warn(
+      "[CONNECT] Failed to generate reverse token, continuing without it",
+    );
+  }
+
+  // ── Step 4: Register this instance on the remote ───────────────────────────
+  // Send our self-identity (not the local connection name) so the remote knows
+  // us by our actual instanceId. The form's `instanceId` is the name WE give
+  // the remote in OUR DB; the remote should see us as `selfInstanceId`.
   const registerResult = await registerOnRemote({
     remoteUrl,
     token,
     leadId: effectiveLeadId,
-    instanceId,
+    instanceId: selfInstanceId,
+    locale,
+    friendlyName: friendlyName ?? selfInstanceId,
+    reverseToken,
+    reverseLeadId: user.leadId,
     logger,
   });
 
   if (!registerResult.ok) {
-    if (registerResult.conflict) {
-      return fail({
-        message: t("post.errors.instanceIdConflict.title"),
-        errorType: ErrorResponseTypes.CONFLICT,
-      });
-    }
     return fail({
       message: t("post.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 
-  // ── Step 4: Store locally ───────────────────────────────────────────────────
+  // ── Step 5: Store locally ───────────────────────────────────────────────────
   const storeResult = await upsertRemoteConnection({
     userId: user.id,
     remoteUrl,
@@ -299,7 +362,9 @@ export async function connectRemote(
     leadId: effectiveLeadId,
     instanceId,
     friendlyName: friendlyName ?? instanceId,
+    remoteFriendlyName: registerResult.remoteFriendlyName ?? undefined,
     remoteInstanceId: registerResult.remoteInstanceId ?? undefined,
+    isDefault: true,
     logger,
   });
 
@@ -310,31 +375,21 @@ export async function connectRemote(
     });
   }
 
-  // Invalidate cache so pulse/task-sync pick up the new instanceId immediately
-  invalidateInstanceIdCache();
-
-  // ── Step 4b: Upsert local self-identity record (token="self") ──────────────
+  // ── Step 5b: Upsert local self-identity record ─────────────────────────────
   // This lets getLocalInstanceId() return our own instanceId even when no remote
   // has registered here yet (e.g. outbound-only setups).
-  try {
-    await db
-      .insert(userRemoteConnections)
-      .values({
-        userId: user.id,
-        instanceId,
-        friendlyName: `${instanceId} (self)`,
-        remoteUrl: envClient.NEXT_PUBLIC_APP_URL ?? "",
-        localUrl: null,
-        token: "self",
-        isActive: true,
-        updatedAt: new Date(),
-      })
-      .onConflictDoNothing();
-  } catch {
-    // Non-fatal — self-record may already exist or conflict with the connection row
-  }
+  // Reuses selfInstanceId from step 3a (deriveDefaultSelfInstanceId).
+  await upsertInstanceIdentity({
+    userId: user.id,
+    instanceId: selfInstanceId,
+    friendlyName: selfInstanceId,
+    isDefault: true,
+  });
 
-  // ── Step 5: Write default remote tools to user's allowedTools setting ───────
+  // Invalidate cache AFTER upsert so pulse/task-sync pick up the new identity
+  invalidateInstanceIdCache();
+
+  // ── Step 6: Write default remote tools to user's availableTools setting ───────
   try {
     const { ChatSettingsRepository } =
       await import("@/app/api/[locale]/agent/chat/settings/repository");
@@ -348,7 +403,7 @@ export async function connectRemote(
       settingsT,
     );
     const existingAllowed = existingResult.success
-      ? (existingResult.data.allowedTools ?? [])
+      ? (existingResult.data.availableTools ?? [])
       : [];
     const remoteTools = DEFAULT_REMOTE_TOOL_IDS.map((id) => ({
       toolId: `${instanceId}__${id}`,
@@ -360,13 +415,13 @@ export async function connectRemote(
     );
     if (newTools.length > 0) {
       await ChatSettingsRepository.upsertSettings(
-        { allowedTools: [...existingAllowed, ...newTools] },
+        { availableTools: [...existingAllowed, ...newTools] },
         user,
         logger,
         settingsT,
       );
       logger.info(
-        `[CONNECT] Added ${newTools.length.toString()} remote tools to allowedTools`,
+        `[CONNECT] Added ${newTools.length.toString()} remote tools to availableTools`,
         {
           instanceId,
         },
@@ -374,7 +429,7 @@ export async function connectRemote(
     }
   } catch (toolWriteError) {
     // Non-fatal — connection is established, tools can be added manually
-    logger.warn("[CONNECT] Failed to write remote tools to allowedTools", {
+    logger.warn("[CONNECT] Failed to write remote tools to availableTools", {
       error: String(toolWriteError),
     });
   }

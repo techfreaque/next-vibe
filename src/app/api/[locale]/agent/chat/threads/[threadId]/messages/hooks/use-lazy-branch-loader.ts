@@ -15,17 +15,19 @@ import { parseError } from "next-vibe/shared/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../../../config";
-import type { ChatMessage, ChatThread, MessageMetadata } from "../../../../db";
+import type { ChatThread, MessageMetadata } from "../../../../db";
 import { useChatStore } from "../../../../hooks/store";
 import messagesDefinitions from "../definition";
 import type { PathGetResponseOutput } from "../path/definition";
 import pathDefinitions from "../path/definition";
+import { patchMessage, upsertMessage } from "./update-messages";
 
 interface LazyBranchLoaderReturn {
   isLoadingBranch: boolean;
@@ -48,8 +50,6 @@ export function useLazyBranchLoader(
   activeThreadId: string | null,
   threads: Record<string, ChatThread>,
   leafMessageId: string | null,
-  addMessage: (message: ChatMessage) => void,
-  updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void,
   setThreadLoadMode: (threadId: string, mode: "full" | "partial") => void,
   user: JwtPayloadType,
   /** SSR-prefetched path data — pre-populates React Query cache, skips initial fetch */
@@ -135,7 +135,7 @@ export function useLazyBranchLoader(
     const messages = pathData.messages ?? [];
 
     for (const message of messages) {
-      addMessage({
+      upsertMessage(activeThreadId, rootFolderId, logger, {
         ...message,
         createdAt: new Date(message.createdAt),
         updatedAt: new Date(message.updatedAt),
@@ -168,7 +168,7 @@ export function useLazyBranchLoader(
   }, [
     pathData,
     activeThreadId,
-    addMessage,
+    rootFolderId,
     setThreadLoadMode,
     logger,
     setLeafMessageId,
@@ -216,10 +216,21 @@ export function useLazyBranchLoader(
 
             // Clear hasOlderHistory flag on the current oldest message — the older
             // chunk now replaces it (the chunk itself will have the flag if needed).
-            const currentOldest =
-              useChatStore.getState().messages[oldestMessageId];
+            const cachedData = apiClient.getEndpointData(
+              messagesDefinitions.GET,
+              logger,
+              {
+                urlPathParams: { threadId: activeThreadId },
+                requestData: { rootFolderId },
+              },
+            );
+            const currentOldest = cachedData?.success
+              ? (cachedData.data.messages.find(
+                  (m) => m.id === oldestMessageId,
+                ) ?? null)
+              : null;
             if (currentOldest) {
-              updateMessage(oldestMessageId, {
+              patchMessage(threadId, rootFolderId, logger, oldestMessageId, {
                 metadata: {
                   ...(currentOldest.metadata as MessageMetadata | null),
                   hasOlderHistory: false,
@@ -229,7 +240,7 @@ export function useLazyBranchLoader(
 
             if (data.messages) {
               for (const message of data.messages) {
-                addMessage({
+                upsertMessage(threadId, rootFolderId, logger, {
                   ...message,
                   createdAt: new Date(message.createdAt),
                   updatedAt: new Date(message.updatedAt),
@@ -240,15 +251,26 @@ export function useLazyBranchLoader(
             // If this older chunk's newest message already has a newer chunk loaded,
             // clear the hasNewerHistory flag so no stale button appears.
             if (data.newerChunkAnchorId) {
-              const alreadyLoaded =
-                !!useChatStore.getState().messages[data.newerChunkAnchorId];
+              const cachedAfterUpsert = apiClient.getEndpointData(
+                messagesDefinitions.GET,
+                logger,
+                {
+                  urlPathParams: { threadId: activeThreadId },
+                  requestData: { rootFolderId },
+                },
+              );
+              const msgs = cachedAfterUpsert?.success
+                ? cachedAfterUpsert.data.messages
+                : [];
+              const alreadyLoaded = msgs.some(
+                (m) => m.id === data.newerChunkAnchorId,
+              );
               if (alreadyLoaded) {
                 // The leaf message that had the flag — find it by newerAnchorId
-                const msgs = useChatStore.getState().messages;
-                for (const msg of Object.values(msgs)) {
+                for (const msg of msgs) {
                   const meta = msg.metadata as MessageMetadata | null;
                   if (meta?.newerAnchorId === data.newerChunkAnchorId) {
-                    updateMessage(msg.id, {
+                    patchMessage(threadId, rootFolderId, logger, msg.id, {
                       metadata: {
                         ...meta,
                         hasNewerHistory: false,
@@ -289,10 +311,9 @@ export function useLazyBranchLoader(
       isLoadingOlderHistory,
       locale,
       logger,
-      addMessage,
-      updateMessage,
       user,
       thread?.rootFolderId,
+      rootFolderId,
     ],
   );
 
@@ -339,11 +360,19 @@ export function useLazyBranchLoader(
 
             // Clear hasNewerHistory flag on the leaf message that triggered this load.
             // The new chunk's messages will carry their own flags if further chunks exist.
-            const msgs = useChatStore.getState().messages;
-            for (const msg of Object.values(msgs)) {
+            const cachedData = apiClient.getEndpointData(
+              messagesDefinitions.GET,
+              logger,
+              {
+                urlPathParams: { threadId: activeThreadId },
+                requestData: { rootFolderId },
+              },
+            );
+            const msgs = cachedData?.success ? cachedData.data.messages : [];
+            for (const msg of msgs) {
               const meta = msg.metadata as MessageMetadata | null;
               if (meta?.newerAnchorId === anchorId) {
-                updateMessage(msg.id, {
+                patchMessage(threadId, rootFolderId, logger, msg.id, {
                   metadata: {
                     ...meta,
                     hasNewerHistory: false,
@@ -356,7 +385,7 @@ export function useLazyBranchLoader(
 
             if (data.messages) {
               for (const message of data.messages) {
-                addMessage({
+                upsertMessage(threadId, rootFolderId, logger, {
                   ...message,
                   createdAt: new Date(message.createdAt),
                   updatedAt: new Date(message.updatedAt),
@@ -403,10 +432,9 @@ export function useLazyBranchLoader(
       isLoadingNewerHistory,
       locale,
       logger,
-      addMessage,
-      updateMessage,
       user,
       thread?.rootFolderId,
+      rootFolderId,
       setLeafMessageId,
     ],
   );
@@ -443,13 +471,15 @@ export function useFullLoadFallback(
   logger: EndpointLogger,
   activeThreadId: string | null,
   threadLoadMode: Record<string, "full" | "partial">,
-  addMessage: (message: ChatMessage) => void,
   setThreadLoadMode: (threadId: string, mode: "full" | "partial") => void,
   needsFullLoad: boolean,
   user: JwtPayloadType,
+  currentRootFolderId: DefaultFolderId,
 ): { isUpgrading: boolean } {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const upgradedRef = useRef<Set<string>>(new Set());
+
+  const pendingNewThreadIds = useChatStore((s) => s.pendingNewThreadIds);
 
   useEffect(() => {
     if (
@@ -457,7 +487,7 @@ export function useFullLoadFallback(
       !needsFullLoad ||
       threadLoadMode[activeThreadId] === "full" ||
       upgradedRef.current.has(activeThreadId) ||
-      useChatStore.getState().isThreadPendingCreate(activeThreadId)
+      pendingNewThreadIds.has(activeThreadId)
     ) {
       return;
     }
@@ -465,15 +495,15 @@ export function useFullLoadFallback(
     upgradedRef.current.add(activeThreadId);
     setIsUpgrading(true);
 
+    const rootFolderId = currentRootFolderId;
+
     const loadAll = async (): Promise<void> => {
       try {
         const response = await executeQuery({
           endpoint: messagesDefinitions.GET,
           logger,
           requestData: {
-            rootFolderId:
-              useChatStore.getState().threads[activeThreadId]?.rootFolderId ??
-              DefaultFolderId.PRIVATE,
+            rootFolderId,
           },
           pathParams: { threadId: activeThreadId },
           locale,
@@ -485,7 +515,7 @@ export function useFullLoadFallback(
 
           if (data.messages) {
             for (const message of data.messages) {
-              addMessage({
+              upsertMessage(activeThreadId, rootFolderId, logger, {
                 ...message,
                 createdAt: new Date(message.createdAt),
                 updatedAt: new Date(message.updatedAt),
@@ -513,9 +543,10 @@ export function useFullLoadFallback(
     threadLoadMode,
     locale,
     logger,
-    addMessage,
     setThreadLoadMode,
     user,
+    currentRootFolderId,
+    pendingNewThreadIds,
   ]);
 
   return { isUpgrading };

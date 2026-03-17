@@ -234,7 +234,7 @@ export function ContainerWidget<
   // Call useWatch unconditionally (React hooks rule) - disabled when not needed
   const watchPath = discriminator ?? "";
   const watchedDiscriminator = useWatch({
-    control: form?.control,
+    control: form.control,
     name: watchPath as Path<TEndpoint["types"]["RequestOutput"]>,
     disabled: !discriminator || !form,
   }) as string | undefined;

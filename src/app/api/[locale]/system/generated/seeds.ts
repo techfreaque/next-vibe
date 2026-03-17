@@ -33,12 +33,12 @@ export async function getSeedModule(
       return (await import("../../newsletter/seeds")) as EnvironmentSeeds;
     case "subscription":
       return (await import("../../subscription/seeds")) as EnvironmentSeeds;
+    case "error-monitor":
+      return (await import("../unified-interface/tasks/error-monitor/seeds")) as EnvironmentSeeds;
     case "tasks":
       return (await import("../unified-interface/tasks/seeds")) as EnvironmentSeeds;
     case "vibe-sense":
       return (await import("../unified-interface/vibe-sense/seeds")) as EnvironmentSeeds;
-    case "remote-connection":
-      return (await import("../../user/remote-connection/seeds")) as EnvironmentSeeds;
     case "user":
       return (await import("../../user/seeds")) as EnvironmentSeeds;
     case "users":
@@ -61,9 +61,9 @@ export function getAllSeedModuleNames(): string[] {
     "smtp-client",
     "newsletter",
     "subscription",
+    "error-monitor",
     "tasks",
     "vibe-sense",
-    "remote-connection",
     "user",
     "users",
   ];

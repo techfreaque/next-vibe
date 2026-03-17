@@ -14,6 +14,7 @@ import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { Platform } from "../../../../shared/types/platform";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
+import { InkEndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 
@@ -34,7 +35,12 @@ export class CliResultFormatter {
     user: JwtPayloadType,
   ): Promise<string> {
     if (!result.success) {
-      return CliErrorFormatter.formatErrorResult(result, locale, verbose);
+      return CliErrorFormatter.formatErrorResult(
+        result,
+        locale,
+        verbose,
+        endpoint,
+      );
     }
 
     let output = "";
@@ -104,8 +110,6 @@ export class CliResultFormatter {
 
       // Create component
       const createStart = performance.now();
-      const { InkEndpointRenderer } =
-        await import("@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer");
       const component = createElement(InkEndpointRenderer, {
         endpoint,
         locale,
@@ -120,7 +124,7 @@ export class CliResultFormatter {
 
       // Use fast renderer (supports hooks via renderToStaticMarkup internally for function components)
       const renderStart = performance.now();
-      const output = fastRenderToString(component);
+      const output = fastRenderToString(component, logger);
       const renderTime = performance.now() - renderStart;
 
       const totalTime = performance.now() - perfStart;
@@ -134,7 +138,7 @@ export class CliResultFormatter {
 
       // Fall back to JSON if renderer produced empty output (reconciler failure)
       if (!output) {
-        logger.debug("[Fast Renderer] Empty output, falling back to JSON");
+        logger.error("[Fast Renderer] Empty output, falling back to JSON");
         return JSON.stringify(data, null, 2);
       }
 

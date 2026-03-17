@@ -64,6 +64,14 @@ interface EndpointsPagePropsBase<
 > {
   /** Endpoint definitions (supports GET, POST, PUT, PATCH, DELETE) */
   endpoint: T;
+  /**
+   * Optional pre-created endpoint instance from a parent's useEndpoint call.
+   * When provided, EndpointsPage skips its own useEndpoint call and uses this
+   * instance instead — the parent owns the query key, data, and side effects.
+   * useEndpoint is still called internally (no conditional hooks) but its result
+   * is discarded in favour of this instance.
+   */
+  endpointInstance?: ReturnType<typeof useEndpoint>;
   /** Locale for translations */
   locale: CountryLanguage;
   /** Optional description to show above the endpoint (usually not needed - comes from endpoint.description) */
@@ -128,6 +136,7 @@ type EndpointsPagePropsInternal<
   },
 > = EndpointsPagePropsBase<T> & {
   endpointOptions?: UseEndpointOptionsBase<T>;
+  endpointInstance?: ReturnType<typeof useEndpoint>;
 };
 
 function EndpointsPageInternal<
@@ -143,6 +152,7 @@ function EndpointsPageInternal<
   locale,
   description,
   endpointOptions,
+  endpointInstance: providedEndpointInstance,
   submitButton,
   debug,
   className,
@@ -154,14 +164,39 @@ function EndpointsPageInternal<
   // Check finalNavigation stack to render stacked endpoints (only for base layer)
   const navigation = useNavigationStack();
 
-  // Apply navigationOverride if provided
-  const finalNavigation = useMemo(
-    () =>
-      navigationOverride
-        ? { ...navigation, ...navigationOverride }
-        : navigation,
-    [navigation, navigationOverride],
-  );
+  // Extract stable Zustand refs directly — these are stable function/array references
+  // that only change when the store actually changes (push/pop), not on every render.
+  const navigationPop = navigation.pop;
+  const navigationReplace = navigation.replace;
+  const navigationStack = navigation.stack;
+
+  // Apply navigationOverride if provided.
+  // IMPORTANT: navigation is a new plain object every render (useNavigationStack returns
+  // { push, replace, pop, stack, canGoBack, current } inline). We must NOT put `navigation`
+  // in the dep array or the body — use only the stable extracted refs so the memoized
+  // object reference stays stable across renders when nothing actually changed.
+  const navigationPush = navigation.push;
+  const navigationCanGoBack = navigation.canGoBack;
+  const navigationCurrent = navigation.current;
+  const finalNavigation = useMemo(() => {
+    const base = {
+      push: navigationPush,
+      replace: navigationReplace,
+      pop: navigationPop,
+      stack: navigationStack,
+      canGoBack: navigationCanGoBack,
+      current: navigationCurrent,
+    };
+    return navigationOverride ? { ...base, ...navigationOverride } : base;
+  }, [
+    navigationOverride,
+    navigationStack,
+    navigationPush,
+    navigationReplace,
+    navigationPop,
+    navigationCanGoBack,
+    navigationCurrent,
+  ]);
   // Determine which endpoint to use for base layer
   // If forceMethod is provided, use that; otherwise use default priority
   const forcedEndpoint = forceMethod ? endpoint[forceMethod] : undefined;
@@ -202,11 +237,7 @@ function EndpointsPageInternal<
     const callerMutationOptions = endpointOptions?.create?.mutationOptions;
 
     // For POST/PUT endpoints, wrap to add navigation AFTER onSuccess
-    if (
-      isMutationEndpoint &&
-      (endpoint.POST ?? endpoint.PUT) &&
-      finalNavigation
-    ) {
+    if (isMutationEndpoint && (endpoint.POST ?? endpoint.PUT)) {
       const callerOnSuccess = callerMutationOptions?.onSuccess as
         | ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
         | undefined;
@@ -240,8 +271,7 @@ function EndpointsPageInternal<
           }
 
           // Handle navigation pop or replace
-          const currentEntry =
-            finalNavigation.stack[finalNavigation.stack.length - 1];
+          const currentEntry = navigationStack[navigationStack.length - 1];
           const popCount = currentEntry?.popNavigationOnSuccess;
           const replaceConfig = currentEntry?.replaceOnSuccess;
           const successCallback = currentEntry?.onSuccessCallback;
@@ -250,7 +280,7 @@ function EndpointsPageInternal<
             const urlPathParams = replaceConfig.getUrlPathParams
               ? replaceConfig.getUrlPathParams(responseData)
               : undefined;
-            finalNavigation.replace(replaceConfig.endpoint, {
+            navigationReplace(replaceConfig.endpoint, {
               urlPathParams,
               prefillFromGet: replaceConfig.prefillFromGet,
               getEndpoint: replaceConfig.prefillFromGet
@@ -259,7 +289,7 @@ function EndpointsPageInternal<
             });
           } else if (popCount && popCount > 0) {
             for (let i = 0; i < popCount; i++) {
-              finalNavigation.pop();
+              navigationPop();
             }
             successCallback?.();
           }
@@ -273,7 +303,9 @@ function EndpointsPageInternal<
     endpoint.POST,
     endpoint.PUT,
     endpointOptions?.create?.mutationOptions,
-    finalNavigation,
+    navigationPop,
+    navigationReplace,
+    navigationStack,
   ]);
 
   // Create wrapped PATCH mutation options with finalNavigation handling
@@ -283,7 +315,7 @@ function EndpointsPageInternal<
       | ApiMutationOptions<WidgetData, WidgetData, WidgetData>
       | undefined;
 
-    if (!patchEndpoint || !finalNavigation) {
+    if (!patchEndpoint) {
       return existingPatchOptions;
     }
 
@@ -317,8 +349,7 @@ function EndpointsPageInternal<
         }
 
         // Handle popNavigationOnSuccess or replaceOnSuccess from finalNavigation entry
-        const currentEntry =
-          finalNavigation.stack[finalNavigation.stack.length - 1];
+        const currentEntry = navigationStack[navigationStack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
         const replaceConfig = currentEntry?.replaceOnSuccess;
         const successCallback = currentEntry?.onSuccessCallback;
@@ -327,7 +358,7 @@ function EndpointsPageInternal<
           const urlPathParams = replaceConfig.getUrlPathParams
             ? replaceConfig.getUrlPathParams(responseData)
             : undefined;
-          finalNavigation.replace(replaceConfig.endpoint, {
+          navigationReplace(replaceConfig.endpoint, {
             urlPathParams,
             prefillFromGet: replaceConfig.prefillFromGet,
             getEndpoint: replaceConfig.prefillFromGet
@@ -336,7 +367,7 @@ function EndpointsPageInternal<
           });
         } else if (popCount && popCount > 0) {
           for (let i = 0; i < popCount; i++) {
-            finalNavigation.pop();
+            navigationPop();
           }
           successCallback?.();
         }
@@ -345,7 +376,9 @@ function EndpointsPageInternal<
   }, [
     endpoint.PATCH,
     endpointOptions?.update?.mutationOptions,
-    finalNavigation,
+    navigationPop,
+    navigationReplace,
+    navigationStack,
   ]);
 
   // Create wrapped DELETE mutation options with finalNavigation handling
@@ -355,7 +388,7 @@ function EndpointsPageInternal<
       | ApiMutationOptions<WidgetData, WidgetData, WidgetData>
       | undefined;
 
-    if (!deleteEndpoint || !finalNavigation) {
+    if (!deleteEndpoint) {
       return existingDeleteOptions;
     }
 
@@ -389,8 +422,7 @@ function EndpointsPageInternal<
         }
 
         // Handle popNavigationOnSuccess or replaceOnSuccess from finalNavigation entry
-        const currentEntry =
-          finalNavigation.stack[finalNavigation.stack.length - 1];
+        const currentEntry = navigationStack[navigationStack.length - 1];
         const popCount = currentEntry?.popNavigationOnSuccess;
         const replaceConfig = currentEntry?.replaceOnSuccess;
         const successCallback = currentEntry?.onSuccessCallback;
@@ -399,7 +431,7 @@ function EndpointsPageInternal<
           const urlPathParams = replaceConfig.getUrlPathParams
             ? replaceConfig.getUrlPathParams(responseData)
             : undefined;
-          finalNavigation.replace(replaceConfig.endpoint, {
+          navigationReplace(replaceConfig.endpoint, {
             urlPathParams,
             prefillFromGet: replaceConfig.prefillFromGet,
             getEndpoint: replaceConfig.prefillFromGet
@@ -408,7 +440,7 @@ function EndpointsPageInternal<
           });
         } else if (popCount && popCount > 0) {
           for (let i = 0; i < popCount; i++) {
-            finalNavigation.pop();
+            navigationPop();
           }
           successCallback?.();
         }
@@ -417,7 +449,9 @@ function EndpointsPageInternal<
   }, [
     endpoint.DELETE,
     endpointOptions?.delete?.mutationOptions,
-    finalNavigation,
+    navigationPop,
+    navigationReplace,
+    navigationStack,
   ]);
 
   // Merge finalNavigation-aware mutation options and endpoint's built-in options
@@ -468,13 +502,16 @@ function EndpointsPageInternal<
     deleteMutationOptionsWithNav,
   ]);
 
-  // Use the endpoint hook for base endpoint
-  const endpointState = useEndpoint(
-    endpoint,
-    finalEndpointOptions as UseEndpointOptions<T>,
-    logger,
-    user,
-  );
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- intentional: endpointInstance is always
+  // the same reference type at a given call site (static composition), never switches at runtime.
+  const endpointState = (providedEndpointInstance ??
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEndpoint(
+      endpoint,
+      finalEndpointOptions as UseEndpointOptions<T>,
+      logger,
+      user,
+    )) as ReturnType<typeof useEndpoint>;
 
   // Extract response and data based on endpoint type
   let response;
@@ -827,6 +864,7 @@ function StackEntryLayer({
   const method = entry.endpoint.method;
 
   // Hooks called at top level of this component (before any conditional returns)
+  const navigationPop = finalNavigation.pop;
   const navigationOverride = useMemo(() => {
     if (isModal) {
       return {
@@ -837,7 +875,7 @@ function StackEntryLayer({
               [entry.timestamp]: false,
             }),
           );
-          finalNavigation.pop();
+          navigationPop();
         },
         canGoBack: true,
       };
@@ -846,13 +884,13 @@ function StackEntryLayer({
     if (index > 0) {
       return {
         pop: (): void => {
-          finalNavigation.pop();
+          navigationPop();
         },
         canGoBack: true,
       };
     }
     return undefined;
-  }, [isModal, index, entry.timestamp, finalNavigation, setModalOpenState]);
+  }, [isModal, index, entry.timestamp, navigationPop, setModalOpenState]);
 
   // Don't render if not visible
   if (!isVisible) {

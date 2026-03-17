@@ -33,7 +33,7 @@ export const translations: typeof enTranslations = {
             description:
               "Maksymalny limit wydatków w USD. Zapobiega niekontrolowanym kosztom użycia narzędzi. Pomiń dla braku limitu.",
           },
-          allowedTools: {
+          availableTools: {
             label: "Dozwolone narzędzia",
             description:
               "Rozdzielona przecinkami lista dozwolonych narzędzi (np. Read,Edit,Bash). Pomiń dla wszystkich domyślnych narzędzi.",

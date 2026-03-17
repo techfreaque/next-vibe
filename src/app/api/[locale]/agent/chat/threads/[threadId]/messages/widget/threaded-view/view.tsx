@@ -24,16 +24,16 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useCharacter } from "../../../../../characters/[id]/hooks";
+import { useSkill } from "../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
-import { useStreamingMessagesStore } from "../../hooks/streaming-messages-store";
+import { useMessageItem } from "../../hooks/use-message-item";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
-import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
+import { ModelSkillSelectorModal } from "../model-skill-selector-modal";
 import { ReplyInput } from "../reply-input";
 import { UserProfileCard } from "../user-profile-card";
 import { ThreadedMessageActions } from "./actions";
@@ -132,8 +132,6 @@ export function ThreadedMessage({
     (s) => s.setEditorAttachments,
   );
   const setRetrying = useMessageEditorStore((s) => s.setRetrying);
-  const clearEditing = useMessageEditorStore((s) => s.clearEditing);
-  const clearRetrying = useMessageEditorStore((s) => s.clearRetrying);
   const clearAnswering = useMessageEditorStore((s) => s.clearAnswering);
   const clearReplying = useMessageEditorStore((s) => s.clearReplying);
 
@@ -176,7 +174,7 @@ export function ThreadedMessage({
           undefined,
           editorAttachments.length > 0 ? editorAttachments : undefined,
         );
-        clearEditing();
+        // Editor closed via event-handlers.ts when USER MESSAGE_CREATED arrives
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -186,7 +184,7 @@ export function ThreadedMessage({
         );
       }
     },
-    [logger, editorAttachments, clearEditing],
+    [logger, editorAttachments],
   );
 
   const handleConfirmRetry = useCallback(
@@ -202,7 +200,7 @@ export function ThreadedMessage({
           messageId,
           editorAttachments.length > 0 ? editorAttachments : undefined,
         );
-        clearRetrying();
+        // Editor closed via event-handlers.ts when USER MESSAGE_CREATED arrives
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -212,7 +210,7 @@ export function ThreadedMessage({
         );
       }
     },
-    [logger, editorAttachments, clearRetrying],
+    [logger, editorAttachments],
   );
 
   const handleConfirmAnswer = useCallback(
@@ -282,10 +280,8 @@ export function ThreadedMessage({
   const { group: messageGroupClass } = useMessageGroupName();
 
   // Check if this message is currently streaming
-  const streamingMessage = useStreamingMessagesStore(
-    (state) => state.streamingMessages[message.id],
-  );
-  const isMessageStreaming = streamingMessage?.isStreaming ?? false;
+  const liveMessage = useMessageItem(message.id);
+  const isMessageStreaming = liveMessage?.metadata?.isStreaming ?? false;
 
   // TTS support for assistant messages
   // Process entire message group (primary + continuations) for sequential playback
@@ -335,11 +331,7 @@ export function ThreadedMessage({
   // Get vote status
   const { userVote, voteScore } = getVoteStatus(message, currentUserId);
 
-  const characterHook = useCharacter(
-    message.character || undefined,
-    user,
-    logger,
-  );
+  const characterHook = useSkill(message.skill || undefined, user, logger);
   const characterName = characterHook.read?.data?.name ?? null;
 
   // Minimal fixed indent - just THREAD_INDENT for any nested level (no increase with depth)
@@ -453,7 +445,7 @@ export function ThreadedMessage({
               </Div>
             ) : isRetrying ? (
               <Div className="flex justify-end">
-                <ModelCharacterSelectorModal
+                <ModelSkillSelectorModal
                   titleKey="widget.threadedView.retryModal.title"
                   descriptionKey="widget.threadedView.retryModal.description"
                   onConfirm={(): Promise<void> =>
@@ -513,7 +505,7 @@ export function ThreadedMessage({
           {/* Show Answer-as-AI dialog below the message */}
           {isAnswering && (
             <Div className="mt-3">
-              <ModelCharacterSelectorModal
+              <ModelSkillSelectorModal
                 titleKey="widget.threadedView.answerModal.title"
                 descriptionKey="widget.threadedView.answerModal.description"
                 showInput={true}

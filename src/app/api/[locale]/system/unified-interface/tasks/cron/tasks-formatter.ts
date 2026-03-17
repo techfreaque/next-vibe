@@ -23,6 +23,7 @@ export interface RecentExecution {
 
 export interface TaskSummaryItem {
   id: string;
+  shortId: string;
   displayName: string;
   description: string | null;
   schedule: string;
@@ -123,7 +124,7 @@ function fullLine(task: TaskSummaryItem): string {
   const result = task.lastResultSummary ? ` → "${task.lastResultSummary}"` : "";
   const errors = task.errorCount > 0 ? ` ⚠ errors:${task.errorCount}` : "";
   const desc = task.description ? ` — ${task.description}` : "";
-  return `- [${task.id.slice(-8)}] ${status} ${task.displayName}${desc} | ${task.schedule} | ${lastRun}${result}${errors} | route:${task.routeId}`;
+  return `- [${task.shortId}] ${status} ${task.displayName}${desc} | ${task.schedule} | ${lastRun}${result}${errors} | route:${task.routeId}`;
 }
 
 /**
@@ -132,7 +133,7 @@ function fullLine(task: TaskSummaryItem): string {
 function compactLine(task: TaskSummaryItem): string {
   const status = task.enabled ? "✓" : "✗";
   const errors = task.errorCount > 0 ? ` ⚠${task.errorCount}err` : "";
-  return `- [${task.id.slice(-8)}] ${status} ${task.displayName}${errors}`;
+  return `- [${task.shortId}] ${status} ${task.displayName}${errors}`;
 }
 
 /**

@@ -11,8 +11,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { ToolExecutionContext } from "../../../chat/config";
 import type { ToolCall, ToolCallResult } from "../../../chat/db";
-import { NO_LOOP_PARAM } from "../core/constants";
 import type { MessageDbWriter } from "../core/message-db-writer";
 import type { StreamContext } from "../core/stream-context";
 
@@ -34,7 +34,7 @@ export class ToolCallHandler {
     threadId: string;
     currentParentId: string | null;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -45,6 +45,7 @@ export class ToolCallHandler {
     streamAbortController: AbortController;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
+    streamContext: ToolExecutionContext;
   }): Promise<{
     currentAssistantMessageId: string | null;
     currentAssistantContent: string;
@@ -66,7 +67,7 @@ export class ToolCallHandler {
       isInReasoningBlock,
       threadId,
       model,
-      character,
+      skill,
       sequenceId,
       userId,
       toolsConfig,
@@ -97,7 +98,7 @@ export class ToolCallHandler {
         parentId: params.currentParentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
       });
 
@@ -155,18 +156,14 @@ export class ToolCallHandler {
           ) ?? null)
         : null;
 
-    // Legacy: noLoop param still works for backward compat
-    const hasLegacyNoLoop =
-      typeof toolCallArgs === "object" &&
-      toolCallArgs !== null &&
-      !Array.isArray(toolCallArgs) &&
-      NO_LOOP_PARAM in toolCallArgs &&
-      toolCallArgs[NO_LOOP_PARAM] === true;
-
-    if (callbackModeArg === CallbackMode.END_LOOP || hasLegacyNoLoop) {
+    // endLoop: stop the AI loop after this step completes.
+    // wakeUp does NOT stop the loop — the AI gets {taskId, hint} back immediately
+    // and continues its turn (generates acknowledgement text), then ends naturally.
+    // The revival happens later when the background task completes.
+    if (callbackModeArg === CallbackMode.END_LOOP) {
       ctx.shouldStopLoop = true;
       logger.debug(
-        "[AI Stream] Model requested loop stop via callbackMode/noLoop parameter",
+        "[AI Stream] Model requested loop stop via callbackMode endLoop",
         {
           toolName: part.toolName,
           toolCallId: part.toolCallId,
@@ -214,7 +211,7 @@ export class ToolCallHandler {
       parentId: newCurrentParentId,
       userId,
       model,
-      character,
+      skill,
       sequenceId,
       toolCall: toolCallData,
     });

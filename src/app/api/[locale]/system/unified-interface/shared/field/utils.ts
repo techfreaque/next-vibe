@@ -7,6 +7,8 @@
 
 import { z } from "zod";
 
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+
 import type {
   AnyChildrenConstrain,
   ArrayChildConstraint,
@@ -559,10 +561,17 @@ export type InferObjectType<C, Usage extends FieldUsage> =
  * proper input/output type differentiation using z.ZodType<Output, ZodTypeDef, Input>.
  *
  * We return the actual inferred schema type to preserve input/output differentiation.
+ *
+ * @param userRoles - Optional caller roles for field-level visibility enforcement.
+ *   When provided, fields with `visibleFor` set are excluded from the schema unless
+ *   the caller has at least one matching role. This is the schema-level security
+ *   guarantee — excluded fields are stripped by Zod's default `.strip()` behaviour
+ *   and never reach the handler, regardless of what the client sends.
  */
 export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   field: F,
   targetUsage: Usage,
+  userRoles?: readonly (typeof UserPermissionRoleValue)[],
 ): InferSchemaFromField<F, Usage> {
   // Defensive check: ensure field is defined
   if (!field || typeof field !== "object") {
@@ -591,6 +600,30 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       default:
         return false;
     }
+  };
+
+  /**
+   * Check if a field is visible for the current caller's roles.
+   * If `visibleFor` is absent the field is visible to all.
+   * If `visibleFor` is present and `userRoles` is provided, the caller must
+   * have at least one matching role — otherwise the field is excluded.
+   * When `userRoles` is undefined (static schema build at startup) the
+   * visibility constraint is ignored so the static schema stays permissive.
+   */
+  interface FieldWithVisibleFor {
+    visibleFor?: readonly (typeof UserPermissionRoleValue)[];
+  }
+  const isVisibleForRoles = (childField: FieldWithVisibleFor): boolean => {
+    if (childField.visibleFor === undefined) {
+      return true; // no constraint — always visible
+    }
+    if (!userRoles) {
+      return true; // no caller context — static build, skip enforcement
+    }
+    if (childField.visibleFor.length === 0) {
+      return false; // explicitly empty → no one sees it
+    }
+    return childField.visibleFor.some((role) => userRoles.includes(role));
   };
 
   interface FieldWithType {
@@ -666,6 +699,11 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           continue;
         }
 
+        // Skip fields that are not visible for the current caller's roles
+        if (!isVisibleForRoles(childField as FieldWithVisibleFor)) {
+          continue;
+        }
+
         // CRITICAL: Skip objectFields that only contain widget children - they're UI-only containers
         // Examples: footerLinks container with only widget links inside
         const isObjectFieldWithOnlyWidgets =
@@ -717,6 +755,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         const childSchema = generateSchemaForUsage<typeof childField, Usage>(
           childField,
           targetUsage,
+          userRoles,
         );
         // Check if schema is z.never() by comparing type to actual z.never() instance
         if (childSchema._def.type !== neverType) {
@@ -766,9 +805,15 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           continue;
         }
 
+        // Skip fields that are not visible for the current caller's roles
+        if (!isVisibleForRoles(childField as FieldWithVisibleFor)) {
+          continue;
+        }
+
         const childSchema = generateSchemaForUsage<typeof childField, Usage>(
           childField,
           targetUsage,
+          userRoles,
         );
         if (childSchema._def.type !== neverType) {
           shape[key] = childSchema;
@@ -807,6 +852,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       const variantSchema = generateSchemaForUsage<typeof variant, Usage>(
         variant,
         targetUsage,
+        userRoles,
       );
 
       // Skip variants that don't match the usage
@@ -860,6 +906,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         childSchema = generateSchemaForUsage<typeof typedField.child, Usage>(
           typedField.child,
           targetUsage,
+          userRoles,
         );
         // Check if schema is z.never() using _def.type check
         if (childSchema._def.type === neverType) {
@@ -897,6 +944,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         childSchema = generateSchemaForUsage<typeof typedField.child, Usage>(
           typedField.child,
           targetUsage,
+          userRoles,
         );
         // Check if schema is z.never() using _def.type check
         if (childSchema._def.type === neverType) {
@@ -936,6 +984,22 @@ export function generateRequestDataSchema<F>(
   return generateSchemaForUsage<F, FieldUsage.RequestData>(
     field,
     FieldUsage.RequestData,
+  );
+}
+
+/**
+ * Generate a role-filtered request data schema.
+ * Fields with `visibleFor` set are excluded unless the caller holds a matching role.
+ * Use this at request time (after auth) instead of the static `endpoint.requestSchema`.
+ */
+export function generateRoleFilteredRequestSchema<F>(
+  field: F,
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
+): InferSchemaFromField<F, FieldUsage.RequestData> {
+  return generateSchemaForUsage<F, FieldUsage.RequestData>(
+    field,
+    FieldUsage.RequestData,
+    userRoles,
   );
 }
 

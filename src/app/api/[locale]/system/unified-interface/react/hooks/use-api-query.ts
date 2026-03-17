@@ -5,7 +5,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -263,11 +263,13 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     initialDataUpdatedAt: initialData ? Date.now() : undefined,
   });
 
-  // Stable refetch function
+  // Stable refetch function — use ref to avoid depending on query object (new every render)
+  const queryRef = useRef(query);
+  queryRef.current = query;
   const refetch = useCallback(async () => {
-    const result = await query.refetch();
-    return result.data ?? query.data ?? success(undefined as never);
-  }, [query]);
+    const result = await queryRef.current.refetch();
+    return result.data ?? queryRef.current.data ?? success(undefined as never);
+  }, []);
 
   // Stable remove function
   const remove = useCallback(() => {
@@ -347,5 +349,17 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       remove,
       setErrorType,
     };
-  }, [query, enabled, refetch, remove, setErrorType]);
+  }, [
+    query.data,
+    query.status,
+    query.isLoading,
+    query.isFetching,
+    query.isPlaceholderData,
+    query.isError,
+    query.isSuccess,
+    enabled,
+    refetch,
+    remove,
+    setErrorType,
+  ]);
 }

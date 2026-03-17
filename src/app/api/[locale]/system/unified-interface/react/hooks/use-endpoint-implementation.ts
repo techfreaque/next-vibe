@@ -140,30 +140,62 @@ export function useEndpoint<
       ? endpointReadOptions.formOptions.debounceMs
       : undefined;
 
-  const read = useEndpointRead(readEndpoint, logger, user, {
-    formOptions: {
-      persistForm: options?.read?.formOptions?.persistForm ?? false,
-      persistenceKey: options?.read?.formOptions?.persistenceKey,
-      autoSubmit: options?.read?.formOptions?.autoSubmit ?? endpointAutoSubmit,
-      debounceMs: options?.read?.formOptions?.debounceMs ?? endpointDebounceMs,
-    },
-    queryOptions: {
-      enabled: readQueryEnabled,
-      staleTime: readStaleTime,
-      refetchOnWindowFocus: readRefetchOnWindowFocus,
-      refetchInterval: readRefetchInterval,
-      queryKey: options?.read?.queryOptions?.queryKey,
-    },
-    urlPathParams: readUrlPathParams,
-    autoPrefillConfig: {
-      autoPrefill: autoPrefillEnabled,
-      autoPrefillFromLocalStorage: false,
-      showUnsavedChangesAlert: false,
-      clearStorageAfterSubmit: false,
-    },
-    initialState: options?.read?.initialState,
-    initialData: options?.read?.initialData,
-  });
+  const readPersistForm = options?.read?.formOptions?.persistForm ?? false;
+  const readPersistenceKey = options?.read?.formOptions?.persistenceKey;
+  const readAutoSubmit =
+    options?.read?.formOptions?.autoSubmit ?? endpointAutoSubmit;
+  const readDebounceMs =
+    options?.read?.formOptions?.debounceMs ?? endpointDebounceMs;
+  const readQueryKey = options?.read?.queryOptions?.queryKey;
+  const readInitialState = options?.read?.initialState;
+  const readInitialData = options?.read?.initialData;
+
+  const readOptions = useMemo(
+    () => ({
+      formOptions: {
+        persistForm: readPersistForm,
+        persistenceKey: readPersistenceKey,
+        // Default to false: auto-submit on form value changes causes a
+        // re-render loop when the query's onSuccess resets form values.
+        // Only enable when explicitly configured by endpoint or caller.
+        autoSubmit: readAutoSubmit ?? false,
+        debounceMs: readDebounceMs,
+      },
+      queryOptions: {
+        enabled: readQueryEnabled,
+        staleTime: readStaleTime,
+        refetchOnWindowFocus: readRefetchOnWindowFocus,
+        refetchInterval: readRefetchInterval,
+        queryKey: readQueryKey,
+      },
+      urlPathParams: readUrlPathParams,
+      autoPrefillConfig: {
+        autoPrefill: autoPrefillEnabled,
+        autoPrefillFromLocalStorage: false,
+        showUnsavedChangesAlert: false,
+        clearStorageAfterSubmit: false,
+      },
+      initialState: readInitialState,
+      initialData: readInitialData,
+    }),
+    [
+      readPersistForm,
+      readPersistenceKey,
+      readAutoSubmit,
+      readDebounceMs,
+      readQueryEnabled,
+      readStaleTime,
+      readRefetchOnWindowFocus,
+      readRefetchInterval,
+      readQueryKey,
+      readUrlPathParams,
+      autoPrefillEnabled,
+      readInitialState,
+      readInitialData,
+    ],
+  );
+
+  const read = useEndpointRead(readEndpoint, logger, user, readOptions);
 
   // Use the appropriate operation based on endpoint type
   const autoPrefillData = useMemo(() => {

@@ -8,7 +8,7 @@ import {
   type IntelligenceLevelValue,
   SpeedLevel,
   type SpeedLevelValue,
-} from "../chat/characters/enum";
+} from "../chat/skills/enum";
 import type { AgentTranslationKey } from "../i18n";
 import { ModelUtility, type ModelUtilityValue } from "./enum";
 

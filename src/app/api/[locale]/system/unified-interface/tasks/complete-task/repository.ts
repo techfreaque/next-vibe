@@ -72,10 +72,8 @@ export async function completeTask(
 
     if (status === CronTaskStatus.COMPLETED) {
       updates.successCount = task.successCount + 1;
-      updates.lastExecutionError = null;
     } else {
       updates.errorCount = task.errorCount + 1;
-      updates.lastExecutionError = summary;
     }
 
     // Run-once tasks: disable after completion
@@ -121,14 +119,10 @@ export async function completeTask(
   }
 
   // Backfill tool message + emit WS event + start headless stream if needed
-  const taskInputData = task.taskInput ?? {};
-  const toolMessageId =
-    typeof taskInputData.toolMessageId === "string"
-      ? taskInputData.toolMessageId
-      : null;
-  const threadId =
-    typeof taskInputData.threadId === "string" ? taskInputData.threadId : null;
-  const rawCallbackMode = taskInputData.callbackMode;
+  // Read revival context from typed wakeUp* columns — not from untyped taskInput JSON.
+  const toolMessageId = task.wakeUpToolMessageId ?? null;
+  const threadId = task.wakeUpThreadId ?? null;
+  const rawCallbackMode = task.wakeUpCallbackMode;
   const callbackMode: CallbackModeValue | null =
     rawCallbackMode === CallbackMode.WAIT
       ? CallbackMode.WAIT
@@ -150,7 +144,10 @@ export async function completeTask(
       status,
       output: output ?? null,
       taskId,
-      taskInput: task.taskInput,
+      modelId: task.wakeUpModelId ?? null,
+      skillId: task.wakeUpSkillId ?? null,
+      favoriteId: task.wakeUpFavoriteId ?? null,
+      leafMessageId: task.wakeUpLeafMessageId ?? null,
       userId: task.userId,
       logger,
     });

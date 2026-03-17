@@ -44,13 +44,13 @@ export function AdminAddCreditsContainer({
   const onSubmit = useWidgetOnSubmit();
   const user = useWidgetUser();
 
-  const amount: number = Number(form?.watch("amount") ?? 100) || 100;
-  const targetUserId = form?.watch("targetUserId") as string | undefined;
+  const amount = form.watch("amount") ?? 100;
+  const targetUserId = form.watch("targetUserId");
   const isSelf = !targetUserId || ("id" in user && user.id === targetUserId);
 
   function setAmount(next: number): void {
     const clamped = Math.max(1, next);
-    form?.setValue("amount", clamped, { shouldValidate: true });
+    form.setValue("amount", clamped, { shouldValidate: true });
   }
 
   return (

@@ -24,6 +24,7 @@ import { CHAT_SHARE_LINKS_CREATED_ALIAS } from "./data-sources/chat-share-links-
 import { CHAT_MEMORIES_CREATED_ALIAS } from "./data-sources/chat-memories-created/constants";
 import { CHAT_UNIQUE_USERS_ALIAS } from "./data-sources/chat-unique-users/constants";
 import { CHAT_MESSAGES_WITH_ATTACHMENTS_ALIAS } from "./data-sources/chat-messages-with-attachments/constants";
+import { CHAT_THREADS_ACTIVE_TOTAL_ALIAS } from "./data-sources/chat-threads-active-total/constants";
 import { EMA_ALIAS } from "../../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../../analytics/indicators/window-avg/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../../analytics/transformers/ratio/constants";
@@ -346,6 +347,110 @@ const aiFeatureAdoptionConfig: GraphConfig = {
   trigger: { type: "cron", schedule: "0 0 * * *" },
 };
 
+// ─── AI Session Depth ────────────────────────────────────────────────────────
+
+const aiSessionDepthConfig: GraphConfig = {
+  nodes: {
+    threads_active: {
+      endpointPath: CHAT_THREADS_ACTIVE_TOTAL_ALIAS,
+      pane: 0,
+      color: BLUE,
+    },
+    threads_created: {
+      endpointPath: CHAT_THREADS_CREATED_ALIAS,
+      pane: 0,
+      color: GREEN,
+    },
+    messages_total: {
+      endpointPath: CHAT_MESSAGES_TOTAL_ALIAS,
+      pane: 0,
+      color: CYAN,
+    },
+    unique_users: {
+      endpointPath: CHAT_UNIQUE_USERS_ALIAS,
+      pane: 0,
+      color: PURPLE,
+    },
+
+    active_threads_ema7: {
+      endpointPath: EMA_ALIAS,
+      params: { period: 7 },
+      pane: 0,
+      color: BLUE,
+    },
+
+    msgs_per_active_thread: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: AMBER,
+    },
+    active_to_created_ratio: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: GREEN,
+    },
+    threads_per_user: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: PURPLE,
+    },
+
+    eval_low_active_threads: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 3 },
+      visible: false,
+    },
+    eval_shallow_sessions: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 2 },
+      visible: false,
+    },
+
+    action_notify_low_active: {
+      endpointPath: COMPLETE_TASK_ALIAS,
+      persist: "never",
+      visible: false,
+      params: {
+        taskId: "vibe-sense-alert",
+        status: "status.completed",
+        summary:
+          "ALERT: Active thread count (7-day EMA) dropped below 3. Users are not returning to conversations. Review session continuity and AI response quality.",
+      },
+    },
+  },
+
+  edges: [
+    { from: "threads_active", to: "active_threads_ema7" },
+    { from: "messages_total", to: "msgs_per_active_thread", toHandle: "a" },
+    { from: "threads_active", to: "msgs_per_active_thread", toHandle: "b" },
+    { from: "threads_active", to: "active_to_created_ratio", toHandle: "a" },
+    { from: "threads_created", to: "active_to_created_ratio", toHandle: "b" },
+    { from: "threads_active", to: "threads_per_user", toHandle: "a" },
+    { from: "unique_users", to: "threads_per_user", toHandle: "b" },
+    { from: "active_threads_ema7", to: "eval_low_active_threads" },
+    { from: "msgs_per_active_thread", to: "eval_shallow_sessions" },
+    { from: "eval_low_active_threads", to: "action_notify_low_active" },
+  ],
+
+  positions: {
+    threads_active: { x: 0, y: 0 },
+    threads_created: { x: 0, y: 120 },
+    messages_total: { x: 0, y: 240 },
+    unique_users: { x: 0, y: 360 },
+    active_threads_ema7: { x: 300, y: 0 },
+    msgs_per_active_thread: { x: 300, y: 120 },
+    active_to_created_ratio: { x: 300, y: 240 },
+    threads_per_user: { x: 300, y: 360 },
+    eval_low_active_threads: { x: 600, y: 0 },
+    eval_shallow_sessions: { x: 600, y: 120 },
+    action_notify_low_active: { x: 900, y: 0 },
+  },
+
+  trigger: { type: "cron", schedule: "0 */6 * * *" },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const graphSeeds: GraphSeedEntry[] = [
@@ -369,5 +474,12 @@ export const graphSeeds: GraphSeedEntry[] = [
     description:
       "Tracks tool call usage, file attachments, memory creation, and share links. Measures feature adoption rates against total messages.",
     config: aiFeatureAdoptionConfig,
+  },
+  {
+    slug: "ai-session-depth",
+    name: "AI Session Depth",
+    description:
+      "Tracks active thread retention, messages per active thread, active-to-created ratio, and threads per user. Alerts on low active threads and shallow sessions.",
+    config: aiSessionDepthConfig,
   },
 ];

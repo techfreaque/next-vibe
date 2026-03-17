@@ -11,6 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import definitions from "./definition";
+import type { DefaultFolderId } from "../../../config";
 
 /**
  * Hook for fetching messages list with tree structure support
@@ -27,6 +28,7 @@ import definitions from "./definition";
 export function useMessagesList(
   params: {
     threadId: string;
+    rootFolderId: DefaultFolderId;
     enabled?: boolean;
   },
   user: JwtPayloadType,
@@ -37,6 +39,9 @@ export function useMessagesList(
     {
       read: {
         urlPathParams: { threadId: params.threadId },
+        initialState: {
+          rootFolderId: params.rootFolderId,
+        },
         queryOptions: {
           enabled: params.enabled ?? true,
           refetchOnWindowFocus: true,
@@ -68,6 +73,7 @@ export function useMessagesList(
 export function useCreateMessage(
   params: {
     threadId: string;
+    rootFolderId: DefaultFolderId;
   },
   user: JwtPayloadType,
   logger: EndpointLogger,
@@ -77,6 +83,9 @@ export function useCreateMessage(
     {
       read: {
         urlPathParams: { threadId: params.threadId },
+        initialState: {
+          rootFolderId: params.rootFolderId,
+        },
         queryOptions: { enabled: false },
       },
       create: {

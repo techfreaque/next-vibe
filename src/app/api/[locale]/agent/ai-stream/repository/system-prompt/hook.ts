@@ -2,20 +2,13 @@
 
 import { useMemo } from "react";
 
-import { useCharacter } from "@/app/api/[locale]/agent/chat/characters/[id]/hooks";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { useFavoritesSummary } from "@/app/api/[locale]/agent/chat/favorites/hooks/use-favorites-summary";
-import { useMemorySummary } from "@/app/api/[locale]/agent/chat/memories/hooks/use-memory-summary";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
+import { useAllPromptFragments } from "@/app/api/[locale]/system/generated/prompt-fragments-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/use-tasks-summary";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-import { buildTrailingSystemMessage, generateSystemPrompt } from "./generator";
+import { buildTrailingSystemMessage, generateSystemPrompt } from "./assembler";
 
 export interface DebugSystemPromptParts {
   /** Leading system prompt — sent as the static `system` param to the AI (cacheable). */
@@ -27,122 +20,58 @@ export interface DebugSystemPromptParts {
 }
 
 /**
- * Hook for debug view that handles all data fetching and system prompt generation
- * Fetches character, memories, tasks, computes call mode, and generates system prompt.
- * Mirrors what the server does in builder.ts so the debug view matches actual behaviour.
- *
- * Returns the three parts separately so the UI can render them as distinct sections.
+ * Hook for debug view that handles all data fetching and system prompt generation.
+ * Uses generated useAllPromptFragments — zero hardcoded fragment imports.
+ * Adding a new fragment only requires running the generator; no changes here.
  */
 export function useDebugSystemPrompt(params: {
   locale: CountryLanguage;
   rootFolderId: DefaultFolderId;
   subFolderId?: string | null;
-  characterId?: string | null;
+  skillId?: string | null;
   selectedModel?: string;
   user: JwtPayloadType;
   logger: EndpointLogger;
+  /** ttsAutoplay from settings — caller must pass this to avoid a second useChatSettings instance */
+  callMode: boolean;
 }): DebugSystemPromptParts {
   const {
     locale,
     rootFolderId,
     subFolderId,
-    characterId,
+    skillId,
     selectedModel,
     user,
     logger,
+    callMode,
   } = params;
 
-  const isPublicUser = user.isPublic;
-  const isAdmin =
-    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-
-  // Get TTS autoplay from chat settings (same source the server uses via data.voiceMode?.enabled)
-  const { settings: chatSettings } = useChatSettings(user, logger);
-  const isCallMode = chatSettings?.ttsAutoplay ?? false;
-
-  // Fetch character data if characterId is provided (for custom characters)
-  const characterEndpoint = useCharacter(characterId || "", user, logger);
-
-  // Get character prompt from fetched data
-  const characterPrompt = useMemo(() => {
-    if (!characterId) {
-      return "";
-    }
-
-    const response = characterEndpoint.read?.response;
-    if (!response || !response.success) {
-      return "";
-    }
-
-    return response.data.systemPrompt || "";
-  }, [characterId, characterEndpoint.read?.response]);
-
-  // Incognito mode: never load personal data (memories, tasks, favorites)
   const isIncognito = rootFolderId === "incognito";
+  const isExposedFolder =
+    rootFolderId === "public" || rootFolderId === "shared";
+  const enabled = !isIncognito;
+  const enabledPrivate = enabled && !isExposedFolder;
 
-  // Fetch memories (skip in incognito — mirrors server behaviour)
-  const { memorySummary } = useMemorySummary({
-    enabled: !isIncognito,
+  const { leading, trailing } = useAllPromptFragments({
     user,
     logger,
-  });
-
-  // Fetch tasks (skip in incognito — mirrors server behaviour)
-  const { tasksSummary } = useTasksSummary({
-    enabled: !isIncognito,
-    user,
-    logger,
-  });
-
-  // Fetch favorites (skip in incognito — mirrors server behaviour)
-  const { favoritesSummary } = useFavoritesSummary({
-    enabled: !isIncognito,
-    user,
-    logger,
-  });
-
-  return useMemo((): DebugSystemPromptParts => {
-    const { t } = simpleT(locale);
-    const appName = t("config.appName");
-
-    // Build the base system prompt — same as server (leading, cacheable)
-    const systemPrompt = generateSystemPrompt({
-      appName,
-      locale,
-      rootFolderId,
-      subFolderId,
-      characterPrompt,
-      callMode: isCallMode,
-      isPublicUser,
-      isAdmin,
-      isLocalMode: envClient.NEXT_PUBLIC_LOCAL_MODE,
-      isDev: envClient.NODE_ENV !== "production",
-      appUrl: envClient.NEXT_PUBLIC_APP_URL,
-    });
-
-    // Build trailing system message — same DRY function as the server
-    const trailingSystemMessage = buildTrailingSystemMessage({
-      tasksSummary,
-      memorySummary,
-      favoritesSummary,
-    });
-
-    // Upcoming assistant context line — always last in the messages array
-    const contextLine = `[Context: ID:<msg-id> | Model:${selectedModel ?? "<model>"} | Character:${characterId ?? "<none>"} | Posted:<timestamp>]`;
-
-    return { systemPrompt, trailingSystemMessage, contextLine };
-  }, [
     locale,
+    enabled,
+    enabledPrivate,
+    skillId,
     rootFolderId,
     subFolderId,
-    characterPrompt,
-    isCallMode,
-    isPublicUser,
-    isAdmin,
-    memorySummary,
-    tasksSummary,
-    favoritesSummary,
-    selectedModel,
-    characterId,
-  ]);
+    callMode,
+  });
+
+  return useMemo(() => {
+    const systemPrompt = generateSystemPrompt({ leadingFragments: leading });
+
+    const trailingSystemMessage = buildTrailingSystemMessage({
+      trailingFragments: trailing.map((x) => x.str),
+    });
+
+    const contextLine = `[Context: ID:<msg-id> | Model:${selectedModel ?? "<model>"} | Skill:${skillId ?? "<none>"} | Posted:<timestamp>]`;
+    return { systemPrompt, trailingSystemMessage, contextLine };
+  }, [leading, trailing, selectedModel, skillId]);
 }

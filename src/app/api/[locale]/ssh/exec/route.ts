@@ -11,7 +11,7 @@ import { SshExecRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, user, t }) =>
-      SshExecRepository.exec(data, logger, user, t),
+    handler: ({ data, logger, user, t, streamContext }) =>
+      SshExecRepository.exec(data, logger, user, t, streamContext),
   },
 });

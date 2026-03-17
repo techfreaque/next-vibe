@@ -486,6 +486,103 @@ export class VibeSenseRepository {
     }
   }
 
+  // ─── Version Chain ────────────────────────────────────────────────────────────
+
+  /**
+   * Walk the parentVersionId chain from a given graph ID upward (toward ancestors),
+   * collecting up to 50 versions. Returns oldest-first sorted array.
+   */
+  static async getVersionChain(
+    id: string,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: VibeSenseT,
+  ): Promise<
+    ResponseType<{
+      versions: Array<{
+        id: string;
+        name: string;
+        createdAt: string;
+        isActive: boolean;
+      }>;
+    }>
+  > {
+    try {
+      const MAX_CHAIN = 50;
+      const chain: Array<{
+        id: string;
+        name: string;
+        createdAt: string;
+        isActive: boolean;
+      }> = [];
+
+      let currentId: string | null = id;
+      const visited = new Set<string>();
+
+      while (currentId && chain.length < MAX_CHAIN) {
+        if (visited.has(currentId)) {
+          break;
+        }
+        visited.add(currentId);
+
+        const rows: Array<{
+          id: string;
+          name: string;
+          createdAt: Date;
+          isActive: boolean;
+          parentVersionId: string | null;
+          ownerType: string;
+          ownerId: string | null;
+        }> = await db
+          .select({
+            id: pipelineGraphs.id,
+            name: pipelineGraphs.name,
+            createdAt: pipelineGraphs.createdAt,
+            isActive: pipelineGraphs.isActive,
+            parentVersionId: pipelineGraphs.parentVersionId,
+            ownerType: pipelineGraphs.ownerType,
+            ownerId: pipelineGraphs.ownerId,
+          })
+          .from(pipelineGraphs)
+          .where(eq(pipelineGraphs.id, currentId))
+          .limit(1);
+
+        const row: (typeof rows)[0] | undefined = rows[0];
+        if (!row) {
+          break;
+        }
+
+        // Authorization: admin can see system graphs and their own graphs
+        if (row.ownerType !== "system" && row.ownerId !== user.id) {
+          break;
+        }
+
+        chain.push({
+          id: row.id,
+          name: row.name,
+          createdAt: row.createdAt.toISOString(),
+          isActive: row.isActive,
+        });
+
+        currentId = row.parentVersionId;
+      }
+
+      // Sort oldest-first (reverse the collected chain which was collected newest-first)
+      chain.reverse();
+
+      logger.info(
+        `[vibe-sense] getVersionChain: ${String(chain.length)} versions for graph ${id}`,
+      );
+      return success({ versions: chain });
+    } catch (error) {
+      logger.error("[vibe-sense] getVersionChain failed", parseError(error));
+      return fail({
+        message: t("graphs.edit.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
   // ─── Promote to System ────────────────────────────────────────────────────────
 
   static async promoteGraph(

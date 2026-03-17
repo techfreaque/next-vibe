@@ -20,6 +20,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
@@ -29,6 +30,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
+import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { scopedTranslation } from "./i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -171,11 +173,41 @@ export async function runClaudeCode(
   logger: EndpointLogger,
   t: ModuleT,
   cronTaskId?: string,
+  streamContext?: ToolExecutionContext,
 ): Promise<ResponseType<RunResponseOutput>> {
   const timeoutMs = (data.timeoutSeconds ?? 600) * 1000;
   const start = Date.now();
   const isInteractive = data.interactiveMode ?? false;
   const cwd = process.cwd();
+
+  // Batch mode with long timeout: escalate to wakeUp task so the stream doesn't time out.
+  // Interactive mode opens a terminal — returns immediately, no escalation needed.
+  // Escalate if timeoutMs exceeds stream timeout threshold (89s).
+  if (!isInteractive && timeoutMs > 89_000 && streamContext?.escalateToTask) {
+    const { taskId, onComplete } = await streamContext.escalateToTask();
+    logger.info("[ClaudeCode] Escalated batch run to wakeUp task", {
+      taskId,
+      timeoutMs,
+      prompt: data.prompt.slice(0, 100),
+    });
+
+    void (async (): Promise<void> => {
+      const result = await runClaudeCode(data, logger, t, cronTaskId);
+      await onComplete({
+        success: result.success,
+        data: result.success
+          ? (result.data as Record<string, JsonValue>)
+          : undefined,
+        message: result.success ? undefined : result.message,
+      });
+    })();
+
+    return success({
+      output: `[Task escalated — result will be injected when complete. taskId=${taskId}]`,
+      exitCode: 0,
+      durationMs: 0,
+    });
+  }
 
   // ── Auto-create a cron task for tracking when none was provided ──
   let effectiveTaskId = cronTaskId;
@@ -184,11 +216,12 @@ export async function runClaudeCode(
     const title =
       data.taskTitle || data.prompt.slice(0, 80).replace(/\n/g, " ");
     try {
-      const { getLocalInstanceId } =
+      const { deriveDefaultSelfInstanceId } =
         await import("@/app/api/[locale]/user/remote-connection/repository");
-      const instanceId = await getLocalInstanceId();
+      const instanceId = deriveDefaultSelfInstanceId();
       await db.insert(cronTasks).values({
         id: taskId,
+        shortId: taskId,
         routeId: "claude-code",
         displayName: title,
         description: data.prompt.slice(0, 500),
@@ -229,8 +262,8 @@ export async function runClaudeCode(
   if (effectiveTaskId && isInteractive) {
     args[0] = `${args[0]}\n\n[TASK CONTEXT] cronTaskId=${effectiveTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${effectiveTaskId}", status="status.completed"|"status.failed", and a brief summary of what was done.`;
   }
-  // if (data.allowedTools) {
-  //   args.push("--allowedTools", data.allowedTools);
+  // if (data.availableTools) {
+  //   args.push("--availableTools", data.availableTools);
   // }
 
   logger.info("Running Claude Code CLI", {

@@ -26,6 +26,15 @@ export const translations: typeof enTranslations = {
         invalid: "Bitte gib eine gültige URL ein",
       },
     },
+    reverseToken: {
+      label: "Reverse-Token",
+      description:
+        "JWT-Token für die Rückauthentifizierung der entfernten Instanz",
+    },
+    reverseLeadId: {
+      label: "Reverse-Lead-ID",
+      description: "Lead-ID für die Rückverbindung",
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

@@ -31,6 +31,12 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import type {
+  MessageSortFieldValue,
+  MessageStatusFilterValue,
+  MessageTypeFilterValue,
+  SortOrderValue,
+} from "../enum";
 import {
   MessageSortField,
   MessageSortFieldOptions,
@@ -45,6 +51,11 @@ import {
 import { scopedTranslation as messagesScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { EmailStatsGetResponseTypeOutput } from "./definition";
+import type {
+  ChartTypeValue,
+  DateRangePresetValue,
+  TimePeriodValue,
+} from "./enum";
 import {
   ChartType,
   ChartTypeOptions,
@@ -131,19 +142,25 @@ export function EmailStatsContainer({
   const onSubmit = useWidgetOnSubmit();
   const isLoading = data === null || data === undefined;
 
-  const timePeriod: string = form?.watch("timePeriod") ?? TimePeriod.month;
-  const dateRangePreset: string =
-    form?.watch("dateRangePreset") ?? DateRangePreset.last_30_days;
-  const chartType: string = form?.watch("chartType") ?? ChartType.line;
-  const activeStatus: string = form?.watch("status") ?? MessageStatusFilter.ANY;
-  const activeType: string = form?.watch("type") ?? MessageTypeFilter.ANY;
-  const sortBy: string = form?.watch("sortBy") ?? MessageSortField.CREATED_AT;
-  const sortOrder: string = form?.watch("sortOrder") ?? SortOrder.DESC;
-  const includeComparison: boolean = form?.watch("includeComparison") ?? false;
+  const timePeriod: typeof TimePeriodValue =
+    form.watch("timePeriod") ?? TimePeriod.month;
+  const dateRangePreset: typeof DateRangePresetValue =
+    form.watch("dateRangePreset") ?? DateRangePreset.last_30_days;
+  const chartType: typeof ChartTypeValue =
+    form.watch("chartType") ?? ChartType.line;
+  const activeStatus: typeof MessageStatusFilterValue =
+    form.watch("status") ?? MessageStatusFilter.ANY;
+  const activeType: typeof MessageTypeFilterValue =
+    form.watch("type") ?? MessageTypeFilter.ANY;
+  const sortBy: typeof MessageSortFieldValue =
+    form.watch("sortBy") ?? MessageSortField.CREATED_AT;
+  const sortOrder: typeof SortOrderValue =
+    form.watch("sortOrder") ?? SortOrder.DESC;
+  const includeComparison = form.watch("includeComparison") ?? false;
 
   const handleTimePeriodChange = useCallback(
     (value: string): void => {
-      form?.setValue("timePeriod", value);
+      form.setValue("timePeriod", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -153,7 +170,7 @@ export function EmailStatsContainer({
 
   const handleDateRangePresetChange = useCallback(
     (value: string): void => {
-      form?.setValue("dateRangePreset", value);
+      form.setValue("dateRangePreset", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -163,7 +180,7 @@ export function EmailStatsContainer({
 
   const handleChartTypeChange = useCallback(
     (value: string): void => {
-      form?.setValue("chartType", value);
+      form.setValue("chartType", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -173,7 +190,7 @@ export function EmailStatsContainer({
 
   const handleStatusChange = useCallback(
     (value: string): void => {
-      form?.setValue("status", value);
+      form.setValue("status", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -183,7 +200,7 @@ export function EmailStatsContainer({
 
   const handleTypeChange = useCallback(
     (value: string): void => {
-      form?.setValue("type", value);
+      form.setValue("type", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -193,7 +210,7 @@ export function EmailStatsContainer({
 
   const handleSortByChange = useCallback(
     (value: string): void => {
-      form?.setValue("sortBy", value);
+      form.setValue("sortBy", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -203,7 +220,7 @@ export function EmailStatsContainer({
 
   const handleSortOrderChange = useCallback(
     (value: string): void => {
-      form?.setValue("sortOrder", value);
+      form.setValue("sortOrder", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -212,7 +229,7 @@ export function EmailStatsContainer({
   );
 
   const handleToggleComparison = useCallback((): void => {
-    form?.setValue("includeComparison", !includeComparison);
+    form.setValue("includeComparison", !includeComparison);
     if (onSubmit) {
       onSubmit();
     }
@@ -319,9 +336,9 @@ export function EmailStatsContainer({
             <Input
               type="date"
               className="h-9 w-[160px] flex-shrink-0 text-sm"
-              value={form?.watch("dateFrom") ?? ""}
+              value={form.watch("dateFrom") ?? ""}
               onChange={(e) => {
-                form?.setValue("dateFrom", e.target.value);
+                form.setValue("dateFrom", e.target.value);
                 if (onSubmit) {
                   onSubmit();
                 }
@@ -330,9 +347,9 @@ export function EmailStatsContainer({
             <Input
               type="date"
               className="h-9 w-[160px] flex-shrink-0 text-sm"
-              value={form?.watch("dateTo") ?? ""}
+              value={form.watch("dateTo") ?? ""}
               onChange={(e) => {
-                form?.setValue("dateTo", e.target.value);
+                form.setValue("dateTo", e.target.value);
                 if (onSubmit) {
                   onSubmit();
                 }
@@ -394,9 +411,9 @@ export function EmailStatsContainer({
           <Div className="flex-1 relative min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
-              value={form?.watch("search") ?? ""}
+              value={form.watch("search") ?? ""}
               onChange={(e) => {
-                form?.setValue("search", e.target.value);
+                form.setValue("search", e.target.value);
                 if (onSubmit) {
                   onSubmit();
                 }

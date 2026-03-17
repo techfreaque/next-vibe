@@ -20,8 +20,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import React from "react";
+
 import { scopedTranslation } from "./i18n";
-import { EditGraphWidget } from "./widget";
+
+// Lazy import to avoid TDZ circular dependency in MCP context
+// (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
+const EditGraphWidget = React.lazy(() =>
+  import("./widget").then((m) => ({ default: m.EditGraphWidget })),
+);
 
 const { PUT } = createEndpoint({
   scopedTranslation,

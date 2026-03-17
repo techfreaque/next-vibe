@@ -11,17 +11,22 @@ import {
   backButton,
   navigateButtonField,
   objectField,
+  requestField,
   responseArrayField,
   responseField,
   widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId } from "../../models/models";
@@ -52,8 +57,44 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: FavoritesListContainer,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      /**
+       * Admin-only: fetch favorites for a specific user instead of the authenticated user.
+       * Only visible to admins — regular users never see or send this field.
+       */
+      userId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "get.userId.label" as const,
+        description: "get.userId.description" as const,
+        schema: z.string().uuid().optional(),
+        visibleFor: [UserPermissionRole.ADMIN],
+      }),
+      query: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.query.label" as const,
+        description: "get.fields.query.description" as const,
+        columns: 8,
+        schema: z.string().optional(),
+      }),
+      page: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get.fields.page.label" as const,
+        description: "get.fields.page.description" as const,
+        columns: 4,
+        schema: z.number().int().min(1).optional(),
+      }),
+      pageSize: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get.fields.pageSize.label" as const,
+        description: "get.fields.pageSize.description" as const,
+        columns: 4,
+        schema: z.number().int().min(1).max(500).optional(),
+      }),
       // Flattened top action buttons (no container wrapper)
       backButton: backButton(scopedTranslation, {
         usage: { response: true },
@@ -65,7 +106,7 @@ const { GET } = createEndpoint({
       }),
       createButton: navigateButtonField(scopedTranslation, {
         targetEndpoint: async () =>
-          (await import("../characters/definition")).default.GET,
+          (await import("../skills/definition")).default.GET,
         extractParams: () => ({}),
         prefillFromGet: false,
         label: "get.createButton.label" as const,
@@ -73,6 +114,33 @@ const { GET } = createEndpoint({
         variant: "outline",
         className: "ml-auto",
         usage: { response: true },
+      }),
+
+      // Pagination metadata (AI/MCP platform only — null for human callers)
+      totalCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
+      matchedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
+      currentPage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
+      totalPages: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
+      hint: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
       }),
 
       // Favorites list
@@ -91,7 +159,7 @@ const { GET } = createEndpoint({
               hidden: true,
               schema: z.string().uuid(),
             }),
-            characterId: responseField(scopedTranslation, {
+            skillId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
               schema: z.string(),
@@ -232,12 +300,23 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      ownFavorites: {},
+      userFavorites: {
+        userId: "550e8400-e29b-41d4-a716-446655440001",
+      },
+    },
     responses: {
       listAll: {
+        totalCount: null,
+        matchedCount: null,
+        currentPage: null,
+        totalPages: null,
+        hint: null,
         favorites: [
           {
             id: "550e8400-e29b-41d4-a716-446655440000",
-            characterId: "default",
+            skillId: "default",
             modelId: ModelId.CLAUDE_SONNET_4_5,
             voice: TtsVoiceValue,
             position: 0,

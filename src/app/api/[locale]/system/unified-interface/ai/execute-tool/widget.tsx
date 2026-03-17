@@ -16,7 +16,13 @@ import type { AutocompleteOption } from "next-vibe-ui/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe-ui/ui/autocomplete-field";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { FormField, FormItem, FormLabel } from "next-vibe-ui/ui/form/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "next-vibe-ui/ui/form/form";
+import { Pre } from "next-vibe-ui/ui/pre";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -29,6 +35,7 @@ import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-inter
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
@@ -41,6 +48,7 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
 
 import type definition from "./definition";
 import type { RouteExecuteResponseInput } from "./definition";
@@ -76,10 +84,54 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     !Array.isArray(field.value)
       ? (field.value as Record<string, WidgetData>)
       : null;
-  const toolName =
-    form?.watch("toolName") ??
+  const rawToolName =
+    form.watch("toolName") ??
     (typeof fieldValue?.toolName === "string" ? fieldValue.toolName : "");
   const resultData = fieldValue?.result;
+
+  // Parse remote tool prefix: "hermes__ssh_exec_POST" → instanceId + toolName
+  const remoteInfo = useMemo(() => {
+    const sepIdx = rawToolName.indexOf("__");
+    if (sepIdx === -1) {
+      return { instanceId: undefined, toolName: rawToolName };
+    }
+    return {
+      instanceId: rawToolName.slice(0, sepIdx),
+      toolName: rawToolName.slice(sepIdx + 2),
+    };
+  }, [rawToolName]);
+  const toolName = remoteInfo.toolName;
+  const isRemoteTool = remoteInfo.instanceId !== undefined;
+
+  // Fetch remote connections for VibeFrameHost rendering
+  const connectionsState = useEndpoint(
+    remoteConnectionListDefinition,
+    {
+      read: {
+        queryOptions: {
+          refetchOnWindowFocus: false,
+          staleTime: 5 * 60 * 1000,
+          enabled: isRemoteTool,
+        },
+      },
+    },
+    logger,
+    user,
+  );
+  const remoteConnection = useMemo(() => {
+    if (!isRemoteTool) {
+      return null;
+    }
+    const resp = connectionsState?.read?.response;
+    if (!resp || resp.success !== true) {
+      return null;
+    }
+    return (
+      resp.data.connections.find(
+        (c) => c.instanceId === remoteInfo.instanceId && c.isActive,
+      ) ?? null
+    );
+  }, [isRemoteTool, remoteInfo.instanceId, connectionsState?.read?.response]);
 
   // Fetch available tools from help endpoint (role-based filtering)
   const helpState = useEndpoint(
@@ -114,7 +166,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     });
   }, [helpState?.read?.response]);
 
-  const formInputData = form?.watch("input") as
+  const formInputData = form.watch("input") as
     | Record<string, WidgetData>
     | undefined;
   const inputData =
@@ -130,7 +182,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   const [resolveError, setResolveError] = useState<string | null>(null);
 
   useEffect((): (() => void) => {
-    if (!toolName) {
+    if (!toolName || isRemoteTool) {
       setResolvedEndpoint(null);
       setResolveError(null);
       return () => undefined;
@@ -158,7 +210,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     return () => {
       cancelled = true;
     };
-  }, [toolName, t]);
+  }, [toolName, isRemoteTool, t]);
 
   const method = resolvedEndpoint?.method as
     | "GET"
@@ -236,35 +288,46 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     return undefined;
   }, [hasInput, method, inputData]);
 
+  const handleSubmit =
+    form && onSubmit
+      ? (): void => {
+          form.handleSubmit(onSubmit)();
+        }
+      : undefined;
+
   return (
     <Div
       className={disabled ? "flex flex-col gap-0" : "flex flex-col gap-4 p-4"}
     >
       {form && !disabled && (
-        <FormField
-          control={form.control}
-          name="toolName"
-          render={({ field: formField }) => (
-            <FormItem>
-              <FormLabel>
-                {t("executeTool.post.fields.toolName.label")}
-              </FormLabel>
-              <AutocompleteField
-                value={formField.value}
-                onChange={(val) => {
-                  formField.onChange(val);
-                }}
-                onBlur={formField.onBlur}
-                options={toolOptions}
-                placeholder={t("executeTool.post.fields.toolName.placeholder")}
-                searchPlaceholder={t(
-                  "executeTool.post.fields.toolName.description",
-                )}
-                allowCustom={true}
-              />
-            </FormItem>
-          )}
-        />
+        <Form form={form} onSubmit={handleSubmit}>
+          <FormField
+            control={form.control}
+            name="toolName"
+            render={({ field: formField }) => (
+              <FormItem>
+                <FormLabel>
+                  {t("executeTool.post.fields.toolName.label")}
+                </FormLabel>
+                <AutocompleteField
+                  value={formField.value}
+                  onChange={(val) => {
+                    formField.onChange(val);
+                  }}
+                  onBlur={formField.onBlur}
+                  options={toolOptions}
+                  placeholder={t(
+                    "executeTool.post.fields.toolName.placeholder",
+                  )}
+                  searchPlaceholder={t(
+                    "executeTool.post.fields.toolName.description",
+                  )}
+                  allowCustom={true}
+                />
+              </FormItem>
+            )}
+          />
+        </Form>
       )}
 
       {!disabled && !toolName && (
@@ -277,13 +340,76 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
         <P className="text-sm text-destructive">{resolveError}</P>
       )}
 
-      {!disabled && toolName && !resolvedEndpoint && !resolveError && (
-        <P className="text-sm text-muted-foreground">
-          {t("executeTool.post.widget.resolving")}
-        </P>
+      {!disabled &&
+        toolName &&
+        !isRemoteTool &&
+        !resolvedEndpoint &&
+        !resolveError && (
+          <P className="text-sm text-muted-foreground">
+            {t("executeTool.post.widget.resolving")}
+          </P>
+        )}
+
+      {/* Remote tool: render via VibeFrameHost iframe to the remote instance */}
+      {isRemoteTool && remoteConnection && !resultData && (
+        <VibeFrameHost
+          serverUrl={remoteConnection.remoteUrl}
+          endpoint={toolName}
+          locale={locale}
+          data={
+            inputData
+              ? Object.fromEntries(
+                  Object.entries(inputData).map(([k, v]) => [k, String(v)]),
+                )
+              : undefined
+          }
+          className="w-full min-h-[200px]"
+          onSuccess={(data) => {
+            // When the remote frame signals success, submit the parent form
+            if (form) {
+              form.setValue("input", data);
+              if (onSubmit) {
+                form.handleSubmit(onSubmit)();
+              }
+            }
+          }}
+        />
       )}
 
-      {resolvedEndpoint && method && !resultData && (
+      {/* Remote tool without connection — field-driven fallback */}
+      {isRemoteTool && !remoteConnection && !disabled && !resultData && (
+        <Div className="flex flex-col gap-3">
+          <P className="text-sm text-muted-foreground">
+            {t("executeTool.post.widget.unknownTool", {
+              toolName: rawToolName,
+            })}
+          </P>
+          {/* Show the JSON input field so the user can still submit via execute-tool */}
+          {form && (
+            <Form form={form} onSubmit={handleSubmit}>
+              <FormField
+                control={form.control}
+                name="input"
+                render={({ field: formField }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t("executeTool.post.fields.input.label")}
+                    </FormLabel>
+                    <Pre className="rounded-md bg-muted/50 p-3 text-xs font-mono overflow-x-auto min-h-[80px] whitespace-pre-wrap">
+                      {typeof formField.value === "object"
+                        ? JSON.stringify(formField.value, null, 2)
+                        : String(formField.value ?? "{}")}
+                    </Pre>
+                  </FormItem>
+                )}
+              />
+            </Form>
+          )}
+        </Div>
+      )}
+
+      {/* Local tool: render via EndpointsPage */}
+      {!isRemoteTool && resolvedEndpoint && method && !resultData && (
         <EndpointsPage
           endpoint={{ [method]: resolvedEndpoint }}
           locale={locale}
@@ -293,7 +419,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
       )}
 
       {/* Response mode: render the target endpoint with merged input+result data (read-only) */}
-      {resolvedEndpoint && resultData && (
+      {!isRemoteTool && resolvedEndpoint && resultData && (
         <NavigationStackProvider>
           <EndpointRenderer
             endpoint={resolvedEndpoint}
@@ -314,6 +440,13 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
             disabled={disabled}
           />
         </NavigationStackProvider>
+      )}
+
+      {/* Remote tool response: render raw result data */}
+      {isRemoteTool && resultData && (
+        <Div className="rounded-md bg-muted/50 p-3 text-xs font-mono overflow-x-auto">
+          <Pre>{JSON.stringify(resultData, null, 2)}</Pre>
+        </Div>
       )}
 
       {/* Confirmation mode: render Confirm / Cancel buttons when onSubmit/onCancel are provided */}

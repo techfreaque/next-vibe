@@ -14,7 +14,7 @@ export class ReasoningHandler {
     threadId: string;
     currentParentId: string | null;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string;
     userId: string | undefined;
     getNextAssistantMessageId: () => string;
@@ -30,7 +30,7 @@ export class ReasoningHandler {
       threadId,
       currentParentId,
       model,
-      character,
+      skill,
       sequenceId,
       userId,
       getNextAssistantMessageId,
@@ -56,7 +56,7 @@ export class ReasoningHandler {
         parentId: currentParentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
       });
 

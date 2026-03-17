@@ -21,6 +21,11 @@ export const translations = {
           "Maximum wait time in milliseconds. If set to 0, the default timeout will be used",
         placeholder: "Enter timeout (ms)",
       },
+      captureSnapshot: {
+        label: "Capture Snapshot",
+        description:
+          "When enabled, includes the full accessibility snapshot in the response. Disabled by default to keep responses concise.",
+      },
     },
   },
 

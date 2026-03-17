@@ -16,7 +16,7 @@ export class TextHandler {
     threadId: string;
     currentParentId: string | null;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string;
     userId: string | undefined;
     getNextAssistantMessageId: () => string;
@@ -34,7 +34,7 @@ export class TextHandler {
       threadId,
       currentParentId,
       model,
-      character,
+      skill,
       sequenceId,
       userId,
       getNextAssistantMessageId,
@@ -70,7 +70,7 @@ export class TextHandler {
         parentId: currentParentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
       });
 

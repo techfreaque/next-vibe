@@ -188,10 +188,10 @@ objectField(st, { type: WidgetType.CONTAINER, usage: {}, children: {...} })
 When the auto-rendered UI isn't sufficient, use `customWidgetObject` to wire a React component directly into the definition:
 
 ```typescript
-import { CharacterCreateContainer } from "./widget";
+import { SkillCreateContainer } from "./widget";
 
 fields: customWidgetObject({
-  render: CharacterCreateContainer,    // ← component reference
+  render: SkillCreateContainer,    // ← component reference
   usage: { request: "data", response: true } as const,
   children: {
     name: requestField(scopedTranslation, {
@@ -475,23 +475,23 @@ name: responseField(st, {
 });
 
 // ✅ Response array with containers
-characters: responseArrayField(st, {
+skills: responseArrayField(st, {
   type: WidgetType.CONTAINER,
   child: objectField(st, {
     type: WidgetType.CONTAINER,
-    title: "get.response.character.title",
+    title: "get.response.skill.title",
     layoutType: LayoutType.GRID,
     columns: 2,
     usage: { response: true },
     children: {
       id: responseField(st, {
         type: WidgetType.TEXT,
-        content: "get.response.character.id.content",
+        content: "get.response.skill.id.content",
         schema: z.string(),
       }),
       name: responseField(st, {
         type: WidgetType.TEXT,
-        content: "get.response.character.name.content",
+        content: "get.response.skill.name.content",
         schema: z.string(),
       }),
     },
@@ -747,7 +747,7 @@ All translation keys are **short, scoped** relative to the module's i18n scope. 
   title: "get.title",
   description: "get.description",
   category: "app.endpointCategories.chat",   // ← global category key
-  tags: ["tags.characters" as const],        // ← scoped tag key
+  tags: ["tags.skills" as const],        // ← scoped tag key
 }
 ```
 
@@ -1082,7 +1082,7 @@ verbose: requestField(st, { schema: z.boolean().default(false), ... })
 
 **Clean definition files:**
 
-- `src/app/api/[locale]/agent/chat/characters/create/definition.ts` — POST with `customWidgetObject`
+- `src/app/api/[locale]/agent/chat/skills/create/definition.ts` — POST with `customWidgetObject`
 - `src/app/api/[locale]/agent/chat/folders/definition.ts` — GET with `responseArrayField`
 - `src/app/api/[locale]/agent/chat/threads/[threadId]/permissions/definition.ts` — GET + PATCH with urlPathParams
 

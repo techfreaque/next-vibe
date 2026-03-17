@@ -49,19 +49,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<BaseResponseType<GenerateAllResponseType>> {
-    const GENERATING_VIBE = "🚀 Generating some vibe...";
-    const RUNNING_GENERATORS = "Step 1: Running all generators in parallel...";
-    const GENERATION_SUCCESS = "✅ Vibe generation completed successfully!";
-
     const outputLines: string[] = [];
     let generatorsRun = 0;
     let generatorsSkipped = 0;
     let functionalGeneratorsCompleted = false;
 
     try {
-      outputLines.push(GENERATING_VIBE);
-      outputLines.push(RUNNING_GENERATORS);
-
       // Run all generators in parallel
       const generatorPromises = [];
 
@@ -70,7 +63,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("🗂️ Generating endpoints meta...");
               const { endpointsMetaGeneratorRepository } =
                 await import("../endpoints-meta/repository");
 
@@ -89,7 +81,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
 
               if (result.success) {
-                outputLines.push("✅ Endpoints meta generated successfully");
                 generatorsRun++;
                 return "endpoints-meta";
               }
@@ -112,7 +103,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("📝 Generating endpoint (dynamic imports)...");
               const { endpointGeneratorRepository } =
                 await import("../endpoint/repository");
 
@@ -130,7 +120,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
 
               if (result.success) {
-                outputLines.push("✅ Endpoint generated successfully");
                 generatorsRun++;
                 return "endpoint";
               }
@@ -153,9 +142,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push(
-                "📝 Generating route handlers (dynamic imports)...",
-              );
               const { routeHandlersGeneratorRepository } =
                 await import("../route-handlers/repository");
 
@@ -174,7 +160,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
 
               if (result.success) {
-                outputLines.push("✅ Route handlers generated successfully");
                 generatorsRun++;
                 return "route-handlers";
               }
@@ -197,9 +182,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push(
-                "📝 Generating client route handlers (dynamic imports)...",
-              );
               const { ClientRoutesIndexGeneratorRepository } =
                 await import("../client-routes-index/repository");
 
@@ -218,9 +200,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
 
               if (result.success) {
-                outputLines.push(
-                  "✅ Client route handlers generated successfully",
-                );
                 generatorsRun++;
                 return "client-route-handlers";
               }
@@ -243,7 +222,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("🌱 Generating seeds...");
               const { seedsGeneratorRepository } =
                 await import("../seeds/repository");
 
@@ -262,7 +240,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
 
               if (result.success) {
-                outputLines.push("✅ Seeds generated successfully");
                 generatorsRun++;
                 return "seeds";
               }
@@ -287,7 +264,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("📋 Generating task index...");
               const { taskIndexGeneratorRepository } =
                 await import("../task-index/repository");
 
@@ -306,9 +282,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
 
               if (result.success) {
-                outputLines.push(
-                  `✅ Task index generated successfully: ${result.data.message}`,
-                );
                 generatorsRun++;
                 return "task-index";
               }
@@ -329,12 +302,87 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorsSkipped++;
       }
 
+      // 3b. Skills Index Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            const { skillsIndexGeneratorRepository } =
+              await import("../skills-index/repository");
+
+            const { scopedTranslation: skillsIndexI18n } =
+              await import("../skills-index/i18n");
+            const { t: subT } = skillsIndexI18n.scopedT(locale);
+            const result =
+              await skillsIndexGeneratorRepository.generateSkillsIndex(
+                {
+                  outputFile:
+                    "src/app/api/[locale]/system/generated/skills-index.ts",
+                  dryRun: false,
+                },
+                logger,
+                subT,
+              );
+
+            if (result.success) {
+              generatorsRun++;
+              return "skills-index";
+            }
+            outputLines.push(
+              `❌ Skills index generation failed: ${result.message || "Unknown error"}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Skills index generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
+      // 3c. Prompt Fragments Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            const { promptFragmentsGeneratorRepository } =
+              await import("../prompt-fragments/repository");
+
+            const { scopedTranslation: promptFragmentsI18n } =
+              await import("../prompt-fragments/i18n");
+            const { t: subT } = promptFragmentsI18n.scopedT(locale);
+            const result =
+              await promptFragmentsGeneratorRepository.generatePromptFragments(
+                {
+                  outputFile:
+                    "src/app/api/[locale]/system/generated/prompt-fragments.ts",
+                  dryRun: false,
+                },
+                logger,
+                subT,
+              );
+
+            if (result.success) {
+              generatorsRun++;
+              return "prompt-fragments";
+            }
+            outputLines.push(
+              `❌ Prompt fragments generation failed: ${result.message || "Unknown error"}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Prompt fragments generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
       // 4. tRPC Router Generator
       if (data.enableTrpc) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("🔌 Generating tRPC router...");
               const { generateTrpcRouterRepository } =
                 await import("../generate-trpc-router/repository");
 
@@ -352,9 +400,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
 
               if (result.success && result.data) {
-                outputLines.push(
-                  `✅ tRPC router generated successfully: ${result.data.output}`,
-                );
                 generatorsRun++;
                 return "trpc-router";
               }
@@ -379,7 +424,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            outputLines.push("📧 Generating email templates registry...");
             const { emailTemplateGeneratorRepository } =
               await import("../email-templates/repository");
 
@@ -398,9 +442,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
 
             if (result.success) {
-              outputLines.push(
-                "✅ Email templates registry generated successfully",
-              );
               generatorsRun++;
               return "email-templates";
             }
@@ -422,7 +463,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("🔌 Generating remote capabilities...");
               const { remoteCapabilitiesGeneratorRepository } =
                 await import("../remote-capabilities/repository");
               const { scopedTranslation: remoteCapI18n } =
@@ -441,9 +481,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
 
               if (result.success) {
-                outputLines.push(
-                  "✅ Remote capabilities generated successfully",
-                );
                 generatorsRun++;
                 return "remote-capabilities";
               }
@@ -465,7 +502,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            outputLines.push("⚙️ Generating env files...");
             const { envGeneratorRepository } =
               await import("../env/repository");
 
@@ -482,7 +518,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
             );
 
             if (result.success) {
-              outputLines.push("✅ Env files generated successfully");
               generatorsRun++;
               return "env";
             }
@@ -499,11 +534,46 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
       );
 
+      // 7b. Env Keys Generator
+      generatorPromises.push(
+        (async (): Promise<string | null> => {
+          try {
+            const { envKeysGeneratorRepository } =
+              await import("../env-keys/repository");
+
+            const { scopedTranslation: envKeysI18n } =
+              await import("../env-keys/i18n");
+            const { t: subT } = envKeysI18n.scopedT(locale);
+            const result = await envKeysGeneratorRepository.generateEnvKeys(
+              {
+                outputFile: "src/app/api/[locale]/system/generated/env-keys.ts",
+                dryRun: false,
+              },
+              logger,
+              subT,
+            );
+
+            if (result.success) {
+              generatorsRun++;
+              return "env-keys";
+            }
+            outputLines.push(
+              `❌ Env keys generation failed: ${result.message || "Unknown error"}`,
+            );
+            return null;
+          } catch (error) {
+            outputLines.push(
+              `❌ Env keys generator failed: ${parseError(error).message}`,
+            );
+            return null;
+          }
+        })(),
+      );
+
       // 9. Graph Seeds Index Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            outputLines.push("🌱 Generating graph seeds index...");
             const { graphSeedsIndexGeneratorRepository } =
               await import("../graph-seeds-index/repository");
 
@@ -518,7 +588,6 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               );
 
             if (result.success) {
-              outputLines.push("✅ Graph seeds index generated successfully");
               generatorsRun++;
               return "graph-seeds-index";
             }
@@ -547,14 +616,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
 
       functionalGeneratorsCompleted = completedGenerators.length > 0;
 
-      outputLines.push(GENERATION_SUCCESS);
-
       return success({
         success: true,
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 9,
+          totalGenerators: 10,
           generatorsRun,
           generatorsSkipped,
           outputDirectory:
@@ -824,6 +891,70 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       skipped.push("graph-seeds-index");
     }
 
+    if (dirty.skillsIndex) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { skillsIndexGeneratorRepository } =
+              await import("../skills-index/repository");
+            const { scopedTranslation: i18n } =
+              await import("../skills-index/i18n");
+            const { t } = i18n.scopedT(locale);
+            await skillsIndexGeneratorRepository.generateSkillsIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/skills-index.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("skills-index");
+          } catch (error) {
+            logger.error(
+              "skills-index failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("skills-index");
+    }
+
+    if (dirty.promptFragments) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { promptFragmentsGeneratorRepository } =
+              await import("../prompt-fragments/repository");
+            const { scopedTranslation: i18n } =
+              await import("../prompt-fragments/i18n");
+            const { t } = i18n.scopedT(locale);
+            await promptFragmentsGeneratorRepository.generatePromptFragments(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/prompt-fragments.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("prompt-fragments");
+          } catch (error) {
+            logger.error(
+              "prompt-fragments failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("prompt-fragments");
+    }
+
     // Seeds: only run when dirty.seeds AND explicitly not skipped
     // (seeds are expensive DB-related, only on startup)
     if (dirty.seeds) {
@@ -881,10 +1012,7 @@ if (import.meta.main) {
       defaultLocale,
     )
     .then((result) => {
-      if (result.success) {
-        // oxlint-disable-next-line no-console
-        console.log(result.data.output);
-      } else {
+      if (!result.success) {
         // oxlint-disable-next-line no-console
         console.error(`❌ Generation failed: ${result.message}`);
         process.exitCode = 1;

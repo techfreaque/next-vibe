@@ -11,6 +11,7 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import {
   useInkWidgetLocale,
   useInkWidgetPlatform,
@@ -51,6 +52,29 @@ function formatCredits(credits: number | undefined): string {
     return "";
   }
   return `${credits}cr`;
+}
+
+// ── Shared example serialization ─────────────────────────────────────────
+
+/**
+ * Serialize one example entry into dot-notation flags.
+ * Objects expand as --key.subkey="value"; primitives as --key="value".
+ */
+function serializeExampleArgs(exData: CliRequestData, prefix = "--"): string {
+  return Object.entries(exData)
+    .map(([k, v]) => {
+      if (v !== null && typeof v === "object" && !Array.isArray(v)) {
+        const entries = Object.entries(v);
+        if (entries.length === 0) {
+          return `${prefix}${k}.KEY="value"`;
+        }
+        return entries
+          .map(([sk, sv]) => `${prefix}${k}.${sk}="${String(sv)}"`)
+          .join(" ");
+      }
+      return `${prefix}${k}=${typeof v === "string" ? `"${v}"` : String(v)}`;
+    })
+    .join(" ");
 }
 
 // ── Detail Mode (single tool) ────────────────────────────────────────────
@@ -113,12 +137,7 @@ function renderDetailCli(tool: HelpToolItem): string {
       lines.push("");
       lines.push(chalk.bold("Examples"));
       for (const [exName, exData] of exampleEntries) {
-        const args = Object.entries(exData)
-          .map(
-            ([k, v]) =>
-              `--${k}=${typeof v === "string" ? `"${v}"` : String(v)}`,
-          )
-          .join(" ");
+        const args = serializeExampleArgs(exData);
         lines.push(`  ${chalk.dim(`${exName}:`)} vibe ${tool.name} ${args}`);
       }
     }
@@ -158,6 +177,18 @@ function renderDetailMcp(tool: HelpToolItem): string {
         lines.push(
           `  ${key} (${typeStr}${isRequired ? ", required" : ""})${desc}`,
         );
+      }
+    }
+  }
+
+  if (tool.examples?.inputs) {
+    const exampleEntries = Object.entries(tool.examples.inputs);
+    if (exampleEntries.length > 0) {
+      lines.push("");
+      lines.push("Examples:");
+      for (const [exName, exData] of exampleEntries) {
+        const args = serializeExampleArgs(exData);
+        lines.push(`  ${exName}: vibe ${tool.name} ${args}`);
       }
     }
   }

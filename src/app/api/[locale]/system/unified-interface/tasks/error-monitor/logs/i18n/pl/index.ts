@@ -6,6 +6,13 @@ export const translations: typeof en = {
   errors: {
     repositoryInternalError: "Wystąpił błąd wewnętrzny",
     fetchErrorLogs: "Nie udało się pobrać logów błędów",
+    updateErrorLog: "Nie udało się zaktualizować statusu logu błędu",
+  },
+
+  statusFilter: {
+    all: "Wszystkie",
+    active: "Aktywne",
+    resolved: "Rozwiązane",
   },
 
   get: {
@@ -15,36 +22,19 @@ export const translations: typeof en = {
       monitoring: "Monitorowanie",
     },
     fields: {
-      source: {
-        label: "Źródło",
-        description: "Filtruj według źródła błędu",
-        options: {
-          backend: "Backend",
-          task: "Zadanie",
-          chat: "Chat",
-        },
+      status: {
+        label: "Status",
+        description: "Filtruj według statusu rozwiązania",
       },
-      level: {
-        label: "Poziom",
-        description: "Filtruj według poziomu błędu",
-        options: {
-          error: "Błąd",
-          warn: "Ostrzeżenie",
-        },
-      },
-      endpoint: {
-        label: "Endpoint",
-        description: "Filtruj według ścieżki endpointu (częściowe dopasowanie)",
-        placeholder: "Wprowadź endpoint",
+      search: {
+        label: "Szukaj",
+        description: "Szukaj w komunikatach błędów",
+        placeholder: "Szukaj komunikatów...",
       },
       errorType: {
         label: "Typ błędu",
         description: "Filtruj według klasyfikacji typu błędu",
         placeholder: "np. INTERNAL_ERROR",
-      },
-      fingerprint: {
-        label: "Odcisk palca",
-        description: "Filtruj według odcisku palca grupy błędów",
       },
       startDate: {
         label: "Od",
@@ -121,6 +111,80 @@ export const translations: typeof en = {
     },
   },
 
+  patch: {
+    title: "Aktualizuj log błędu",
+    description: "Rozwiąż lub otwórz ponownie log błędu według odcisku palca",
+    tags: {
+      monitoring: "Monitorowanie",
+    },
+    fields: {
+      fingerprint: {
+        label: "Odcisk palca",
+        description: "Odcisk palca logu błędu",
+        placeholder: "Wprowadź odcisk palca",
+      },
+      resolved: {
+        label: "Rozwiązane",
+        description:
+          "Ustaw na prawda aby rozwiązać, fałsz aby otworzyć ponownie",
+      },
+    },
+    response: {
+      fingerprint: {
+        title: "Odcisk palca",
+      },
+      resolved: {
+        title: "Rozwiązane",
+      },
+      affectedRows: {
+        title: "Zmienione wiersze",
+      },
+    },
+    success: {
+      title: "Log zaktualizowany",
+      description: "Status logu błędu zaktualizowany pomyślnie",
+    },
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe parametry żądania",
+      },
+      unauthorized: {
+        title: "Brak autoryzacji",
+        description: "Wymagane uwierzytelnienie",
+      },
+      forbidden: {
+        title: "Zabronione",
+        description: "Odmowa dostępu",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Nie znaleziono logu błędu",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Nie udało się zaktualizować logu błędu",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      unsavedChanges: {
+        titleChanges: "Niezapisane zmiany",
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt danych",
+      },
+    },
+  },
+
   widget: {
     title: "Logi błędów",
     loading: "Ładowanie logów...",
@@ -128,14 +192,23 @@ export const translations: typeof en = {
     header: {
       refresh: "Odśwież",
       runScan: "Uruchom skan",
+      back: "Wstecz",
+      activeCount: "aktywnych",
     },
     col: {
-      level: "Poziom",
-      source: "Źródło",
       message: "Wiadomość",
-      endpoint: "Endpoint",
       errorType: "Typ błędu",
-      createdAt: "Czas",
+      occurrences: "Wystąpienia",
+      firstSeen: "Pierwsze wystąpienie",
+      createdAt: "Ostatnie wystąpienie",
+    },
+    status: {
+      active: "Aktywny",
+      resolved: "Rozwiązany",
+    },
+    action: {
+      resolve: "Rozwiąż",
+      reopen: "Otwórz ponownie",
     },
     detail: {
       stackTrace: "Stack Trace",

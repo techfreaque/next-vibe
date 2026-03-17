@@ -24,7 +24,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -145,9 +145,7 @@ class EndpointsMetaGeneratorRepositoryImpl {
         definitionFiles = [...liveIndex.definitionFiles];
         routeFiles = [...liveIndex.routeFiles];
       } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        const apiCorePath = ["src", "app", "api", "[locale]"];
-        const startDir = join(process.cwd(), ...apiCorePath);
+        const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
         logger.debug("Discovering definition files");
         definitionFiles = findFilesRecursively(startDir, "definition.ts");
@@ -451,26 +449,52 @@ class EndpointsMetaGeneratorRepositoryImpl {
       };
     });
 
-    // ── Alias collision detection ────────────────────────────────────────
+    // ── Duplicate alias detection (within a single endpoint) ─────────────
+    if (logger) {
+      const dupeLines: string[] = [];
+      for (const entry of entries) {
+        const allNames = [entry.toolName, ...entry.aliases];
+        const seen = new Set<string>();
+        const dupes = new Set<string>();
+        for (const name of allNames) {
+          if (seen.has(name)) {
+            dupes.add(name);
+          }
+          seen.add(name);
+        }
+        if (dupes.size > 0) {
+          dupeLines.push(
+            `   ${entry.canonicalName} has duplicate aliases: ${[...dupes].map((d) => `"${d}"`).join(", ")}`,
+          );
+        }
+      }
+      if (dupeLines.length > 0) {
+        logger.warn(
+          `⚠️  Duplicate aliases detected (${dupeLines.length} endpoint${dupeLines.length === 1 ? "" : "s"}):\n${dupeLines.join("\n")}`,
+        );
+      }
+    }
+
+    // ── Alias collision detection (across endpoints) ──────────────────────
     // Every name that an endpoint claims (toolName + all aliases) must be unique.
-    // Map: name → list of canonicalNames that claim it.
-    const nameOwners = new Map<string, string[]>();
+    // Map: name → set of canonicalNames that claim it.
+    const nameOwners = new Map<string, Set<string>>();
     for (const entry of entries) {
       const allNames = [entry.toolName, ...entry.aliases];
       for (const name of allNames) {
-        const owners = nameOwners.get(name) ?? [];
-        owners.push(entry.canonicalName);
+        const owners = nameOwners.get(name) ?? new Set<string>();
+        owners.add(entry.canonicalName);
         nameOwners.set(name, owners);
       }
     }
 
     const collisions = [...nameOwners.entries()].filter(
-      ([, owners]) => owners.length > 1,
+      ([, owners]) => owners.size > 1,
     );
 
     if (collisions.length > 0 && logger) {
       const lines: string[] = [
-        `⚠️  Alias collision detected (${collisions.length} conflict${collisions.length === 1 ? "" : "s"}):`,
+        `⚠️  Alias collision across endpoints (${collisions.length} conflict${collisions.length === 1 ? "" : "s"}):`,
       ];
       for (const [name, owners] of collisions) {
         lines.push(`   "${name}" claimed by:`);
@@ -503,7 +527,7 @@ class EndpointsMetaGeneratorRepositoryImpl {
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 
 export interface EndpointMeta {
   toolName: string;

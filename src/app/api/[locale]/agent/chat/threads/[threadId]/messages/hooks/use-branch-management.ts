@@ -14,15 +14,16 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ChatMessage } from "../../../../db";
-import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 
 export const BRANCH_INDEX_KEY = "__root__";
 
 interface UseBranchManagementProps {
   /** All messages loaded in the current branch window */
   activeThreadMessages: ChatMessage[];
-  /** The current leaf message ID (from URL ?message= param) */
+  /** The current leaf message ID */
   leafMessageId: string | null;
+  /** Callback to update the leaf message ID */
+  setLeafMessageId: (id: string | null) => void;
   /** The active thread ID */
   threadId: string;
   logger: EndpointLogger;
@@ -94,22 +95,30 @@ function deriveBranchIndices(
   return Object.keys(indices).length > 0 ? indices : EMPTY_BRANCH_INDICES;
 }
 
-// setLeafMessage is now just calling the navigation store's setLeafMessageId,
-// which handles the URL update internally.
-
 export function useBranchManagement({
   activeThreadMessages,
   leafMessageId,
+  setLeafMessageId,
   threadId,
   logger,
 }: UseBranchManagementProps): UseBranchManagementReturn {
-  const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
-
   // Derive branchIndices from the leaf + loaded messages (local — for branch navigator rendering)
   const branchIndices = useMemo(
     () => deriveBranchIndices(activeThreadMessages, leafMessageId),
     [activeThreadMessages, leafMessageId],
   );
+
+  // Stable identity: only changes when the SET of message IDs changes, not on content deltas.
+  // This prevents the auto-switch effect from running on every streaming token update.
+  const messageIds = useMemo(
+    () => activeThreadMessages.map((m) => m.id).join(","),
+    [activeThreadMessages],
+  );
+
+  // Keep a ref to the full messages array so the effect can read it without
+  // taking it as a dependency (avoiding re-runs on content-only updates).
+  const activeThreadMessagesRef = useRef(activeThreadMessages);
+  activeThreadMessagesRef.current = activeThreadMessages;
 
   // Track message IDs to detect new messages for auto-switch
   const prevMessageIdsRef = useRef<Set<string>>(new Set());
@@ -118,15 +127,16 @@ export function useBranchManagement({
 
   /**
    * Auto-switch to new leaf when a new message arrives.
-   * If the new message is a child of the current leaf (or current path's leaf),
-   * update URL to the new message ID.
+   * Depends on `messageIds` (stable string) rather than `activeThreadMessages`
+   * so it only fires when the set of IDs changes — not on every content delta.
    */
   useEffect(() => {
     if (!threadId) {
       return;
     }
 
-    const currentIds = new Set(activeThreadMessages.map((m) => m.id));
+    const messages = activeThreadMessagesRef.current;
+    const currentIds = new Set(messages.map((m) => m.id));
     const prevIds = prevMessageIdsRef.current;
     prevMessageIdsRef.current = currentIds;
 
@@ -135,7 +145,7 @@ export function useBranchManagement({
       return;
     }
 
-    const newMessages = activeThreadMessages
+    const newMessages = messages
       .filter((m) => !prevIds.has(m.id))
       .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
@@ -151,19 +161,32 @@ export function useBranchManagement({
 
     const currentLeaf = leafMessageIdRef.current;
 
-    // Only auto-switch when the new message is a direct child of the current leaf.
-    // This handles streaming (new AI response) and retries.
+    // Only auto-switch when the new message is a direct child of the current leaf,
+    // OR when new messages form a chain rooted at the current leaf (e.g. wakeUp revival
+    // adds a synthetic user message + AI response in one batch — the AI response's
+    // parentId is the synthetic user message, not currentLeaf directly).
     // Do NOT auto-switch when:
     //   - currentLeaf is null (no branch selected — avoid corrupting URL with old messages)
     //   - loading older history (new messages are not children of the current leaf)
-    if (currentLeaf && newest.parentId === currentLeaf) {
-      logger.debug("[BranchManagement] Auto-switching to new leaf", {
-        newLeaf: newest.id,
-        threadId,
-      });
-      setLeafMessageId(newest.id);
+    if (currentLeaf) {
+      const newMessageIds = new Set(newMessages.map((m) => m.id));
+      const isDirectChild = newest.parentId === currentLeaf;
+      // Chain: newest's parent is also a new message whose parent chain reaches currentLeaf
+      const isChainFromLeaf =
+        !isDirectChild &&
+        !!newest.parentId &&
+        newMessageIds.has(newest.parentId);
+
+      if (isDirectChild || isChainFromLeaf) {
+        logger.debug("[BranchManagement] Auto-switching to new leaf", {
+          newLeaf: newest.id,
+          threadId,
+          isChain: isChainFromLeaf,
+        });
+        setLeafMessageId(newest.id);
+      }
     }
-  }, [activeThreadMessages, threadId, logger, setLeafMessageId]);
+  }, [messageIds, threadId, logger, setLeafMessageId]);
 
   /**
    * Switch branch: find the index-th sibling of children of parentMessageId,

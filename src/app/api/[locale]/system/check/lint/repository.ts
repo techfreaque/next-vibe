@@ -4,7 +4,7 @@
  */
 
 import { promises as fs } from "node:fs";
-import { dirname, relative, resolve as resolvePath } from "node:path";
+import { dirname, relative } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -208,10 +208,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       `[ESLINT] Running on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`,
     );
 
-    const eslintConfigPath = resolvePath(
-      process.cwd(),
-      checkConfig.eslint.configPath,
-    );
+    const eslintConfigPath = `${process.cwd()}/${checkConfig.eslint.configPath}`;
 
     // Build extra --ignore-pattern flags for non-extensive mode
     const ignorePatternArgs =

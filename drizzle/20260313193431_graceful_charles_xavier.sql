@@ -1,0 +1,1 @@
+ALTER TABLE "user_remote_connections" ADD COLUMN "is_default" boolean DEFAULT false NOT NULL;

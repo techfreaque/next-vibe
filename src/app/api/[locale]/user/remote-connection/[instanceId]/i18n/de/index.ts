@@ -17,6 +17,8 @@ export const translations: typeof enTranslations = {
       connectedTo: "Verbunden mit",
       lastSynced: "Zuletzt synchronisiert",
       refresh: "Aktualisieren",
+      reauth: "Erneut authentifizieren",
+      rename: "Umbenennen",
       disconnect: "Trennen",
     },
     notConnected: {
@@ -78,113 +80,6 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Verbindung abgerufen",
       description: "Fernverbindungsstatus erfolgreich abgerufen",
-    },
-  },
-  patch: {
-    title: "Verbindung umbenennen",
-    description: "Anzeigenamen der Fernverbindung aktualisieren",
-    instanceId: {
-      label: "Instanz-ID",
-      description: "Die umzubenennende Instanz",
-      placeholder: "hermes",
-    },
-    friendlyName: {
-      label: "Anzeigename",
-      description: "Ein lesbarer Name für diese Verbindung",
-      placeholder: "Mein Laptop",
-    },
-    errors: {
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrageparameter",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Verbindung zum Server fehlgeschlagen",
-      },
-      unauthorized: {
-        title: "Nicht angemeldet",
-        description: "Du musst angemeldet sein, um umzubenennen",
-      },
-      forbidden: {
-        title: "Zugriff verweigert",
-        description: "Du hast keine Berechtigung zum Umbenennen",
-      },
-      notFound: {
-        title: "Nicht gefunden",
-        description: "Verbindung nicht gefunden",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Fehler beim Umbenennen",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unerwarteter Fehler ist aufgetreten",
-      },
-      unsavedChanges: {
-        title: "Ungespeicherte Änderungen",
-        description: "Du hast ungespeicherte Änderungen",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Ein Konflikt ist aufgetreten",
-      },
-    },
-    success: {
-      title: "Umbenannt",
-      description: "Verbindung erfolgreich umbenannt",
-    },
-  },
-  delete: {
-    title: "Trennen",
-    description: "Von deiner Remote-Instanz trennen",
-    instanceId: {
-      label: "Instanz-ID",
-      description: "Die zu trennende Instanz",
-      placeholder: "hermes",
-    },
-    errors: {
-      validation: {
-        title: "Validierungsfehler",
-        description: "Ungültige Anfrage",
-      },
-      network: {
-        title: "Netzwerkfehler",
-        description: "Verbindung zum Server fehlgeschlagen",
-      },
-      unauthorized: {
-        title: "Nicht angemeldet",
-        description: "Du musst angemeldet sein, um zu trennen",
-      },
-      forbidden: {
-        title: "Zugriff verweigert",
-        description: "Du hast keine Berechtigung zum Trennen",
-      },
-      notFound: {
-        title: "Nicht verbunden",
-        description: "Keine Fernverbindung zum Trennen",
-      },
-      server: {
-        title: "Serverfehler",
-        description: "Fehler beim Trennen",
-      },
-      unknown: {
-        title: "Unbekannter Fehler",
-        description: "Ein unerwarteter Fehler ist aufgetreten",
-      },
-      unsavedChanges: {
-        title: "Ungespeicherte Änderungen",
-        description: "Du hast ungespeicherte Änderungen",
-      },
-      conflict: {
-        title: "Konflikt",
-        description: "Ein Konflikt ist aufgetreten",
-      },
-    },
-    success: {
-      title: "Getrennt",
-      description: "Deine Fernverbindung wurde entfernt",
     },
   },
 };

@@ -29,7 +29,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import { simpleT } from "@/i18n/core/shared";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type { AiStreamTranslationKey } from "../stream/i18n";
@@ -43,14 +42,15 @@ import type { scopedTranslation as sttScopedTranslation } from "../../speech-to-
 
 type SttModuleT = ReturnType<typeof sttScopedTranslation.scopedT>["t"];
 
-import { DEFAULT_CHARACTERS } from "../../chat/characters/config";
-import { customCharacters } from "../../chat/characters/db";
+import { DEFAULT_SKILLS } from "../../chat/skills/config";
+import { customSkills } from "../../chat/skills/db";
 import type { ToolExecutionContext } from "../../chat/config";
+import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
 import { chatSettings } from "../../chat/settings/db";
-import { ensureThread } from "../../chat/threads/repository";
+import { ThreadsRepository } from "../../chat/threads/repository";
 import {
   DEFAULT_TTS_VOICE,
   type TtsVoiceValue,
@@ -102,9 +102,6 @@ export interface StreamSetupResult {
   messages: ModelMessage[];
   systemPrompt: string;
   trailingSystemMessage: string;
-  memorySummary: string;
-  tasksSummary: string;
-  favoritesSummary: string;
   toolConfirmationResults: Array<{
     messageId: string;
     sequenceId: string;
@@ -157,7 +154,7 @@ export interface StreamSetupResult {
   toolsConfig: Map<string, { requiresConfirmation: boolean; credits: number }>;
   /** Set of tool names the model is allowed to execute (permission layer). null = all allowed. */
   activeToolNames: Set<string> | null;
-  /** Effective compact trigger token threshold (cascade: favorite → character → settings → global) */
+  /** Effective compact trigger token threshold (cascade: favorite → skill → settings → global) */
   effectiveCompactTrigger: number;
   /** Provider for AI streaming */
   provider: ReturnType<typeof ProviderFactoryClass.getProviderForModel>;
@@ -196,7 +193,6 @@ export async function setupAiStream(params: {
     aiStreamT,
     sttT,
   } = params;
-  const { t } = simpleT(locale);
   const isIncognito = data.rootFolderId === "incognito";
 
   // File upload promise for server threads (captured for SSE event emission)
@@ -244,15 +240,21 @@ export async function setupAiStream(params: {
       t: aiStreamT,
       streamContext: {
         rootFolderId: data.rootFolderId,
-        threadId: undefined,
+        threadId: data.threadId ?? undefined,
         aiMessageId: undefined,
         currentToolMessageId: undefined,
-        characterId: undefined,
-        modelId: undefined,
-        favoriteId: undefined,
-        headless: undefined,
+        callerToolCallId: undefined,
+        pendingToolMessages: undefined,
+        pendingTimeoutMs: undefined,
+        // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip
+        leafMessageId: data.leafMessageId ?? undefined,
+        skillId: data.skill,
+        modelId: data.model,
+        favoriteId: params.favoriteIdOverride,
+        headless: params.headless,
         waitingForRemoteResult: undefined,
         abortSignal: undefined,
+        escalateToTask: undefined,
       },
     });
 
@@ -370,7 +372,7 @@ export async function setupAiStream(params: {
 
   let threadResult;
   try {
-    threadResult = await ensureThread({
+    threadResult = await ThreadsRepository.ensureThread({
       threadId: effectiveThreadId,
       rootFolderId: data.rootFolderId,
       subFolderId: data.subFolderId,
@@ -467,7 +469,7 @@ export async function setupAiStream(params: {
     ? { attachments: userMessageResult.data.attachmentMetadata }
     : undefined;
 
-  // Resolve effective compact trigger: favorite → character → settings → global default
+  // Resolve effective compact trigger: favorite → skill → settings → global default
   const effectiveCompactTrigger = await (async (): Promise<number> => {
     if (userId) {
       // 1. Check active favorite compactTrigger (look up activeFavoriteId from settings)
@@ -491,16 +493,16 @@ export async function setupAiStream(params: {
         }
       }
 
-      // 2. Check character compactTrigger (custom characters only — UUIDs)
-      if (data.character) {
-        // Only query DB for UUIDs (custom characters); default/config characters have no DB row
+      // 2. Check skill compactTrigger (custom skills only — UUIDs)
+      if (data.skill) {
+        // Only query DB for UUIDs (custom skills); default/config skills have no DB row
         const uuidPattern =
           /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (uuidPattern.test(data.character)) {
+        if (uuidPattern.test(data.skill)) {
           const [char] = await db
-            .select({ compactTrigger: customCharacters.compactTrigger })
-            .from(customCharacters)
-            .where(eq(customCharacters.id, data.character))
+            .select({ compactTrigger: customSkills.compactTrigger })
+            .from(customSkills)
+            .where(eq(customSkills.id, data.skill))
             .limit(1);
           if (
             char?.compactTrigger !== null &&
@@ -525,154 +527,243 @@ export async function setupAiStream(params: {
 
   logger.debug("[Setup] Effective compact trigger resolved", {
     effectiveCompactTrigger,
-    character: data.character,
+    skill: data.skill,
     userId,
   });
 
-  // Resolve tool config cascade: favorite → character → settings → client-provided → null (all allowed)
+  // Resolve tool config cascade: favorite → skill → settings → client-provided → null (all allowed)
   // null means "no restriction" — model can call any tool
   const resolvedToolConfig = await (async (): Promise<{
-    activeTools: Array<{
-      // Internal name kept for ToolsSetupHandler compatibility (permission gate)
+    availableTools: Array<{
       toolId: string;
       requiresConfirmation: boolean;
     }> | null;
-    visibleTools: Array<{
-      // Internal name kept for ToolsSetupHandler compatibility (context window set)
+    pinnedTools: Array<{
       toolId: string;
       requiresConfirmation: boolean;
     }> | null;
+    /** Union of skill-level + favorite-level denied tools. Applied as a hard block. */
+    deniedToolIds: Set<string>;
+    /** Text from the active favorite's promptAppend — appended to system prompt. */
+    promptAppend: string | null;
+    /** Resolved memory token limit from cascade: favorite → skill → settings → null */
+    memoryLimit: number | null;
   }> => {
     if (!userId) {
-      return { activeTools: null, visibleTools: null };
+      return {
+        availableTools: null,
+        pinnedTools: null,
+        deniedToolIds: new Set(),
+        promptAppend: null,
+        memoryLimit: null,
+      };
     }
 
-    // 1. Load user settings once (used for activeFavoriteId + tool overrides)
+    // 1. Load user settings (activeFavoriteId + tool overrides + memory limit)
     const [userSettings] = await db
       .select({
         activeFavoriteId: chatSettings.activeFavoriteId,
-        activeTools: chatSettings.activeTools,
-        visibleTools: chatSettings.visibleTools,
+        availableTools: chatSettings.availableTools,
+        pinnedTools: chatSettings.pinnedTools,
+        memoryLimit: chatSettings.memoryLimit,
       })
       .from(chatSettings)
       .where(eq(chatSettings.userId, userId))
       .limit(1);
 
-    // 1a. Check active favorite tool config
+    // Build denied tool IDs from skill + favorite (both stack; order doesn't matter)
+    const deniedToolIds = new Set<string>();
+    let promptAppend: string | null = null;
+    // memoryLimit cascade: favorite → skill → settings → null
+    let memoryLimit: number | null = null;
+
+    // Collect skill-level deniedTools regardless of where tool config is resolved from
+    if (data.skill) {
+      const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidPattern.test(data.skill)) {
+        const [skillRow] = await db
+          .select({ deniedTools: customSkills.deniedTools })
+          .from(customSkills)
+          .where(eq(customSkills.id, data.skill))
+          .limit(1);
+        for (const t of skillRow?.deniedTools ?? []) {
+          deniedToolIds.add(t.toolId);
+        }
+      } else {
+        const defaultChar = DEFAULT_SKILLS.find((c) => c.id === data.skill);
+        for (const t of defaultChar?.deniedTools ?? []) {
+          deniedToolIds.add(t.toolId);
+        }
+      }
+    }
+
+    // 1a. Check active favorite for tool config + deniedTools + promptAppend + memoryLimit
     if (userSettings?.activeFavoriteId) {
       const [fav] = await db
         .select({
-          activeTools: chatFavorites.activeTools,
-          visibleTools: chatFavorites.visibleTools,
+          availableTools: chatFavorites.availableTools,
+          pinnedTools: chatFavorites.pinnedTools,
+          deniedTools: chatFavorites.deniedTools,
+          promptAppend: chatFavorites.promptAppend,
+          memoryLimit: chatFavorites.memoryLimit,
         })
         .from(chatFavorites)
         .where(eq(chatFavorites.id, userSettings.activeFavoriteId))
         .limit(1);
 
-      if (fav && (fav.activeTools !== null || fav.visibleTools !== null)) {
+      // Stack favorite deniedTools on top of skill's
+      for (const t of fav?.deniedTools ?? []) {
+        deniedToolIds.add(t.toolId);
+      }
+
+      // Capture promptAppend from favorite (carried through all subsequent returns)
+      promptAppend = fav?.promptAppend ?? null;
+
+      // Favorite memory limit takes highest priority
+      if (fav?.memoryLimit !== null && fav?.memoryLimit !== undefined) {
+        memoryLimit = fav.memoryLimit;
+      }
+
+      if (fav && (fav.availableTools !== null || fav.pinnedTools !== null)) {
         logger.debug("[Setup] Tool config resolved from active favorite", {
           activeFavoriteId: userSettings.activeFavoriteId,
         });
         return {
-          activeTools: normalizeToolConfig(fav.activeTools),
-          visibleTools: normalizeToolConfig(fav.visibleTools),
+          availableTools: normalizeToolConfig(fav.availableTools),
+          pinnedTools: normalizeToolConfig(fav.pinnedTools),
+          deniedToolIds,
+          promptAppend,
+          memoryLimit,
         };
       }
     }
 
-    // 2. Check character tool config
-    if (data.character) {
+    // 2. Check skill tool config (and skill-level memoryLimit for custom skills)
+    if (data.skill) {
       const uuidPattern =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (uuidPattern.test(data.character)) {
-        // Custom character (DB-stored, UUID)
+      if (uuidPattern.test(data.skill)) {
+        // Custom skill (DB-stored, UUID) — availableTools/pinnedTools only (deniedTools already fetched above)
         const [char] = await db
           .select({
-            activeTools: customCharacters.activeTools,
-            visibleTools: customCharacters.visibleTools,
+            availableTools: customSkills.availableTools,
+            pinnedTools: customSkills.pinnedTools,
+            memoryLimit: customSkills.memoryLimit,
           })
-          .from(customCharacters)
-          .where(eq(customCharacters.id, data.character))
+          .from(customSkills)
+          .where(eq(customSkills.id, data.skill))
           .limit(1);
 
-        if (char && (char.activeTools !== null || char.visibleTools !== null)) {
-          logger.debug("[Setup] Tool config resolved from custom character", {
-            characterId: data.character,
+        // Skill memoryLimit used only if favorite didn't set one
+        if (
+          memoryLimit === null &&
+          char?.memoryLimit !== null &&
+          char?.memoryLimit !== undefined
+        ) {
+          memoryLimit = char.memoryLimit;
+        }
+
+        if (
+          char &&
+          (char.availableTools !== null || char.pinnedTools !== null)
+        ) {
+          logger.debug("[Setup] Tool config resolved from custom skill", {
+            skillId: data.skill,
           });
           return {
-            activeTools: normalizeToolConfig(char.activeTools),
-            visibleTools: normalizeToolConfig(char.visibleTools),
+            availableTools: normalizeToolConfig(char.availableTools),
+            pinnedTools: normalizeToolConfig(char.pinnedTools),
+            deniedToolIds,
+            promptAppend,
+            memoryLimit,
           };
         }
       } else {
-        // Default character (config-based, string ID like "research-agent")
-        const defaultChar = DEFAULT_CHARACTERS.find(
-          (c) => c.id === data.character,
-        );
-        if (defaultChar?.activeTools) {
+        // Default skill (config-based, string ID)
+        const defaultChar = DEFAULT_SKILLS.find((c) => c.id === data.skill);
+        if (defaultChar?.availableTools) {
           logger.debug(
-            "[Setup] Tool config resolved from default character config",
+            "[Setup] Tool config resolved from default skill config",
             {
-              characterId: data.character,
+              skillId: data.skill,
             },
           );
           return {
-            activeTools: normalizeToolConfig(defaultChar.activeTools),
-            visibleTools: null,
+            availableTools: normalizeToolConfig(defaultChar.availableTools),
+            pinnedTools: null,
+            deniedToolIds,
+            promptAppend,
+            memoryLimit,
           };
         }
       }
     }
 
-    // 3. Check user's personal settings (customised tool config)
+    // 3. Check user's personal settings (customised tool config + memoryLimit fallback)
+    if (
+      memoryLimit === null &&
+      userSettings?.memoryLimit !== null &&
+      userSettings?.memoryLimit !== undefined
+    ) {
+      memoryLimit = userSettings.memoryLimit;
+    }
+
     if (
       userSettings &&
-      (userSettings.activeTools !== null || userSettings.visibleTools !== null)
+      (userSettings.availableTools !== null ||
+        userSettings.pinnedTools !== null)
     ) {
       logger.debug("[Setup] Tool config resolved from user settings");
       return {
-        activeTools: normalizeToolConfig(userSettings.activeTools),
-        visibleTools: normalizeToolConfig(userSettings.visibleTools),
+        availableTools: normalizeToolConfig(userSettings.availableTools),
+        pinnedTools: normalizeToolConfig(userSettings.pinnedTools),
+        deniedToolIds,
+        promptAppend,
+        memoryLimit,
       };
     }
 
     // 4. Fall back to null (all tools allowed / default visible set)
-    return { activeTools: null, visibleTools: null };
+    return {
+      availableTools: null,
+      pinnedTools: null,
+      deniedToolIds,
+      promptAppend,
+      memoryLimit,
+    };
   })();
 
-  // Build complete system prompt from character and formatting instructions
-  const {
-    systemPrompt: builtSystemPrompt,
-    trailingSystemMessage,
-    memorySummary,
-    tasksSummary,
-    favoritesSummary,
-  } = await buildSystemPrompt({
-    characterId: data.character,
-    user,
-    logger,
-    t,
-    locale,
-    rootFolderId: data.rootFolderId,
-    subFolderId: data.subFolderId ?? null,
-    callMode: data.voiceMode?.enabled,
-    extraInstructions: params.extraInstructions,
-    headless: params.headless,
-    excludeMemories: params.excludeMemories,
-    threadId: threadResult.threadId,
-    voiceTranscription: voiceTranscription
-      ? {
-          wasTranscribed: voiceTranscription.wasTranscribed,
-          confidence: voiceTranscription.confidence,
-        }
-      : null,
-  });
+  // Build complete system prompt from skill and formatting instructions
+  const { systemPrompt: builtSystemPrompt, trailingSystemMessage } =
+    await buildSystemPrompt({
+      skillId: data.skill,
+      user,
+      logger,
+      locale,
+      rootFolderId: data.rootFolderId,
+      subFolderId: data.subFolderId ?? null,
+      callMode: data.voiceMode?.enabled,
+      // Merge extraInstructions with favorite's promptAppend (both go into headless context section)
+      extraInstructions:
+        [params.extraInstructions, resolvedToolConfig.promptAppend]
+          .filter(Boolean)
+          .join("\n\n") || undefined,
+      headless: params.headless,
+      excludeMemories: params.excludeMemories,
+      memoryLimit: resolvedToolConfig.memoryLimit,
+      threadId: threadResult.threadId,
+      voiceTranscription: voiceTranscription
+        ? {
+            wasTranscribed: voiceTranscription.wasTranscribed,
+            confidence: voiceTranscription.confidence,
+          }
+        : null,
+    });
 
   logger.debug("System prompt built", {
     systemPromptLength: builtSystemPrompt.length,
-    hasCharacter: !!data.character,
-    hasMemories: !!memorySummary,
-    hasTasks: !!tasksSummary,
+    hasSkill: !!data.skill,
   });
 
   // Generate AI message ID and timestamp BEFORE building context
@@ -685,15 +776,22 @@ export async function setupAiStream(params: {
     rootFolderId: data.rootFolderId,
     threadId: threadResult.threadId,
     aiMessageId,
-    characterId: data.character,
+    skillId: data.skill,
     modelId: data.model,
     headless: params.headless,
     // favoriteId: from headless override (run endpoint) — lets resume-stream reload full context
     favoriteId: params.favoriteIdOverride,
     currentToolMessageId: undefined,
+    callerToolCallId: undefined,
+    // pendingToolMessages is wired after StreamContext is created (see index.ts)
+    pendingToolMessages: undefined,
+    pendingTimeoutMs: undefined,
+    leafMessageId: undefined,
     waitingForRemoteResult: undefined,
     // abortSignal is set after streamAbortController is created (below)
     abortSignal: undefined,
+    // escalateToTask is wired after streamAbortController is created (below)
+    escalateToTask: undefined,
   };
 
   logger.debug("Generated AI message ID", {
@@ -703,11 +801,20 @@ export async function setupAiStream(params: {
     isIncognito,
   });
 
-  // Build complete message context for AI streaming
+  // For tool confirmations: use the confirmed tool message ID as parentMessageId
+  // so fetchMessageHistory walks up from the confirmed result (includes it in context).
+  // Without this, fetchMessageHistory starts from the assistant message and misses
+  // the confirmed tool result (which is a child of the assistant, not an ancestor).
+  const effectiveContextParentMessageId =
+    hasToolConfirmations && toolConfirmationResults.length > 0
+      ? (toolConfirmationResults[toolConfirmationResults.length - 1]
+          ?.messageId ?? data.parentMessageId)
+      : data.parentMessageId;
+
   const messages = await MessageContextBuilder.buildMessageContext({
     operation: data.operation,
     threadId: effectiveThreadId,
-    parentMessageId: data.parentMessageId,
+    parentMessageId: effectiveContextParentMessageId,
     locale,
     content: effectiveContent,
     role: effectiveRole,
@@ -717,7 +824,7 @@ export async function setupAiStream(params: {
     messageHistory: data.messageHistory,
     logger,
     timezone: data.timezone,
-    upcomingResponseContext: { model: data.model, character: data.character },
+    upcomingResponseContext: { model: data.model, skill: data.skill },
     userMessageMetadata,
     hasToolConfirmations,
     toolConfirmationResults,
@@ -728,6 +835,17 @@ export async function setupAiStream(params: {
     trailingSystemMessage,
   });
 
+  // Apply deniedTools filter: strip blocked tools from both visible and active sets.
+  // This is a hard block — denied tools cannot be seen or executed regardless of cascade.
+  const applyDeniedFilter = <T extends { toolId: string }>(
+    tools: T[] | null | undefined,
+  ): T[] | null | undefined => {
+    if (!resolvedToolConfig.deniedToolIds.size || !tools) {
+      return tools;
+    }
+    return tools.filter((t) => !resolvedToolConfig.deniedToolIds.has(t.toolId));
+  };
+
   const {
     tools,
     toolsConfig,
@@ -735,9 +853,14 @@ export async function setupAiStream(params: {
     systemPrompt: updatedSystemPrompt,
   } = await ToolsSetupHandler.setupStreamingTools({
     modelConfig,
-    // Tool config cascade: cascade-resolved (favorite/character) takes precedence over client-provided
-    visibleTools: resolvedToolConfig.visibleTools ?? data.tools,
-    activeTools: resolvedToolConfig.activeTools ?? data.allowedTools,
+    // Tool config cascade: cascade-resolved (favorite/skill) takes precedence over client-provided.
+    // deniedTools are stripped from both sets before reaching the AI SDK.
+    pinnedTools: applyDeniedFilter(
+      resolvedToolConfig.pinnedTools ?? data.pinnedTools,
+    ),
+    availableTools: applyDeniedFilter(
+      resolvedToolConfig.availableTools ?? data.availableTools,
+    ),
     user,
     locale,
     logger,
@@ -764,8 +887,8 @@ export async function setupAiStream(params: {
     model: data.model,
     hasTools: !!tools,
     toolCount: tools ? Object.keys(tools).length : 0,
-    visibleTools: data.tools,
-    activeTools: data.allowedTools,
+    pinnedTools: data.pinnedTools,
+    availableTools: data.availableTools,
     supportsTools: modelConfig?.supportsTools,
   });
 
@@ -778,6 +901,118 @@ export async function setupAiStream(params: {
   // streamContext was built before the controller (it's needed for tool setup),
   // so we assign the signal here after registration.
   streamContext.abortSignal = streamAbortController.signal;
+
+  // Wire escalateToTask closure into streamContext.
+  // Captures user, locale, logger, and streamContext by reference so tool authors
+  // can call context.streamContext.escalateToTask() from inside execute() to escape
+  // the 90s stream timeout for long-running tools (SSH, claude-code, etc.).
+  streamContext.escalateToTask = async (): Promise<{
+    taskId: string;
+    onComplete: (result: {
+      success: boolean;
+      data?: Record<string, JsonValue>;
+      message?: string;
+    }) => Promise<void>;
+  }> => {
+    const escalatedTaskId = `escalated-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    const { db: dbInstance } = await import("@/app/api/[locale]/system/db");
+    const { cronTasks: cronTasksTable } =
+      await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+    const { CronTaskPriority, CronTaskStatus, TaskCategory, TaskOutputMode } =
+      await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
+
+    const taskThreadId = streamContext.threadId;
+    const taskToolMessageId =
+      streamContext.currentToolMessageId ?? streamContext.aiMessageId;
+    const taskLeafMessageId = streamContext.leafMessageId;
+
+    // Insert wakeUp task row so handleTaskCompletion can fire revival.
+    await dbInstance.insert(cronTasksTable).values({
+      id: escalatedTaskId,
+      shortId: escalatedTaskId,
+      routeId: "escalated-tool",
+      displayName: `Escalated: ${escalatedTaskId}`,
+      category: TaskCategory.SYSTEM,
+      schedule: "* * * * *",
+      priority: CronTaskPriority.HIGH,
+      enabled: false,
+      runOnce: true,
+      lastExecutionStatus: CronTaskStatus.RUNNING,
+      taskInput: {},
+      wakeUpCallbackMode: "wakeUp",
+      wakeUpThreadId: taskThreadId ?? null,
+      wakeUpToolMessageId: taskToolMessageId ?? null,
+      wakeUpLeafMessageId: taskLeafMessageId ?? null,
+      wakeUpModelId: streamContext.modelId ?? null,
+      wakeUpSkillId: streamContext.skillId ?? null,
+      wakeUpFavoriteId: streamContext.favoriteId ?? null,
+      outputMode: TaskOutputMode.STORE_ONLY,
+      notificationTargets: [],
+      tags: ["escalated", "local"],
+      userId: user.id,
+    });
+
+    // Signal stream to time out cleanly — tool continues running in goroutine.
+    streamContext.pendingTimeoutMs = 90_000;
+    streamContext.waitingForRemoteResult = true;
+
+    logger.info("[StreamSetup] Tool escalated to wakeUp task", {
+      taskId: escalatedTaskId,
+      taskThreadId,
+      taskToolMessageId,
+    });
+
+    const onComplete = async (result: {
+      success: boolean;
+      data?: Record<string, JsonValue>;
+      message?: string;
+    }): Promise<void> => {
+      const { handleTaskCompletion } =
+        await import("@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler");
+      const { CallbackMode } =
+        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+      const { CronTaskStatus: CronStatus } =
+        await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
+      const { eq: drizzleEq } = await import("drizzle-orm");
+
+      const finalStatus = result.success
+        ? CronStatus.COMPLETED
+        : CronStatus.FAILED;
+      const finalOutput: Record<string, JsonValue> | null =
+        result.success && result.data ? result.data : null;
+
+      if (taskToolMessageId && taskThreadId && user.id) {
+        await handleTaskCompletion({
+          toolMessageId: taskToolMessageId,
+          threadId: taskThreadId,
+          callbackMode: CallbackMode.WAKE_UP,
+          status: finalStatus,
+          output: finalOutput,
+          taskId: escalatedTaskId,
+          modelId: streamContext.modelId ?? null,
+          skillId: streamContext.skillId ?? null,
+          favoriteId: streamContext.favoriteId ?? null,
+          leafMessageId: taskLeafMessageId ?? null,
+          userId: user.id,
+          logger,
+          directResumeUser: user,
+          directResumeLocale: locale,
+        });
+      }
+
+      // Self-delete task row
+      try {
+        await dbInstance
+          .delete(cronTasksTable)
+          .where(drizzleEq(cronTasksTable.id, escalatedTaskId));
+      } catch {
+        // Non-fatal
+      }
+    };
+
+    return { taskId: escalatedTaskId, onComplete };
+  };
 
   // Register in stream registry so the cancel endpoint can find and abort it
   StreamRegistry.register(
@@ -815,9 +1050,6 @@ export async function setupAiStream(params: {
       messages,
       systemPrompt: updatedSystemPrompt,
       trailingSystemMessage,
-      memorySummary,
-      tasksSummary,
-      favoritesSummary,
       toolConfirmationResults,
       voiceMode: data.voiceMode
         ? {

@@ -56,6 +56,7 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
+
   // Use server-provided user prop to determine authentication status immediately
   // This prevents hydration mismatch - no client-side delay
   const isAuthenticated = user !== undefined && !user.isPublic;

@@ -15,7 +15,7 @@
  */
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 
 import { getFullPath } from "./path";
 

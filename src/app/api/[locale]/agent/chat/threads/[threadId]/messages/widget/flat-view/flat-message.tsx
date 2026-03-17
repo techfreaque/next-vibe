@@ -26,14 +26,14 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { useCharacter } from "../../../../../characters/[id]/hooks";
+import { useSkill } from "../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
-import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
+import { ModelSkillSelectorModal } from "../model-skill-selector-modal";
 import { ReplyInput } from "../reply-input";
 import { ToolDisplay } from "../tool-display";
 import { countPostsByUserId, countReplies, getDirectReplies } from "./helpers";
@@ -150,8 +150,6 @@ export const FlatMessage = memo(function FlatMessage({
     (s) => s.setEditorAttachments,
   );
   const setRetrying = useMessageEditorStore((s) => s.setRetrying);
-  const clearEditing = useMessageEditorStore((s) => s.clearEditing);
-  const clearRetrying = useMessageEditorStore((s) => s.clearRetrying);
   const clearAnswering = useMessageEditorStore((s) => s.clearAnswering);
   const clearReplying = useMessageEditorStore((s) => s.clearReplying);
 
@@ -193,7 +191,7 @@ export const FlatMessage = memo(function FlatMessage({
           undefined,
           editorAttachments.length > 0 ? editorAttachments : undefined,
         );
-        clearEditing();
+        // Editor closed via event-handlers.ts when USER MESSAGE_CREATED arrives
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -203,7 +201,7 @@ export const FlatMessage = memo(function FlatMessage({
         );
       }
     },
-    [logger, editorAttachments, clearEditing],
+    [logger, editorAttachments],
   );
 
   const handleConfirmRetry = useCallback(
@@ -219,7 +217,7 @@ export const FlatMessage = memo(function FlatMessage({
           messageId,
           editorAttachments.length > 0 ? editorAttachments : undefined,
         );
-        clearRetrying();
+        // Editor closed via event-handlers.ts when USER MESSAGE_CREATED arrives
       } catch (error) {
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
@@ -229,7 +227,7 @@ export const FlatMessage = memo(function FlatMessage({
         );
       }
     },
-    [logger, editorAttachments, clearRetrying],
+    [logger, editorAttachments],
   );
 
   const handleConfirmAnswer = useCallback(
@@ -294,7 +292,7 @@ export const FlatMessage = memo(function FlatMessage({
     [logger, clearReplying],
   );
 
-  const character = useCharacter(message.character || undefined, user, logger);
+  const character = useSkill(message.skill || undefined, user, logger);
 
   // TTS support for assistant messages is handled by the message action buttons
 
@@ -330,7 +328,7 @@ export const FlatMessage = memo(function FlatMessage({
   const characterName = character.read?.data?.name;
   const characterDisplayName =
     (message.role === "user" || message.role === "assistant") &&
-    message.character &&
+    message.skill &&
     characterName
       ? characterName
       : t("widget.flatView.anonymous");
@@ -420,6 +418,7 @@ export const FlatMessage = memo(function FlatMessage({
             title={t("widget.flatView.postsById", {
               count: countPostsByUserId(messages, userId),
             })}
+            suppressHydrationWarning
           >
             {isUser
               ? t("widget.flatView.idLabel", { id: userId.slice(0, 8) })
@@ -584,7 +583,7 @@ export const FlatMessage = memo(function FlatMessage({
         </Div>
       ) : retryingMessageId === message.id && !isLoadingRetryAttachments ? (
         <Div className="my-2">
-          <ModelCharacterSelectorModal
+          <ModelSkillSelectorModal
             titleKey="widget.flatView.retryModal.title"
             descriptionKey="widget.flatView.retryModal.description"
             onConfirm={(): Promise<void> =>
@@ -731,7 +730,7 @@ export const FlatMessage = memo(function FlatMessage({
       {/* Show Answer-as-AI dialog below the message */}
       {answeringMessageId === message.id && (
         <Div className="my-3">
-          <ModelCharacterSelectorModal
+          <ModelSkillSelectorModal
             titleKey="widget.flatView.answerModal.title"
             descriptionKey="widget.flatView.answerModal.description"
             showInput={true}

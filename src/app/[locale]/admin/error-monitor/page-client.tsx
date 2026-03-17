@@ -15,6 +15,10 @@ export function ErrorMonitorPageClient({
   user: JwtPayloadType;
 }): JSX.Element {
   return (
-    <EndpointsPage endpoint={errorLogsDefinition} locale={locale} user={user} />
+    <EndpointsPage
+      endpoint={{ GET: errorLogsDefinition.GET }}
+      locale={locale}
+      user={user}
+    />
   );
 }

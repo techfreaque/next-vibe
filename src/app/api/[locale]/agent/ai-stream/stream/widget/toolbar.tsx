@@ -3,6 +3,7 @@
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
+import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import { ViewModeToggle } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/view-mode-toggle";
@@ -26,9 +27,11 @@ interface ChatToolbarProps {
 export function ChatToolbar({ locale }: ChatToolbarProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const { initialSettingsData } = useChatBootContext();
   const { settings, setViewMode: onViewModeChange } = useChatSettings(
     user,
     logger,
+    initialSettingsData,
   );
   const viewMode =
     settings?.viewMode ?? ChatSettingsRepositoryClient.getDefaults().viewMode;

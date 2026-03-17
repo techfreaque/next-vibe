@@ -4,7 +4,7 @@
  * For admins, also includes the task-sync enabled state.
  */
 
-import { and, eq, isNull, ne, or } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -16,7 +16,8 @@ import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cro
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { userRemoteConnections } from "../db";
+import { instanceIdentities, remoteConnections } from "../db";
+import { getConnectionHealth, getLocalInstanceId } from "../repository";
 import type { RemoteConnectionsListResponseOutput } from "./definition";
 
 const TASK_SYNC_PULL_ID = "task-sync-pull";
@@ -27,20 +28,12 @@ export async function listRemoteConnections(
 ): Promise<ResponseType<RemoteConnectionsListResponseOutput>> {
   const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
 
-  const [rows, syncRow] = await Promise.all([
+  const [rows, syncRow, selfInstanceId, selfIdentityRow] = await Promise.all([
     db
       .select()
-      .from(userRemoteConnections)
-      .where(
-        and(
-          eq(userRemoteConnections.userId, user.id),
-          or(
-            isNull(userRemoteConnections.token),
-            ne(userRemoteConnections.token, "self"),
-          ),
-        ),
-      )
-      .orderBy(userRemoteConnections.updatedAt),
+      .from(remoteConnections)
+      .where(eq(remoteConnections.userId, user.id))
+      .orderBy(remoteConnections.updatedAt),
     isAdmin
       ? db
           .select({ id: cronTasks.id })
@@ -48,6 +41,17 @@ export async function listRemoteConnections(
           .where(eq(cronTasks.id, TASK_SYNC_PULL_ID))
           .limit(1)
       : Promise.resolve(null),
+    getLocalInstanceId(user.id),
+    db
+      .select({ friendlyName: instanceIdentities.friendlyName })
+      .from(instanceIdentities)
+      .where(
+        and(
+          eq(instanceIdentities.userId, user.id),
+          eq(instanceIdentities.isDefault, true),
+        ),
+      )
+      .limit(1),
   ]);
 
   logger.debug("Listed remote connections", {
@@ -63,11 +67,15 @@ export async function listRemoteConnections(
     connections: rows.map((r) => ({
       instanceId: r.instanceId,
       friendlyName: r.friendlyName,
+      remoteFriendlyName: r.remoteFriendlyName,
       remoteUrl: r.remoteUrl,
       isActive: r.isActive,
       lastSyncedAt: r.lastSyncedAt?.toISOString() ?? null,
-      hasToken: !!r.token && r.token !== "self",
+      hasToken: !!r.token,
+      healthStatus: getConnectionHealth(r),
     })),
+    selfInstanceId,
+    selfFriendlyName: selfIdentityRow[0]?.friendlyName ?? selfInstanceId,
     syncEnabled,
   });
 }

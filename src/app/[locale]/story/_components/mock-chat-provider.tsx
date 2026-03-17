@@ -33,6 +33,7 @@ const MOCK_ENV: AgentEnvAvailability = {
   gabAI: false,
   veniceAI: false,
   scrappey: false,
+  claudeCode: false,
 };
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {
@@ -87,7 +88,7 @@ export function MockChatProvider({
       initialMessagesData: null,
       initialPathData: null,
       initialSettingsData: null,
-      initialCharacterData: null,
+      initialSkillData: null,
       initialPublicFeedData: null,
       initialThreadId: null,
       initialFolderContentsData: null,

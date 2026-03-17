@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   },
   active: "Aktywny",
   fallbacks: {
-    unknownCharacter: "Nieznana postać",
+    unknownSkill: "Nieznana postać",
     unknownModel: "Nieznany model",
     unknown: "Nieznany",
     unknownProvider: "nieznany",
@@ -77,8 +77,39 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Pobierz ulubione",
     description: "Pobierz wszystkie zapisane ulubione konfiguracje postaci",
+    userId: {
+      label: "ID użytkownika",
+      description:
+        "Tylko dla adminów: pobierz ulubione określonego użytkownika. Pozostaw puste, aby pobrać własne ulubione.",
+    },
+    fields: {
+      query: {
+        label: "Szukaj",
+        description:
+          "Szukaj ulubionych po nazwie, tagline lub ID umiejętności.",
+      },
+      page: {
+        label: "Strona",
+        description:
+          "Numer strony dla paginowanych wyników (AI/MCP: domyślny rozmiar strony 25).",
+      },
+      pageSize: {
+        label: "Rozmiar strony",
+        description:
+          "Liczba ulubionych na stronie (1–500). Wywołujący AI/MCP domyślnie 25; ludzie otrzymują wszystkie.",
+      },
+    },
     addVariant: "Dodaj wariant",
     emptyState: "Nie dodałeś jeszcze żadnych ulubionych",
+    tabs: {
+      myFavorites: "Moje ulubione",
+      browseSkills: "Przeglądaj umiejętności",
+    },
+    sections: {
+      companion: "Towarzysze",
+      skills: "Umiejętności",
+      model: "Bezpośrednie modele",
+    },
     container: {
       title: "Twoje ulubione",
       description: "Zarządzaj ulubionymi konfiguracjami postaci i modeli",
@@ -92,7 +123,7 @@ export const translations: typeof enTranslations = {
         id: {
           content: "ID: {{value}}",
         },
-        characterId: {
+        skillId: {
           content: "Postać: {{value}}",
         },
         customName: {
@@ -233,7 +264,7 @@ export const translations: typeof enTranslations = {
       label: "Dodaj do ulubionych",
       loadingText: "Dodawanie...",
     },
-    characterId: {
+    skillId: {
       label: "Postać",
       description: "Wybierz postać dla tego ulubionego",
     },

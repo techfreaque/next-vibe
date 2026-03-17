@@ -12,6 +12,12 @@ export const translations = {
           "The reqid of the network request (omit to get currently selected request in DevTools)",
         placeholder: "Enter request ID",
       },
+      maxBodyLength: {
+        label: "Max Body Length",
+        description:
+          "Maximum characters to return from inline request/response bodies. Bodies exceeding this are truncated with a notice. Omit for no limit.",
+        placeholder: "e.g. 10000",
+      },
     },
   },
   response: {

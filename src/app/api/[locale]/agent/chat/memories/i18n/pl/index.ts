@@ -21,6 +21,17 @@ export const translations: typeof enTranslations = {
     title: "Lista wspomnień",
     dynamicTitle: "Memories ({{count}})",
     description: "Pobiera wszystkie wspomnienia dla bieżącego użytkownika",
+    fields: {
+      search: {
+        label: "Szukaj",
+        description: "Filtruj wspomnienia według treści lub tagów",
+        placeholder: "Szukaj wspomnień...",
+      },
+      tag: {
+        label: "Filtr tagów",
+        description: "Filtruj wspomnienia według określonego tagu",
+      },
+    },
     container: {
       title: "Wspomnienia",
     },

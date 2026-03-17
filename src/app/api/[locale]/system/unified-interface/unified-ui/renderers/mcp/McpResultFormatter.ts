@@ -85,7 +85,7 @@ export class McpResultFormatter {
 
       // Use fast renderer for performance
       const renderStart = performance.now();
-      const output = fastRenderToString(component);
+      const output = fastRenderToString(component, logger);
       const renderTime = performance.now() - renderStart;
 
       const totalTime = performance.now() - perfStart;

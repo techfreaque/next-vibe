@@ -1,13 +1,13 @@
 /**
  * Error Logs API Definition
  * GET endpoint to browse backend error logs with filtering and pagination
+ * PATCH endpoint to resolve/reopen an error log by fingerprint
  */
 
 import { z } from "zod";
 
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import {
   customWidgetObject,
   requestField,
@@ -20,25 +20,14 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-
-import { ErrorLogLevelDB, ErrorLogSourceDB } from "../db";
 import { ERROR_LOGS_ALIAS } from "./constants";
+import {
+  ErrorLogStatusFilter,
+  ErrorLogStatusFilterDB,
+  ErrorLogStatusFilterOptions,
+} from "./enum";
 import { scopedTranslation } from "./i18n";
 import { ErrorLogsContainer } from "./widget";
-
-const { options: ErrorLogSourceOptions } = createEnumOptions(
-  scopedTranslation,
-  {
-    backend: "get.fields.source.options.backend",
-    task: "get.fields.source.options.task",
-    chat: "get.fields.source.options.chat",
-  },
-);
-
-const { options: ErrorLogLevelOptions } = createEnumOptions(scopedTranslation, {
-  error: "get.fields.level.options.error",
-  warn: "get.fields.level.options.warn",
-});
 
 export const { GET } = createEndpoint({
   scopedTranslation,
@@ -57,28 +46,22 @@ export const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      source: requestField(scopedTranslation, {
+      status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "get.fields.source.label",
-        description: "get.fields.source.description",
-        options: ErrorLogSourceOptions,
-        schema: z.enum(ErrorLogSourceDB).optional(),
+        label: "get.fields.status.label",
+        description: "get.fields.status.description",
+        options: ErrorLogStatusFilterOptions,
+        schema: z
+          .enum(ErrorLogStatusFilterDB)
+          .default(ErrorLogStatusFilter.ACTIVE),
       }),
-      level: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.SELECT,
-        label: "get.fields.level.label",
-        description: "get.fields.level.description",
-        options: ErrorLogLevelOptions,
-        schema: z.enum(ErrorLogLevelDB).optional(),
-      }),
-      endpoint: requestField(scopedTranslation, {
+      search: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "get.fields.endpoint.label",
-        description: "get.fields.endpoint.description",
-        placeholder: "get.fields.endpoint.placeholder",
+        label: "get.fields.search.label",
+        description: "get.fields.search.description",
+        placeholder: "get.fields.search.placeholder",
         schema: z.string().optional(),
       }),
       errorType: requestField(scopedTranslation, {
@@ -87,13 +70,6 @@ export const { GET } = createEndpoint({
         label: "get.fields.errorType.label",
         description: "get.fields.errorType.description",
         placeholder: "get.fields.errorType.placeholder",
-        schema: z.string().optional(),
-      }),
-      fingerprint: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.fingerprint.label",
-        description: "get.fields.fingerprint.description",
         schema: z.string().optional(),
       }),
       startDate: requestField(scopedTranslation, {
@@ -136,17 +112,15 @@ export const { GET } = createEndpoint({
         schema: z.array(
           z.object({
             id: z.string(),
-            source: z.enum(ErrorLogSourceDB),
-            level: z.enum(ErrorLogLevelDB),
             message: z.string(),
-            endpoint: z.string().nullable(),
             errorType: z.string().nullable(),
-            errorCode: z.string().nullable(),
             stackTrace: z.string().nullable(),
-            metadata: z.record(z.string(), z.any()).nullable(),
+            metadata: z.array(z.any()).nullable(),
             fingerprint: z.string(),
             occurrences: z.number(),
             resolved: z.boolean(),
+            level: z.string(),
+            firstSeen: z.string(),
             createdAt: z.string(),
           }),
         ),
@@ -212,8 +186,7 @@ export const { GET } = createEndpoint({
     requests: {
       default: {},
       filtered: {
-        source: "backend",
-        level: "error",
+        status: ErrorLogStatusFilter.ACTIVE,
         limit: 50,
         offset: 0,
       },
@@ -228,10 +201,128 @@ export const { GET } = createEndpoint({
   },
 });
 
+export const { PATCH } = createEndpoint({
+  scopedTranslation,
+  method: Methods.PATCH,
+  path: ["system", "unified-interface", "tasks", "error-monitor", "logs"],
+  aliases: ["update-error-log"],
+  title: "patch.title",
+  description: "patch.description",
+  category: "app.endpointCategories.systemTasks",
+  icon: "alert-triangle",
+  tags: ["patch.tags.monitoring" as const],
+  allowedRoles: [UserRole.ADMIN],
+
+  fields: customWidgetObject({
+    render: ErrorLogsContainer,
+    usage: { request: "data", response: true } as const,
+    children: {
+      // === REQUEST FIELDS ===
+      fingerprint: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.fields.fingerprint.label",
+        description: "patch.fields.fingerprint.description",
+        placeholder: "patch.fields.fingerprint.placeholder",
+        schema: z.string(),
+      }),
+      resolved: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.fields.resolved.label",
+        description: "patch.fields.resolved.description",
+        schema: z.boolean(),
+      }),
+
+      // === RESPONSE FIELDS ===
+      responseFingerprint: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.fingerprint.title",
+        schema: z.string(),
+      }),
+      responseResolved: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.resolved.title",
+        schema: z.boolean(),
+      }),
+      affectedRows: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.affectedRows.title",
+        schema: z.number(),
+      }),
+    },
+  }),
+
+  successTypes: {
+    title: "patch.success.title",
+    description: "patch.success.description",
+  },
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "patch.errors.validation.title",
+      description: "patch.errors.validation.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "patch.errors.network.title",
+      description: "patch.errors.network.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "patch.errors.unauthorized.title",
+      description: "patch.errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "patch.errors.forbidden.title",
+      description: "patch.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "patch.errors.notFound.title",
+      description: "patch.errors.notFound.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "patch.errors.server.title",
+      description: "patch.errors.server.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "patch.errors.unknown.title",
+      description: "patch.errors.unknown.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "patch.errors.unsavedChanges.titleChanges",
+      description: "patch.errors.unsavedChanges.titleChanges",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "patch.errors.conflict.title",
+      description: "patch.errors.conflict.description",
+    },
+  },
+
+  examples: {
+    requests: {
+      resolve: {
+        fingerprint: "abc123",
+        resolved: true,
+      },
+    },
+    responses: {
+      default: {
+        responseFingerprint: "abc123",
+        responseResolved: true,
+        affectedRows: 5,
+      },
+    },
+  },
+});
+
 export type ErrorLogsRequestInput = typeof GET.types.RequestInput;
 export type ErrorLogsRequestOutput = typeof GET.types.RequestOutput;
 export type ErrorLogsResponseInput = typeof GET.types.ResponseInput;
 export type ErrorLogsResponseOutput = typeof GET.types.ResponseOutput;
 
-const endpoints = { GET };
+export type ErrorLogsPatchRequestInput = typeof PATCH.types.RequestInput;
+export type ErrorLogsPatchRequestOutput = typeof PATCH.types.RequestOutput;
+export type ErrorLogsPatchResponseInput = typeof PATCH.types.ResponseInput;
+export type ErrorLogsPatchResponseOutput = typeof PATCH.types.ResponseOutput;
+
+const endpoints = { GET, PATCH };
 export default endpoints;

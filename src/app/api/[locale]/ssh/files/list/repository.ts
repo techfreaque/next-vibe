@@ -72,7 +72,8 @@ export class FilesListRepository {
       const entries: FilesListResponseOutput["entries"] = [];
 
       for (const name of names) {
-        const fullPath = join(dirPath, name);
+        // Use template string to prevent Turbopack from statically tracing paths
+        const fullPath = `${dirPath}/${name}`;
         try {
           const st = await stat(fullPath);
           const isDir = st.isDirectory();

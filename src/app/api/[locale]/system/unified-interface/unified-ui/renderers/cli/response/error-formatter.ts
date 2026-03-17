@@ -5,6 +5,8 @@
 
 import { scopedTranslation as cliScopedTranslation } from "@/app/api/[locale]/system/unified-interface/cli/i18n";
 import type { RouteExecutionResult } from "@/app/api/[locale]/system/unified-interface/cli/runtime/route-executor";
+import { formatValidationErrorDetails } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
@@ -20,22 +22,39 @@ export class CliErrorFormatter {
     result: RouteExecutionResult,
     locale: CountryLanguage,
     verbose: boolean,
+    endpoint?: CreateApiEndpointAny | null,
   ): string {
     const { t } = simpleT(locale);
     const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
+    // Format validation errors nicely — each field on its own line
+    const errorParams = result.errorParams;
+    const isValidationError =
+      errorParams && "error" in errorParams && "errorCount" in errorParams;
+
+    // Don't interpolate errorParams into the message for validation errors —
+    // the raw error/errorCount values would produce ugly output like "Validation Error ({...})"
     let errorMessage = t(
       result.error ?? cliT("vibe.errors.unknownError", result.errorParams),
-      result.errorParams,
+      isValidationError ? undefined : result.errorParams,
     );
 
     let detailedError = errorMessage;
-
-    // Always show error details from errorParams, even in non-verbose mode
-    if (result.errorParams && Object.keys(result.errorParams).length > 0) {
+    if (isValidationError) {
+      const details = formatValidationErrorDetails(
+        errorParams as Record<string, string | number>,
+        endpoint,
+        result.inputData,
+      );
+      if (details) {
+        // Skip the redundant "Validation Error" title — details are self-explanatory
+        detailedError = details;
+      }
+    } else if (errorParams && Object.keys(errorParams).length > 0) {
+      // Generic params — show as before
       // eslint-disable-next-line i18next/no-literal-string
       detailedError += "\n\nDetails:";
-      for (const [key, value] of Object.entries(result.errorParams)) {
+      for (const [key, value] of Object.entries(errorParams)) {
         // eslint-disable-next-line i18next/no-literal-string
         detailedError += `\n  ${key}: ${value}`;
       }
@@ -55,12 +74,14 @@ export class CliErrorFormatter {
       detailedError += causeChain;
     }
 
+    // eslint-disable-next-line i18next/no-literal-string
+    const prefix = isValidationError ? "❌" : "❌ Error:";
     if (verbose) {
       // eslint-disable-next-line i18next/no-literal-string
-      return `❌ Error: ${detailedError}\n\nFull Response:\n${JSON.stringify(result, null, 2)}`;
+      return `${prefix} ${detailedError}\n\nFull Response:\n${JSON.stringify(result, null, 2)}`;
     }
     // eslint-disable-next-line i18next/no-literal-string
-    return `❌ Error: ${detailedError}`;
+    return `${prefix} ${detailedError}`;
   }
 
   /**

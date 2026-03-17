@@ -79,14 +79,15 @@ export class ToolConfirmationProcessor {
         return confirmResult;
       }
 
-      // Get the updated message from database to retrieve the full toolCall data
+      // toolMessageId is either the original (updated in-place) or a new deferred row.
+      const toolMessageId = confirmResult.data.toolMessageId;
       const updatedMessage = await db.query.chatMessages.findFirst({
-        where: eq(chatMessages.id, toolConfirmation.messageId),
+        where: eq(chatMessages.id, toolMessageId),
       });
 
       if (updatedMessage?.metadata?.toolCall) {
         results.push({
-          messageId: toolConfirmation.messageId,
+          messageId: toolMessageId,
           sequenceId: updatedMessage.sequenceId ?? crypto.randomUUID(),
           toolCall: updatedMessage.metadata.toolCall,
         });

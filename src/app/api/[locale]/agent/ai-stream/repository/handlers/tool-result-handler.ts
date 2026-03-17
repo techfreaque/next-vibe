@@ -117,7 +117,7 @@ export class ToolResultHandler {
       | undefined;
     threadId: string;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -134,7 +134,7 @@ export class ToolResultHandler {
       pendingToolMessage,
       threadId,
       model,
-      character,
+      skill,
       sequenceId,
       isIncognito,
       userId,
@@ -215,6 +215,40 @@ export class ToolResultHandler {
 
     const isBackground =
       !effectiveIsError && toolCallData.toolCall.callbackMode === "detach";
+    // Mark as "pending" for remote wait when the output signals a dispatched task.
+    // tools-loader unwraps success().data, so output is {status: "status.pending"} directly.
+    // Note: callbackMode may not be set on toolCallData.toolCall at this point —
+    // the AI calls execute-tool which internally defaults to WAIT, but the AI SDK
+    // tool call args don't include callbackMode. So we check the output shape only.
+    // Check if output signals a pending remote task.
+    // tools-loader may return the result as a JSON string, so we need to handle both
+    // object and string-encoded-object forms.
+    let isWaitingForRemote = false;
+    if (!effectiveIsError && output !== null && output !== undefined) {
+      if (
+        typeof output === "object" &&
+        !Array.isArray(output) &&
+        "status" in output &&
+        output.status === "status.pending"
+      ) {
+        isWaitingForRemote = true;
+      } else if (typeof output === "string") {
+        try {
+          const parsed = JSON.parse(output) as JSONValue;
+          if (
+            typeof parsed === "object" &&
+            parsed !== null &&
+            !Array.isArray(parsed) &&
+            "status" in parsed &&
+            parsed.status === "status.pending"
+          ) {
+            isWaitingForRemote = true;
+          }
+        } catch {
+          // Not JSON, ignore
+        }
+      }
+    }
 
     const toolCallWithResult: ToolCall = {
       ...toolCallData.toolCall,
@@ -222,7 +256,7 @@ export class ToolResultHandler {
       error: toolError,
       status: effectiveIsError
         ? "failed"
-        : isBackground
+        : isBackground || isWaitingForRemote
           ? "pending"
           : "completed",
     };
@@ -234,7 +268,7 @@ export class ToolResultHandler {
         parentId: toolCallData.parentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
         toolCall: toolCallWithResult,
         toolName: part.toolName,

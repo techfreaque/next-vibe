@@ -4,7 +4,7 @@
  */
 
 import { createWriteStream, existsSync, mkdirSync } from "node:fs";
-import { basename, dirname, join, resolve as resolvePath } from "node:path";
+import { basename, dirname, join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
@@ -65,7 +65,8 @@ export class AssetZipper implements IAssetZipper {
     logger.info(MESSAGES.ZIPPING_FOLDERS);
 
     for (const zipConfig of foldersToZip) {
-      const inputPath = resolvePath(process.cwd(), zipConfig.input);
+      // Use template string to prevent Turbopack from statically tracing paths
+      const inputPath = `${process.cwd()}/${zipConfig.input}`;
 
       let outputFileName = basename(zipConfig.output);
       outputFileName = outputFileName
@@ -81,7 +82,7 @@ export class AssetZipper implements IAssetZipper {
             .join("-"),
         );
 
-      const outputDir = dirname(resolvePath(process.cwd(), zipConfig.output));
+      const outputDir = dirname(`${process.cwd()}/${zipConfig.output}`);
       const outputPath = join(outputDir, outputFileName);
 
       if (!existsSync(outputDir)) {

@@ -18,6 +18,8 @@ import { WidgetType } from "@/app/api/[locale]/system/unified-interface/shared/t
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/widgets/configs";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+
 import {
   isRequestField,
   isResponseField,
@@ -112,6 +114,8 @@ export interface ChildrenFilterConfig {
   requestOnly?: boolean;
   /** Whether the context has actual response data (from context.response.success) */
   hasResponseData?: boolean;
+  /** User's permission roles — used to enforce visibleFor field-level role whitelist */
+  userRoles?: readonly (typeof UserPermissionRoleValue)[];
   /** Custom predicate to filter children */
   predicate?: (
     name: string,
@@ -206,6 +210,17 @@ export class ChildrenDataRenderer {
             field.hidden(value)))
       ) {
         continue;
+      }
+
+      // Check visibleFor role whitelist
+      if ("visibleFor" in field && field.visibleFor !== undefined) {
+        const visibleFor =
+          field.visibleFor as readonly (typeof UserPermissionRoleValue)[];
+        const userRoles = config.userRoles ?? [];
+        const hasRole = visibleFor.some((role) => userRoles.includes(role));
+        if (!hasRole) {
+          continue;
+        }
       }
 
       // Check response/request only modes

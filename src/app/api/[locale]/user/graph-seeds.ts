@@ -20,6 +20,7 @@ import { USERS_TWO_FA_ENABLED_ALIAS } from "./data-sources/users-two-fa-enabled/
 import { USERS_WITH_STRIPE_ALIAS } from "./data-sources/users-with-stripe/constants";
 import { USERS_LOGIN_ATTEMPTS_TOTAL_ALIAS } from "./data-sources/users-login-attempts-total/constants";
 import { USERS_LOGIN_ATTEMPTS_FAILED_ALIAS } from "./data-sources/users-login-attempts-failed/constants";
+import { USERS_MARKETING_CONSENT_ALIAS } from "./data-sources/users-marketing-consent/constants";
 import { LEADS_CREATED_ALIAS } from "../leads/data-sources/leads-created/constants";
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
@@ -308,6 +309,110 @@ const securityLoginMonitoringConfig: GraphConfig = {
   trigger: { type: "cron", schedule: "*/15 * * * *" },
 };
 
+// ─── Marketing & Conversion Funnel ───────────────────────────────────────────
+
+const marketingConversionFunnelConfig: GraphConfig = {
+  nodes: {
+    leads_created: {
+      endpointPath: LEADS_CREATED_ALIAS,
+      pane: 0,
+      color: CYAN,
+    },
+    users_registered: {
+      endpointPath: USERS_REGISTERED_ALIAS,
+      pane: 0,
+      color: BLUE,
+    },
+    marketing_consent: {
+      endpointPath: USERS_MARKETING_CONSENT_ALIAS,
+      pane: 0,
+      color: GREEN,
+    },
+    users_with_stripe: {
+      endpointPath: USERS_WITH_STRIPE_ALIAS,
+      pane: 0,
+      color: AMBER,
+    },
+
+    marketing_consent_ema7: {
+      endpointPath: EMA_ALIAS,
+      params: { period: 7 },
+      pane: 0,
+      color: GREEN,
+    },
+
+    lead_to_user_rate: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: BLUE,
+    },
+    marketing_opt_in_rate: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: GREEN,
+    },
+    user_to_paying_rate: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: AMBER,
+    },
+
+    eval_low_conversion: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 0.1 },
+      visible: false,
+    },
+    eval_low_marketing_opt_in: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 0.2 },
+      visible: false,
+    },
+
+    action_notify_low_conversion: {
+      endpointPath: COMPLETE_TASK_ALIAS,
+      persist: "never",
+      visible: false,
+      params: {
+        taskId: "vibe-sense-alert",
+        status: "status.completed",
+        summary:
+          "ALERT: Lead-to-user conversion rate dropped below 10% (weekly). Registration funnel is leaking. Review onboarding flow, sign-up friction, and landing page effectiveness.",
+      },
+    },
+  },
+
+  edges: [
+    { from: "users_registered", to: "lead_to_user_rate", toHandle: "a" },
+    { from: "leads_created", to: "lead_to_user_rate", toHandle: "b" },
+    { from: "marketing_consent", to: "marketing_opt_in_rate", toHandle: "a" },
+    { from: "users_registered", to: "marketing_opt_in_rate", toHandle: "b" },
+    { from: "users_with_stripe", to: "user_to_paying_rate", toHandle: "a" },
+    { from: "users_registered", to: "user_to_paying_rate", toHandle: "b" },
+    { from: "marketing_consent", to: "marketing_consent_ema7" },
+    { from: "lead_to_user_rate", to: "eval_low_conversion" },
+    { from: "marketing_opt_in_rate", to: "eval_low_marketing_opt_in" },
+    { from: "eval_low_conversion", to: "action_notify_low_conversion" },
+  ],
+
+  positions: {
+    leads_created: { x: 0, y: 0 },
+    users_registered: { x: 0, y: 120 },
+    marketing_consent: { x: 0, y: 240 },
+    users_with_stripe: { x: 0, y: 360 },
+    marketing_consent_ema7: { x: 300, y: 240 },
+    lead_to_user_rate: { x: 300, y: 60 },
+    marketing_opt_in_rate: { x: 300, y: 180 },
+    user_to_paying_rate: { x: 300, y: 360 },
+    eval_low_conversion: { x: 600, y: 60 },
+    eval_low_marketing_opt_in: { x: 600, y: 180 },
+    action_notify_low_conversion: { x: 900, y: 60 },
+  },
+
+  trigger: { type: "cron", schedule: "0 */6 * * *" },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const graphSeeds: GraphSeedEntry[] = [
@@ -331,5 +436,12 @@ export const graphSeeds: GraphSeedEntry[] = [
     description:
       "15-minute security watch: login failure rate, brute-force detection, ban spikes. Critical for early attack response.",
     config: securityLoginMonitoringConfig,
+  },
+  {
+    slug: "marketing-conversion-funnel",
+    name: "Marketing & Conversion Funnel",
+    description:
+      "Tracks lead-to-user conversion, marketing consent opt-in rate, and user-to-paying conversion. Alerts on low conversion and declining marketing opt-in.",
+    config: marketingConversionFunnelConfig,
   },
 ];

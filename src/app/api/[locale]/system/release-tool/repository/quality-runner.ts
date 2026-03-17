@@ -435,7 +435,8 @@ export class QualityRunner implements IQualityRunner {
     // Default clean: remove dist, build, node_modules/.cache
     const dirsToClean = ["dist", "build", "node_modules/.cache", ".turbo"];
     for (const dir of dirsToClean) {
-      const dirPath = join(cwd, dir);
+      // Use template string to prevent Turbopack from statically tracing paths
+      const dirPath = `${cwd}/${dir}`;
       if (existsSync(dirPath)) {
         try {
           execSync(`rm -rf "${dirPath}"`, { cwd, stdio: "pipe" });

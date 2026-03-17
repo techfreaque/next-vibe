@@ -175,10 +175,7 @@ export function UsersStatsContainer({
     }
   }, [onSubmit, endpointMutations]);
 
-  const includeComparison: boolean =
-    (form?.watch("timePeriodOptions.includeComparison") as
-      | boolean
-      | undefined) ?? false;
+  const includeComparison = form.watch("timePeriodOptions.includeComparison");
 
   const overviewStats = data?.overviewStats;
   const paymentStats = data?.paymentStats;
@@ -295,7 +292,7 @@ export function UsersStatsContainer({
             <Checkbox
               checked={includeComparison}
               onCheckedChange={(checked) => {
-                form?.setValue(
+                form.setValue(
                   "timePeriodOptions.includeComparison",
                   checked === true,
                 );

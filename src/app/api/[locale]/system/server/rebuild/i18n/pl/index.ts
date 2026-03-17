@@ -14,14 +14,18 @@ export const translations: typeof enTranslations = {
       description: "Przebuduj aplikację i uruchom ponownie serwer",
     },
     fields: {
-      success: {
-        title: "Wynik",
-      },
-      errors: {
-        title: "Błędy",
-      },
+      success: { title: "Wynik" },
+      errors: { title: "Błędy" },
+      duration: { title: "Czas" },
+      steps: { title: "Kroki" },
     },
     steps: {
+      codegen: "Generowanie kodu",
+      vibeCheck: "Vibe check",
+      nextBuild: "Build Next.js",
+      migrate: "Migracje",
+      seed: "Seeding",
+      restart: "Restart",
       codegenFailed: "Generowanie kodu nie powiodło się: {{error}}",
       vibeCheckFailed:
         "Vibe check: {{errors}} błędów, {{warnings}} ostrzeżeń. Użyj 'vibe check' lub MCP check tool po szczegóły.",
@@ -69,6 +73,14 @@ export const translations: typeof enTranslations = {
       title: "Przebudowa zakończona",
       description:
         "Aplikacja przebudowana i serwer uruchomiony ponownie pomyślnie",
+    },
+    widget: {
+      rebuildComplete: "Przebudowa zakończona",
+      rebuildFailed: "Przebudowa nie powiodła się",
+      errors: "Błędy:",
+      runRebuild: "Uruchom przebudowę",
+      runAgain: "Uruchom ponownie",
+      skipped: "pominięto",
     },
   },
 };

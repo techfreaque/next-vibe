@@ -27,6 +27,8 @@ export class AudioQueueManager {
   private prefetchTimerId: ReturnType<typeof setTimeout> | null = null;
   /** Whether the look-ahead prefetch has fired for the current chunk */
   private prefetchTriggered = false;
+  /** Cleanup function for listeners attached to the currently-playing audio element */
+  private currentAudioCleanup: (() => void) | null = null;
 
   /**
    * Update voice mode store with playback state
@@ -206,6 +208,12 @@ export class AudioQueueManager {
       }
     };
     audio.addEventListener("timeupdate", onTimeUpdate);
+
+    // Track cleanup so stop() can remove these listeners if called mid-playback
+    this.currentAudioCleanup = (): void => {
+      audio.removeEventListener("loadedmetadata", onMeta);
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+    };
   }
 
   /**
@@ -266,6 +274,7 @@ export class AudioQueueManager {
         audio.removeEventListener("error", onError);
         this.clearPrefetchTimer();
         this.currentAudio = null;
+        this.currentAudioCleanup = null;
         resolve();
       };
 
@@ -274,6 +283,7 @@ export class AudioQueueManager {
         audio.removeEventListener("error", onError);
         this.clearPrefetchTimer();
         this.currentAudio = null;
+        this.currentAudioCleanup = null;
         reject(e);
       };
 
@@ -305,8 +315,13 @@ export class AudioQueueManager {
     const wasPlaying = this.isPlaying;
     this.queue = [];
     this.clearPrefetchTimer();
+    if (this.currentAudioCleanup) {
+      this.currentAudioCleanup();
+      this.currentAudioCleanup = null;
+    }
     if (this.currentAudio) {
       this.currentAudio.pause();
+      this.currentAudio.src = "";
       this.currentAudio = null;
     }
     this.isPlaying = false;

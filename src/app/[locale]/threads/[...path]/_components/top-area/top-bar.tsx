@@ -38,7 +38,6 @@ interface TopBarProps {
 }
 
 export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
-  const messages = useChatStore((s) => s.messages);
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const currentRootFolderId = useChatNavigationStore(
     (s) => s.currentRootFolderId,
@@ -171,7 +170,9 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
             </Button>
           </>
         )}
-        {(!sidebarCollapsed || Object.keys(messages).length === 0) && (
+        {(!sidebarCollapsed ||
+          !activeThreadId ||
+          activeThreadId === NEW_MESSAGE_ID) && (
           <Div className="flex-1 flex justify-center">
             <Logo locale={locale} pathName="/story" size="h-8" />
           </Div>

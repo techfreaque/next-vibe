@@ -13,13 +13,13 @@
 import { stripSpecialTags } from "../../../../text-to-speech/content-processing";
 
 /**
- * Minimum characters before emitting a chunk
+ * Minimum skills before emitting a chunk
  * Avoids choppy audio from very short phrases
  */
 const MIN_CHUNK_SIZE = 50;
 
 /**
- * Characters to emit on when buffer is large
+ * Skills to emit on when buffer is large
  */
 const LARGE_BUFFER_SIZE = 200;
 

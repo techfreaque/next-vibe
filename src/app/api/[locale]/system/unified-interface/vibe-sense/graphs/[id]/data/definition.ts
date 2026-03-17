@@ -27,8 +27,15 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { graphConfigSchema } from "../../../graph/schema";
 import { GraphResolution, GraphResolutionDB } from "../../../enum";
 
+import React from "react";
+
 import { scopedTranslation } from "./i18n";
-import { GraphChartView } from "./widget";
+
+// Lazy import to avoid TDZ circular dependency in MCP context
+// (widget.tsx type-imports definition → circular module resolution → "Cannot access 'default' before initialization")
+const GraphChartView = React.lazy(() =>
+  import("./widget").then((m) => ({ default: m.GraphChartView })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

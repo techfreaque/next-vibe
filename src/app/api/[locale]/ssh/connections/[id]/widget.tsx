@@ -33,7 +33,7 @@ export function ConnectionDetailContainer({
   const emptyField = useMemo(() => ({}), []);
 
   // Watch authType reactively; fall back to loaded value before form initialises
-  const watchedAuthType = form?.watch("authType");
+  const watchedAuthType = form.watch("authType");
   const authType = watchedAuthType ?? field.value?.authType;
   const isLocal = authType === SshAuthType.LOCAL;
   const isKeyAgent = authType === SshAuthType.KEY_AGENT;

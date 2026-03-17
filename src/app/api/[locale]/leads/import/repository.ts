@@ -568,6 +568,7 @@ export class LeadsImportRepository implements DomainImportRepository<LeadRecord>
             .insert(cronTasks)
             .values({
               id: taskId,
+              shortId: taskId,
               routeId: "leads_import_process_POST",
               displayName: `Process import job ${result.data.jobId}`,
               category: TaskCategory.MAINTENANCE,

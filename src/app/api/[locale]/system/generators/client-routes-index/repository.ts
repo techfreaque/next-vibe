@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import { join } from "node:path";
-
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -71,8 +69,7 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
         logger.debug("Using live index for file discovery");
         clientRouteFiles = [...liveIndex.clientRouteFiles];
       } else {
-        const apiCorePath = ["src", "app", "api", "[locale]"];
-        const startDir = join(process.cwd(), ...apiCorePath);
+        const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
         logger.debug("Discovering route-client files");
         clientRouteFiles = findFilesRecursively(startDir, "route-client.ts");

@@ -70,6 +70,20 @@ const { POST } = createEndpoint({
             "Maximum wait time in milliseconds. If set to 0, the default timeout will be used.",
           ),
       }),
+      captureSnapshot: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "wait-for.form.fields.captureSnapshot.label",
+        description: "wait-for.form.fields.captureSnapshot.description",
+        columns: 4,
+        schema: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe(
+            "When true, includes the full accessibility snapshot in the response. Defaults to false.",
+          ),
+      }),
 
       // Response fields
       success: responseField(scopedTranslation, {

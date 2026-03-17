@@ -97,7 +97,7 @@ export function FolderMoveContainer({ field }: MoveWidgetProps): JSX.Element {
     [folders, excludedIds],
   );
 
-  const selectedParentId = (form.watch("parentId") as string | null) ?? null;
+  const selectedParentId = form.watch("parentId") ?? null;
 
   const renderFolder = (
     parentId: string | null,

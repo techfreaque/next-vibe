@@ -29,8 +29,8 @@ import {
 import type {
   FiltersModelSelection,
   ManualModelSelection,
-} from "../../characters/create/definition";
-import { IntelligenceLevel, ModelSelectionType } from "../../characters/enum";
+} from "../../skills/create/definition";
+import { IntelligenceLevel, ModelSelectionType } from "../../skills/enum";
 import { FAVORITE_CREATE_ALIAS } from "../constants";
 import { scopedTranslation } from "./i18n";
 import { FavoriteCreateContainer } from "./widget";
@@ -66,10 +66,9 @@ const { POST } = createEndpoint({
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
-        const charactersDefinition =
-          await import("../../characters/definition");
+        const charactersDefinition = await import("../../skills/definition");
         const characterSingleDefinitions =
-          await import("../../characters/[id]/definition");
+          await import("../../skills/[id]/definition");
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
 
@@ -77,24 +76,42 @@ const { POST } = createEndpoint({
         const character = apiClient.getEndpointData(
           characterSingleDefinitions.default.GET,
           logger,
-          { urlPathParams: { id: requestData.characterId } },
+          { urlPathParams: { id: requestData.skillId } },
         );
-        if (!character?.success) {
-          logger.error(
-            "Failed to fetch character data in create favorite onSuccess",
-            {
-              characterId: requestData.characterId,
-            },
-          );
-          return;
-        }
 
-        const characterModelSelection = character.data.modelSelection;
+        // Fall back to DEFAULT_SKILLS for built-in skills not yet in the single-fetch cache
+        let characterName: string | null = null;
+        let characterTagline: string | null = null;
+        let characterDescription: string | null = null;
+        let characterModelSelection:
+          | FiltersModelSelection
+          | ManualModelSelection
+          | null = null;
+        if (character?.success) {
+          characterName = character.data.name ?? null;
+          characterTagline = character.data.tagline ?? null;
+          characterDescription = character.data.description ?? null;
+          characterModelSelection = character.data.modelSelection ?? null;
+        } else {
+          const { DEFAULT_SKILLS } = await import("../../skills/config");
+          const defaultSkill = DEFAULT_SKILLS.find(
+            (s) => s.id === requestData.skillId,
+          );
+          if (defaultSkill) {
+            characterModelSelection = defaultSkill.modelSelection ?? null;
+          } else {
+            logger.error(
+              "Failed to fetch character data in create favorite onSuccess",
+              { skillId: requestData.skillId },
+            );
+            return;
+          }
+        }
 
         // Create new favorite config for optimistic update
         const newFavoriteConfig = {
           id: responseData.id,
-          characterId: requestData.characterId ?? "default",
+          skillId: requestData.skillId ?? "default",
           customIcon: null,
           voice: requestData.voice ?? null,
           modelSelection: requestData.modelSelection,
@@ -115,9 +132,9 @@ const { POST } = createEndpoint({
                 newFavoriteConfig,
                 characterModelSelection,
                 characterIcon ?? null,
-                character.data.name ?? null,
-                character.data.tagline ?? null,
-                character.data.description ?? null,
+                characterName,
+                characterTagline,
+                characterDescription,
                 null,
                 null,
                 locale,
@@ -127,6 +144,7 @@ const { POST } = createEndpoint({
             return {
               success: true,
               data: {
+                ...oldData.data,
                 favorites: [...oldData.data.favorites, newFavorite],
               },
             };
@@ -148,8 +166,8 @@ const { POST } = createEndpoint({
                 ...oldData.data,
                 sections: oldData.data.sections.map((section) => ({
                   ...section,
-                  characters: section.characters.map((char) =>
-                    char.id === requestData.characterId
+                  characters: section.skills.map((char) =>
+                    char.id === requestData.skillId
                       ? { ...char, addedToFav: true }
                       : char,
                   ),
@@ -173,10 +191,10 @@ const { POST } = createEndpoint({
       }),
 
       // === REQUEST ===
-      characterId: requestField(scopedTranslation, {
+      skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.characterId.label" as const,
+        label: "post.skillId.label" as const,
         columns: 6,
         hidden: true,
         schema: z.string(),
@@ -226,11 +244,11 @@ const { POST } = createEndpoint({
       }),
 
       // Tool configuration — null = fall through to character/settings default
-      allowedTools: requestField(scopedTranslation, {
+      availableTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.allowedTools.label" as const,
-        description: "post.allowedTools.description" as const,
+        label: "post.availableTools.label" as const,
+        description: "post.availableTools.description" as const,
         schema: z
           .array(
             z.object({
@@ -315,7 +333,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       create: {
-        characterId: "thea",
+        skillId: "thea",
         icon: "female" as const,
         voice: TtsVoice.FEMALE,
         modelSelection: {
@@ -326,7 +344,7 @@ const { POST } = createEndpoint({
           },
         },
         compactTrigger: null,
-        allowedTools: null,
+        availableTools: null,
         pinnedTools: null,
       },
     },

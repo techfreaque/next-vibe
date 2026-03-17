@@ -1,6 +1,6 @@
 /**
  * Favorites Repository
- * Database operations for user favorites (character + model settings combos)
+ * Database operations for user favorites (skill + model settings combos)
  */
 
 import "server-only";
@@ -16,13 +16,16 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_CHARACTERS } from "../characters/config";
-import { NO_CHARACTER_ID } from "../characters/constants";
-import { scopedTranslation as charactersScopedTranslation } from "../characters/i18n";
-import { CharactersRepository } from "../characters/repository";
+import { DEFAULT_SKILLS } from "../skills/config";
+import { NO_SKILL_ID } from "../skills/constants";
+import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
+import { SkillsRepository } from "../skills/repository";
 import { chatSettings } from "../settings/db";
 import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n";
 import { ChatSettingsRepository } from "../settings/repository";
@@ -32,6 +35,7 @@ import {
   formatEmptyFavoritesGuidance,
   formatFavoritesSummary,
 } from "./favorites-formatter";
+import type { FavoriteSummaryItem } from "./system-prompt/prompt";
 import type { scopedTranslation } from "./i18n";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 
@@ -49,9 +53,21 @@ export class ChatFavoritesRepository {
     logger: EndpointLogger,
     t: FavoritesT,
     locale: CountryLanguage,
+    targetUserId?: string,
+    query?: string,
+    page?: number,
+    pageSize?: number,
+    platform?: Platform,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
-    const userId = user.id;
+    const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
+    const userId = targetUserId && isAdmin ? targetUserId : user.id;
     const { t: settingsT } = settingsScopedTranslation.scopedT(locale);
+    const isCompact = platform ? isAgentPlatform(platform) : false;
+    const COMPACT_PAGE_SIZE = 25;
+    const effectivePageSize =
+      pageSize ?? (isCompact ? COMPACT_PAGE_SIZE : undefined);
+    const currentPage = page ?? 1;
+    const normalizedQuery = query?.trim().toLowerCase();
 
     try {
       logger.debug("Fetching favorites", { userId });
@@ -75,7 +91,7 @@ export class ChatFavoritesRepository {
       // Compute display fields for all favorites
       const favoritesCards = await Promise.all(
         favorites.map(async (favorite) => {
-          // Fetch character data if needed
+          // Fetch skill data if needed
           let characterModelSelection = null;
           let characterIcon = null;
           let characterName = null;
@@ -83,20 +99,20 @@ export class ChatFavoritesRepository {
           let characterDescription = null;
           let characterVoice = null;
 
-          if (favorite.characterId && favorite.characterId.trim() !== "") {
-            const characterResult = await CharactersRepository.getCharacterById(
-              { id: favorite.characterId },
+          if (favorite.skillId && favorite.skillId.trim() !== "") {
+            const skillResult = await SkillsRepository.getSkillById(
+              { id: favorite.skillId },
               user,
               logger,
               locale,
             );
-            if (characterResult.success) {
-              characterModelSelection = characterResult.data.modelSelection;
-              characterIcon = characterResult.data.icon;
-              characterName = characterResult.data.name;
-              characterTagline = characterResult.data.tagline;
-              characterDescription = characterResult.data.description;
-              characterVoice = characterResult.data.voice;
+            if (skillResult.success) {
+              characterModelSelection = skillResult.data.modelSelection;
+              characterIcon = skillResult.data.icon;
+              characterName = skillResult.data.name;
+              characterTagline = skillResult.data.tagline;
+              characterDescription = skillResult.data.description;
+              characterVoice = skillResult.data.voice;
             }
           }
 
@@ -105,7 +121,7 @@ export class ChatFavoritesRepository {
           return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
             {
               id: favorite.id,
-              characterId: favorite.characterId,
+              skillId: favorite.skillId,
               customIcon: favorite.customIcon,
               voice: favorite.voice,
               modelSelection: favorite.modelSelection,
@@ -124,7 +140,55 @@ export class ChatFavoritesRepository {
         }),
       );
 
-      return success({ favorites: favoritesCards });
+      // Apply search filter if query provided
+      let filtered = favoritesCards;
+      if (normalizedQuery) {
+        filtered = favoritesCards.filter(
+          (fav) =>
+            fav.name.toLowerCase().includes(normalizedQuery) ||
+            (fav.tagline ?? "").toLowerCase().includes(normalizedQuery) ||
+            (fav.description ?? "").toLowerCase().includes(normalizedQuery) ||
+            fav.skillId.toLowerCase().includes(normalizedQuery),
+        );
+      }
+
+      const totalCount = filtered.length;
+
+      // Apply pagination for compact (AI/MCP) callers
+      if (isCompact && effectivePageSize) {
+        const totalPages = Math.max(
+          1,
+          Math.ceil(totalCount / effectivePageSize),
+        );
+        const safePage = Math.min(currentPage, totalPages);
+        const offset = (safePage - 1) * effectivePageSize;
+        const pageFavorites = filtered.slice(
+          offset,
+          offset + effectivePageSize,
+        );
+        const hint =
+          totalPages > 1
+            ? `Page ${safePage}/${totalPages} (${totalCount} favorites). Use page param to navigate.`
+            : `${totalCount} favorite${totalCount === 1 ? "" : "s"} found.`;
+
+        return success({
+          favorites: pageFavorites,
+          totalCount,
+          matchedCount: totalCount,
+          currentPage: safePage,
+          totalPages,
+          hint,
+        });
+      }
+
+      return success({
+        favorites: filtered,
+        totalCount: null,
+        matchedCount: null,
+        currentPage: null,
+        totalPages: null,
+        hint: null,
+      });
     } catch (error) {
       logger.error("Failed to fetch favorites", parseError(error));
       return fail({
@@ -165,34 +229,33 @@ export async function generateFavoritesSummary(params: {
       return formatEmptyFavoritesGuidance();
     }
 
-    // Resolve localized character names
+    // Resolve localized skill names
     const { t: charT } = charactersScopedTranslation.scopedT(locale);
-    const characterNameMap = new Map<string, string>();
-    for (const char of DEFAULT_CHARACTERS) {
-      characterNameMap.set(char.id, charT(char.name));
+    const skillNameMap = new Map<string, string>();
+    for (const char of DEFAULT_SKILLS) {
+      skillNameMap.set(char.id, charT(char.name));
     }
 
-    // Look up custom character names for any non-default characterIds
-    const customCharIds = rows
-      .map((r) => r.characterId)
-      .filter((id) => id !== NO_CHARACTER_ID && !characterNameMap.has(id));
-    if (customCharIds.length > 0) {
-      const { customCharacters: customCharsTable } =
-        await import("../characters/db");
-      const customChars = await db
-        .select({ id: customCharsTable.id, name: customCharsTable.name })
-        .from(customCharsTable)
-        .where(inArray(customCharsTable.id, customCharIds));
-      for (const cc of customChars) {
-        characterNameMap.set(cc.id, cc.name);
+    // Look up custom skill names for any non-default skillIds
+    const customSkillIds = rows
+      .map((r) => r.skillId)
+      .filter((id) => id !== NO_SKILL_ID && !skillNameMap.has(id));
+    if (customSkillIds.length > 0) {
+      const { customSkills: customSkillsTable } = await import("../skills/db");
+      const customSkillsList = await db
+        .select({ id: customSkillsTable.id, name: customSkillsTable.name })
+        .from(customSkillsTable)
+        .where(inArray(customSkillsTable.id, customSkillIds));
+      for (const s of customSkillsList) {
+        skillNameMap.set(s.id, s.name);
       }
     }
 
     const items = rows.map((row) => ({
       id: row.id,
-      name: row.customName ?? row.characterId,
-      characterId: row.characterId,
-      characterName: characterNameMap.get(row.characterId) ?? null,
+      name: row.customName ?? row.skillId,
+      skillId: row.skillId,
+      characterName: skillNameMap.get(row.skillId) ?? null,
       modelId: null as string | null, // model resolved client-side; not stored server-side
       modelInfo: "",
       isActive: row.id === activeFavoriteId,
@@ -212,4 +275,77 @@ export async function generateFavoritesSummary(params: {
     logger.error("Failed to generate favorites summary", parseError(error));
     return "";
   }
+}
+
+/**
+ * Load raw favorites items for system prompt (server-side).
+ * Returns empty array when user has no favorites.
+ */
+export async function loadFavoritesItems(params: {
+  userId: string;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+}): Promise<FavoriteSummaryItem[]> {
+  const { userId, locale, logger } = params;
+
+  const [settingsRow] = await db
+    .select({ activeFavoriteId: chatSettings.activeFavoriteId })
+    .from(chatSettings)
+    .where(eq(chatSettings.userId, userId))
+    .limit(1);
+
+  const activeFavoriteId = settingsRow?.activeFavoriteId ?? null;
+
+  const rows = await db
+    .select()
+    .from(chatFavorites)
+    .where(eq(chatFavorites.userId, userId))
+    .orderBy(asc(chatFavorites.position));
+
+  if (rows.length === 0) {
+    return [];
+  }
+
+  // Resolve localized skill names
+  const { t: charT } = charactersScopedTranslation.scopedT(locale);
+  const skillNameMap = new Map<string, string>();
+  for (const char of DEFAULT_SKILLS) {
+    skillNameMap.set(char.id, charT(char.name));
+  }
+
+  // Look up custom skill names for any non-default skillIds
+  const customSkillIds = rows
+    .map((r) => r.skillId)
+    .filter((id) => id !== NO_SKILL_ID && !skillNameMap.has(id));
+  if (customSkillIds.length > 0) {
+    const { customSkills: customSkillsTable } = await import("../skills/db");
+    const customSkillsList = await db
+      .select({ id: customSkillsTable.id, name: customSkillsTable.name })
+      .from(customSkillsTable)
+      .where(inArray(customSkillsTable.id, customSkillIds));
+    for (const s of customSkillsList) {
+      skillNameMap.set(s.id, s.name);
+    }
+  }
+
+  const items: FavoriteSummaryItem[] = rows.map((row) => ({
+    id: row.id,
+    name: row.customName ?? row.skillId,
+    skillId: row.skillId,
+    characterName: skillNameMap.get(row.skillId) ?? null,
+    modelId: null,
+    modelInfo: "",
+    isActive: row.id === activeFavoriteId,
+    position: row.position,
+    useCount: row.useCount,
+    lastUsedAt: row.lastUsedAt,
+  }));
+
+  logger.debug("Loaded favorites items", {
+    userId,
+    count: items.length,
+    activeFavoriteId,
+  });
+
+  return items;
 }

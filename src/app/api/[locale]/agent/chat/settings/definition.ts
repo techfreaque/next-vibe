@@ -61,7 +61,7 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.enum(ModelId),
       }),
-      selectedCharacter: responseField(scopedTranslation, {
+      selectedSkill: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),
@@ -86,7 +86,7 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.enum(ViewModeDB),
       }),
-      allowedTools: responseField(scopedTranslation, {
+      availableTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
@@ -113,6 +113,13 @@ const { GET } = createEndpoint({
 
       // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
       compactTrigger: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
+      }),
+
+      // Memory budget limit (null = use DEFAULT_MEMORY_BUDGET = 4000 chars)
+      memoryLimit: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.number().int().nullable(),
@@ -168,14 +175,15 @@ const { GET } = createEndpoint({
     responses: {
       get: {
         selectedModel: ModelId.CLAUDE_SONNET_4_5,
-        selectedCharacter: "default",
+        selectedSkill: "default",
         activeFavoriteId: null,
         ttsAutoplay: false,
         ttsVoice: TtsVoiceDB[0],
         viewMode: ViewMode.LINEAR,
-        allowedTools: null,
+        availableTools: null,
         pinnedTools: null,
         compactTrigger: null,
+        memoryLimit: null,
       },
     },
   },
@@ -214,10 +222,10 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(ModelId).optional(),
       }),
-      selectedCharacter: requestField(scopedTranslation, {
+      selectedSkill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.selectedCharacter.label" as const,
+        label: "post.selectedSkill.label" as const,
         columns: 6,
         schema: z.string().optional(),
       }),
@@ -251,10 +259,10 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.enum(ViewModeDB).optional(),
       }),
-      allowedTools: requestField(scopedTranslation, {
+      availableTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.allowedTools.label" as const,
+        label: "post.availableTools.label" as const,
         columns: 12,
         schema: z
           .array(
@@ -291,6 +299,17 @@ const { POST } = createEndpoint({
         hidden: true,
         columns: 6,
         schema: z.number().int().min(1000).max(200000).nullable().optional(),
+      }),
+
+      // Memory budget limit (null = use DEFAULT_MEMORY_BUDGET = 4000 chars)
+      memoryLimit: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.memoryLimit.label" as const,
+        description: "post.memoryLimit.description" as const,
+        hidden: true,
+        columns: 6,
+        schema: z.number().int().min(100).max(100000).nullable().optional(),
       }),
     },
   }),
@@ -357,7 +376,7 @@ export type ChatSettingsUpdateRequestInput = typeof POST.types.RequestInput;
 export type ChatSettingsUpdateRequestOutput = typeof POST.types.RequestOutput;
 export type ChatSettingsUpdateResponseOutput = typeof POST.types.ResponseOutput;
 export type ToolConfigItem = NonNullable<
-  ChatSettingsUpdateRequestInput["allowedTools"]
+  ChatSettingsUpdateRequestInput["availableTools"]
 >[number];
 const definitions = { GET, POST };
 export default definitions;

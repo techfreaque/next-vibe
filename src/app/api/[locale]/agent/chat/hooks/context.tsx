@@ -15,7 +15,7 @@ import { createContext, useContext, useMemo } from "react";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 
-import type { CharacterGetResponseOutput } from "../characters/[id]/definition";
+import type { SkillGetResponseOutput } from "../skills/[id]/definition";
 import type { DefaultFolderId } from "../config";
 import type { FolderContentsResponseOutput } from "../folder-contents/[rootFolderId]/definition";
 import type { FolderListResponseOutput } from "../folders/[rootFolderId]/definition";
@@ -53,7 +53,7 @@ export interface ChatBootValue {
   /** Initial settings fetched server-side — used as initialData for chat settings */
   initialSettingsData: ChatSettingsGetResponseOutput | null;
   /** Initial character fetched server-side — used as initialData for the selected character */
-  initialCharacterData: CharacterGetResponseOutput | null;
+  initialSkillData: SkillGetResponseOutput | null;
   /** Thread ID at page load — initialMessagesData only applies to this thread */
   initialThreadId: string | null;
   /** Initial public feed data fetched server-side — used when rootFolderId=public and no thread selected */
@@ -92,7 +92,7 @@ interface ChatBootProviderProps {
   initialMessagesData: MessageListResponseOutput | null;
   initialPathData: PathGetResponseOutput | null;
   initialSettingsData: ChatSettingsGetResponseOutput | null;
-  initialCharacterData: CharacterGetResponseOutput | null;
+  initialSkillData: SkillGetResponseOutput | null;
   initialPublicFeedData: PublicFeedGetResponseOutput | null;
   initialFolderContentsData: FolderContentsResponseOutput | null;
   initialSubFolderContentsData?: FolderContentsResponseOutput | null;
@@ -115,7 +115,7 @@ export function ChatBootProvider({
   initialMessagesData = null,
   initialPathData = null,
   initialSettingsData = null,
-  initialCharacterData = null,
+  initialSkillData = null,
   initialPublicFeedData = null,
   initialFolderContentsData = null,
   initialSubFolderContentsData = null,
@@ -132,7 +132,7 @@ export function ChatBootProvider({
       initialMessagesData,
       initialPathData,
       initialSettingsData,
-      initialCharacterData,
+      initialSkillData,
       initialThreadId: activeThreadId,
       initialPublicFeedData,
       initialFolderContentsData,
@@ -149,7 +149,7 @@ export function ChatBootProvider({
       initialMessagesData,
       initialPathData,
       initialSettingsData,
-      initialCharacterData,
+      initialSkillData,
       activeThreadId,
       initialPublicFeedData,
       initialFolderContentsData,

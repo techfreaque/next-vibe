@@ -247,7 +247,8 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
 
     try {
       // Resolve API directory
-      const resolvedApiDir = path.resolve(process.cwd(), apiDir);
+      // Use template string to prevent Turbopack from statically tracing paths
+      const resolvedApiDir = `${process.cwd()}/${apiDir}`;
 
       if (!fs.existsSync(resolvedApiDir)) {
         // eslint-disable-next-line i18next/no-literal-string
@@ -484,14 +485,10 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   checkRouterExists(apiDir: string): boolean {
     /* eslint-disable i18next/no-literal-string */
     try {
-      const resolvedApiDir = path.resolve(process.cwd(), apiDir);
-      const routerFile = path.join(
-        resolvedApiDir,
-        "[locale]",
-        "trpc",
-        "[...trpc]",
-        "router.ts",
-      );
+      // Use template string to prevent Turbopack from statically tracing paths
+      const resolvedApiDir = `${process.cwd()}/${apiDir}`;
+      // Use template string to prevent Turbopack from statically tracing bracket paths
+      const routerFile = `${resolvedApiDir}/[locale]/trpc/[...trpc]/router.ts`;
 
       const exists = fs.existsSync(routerFile);
 

@@ -6,7 +6,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import * as repository from "../repository";
+import { MemoriesRepository } from "../repository";
 import definitions from "./definition";
 
 export const { PATCH, DELETE, tools } = endpointsHandler({
@@ -14,7 +14,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
   [Methods.PATCH]: {
     email: undefined,
     handler: ({ user, data, urlPathParams, logger, t }) =>
-      repository.updateMemory({
+      MemoriesRepository.updateMemory({
         userId: user.id,
         memoryNumber: urlPathParams.id,
         content: data.content,
@@ -30,7 +30,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
   [Methods.DELETE]: {
     email: undefined,
     handler: ({ user, urlPathParams, logger, t }) =>
-      repository.deleteMemory({
+      MemoriesRepository.deleteMemory({
         userId: user.id,
         memoryNumber: urlPathParams.id,
         logger,

@@ -56,8 +56,14 @@ export class StreamContextInitializer {
       sequenceIdOverride ??
       lastConfirmedTool?.sequenceId ??
       crypto.randomUUID();
+    // For tool confirmations: use the last deferred confirm message as parent
+    // so the AI response is a CHILD of it (not a sibling).
+    // The deferred confirm messages all have parentId = assistantPlaceholder,
+    // so the chain is: userMsg → assistantPlaceholder → [tool1, tool2, ...deferred1, deferred2] → AI response.
+    // We want AI response to be after the last deferred result, not alongside it.
+    // Fall back to effectiveParentMessageId / userMessageId if no confirmations.
     const initialParentForContext =
-      lastConfirmedTool?.messageId ?? initialAiParentId;
+      lastConfirmedTool?.messageId ?? initialAiParentId ?? null;
 
     const ctx = new StreamContext({
       sequenceId,

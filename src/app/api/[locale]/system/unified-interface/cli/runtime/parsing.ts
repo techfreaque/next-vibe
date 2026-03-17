@@ -6,6 +6,8 @@
 import { parseError } from "next-vibe/shared/utils";
 import type { z } from "zod";
 
+import type { CliRequestData } from "./cli-request-data";
+
 import { isEmptySchema } from "../../../../shared/utils/validation";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -796,21 +798,3 @@ type CliValue = string | number | boolean | CliObject | CliValue[];
  * Type for parsed CLI data - supports nested objects
  */
 export type ParsedCliData = Record<string, CliValue | null>;
-
-/**
- * CLI request data type
- */
-export interface CliRequestData {
-  [key: string]:
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | string[]
-    | number[]
-    | boolean[]
-    | CliRequestData
-    | CliRequestData[]
-    | CliRequestData[][];
-}

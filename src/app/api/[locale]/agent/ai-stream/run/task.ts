@@ -4,7 +4,7 @@
  * work through tasks, and serve the human.
  *
  * Disabled by default — user must opt in via the cron task UI.
- * Uses the user's companion character (default: Thea).
+ * Uses the user's companion skill (default: Thea).
  * All runs persist in the CRON folder as background chats.
  */
 import "server-only";
@@ -41,7 +41,7 @@ const aiHeartbeatTask = createCronTask(aiRunDefinition.POST, tools.POST, {
   historyInterval: HISTORY_INTERVALS.EVERY_HOUR,
   taskInput: {
     favoriteId: undefined,
-    character: "thea",
+    skill: "thea",
     prompt:
       "Run your scheduled heartbeat. Check system health via your tools, review pending tasks, and report anything that needs human attention. If you cannot reach the human (no email or messaging configured), mention that they should set up a contact method in their settings.",
     instructions:

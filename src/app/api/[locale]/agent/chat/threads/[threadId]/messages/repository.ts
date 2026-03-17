@@ -281,7 +281,7 @@ export async function createAiMessagePlaceholder(params: {
   parentId: string | null;
   userId: string | undefined;
   model: ModelId;
-  character: string | null | undefined;
+  skill: string | null | undefined;
   sequenceId: string | null;
   logger: EndpointLogger;
 }): Promise<void> {
@@ -295,7 +295,7 @@ export async function createAiMessagePlaceholder(params: {
     sequenceId: params.sequenceId,
     isAI: true,
     model: params.model,
-    character: params.character ?? null,
+    skill: params.skill ?? null,
   });
 
   params.logger.info("Created AI message placeholder", {
@@ -359,7 +359,7 @@ export async function createTextMessage(params: {
   parentId: string | null;
   userId: string | undefined;
   model: ModelId;
-  character: string;
+  skill: string;
   sequenceId: string | null;
   logger: EndpointLogger;
   locale: CountryLanguage;
@@ -375,7 +375,7 @@ export async function createTextMessage(params: {
       sequenceId: params.sequenceId,
       isAI: true,
       model: params.model,
-      character: params.character,
+      skill: params.skill,
     });
 
     params.logger.debug("Created text message", {
@@ -389,7 +389,7 @@ export async function createTextMessage(params: {
   } catch (error) {
     params.logger.error("Failed to insert chat message", parseError(error), {
       messageId: params.messageId,
-      character: params.character,
+      skill: params.skill,
       model: params.model,
     });
     const { t } = scopedTranslation.scopedT(params.locale);
@@ -424,9 +424,10 @@ export async function createToolMessage(params: {
   userId: string | undefined;
   sequenceId: string | null;
   model: ModelId;
-  character: string;
+  skill: string;
   logger: EndpointLogger;
-}): Promise<void> {
+  locale: CountryLanguage;
+}): Promise<ResponseType<void>> {
   const metadata: Record<
     string,
     | string
@@ -450,7 +451,7 @@ export async function createToolMessage(params: {
       sequenceId: params.sequenceId,
       isAI: true,
       model: params.model,
-      character: params.character,
+      skill: params.skill,
       metadata,
     });
 
@@ -461,6 +462,7 @@ export async function createToolMessage(params: {
       sequenceId: params.sequenceId,
       userId: params.userId ?? "public",
     });
+    return success(undefined);
   } catch (error) {
     params.logger.error("Failed to create TOOL message - FULL ERROR", {
       error: error instanceof Error ? error.message : String(error),
@@ -476,8 +478,11 @@ export async function createToolMessage(params: {
       parentId: params.parentId,
       sequenceId: params.sequenceId,
     });
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    throw error;
+    const { t } = scopedTranslation.scopedT(params.locale);
+    return fail({
+      message: t("post.errors.createFailed.title"),
+      errorType: ErrorResponseTypes.DATABASE_ERROR,
+    });
   }
 }
 
@@ -723,7 +728,7 @@ export class MessagesRepository {
           authorId: userIdentifier,
           isAI: safeRole === ChatMessageRole.ASSISTANT,
           model: user.isPublic ? null : data.model || null,
-          character: user.isPublic ? null : data.character || null,
+          skill: user.isPublic ? null : data.skill || null,
           metadata: data.metadata || {},
         })
         .returning({

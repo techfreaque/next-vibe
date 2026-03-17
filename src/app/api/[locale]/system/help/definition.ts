@@ -25,9 +25,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { cliRequestDataSchema } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import { TOOL_HELP_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { HelpToolsWidget } from "./widget";
+import { Platform } from "../unified-interface/shared/types/platform";
 
 // Serializable tool metadata returned in response
 const aiToolMetadataSchema = z.object({
@@ -47,16 +49,12 @@ const aiToolMetadataSchema = z.object({
   /** Credit cost — only present when > 0 */
   credits: z.number().optional(),
   /** Platforms this tool is available on (admin only) */
-  platforms: z.array(z.string()).optional(),
+  platforms: z.array(z.enum(Platform)).optional(),
   parameters: z.record(z.string(), z.unknown()).optional(),
   examples: z
     .object({
-      inputs: z
-        .record(z.string(), z.record(z.string(), z.unknown()))
-        .optional(),
-      responses: z
-        .record(z.string(), z.record(z.string(), z.unknown()))
-        .optional(),
+      inputs: z.record(z.string(), cliRequestDataSchema).optional(),
+      responses: z.record(z.string(), cliRequestDataSchema).optional(),
     })
     .optional(),
   /** Remote instance this tool belongs to (only present for remote tools) */
@@ -161,7 +159,7 @@ const { GET } = createEndpoint({
         label: "get.fields.platform.label" as const,
         description: "get.fields.platform.description" as const,
         columns: 3,
-        schema: z.enum(["cli", "mcp", "ai", "web", "all"]).optional(),
+        schema: z.enum(Platform).optional(),
       }),
 
       includeProdOnly: requestField(scopedTranslation, {
@@ -180,6 +178,18 @@ const { GET } = createEndpoint({
         description: "get.fields.instanceId.description" as const,
         columns: 4,
         schema: z.string().optional(),
+      }),
+
+      statsFilter: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.statsFilter.label" as const,
+        description: "get.fields.statsFilter.description" as const,
+        columns: 4,
+        schema: z
+          .enum(["all", "pinned", "allowed"])
+          .optional()
+          .default("pinned"),
       }),
 
       // === RESPONSE FIELDS ===
@@ -303,7 +313,7 @@ const { GET } = createEndpoint({
       searchByName: { query: "search", page: 1 },
       filterByCategory: { category: "chat", page: 1, pageSize: 50 },
       toolDetail: { toolName: "agent_search_brave_GET" },
-      adminAllPlatforms: { platform: "all" as const },
+      adminAllPlatforms: { platform: Platform.CLI },
     },
     responses: {
       default: {

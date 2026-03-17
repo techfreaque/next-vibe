@@ -4,8 +4,8 @@
  * When the AI model calls a tool not in the visible tools set (e.g. discovered
  * via tool-help), the AI SDK emits a tool-error. This handler catches that
  * case and either:
- * 1. Executes the tool via RouteExecutionExecutor (if it's in activeTools)
- * 2. Returns a "tool disabled by user" error to the model (if not in activeTools)
+ * 1. Executes the tool via RouteExecutionExecutor (if it's in availableTools)
+ * 2. Returns a "tool disabled by user" error to the model (if not in availableTools)
  * 3. Handles confirmation requirements (if tool requires confirmation)
  */
 
@@ -18,7 +18,7 @@ import {
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -55,7 +55,7 @@ export class ToolErrorHandler {
       | undefined;
     threadId: string;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -80,7 +80,7 @@ export class ToolErrorHandler {
       pendingToolMessage,
       threadId,
       model,
-      character,
+      skill,
       sequenceId,
       isIncognito,
       userId,
@@ -112,7 +112,7 @@ export class ToolErrorHandler {
           toolCallData,
           threadId,
           model,
-          character,
+          skill,
           sequenceId,
           isIncognito,
           userId,
@@ -124,7 +124,7 @@ export class ToolErrorHandler {
       }
 
       logger.info(
-        "[AI Stream] Tool not in activeTools — returning disabled error to model",
+        "[AI Stream] Tool not in availableTools — returning disabled error to model",
         {
           toolName: part.toolName,
           toolCallId: part.toolCallId,
@@ -148,7 +148,7 @@ export class ToolErrorHandler {
         parentId: toolCallData.parentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
         toolCall: toolCallWithError,
         toolName: part.toolName,
@@ -163,7 +163,7 @@ export class ToolErrorHandler {
 
     // Step 2: Check confirmation requirements.
     // toolsConfig already has the resolved value from setup.
-    // For fallback tools (not in visibleTools), lazy-load to get definition default.
+    // For fallback tools (not in pinnedTools), lazy-load to get definition default.
     const toolConfig = toolsConfig.get(part.toolName);
     let requiresConfirmation = toolConfig?.requiresConfirmation;
     if (requiresConfirmation === undefined) {
@@ -196,7 +196,7 @@ export class ToolErrorHandler {
         parentId: toolCallData.parentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
         toolCall: toolCallWithConfirmation,
         toolName: part.toolName,
@@ -249,7 +249,7 @@ export class ToolErrorHandler {
         parentId: toolCallData.parentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
         toolCall: toolCallWithResult,
         toolName: part.toolName,
@@ -293,7 +293,7 @@ export class ToolErrorHandler {
         parentId: toolCallData.parentId,
         userId,
         model,
-        character,
+        skill,
         sequenceId,
         toolCall: toolCallWithError,
         toolName: part.toolName,
@@ -315,7 +315,7 @@ export class ToolErrorHandler {
       toolCallData,
       threadId,
       model,
-      character,
+      skill,
       sequenceId,
       isIncognito,
       userId,
@@ -399,7 +399,7 @@ export class ToolErrorHandler {
     };
     threadId: string;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
@@ -416,7 +416,7 @@ export class ToolErrorHandler {
       toolCallData,
       threadId,
       model,
-      character,
+      skill,
       sequenceId,
       isIncognito,
       userId,
@@ -469,7 +469,7 @@ export class ToolErrorHandler {
       parentId: toolCallData.parentId,
       userId,
       model,
-      character,
+      skill,
       sequenceId,
       toolCall: toolCallWithError,
       toolName: part.toolName,

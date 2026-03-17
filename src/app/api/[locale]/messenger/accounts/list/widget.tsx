@@ -28,6 +28,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import messengerAccountEditDefinition from "../edit/[id]/definition";
+import type { MessengerChannelFilterValue } from "../enum";
 import {
   MessengerAccountStatus,
   MessengerChannelFilter,
@@ -155,11 +156,11 @@ export function MessengerAccountsListContainer({
   const enumT = accountsScopedTranslation.scopedT(locale).t;
   const onSubmit = useWidgetOnSubmit();
 
-  const activeChannel: string =
-    form?.watch("channel") ?? MessengerChannelFilter.ANY;
-  const searchValue: string = form?.watch("search") ?? "";
-  const currentPage: number = form?.watch("page") ?? 1;
-  const limit: number = form?.watch("limit") ?? 20;
+  const activeChannel: typeof MessengerChannelFilterValue =
+    form.watch("channel") ?? MessengerChannelFilter.ANY;
+  const searchValue = form.watch("search") ?? "";
+  const currentPage = form.watch("page") ?? 1;
+  const limit = form.watch("limit") ?? 20;
 
   const accounts = useMemo(
     () => field.value?.accounts ?? [],
@@ -192,7 +193,7 @@ export function MessengerAccountsListContainer({
 
   const handleChannelTab = useCallback(
     (value: string): void => {
-      form?.setValue("channel", value);
+      form.setValue("channel", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -202,7 +203,7 @@ export function MessengerAccountsListContainer({
 
   const handlePageChange = useCallback(
     (page: number): void => {
-      form?.setValue("page", page);
+      form.setValue("page", page);
       if (onSubmit) {
         onSubmit();
       }
@@ -275,7 +276,7 @@ export function MessengerAccountsListContainer({
           <Input
             value={searchValue}
             onChange={(e) => {
-              form?.setValue("search", e.target.value);
+              form.setValue("search", e.target.value);
               if (onSubmit) {
                 onSubmit();
               }

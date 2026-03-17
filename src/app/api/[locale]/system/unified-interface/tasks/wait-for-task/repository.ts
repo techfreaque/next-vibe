@@ -24,10 +24,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import {
-  CallbackMode,
-  type TaskRoutingContext,
-} from "../../ai/execute-tool/constants";
+import { CallbackMode } from "../../ai/execute-tool/constants";
 import { cronTaskExecutions, cronTasks } from "../cron/db";
 import { CronTaskStatus } from "../enum";
 import type { scopedTranslation } from "../i18n";
@@ -48,25 +45,29 @@ export async function waitForTask(
   const { taskId } = data;
 
   try {
-    // Wait for stream-part-handler to set currentToolMessageId.
-    // execute() starts concurrently with stream-part-handler's tool-call processing —
-    // poll up to 200ms to let stream-part-handler catch up and set the field.
-    if (streamContext && !streamContext.currentToolMessageId) {
-      for (let i = 0; i < 40; i++) {
-        await new Promise<void>((resolve) => {
-          setTimeout(resolve, 5);
+    // tools-loader injects currentToolMessageId from pendingToolMessages before execute() is called.
+    // No polling needed — by the time execute() runs, tool-call has already been processed.
+
+    // Short retry to handle the parallel-batch race: if execute-tool(wakeUp) and
+    // wait-for-task run in the same parallel tool batch, execute-tool may not have
+    // finished inserting the task row when wait-for-task queries for it.
+    let task = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const [found] = await db
+        .select()
+        .from(cronTasks)
+        .where(eq(cronTasks.id, taskId))
+        .limit(1);
+      if (found) {
+        task = found;
+        break;
+      }
+      if (attempt < 4) {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 200);
         });
-        if (streamContext.currentToolMessageId) {
-          break;
-        }
       }
     }
-
-    const [task] = await db
-      .select()
-      .from(cronTasks)
-      .where(eq(cronTasks.id, taskId))
-      .limit(1);
 
     if (!task) {
       return fail({
@@ -133,23 +134,22 @@ export async function waitForTask(
 
     if (effectiveThreadId && effectiveToolMessageId) {
       const streamModelId = streamContext?.modelId;
-      const streamCharacterId = streamContext?.characterId;
+      const streamSkillId = streamContext?.skillId;
       const streamFavoriteId = streamContext?.favoriteId;
 
+      const streamLeafMessageId = streamContext?.leafMessageId;
+
+      // Write revival context to typed wakeUp* columns — not into taskInput JSON blob.
       await db
         .update(cronTasks)
         .set({
-          taskInput: {
-            ...(task.taskInput ?? {}),
-            ...({
-              callbackMode: CallbackMode.WAKE_UP,
-              threadId: effectiveThreadId,
-              toolMessageId: effectiveToolMessageId,
-            } satisfies TaskRoutingContext),
-            ...(streamModelId ? { modelId: streamModelId } : {}),
-            ...(streamCharacterId ? { characterId: streamCharacterId } : {}),
-            ...(streamFavoriteId ? { favoriteId: streamFavoriteId } : {}),
-          },
+          wakeUpCallbackMode: CallbackMode.WAKE_UP,
+          wakeUpThreadId: effectiveThreadId,
+          wakeUpToolMessageId: effectiveToolMessageId,
+          wakeUpModelId: streamModelId ?? null,
+          wakeUpSkillId: streamSkillId ?? null,
+          wakeUpFavoriteId: streamFavoriteId ?? null,
+          wakeUpLeafMessageId: streamLeafMessageId ?? null,
           // Use the calling user's ID so resume-stream runs as the stream owner
           userId: !user.isPublic ? user.id : (task.userId ?? null),
           updatedAt: new Date(),
@@ -163,8 +163,10 @@ export async function waitForTask(
       });
 
       // Pause the stream — resume-stream will revive when the task completes.
+      // Set pendingTimeoutMs so finish-step-handler starts the 90s abort timer.
       if (streamContext) {
         streamContext.waitingForRemoteResult = true;
+        streamContext.pendingTimeoutMs = 90_000;
       }
     } else {
       logger.warn(

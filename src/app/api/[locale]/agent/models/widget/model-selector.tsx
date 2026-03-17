@@ -42,8 +42,8 @@ import {
   ModelSortFieldOptions,
   PRICE_DISPLAY,
   SPEED_DISPLAY,
-} from "@/app/api/[locale]/agent/chat/characters/enum";
-import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
+} from "@/app/api/[locale]/agent/chat/skills/enum";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
@@ -60,6 +60,7 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_INPUT_TOKENS, DEFAULT_OUTPUT_TOKENS } from "../constants";
@@ -236,7 +237,7 @@ export interface ModelSelectorProps {
   onChange?: (selection: ModelSelectionSimple | null) => void;
 
   /**
-   * Character's model selection (optional, for CHARACTER_BASED mode)
+   * Skill's model selection (optional, for CHARACTER_BASED mode)
    */
   characterModelSelection?: ModelSelectionSimple | undefined;
 
@@ -259,6 +260,32 @@ export interface ModelSelectorProps {
    * User payload for admin-only model filtering
    */
   user: JwtPayloadType;
+}
+
+/** Returns true if the model's provider is available given current env */
+function isProviderAvailable(
+  model: ModelOption,
+  envAvailability: AgentEnvAvailability | undefined,
+): boolean {
+  if (!envAvailability) {
+    return true;
+  }
+  switch (model.apiProvider) {
+    case ApiProvider.OPENROUTER:
+      return envAvailability.openRouter;
+    case ApiProvider.CLAUDE_CODE:
+      return envAvailability.claudeCode;
+    case ApiProvider.UNCENSORED_AI:
+      return envAvailability.uncensoredAI;
+    case ApiProvider.FREEDOMGPT:
+      return envAvailability.freedomGPT;
+    case ApiProvider.GAB_AI:
+      return envAvailability.gabAI;
+    case ApiProvider.VENICE_AI:
+      return envAvailability.veniceAI;
+    default:
+      return true;
+  }
 }
 
 /** Map ApiProvider to the availability key */
@@ -292,6 +319,10 @@ function getSetupRequiredMessage(
       return envAvailability.veniceAI
         ? null
         : `${t("selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
+    case ApiProvider.CLAUDE_CODE:
+      return envAvailability.claudeCode
+        ? null
+        : `${t("selector.addEnvKey")}: CLAUDE_CODE_ENABLED=true (install claude CLI)`;
     default:
       return null;
   }
@@ -311,14 +342,14 @@ export function ModelSelector({
   const envAvailabilityCtx = useEnvAvailability();
   const envAvailability = envAvailabilityProp ?? envAvailabilityCtx;
   // UI state - initialize to CHARACTER_BASED if modelSelection is null and we have character defaults
-  const [useCharacterBased, setUseCharacterBased] = useState(
+  const [useSkillBased, setUseSkillBased] = useState(
     !modelSelection && !!characterModelSelection,
   );
 
   // Reset to CHARACTER_BASED when characterModelSelection changes and we have no modelSelection
   useEffect(() => {
     if (!modelSelection && characterModelSelection) {
-      setUseCharacterBased(true);
+      setUseSkillBased(true);
     }
   }, [characterModelSelection, modelSelection]);
 
@@ -330,12 +361,12 @@ export function ModelSelector({
 
   // Current selection - use character's selection if in CHARACTER_BASED mode
   const currentSelection =
-    useCharacterBased && characterModelSelection
+    useSkillBased && characterModelSelection
       ? characterModelSelection
       : (modelSelection ?? { selectionType: ModelSelectionType.FILTERS });
 
   // Determine current mode
-  const mode = useCharacterBased
+  const mode = useSkillBased
     ? ModelSelectionType.CHARACTER_BASED
     : currentSelection.selectionType;
 
@@ -345,7 +376,7 @@ export function ModelSelector({
   // For slider UI, show character filters when in CHARACTER_BASED, otherwise show modelSelection filters
   // Both FILTERS and MANUAL types store filter ranges
   const sliderSource =
-    useCharacterBased && characterModelSelection
+    useSkillBased && characterModelSelection
       ? characterModelSelection
       : modelSelection;
 
@@ -406,10 +437,10 @@ export function ModelSelector({
   ): void => {
     if (newMode === ModelSelectionType.CHARACTER_BASED) {
       // Toggle UI state and set form value to null
-      setUseCharacterBased(true);
+      setUseSkillBased(true);
       updateValue(null);
     } else {
-      setUseCharacterBased(false);
+      setUseSkillBased(false);
 
       // Use current slider values (which reflect character filters if coming from CHARACTER_BASED)
       const baseProps = {
@@ -444,7 +475,7 @@ export function ModelSelector({
 
   // Range change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
   const handleIntelligenceChange = (min: number, max: number): void => {
-    setUseCharacterBased(false);
+    setUseSkillBased(false);
     const newType =
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
@@ -481,7 +512,7 @@ export function ModelSelector({
   };
 
   const handleContentChange = (min: number, max: number): void => {
-    setUseCharacterBased(false);
+    setUseSkillBased(false);
     const newType =
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
@@ -518,7 +549,7 @@ export function ModelSelector({
   };
 
   const handleSpeedChange = (min: number, max: number): void => {
-    setUseCharacterBased(false);
+    setUseSkillBased(false);
     const newType =
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
@@ -555,7 +586,7 @@ export function ModelSelector({
   };
 
   const handlePriceChange = (min: number, max: number): void => {
-    setUseCharacterBased(false);
+    setUseSkillBased(false);
     const newType =
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
@@ -593,7 +624,7 @@ export function ModelSelector({
 
   const handleModelSelect = (modelId: ModelId): void => {
     // When selecting a model, preserve current filter/sort settings
-    setUseCharacterBased(false);
+    setUseSkillBased(false);
     updateValue({
       selectionType: ModelSelectionType.MANUAL,
       manualModelId: modelId,
@@ -629,7 +660,7 @@ export function ModelSelector({
     // All fields default to DESC (highest/best first, including most expensive for price)
     const defaultDirection = ModelSortDirection.DESC;
 
-    setUseCharacterBased(false);
+    setUseSkillBased(false);
     const newType =
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
@@ -671,7 +702,7 @@ export function ModelSelector({
         ? ModelSortDirection.DESC
         : ModelSortDirection.ASC;
 
-    setUseCharacterBased(false);
+    setUseSkillBased(false);
     const newType =
       mode === ModelSelectionType.MANUAL
         ? ModelSelectionType.MANUAL
@@ -726,7 +757,7 @@ export function ModelSelector({
       sortBy,
       sortDirection,
     };
-    return CharactersRepositoryClient.getFilteredModelsForCharacter(
+    return SkillsRepositoryClient.getFilteredModelsForSkill(
       filtersModelSelection,
       user,
     );
@@ -749,7 +780,7 @@ export function ModelSelector({
       return getModelById(manualModelId) ?? null;
     } else if (mode === ModelSelectionType.CHARACTER_BASED) {
       if (characterModelSelection) {
-        return CharactersRepositoryClient.getBestModelForCharacter(
+        return SkillsRepositoryClient.getBestModelForSkill(
           characterModelSelection,
           user,
         );
@@ -760,10 +791,20 @@ export function ModelSelector({
     }
   }, [mode, manualModelId, bestFilteredModel, characterModelSelection, user]);
 
+  // For non-admins: hide models whose provider is unavailable (admins see them with setup-required styling)
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const filterUnavailableProviders = (models: ModelOption[]): ModelOption[] => {
+    if (isAdmin) {
+      return models;
+    }
+    return models.filter((m) => isProviderAvailable(m, envAvailability));
+  };
+
   // Get models to show (filtered or all)
-  const modelsToShow = showUnfilteredModels
-    ? getAllModelOptions()
-    : filteredModels;
+  const modelsToShow = filterUnavailableProviders(
+    showUnfilteredModels ? getAllModelOptions() : filteredModels,
+  );
 
   // Compute which model names appear with multiple providers (need provider suffix)
   const duplicateModelNames = useMemo(() => {
@@ -892,7 +933,7 @@ export function ModelSelector({
               }
               disabled={readOnly}
             >
-              {t("selector.characterMode")}
+              {t("selector.skillMode")}
             </Button>
           )}
           <Button
@@ -940,7 +981,7 @@ export function ModelSelector({
                   ? t("selector.autoSelectedModel")
                   : mode === ModelSelectionType.MANUAL
                     ? t("selector.manualSelectedModel")
-                    : t("selector.characterSelectedModel")}
+                    : t("selector.skillSelectedModel")}
               </Span>
               <Span className="text-sm font-bold text-primary block truncate">
                 {bestModel.name}

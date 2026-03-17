@@ -15,6 +15,12 @@ export const translations: typeof enTranslations = {
           "Die reqid der Netzwerk-Anfrage (weglassen für aktuell ausgewählte Anfrage in DevTools)",
         placeholder: "Anfrage-ID eingeben",
       },
+      maxBodyLength: {
+        label: "Maximale Body-Länge",
+        description:
+          "Maximale Zeichen für inline Request/Response-Bodies. Überschreitungen werden mit einem Hinweis abgeschnitten.",
+        placeholder: "z.B. 10000",
+      },
     },
   },
   response: {

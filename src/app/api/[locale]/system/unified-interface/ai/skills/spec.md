@@ -44,7 +44,7 @@ The **public** root folder is the social network surface.
 - `published: boolean` — unpublished threads are drafts, invisible in the public feed
 - Carries `rolesView, rolesEdit, rolesPost, rolesModerate, rolesAdmin` arrays (same semantics as folder)
 - Thread-level permissions override folder defaults when set
-- Fields: `defaultModel, defaultCharacter, systemPrompt, tags`
+- Fields: `defaultModel, defaultSkill, systemPrompt, tags`
 
 ### 2.4 Messages
 

@@ -15,7 +15,6 @@
 
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, renameSync, rmSync } from "node:fs";
-import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -39,8 +38,17 @@ import type { scopedTranslation } from "./i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
+interface RebuildStep {
+  label: string;
+  ok: boolean;
+  skipped: boolean;
+  durationMs: number;
+}
+
 interface RebuildResponse {
   success: string;
+  duration: number;
+  steps: RebuildStep[];
   errors?: string[];
 }
 
@@ -65,31 +73,55 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
     t: ModuleT,
   ): Promise<ResponseType<RebuildResponse>> {
     const errors: string[] = [];
+    const steps: RebuildStep[] = [];
+    const totalStart = Date.now();
+
+    // fn returns null on success, or an error string on failure
+    const runStep = async (
+      label: string,
+      fn: () => Promise<string | null> | string | null,
+    ): Promise<boolean> => {
+      const t0 = Date.now();
+      const errorMsg = await fn();
+      const ok = errorMsg === null;
+      steps.push({ label, ok, skipped: false, durationMs: Date.now() - t0 });
+      if (!ok) {
+        errors.push(errorMsg);
+      }
+      return ok;
+    };
 
     try {
       // Step 1: Code generation
       // IMPORTANT: Generators use dynamic import(variable) to scan definition.ts files.
       // This MUST run in a separate Bun subprocess — not inside the Next.js server process,
       // where the bundler intercepts import() and fails with "expression is too dynamic".
-      try {
-        const generatorScript = join(
-          process.cwd(),
-          "src/app/api/[locale]/system/generators/generate-all/repository.ts",
-        );
-        execSync(`bun run ${generatorScript}`, {
-          stdio: "inherit",
-          cwd: process.cwd(),
-          env: { ...process.env },
+      const codegenOk = await runStep(t("post.steps.codegen"), () => {
+        const generatorScript = `${process.cwd()}/src/app/api/[locale]/system/generators/generate-all/repository.ts`;
+        try {
+          execSync(`bun run ${generatorScript}`, {
+            stdio: "inherit",
+            cwd: process.cwd(),
+            env: { ...process.env },
+          });
+          return null;
+        } catch (error) {
+          return t("post.steps.codegenFailed", {
+            error: parseError(error).message,
+          });
+        }
+      });
+      if (!codegenOk) {
+        return success({
+          success: t("post.errors.server.title"),
+          duration: Date.now() - totalStart,
+          steps,
+          errors,
         });
-      } catch (error) {
-        errors.push(
-          t("post.steps.codegenFailed", { error: parseError(error).message }),
-        );
-        return success({ success: t("post.errors.server.title"), errors });
       }
 
       // Step 2: Vibe check (code quality gate)
-      try {
+      const vibeOk = await runStep(t("post.steps.vibeCheck"), async () => {
         const { t: checkT } = checkScopedTranslation.scopedT(locale);
         const checkResult = await VibeCheckRepository.execute(
           { summaryOnly: true, page: 1 },
@@ -98,29 +130,26 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
           checkT,
           locale,
         );
-
         if (checkResult.success) {
           const { totalIssues, totalErrors } = checkResult.data;
           const errCount = totalErrors ?? totalIssues;
           const warnCount = totalIssues - errCount;
-
           if (errCount > 0) {
-            errors.push(
-              t("post.steps.vibeCheckFailed", {
-                errors: String(errCount),
-                warnings: String(warnCount),
-              }),
-            );
-            return success({ success: t("post.errors.server.title"), errors });
+            return t("post.steps.vibeCheckFailed", {
+              errors: String(errCount),
+              warnings: String(warnCount),
+            });
           }
         }
-      } catch (error) {
-        errors.push(
-          t("post.steps.vibeCheckError", {
-            error: parseError(error).message,
-          }),
-        );
-        return success({ success: t("post.errors.server.title"), errors });
+        return null;
+      });
+      if (!vibeOk) {
+        return success({
+          success: t("post.errors.server.title"),
+          duration: Date.now() - totalStart,
+          steps,
+          errors,
+        });
       }
 
       // Step 3: Next.js build to staging dir, then atomic swap
@@ -129,25 +158,31 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
       const prodDir = ".next-prod";
       const oldDir = ".next-old";
 
-      try {
-        const stagingPath = join(cwd, stagingDir);
+      const buildOk = await runStep(t("post.steps.nextBuild"), () => {
+        const stagingPath = `${cwd}/${stagingDir}`;
         if (existsSync(stagingPath)) {
           rmSync(stagingPath, { recursive: true, force: true });
         }
 
-        execSync("bunx next build", {
-          stdio: "inherit",
-          cwd,
-          env: {
-            ...process.env,
-            NODE_ENV: "production",
-            NEXT_DIST_DIR: stagingDir,
-          },
-        });
+        try {
+          execSync("bunx next build", {
+            stdio: "inherit",
+            cwd,
+            env: {
+              ...process.env,
+              NODE_ENV: "production",
+              NEXT_DIST_DIR: stagingDir,
+            },
+          });
+        } catch (error) {
+          return t("post.steps.buildFailed", {
+            error: parseError(error).message,
+          });
+        }
 
         // Atomic swap: .next-prod → .next-old, .next-rebuild → .next-prod
-        const prodPath = join(cwd, prodDir);
-        const oldPath = join(cwd, oldDir);
+        const prodPath = `${cwd}/${prodDir}`;
+        const oldPath = `${cwd}/${oldDir}`;
 
         if (existsSync(oldPath)) {
           rmSync(oldPath, { recursive: true, force: true });
@@ -157,7 +192,6 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
         }
         renameSync(stagingPath, prodPath);
 
-        // Clean up old dir
         if (existsSync(oldPath)) {
           try {
             rmSync(oldPath, { recursive: true, force: true });
@@ -165,12 +199,11 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
             // Non-critical cleanup
           }
         }
-      } catch (error) {
-        const msg = parseError(error).message;
-        errors.push(t("post.steps.buildFailed", { error: msg }));
-
+        return null;
+      });
+      if (!buildOk) {
         // Clean up staging dir on failure
-        const stagingPath = join(cwd, stagingDir);
+        const stagingPath = `${cwd}/${stagingDir}`;
         if (existsSync(stagingPath)) {
           try {
             rmSync(stagingPath, { recursive: true, force: true });
@@ -178,67 +211,77 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
             // Ignore cleanup errors
           }
         }
-
         return fail({
           message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: msg },
+          messageParams: { error: errors[errors.length - 1] ?? "" },
         });
       }
 
       // Step 4: Database migrations
-      try {
+      const migrateOk = await runStep(t("post.steps.migrate"), async () => {
         const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
         const migrateResult = await databaseMigrationRepository.runMigrations(
-          {
-            generate: false,
-            dryRun: false,
-            redo: false,
-            schema: "public",
-          },
+          { generate: false, dryRun: false, redo: false, schema: "public" },
           migrateT,
           logger,
         );
-
-        if (!migrateResult.success) {
-          return fail({
-            message: t("post.errors.server.title"),
-            errorType: ErrorResponseTypes.DATABASE_ERROR,
-            messageParams: { error: "Migrations failed" },
-            cause: migrateResult,
-          });
-        }
-      } catch (error) {
+        return migrateResult.success
+          ? null
+          : (migrateResult.message ?? "Migrations failed");
+      });
+      if (!migrateOk) {
         return fail({
-          message: t("post.steps.migrationFailed", {
-            error: parseError(error).message,
-          }),
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { error: parseError(error).message },
+          messageParams: { error: errors[errors.length - 1] ?? "" },
         });
       }
 
       // Step 5: Database seeding
-      try {
-        await seedDatabase("prod", logger, locale);
-      } catch (error) {
-        errors.push(
-          t("post.steps.seedingFailed", { error: parseError(error).message }),
-        );
-        return success({ success: t("post.errors.server.title"), errors });
+      const seedOk = await runStep(t("post.steps.seed"), async () => {
+        try {
+          await seedDatabase("prod", logger, locale);
+          return null;
+        } catch (error) {
+          return t("post.steps.seedingFailed", {
+            error: parseError(error).message,
+          });
+        }
+      });
+      if (!seedOk) {
+        return success({
+          success: t("post.errors.server.title"),
+          duration: Date.now() - totalStart,
+          steps,
+          errors,
+        });
       }
 
       // Step 6: Signal vibe start to restart Next.js
       const restartResult = this.signalRestart(logger);
+      steps.push({
+        label: t("post.steps.restart"),
+        ok: restartResult.success,
+        skipped: false,
+        durationMs: 0,
+      });
       if (!restartResult.success) {
         errors.push(
           t("post.steps.restartFailed", { error: restartResult.reason }),
         );
-        return success({ success: t("post.errors.server.title"), errors });
+        return success({
+          success: t("post.errors.server.title"),
+          duration: Date.now() - totalStart,
+          steps,
+          errors,
+        });
       }
 
       return success({
         success: t("post.success.title"),
+        duration: Date.now() - totalStart,
+        steps,
         errors: errors.length > 0 ? errors : undefined,
       });
     } catch (error) {
@@ -284,7 +327,7 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
 
     try {
       process.kill(pid, "SIGUSR1");
-      logger.info("Sent SIGUSR1 to vibe start", { pid });
+      logger.info(`🔄 Server restart signal sent (pid: ${pid})`);
       return { success: true, pid };
     } catch (error) {
       return {

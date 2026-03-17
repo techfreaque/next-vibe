@@ -72,6 +72,7 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: ExecuteToolWidget,
+    noFormElement: true,
     usage: { request: "data", response: true } as const,
     children: {
       // ── Request fields ────────────────────────────────────────────────────

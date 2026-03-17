@@ -19,6 +19,8 @@ import { validateData } from "next-vibe/shared/utils";
 
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { Platform } from "../shared/types/platform";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
@@ -102,6 +104,7 @@ export function wrapErrorResponse(
     errorResponseSchema,
     logger,
     locale,
+    Platform.NEXT_API,
   );
 
   // Handle validation errors in the error response itself

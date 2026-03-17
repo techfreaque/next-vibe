@@ -139,6 +139,11 @@ export const translations: typeof enTranslations = {
         label: "Aufgabeneingabe",
         description: "JSON-Eingabedaten für die Aufgabe",
       },
+      hidden: {
+        label: "Versteckt",
+        description:
+          "Diese Aufgabe in KI-System-Prompts und Standard-Aufgabenlisten ausblenden",
+      },
       runOnce: {
         label: "Einmal ausführen",
         description: "Diese Aufgabe nur einmal ausführen und dann deaktivieren",

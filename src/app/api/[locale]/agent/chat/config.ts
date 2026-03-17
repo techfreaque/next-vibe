@@ -4,6 +4,7 @@
  */
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import {
   type UserPermissionRoleValue,
   UserRole,
@@ -45,19 +46,44 @@ export interface ToolExecutionContext {
   /** The assistant message ID currently being generated */
   aiMessageId: string | undefined;
   /**
-   * Mutable: the TOOL call message ID for the currently executing tool.
-   * Set by stream-part-handler when processing tool-call, before execute() runs.
-   * execute-tool/repository.ts polls this for up to 200ms at startup to
-   * handle the race where execute() starts concurrently with stream-part-handler.
+   * The tool message ID for the current tool call being executed.
+   * Set by tools-loader execute() wrapper from pendingToolMessages.get(toolCallId)
+   * before calling each tool's execute(). Parallel-safe via per-call injection.
+   * Used by execute-tool and wait-for-task to record which DB row to update.
    */
   currentToolMessageId: string | undefined;
+  /**
+   * Read-only reference to StreamContext.pendingToolMessages.
+   * Keyed by AI SDK toolCallId. Set once in stream-setup and never replaced.
+   * tools-loader inject currentToolMessageId from this map before each execute() call.
+   * Not present in non-streaming contexts (cron, headless).
+   */
+  pendingToolMessages:
+    | ReadonlyMap<
+        string,
+        { messageId: string; toolCallData?: { parentId: string | null } }
+      >
+    | undefined;
+  /**
+   * When set, finish-step-handler starts a timeout of this many ms using the
+   * stream's abort controller. Used for remote queue path and wait-for-task.
+   * Direct HTTP wait mode does NOT use this — the HTTP connection is the timeout.
+   */
+  pendingTimeoutMs: number | undefined;
+  /**
+   * The branch leaf message ID at the time this tool call was initiated.
+   * Set by tools-loader from PendingToolData.toolCallData.parentId before each execute() call.
+   * Stored on wakeUp task rows so resume-stream can append the deferred result to the
+   * correct branch even if the user has switched to a different branch in the meantime.
+   */
+  leafMessageId: string | undefined;
   /**
    * The active favorite ID — allows resume-stream to reload the exact same
    * model + character config when restarting a dead stream after a remote tool result.
    */
   favoriteId: string | undefined;
   /** The character/persona driving the conversation */
-  characterId: string | undefined;
+  skillId: string | undefined;
   /** The model being used (e.g. "claude-sonnet-4-6") */
   modelId: string | undefined;
   /** Whether this is a headless/cron invocation */
@@ -72,6 +98,37 @@ export interface ToolExecutionContext {
    * Tool executions check this before starting to bail out if the stream was cancelled.
    */
   abortSignal: AbortSignal | undefined;
+  /**
+   * The AI SDK toolCallId for the current tool call being executed.
+   * Set by tools-loader execute() wrapper from options.toolCallId before calling execute().
+   * Used by execute-tool to look up the correct toolMessageId for parallel tool calls.
+   * Not present in non-streaming contexts (cron, headless).
+   */
+  callerToolCallId: string | undefined;
+  /**
+   * Call this from inside a long-running tool execute() to escape the 90s stream timeout.
+   * Creates a wakeUp cron task row for this tool call, sets pendingTimeoutMs=90_000 so
+   * the stream times out cleanly, and registers the tool with WAKE_UP semantics.
+   * The tool continues running after this returns. When done, call handleTaskCompletion.
+   * Only available in streaming contexts — undefined for cron/headless invocations.
+   *
+   * Usage:
+   *   if (context.streamContext?.escalateToTask) {
+   *     const { taskId, onComplete } = await context.streamContext.escalateToTask();
+   *     // ... do long-running work ...
+   *     await onComplete({ success: true, data: result });
+   *   }
+   */
+  escalateToTask:
+    | (() => Promise<{
+        taskId: string;
+        onComplete: (result: {
+          success: boolean;
+          data?: Record<string, JsonValue>;
+          message?: string;
+        }) => Promise<void>;
+      }>)
+    | undefined;
 }
 
 /**

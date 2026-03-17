@@ -9,7 +9,6 @@
 import "server-only";
 
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -77,7 +76,8 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         taskFiles = [...liveIndex.taskFiles];
         taskRunnerFiles = [...liveIndex.taskRunnerFiles];
       } else {
-        const startDir = join(process.cwd(), "src", "app", "api");
+        // Use template string to prevent Turbopack from statically tracing paths
+        const startDir = `${process.cwd()}/src/app/api`;
 
         logger.debug("Discovering task files");
         taskFiles = findFilesRecursively(startDir, "task.ts");

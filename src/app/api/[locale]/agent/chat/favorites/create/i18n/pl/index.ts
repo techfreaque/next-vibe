@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       label: "Użyj bez zapisywania",
       loadingText: "Stosowanie...",
     },
-    characterId: {
+    skillId: {
       label: "Postać",
       description: "Wybierz postać dla tego ulubionego",
     },
@@ -147,7 +147,7 @@ export const translations: typeof enTranslations = {
       description:
         "Liczba tokenów wyzwalająca kompresję rozmowy. Null = postać lub domyślna globalna.",
     },
-    allowedTools: {
+    availableTools: {
       label: "Dozwolone narzędzia",
       description:
         "Narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = postać lub ustawienia globalne.",
@@ -205,10 +205,10 @@ export const translations: typeof enTranslations = {
       title: "Sukces",
       description: "Ulubiony utworzony pomyślnie",
     },
-    changeCharacter: {
+    changeSkill: {
       label: "Zmień postać",
     },
-    modifyCharacter: {
+    modifySkill: {
       label: "Modyfikuj postać",
     },
     character: {

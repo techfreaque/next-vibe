@@ -58,8 +58,8 @@ export const translations: typeof enTranslations = {
       description: "Privat, Inkognito, Geteilt, Öffentlich",
     },
     characters: {
-      title: "KI-Characters",
-      description: "Benutzerdefinierte & Community-Characters",
+      title: "KI-Skills",
+      description: "Benutzerdefinierte & Community-Skills",
     },
   },
   post: {

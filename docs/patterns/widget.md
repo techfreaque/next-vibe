@@ -20,18 +20,19 @@ When a custom widget IS needed, it lives alongside the endpoint's `definition.ts
 3. **No reconstruction** — Never recreate features that belong to another endpoint. If you need another endpoint's UI, use `EndpointsPage` (for embedding) or the navigation stack (for navigation/modal).
 4. **Definition is the contract** — Widgets access data through the typed `field.children` from `customWidgetObject`. No raw API calls inside a widget.
 5. **Context hooks for runtime data** — Inside a `customWidgetObject` widget, use `useWidget*` hooks for locale, user, form, navigation. Never accept these via props. Exception: dialog wrappers and page-level wrappers that pass `locale`/`user` down to `EndpointsPage` DO accept them as props — but they are not widgets, they are wrappers.
+6. **No local state for request params** — Search queries, filters, sort order, pagination — any value that controls what data is fetched or how it is filtered — must be a `requestField` in the definition and read/written via `form.watch()` / `form.setValue()`. Only use `useState` for pure UI state (open/closed dialogs, hover, loading spinners).
 
 ## File Structure
 
 ### Single-file widget
 
 ```
-src/app/api/[locale]/agent/chat/characters/create/
-├── definition.ts       ← customWidgetObject references CharacterCreateContainer
+src/app/api/[locale]/agent/chat/skills/create/
+├── definition.ts       ← customWidgetObject references SkillCreateContainer
 ├── repository.ts
 ├── route.ts
 ├── i18n/
-└── widget.tsx          ← exports CharacterCreateContainer
+└── widget.tsx          ← exports SkillCreateContainer
 ```
 
 ### Widget folder
@@ -73,13 +74,13 @@ The widget is registered in `definition.ts` via `customWidgetObject`:
 
 ```typescript
 // definition.ts
-import { CharacterCreateContainer } from "./widget";
+import { SkillCreateContainer } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   // ...
   fields: customWidgetObject({
-    render: CharacterCreateContainer, // ← component reference
+    render: SkillCreateContainer, // ← component reference
     usage: { request: "data", response: true } as const,
     children: {
       name: requestField(scopedTranslation, {
@@ -111,7 +112,7 @@ const { POST } = createEndpoint({
 ```typescript
 interface CustomWidgetProps {
   field: {
-    value: CharacterCreateResponseOutput | null | undefined;
+    value: SkillCreateResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
   fieldName: string;
 }
@@ -144,6 +145,33 @@ import {
 | `useWidgetNavigation()`            | Navigation stack         | Push/pop route layers                 |
 | `useWidgetData()`                  | Response data            | Read server response                  |
 | `useWidgetTranslation()`           | `t()` function           | Scoped translations                   |
+
+### Form state for search / filter / sort (never `useState`)
+
+Request params (search, filter, sort, pagination) must live in form state — not `useState`. Add the field to `definition.ts` as a `requestField`, then read and write it via `form`:
+
+```typescript
+// definition.ts — declare the field
+search: requestField(scopedTranslation, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.TEXT,
+  label: "get.fields.search.label",
+  schema: z.string().optional(),
+}),
+
+// widget.tsx — read & write via form (never useState)
+const form = useWidgetForm<typeof definition.GET>();
+const search = form?.watch("search") ?? "";
+
+<Input
+  value={search}
+  onChange={(e) => form?.setValue("search", e.target.value, {
+    shouldValidate: true, shouldDirty: true, shouldTouch: true,
+  })}
+/>
+```
+
+`useState` is only appropriate for pure UI state: open/closed dialogs, hover highlights, local loading flags.
 
 ### Rendering child fields
 
@@ -364,14 +392,14 @@ Rules:
 3. The owner widget does NOT depend on any widget that imports it (no circular deps)
 
 ```
-// ✅ characters/widget imports from models/widget — models owns ModelSelector
+// ✅ skills/widget imports from models/widget — models owns ModelSelector
 import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
 
 // ✅ messages/widget imports from threads/widget/chat-input — threads owns chat input
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/selector";
 
-// ❌ models/widget imports from characters/widget — that reverses ownership
-import { CharacterCard } from "@/app/api/[locale]/agent/chat/characters/widget"; // WRONG
+// ❌ models/widget imports from skills/widget — that reverses ownership
+import { SkillCard } from "@/app/api/[locale]/agent/chat/skills/widget"; // WRONG
 ```
 
 For truly generic, domain-agnostic components (buttons, inputs, icons, layout primitives), use `src/packages/next-vibe-ui/`.

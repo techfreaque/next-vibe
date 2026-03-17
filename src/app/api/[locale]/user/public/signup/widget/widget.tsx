@@ -178,6 +178,8 @@ export function SignupFormContainer({
                       <Link
                         href={`/${locale}/story/terms-of-service`}
                         className="underline hover:text-foreground"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
                         {t("fields.acceptTerms.termsLink")}
                       </Link>{" "}
@@ -185,6 +187,8 @@ export function SignupFormContainer({
                       <Link
                         href={`/${locale}/story/privacy-policy`}
                         className="underline hover:text-foreground"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
                         {t("fields.acceptTerms.conditionsLink")}
                       </Link>{" "}
@@ -196,7 +200,7 @@ export function SignupFormContainer({
               {fieldState.error && (
                 <Div className="flex items-center gap-2 text-sm text-destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <FormMessage />
+                  <FormMessage t={t} />
                 </Div>
               )}
             </FormItem>

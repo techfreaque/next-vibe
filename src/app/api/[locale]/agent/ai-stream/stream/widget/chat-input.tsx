@@ -51,9 +51,9 @@ export interface WidgetChatInputProps {
   content: string;
   onContentChange: (value: string) => void;
   modelId: ModelId;
-  characterId: string;
+  skillId: string;
   onModelChange: (id: ModelId) => void;
-  onCharacterChange: (id: string) => void;
+  onSkillChange: (id: string) => void;
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -76,9 +76,9 @@ export function WidgetChatInput({
   content,
   onContentChange,
   modelId,
-  characterId,
+  skillId,
   onModelChange,
-  onCharacterChange,
+  onSkillChange,
   locale,
   user,
   logger,
@@ -96,10 +96,10 @@ export function WidgetChatInput({
   const { t } = simpleT(locale);
   const isInactive = disabled || isSubmitting;
 
-  // Bridge: react to favorite selection → sync model/character to form
+  // Bridge: react to favorite selection → sync model/skill to form
   const { settings } = useChatSettings(user, logger);
   const settingsModelRef = useRef(settings?.selectedModel);
-  const settingsCharRef = useRef(settings?.selectedCharacter);
+  const settingsCharRef = useRef(settings?.selectedSkill);
 
   useEffect(() => {
     if (
@@ -110,17 +110,17 @@ export function WidgetChatInput({
       onModelChange(settings.selectedModel);
     }
     if (
-      settings?.selectedCharacter &&
-      settings.selectedCharacter !== settingsCharRef.current
+      settings?.selectedSkill &&
+      settings.selectedSkill !== settingsCharRef.current
     ) {
-      settingsCharRef.current = settings.selectedCharacter;
-      onCharacterChange(settings.selectedCharacter);
+      settingsCharRef.current = settings.selectedSkill;
+      onSkillChange(settings.selectedSkill);
     }
   }, [
     settings?.selectedModel,
-    settings?.selectedCharacter,
+    settings?.selectedSkill,
     onModelChange,
-    onCharacterChange,
+    onSkillChange,
   ]);
 
   // Keyboard: Enter to submit, Shift+Enter for newline
@@ -202,7 +202,7 @@ export function WidgetChatInput({
           )}
         >
           <Selector
-            characterId={characterId}
+            skillId={skillId}
             modelId={modelId}
             locale={locale}
             buttonClassName={cn(

@@ -138,6 +138,11 @@ export const translations = {
         label: "Task Input",
         description: "JSON input data for the task",
       },
+      hidden: {
+        label: "Hidden",
+        description:
+          "Hide this task from AI system prompts and default task listings",
+      },
       runOnce: {
         label: "Run Once",
         description: "Run this task only once and then disable it",

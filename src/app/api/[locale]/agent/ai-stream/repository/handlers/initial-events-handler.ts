@@ -84,7 +84,7 @@ export class InitialEventsHandler {
     effectiveParentMessageId: string | null | undefined;
     effectiveContent: string;
     model: ModelId;
-    character: string | null;
+    skill: string | null;
     user: JwtPayloadType;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
@@ -113,7 +113,7 @@ export class InitialEventsHandler {
       effectiveParentMessageId,
       effectiveContent,
       model,
-      character,
+      skill,
       user,
       dbWriter,
       logger,
@@ -147,7 +147,7 @@ export class InitialEventsHandler {
       content: isVoiceMode ? "" : effectiveContent,
       parentId: effectiveParentMessageId ?? null,
       model,
-      character,
+      skill: skill,
       metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
     });
 

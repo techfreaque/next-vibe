@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "execute"],
   aliases: [TASK_EXECUTE_ALIAS, "task-execute"],
-  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.MCP_VISIBLE],
+  allowedRoles: [UserRole.ADMIN, UserRole.CUSTOMER],
 
   title: "post.title",
   description: "post.description",

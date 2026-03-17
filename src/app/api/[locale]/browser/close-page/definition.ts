@@ -30,7 +30,10 @@ const { POST } = createEndpoint({
   description: "close-page.description",
   category: "app.endpointCategories.browser",
   icon: "x-square",
-  tags: ["close-page.tags.browserAutomation", "close-page.tags.chromeDevTools"],
+  tags: [
+    "close-page.tags.browserAutomation",
+    "close-page.tags.navigationAutomation",
+  ],
 
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 

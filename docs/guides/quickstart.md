@@ -59,14 +59,32 @@ bun install
 npm install
 ```
 
-### 3. Environment Configuration
+### 3. First-Run Setup
+
+**Option A — Web UI (recommended for new users):**
 
 ```bash
-# Copy the example environment file
-cp .env.example .env
+vibe dev
 ```
 
-Edit `.env` with your configuration, the '.env.example' file contains all the environment variables you need to and what they are used for.
+Start the dev server, then open http://localhost:3000 and log in with the default admin credentials (`admin@example.com` / `change-me-now`). You'll be redirected automatically to the Settings page where the setup wizard walks you through configuration step by step.
+
+**Option B — CLI wizard:**
+
+```bash
+vibe init
+```
+
+Runs the interactive terminal wizard directly:
+
+1. **Admin Account** — email + password
+2. **Database** — PostgreSQL connection URL
+3. **Security Keys** — JWT secret + cron secret (auto-generated, confirm or replace)
+4. **AI Provider** — OpenRouter API key (get free at openrouter.ai/keys) and/or Claude Code (auto-detects if `claude` CLI is installed)
+
+Sensitive values are encrypted at rest. After the wizard, `.env` is written and you're ready to go.
+
+You can also edit `.env` directly — `.env.example` documents every variable. Use `vibe system-settings` to view the current config with health indicators.
 
 ### 4. Start Development Server
 
@@ -116,6 +134,13 @@ vibe lint --fix             # Fix auto-fixable issues
 vibe typecheck              # Type checking only
 vibe test                   # Run tests
 vibe test --watch           # Watch mode
+```
+
+### Configuration & Setup
+
+```bash
+vibe init                   # Run interactive setup wizard (wizard auto-starts if no .env)
+vibe system-settings        # View all settings with health indicators (read-only)
 ```
 
 ### Production

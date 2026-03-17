@@ -89,7 +89,7 @@ const { GET } = createEndpoint({
         content: "get.response.thread.defaultModel.content" as const,
         schema: z.string().nullable(),
       }),
-      defaultCharacter: responseField(scopedTranslation, {
+      defaultSkill: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.thread.defaultTone.content" as const,
         schema: z.string().nullable(),
@@ -251,7 +251,7 @@ const { GET } = createEndpoint({
         folderId: null,
         status: ThreadStatus.ACTIVE,
         defaultModel: "gpt-4o",
-        defaultCharacter: "professional",
+        defaultSkill: "professional",
         systemPrompt: null,
         pinned: false,
         archived: false,
@@ -350,7 +350,7 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.enum(ModelId).nullable().optional(),
       }),
-      defaultCharacter: requestField(scopedTranslation, {
+      defaultSkill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.defaultTone.label" as const,

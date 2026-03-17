@@ -19,15 +19,19 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { disconnectChannel } from "@/app/api/[locale]/system/unified-interface/websocket/client";
 
+import { useChatStore } from "../../../../hooks/store";
 import type { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole } from "../../../../enum";
-import { useChatStore } from "../../../../hooks/store";
+import folderContentsDefinition from "../../../../folder-contents/[rootFolderId]/definition";
 import threadsDefinition from "../../../definition";
 import { buildMessagesChannel } from "../channel";
 import type { CreditsDeductedEventData } from "../events";
 import { StreamEventType } from "../events";
 import { createMessageEventHandlers } from "./event-handlers";
+import { upsertMessage } from "./update-messages";
 import { subscribeToMessages } from "./use-messages-ws";
+import messagesDefinition from "../definition";
+import pathDefinitions from "../path/definition";
 
 /**
  * Options for the messages subscription hook.
@@ -74,7 +78,11 @@ export function useMessagesSubscription(
     const store = useAIStreamStore.getState;
 
     // Get self-contained message handlers from event-handlers.ts
-    const messageHandlers = createMessageEventHandlers(threadId, logger);
+    const messageHandlers = createMessageEventHandlers(
+      threadId,
+      rootFolderId,
+      logger,
+    );
 
     const cleanup = subscribeToMessages(
       threadId,
@@ -205,9 +213,29 @@ export function useMessagesSubscription(
               },
             },
           );
+          // Also update folder-contents cache (primary sidebar data source)
+          apiClient.updateEndpointData(
+            folderContentsDefinition.GET,
+            logger,
+            (old) => {
+              if (!old?.success) {
+                return old;
+              }
+              return success({
+                ...old.data,
+                items: old.data.items.map((item) =>
+                  item.id === e.threadId ? { ...item, title: e.title } : item,
+                ),
+              });
+            },
+            {
+              urlPathParams: { rootFolderId: rootFolderId },
+              requestData: { subFolderId: subFolderId ?? null },
+            },
+          );
         },
 
-        // TASK_COMPLETED: background/noLoop task finished — add deferred result message to store
+        // TASK_COMPLETED: endLoop task finished — add deferred result message to cache
         [StreamEventType.TASK_COMPLETED]: (e) => {
           if (!e.deferredMessage) {
             return;
@@ -219,7 +247,7 @@ export function useMessagesSubscription(
             sequenceId,
             toolCall,
           } = e.deferredMessage;
-          useChatStore.getState().addMessage({
+          upsertMessage(msgThreadId, rootFolderId, logger, {
             id,
             threadId: msgThreadId,
             role: ChatMessageRole.TOOL,
@@ -230,7 +258,7 @@ export function useMessagesSubscription(
             authorName: null,
             isAI: true,
             model: null,
-            character: null,
+            skill: null,
             errorType: null,
             errorMessage: null,
             errorCode: null,
@@ -241,8 +269,6 @@ export function useMessagesSubscription(
             updatedAt: new Date(),
             searchVector: null,
           });
-          // Update leaf so the path walker picks up the new message
-          useChatStore.getState().setLeafMessageId(msgThreadId, id);
         },
 
         // STREAM_FINISHED: definitive "stream is over" signal
@@ -253,8 +279,52 @@ export function useMessagesSubscription(
           store().stopStream(threadId);
           optionsRef.current.onStreamFinished?.();
 
-          // Clear pending-create flag — thread is now persisted on the server
+          // Seed the path cache with the messages already in the messages cache.
+          // This prevents the path endpoint from refetching from the server when
+          // isPendingCreate clears — we already have all messages optimistically.
+          const existingMessages = apiClient.getEndpointData(
+            messagesDefinition.GET,
+            logger,
+            {
+              urlPathParams: { threadId },
+              requestData: { rootFolderId },
+            },
+          );
+          if (
+            existingMessages?.success &&
+            existingMessages.data.messages.length > 0
+          ) {
+            const msgs = existingMessages.data.messages;
+            const lastMsg = msgs[msgs.length - 1];
+            apiClient.updateEndpointData(
+              pathDefinitions.GET,
+              logger,
+              (old) => {
+                if (old?.success) {
+                  return old; // already seeded, don't overwrite
+                }
+                return success({
+                  messages: msgs,
+                  hasOlderHistory: false,
+                  hasNewerMessages: false,
+                  resolvedLeafMessageId: lastMsg?.id ?? null,
+                  oldestLoadedMessageId: msgs[0]?.id ?? null,
+                  compactionBoundaryId: null,
+                  newerChunkAnchorId: null,
+                });
+              },
+              {
+                urlPathParams: { threadId },
+              },
+            );
+          }
+
+          // Clear pending-create flag so path/messages queries can now fire.
+          // The thread is now persisted in DB after the stream completes.
           useChatStore.getState().clearThreadPendingCreate(threadId);
+
+          // NOTE: pending-create flag clearing was previously in useChatStore;
+          // once useChatStore message slice is removed this is no longer needed.
 
           // If this was a remote stream, invalidate so next navigation fetches fresh data
           if (!wasLocalStream) {

@@ -18,10 +18,12 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type { ErrorInfo, JSX, ReactNode } from "react";
 import { Component } from "react";
 
-import { Environment } from "@/app/api/[locale]/shared/utils";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
+// Track errors already caught by a boundary so parent boundaries don't re-throw them
+const handledErrors = new WeakSet<Error>();
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -65,29 +67,48 @@ export function DefaultErrorFallback({
   const componentStack =
     errorInfo?.componentStack || "No component stack available";
 
+  // Extract component names from stack — strip bundle URLs, keep "at ComponentName"
+  const componentStackLines = componentStack
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => l.replace(/\s*\(https?:\/\/[^)]+\)/g, "").trim())
+    .filter(Boolean);
+  // First line is the failing component, next few are its ancestors
+  const topComponents = componentStackLines.slice(0, 8).join("\n");
+
   return (
     <Card className="border-destructive max-w-4xl mx-auto my-4">
       <CardContent className="pt-6">
-        <Div className="flex flex-col items-center text-center mb-6">
+        <Div className="flex flex-col items-center text-center mb-4">
           <Info className="h-12 w-12 text-destructive mb-4" />
           <H3 className="text-xl font-semibold mb-2">
             {t("app.common.error.title")}
           </H3>
-          <P className="text-muted-foreground mb-4">
-            {t("app.common.error.message")}
-          </P>
-          <P className="text-sm text-destructive font-medium mb-4">
+          <P className="text-sm text-destructive font-medium mb-2">
             {error.message || t("app.common.errors.unknown")}
           </P>
           <Button
             onClick={reset}
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 mb-4"
           >
             <RotateCcw className="h-4 w-4" />
             {t("app.common.error.tryAgain")}
           </Button>
         </Div>
+
+        {/* Component stack shown first — most useful for infinite loop / update depth errors */}
+        {topComponents && (
+          <Div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
+            <Span className="text-xs font-semibold text-destructive uppercase tracking-wide block mb-1">
+              {t("app.common.error.boundary.componentStack")}
+            </Span>
+            <Pre className="text-xs text-destructive/80 whitespace-pre-wrap break-all">
+              {topComponents}
+            </Pre>
+          </Div>
+        )}
 
         {/* Detailed Error Information */}
         <Accordion type="multiple" collapsible className="space-y-4">
@@ -104,7 +125,7 @@ export function DefaultErrorFallback({
 
           <AccordionItem value="componentStack">
             <AccordionTrigger className="text-sm font-semibold">
-              {t("app.common.error.boundary.componentStack")}
+              {t("app.common.error.boundary.componentStackFull")}
             </AccordionTrigger>
             <AccordionContent>
               <Pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto max-h-64 border border-border">
@@ -166,7 +187,12 @@ export class ErrorBoundary extends Component<
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    // Update state so the next render will show the fallback UI
+    // If this error was already caught and re-thrown by an inner boundary,
+    // let it propagate up to Next.js — don't swallow it here.
+    if (handledErrors.has(error)) {
+      // eslint-disable-next-line no-restricted-syntax -- Required by React error boundary contract: re-throw to propagate to parent boundary
+      throw error;
+    }
     return {
       hasError: true,
       error,
@@ -174,23 +200,23 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log error details for debugging
     // eslint-disable-next-line no-console -- Intentional error logging in error boundary
     console.error("ErrorBoundary caught an error:", error);
     // eslint-disable-next-line no-console -- Intentional error logging in error boundary
     console.error("Component stack:", errorInfo.componentStack);
 
-    // Update state with error info
-    this.setState({
-      errorInfo,
-    });
+    this.setState({ errorInfo });
 
-    // Call optional error callback
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
-    if (envClient.NODE_ENV !== Environment.PRODUCTION) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
+
+    // In dev: re-throw so Next.js dev overlay shows the real error origin.
+    // Mark it first so getDerivedStateFromError in parent boundaries re-throws
+    // instead of catching — letting it propagate all the way to Next.js.
+    if (envClient.NODE_ENV !== "production") {
+      handledErrors.add(error);
+      // eslint-disable-next-line no-restricted-syntax -- Required by React error boundary contract: re-throw in dev to surface original error in Next.js overlay
       throw error;
     }
   }

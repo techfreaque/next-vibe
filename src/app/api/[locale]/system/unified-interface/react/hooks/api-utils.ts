@@ -6,6 +6,8 @@ import {
 import { validateData } from "next-vibe/shared/utils";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { Platform } from "../../shared/types/platform";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { scopedTranslation as authScopedTranslation } from "@/app/api/[locale]/user/auth/i18n";
@@ -328,6 +330,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         endpoint.responseSchema,
         logger,
         locale,
+        Platform.NEXT_API,
       );
 
       if (!validationResponse.success) {

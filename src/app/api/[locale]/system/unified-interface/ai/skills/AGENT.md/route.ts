@@ -19,7 +19,7 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { getListableCharacters } from "../markdown-generator";
+import { getListableSkills } from "../markdown-generator";
 
 const CACHE_MAX_AGE = 300; // 5 minutes — now includes dynamic character list
 
@@ -30,7 +30,7 @@ async function generateGatewayMarkdown(
   const skillsBase = `${baseUrl}/api/${locale}/system/unified-interface/ai/skills`;
   const now = new Date().toISOString();
 
-  const characters = await getListableCharacters(locale);
+  const characters = await getListableSkills(locale);
 
   // Group characters by category for the listing
   const charByCategory = new Map<string, typeof characters>();
@@ -42,7 +42,7 @@ async function generateGatewayMarkdown(
 
   const characterSection = [...charByCategory.entries()]
     .map(([category, chars]) => {
-      const header = `| Character | Auth | HTTP Tools | AI Run |`;
+      const header = `| Skill | Auth | HTTP Tools | AI Run |`;
       const divider = `|-----------|------|------------|--------|`;
       const rows = chars
         .map((char) => {
@@ -137,12 +137,12 @@ Each tier has two companion files: an **HTTP reference** (tool schemas) and an *
 | [\`PUBLIC_USER_AI_RUN.md\`](${skillsBase}/PUBLIC_USER_AI_RUN.md) | AI Run guide | Delegate tasks without a specific character |
 | [\`USER_WITH_ACCOUNT_SKILL.md\`](${skillsBase}/USER_WITH_ACCOUNT_SKILL.md) | HTTP reference | Account-required tools only |
 | [\`USER_WITH_ACCOUNT_AI_RUN.md\`](${skillsBase}/USER_WITH_ACCOUNT_AI_RUN.md) | AI Run guide | Account-required tasks via AI Run |
-| \`[character-id]-skill.md\` | HTTP reference | Character-scoped tool listing |
+| \`[character-id]-skill.md\` | HTTP reference | Skill-scoped tool listing |
 | \`[character-id]-ai-run.md\` | AI Run guide | Delegate tasks to a specific character |
 
 ---
 
-## Available Characters
+## Available Skills
 
 Each character has a focused skill set. Load its skill file for the exact tools it uses.
 🔒 = requires authentication · 🌐 = public access

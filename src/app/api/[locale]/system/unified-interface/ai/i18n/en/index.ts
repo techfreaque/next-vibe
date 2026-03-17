@@ -29,7 +29,7 @@ export const translations = {
         callbackMode: {
           label: "Callback Mode",
           description:
-            'How to handle the async result. "wait": poll until done (default for fast tools), "task-done": return taskId immediately, "inject": stream result into the current thread.',
+            '"wait": execute synchronously, return result inline (default). "detach": fire-and-forget, returns {taskId} immediately — use wait-for-task later if needed. "wakeUp": fire-and-forget, result is automatically injected into the thread when ready — do NOT call wait-for-task. "endLoop": execute normally and return the result, but stop the tool loop after this batch — no further tool calls this turn (parallel sibling calls in the same batch still run). "approve": require user confirmation before executing.',
         },
       },
       response: {

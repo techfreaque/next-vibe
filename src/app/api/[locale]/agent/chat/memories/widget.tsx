@@ -23,6 +23,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetEndpointMutations,
+  useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -149,8 +150,9 @@ export function MemoriesListContainer({
   const endpointMutations = useWidgetEndpointMutations();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const form = useWidgetForm<typeof definition.GET>();
+  const searchQuery = form.watch("search") ?? "";
+  const selectedTag = form.watch("tag") ?? null;
 
   const memories = useMemo(
     () => field.value?.memories ?? [],
@@ -272,14 +274,26 @@ export function MemoriesListContainer({
               type="text"
               placeholder={t("searchPlaceholder")}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) =>
+                form.setValue("search", e.target.value, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                  shouldTouch: true,
+                })
+              }
               className="pl-9 pr-9"
             />
             {searchQuery && (
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setSearchQuery("")}
+                onClick={() =>
+                  form.setValue("search", "", {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  })
+                }
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
               >
                 <X className="h-4 w-4" />
@@ -296,7 +310,15 @@ export function MemoriesListContainer({
                   variant={selectedTag === tag ? "default" : "outline"}
                   size="sm"
                   onClick={() =>
-                    setSelectedTag(selectedTag === tag ? null : tag)
+                    form.setValue(
+                      "tag",
+                      selectedTag === tag ? undefined : tag,
+                      {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true,
+                      },
+                    )
                   }
                   className="h-8"
                 >
@@ -307,7 +329,13 @@ export function MemoriesListContainer({
                 <Button
                   variant="default"
                   size="sm"
-                  onClick={() => setSelectedTag(null)}
+                  onClick={() =>
+                    form.setValue("tag", undefined, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                      shouldTouch: true,
+                    })
+                  }
                   className="h-8"
                 >
                   {selectedTag}

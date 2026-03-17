@@ -62,7 +62,7 @@ export class ChatMessagesRepositoryClient {
           authorName: msg.authorName,
           isAI: msg.isAI,
           model: msg.model,
-          character: msg.character,
+          skill: msg.skill,
           errorType: msg.errorType,
           errorMessage: msg.errorMessage,
           errorCode: msg.errorCode,
@@ -101,7 +101,7 @@ export class ChatMessagesRepositoryClient {
         data.content,
         data.parentId ?? null,
         data.model ?? null,
-        data.character ?? null,
+        data.skill ?? null,
         data.metadata ?? {},
         messageId,
       );

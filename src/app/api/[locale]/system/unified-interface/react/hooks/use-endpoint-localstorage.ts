@@ -10,7 +10,7 @@ import {
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import type { z } from "zod";
 
@@ -85,7 +85,10 @@ export function useLocalStorageRead<T, TEndpoint extends CreateApiEndpointAny>(
   });
 
   const { locale } = useTranslation();
-  const { t: hooksT } = hooksScopedTranslation.scopedT(locale);
+  const { t: hooksT } = useMemo(
+    () => hooksScopedTranslation.scopedT(locale),
+    [locale],
+  );
 
   // Build query key for React Query
   const queryKey = endpoint

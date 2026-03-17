@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Favoriten löschen",
     },
-    customizeCharacterButton: {
+    customizeSkillButton: {
       label: "Charakter-Persönlichkeit anpassen",
     },
     signupPrompt: {
@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
       label: "Favoriten-ID",
     },
     response: {
-      characterId: {
+      skillId: {
         content: "Charakter: {{value}}",
       },
       customName: {
@@ -169,10 +169,10 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Favorit löschen",
     },
-    customizeCharacterButton: {
+    customizeSkillButton: {
       label: "Charakter-Persönlichkeit anpassen",
     },
-    useThisCharacterButton: {
+    useThisSkillButton: {
       label: "Diesen Charakter verwenden",
     },
     useThisModelButton: {
@@ -200,7 +200,7 @@ export const translations: typeof enTranslations = {
     id: {
       label: "Favoriten-ID",
     },
-    characterId: {
+    skillId: {
       label: "Charakter",
     },
     customName: {
@@ -301,7 +301,7 @@ export const translations: typeof enTranslations = {
       description:
         "Token-Anzahl, die eine automatische Gesprächskomprimierung auslöst. Null = Charakter oder globaler Standard.",
     },
-    allowedTools: {
+    availableTools: {
       label: "Erlaubte Tools",
       description:
         "Tools für diesen Slot überschreiben. Jeder Eintrag benötigt eine toolId. Null = Charakter oder globale Einstellungen.",
@@ -311,10 +311,26 @@ export const translations: typeof enTranslations = {
       description:
         "Angeheftete Toolbar-Tools für diesen Slot überschreiben. Null = Charakter oder globale Einstellungen.",
     },
-    changeCharacter: {
+    deniedTools: {
+      label: "Gesperrte Tools",
+      description:
+        "Bestimmte Tools für diesen Slot sperren – zusätzlich zur Liste des Skills. Diese Tools können unabhängig von anderen Einstellungen nicht aufgerufen werden.",
+    },
+    promptAppend: {
+      label: "Prompt-Anhang",
+      description:
+        "Zusätzliche Anweisungen, die nur für diesen Slot an den System-Prompt des Skills angehängt werden. Damit können Sie das Verhalten der KI personalisieren, ohne den gemeinsamen Skill zu ändern.",
+      placeholder: "z. B. Antworte immer in einem freundlichen, lockeren Ton.",
+    },
+    memoryLimit: {
+      label: "Speicherlimit (Token)",
+      description:
+        "Maximale Gesamttoken des Speicherinhalts für diesen Slot. Null = Skill oder globaler Standard.",
+    },
+    changeSkill: {
       label: "Charakter wechseln",
     },
-    modifyCharacter: {
+    modifySkill: {
       label: "Charakter bearbeiten",
     },
     response: {

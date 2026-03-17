@@ -14,11 +14,50 @@ import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/en
 
 // Base fields shared by both storage types
 const baseFields = {
+  CLAUDE_CODE_ENABLED: {
+    schema: z
+      .string()
+      .optional()
+      .transform((v) => {
+        if (v === "true") {
+          return true;
+        }
+        if (v === "false") {
+          return false;
+        }
+        // Auto-detect: check if `claude` CLI is available
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { execSync } = require("node:child_process") as {
+            execSync: (
+              cmd: string,
+              opts: { stdio: string; timeout: number },
+            ) => void;
+          };
+          execSync("claude --version", { stdio: "ignore", timeout: 3000 });
+          return true;
+        } catch {
+          return false;
+        }
+      }),
+    example: "true",
+    comment:
+      "Claude Code provider enabled — set true/false to override, or leave unset for auto-detection (checks if `claude` CLI is installed)",
+    commented: true,
+    fieldType: "boolean" as const,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
+  },
   OPENROUTER_API_KEY: {
     schema: z.string().optional(),
     example: "sk-or-v1-...",
-    comment: "OpenRouter API key - get yours at https://openrouter.ai/keys",
+    comment:
+      "OpenRouter API key — access 200+ AI models. Get yours at https://openrouter.ai/keys",
     commented: true,
+    sensitive: true,
+    onboardingRequired: true,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
   },
   UNCENSORED_AI_API_KEY: {
     schema: z.string().optional(),
@@ -78,12 +117,15 @@ const s3Fields = {
     schema: z.literal("s3"),
     example: "s3",
     comment: "Storage type - S3",
+    fieldType: "select",
+    options: ["filesystem", "s3"],
   },
   S3_ENDPOINT: {
     schema: z.string().min(1),
     example: "https://s3.amazonaws.com",
     comment: "S3 endpoint URL",
     commented: true,
+    fieldType: "url",
   },
   S3_REGION: {
     schema: z.string().min(1),
@@ -128,6 +170,8 @@ const filesystemFields = {
     schema: z.literal("filesystem"),
     example: "filesystem",
     comment: "Storage type - Filesystem",
+    fieldType: "select",
+    options: ["filesystem", "s3"],
   },
   CHAT_STORAGE_PATH: {
     schema: z.string().min(1),

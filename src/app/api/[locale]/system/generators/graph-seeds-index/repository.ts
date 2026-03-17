@@ -9,7 +9,6 @@
 import "server-only";
 
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -57,8 +56,8 @@ class GraphSeedsIndexGeneratorRepositoryImpl {
         logger.debug("Using live index for file discovery");
         seedFiles = [...liveIndex.graphSeedFiles];
       } else {
-        const apiCorePath = ["src", "app", "api", "[locale]"];
-        const startDir = join(process.cwd(), ...apiCorePath);
+        // Use template string to prevent Turbopack from statically tracing paths
+        const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
         logger.debug("Discovering graph-seeds.ts files");
         seedFiles = findFilesRecursively(startDir, "graph-seeds.ts");

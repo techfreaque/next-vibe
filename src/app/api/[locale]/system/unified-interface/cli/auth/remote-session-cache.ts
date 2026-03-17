@@ -1,9 +1,9 @@
 /**
  * Remote Session
  *
- * Reads per-user remote connection config from `user_remote_connections` DB.
- * --remote always uses the preview DB (enforced in environment.ts via port swap),
- * so the active db singleton is always correct when this is called.
+ * Reads per-user remote connection config from `remote_connections` DB.
+ * --remote uses the dev DB by default, or the preview DB when combined with --local.
+ * The active db singleton is always correct when this is called.
  */
 
 export interface RemoteSession {

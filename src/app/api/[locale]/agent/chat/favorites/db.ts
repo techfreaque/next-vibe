@@ -26,7 +26,7 @@ import type { FavoriteGetModelSelection } from "./[id]/definition";
  * Favorites Table
  * Stores user favorites (character + model settings combos)
  * Users can have multiple favorites for the same character with different settings
- * characterId can be null for model-only setups
+ * skillId can be null for model-only setups
  */
 export const chatFavorites = pgTable("chat_favorites", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -36,9 +36,9 @@ export const chatFavorites = pgTable("chat_favorites", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
 
-  // Character reference
-  // Note: DB column is "character_id", mapped to characterId in code
-  characterId: text("character_id").notNull(),
+  // Skill reference
+  // Note: DB column is "character_id", mapped to skillId in code
+  skillId: text("character_id").notNull(),
 
   // Custom display name (DB column is just "name")
   customName: text("name"),
@@ -57,9 +57,22 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Auto-compacting token threshold (null = fall through to character/settings default)
   compactTrigger: integer("compact_trigger"),
 
+  // Memory budget in chars (null = inherit from skill → user settings; overrides for this favorite)
+  memoryLimit: integer("memory_limit"),
+
   // Tool configuration — null = fall through to character/settings default
-  activeTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
-  visibleTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
+  availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
+  pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
+  // Additional tool blocks on top of skill defaults
+  deniedTools: jsonb("denied_tools").$type<ToolConfigItem[] | null>(),
+
+  // User-level prompt customization — appended to skill's systemPrompt
+  promptAppend: text("prompt_append"),
+
+  // Sub-agent favorite override: which favorite config sub-agents spawned by this favorite inherit
+  // null = task isolation (sub-agents get skill systemPrompt + companionPrompt only, no user favorites)
+  // set = sub-agents inherit that favorite's model + tool config (power-user override)
+  subAgentFavoriteId: uuid("sub_agent_favorite_id"),
 
   // Usage stats
   useCount: integer("use_count").default(0).notNull(),

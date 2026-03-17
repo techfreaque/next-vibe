@@ -36,11 +36,18 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import type { MessengerChannelFilterValue } from "../../accounts/enum";
 import {
   MessageChannel,
   MessengerChannelFilter,
   MessengerChannelFilterOptions,
 } from "../../accounts/enum";
+import type {
+  MessageSortFieldValue,
+  MessageStatusFilterValue,
+  MessageTypeFilterValue,
+  SortOrderValue,
+} from "../enum";
 import {
   MessageSortField,
   MessageSortFieldOptions,
@@ -204,7 +211,8 @@ export function EmailsListContainer({
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
-  const activeStatus = form?.watch("filters.status") ?? MessageStatusFilter.ANY;
+  const activeStatus: typeof MessageStatusFilterValue =
+    form.watch("filters.status") ?? MessageStatusFilter.ANY;
 
   const emails = useMemo(
     () => field.value?.emails ?? [],
@@ -249,7 +257,7 @@ export function EmailsListContainer({
     (
       status: (typeof MessageStatusFilter)[keyof typeof MessageStatusFilter],
     ): void => {
-      form?.setValue("filters.status", status);
+      form.setValue("filters.status", status);
       if (onSubmit) {
         onSubmit();
       }
@@ -259,7 +267,7 @@ export function EmailsListContainer({
 
   const handlePageChange = useCallback(
     (newPage: number): void => {
-      form?.setValue("displayOptions.page", newPage);
+      form.setValue("displayOptions.page", newPage);
       if (onSubmit) {
         onSubmit();
       }
@@ -269,7 +277,7 @@ export function EmailsListContainer({
 
   const handleSortByChange = useCallback(
     (value: string): void => {
-      form?.setValue("displayOptions.sortBy", value);
+      form.setValue("displayOptions.sortBy", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -279,7 +287,7 @@ export function EmailsListContainer({
 
   const handleSortOrderChange = useCallback(
     (value: string): void => {
-      form?.setValue("displayOptions.sortOrder", value);
+      form.setValue("displayOptions.sortOrder", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -289,7 +297,7 @@ export function EmailsListContainer({
 
   const handleTypeFilter = useCallback(
     (value: string): void => {
-      form?.setValue("filters.type", value);
+      form.setValue("filters.type", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -299,7 +307,7 @@ export function EmailsListContainer({
 
   const handleChannelFilter = useCallback(
     (value: string): void => {
-      form?.setValue("filters.channel", value);
+      form.setValue("filters.channel", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -307,15 +315,15 @@ export function EmailsListContainer({
     [form, onSubmit],
   );
 
-  const activeChannel: string =
-    form?.watch("filters.channel") ?? MessengerChannelFilter.ANY;
+  const activeChannel: typeof MessengerChannelFilterValue =
+    form.watch("filters.channel") ?? MessengerChannelFilter.ANY;
 
-  const sortBy: string =
-    form?.watch("displayOptions.sortBy") ?? MessageSortField.CREATED_AT;
-  const sortOrder: string =
-    form?.watch("displayOptions.sortOrder") ?? SortOrder.DESC;
-  const activeType: string =
-    form?.watch("filters.type") ?? MessageTypeFilter.ANY;
+  const sortBy: typeof MessageSortFieldValue =
+    form.watch("displayOptions.sortBy") ?? MessageSortField.CREATED_AT;
+  const sortOrder: typeof SortOrderValue =
+    form.watch("displayOptions.sortOrder") ?? SortOrder.DESC;
+  const activeType: typeof MessageTypeFilterValue =
+    form.watch("filters.type") ?? MessageTypeFilter.ANY;
 
   const currentPage = pagination?.page ?? 1;
   const totalPages = pagination?.totalPages ?? 1;
@@ -447,9 +455,9 @@ export function EmailsListContainer({
         <Div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
-            value={form?.watch("filters.search") ?? ""}
+            value={form.watch("filters.search") ?? ""}
             onChange={(e) => {
-              form?.setValue("filters.search", e.target.value);
+              form.setValue("filters.search", e.target.value);
               if (onSubmit) {
                 onSubmit();
               }

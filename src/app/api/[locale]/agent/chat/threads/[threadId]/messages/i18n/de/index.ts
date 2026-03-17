@@ -32,6 +32,10 @@ export const translations: typeof enTranslations = {
       label: "Stammordner",
       description: "Stammordner des Threads (für Client-Routing verwendet)",
     },
+    leafMessageId: {
+      label: "Blatt-Nachrichten-ID",
+      description: "Aktuelle Zweig-Blatt-Nachrichten-ID",
+    },
     response: {
       title: "Messages Response",
       description: "List of messages in the thread",
@@ -62,7 +66,7 @@ export const translations: typeof enTranslations = {
           model: {
             content: "Model",
           },
-          character: {
+          skill: {
             content: "Charakter",
           },
           tokens: {
@@ -171,7 +175,7 @@ export const translations: typeof enTranslations = {
       label: "Model",
       description: "AI model to use for response",
     },
-    character: {
+    skill: {
       label: "Charakter",
       description: "KI-Charakter/Persona für die Nachricht",
     },
@@ -266,6 +270,8 @@ export const translations: typeof enTranslations = {
     systemPromptTitle: "System-Prompt",
     copied: "Kopiert!",
     systemMessageHint: "Systemnachricht (für Benutzer verborgen)",
+    systemPromptLabel: "System-Prompt · führend · gecacht",
+    upcomingContextLabel: "kommender Assistenten-Kontext · letzte Nachricht",
   },
   widget: {
     common: {

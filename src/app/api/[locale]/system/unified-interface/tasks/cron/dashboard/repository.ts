@@ -197,7 +197,7 @@ export class CronDashboardRepository {
             consecutiveFailures: ft.consecutiveFailures,
             lastError: lastFailed?.error?.message
               ? truncate(lastFailed.error.message, 120)
-              : (ft.lastExecutionError ?? null),
+              : null,
             lastFailedAt: lastFailed?.startedAt?.toISOString() ?? null,
           };
         });

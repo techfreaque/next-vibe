@@ -19,9 +19,12 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useState } from "react";
+import React from "react";
 
-import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetContext,
+  useWidgetForm,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { DefaultFolderId } from "../../config";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
@@ -184,13 +187,19 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
  */
 function PublicFeedView({
   items,
+  sortMode,
+  searchQuery,
+  onSortChange,
+  onSearchChange,
 }: {
   items: PublicFeedItem[];
+  sortMode: SortMode;
+  searchQuery: string;
+  onSortChange: (mode: SortMode) => void;
+  onSearchChange: (query: string) => void;
 }): React.JSX.Element {
   const { locale } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
-  const [sortMode, setSortMode] = useState<SortMode>(FeedSortMode.HOT);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const filtered = items.filter((item) =>
     searchQuery
@@ -227,7 +236,7 @@ function PublicFeedView({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setSortMode(FeedSortMode.HOT)}
+                onClick={() => onSortChange(FeedSortMode.HOT)}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
                   sortMode === FeedSortMode.HOT &&
@@ -240,7 +249,7 @@ function PublicFeedView({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setSortMode(FeedSortMode.RISING)}
+                onClick={() => onSortChange(FeedSortMode.RISING)}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
                   sortMode === FeedSortMode.RISING &&
@@ -253,7 +262,7 @@ function PublicFeedView({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setSortMode(FeedSortMode.NEW)}
+                onClick={() => onSortChange(FeedSortMode.NEW)}
                 className={cn(
                   "bg-card backdrop-blur-sm shadow-sm hover:bg-accent gap-2",
                   sortMode === FeedSortMode.NEW &&
@@ -271,7 +280,7 @@ function PublicFeedView({
                 type="text"
                 placeholder={t("get.search.description")}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => onSearchChange(e.target.value)}
                 className="pl-9"
               />
             </Div>
@@ -302,5 +311,29 @@ export function PublicFeedContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const items = field.value?.items ?? [];
-  return <PublicFeedView items={items} />;
+  const form = useWidgetForm<typeof definition.GET>();
+  const sortMode = form.watch("sortMode");
+  const searchQuery = form.watch("search") ?? "";
+
+  return (
+    <PublicFeedView
+      items={items}
+      sortMode={sortMode}
+      searchQuery={searchQuery}
+      onSortChange={(mode) =>
+        form.setValue("sortMode", mode, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        })
+      }
+      onSearchChange={(query) =>
+        form.setValue("search", query, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        })
+      }
+    />
+  );
 }

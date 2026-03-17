@@ -1,6 +1,9 @@
 /**
- * User Remote Connection Repository
- * DB operations for per-user remote connection config
+ * Remote Connection Repository
+ *
+ * DB operations for the two-table schema:
+ * - `instance_identities` — self-identity (who am I?)
+ * - `remote_connections`  — outbound connections (who do I talk to?)
  */
 
 import {
@@ -10,7 +13,7 @@ import {
   randomBytes,
 } from "node:crypto";
 
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -22,36 +25,27 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
+import { envClient } from "@/config/env-client";
 
-import type { RemoteConnectionByIdT } from "./[instanceId]/i18n";
+import type { RemoteConnectionDisconnectT } from "./[instanceId]/disconnect/i18n";
 import type { RemoteToolCapability } from "./db";
-import { userRemoteConnections } from "./db";
+import { instanceIdentities, remoteConnections } from "./db";
 
-/**
- * AES-256-GCM token encryption for remote connection JWTs stored in the DB.
- *
- * The encryption key is derived from JWT_SECRET_KEY via SHA-256, so no extra
- * env var is needed — if you have a valid JWT secret you can also decrypt tokens.
- *
- * Encrypted format: "enc:<iv_hex>:<tag_hex>:<ciphertext_hex>"
- * Plain tokens (legacy rows written before encryption was added) are detected by
- * absence of the "enc:" prefix and returned as-is for backwards compatibility.
- */
+// ─── Token Encryption ─────────────────────────────────────────────────────────
+
 const ALGORITHM = "aes-256-gcm";
 const ENC_PREFIX = "enc:";
 
 function getEncryptionKey(): Buffer {
-  // SHA-256 of the JWT secret gives a stable 32-byte AES-256 key.
-  // Using a domain-separation prefix prevents key reuse between JWT signing and AES.
   return createHash("sha256")
     .update("remote-token-aes:")
     .update(env.JWT_SECRET_KEY)
     .digest();
 }
 
-function encryptToken(token: string): string {
+export function encryptToken(token: string): string {
   const key = getEncryptionKey();
-  const iv = randomBytes(12); // 96-bit IV for GCM
+  const iv = randomBytes(12);
   const cipher = createCipheriv(ALGORITHM, key, iv);
   const ciphertext = Buffer.concat([
     cipher.update(token, "utf8"),
@@ -61,14 +55,14 @@ function encryptToken(token: string): string {
   return `${ENC_PREFIX}${iv.toString("hex")}:${tag.toString("hex")}:${ciphertext.toString("hex")}`;
 }
 
-function decryptToken(stored: string): string {
+export function decryptToken(stored: string): string {
   if (!stored.startsWith(ENC_PREFIX)) {
-    return stored; // legacy plaintext — backwards compatible
+    return stored; // legacy plaintext
   }
   const key = getEncryptionKey();
   const parts = stored.slice(ENC_PREFIX.length).split(":");
   if (parts.length !== 3) {
-    return stored; // malformed — return as-is
+    return stored; // malformed
   }
   const [ivHex, tagHex, ctHex] = parts as [string, string, string];
   const iv = Buffer.from(ivHex, "hex");
@@ -79,9 +73,149 @@ function decryptToken(stored: string): string {
   return decipher.update(ciphertext).toString("utf8") + decipher.final("utf8");
 }
 
+// ─── Connection Health ────────────────────────────────────────────────────────
+
+export type ConnectionHealth =
+  | "healthy"
+  | "warning"
+  | "critical"
+  | "disconnected";
+
+export function getConnectionHealth(conn: {
+  isActive: boolean;
+  lastSyncedAt: Date | null;
+}): ConnectionHealth {
+  if (!conn.isActive) {
+    return "disconnected";
+  }
+  if (!conn.lastSyncedAt) {
+    return "critical";
+  }
+  const ageMs = Date.now() - conn.lastSyncedAt.getTime();
+  if (ageMs < 3 * 60_000) {
+    return "healthy";
+  }
+  if (ageMs < 10 * 60_000) {
+    return "warning";
+  }
+  return "critical";
+}
+
+// ─── Instance Identities ──────────────────────────────────────────────────────
+
+/**
+ * Derive a default instanceId for this host from its runtime context.
+ * - Preview mode (IS_PREVIEW_MODE=true, vibe start) → "hermes"
+ * - Production (non-localhost URL) → "thea"
+ * - Local dev (vibe dev, localhost) → "hermes-dev"
+ *
+ * Used by register (cloud-side) and connect (local-side) to set self-identity,
+ * and by getLocalInstanceId as a fallback when no DB record exists.
+ */
+export function deriveDefaultSelfInstanceId(): string {
+  if (process.env["IS_PREVIEW_MODE"] === "true") {
+    return "hermes";
+  }
+
+  try {
+    const parsed = new URL(envClient.NEXT_PUBLIC_APP_URL);
+    const hostname = parsed.hostname;
+    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+      return "thea";
+    }
+  } catch {
+    // ignore
+  }
+
+  return "hermes-dev";
+}
+
+/**
+ * Upsert a self-identity record for this instance.
+ */
+export async function upsertInstanceIdentity(params: {
+  userId: string;
+  instanceId: string;
+  friendlyName: string;
+  isDefault?: boolean;
+}): Promise<void> {
+  const { userId, instanceId, friendlyName, isDefault = false } = params;
+
+  if (isDefault) {
+    await db
+      .update(instanceIdentities)
+      .set({ isDefault: false, updatedAt: new Date() })
+      .where(
+        and(
+          eq(instanceIdentities.userId, userId),
+          eq(instanceIdentities.isDefault, true),
+        ),
+      );
+  }
+
+  await db
+    .insert(instanceIdentities)
+    .values({
+      userId,
+      instanceId,
+      friendlyName,
+      isDefault,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [instanceIdentities.userId, instanceIdentities.instanceId],
+      set: {
+        friendlyName,
+        isDefault,
+        updatedAt: new Date(),
+      },
+    });
+}
+
+/**
+ * Get the instance identity for a specific user.
+ * Looks up the user's default identity from instance_identities.
+ * Falls back to deriveDefaultSelfInstanceId() if no DB record exists.
+ *
+ * For system-level code without a user (pulse, task-sync), use
+ * deriveDefaultSelfInstanceId() directly instead.
+ */
+const userInstanceIdCache = new Map<string, string>();
+
+export async function getLocalInstanceId(userId: string): Promise<string> {
+  const cached = userInstanceIdCache.get(userId);
+  if (cached) {
+    return cached;
+  }
+
+  const [row] = await db
+    .select({ instanceId: instanceIdentities.instanceId })
+    .from(instanceIdentities)
+    .where(
+      and(
+        eq(instanceIdentities.userId, userId),
+        eq(instanceIdentities.isDefault, true),
+      ),
+    )
+    .limit(1);
+
+  const result = row?.instanceId ?? deriveDefaultSelfInstanceId();
+  userInstanceIdCache.set(userId, result);
+  return result;
+}
+
+export function invalidateInstanceIdCache(userId?: string): void {
+  if (userId) {
+    userInstanceIdCache.delete(userId);
+  } else {
+    userInstanceIdCache.clear();
+  }
+}
+
+// ─── Remote Connections ───────────────────────────────────────────────────────
+
 /**
  * Get the current remote connection status for a user (no token in response).
- * Returns the first active connection if no instanceId specified.
  */
 export async function getRemoteConnection(
   user: JwtPrivatePayloadType,
@@ -95,17 +229,24 @@ export async function getRemoteConnection(
     lastSyncedAt: string | null;
     instanceId: string | null;
     friendlyName: string | null;
+    remoteFriendlyName: string | null;
+    healthStatus: ConnectionHealth | null;
   }>
 > {
-  const conditions = [eq(userRemoteConnections.userId, user.id)];
+  const conditions = [eq(remoteConnections.userId, user.id)];
   if (instanceId) {
-    conditions.push(eq(userRemoteConnections.instanceId, instanceId));
+    conditions.push(eq(remoteConnections.instanceId, instanceId));
   }
 
   const [row] = await db
     .select()
-    .from(userRemoteConnections)
-    .where(and(...conditions));
+    .from(remoteConnections)
+    .where(and(...conditions))
+    .orderBy(
+      desc(remoteConnections.isDefault),
+      desc(remoteConnections.updatedAt),
+    )
+    .limit(1);
 
   if (!row || !row.isActive) {
     logger.debug("No active remote connection for user", { userId: user.id });
@@ -116,14 +257,10 @@ export async function getRemoteConnection(
       lastSyncedAt: null,
       instanceId: null,
       friendlyName: null,
+      remoteFriendlyName: null,
+      healthStatus: null,
     });
   }
-
-  logger.debug("Retrieved remote connection", {
-    userId: user.id,
-    remoteUrl: row.remoteUrl,
-    instanceId: row.instanceId,
-  });
 
   return success({
     isConnected: true,
@@ -132,11 +269,14 @@ export async function getRemoteConnection(
     lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,
     instanceId: row.instanceId,
     friendlyName: row.friendlyName,
+    remoteFriendlyName: row.remoteFriendlyName,
+    healthStatus: getConnectionHealth(row),
   });
 }
 
 /**
- * Store or update a remote connection for a user (upsert on userId + instanceId)
+ * Store or update a remote connection (upsert on userId + instanceId).
+ * Also ensures a self-identity record exists.
  */
 export async function upsertRemoteConnection(params: {
   userId: string;
@@ -146,6 +286,8 @@ export async function upsertRemoteConnection(params: {
   instanceId?: string;
   friendlyName?: string;
   remoteInstanceId?: string;
+  remoteFriendlyName?: string;
+  isDefault?: boolean;
   logger: EndpointLogger;
 }): Promise<ResponseType<{ remoteUrl: string; isConnected: boolean }>> {
   const {
@@ -153,16 +295,47 @@ export async function upsertRemoteConnection(params: {
     remoteUrl,
     token,
     leadId,
-    instanceId = "hermes",
+    instanceId: rawInstanceId,
     friendlyName,
     remoteInstanceId,
+    remoteFriendlyName,
+    isDefault = false,
     logger,
   } = params;
 
+  // Derive instanceId from remote URL hostname if not explicitly provided
+  let instanceId = rawInstanceId;
+  if (!instanceId) {
+    try {
+      const parsed = new URL(remoteUrl);
+      const hostname = parsed.hostname;
+      if (hostname === "localhost" || hostname === "127.0.0.1") {
+        instanceId = `local-${parsed.port || "3000"}`;
+      } else {
+        instanceId = hostname.split(".")[0] ?? "remote";
+      }
+    } catch {
+      instanceId = "remote";
+    }
+  }
+
   const encryptedToken = encryptToken(token);
 
+  // Unmark previous default if setting this as default
+  if (isDefault) {
+    await db
+      .update(remoteConnections)
+      .set({ isDefault: false, updatedAt: new Date() })
+      .where(
+        and(
+          eq(remoteConnections.userId, userId),
+          eq(remoteConnections.isDefault, true),
+        ),
+      );
+  }
+
   await db
-    .insert(userRemoteConnections)
+    .insert(remoteConnections)
     .values({
       userId,
       remoteUrl,
@@ -171,18 +344,22 @@ export async function upsertRemoteConnection(params: {
       instanceId,
       friendlyName: friendlyName ?? instanceId,
       remoteInstanceId: remoteInstanceId ?? null,
+      remoteFriendlyName: remoteFriendlyName ?? null,
       isActive: true,
+      isDefault,
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
-      target: [userRemoteConnections.userId, userRemoteConnections.instanceId],
+      target: [remoteConnections.userId, remoteConnections.instanceId],
       set: {
         remoteUrl,
         token: encryptedToken,
         leadId: leadId ?? null,
         friendlyName: friendlyName ?? instanceId,
         remoteInstanceId: remoteInstanceId ?? null,
+        remoteFriendlyName: remoteFriendlyName ?? null,
         isActive: true,
+        isDefault,
         updatedAt: new Date(),
       },
     });
@@ -192,21 +369,22 @@ export async function upsertRemoteConnection(params: {
 }
 
 /**
- * Clear the remote connection for a user (by instanceId, or all if not specified)
+ * Clear a remote connection (by instanceId, or all if not specified).
+ * Does NOT delete instance identities — those persist across reconnects.
  */
 export async function clearRemoteConnection(
   user: JwtPrivatePayloadType,
   logger: EndpointLogger,
-  t: RemoteConnectionByIdT,
+  t: RemoteConnectionDisconnectT,
   instanceId?: string,
 ): Promise<ResponseType<{ disconnected: boolean }>> {
-  const conditions = [eq(userRemoteConnections.userId, user.id)];
+  const conditions = [eq(remoteConnections.userId, user.id)];
   if (instanceId) {
-    conditions.push(eq(userRemoteConnections.instanceId, instanceId));
+    conditions.push(eq(remoteConnections.instanceId, instanceId));
   }
 
   const result = await db
-    .delete(userRemoteConnections)
+    .delete(remoteConnections)
     .where(and(...conditions))
     .returning();
 
@@ -217,17 +395,13 @@ export async function clearRemoteConnection(
     });
   }
 
-  // Invalidate cache so subsequent reads reflect the disconnected state
   invalidateInstanceIdCache();
-
   logger.info("Cleared remote connection", { userId: user.id, instanceId });
   return success({ disconnected: true });
 }
 
 /**
- * Compute a cheap SHA256 hash of all shared memories for a user.
- * Input: sorted "id:updatedAt" pairs — no content, just identity + freshness.
- * This is stored on the connection row so sync never needs a full table scan.
+ * Compute SHA256 hash of all shared memories and store on active connections.
  */
 export async function computeAndStoreMemoriesHash(
   userId: string,
@@ -245,7 +419,6 @@ export async function computeAndStoreMemoriesHash(
       ),
     );
 
-  // Also include tombstones (unshared but still have syncId — need to propagate deletion)
   const tombstones = await db
     .select({ id: memories.id, updatedAt: memories.updatedAt })
     .from(memories)
@@ -260,14 +433,13 @@ export async function computeAndStoreMemoriesHash(
 
   const hash = createHash("sha256").update(sorted.join(",")).digest("hex");
 
-  // Store on all active connections for this user
   await db
-    .update(userRemoteConnections)
+    .update(remoteConnections)
     .set({ memoriesHash: hash, updatedAt: new Date() })
     .where(
       and(
-        eq(userRemoteConnections.userId, userId),
-        eq(userRemoteConnections.isActive, true),
+        eq(remoteConnections.userId, userId),
+        eq(remoteConnections.isActive, true),
       ),
     );
 
@@ -275,7 +447,7 @@ export async function computeAndStoreMemoriesHash(
 }
 
 /**
- * Get all active connections across all users — for system-level task sync iteration.
+ * Get all active connections across all users — for system-level task sync.
  */
 export async function getAllActiveConnectionsForSync(): Promise<
   Array<{
@@ -290,17 +462,17 @@ export async function getAllActiveConnectionsForSync(): Promise<
     capabilitiesVersion: string | null;
     taskCursor: string | null;
     remoteInstanceId: string | null;
+    localUrl: string | null;
+    isDirectlyAccessible: boolean;
   }>
 > {
   const rows = await db
     .select()
-    .from(userRemoteConnections)
-    .where(eq(userRemoteConnections.isActive, true));
+    .from(remoteConnections)
+    .where(eq(remoteConnections.isActive, true));
 
   return rows
-    .filter(
-      (r): r is typeof r & { token: string } => !!r.token && r.token !== "self",
-    )
+    .filter((r): r is typeof r & { token: string } => !!r.token)
     .map((r) => ({
       userId: r.userId,
       remoteUrl: r.remoteUrl,
@@ -313,13 +485,13 @@ export async function getAllActiveConnectionsForSync(): Promise<
       capabilitiesVersion: r.capabilitiesVersion ?? null,
       taskCursor: r.taskCursor ?? null,
       remoteInstanceId: r.remoteInstanceId ?? null,
+      localUrl: r.localUrl ?? null,
+      isDirectlyAccessible: r.isDirectlyAccessible,
     }));
 }
 
 /**
- * Get all active connections for a user — for task sync iteration and system prompt.
- * remoteInstanceId: the instanceId the remote uses to identify itself (from its self-record).
- * The AI should pass remoteInstanceId to execute-tool/help so tasks target the right instance.
+ * Get all active connections for a user — for task sync and system prompt.
  */
 export async function getAllActiveConnections(userId: string): Promise<
   Array<{
@@ -333,20 +505,16 @@ export async function getAllActiveConnections(userId: string): Promise<
 > {
   const rows = await db
     .select()
-    .from(userRemoteConnections)
+    .from(remoteConnections)
     .where(
       and(
-        eq(userRemoteConnections.userId, userId),
-        eq(userRemoteConnections.isActive, true),
+        eq(remoteConnections.userId, userId),
+        eq(remoteConnections.isActive, true),
       ),
     );
 
   return rows
-    .filter(
-      // Exclude self-identity records (token="self") — these are not real remotes.
-      // Only include rows with actual JWT tokens (real remote connections).
-      (r): r is typeof r & { token: string } => !!r.token && r.token !== "self",
-    )
+    .filter((r): r is typeof r & { token: string } => !!r.token)
     .map((r) => ({
       remoteUrl: r.remoteUrl,
       token: decryptToken(r.token),
@@ -358,7 +526,8 @@ export async function getAllActiveConnections(userId: string): Promise<
 }
 
 /**
- * Get the full connection record (with token) for a specific user+instance
+ * Get the full connection record (with decrypted token) for a specific user.
+ * Prefers isDefault=true, then most recently updated.
  */
 export async function getRemoteConnectionRecord(
   userId: string,
@@ -369,17 +538,23 @@ export async function getRemoteConnectionRecord(
   leadId: string;
   instanceId: string;
 } | null> {
-  const conditions = [eq(userRemoteConnections.userId, userId)];
+  const conditions = [eq(remoteConnections.userId, userId)];
   if (instanceId) {
-    conditions.push(eq(userRemoteConnections.instanceId, instanceId));
+    conditions.push(eq(remoteConnections.instanceId, instanceId));
   }
 
-  const [row] = await db
+  const rows = await db
     .select()
-    .from(userRemoteConnections)
-    .where(and(...conditions));
+    .from(remoteConnections)
+    .where(and(...conditions))
+    .orderBy(
+      sql`${remoteConnections.isDefault} DESC`,
+      sql`${remoteConnections.updatedAt} DESC`,
+    )
+    .limit(1);
 
-  if (!row || !row.isActive || !row.token || row.token === "self") {
+  const row = rows[0];
+  if (!row || !row.isActive || !row.token) {
     return null;
   }
 
@@ -393,7 +568,6 @@ export async function getRemoteConnectionRecord(
 
 /**
  * Update lastSyncedAt + capabilities snapshot for a connection.
- * Also stores the remote's memoriesHash so future syncs can diff.
  */
 export async function touchLastSynced(
   userId: string,
@@ -402,12 +576,13 @@ export async function touchLastSynced(
     capabilities?: RemoteToolCapability[];
     capabilitiesVersion?: string;
     remoteMemoriesHash?: string;
+    remoteFriendlyName?: string;
     taskCursor?: string;
     isActive?: boolean;
   },
 ): Promise<void> {
   await db
-    .update(userRemoteConnections)
+    .update(remoteConnections)
     .set({
       lastSyncedAt: new Date(),
       updatedAt: new Date(),
@@ -420,6 +595,9 @@ export async function touchLastSynced(
       ...(opts?.remoteMemoriesHash !== undefined
         ? { remoteMemoriesHash: opts.remoteMemoriesHash }
         : {}),
+      ...(opts?.remoteFriendlyName !== undefined
+        ? { remoteFriendlyName: opts.remoteFriendlyName }
+        : {}),
       ...(opts?.taskCursor !== undefined
         ? { taskCursor: opts.taskCursor }
         : {}),
@@ -427,77 +605,14 @@ export async function touchLastSynced(
     })
     .where(
       and(
-        eq(userRemoteConnections.userId, userId),
-        eq(userRemoteConnections.instanceId, instanceId),
+        eq(remoteConnections.userId, userId),
+        eq(remoteConnections.instanceId, instanceId),
       ),
     );
 }
 
 /**
- * Get this instance's own ID from the DB.
- * Self-identity row has token="self". This is the canonical record created by
- * the register endpoint when a remote connects to us. Falls back to the first
- * outbound connection row (token IS NOT NULL AND != 'self') when no self-record
- * exists yet (e.g. the instance connected out but no remote has registered here).
- */
-let cachedInstanceId: string | null | undefined = undefined;
-
-export async function getLocalInstanceId(): Promise<string | null> {
-  // Cache only when we have a value — don't cache null so the next pulse
-  // retries after a connection is established (e.g. after dev seeds run).
-  if (cachedInstanceId !== undefined) {
-    return cachedInstanceId;
-  }
-
-  // Prefer the explicit self-record (token="self") — this is the authoritative
-  // identity set when a remote instance registers here.
-  const [selfRow] = await db
-    .select({ instanceId: userRemoteConnections.instanceId })
-    .from(userRemoteConnections)
-    .where(
-      and(
-        eq(userRemoteConnections.isActive, true),
-        eq(userRemoteConnections.token, "self"),
-      ),
-    )
-    .limit(1);
-
-  if (selfRow) {
-    cachedInstanceId = selfRow.instanceId;
-    return selfRow.instanceId;
-  }
-
-  // Fallback: use the instanceId from the first outbound connection row.
-  // This covers the case where we've connected out but haven't been registered by a remote yet.
-  const [connRow] = await db
-    .select({ instanceId: userRemoteConnections.instanceId })
-    .from(userRemoteConnections)
-    .where(
-      and(
-        eq(userRemoteConnections.isActive, true),
-        sql`${userRemoteConnections.token} IS NOT NULL AND ${userRemoteConnections.token} != '' AND ${userRemoteConnections.token} != 'self'`,
-      ),
-    )
-    .limit(1);
-
-  const id = connRow?.instanceId ?? null;
-  if (id !== null) {
-    cachedInstanceId = id; // Only cache when found — retry on next call if null
-  }
-  return id;
-}
-
-/**
- * Invalidate the cached instance ID (call after connect/disconnect).
- */
-export function invalidateInstanceIdCache(): void {
-  cachedInstanceId = undefined;
-}
-
-/**
- * Get capabilities snapshot for a connection identified by instanceId or remoteInstanceId.
- * - Cloud looking up dev: matches by instanceId ("hermes") on cloud's connection row
- * - Dev looking up cloud: matches by remoteInstanceId ("thea") on dev's connection row
+ * Get capabilities snapshot for a connection by instanceId or remoteInstanceId.
  */
 export async function getCapabilities(
   userId: string,
@@ -508,8 +623,8 @@ export async function getCapabilities(
 }
 
 /**
- * Get the connection row (capabilities + remoteInstanceId) for a given instanceId label.
- * Matches by either instanceId (local label) or remoteInstanceId (what remote calls itself).
+ * Get connection row (capabilities + remoteInstanceId) by instanceId label.
+ * Matches by either instanceId (local label) or remoteInstanceId (remote's name).
  */
 export async function getConnectionForInstance(
   userId: string,
@@ -517,20 +632,29 @@ export async function getConnectionForInstance(
 ): Promise<{
   capabilities: RemoteToolCapability[] | null;
   remoteInstanceId: string | null;
+  isDirectlyAccessible: boolean;
+  remoteUrl: string;
+  /** Local instance URL — set on cloud-side records to push tasks/memories directly. */
+  localUrl: string | null;
+  token: string | null;
 } | null> {
   const [row] = await db
     .select({
-      capabilities: userRemoteConnections.capabilities,
-      remoteInstanceId: userRemoteConnections.remoteInstanceId,
+      capabilities: remoteConnections.capabilities,
+      remoteInstanceId: remoteConnections.remoteInstanceId,
+      isDirectlyAccessible: remoteConnections.isDirectlyAccessible,
+      remoteUrl: remoteConnections.remoteUrl,
+      localUrl: remoteConnections.localUrl,
+      token: remoteConnections.token,
     })
-    .from(userRemoteConnections)
+    .from(remoteConnections)
     .where(
       and(
-        eq(userRemoteConnections.userId, userId),
-        eq(userRemoteConnections.isActive, true),
+        eq(remoteConnections.userId, userId),
+        eq(remoteConnections.isActive, true),
         or(
-          eq(userRemoteConnections.instanceId, instanceId),
-          eq(userRemoteConnections.remoteInstanceId, instanceId),
+          eq(remoteConnections.instanceId, instanceId),
+          eq(remoteConnections.remoteInstanceId, instanceId),
         ),
       ),
     );
@@ -541,5 +665,36 @@ export async function getConnectionForInstance(
   return {
     capabilities: row.capabilities,
     remoteInstanceId: row.remoteInstanceId,
+    isDirectlyAccessible: row.isDirectlyAccessible,
+    remoteUrl: row.remoteUrl,
+    localUrl: row.localUrl,
+    token: row.token ? decryptToken(row.token) : null,
   };
+}
+
+/**
+ * Get capabilities for a remote instance without requiring a specific userId.
+ * Used by CLI_AUTH_BYPASS / public contexts where userId is unavailable.
+ * Read-only metadata — safe for unauthenticated discovery.
+ */
+export async function getCapabilitiesAnyUser(
+  instanceId: string,
+): Promise<RemoteToolCapability[] | null> {
+  const [row] = await db
+    .select({
+      capabilities: remoteConnections.capabilities,
+    })
+    .from(remoteConnections)
+    .where(
+      and(
+        eq(remoteConnections.isActive, true),
+        or(
+          eq(remoteConnections.instanceId, instanceId),
+          eq(remoteConnections.remoteInstanceId, instanceId),
+        ),
+      ),
+    )
+    .limit(1);
+
+  return row?.capabilities ?? null;
 }

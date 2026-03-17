@@ -370,6 +370,7 @@ export const translations = {
       boundary: {
         stackTrace: "Stack Trace",
         componentStack: "Component Stack",
+        componentStackFull: "Component Stack (full)",
         errorDetails: "Error Details",
         name: "Name:",
         errorMessage: "Message:",
@@ -387,7 +388,7 @@ export const translations = {
     analyticsTransformers: "Analytics: Transformers",
     browser: "Browser",
     browserDevTools: "Browser: DevTools",
-    chatCharacters: "Chat: Characters",
+    chatSkills: "Chat: Skills",
     chatFavorites: "Chat: Favorites",
     chatMemories: "Chat: Memories",
     chatMessages: "Chat: Messages",

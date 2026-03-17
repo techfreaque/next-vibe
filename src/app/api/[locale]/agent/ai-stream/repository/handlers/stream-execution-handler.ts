@@ -5,7 +5,11 @@
 import "server-only";
 
 import type { ModelMessage } from "ai";
-import { stepCountIs, streamText as aiStreamText } from "ai";
+import {
+  stepCountIs,
+  streamText as aiStreamText,
+  type StopCondition,
+} from "ai";
 
 const DEFAULT_TEMPERATURE = 0.7;
 
@@ -21,7 +25,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { AiStreamT } from "../../stream/i18n";
-import { MAX_TOOL_CALLS } from "../core/constants";
+import {
+  AbortReason,
+  MAX_TOOL_CALLS,
+  StreamAbortError,
+} from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
@@ -49,7 +57,7 @@ export class StreamExecutionHandler {
     ctx: StreamContext;
     threadId: string;
     model: ModelId;
-    character: string;
+    skill: string;
     isIncognito: boolean;
     userId: string | undefined;
     emittedToolResultIds: Set<string> | undefined;
@@ -73,7 +81,7 @@ export class StreamExecutionHandler {
       ctx,
       threadId,
       model,
-      character,
+      skill,
       isIncognito,
       userId,
       emittedToolResultIds,
@@ -113,7 +121,19 @@ export class StreamExecutionHandler {
       ...(tools
         ? {
             tools,
-            stopWhen: stepCountIs(MAX_TOOL_CALLS),
+            stopWhen: [
+              stepCountIs(MAX_TOOL_CALLS),
+              // endLoop / approve: stop before the next AI turn starts.
+              // The current step (tool calls + results) finishes naturally;
+              // this predicate prevents the AI SDK from making another API request.
+              // wakeUp: also yield when a wake-up-ready pub/sub signal has arrived.
+              (
+                (): StopCondition<typeof tools> => () =>
+                  ctx.shouldStopLoop ||
+                  ctx.stepHasToolsAwaitingConfirmation ||
+                  ctx.shouldYieldForWakeUp
+              )(),
+            ],
             onStepFinish: (stepResult): void => {
               // Tool arguments are already sent via tool-call stream events.
               // Additionally: check real input token usage and abort if we are
@@ -130,7 +150,7 @@ export class StreamExecutionHandler {
                   },
                 );
                 streamAbortController.abort(
-                  new Error("context-window-guard: tool loop aborted"),
+                  new StreamAbortError(AbortReason.CONTEXT_WINDOW_GUARD),
                 );
               }
             },
@@ -145,7 +165,7 @@ export class StreamExecutionHandler {
           ctx,
           threadId,
           model,
-          character,
+          skill,
           isIncognito,
           userId,
           user,
@@ -170,8 +190,52 @@ export class StreamExecutionHandler {
         ttsHandler.cancel();
       }
 
-      // If stream was aborted, handle it inline and emit all events NOW
-      // (before the ReadableStream's cancel() closes the controller)
+      // If stream was intentionally aborted, run AbortErrorHandler for cleanup
+      // (save partial content, deduct credits, emit interruption message).
+      // The handler is idempotent via ctx.abortHandled flag.
+      if (streamAbortController.signal.aborted) {
+        const reason = streamAbortController.signal.reason;
+        const abortError =
+          reason instanceof Error
+            ? reason
+            : new Error(String(reason ?? "Stream aborted"));
+
+        if (!ctx.abortHandled) {
+          const { AbortErrorHandler } = await import("./abort-error-handler");
+          await AbortErrorHandler.handleAbortError({
+            error: abortError,
+            ctx,
+            logger,
+            threadId,
+            isIncognito,
+            userId,
+            model,
+            systemPrompt,
+            trailingSystemMessage,
+            messages,
+            tools,
+            user,
+            t,
+          });
+          ctx.abortHandled = true;
+        } else {
+          logger.info(
+            "[AI Stream] Swallowing post-abort error (already handled)",
+            {
+              abortReason: abortError.message,
+              errorName:
+                streamError instanceof Error ? streamError.name : "unknown",
+              errorMessage:
+                streamError instanceof Error
+                  ? streamError.message
+                  : String(streamError),
+            },
+          );
+        }
+        return;
+      }
+
+      // Non-abort error: try AbortErrorHandler (handles e.g. "Client disconnected")
       if (streamError instanceof Error) {
         const { AbortErrorHandler } = await import("./abort-error-handler");
         const { wasHandled } = await AbortErrorHandler.handleAbortError({
@@ -191,6 +255,7 @@ export class StreamExecutionHandler {
         });
 
         if (wasHandled) {
+          ctx.abortHandled = true;
           return;
         }
       }

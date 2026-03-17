@@ -15,14 +15,17 @@ import { defaultLocale } from "@/i18n/core/config";
 import {
   envClient as env_envClient,
   envClientSchema as env_envClientSchema,
+  envClientExamples,
 } from "../../../../../config/env-client";
 import {
   contactClientEnv,
   contactClientEnvSchema,
+  contactClientEnvExamples,
 } from "../../contact/env-client";
 import {
   paymentClientEnv,
   paymentClientEnvSchema,
+  paymentClientEnvExamples,
 } from "../../payment/env-client";
 
 // Platform detection (will be set at runtime)
@@ -39,9 +42,21 @@ const platform = {
 
 // Module registry for introspection
 export const envClientModules = {
-  env: { env: env_envClient, schema: env_envClientSchema },
-  contact: { env: contactClientEnv, schema: contactClientEnvSchema },
-  payment: { env: paymentClientEnv, schema: paymentClientEnvSchema },
+  env: {
+    env: env_envClient,
+    schema: env_envClientSchema,
+    examples: envClientExamples,
+  },
+  contact: {
+    env: contactClientEnv,
+    schema: contactClientEnvSchema,
+    examples: contactClientEnvExamples,
+  },
+  payment: {
+    env: paymentClientEnv,
+    schema: paymentClientEnvSchema,
+    examples: paymentClientEnvExamples,
+  },
 } as const;
 
 // Export platform for external use

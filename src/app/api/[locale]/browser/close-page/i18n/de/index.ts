@@ -80,6 +80,6 @@ export const translations: typeof enTranslations = {
   category: "Browser",
   tags: {
     browserAutomation: "Browser-Automatisierung",
-    chromeDevTools: "Chrome DevTools",
+    navigationAutomation: "Navigationsautomatisierung",
   },
 };

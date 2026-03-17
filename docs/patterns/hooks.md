@@ -21,7 +21,7 @@ A `hooks.ts` file (or `hooks/` folder) is justified when:
 ### Simple: `hooks.ts` (single file)
 
 ```
-src/app/api/[locale]/agent/chat/characters/[id]/
+src/app/api/[locale]/agent/chat/skills/[id]/
 ├── definition.ts
 ├── repository.ts
 ├── route.ts
@@ -80,34 +80,34 @@ import { useEndpoint } from "@/app/api/.../react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/.../shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/.../user/auth/types";
 
-import type { CharacterGetResponseOutput } from "./definition";
+import type { SkillGetResponseOutput } from "./definition";
 import definitions from "./definition";
 
-export function useCharacter(
-  characterId: string | undefined,
+export function useSkill(
+  skillId: string | undefined,
   user: JwtPayloadType,
   logger: EndpointLogger,
-  initialData?: CharacterGetResponseOutput | null,
-): CharacterEndpointReturn {
+  initialData?: SkillGetResponseOutput | null,
+): SkillEndpointReturn {
   const options = useMemo(
     () => ({
       read: {
         queryOptions: {
-          enabled: !!characterId,
+          enabled: !!skillId,
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000,
         },
-        ...(characterId ? { urlPathParams: { id: characterId } } : {}),
+        ...(skillId ? { urlPathParams: { id: skillId } } : {}),
         initialData: initialData ?? undefined,
       },
     }),
-    [characterId, initialData],
+    [skillId, initialData],
   );
   return useEndpoint(definitions, options, logger, user);
 }
 
 // Export the return type — consumers import this for typing
-export type CharacterEndpointReturn = EndpointReturn<typeof definitions>;
+export type SkillEndpointReturn = EndpointReturn<typeof definitions>;
 ```
 
 ### Key rules

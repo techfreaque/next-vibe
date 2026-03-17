@@ -125,7 +125,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
   const result = field.value;
 
   // Watch taskId from form
-  const taskId = form?.watch("taskId") ?? "";
+  const taskId = form.watch("taskId") ?? "";
 
   // Fetch cron task details to get routeId + taskInput
   // Use only { GET } so options type doesn't require PUT/DELETE url params

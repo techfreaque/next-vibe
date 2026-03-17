@@ -41,14 +41,14 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
-} from "../../characters/create/definition";
+} from "../../skills/create/definition";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   PriceLevel,
   SpeedLevel,
-} from "../../characters/enum";
+} from "../../skills/enum";
 import {
   FAVORITE_DELETE_ALIAS,
   FAVORITE_GET_ALIAS,
@@ -82,11 +82,10 @@ const { DELETE } = createEndpoint({
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
-        const charactersDefinition =
-          await import("../../characters/definition");
+        const charactersDefinition = await import("../../skills/definition");
 
-        // Find the characterId from the deleted favorite
-        let deletedCharacterId: string | null = null;
+        // Find the skillId from the deleted favorite
+        let deletedSkillId: string | null = null;
 
         // Get the favorite from the list before removing it
         apiClient.updateEndpointData(
@@ -98,7 +97,7 @@ const { DELETE } = createEndpoint({
                 (fav) => fav.id === data.pathParams.id,
               );
               if (deletedFavorite) {
-                deletedCharacterId = deletedFavorite.characterId;
+                deletedSkillId = deletedFavorite.skillId;
               }
             }
             return oldData;
@@ -117,6 +116,7 @@ const { DELETE } = createEndpoint({
             return {
               success: true,
               data: {
+                ...oldData.data,
                 favorites: oldData.data.favorites.filter(
                   (fav) => fav.id !== data.pathParams.id,
                 ),
@@ -125,8 +125,8 @@ const { DELETE } = createEndpoint({
           },
         );
 
-        // Optimistically update characters list addedToFav if we found the characterId
-        if (deletedCharacterId) {
+        // Optimistically update characters list addedToFav if we found the skillId
+        if (deletedSkillId) {
           apiClient.updateEndpointData(
             charactersDefinition.default.GET,
             data.logger,
@@ -138,10 +138,11 @@ const { DELETE } = createEndpoint({
               return {
                 success: true,
                 data: {
+                  ...oldData.data,
                   sections: oldData.data.sections.map((section) => ({
                     ...section,
-                    characters: section.characters.map((char) =>
-                      char.id === deletedCharacterId
+                    characters: section.skills.map((char) =>
+                      char.id === deletedSkillId
                         ? { ...char, addedToFav: false }
                         : char,
                     ),
@@ -206,7 +207,7 @@ const { DELETE } = createEndpoint({
 
       // === RESPONSE ===
       // Note: id is already known from the URL param, not repeated
-      characterId: responseField(scopedTranslation, {
+      skillId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
@@ -279,7 +280,7 @@ const { DELETE } = createEndpoint({
     },
     responses: {
       delete: {
-        characterId: "thea",
+        skillId: "thea",
         voice: null,
         modelSelection: null,
         createdAt: "2024-01-15T10:00:00.000Z",
@@ -333,14 +334,13 @@ const { PATCH } = createEndpoint({
         if (isActiveFavorite && settingsData?.success) {
           let modelId = settingsData.data.selectedModel;
           if (requestData.modelSelection) {
-            const { CharactersRepositoryClient } =
-              await import("../../characters/repository-client");
-            const bestModel =
-              CharactersRepositoryClient.getBestModelForFavorite(
-                requestData.modelSelection,
-                undefined,
-                user,
-              );
+            const { SkillsRepositoryClient } =
+              await import("../../skills/repository-client");
+            const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+              requestData.modelSelection,
+              undefined,
+              user,
+            );
             modelId = bestModel?.id || settingsData.data.selectedModel;
           }
 
@@ -401,6 +401,7 @@ const { PATCH } = createEndpoint({
             return {
               success: true,
               data: {
+                ...oldData.data,
                 favorites: oldData.data.favorites.map((fav) => {
                   if (fav.id !== pathParams.id) {
                     return fav;
@@ -433,7 +434,7 @@ const { PATCH } = createEndpoint({
                     ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
                       {
                         id: pathParams.id,
-                        characterId: fav.characterId,
+                        skillId: fav.skillId,
                         customIcon: requestData.icon ?? null,
                         voice: requestData.voice ?? null,
                         modelSelection: requestData.modelSelection,
@@ -523,10 +524,10 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST ===
-      characterId: requestField(scopedTranslation, {
+      skillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "patch.characterId.label" as const,
+        label: "patch.skillId.label" as const,
         columns: 6,
         hidden: true,
         schema: z.string().optional(),
@@ -576,11 +577,11 @@ const { PATCH } = createEndpoint({
       }),
 
       // Tool configuration — null = fall through to character/settings default
-      allowedTools: requestField(scopedTranslation, {
+      availableTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "patch.allowedTools.label" as const,
-        description: "patch.allowedTools.description" as const,
+        label: "patch.availableTools.label" as const,
+        description: "patch.availableTools.description" as const,
         schema: z
           .array(
             z.object({
@@ -605,6 +606,42 @@ const { PATCH } = createEndpoint({
           )
           .nullable()
           .optional(),
+      }),
+      // Additional tool blocks on top of skill's defaults — hard blocked regardless of other settings
+      deniedTools: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.deniedTools.label" as const,
+        description: "patch.deniedTools.description" as const,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
+      }),
+      // Extra text appended to the skill's system prompt for this slot only
+      promptAppend: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "patch.promptAppend.label" as const,
+        description: "patch.promptAppend.description" as const,
+        placeholder: "patch.promptAppend.placeholder" as const,
+        columns: 12,
+        schema: z.string().nullable().optional(),
+      }),
+
+      // Memory budget limit (null = fall through to skill or global default)
+      memoryLimit: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "patch.memoryLimit.label" as const,
+        description: "patch.memoryLimit.description" as const,
+        columns: 6,
+        schema: z.number().int().min(100).max(100000).nullable().optional(),
       }),
     },
   }),
@@ -656,7 +693,7 @@ const { PATCH } = createEndpoint({
   examples: {
     requests: {
       update: {
-        characterId: "thea",
+        skillId: "thea",
         icon: "sun" as const,
         voice: TtsVoice.FEMALE,
         modelSelection: {
@@ -679,7 +716,9 @@ const { PATCH } = createEndpoint({
           },
         },
         compactTrigger: null,
-        allowedTools: [{ toolId: "execute-tool", requiresConfirmation: false }],
+        availableTools: [
+          { toolId: "execute-tool", requiresConfirmation: false },
+        ],
         pinnedTools: null,
       },
     },
@@ -765,7 +804,7 @@ const { GET } = createEndpoint({
       }),
 
       // === FLAT RESPONSE FIELDS ===
-      characterId: responseField(scopedTranslation, {
+      skillId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
         hidden: true,
@@ -826,7 +865,7 @@ const { GET } = createEndpoint({
       }),
 
       // Tool configuration — null = fall through to character/settings default
-      allowedTools: responseField(scopedTranslation, {
+      availableTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
@@ -849,6 +888,28 @@ const { GET } = createEndpoint({
             }),
           )
           .nullable(),
+      }),
+      deniedTools: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().optional(),
+            }),
+          )
+          .nullable(),
+      }),
+      promptAppend: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().nullable(),
+      }),
+      memoryLimit: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.number().int().nullable(),
       }),
     },
   }),
@@ -900,9 +961,9 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        characterId: "thea",
+        skillId: "thea",
         icon: "sun" as const,
-        name: "fallbacks.unknownCharacter" as const,
+        name: "fallbacks.unknownSkill" as const,
         tagline: "fallbacks.noTagline" as const,
         description: "fallbacks.noDescription" as const,
         voice: null,
@@ -945,8 +1006,11 @@ const { GET } = createEndpoint({
           },
         },
         compactTrigger: null,
-        allowedTools: null,
+        availableTools: null,
         pinnedTools: null,
+        deniedTools: null,
+        promptAppend: null,
+        memoryLimit: null,
       },
     },
     urlPathParams: {
@@ -1001,7 +1065,7 @@ export type FavoriteGetManualModelSelection = Extract<
   { selectionType: typeof ModelSelectionType.MANUAL }
 >;
 
-export type FavoriteGetCharacterBasedModelSelection = Extract<
+export type FavoriteGetSkillBasedModelSelection = Extract<
   FavoriteGetModelSelection,
   { selectionType: typeof ModelSelectionType.CHARACTER_BASED }
 >;
@@ -1014,7 +1078,7 @@ const _test_get_2: ManualModelSelection = {} as FavoriteGetManualModelSelection;
 // oxlint-disable-next-line no-unused-vars
 const _test_get_3: {
   selectionType: typeof ModelSelectionType.CHARACTER_BASED;
-} = {} as FavoriteGetCharacterBasedModelSelection;
+} = {} as FavoriteGetSkillBasedModelSelection;
 
 // PATCH request tests
 type FavoriteModelSelection = FavoriteUpdateRequestOutput["modelSelection"];
@@ -1029,7 +1093,7 @@ type FavoriteManualModelSelection = Extract<
   { selectionType: typeof ModelSelectionType.MANUAL }
 >;
 
-type FavoriteCharacterBasedModelSelection = Extract<
+type FavoriteSkillBasedModelSelection = Extract<
   FavoriteModelSelection,
   { selectionType: typeof ModelSelectionType.CHARACTER_BASED }
 >;
@@ -1041,4 +1105,4 @@ const _test2: ManualModelSelection = {} as FavoriteManualModelSelection;
 // oxlint-disable-next-line no-unused-vars
 const _test3: {
   selectionType: typeof ModelSelectionType.CHARACTER_BASED;
-} = {} as FavoriteCharacterBasedModelSelection;
+} = {} as FavoriteSkillBasedModelSelection;

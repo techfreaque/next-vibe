@@ -85,6 +85,24 @@ const { POST } = createEndpoint({
             "The absolute or relative path to save the response body to. If omitted, the body is returned inline.",
           ),
       }),
+      maxBodyLength: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get-network-request.form.fields.maxBodyLength.label",
+        description:
+          "get-network-request.form.fields.maxBodyLength.description",
+        placeholder:
+          "get-network-request.form.fields.maxBodyLength.placeholder",
+        columns: 4,
+        schema: z
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe(
+            "Maximum number of characters to return from inline request/response bodies. Bodies exceeding this limit are truncated with a notice. Omit for no limit.",
+          ),
+      }),
 
       // Response fields
       success: responseField(scopedTranslation, {

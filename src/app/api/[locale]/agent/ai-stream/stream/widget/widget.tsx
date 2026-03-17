@@ -17,14 +17,15 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
@@ -76,40 +77,70 @@ interface CustomWidgetProps {
 // ─── Main Widget ─────────────────────────────────────────────────────────────
 
 function AiStreamChatArea(): JSX.Element {
-  const { initialMessagesData, initialThreadId } = useChatBootContext();
+  const { initialMessagesData, initialPathData, initialThreadId } =
+    useChatBootContext();
 
   const locale = useWidgetLocale();
   const user = useWidgetUser();
-
+  const logger = useWidgetLogger();
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
-  const pendingNewThreadIds = useChatStore((s) => s.pendingNewThreadIds);
-
-  const isThreadPending =
-    !!activeThreadId && pendingNewThreadIds.has(activeThreadId);
 
   const threadIdToRender =
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null;
 
-  const messagesInitialData =
-    threadIdToRender && threadIdToRender === initialThreadId
-      ? initialMessagesData
-      : null;
+  // Prefer initialMessagesData (full messages list); fall back to initialPathData messages.
+  // Both apply only to the boot thread — navigated-to threads must fetch fresh.
+  const messagesInitialData = useMemo(() => {
+    if (!threadIdToRender || threadIdToRender !== initialThreadId) {
+      return null;
+    }
+    if (initialMessagesData) {
+      return initialMessagesData;
+    }
+    if (initialPathData?.messages?.length) {
+      return { messages: initialPathData.messages };
+    }
+    return null;
+  }, [threadIdToRender, initialThreadId, initialMessagesData, initialPathData]);
 
   const inputContainerRef = useRef<DivRefObject>(null);
   const inputHeight = useInputHeight(inputContainerRef);
   const insets = useSafeAreaInsets();
 
+  // Single endpoint instance — used both for pre-seeding (initialData) and as the
+  // widget form owner passed into EndpointsPage via endpointInstance.
+  const messagesReadOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { threadId: threadIdToRender ?? "" },
+        initialState: { rootFolderId },
+        queryOptions: { enabled: !!threadIdToRender, staleTime: Infinity },
+        ...(messagesInitialData ? { initialData: messagesInitialData } : {}),
+      },
+      create: {
+        urlPathParams: { threadId: threadIdToRender ?? "" },
+      },
+    }),
+    [threadIdToRender, rootFolderId, messagesInitialData],
+  );
+  const messagesEndpointInstance = useEndpoint(
+    messagesDefinition,
+    messagesReadOptions,
+    logger,
+    user,
+  );
+  // endpointOptions for EndpointsPage type constraint — only read needed since we pass GET only
   const messagesEndpointOptions = useMemo(
     () => ({
       read: {
         urlPathParams: { threadId: threadIdToRender ?? "" },
         initialState: { rootFolderId },
-        queryOptions: { enabled: !!threadIdToRender && !isThreadPending },
+        queryOptions: { enabled: !!threadIdToRender, staleTime: Infinity },
         ...(messagesInitialData ? { initialData: messagesInitialData } : {}),
       },
     }),
-    [threadIdToRender, rootFolderId, isThreadPending, messagesInitialData],
+    [threadIdToRender, rootFolderId, messagesInitialData],
   );
 
   return (
@@ -144,6 +175,7 @@ function AiStreamChatArea(): JSX.Element {
                   key={threadIdToRender}
                   endpoint={{ GET: messagesDefinition.GET }}
                   endpointOptions={messagesEndpointOptions}
+                  endpointInstance={messagesEndpointInstance}
                   className="h-full"
                   locale={locale}
                   user={user}

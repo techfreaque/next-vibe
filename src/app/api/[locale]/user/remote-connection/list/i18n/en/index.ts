@@ -101,6 +101,12 @@ export const translations = {
       noConnectionsYet: "No connections yet.",
       connectionsTitle: "Linked Connections",
     },
+    // Self-identity
+    selfIdentity: {
+      title: "Your Instance ID",
+      description:
+        "Other instances see this server as this ID. Must be unique across all connected instances.",
+    },
     // Sync settings (admin only)
     syncSettings: {
       title: "Auto-Sync",

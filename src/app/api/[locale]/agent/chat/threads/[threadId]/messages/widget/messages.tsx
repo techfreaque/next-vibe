@@ -30,36 +30,40 @@ import {
 } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
-import characterDefinitions from "@/app/api/[locale]/agent/chat/characters/[id]/definition";
+import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
+import { parseError } from "next-vibe/shared/utils";
+
+import { executeQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/query-executor";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
+  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
 
+import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
+import messagesDefinition from "../definition";
 import { loadMessageAttachments } from "../hooks/load-message-attachments";
-import { useStreamingMessagesStore } from "../hooks/streaming-messages-store";
 import { useBranchManagement } from "../hooks/use-branch-management";
 import { useCollapseState } from "../hooks/use-collapse-state";
-import {
-  useFullLoadFallback,
-  useLazyBranchLoader,
-} from "../hooks/use-lazy-branch-loader";
 import { useMessageEditorStore } from "../hooks/use-message-editor-store";
 import { useMessagesSubscription } from "../hooks/use-messages-subscription";
 import { useMessageOperations } from "../hooks/use-operations";
+import pathDefinitions from "../path/definition";
+import { patchMessage, upsertMessage } from "../hooks/update-messages";
 import { scopedTranslation } from "../i18n";
 import { FlatMessageView } from "./flat-view/view";
+import { DebugLinearMessageView } from "./linear-view/view-debug";
 import { LinearMessageView } from "./linear-view/view";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
@@ -132,10 +136,9 @@ export function ChatMessages({
   // Boot context for stable server-origin values
   const {
     initialCredits,
-    initialPathData,
     initialThreadId: bootInitialThreadId,
     initialSettingsData,
-    initialCharacterData,
+    initialSkillData,
   } = useChatBootContext();
 
   // Navigation state from Zustand store
@@ -147,73 +150,70 @@ export function ChatMessages({
     (s) => s.currentSubFolderId,
   );
 
-  // Chat store state
-  const threads = useChatStore((s) => s.threads);
-  const allMessages = useChatStore((s) => s.messages);
-  const isLoading = useChatStore((s) => s.isLoading);
-  const threadLoadMode = useChatStore((s) => s.threadLoadMode);
-  const setThreadLoadMode = useChatStore((s) => s.setThreadLoadMode);
-  const addMessage = useChatStore((s) => s.addMessage);
-  const chatSetLoading = useChatStore((s) => s.setLoading);
-  const chatGetThreadMessages = useChatStore((s) => s.getThreadMessages);
-  const chatDeleteMessage = useChatStore((s) => s.deleteMessage);
-  const chatUpdateMessage = useChatStore((s) => s.updateMessage);
+  // Read messages reactively from the React Query / apiClient cache via useEndpoint.
+  // staleTime: Infinity — data is managed via updateEndpointData/upsertMessage; never auto-refetch.
+  const messagesEndpointOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { threadId: activeThreadId ?? "" },
+        initialState: { rootFolderId: currentRootFolderId },
+        queryOptions: {
+          enabled: !!activeThreadId && activeThreadId !== NEW_MESSAGE_ID,
+          staleTime: Infinity,
+        },
+      },
+      create: {
+        urlPathParams: { threadId: activeThreadId ?? "" },
+      },
+    }),
+    [activeThreadId, currentRootFolderId],
+  );
+  const messagesEndpoint = useEndpoint(
+    messagesDefinition,
+    messagesEndpointOptions,
+    logger,
+    user,
+  );
 
-  // Derived state
-  const activeThread = activeThreadId
-    ? (threads[activeThreadId] ?? null)
-    : null;
-  const activeThreadMessages = useMemo(() => {
+  const isLoading = messagesEndpoint.read?.isLoading ?? false;
+
+  const activeThreadMessages: ChatMessage[] = useMemo(() => {
     if (!activeThreadId || activeThreadId === NEW_MESSAGE_ID) {
       return [];
     }
-    const stored = Object.values(allMessages)
-      .filter((msg) => msg.threadId === activeThreadId)
-      .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-    // Fall back to SSR path data on first render (before useEffect populates Zustand).
-    // Only use for the boot thread — navigated-to threads must fetch fresh.
-    if (
-      stored.length === 0 &&
-      activeThreadId === bootInitialThreadId &&
-      initialPathData?.messages &&
-      initialPathData.messages.length > 0
-    ) {
-      return initialPathData.messages.map((msg) => ({
-        ...msg,
-        createdAt: new Date(msg.createdAt),
-        updatedAt: new Date(msg.updatedAt),
-      }));
-    }
-    return stored;
-  }, [activeThreadId, allMessages, bootInitialThreadId, initialPathData]);
+    const data = messagesEndpoint.read?.data;
+    return (data?.messages ?? []).map((msg) => ({
+      ...msg,
+      createdAt:
+        msg.createdAt instanceof Date ? msg.createdAt : new Date(msg.createdAt),
+      updatedAt:
+        msg.updatedAt instanceof Date ? msg.updatedAt : new Date(msg.updatedAt),
+    }));
+  }, [messagesEndpoint.read?.data, activeThreadId]);
 
   // Settings — pass SSR initialData so no client fetch on hydration
   const { settings } = useChatSettings(user, logger, initialSettingsData);
   const defaults = ChatSettingsRepositoryClient.getDefaults();
   const effectiveSettings = settings ?? defaults;
   const viewMode = effectiveSettings.viewMode;
-  const selectedCharacter = effectiveSettings.selectedCharacter;
+  const selectedSkill = effectiveSettings.selectedSkill;
   const selectedModel = effectiveSettings.selectedModel;
 
-  // Pre-seed character React Query cache from SSR data so useCharacter() callers
+  // Pre-seed character React Query cache from SSR data so useSkill() callers
   // (grouped-assistant-message, threaded-view, flat-message) find it cached on mount.
   // Only seed once (ref guard) to avoid overwriting user-triggered updates.
   const characterSeedDoneRef = useRef(false);
   useEffect(() => {
-    if (
-      !characterSeedDoneRef.current &&
-      initialCharacterData &&
-      selectedCharacter
-    ) {
+    if (!characterSeedDoneRef.current && initialSkillData && selectedSkill) {
       characterSeedDoneRef.current = true;
       apiClient.updateEndpointData(
         characterDefinitions.GET,
         logger,
-        (old) => old ?? success(initialCharacterData),
-        { urlPathParams: { id: selectedCharacter } },
+        (old) => old ?? success(initialSkillData),
+        { urlPathParams: { id: selectedSkill } },
       );
     }
-  }, [initialCharacterData, selectedCharacter, logger]);
+  }, [initialSkillData, selectedSkill, logger]);
 
   // Credits
   const creditsHook = useCredits(user, logger, initialCredits);
@@ -227,93 +227,418 @@ export function ChatMessages({
 
   // Input store
   const setInput = useChatInputStore((s) => s.setInput);
-  const setAttachments = useChatInputStore((s) => s.setAttachments);
   const chatInput = useChatInputStore((s) => s.input);
   const chatInputRef = useChatInputStore((s) => s.inputRef);
 
+  // leafMessageId — read from nav store (single source of truth, syncs URL)
+  // Written by setLeafMessageId which updates both the form field and the nav store.
+  const navLeafMessageId = useChatNavigationStore((s) => s.leafMessageId);
+  const navSetLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
+  const messagesForm = useWidgetForm();
+  const leafMessageId = navLeafMessageId;
+  const setLeafMessageId = useCallback(
+    (id: string | null) => {
+      messagesForm?.setValue("leafMessageId", id ?? null);
+      navSetLeafMessageId(id);
+    },
+    [messagesForm, navSetLeafMessageId],
+  );
+
   // Message operations
   const messageOps = useMessageOperations({
-    aiStream,
+    startStream: aiStream.startStream,
+    cancelStream: aiStream.cancelStream,
     activeThreadId,
     currentRootFolderId,
     currentSubFolderId,
-    chatStore: {
-      messages: allMessages,
-      threads,
-      setLoading: chatSetLoading,
-      getThreadMessages: chatGetThreadMessages,
-      deleteMessage: chatDeleteMessage,
-      updateMessage: chatUpdateMessage,
-    },
+    leafMessageId,
     settings: {
       selectedModel: effectiveSettings.selectedModel,
-      selectedCharacter: effectiveSettings.selectedCharacter,
-      allowedTools: effectiveSettings.allowedTools,
+      selectedSkill: effectiveSettings.selectedSkill,
+      availableTools: effectiveSettings.availableTools,
       pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
       ttsVoice: effectiveSettings.ttsVoice,
     },
-    setInput,
-    setAttachments,
   });
 
   const { retryMessage, branchMessage, answerAsAI, sendMessage, voteMessage } =
     messageOps;
 
-  // leafMessageId lives in the navigation store — seeded from server URL, updated by branch switches
-  const leafMessageId = useChatNavigationStore((s) => s.leafMessageId);
-  const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
+  // Loading states for branch/history operations
+  const [isLoadingBranch, setIsLoadingBranch] = useState(false);
+  const [isLoadingOlderHistory, setIsLoadingOlderHistory] = useState(false);
+  const [isLoadingNewerHistory, setIsLoadingNewerHistory] = useState(false);
 
-  // Lazy branch loader — fetches all messages in the branch window (path + siblings).
-  // Sentinel messages (BOUNDARY_OLDER / BOUNDARY_NEWER) are injected server-side and stored
-  // in the Zustand messages store — no client-side hasOlderHistory / hasNewerMessages state.
-  const {
-    isLoadingBranch: rawIsLoadingBranch,
-    isLoadingOlderHistory,
-    loadOlderHistory,
-    isLoadingNewerHistory,
-    loadNewerHistory,
-    invalidateThread,
-  } = useLazyBranchLoader(
+  // Abort controllers for in-flight requests (independent lifecycle per thread)
+  const olderHistoryAbortRef = useRef<AbortController | null>(null);
+  const newerHistoryAbortRef = useRef<AbortController | null>(null);
+  const branchLoadAbortRef = useRef<AbortController | null>(null);
+
+  // Keep a ref to current leafMessageId for async callbacks
+  const leafMessageIdRef = useRef<string | null>(null);
+  leafMessageIdRef.current = leafMessageId;
+
+  /**
+   * Branch chunk load — fires when activeThreadId changes.
+   * Boot thread: skipped — messages are pre-seeded via initialData on EndpointsPage.
+   * Navigated threads: fetch via pathDefinitions.GET, upsert into messages cache.
+   */
+  useEffect(() => {
+    if (
+      !activeThreadId ||
+      activeThreadId === NEW_MESSAGE_ID ||
+      activeThreadId === bootInitialThreadId
+    ) {
+      return;
+    }
+
+    branchLoadAbortRef.current?.abort();
+    const controller = new AbortController();
+    branchLoadAbortRef.current = controller;
+
+    setIsLoadingBranch(true);
+
+    const load = async (): Promise<void> => {
+      try {
+        const response = await executeQuery({
+          endpoint: pathDefinitions.GET,
+          logger,
+          requestData: { rootFolderId: currentRootFolderId },
+          pathParams: { threadId: activeThreadId },
+          locale,
+          user,
+        });
+
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        if (response.success) {
+          const data = response.data;
+          for (const message of data.messages ?? []) {
+            upsertMessage(activeThreadId, currentRootFolderId, logger, {
+              ...message,
+              createdAt: new Date(message.createdAt),
+              updatedAt: new Date(message.updatedAt),
+            });
+          }
+          const resolvedLeaf = data.resolvedLeafMessageId;
+          const currentLeaf = leafMessageIdRef.current;
+          if (resolvedLeaf && resolvedLeaf !== currentLeaf) {
+            if (typeof window !== "undefined") {
+              const url = new URL(window.location.href);
+              url.searchParams.set("message", resolvedLeaf);
+              window.history.replaceState(null, "", url.toString());
+            }
+            setLeafMessageId(resolvedLeaf);
+          }
+        } else if (!response.success && response.errorType?.errorCode === 404) {
+          // Thread not yet persisted (new thread just created) — skip silently.
+          // Messages will arrive via WS events as they are created.
+          logger.debug("Chat: Branch load skipped — thread not found yet", {
+            threadId: activeThreadId,
+          });
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          logger.error("Chat: Error loading branch chunk", {
+            threadId: activeThreadId,
+            error: parseError(error).message,
+          });
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoadingBranch(false);
+        }
+      }
+    };
+
+    void load();
+
+    return (): void => {
+      controller.abort();
+    };
+  }, [
+    activeThreadId,
+    bootInitialThreadId,
+    currentRootFolderId,
     locale,
     logger,
-    activeThreadId,
-    threads,
-    leafMessageId,
-    addMessage,
-    chatUpdateMessage,
-    setThreadLoadMode,
     user,
-    // Only use SSR path data for the thread we had at boot time
-    activeThreadId === bootInitialThreadId ? initialPathData : null,
-    currentRootFolderId,
     setLeafMessageId,
+  ]);
+
+  // Abort in-flight history requests when thread changes
+  useEffect(() => {
+    return (): void => {
+      olderHistoryAbortRef.current?.abort();
+      newerHistoryAbortRef.current?.abort();
+    };
+  }, [activeThreadId]);
+
+  /**
+   * Load older history (triggered by "Show older messages" button).
+   */
+  const loadOlderHistory = useCallback(
+    (oldestMessageId: string): void => {
+      if (!activeThreadId || isLoadingOlderHistory) {
+        return;
+      }
+      olderHistoryAbortRef.current?.abort();
+      const controller = new AbortController();
+      olderHistoryAbortRef.current = controller;
+      const threadId = activeThreadId;
+      setIsLoadingOlderHistory(true);
+
+      const load = async (): Promise<void> => {
+        try {
+          const response = await executeQuery({
+            endpoint: pathDefinitions.GET,
+            logger,
+            requestData: {
+              rootFolderId: currentRootFolderId,
+              before: oldestMessageId,
+            },
+            pathParams: { threadId },
+            locale,
+            user,
+          });
+
+          if (controller.signal.aborted) {
+            return;
+          }
+
+          if (response.success) {
+            const data = response.data;
+
+            // Clear hasOlderHistory flag on the current oldest message
+            const cachedData = apiClient.getEndpointData(
+              messagesDefinition.GET,
+              logger,
+              {
+                urlPathParams: { threadId: activeThreadId },
+                requestData: { rootFolderId: currentRootFolderId },
+              },
+            );
+            const currentOldest = cachedData?.success
+              ? (cachedData.data.messages.find(
+                  (m) => m.id === oldestMessageId,
+                ) ?? null)
+              : null;
+            if (currentOldest) {
+              patchMessage(
+                threadId,
+                currentRootFolderId,
+                logger,
+                oldestMessageId,
+                {
+                  metadata: {
+                    ...(currentOldest.metadata as MessageMetadata | null),
+                    hasOlderHistory: false,
+                  },
+                },
+              );
+            }
+
+            for (const message of data.messages ?? []) {
+              upsertMessage(threadId, currentRootFolderId, logger, {
+                ...message,
+                createdAt: new Date(message.createdAt),
+                updatedAt: new Date(message.updatedAt),
+              });
+            }
+
+            // Clear stale hasNewerHistory flag if newer chunk already loaded
+            if (data.newerChunkAnchorId) {
+              const cachedAfter = apiClient.getEndpointData(
+                messagesDefinition.GET,
+                logger,
+                {
+                  urlPathParams: { threadId: activeThreadId },
+                  requestData: { rootFolderId: currentRootFolderId },
+                },
+              );
+              const msgs = cachedAfter?.success
+                ? cachedAfter.data.messages
+                : [];
+              const alreadyLoaded = msgs.some(
+                (m) => m.id === data.newerChunkAnchorId,
+              );
+              if (alreadyLoaded) {
+                for (const msg of msgs) {
+                  const meta = msg.metadata as MessageMetadata | null;
+                  if (meta?.newerAnchorId === data.newerChunkAnchorId) {
+                    patchMessage(
+                      threadId,
+                      currentRootFolderId,
+                      logger,
+                      msg.id,
+                      {
+                        metadata: {
+                          ...meta,
+                          hasNewerHistory: false,
+                          newerAnchorId: null,
+                        },
+                      },
+                    );
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        } catch (error) {
+          if (!controller.signal.aborted) {
+            logger.error("Chat: Error loading older history", {
+              threadId,
+              error: parseError(error).message,
+            });
+          }
+        } finally {
+          if (!controller.signal.aborted) {
+            setIsLoadingOlderHistory(false);
+          }
+        }
+      };
+
+      void load();
+    },
+    [
+      activeThreadId,
+      isLoadingOlderHistory,
+      currentRootFolderId,
+      locale,
+      logger,
+      user,
+    ],
+  );
+
+  /**
+   * Load newer history (triggered by "Show newer messages" button).
+   */
+  const loadNewerHistory = useCallback(
+    (anchorId: string): void => {
+      if (!activeThreadId || isLoadingNewerHistory) {
+        return;
+      }
+      newerHistoryAbortRef.current?.abort();
+      const controller = new AbortController();
+      newerHistoryAbortRef.current = controller;
+      const threadId = activeThreadId;
+      setIsLoadingNewerHistory(true);
+
+      const load = async (): Promise<void> => {
+        try {
+          const response = await executeQuery({
+            endpoint: pathDefinitions.GET,
+            logger,
+            requestData: {
+              rootFolderId: currentRootFolderId,
+              leafMessageId: anchorId,
+            },
+            pathParams: { threadId },
+            locale,
+            user,
+          });
+
+          if (controller.signal.aborted) {
+            return;
+          }
+
+          if (response.success) {
+            const data = response.data;
+
+            // Clear hasNewerHistory flag on the message that triggered this load
+            const cachedData = apiClient.getEndpointData(
+              messagesDefinition.GET,
+              logger,
+              {
+                urlPathParams: { threadId: activeThreadId },
+                requestData: { rootFolderId: currentRootFolderId },
+              },
+            );
+            const msgs = cachedData?.success ? cachedData.data.messages : [];
+            for (const msg of msgs) {
+              const meta = msg.metadata as MessageMetadata | null;
+              if (meta?.newerAnchorId === anchorId) {
+                patchMessage(threadId, currentRootFolderId, logger, msg.id, {
+                  metadata: {
+                    ...meta,
+                    hasNewerHistory: false,
+                    newerAnchorId: null,
+                  },
+                });
+                break;
+              }
+            }
+
+            for (const message of data.messages ?? []) {
+              upsertMessage(threadId, currentRootFolderId, logger, {
+                ...message,
+                createdAt: new Date(message.createdAt),
+                updatedAt: new Date(message.updatedAt),
+              });
+            }
+
+            const resolvedLeaf = data.resolvedLeafMessageId;
+            if (resolvedLeaf) {
+              if (typeof window !== "undefined") {
+                const url = new URL(window.location.href);
+                url.searchParams.set("message", resolvedLeaf);
+                window.history.replaceState(null, "", url.toString());
+              }
+              setLeafMessageId(resolvedLeaf);
+            }
+          }
+        } catch (error) {
+          if (!controller.signal.aborted) {
+            logger.error("Chat: Error loading newer history", {
+              threadId,
+              error: parseError(error).message,
+            });
+          }
+        } finally {
+          if (!controller.signal.aborted) {
+            setIsLoadingNewerHistory(false);
+          }
+        }
+      };
+
+      void load();
+    },
+    [
+      activeThreadId,
+      isLoadingNewerHistory,
+      currentRootFolderId,
+      locale,
+      logger,
+      user,
+      setLeafMessageId,
+    ],
+  );
+
+  /**
+   * Invalidate thread — refetch messages from server.
+   * Called by useMessagesSubscription when a remote stream completes.
+   */
+  const invalidateThread = useCallback(
+    (tid: string): void => {
+      if (tid === activeThreadId) {
+        void messagesEndpoint.read?.refetch();
+      }
+    },
+    [activeThreadId, messagesEndpoint.read],
   );
 
   // Branch management — derives branchIndices from leafMessageId + loaded messages
   const { branchIndices, handleSwitchBranch } = useBranchManagement({
     activeThreadMessages,
     leafMessageId,
+    setLeafMessageId,
     threadId: activeThreadId || "",
     logger,
   });
-
-  // Full load fallback for non-linear views
-  const needsFullLoad =
-    effectiveSettings.viewMode !== ViewMode.LINEAR &&
-    effectiveSettings.viewMode !== ViewMode.DEBUG;
-  const { isUpgrading: isUpgradingToFullLoad } = useFullLoadFallback(
-    locale,
-    logger,
-    activeThreadId,
-    threadLoadMode,
-    addMessage,
-    setThreadLoadMode,
-    needsFullLoad,
-    user,
-  );
-
-  const isLoadingBranch = rawIsLoadingBranch || isUpgradingToFullLoad;
 
   // Streaming state from navigation store
   const startStream = useChatNavigationStore((s) => s.startStream);
@@ -409,122 +734,8 @@ export function ChatMessages({
   // Whether user is actively touching (suppresses our instant-scroll during gesture)
   const touchActiveRef = useRef<boolean>(false);
 
-  // Get streaming messages from the messages store
-  const streamingMessages = useStreamingMessagesStore(
-    (s) => s.streamingMessages,
-  );
-
-  // Merge streaming messages with persisted messages for instant UI updates
-  const mergedMessages = useMemo(() => {
-    const messageMap = new Map<string, ChatMessage>();
-
-    // Add all persisted messages first
-    for (const msg of activeThreadMessages) {
-      messageMap.set(msg.id, msg);
-    }
-
-    // Override with streaming messages (they have the latest content)
-    // IMPORTANT: Only merge streaming messages that belong to the current thread
-    for (const streamMsg of Object.values(streamingMessages)) {
-      // Skip streaming messages from other threads
-      if (activeThreadId && streamMsg.threadId !== activeThreadId) {
-        continue;
-      }
-
-      // Token fields from streaming store (available after TOKENS_UPDATED event)
-      const streamingTokenMetadata = {
-        ...(streamMsg.promptTokens !== undefined
-          ? { promptTokens: streamMsg.promptTokens }
-          : {}),
-        ...(streamMsg.completionTokens !== undefined
-          ? { completionTokens: streamMsg.completionTokens }
-          : {}),
-        ...(streamMsg.totalTokens !== undefined
-          ? { totalTokens: streamMsg.totalTokens }
-          : {}),
-        ...(streamMsg.cachedInputTokens !== undefined
-          ? { cachedInputTokens: streamMsg.cachedInputTokens }
-          : {}),
-        ...(streamMsg.cacheWriteTokens !== undefined
-          ? { cacheWriteTokens: streamMsg.cacheWriteTokens }
-          : {}),
-        ...(streamMsg.timeToFirstToken !== undefined
-          ? { timeToFirstToken: streamMsg.timeToFirstToken }
-          : {}),
-        ...(streamMsg.creditCost !== undefined
-          ? { creditCost: streamMsg.creditCost }
-          : {}),
-        ...(streamMsg.finishReason !== undefined
-          ? { finishReason: streamMsg.finishReason ?? undefined }
-          : {}),
-      };
-
-      const existingMsg = messageMap.get(streamMsg.messageId);
-      if (existingMsg) {
-        // Update existing message with streaming content and metadata
-        messageMap.set(streamMsg.messageId, {
-          ...existingMsg,
-          content: streamMsg.content,
-          metadata: {
-            ...existingMsg.metadata,
-            ...streamingTokenMetadata,
-            ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
-            ...(streamMsg.isCompacting !== undefined
-              ? { isCompacting: streamMsg.isCompacting }
-              : {}),
-            ...(streamMsg.compactedMessageCount !== undefined
-              ? { compactedMessageCount: streamMsg.compactedMessageCount }
-              : {}),
-            ...(streamMsg.isStreaming !== undefined
-              ? { isStreaming: streamMsg.isStreaming }
-              : {}),
-          },
-        });
-      } else {
-        // Add new streaming message with all required fields
-        messageMap.set(streamMsg.messageId, {
-          id: streamMsg.messageId,
-          threadId: streamMsg.threadId,
-          role: streamMsg.role,
-          content: streamMsg.content,
-          parentId: streamMsg.parentId,
-          model: streamMsg.model ?? null,
-          character: streamMsg.character ?? null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          sequenceId: streamMsg.sequenceId ?? null,
-          // Required fields with defaults
-          authorId: null,
-          authorName: null,
-          isAI: streamMsg.role === "assistant",
-          errorType: null,
-          errorMessage: null,
-          errorCode: null,
-          metadata: {
-            ...streamingTokenMetadata,
-            ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
-            ...(streamMsg.isCompacting !== undefined
-              ? { isCompacting: streamMsg.isCompacting }
-              : {}),
-            ...(streamMsg.compactedMessageCount !== undefined
-              ? { compactedMessageCount: streamMsg.compactedMessageCount }
-              : {}),
-            ...(streamMsg.isStreaming !== undefined
-              ? { isStreaming: streamMsg.isStreaming }
-              : {}),
-          },
-          upvotes: 0,
-          downvotes: 0,
-          searchVector: null,
-        });
-      }
-    }
-
-    return [...messageMap.values()];
-  }, [activeThreadMessages, streamingMessages, activeThreadId]);
-
-  // All merged messages are real messages — no sentinel filtering needed.
-  const realMessages = mergedMessages;
+  // All messages from cache are real messages — no merge or sentinel filtering needed.
+  const realMessages = activeThreadMessages;
 
   // Flat view: sorted messages by timestamp (memoized)
   const flatSortedMessages = useMemo(
@@ -638,14 +849,14 @@ export function ChatMessages({
 
   // Reset render window + sticky state when thread changes
   useEffect(() => {
-    const currentThreadId = activeThread?.id ?? null;
+    const currentThreadId = activeThreadId ?? null;
     if (renderWindowThreadRef.current !== currentThreadId) {
       setRenderWindowExpansions(0);
       renderWindowThreadRef.current = currentThreadId;
       // New thread: start sticky
       stickyBottomRef.current = true;
     }
-  }, [activeThread?.id]);
+  }, [activeThreadId]);
 
   const hasAnyMessages = activeThreadMessages.length > 0;
 
@@ -654,7 +865,7 @@ export function ChatMessages({
   // This is the single source of truth for auto-scroll — no separate streaming detection.
   useLayoutEffect(() => {
     // Initial scroll-to-bottom once per thread (not just during streaming)
-    const currentThreadId = activeThread?.id ?? null;
+    const currentThreadId = activeThreadId ?? null;
     if (
       currentThreadId &&
       !initialScrollDoneRef.current.has(currentThreadId) &&
@@ -920,40 +1131,81 @@ export function ChatMessages({
                     </Div>
                   )}
 
-                  <LinearMessageView
-                    messages={visiblePath}
-                    branchInfo={branchInfo}
-                    locale={locale}
-                    logger={logger}
-                    currentUserId={currentUserId ?? null}
-                    user={user}
-                    viewMode={viewMode}
-                    collapseState={collapseState}
-                    rootFolderId={currentRootFolderId}
-                    subFolderId={currentSubFolderId}
-                    onRetryMessage={retryMessage}
-                    onSwitchBranch={handleSwitchBranch}
-                    onBranchMessage={branchMessage}
-                    onStartEdit={startEdit}
-                    onStartRetry={handleLinearStartRetry}
-                    onStartAnswer={startAnswer}
-                    answerAsAI={answerAsAI}
-                    onCancelAction={cancelEditorAction}
-                    editingMessageId={editingMessageId}
-                    retryingMessageId={retryingMessageId}
-                    answeringMessageId={answeringMessageId}
-                    answerContent={answerContent}
-                    onSetAnswerContent={setAnswerContent}
-                    editorAttachments={editorAttachments}
-                    isLoadingRetryAttachments={isLoadingRetryAttachments}
-                    selectedCharacter={selectedCharacter}
-                    selectedModel={selectedModel}
-                    sendMessage={sendMessage}
-                    deductCredits={deductCredits}
-                    onLoadNewerHistory={loadNewerHistory}
-                    isLoadingNewerHistory={isLoadingNewerHistory}
-                    onVoteMessage={voteMessage}
-                  />
+                  <ErrorBoundary locale={locale}>
+                    {viewMode === ViewMode.DEBUG ? (
+                      <DebugLinearMessageView
+                        messages={visiblePath}
+                        branchInfo={branchInfo}
+                        locale={locale}
+                        logger={logger}
+                        currentUserId={currentUserId ?? null}
+                        user={user}
+                        collapseState={collapseState}
+                        rootFolderId={currentRootFolderId}
+                        subFolderId={currentSubFolderId}
+                        onRetryMessage={retryMessage}
+                        onSwitchBranch={handleSwitchBranch}
+                        onBranchMessage={branchMessage}
+                        onStartEdit={startEdit}
+                        onStartRetry={handleLinearStartRetry}
+                        onStartAnswer={startAnswer}
+                        answerAsAI={answerAsAI}
+                        onCancelAction={cancelEditorAction}
+                        editingMessageId={editingMessageId}
+                        retryingMessageId={retryingMessageId}
+                        answeringMessageId={answeringMessageId}
+                        answerContent={answerContent}
+                        onSetAnswerContent={setAnswerContent}
+                        editorAttachments={editorAttachments}
+                        isLoadingRetryAttachments={isLoadingRetryAttachments}
+                        selectedSkill={selectedSkill}
+                        selectedModel={selectedModel}
+                        sendMessage={sendMessage}
+                        deductCredits={deductCredits}
+                        onLoadNewerHistory={loadNewerHistory}
+                        isLoadingNewerHistory={isLoadingNewerHistory}
+                        onVoteMessage={voteMessage}
+                        ttsAutoplay={effectiveSettings.ttsAutoplay}
+                        ttsVoice={effectiveSettings.ttsVoice}
+                      />
+                    ) : (
+                      <LinearMessageView
+                        messages={visiblePath}
+                        branchInfo={branchInfo}
+                        locale={locale}
+                        logger={logger}
+                        currentUserId={currentUserId ?? null}
+                        user={user}
+                        collapseState={collapseState}
+                        rootFolderId={currentRootFolderId}
+                        subFolderId={currentSubFolderId}
+                        onRetryMessage={retryMessage}
+                        onSwitchBranch={handleSwitchBranch}
+                        onBranchMessage={branchMessage}
+                        onStartEdit={startEdit}
+                        onStartRetry={handleLinearStartRetry}
+                        onStartAnswer={startAnswer}
+                        answerAsAI={answerAsAI}
+                        onCancelAction={cancelEditorAction}
+                        editingMessageId={editingMessageId}
+                        retryingMessageId={retryingMessageId}
+                        answeringMessageId={answeringMessageId}
+                        answerContent={answerContent}
+                        onSetAnswerContent={setAnswerContent}
+                        editorAttachments={editorAttachments}
+                        isLoadingRetryAttachments={isLoadingRetryAttachments}
+                        selectedSkill={selectedSkill}
+                        selectedModel={selectedModel}
+                        sendMessage={sendMessage}
+                        deductCredits={deductCredits}
+                        onLoadNewerHistory={loadNewerHistory}
+                        isLoadingNewerHistory={isLoadingNewerHistory}
+                        onVoteMessage={voteMessage}
+                        ttsAutoplay={effectiveSettings.ttsAutoplay}
+                        ttsVoice={effectiveSettings.ttsVoice}
+                      />
+                    )}
+                  </ErrorBoundary>
                 </>
               );
             })()

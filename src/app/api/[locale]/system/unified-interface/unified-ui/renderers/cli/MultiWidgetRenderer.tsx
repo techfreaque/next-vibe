@@ -22,6 +22,7 @@ import {
   type ProcessedChildren,
 } from "./ChildrenDataRenderer";
 import { InkWidgetRenderer } from "./CliWidgetRenderer";
+import { useInkWidgetUser } from "../../widgets/_shared/use-ink-widget-context";
 
 /**
  * Render a processed child inline group
@@ -137,6 +138,7 @@ export function ObjectChildrenRenderer<
   value,
   fieldName,
 }: ObjectChildrenRendererProps<TKey, TUsage, TChildren>): ReactElement {
+  const user = useInkWidgetUser();
   const processed = useMemo(() => {
     if (!childrenSchema) {
       return undefined;
@@ -144,6 +146,7 @@ export function ObjectChildrenRenderer<
     const extracted = ChildrenDataRenderer.extractChildren(
       childrenSchema,
       value,
+      { userRoles: user.roles },
     );
     const sorted = ChildrenDataRenderer.sortChildren(extracted);
     const groupResult = ChildrenDataRenderer.groupInlineFields(sorted);
@@ -152,7 +155,7 @@ export function ObjectChildrenRenderer<
       inlineGroups: groupResult.groups,
       inlineGroupMembers: groupResult.members,
     };
-  }, [childrenSchema, value]);
+  }, [childrenSchema, value, user.roles]);
 
   if (!processed || processed.children.length === 0) {
     return <></>;

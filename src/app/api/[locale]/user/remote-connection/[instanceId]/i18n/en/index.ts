@@ -14,6 +14,8 @@ export const translations = {
       connectedTo: "Connected to",
       lastSynced: "Last synced",
       refresh: "Refresh",
+      reauth: "Re-authenticate",
+      rename: "Rename",
       disconnect: "Disconnect",
     },
     notConnected: {
@@ -75,113 +77,6 @@ export const translations = {
     success: {
       title: "Connection Retrieved",
       description: "Remote connection status retrieved successfully",
-    },
-  },
-  patch: {
-    title: "Rename Connection",
-    description: "Update the friendly name of a remote connection",
-    instanceId: {
-      label: "Instance ID",
-      description: "The instance to rename",
-      placeholder: "hermes",
-    },
-    friendlyName: {
-      label: "Friendly Name",
-      description: "A human-readable name for this connection",
-      placeholder: "My Laptop",
-    },
-    errors: {
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request parameters",
-      },
-      network: {
-        title: "Network Error",
-        description: "Failed to connect to the server",
-      },
-      unauthorized: {
-        title: "Not Logged In",
-        description: "You must be logged in to rename a connection",
-      },
-      forbidden: {
-        title: "Access Denied",
-        description: "You don't have permission to rename this connection",
-      },
-      notFound: {
-        title: "Not Found",
-        description: "Connection not found",
-      },
-      server: {
-        title: "Server Error",
-        description: "An error occurred while renaming",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unexpected error occurred",
-      },
-      unsavedChanges: {
-        title: "Unsaved Changes",
-        description: "You have unsaved changes",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "A conflict occurred",
-      },
-    },
-    success: {
-      title: "Renamed",
-      description: "Connection renamed successfully",
-    },
-  },
-  delete: {
-    title: "Disconnect",
-    description: "Remove the connection to your remote instance",
-    instanceId: {
-      label: "Instance ID",
-      description: "The instance to disconnect",
-      placeholder: "hermes",
-    },
-    errors: {
-      validation: {
-        title: "Validation Error",
-        description: "Invalid request",
-      },
-      network: {
-        title: "Network Error",
-        description: "Failed to connect to the server",
-      },
-      unauthorized: {
-        title: "Not Logged In",
-        description: "You must be logged in to disconnect",
-      },
-      forbidden: {
-        title: "Access Denied",
-        description: "You don't have permission to disconnect",
-      },
-      notFound: {
-        title: "Not Connected",
-        description: "No remote connection to disconnect",
-      },
-      server: {
-        title: "Server Error",
-        description: "An error occurred while disconnecting",
-      },
-      unknown: {
-        title: "Unknown Error",
-        description: "An unexpected error occurred",
-      },
-      unsavedChanges: {
-        title: "Unsaved Changes",
-        description: "You have unsaved changes",
-      },
-      conflict: {
-        title: "Conflict",
-        description: "A conflict occurred",
-      },
-    },
-    success: {
-      title: "Disconnected",
-      description: "Your remote connection has been removed",
     },
   },
 };

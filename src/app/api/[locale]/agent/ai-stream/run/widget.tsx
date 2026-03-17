@@ -48,7 +48,7 @@ import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useCharacter } from "../../chat/characters/[id]/hooks";
+import { useSkill } from "../../chat/skills/[id]/hooks";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
 import {
@@ -330,18 +330,18 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const isDisabled = useWidgetDisabled();
   const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
-  // ── Tools cascade: user settings → character → form (explicit) ───────────
-  const characterId = form.watch("character") ?? undefined;
-  const characterEndpoint = useCharacter(characterId, user, logger);
-  const characterData = characterEndpoint.read?.data;
+  // ── Tools cascade: user settings → skill → form (explicit) ───────────
+  const skillId = form.watch("skill") ?? undefined;
+  const skillEndpoint = useSkill(skillId, user, logger);
+  const skillData = skillEndpoint.read?.data;
 
   const settingsOps = useChatSettings(user, logger);
   const settingsData = settingsOps.settings;
 
   const fallbackAllowedTools: ToolEntry[] | null =
-    characterData?.allowedTools ?? settingsData?.allowedTools ?? null;
+    skillData?.availableTools ?? settingsData?.availableTools ?? null;
   const fallbackPinnedTools: ToolEntry[] | null =
-    characterData?.pinnedTools ?? settingsData?.pinnedTools ?? null;
+    skillData?.pinnedTools ?? settingsData?.pinnedTools ?? null;
 
   const helpState = useEndpoint(
     helpDefinitions,
@@ -387,31 +387,31 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   );
 
   // Tools config integration
-  const allowedTools: ToolEntry[] | null = form.watch("allowedTools") ?? null;
-  const tools: ToolEntry[] | null = form.watch("tools") ?? null;
+  const availableTools = form.watch("availableTools") ?? null;
+  const pinnedTools = form.watch("pinnedTools") ?? null;
 
   const toolsValue = useMemo(
-    () => ({ allowedTools, pinnedTools: tools }),
-    [allowedTools, tools],
+    () => ({ availableTools, pinnedTools }),
+    [availableTools, pinnedTools],
   );
 
   const handleToolsChange = useCallback(
     ({
-      allowedTools: newAllowed,
+      availableTools: newAllowed,
       pinnedTools: newPinned,
     }: {
-      allowedTools: ToolEntry[] | null;
+      availableTools: ToolEntry[] | null;
       pinnedTools: ToolEntry[] | null;
     }): void => {
-      form.setValue("allowedTools", newAllowed, { shouldDirty: true });
-      form.setValue("tools", newPinned, { shouldDirty: true });
+      form.setValue("availableTools", newAllowed, { shouldDirty: true });
+      form.setValue("pinnedTools", newPinned, { shouldDirty: true });
     },
     [form],
   );
 
   const promptValue = form.watch("prompt") ?? "";
   const modelValue = form.watch("model") ?? defaultModel;
-  const characterValue = form.watch("character") ?? "";
+  const skillValue = form.watch("skill") ?? "";
 
   const handleContentChange = useCallback(
     (val: string) => form.setValue("prompt", val, { shouldDirty: true }),
@@ -421,8 +421,8 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     (id: ModelId) => form.setValue("model", id, { shouldDirty: true }),
     [form],
   );
-  const handleCharacterChange = useCallback(
-    (id: string) => form.setValue("character", id, { shouldDirty: true }),
+  const handleSkillChange = useCallback(
+    (id: string) => form.setValue("skill", id, { shouldDirty: true }),
     [form],
   );
   const handleSubmit = useCallback(() => {
@@ -467,7 +467,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
       sequenceId: null,
       authorId: null,
       authorName: null,
-      character: null,
+      skill: null,
       model: null,
       upvotes: 0,
       downvotes: 0,
@@ -487,7 +487,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         content: promptValue,
         isAI: false,
         model: null,
-        character: null,
+        skill: null,
         metadata: {},
       },
       {
@@ -498,7 +498,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         isAI: true,
         parentId: userMsgId,
         model: modelValue ?? null,
-        character: characterValue || null,
+        skill: skillValue || null,
         metadata: {
           promptTokens: responseData.promptTokens ?? undefined,
           completionTokens: responseData.completionTokens ?? undefined,
@@ -506,7 +506,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
       },
     ];
     return { messages };
-  }, [isDisabled, responseData, promptValue, modelValue, characterValue]);
+  }, [isDisabled, responseData, promptValue, modelValue, skillValue]);
 
   // When a real run completes, invalidate the messages cache so EmbeddedMessagesView refetches.
   const completedThreadId = isDisabled ? responseData?.threadId : undefined;
@@ -516,8 +516,9 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     }
     void apiClient.refetchEndpoint(messagesDefinition.GET, logger, {
       urlPathParams: { threadId: completedThreadId },
+      requestData: { rootFolderId: rootFolderValue },
     });
-  }, [completedThreadId, logger]);
+  }, [completedThreadId, rootFolderValue, logger]);
 
   return (
     <Div className="flex flex-col h-[500px] min-h-[300px]">
@@ -559,9 +560,9 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         content={promptValue}
         onContentChange={handleContentChange}
         modelId={modelValue}
-        characterId={characterValue}
+        skillId={skillValue}
         onModelChange={handleModelChange}
-        onCharacterChange={handleCharacterChange}
+        onSkillChange={handleSkillChange}
         locale={locale}
         user={user}
         logger={logger}
@@ -595,8 +596,8 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
               user={user}
               logger={logger}
               label="Allowed to execute + pinned to context"
-              characterAllowedTools={fallbackAllowedTools}
-              characterPinnedTools={fallbackPinnedTools}
+              skillAvailableTools={fallbackAllowedTools}
+              skillPinnedTools={fallbackPinnedTools}
             />
 
             {/* Max Turns & Thread ID */}

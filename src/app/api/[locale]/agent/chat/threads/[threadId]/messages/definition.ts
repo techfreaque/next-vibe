@@ -261,6 +261,15 @@ const { GET } = createEndpoint({
         description: "get.rootFolderId.description" as const,
         columns: 6,
         schema: z.enum(DefaultFolderId),
+        includeInCacheKey: true,
+      }),
+      leafMessageId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "get.leafMessageId.label" as const,
+        description: "get.leafMessageId.description" as const,
+        columns: 3,
+        schema: z.uuid().nullable().optional(),
       }),
 
       // === RESPONSE ===
@@ -311,7 +320,7 @@ const { GET } = createEndpoint({
               type: WidgetType.BADGE,
               schema: z.nativeEnum(ModelId).nullable(),
             }),
-            character: responseField(scopedTranslation, {
+            skill: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               schema: z.string().nullable(),
             }),
@@ -385,7 +394,7 @@ const { GET } = createEndpoint({
             authorName: null,
             isAI: false,
             model: null,
-            character: null,
+            skill: null,
             sequenceId: null,
             metadata: null,
             upvotes: 0,
@@ -407,7 +416,7 @@ const { GET } = createEndpoint({
             authorName: null,
             isAI: true,
             model: ModelId.GPT_5,
-            character: null,
+            skill: null,
             sequenceId: null,
             metadata: null,
             upvotes: 0,
@@ -555,11 +564,11 @@ const { POST } = createEndpoint({
         description: "post.model.description" as const,
         schema: z.enum(ModelId).optional(),
       }),
-      character: requestField(scopedTranslation, {
+      skill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.character.label" as const,
-        description: "post.character.description" as const,
+        label: "post.skill.label" as const,
+        description: "post.skill.description" as const,
         schema: z.string().optional(),
       }),
       metadata: requestField(scopedTranslation, {

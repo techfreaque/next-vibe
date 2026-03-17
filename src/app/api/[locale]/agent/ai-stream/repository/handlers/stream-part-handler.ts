@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ModelId } from "../../../models/models";
 import type { AiStreamT } from "../../stream/i18n";
+import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinishStepHandler } from "./finish-step-handler";
@@ -31,7 +32,7 @@ export class StreamPartHandler {
     ctx: StreamContext;
     threadId: string;
     model: ModelId;
-    character: string;
+    skill: string;
     isIncognito: boolean;
     userId: string | undefined;
     user: JwtPayloadType;
@@ -54,7 +55,7 @@ export class StreamPartHandler {
       ctx,
       threadId,
       model,
-      character,
+      skill,
       isIncognito,
       userId,
       user,
@@ -73,6 +74,7 @@ export class StreamPartHandler {
       const { shouldAbort } = await FinishStepHandler.processFinishStep({
         ctx,
         streamAbortController,
+        streamContext,
         logger,
       });
 
@@ -80,6 +82,14 @@ export class StreamPartHandler {
     }
 
     if (part.type === "text-delta") {
+      // Once a tool in this step requires confirmation, discard any subsequent
+      // text-deltas in the same step. The AI often emits follow-up text after
+      // tool calls (e.g. "Waiting for your approval...") — we don't want this
+      // persisted since the stream will stop at finish-step and the confirm flow
+      // takes over. Do NOT abort the stream here — let the step finish naturally.
+      if (ctx.stepHasToolsAwaitingConfirmation) {
+        return { shouldAbort: false };
+      }
       const textContent = part.text;
       const result = await TextHandler.processTextDelta({
         textDelta: textContent,
@@ -88,7 +98,7 @@ export class StreamPartHandler {
         threadId,
         currentParentId: ctx.currentParentId,
         model,
-        character,
+        skill,
         sequenceId: ctx.sequenceId,
         userId,
         getNextAssistantMessageId: ctx.getNextAssistantMessageId.bind(ctx),
@@ -122,7 +132,7 @@ export class StreamPartHandler {
         threadId,
         currentParentId: ctx.currentParentId,
         model,
-        character,
+        skill,
         sequenceId: ctx.sequenceId,
         userId,
         getNextAssistantMessageId: ctx.getNextAssistantMessageId.bind(ctx),
@@ -205,7 +215,7 @@ export class StreamPartHandler {
           threadId,
           currentParentId: ctx.currentParentId,
           model,
-          character,
+          skill,
           sequenceId: ctx.sequenceId,
           isIncognito,
           userId,
@@ -213,6 +223,7 @@ export class StreamPartHandler {
           streamAbortController,
           dbWriter: ctx.dbWriter,
           logger,
+          streamContext,
         });
         ctx.currentAssistantMessageId = result.currentAssistantMessageId;
         ctx.currentAssistantContent = result.currentAssistantContent;
@@ -221,27 +232,40 @@ export class StreamPartHandler {
           ctx.lastAssistantMessageId = result.currentAssistantMessageId;
         }
 
+        ctx.currentParentId = result.pendingToolMessage.messageId;
+        ctx.lastParentId = result.pendingToolMessage.messageId;
+
+        // Expose the current tool message ID to streamContext.
+        // tools-loader execute() wrapper reads from ctx.pendingToolMessages
+        // keyed by toolCallId for parallel-safe per-tool lookup.
+        streamContext.currentToolMessageId =
+          result.pendingToolMessage.messageId;
+
+        // Track the branch tip at the time of this tool call.
+        // parentId is the assistant message that spawned the tool — this is the
+        // correct leaf for deferred result insertion (wakeUp, approve, remote).
+        // Updated on every tool-call so it reflects the latest branch tip if
+        // multiple sequential tool calls happen in the same step.
+        if (result.pendingToolMessage.toolCallData.parentId) {
+          streamContext.leafMessageId =
+            result.pendingToolMessage.toolCallData.parentId;
+        }
+
+        ctx.pendingToolMessages.set(part.toolCallId, result.pendingToolMessage);
+
+        // APPROVE: mark that this stream has approve tools — abort deferred to finish-step.
+        // stepHasToolsAwaitingConfirmation persists across steps so sequential tool calls
+        // all complete before the stream aborts at the AI-response turn boundary.
         if (result.requiresConfirmation) {
           ctx.stepHasToolsAwaitingConfirmation = true;
           logger.info(
-            "[AI Stream] Tool requires confirmation - will abort at finish-step",
+            "[AI Stream] Tool requires confirmation - will abort at finish-step after all tool steps complete",
             {
               toolName: part.toolName,
               messageId: result.pendingToolMessage.messageId,
             },
           );
         }
-
-        ctx.currentParentId = result.pendingToolMessage.messageId;
-        ctx.lastParentId = result.pendingToolMessage.messageId;
-
-        // Expose the tool message ID to the tool's execute() via streamContext.
-        // execute-tool/repository.ts polls this for up to 200ms at startup to
-        // handle the race where execute() starts before stream-part-handler processes tool-call.
-        streamContext.currentToolMessageId =
-          result.pendingToolMessage.messageId;
-
-        ctx.pendingToolMessages.set(part.toolCallId, result.pendingToolMessage);
       }
 
       return { shouldAbort: false };
@@ -265,7 +289,7 @@ export class StreamPartHandler {
           pendingToolMessage: pending,
           threadId,
           model,
-          character,
+          skill,
           sequenceId: ctx.sequenceId,
           isIncognito,
           userId,
@@ -307,7 +331,7 @@ export class StreamPartHandler {
         pendingToolMessage: pending,
         threadId,
         model,
-        character,
+        skill,
         sequenceId: ctx.sequenceId,
         isIncognito,
         userId,
@@ -345,17 +369,37 @@ export class StreamPartHandler {
         ctx.currentAssistantContent = "";
         ctx.isInReasoningBlock = false;
 
-        // Remote tool with callbackMode=wait: pause stream after this step.
-        // finish-step-handler will abort when stepHasToolsAwaitingConfirmation is set.
-        // /report resumes the thread server-side when the result arrives.
+        // Remote tool with callbackMode=wait: abort stream IMMEDIATELY.
+        // Cannot defer to finish-step because the AI SDK continues generating
+        // text in the same step after tool-result (no finish-step boundary).
+        // /report backfills the real result and resume-stream wakes the thread.
         if (streamContext.waitingForRemoteResult) {
-          ctx.stepHasToolsAwaitingConfirmation = true;
           streamContext.waitingForRemoteResult = false;
           logger.info(
-            "[AI Stream] Remote tool wait mode — will pause stream at finish-step",
+            "[AI Stream] Remote tool wait mode — aborting stream immediately",
             {
               toolName: part.toolName,
               toolCallId: part.toolCallId,
+            },
+          );
+          streamAbortController.abort(
+            new StreamAbortError(AbortReason.REMOTE_TOOL_WAIT),
+          );
+          return { shouldAbort: true };
+        }
+
+        // endLoop: defer abort to finish-step (same as approve).
+        // The step must fully complete (all parallel tool results received) before
+        // aborting — otherwise the abort fires mid-step and kills sibling tools.
+        // finish-step fires after all tool results in the step, before the AI SDK
+        // makes the next API call, so deferring there is always safe.
+        if (ctx.shouldStopLoop) {
+          logger.info(
+            "[AI Stream] endLoop tool result received — deferring abort to finish-step",
+            {
+              toolName: part.toolName,
+              toolCallId: part.toolCallId,
+              pendingTools: ctx.pendingToolMessages.size,
             },
           );
         }

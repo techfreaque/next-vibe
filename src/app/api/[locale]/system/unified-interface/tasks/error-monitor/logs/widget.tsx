@@ -1,6 +1,7 @@
 /**
  * Custom Widget for Error Logs
- * Card list with collapsible stack trace / metadata and live filtering
+ * Card list with collapsible stack trace / metadata, resolve/reopen actions,
+ * and pagination.
  */
 
 "use client";
@@ -15,6 +16,7 @@ import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useState } from "react";
@@ -23,11 +25,13 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetLocale,
+  useWidgetLogger,
   useWidgetOnSubmit,
   useWidgetTranslation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 
 import type endpoints from "./definition";
@@ -52,24 +56,6 @@ function formatDate(s: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Level / Source badges
-// ---------------------------------------------------------------------------
-
-const LEVEL_CLASS: Record<string, string> = {
-  error: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  warn: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-};
-
-const SOURCE_CLASS: Record<string, string> = {
-  backend: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  task: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  chat: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-};
-
-const DEFAULT_BADGE =
-  "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
-
-// ---------------------------------------------------------------------------
 // ErrorLogCard
 // ---------------------------------------------------------------------------
 
@@ -77,40 +63,24 @@ function ErrorLogCard({
   log,
   expandedSection,
   onToggle,
+  onToggleResolved,
+  isUpdating,
   t,
 }: {
   log: ErrorLog;
   expandedSection: "stack" | "meta" | null;
   onToggle: (section: "stack" | "meta") => void;
+  onToggleResolved: (fingerprint: string, resolved: boolean) => void;
+  isUpdating: boolean;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
   const hasStack = Boolean(log.stackTrace);
-  const hasMeta = log.metadata && Object.keys(log.metadata).length > 0;
+  const hasMeta = log.metadata && log.metadata.length > 0;
 
   return (
     <Div className="rounded-lg border bg-card overflow-hidden">
       {/* Main row */}
       <Div className="flex items-start gap-3 p-3">
-        {/* Level badge */}
-        <Span
-          className={cn(
-            "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5",
-            LEVEL_CLASS[log.level] ?? DEFAULT_BADGE,
-          )}
-        >
-          {log.level}
-        </Span>
-
-        {/* Source badge */}
-        <Span
-          className={cn(
-            "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5",
-            SOURCE_CLASS[log.source] ?? DEFAULT_BADGE,
-          )}
-        >
-          {log.source}
-        </Span>
-
         {/* Resolved badge */}
         {log.resolved && (
           <Span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
@@ -119,23 +89,66 @@ function ErrorLogCard({
           </Span>
         )}
 
+        {/* Occurrences badge */}
+        {log.occurrences > 1 && (
+          <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-muted text-muted-foreground">
+            {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- simple count */}
+            {"x"}
+            {log.occurrences}
+          </Span>
+        )}
+
         {/* Message + meta */}
         <Div className="flex flex-col gap-0.5 flex-1 min-w-0">
           <Span className="text-sm font-medium break-words">{log.message}</Span>
           <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground font-mono">
-            <Span>{formatDate(log.createdAt)}</Span>
-            {log.endpoint && <Span>{log.endpoint}</Span>}
+            <Span>
+              {t("widget.col.firstSeen")}: {formatDate(log.firstSeen)}
+            </Span>
+            {log.firstSeen !== log.createdAt && (
+              <Span>
+                {t("widget.col.createdAt")}: {formatDate(log.createdAt)}
+              </Span>
+            )}
+            {log.level === "warn" && (
+              <Span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 px-1 rounded">
+                {"WARN"}
+              </Span>
+            )}
             {log.errorType && (
               <Span className="bg-muted px-1 rounded">{log.errorType}</Span>
-            )}
-            {log.errorCode && (
-              <Span className="bg-muted px-1 rounded">{log.errorCode}</Span>
             )}
           </Div>
         </Div>
 
-        {/* Expand buttons */}
+        {/* Action buttons */}
         <Div className="flex items-center gap-1 flex-shrink-0">
+          {/* Resolve / Reopen */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={isUpdating}
+            onClick={() => onToggleResolved(log.fingerprint, !log.resolved)}
+            className={cn(
+              "h-7 px-2 text-xs gap-1",
+              log.resolved
+                ? "text-orange-600 hover:text-orange-700 dark:text-orange-400"
+                : "text-green-600 hover:text-green-700 dark:text-green-400",
+            )}
+          >
+            {isUpdating ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : log.resolved ? (
+              <RotateCcw className="h-3 w-3" />
+            ) : (
+              <Check className="h-3 w-3" />
+            )}
+            {log.resolved
+              ? t("widget.action.reopen")
+              : t("widget.action.resolve")}
+          </Button>
+
           {hasStack && (
             <Button
               type="button"
@@ -202,14 +215,23 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
+  const user = useWidgetUser();
+  const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [updatingFingerprint, setUpdatingFingerprint] = useState<string | null>(
+    null,
+  );
 
   const value = field.value;
   const totalCount = value?.totalCount ?? 0;
   const logs = value?.logs ?? [];
 
-  const offset = Number(form?.watch("offset") ?? 0);
+  const activeCount = logs.filter((l) => !l.resolved).length;
+
+  const offset = form.watch("offset") ?? 0;
+  const fingerprintFilter = form.watch("fingerprint");
   const isLoading = endpointMutations?.read?.isLoading;
 
   const currentPage = Math.floor(offset / LIMIT) + 1;
@@ -221,7 +243,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
 
   const handlePageChange = useCallback(
     (newOffset: number): void => {
-      form?.setValue("offset", newOffset);
+      form.setValue("offset", newOffset);
       if (onSubmit) {
         onSubmit();
       } else {
@@ -239,9 +261,36 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
     [],
   );
 
+  const handleToggleResolved = useCallback(
+    async (fingerprint: string, resolved: boolean): Promise<void> => {
+      if (!user) {
+        return;
+      }
+      setUpdatingFingerprint(fingerprint);
+      try {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const endpointsDef = await import("./definition");
+        await apiClient.mutate(
+          endpointsDef.PATCH,
+          logger,
+          user,
+          { fingerprint, resolved },
+          undefined,
+          locale,
+        );
+        // Refetch the logs list to reflect updated status
+        endpointMutations?.read?.refetch?.();
+      } finally {
+        setUpdatingFingerprint(null);
+      }
+    },
+    [user, logger, locale, endpointMutations],
+  );
+
   return (
     <Div className="flex flex-col gap-0">
-      {/* ── Header ── */}
+      {/* -- Header -- */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <AlertTriangle className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-base mr-auto">
@@ -249,6 +298,16 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
           {totalCount > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({totalCount})
+            </Span>
+          )}
+          {activeCount > 0 && (
+            <Span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+              {activeCount} {t("widget.header.activeCount")}
+            </Span>
+          )}
+          {fingerprintFilter && (
+            <Span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground font-mono">
+              {fingerprintFilter}
             </Span>
           )}
         </Span>
@@ -264,26 +323,21 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
         </Button>
       </Div>
 
-      {/* ── Filters ── */}
-      <Div className="flex flex-col gap-2 px-4 py-3 border-b">
-        <Div className="grid grid-cols-2 gap-2">
-          <SelectFieldWidget fieldName={"source"} field={children.source} />
-          <SelectFieldWidget fieldName={"level"} field={children.level} />
-        </Div>
-        <Div className="grid grid-cols-2 gap-2">
-          <TextFieldWidget fieldName={"endpoint"} field={children.endpoint} />
-          <TextFieldWidget fieldName={"errorType"} field={children.errorType} />
+      {/* -- Filters -- */}
+      <Div className="flex items-center gap-2 px-4 py-3 border-b">
+        <Div className="w-48">
+          <SelectFieldWidget fieldName={"status"} field={children.status} />
         </Div>
       </Div>
 
-      {/* ── Loading state ── */}
+      {/* -- Loading state -- */}
       {isLoading && (
         <Div className="flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </Div>
       )}
 
-      {/* ── Card list ── */}
+      {/* -- Card list -- */}
       {!isLoading && (
         <Div className="flex flex-col gap-2 px-4 py-3">
           <FormAlertWidget field={{}} />
@@ -296,15 +350,21 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
             </Div>
           ) : (
             logs.map((log) => {
-              const key = expandedId?.startsWith(log.id)
-                ? (expandedId.split(":")[1] as "stack" | "meta")
-                : null;
+              const expandedSection = expandedId?.startsWith(log.id)
+                ? expandedId.split(":")[1]
+                : undefined;
+              const key: "stack" | "meta" | null =
+                expandedSection === "stack" || expandedSection === "meta"
+                  ? expandedSection
+                  : null;
               return (
                 <ErrorLogCard
                   key={log.id}
                   log={log}
                   expandedSection={key}
                   onToggle={(section) => handleToggle(log.id, section)}
+                  onToggleResolved={handleToggleResolved}
+                  isUpdating={updatingFingerprint === log.fingerprint}
                   t={t}
                 />
               );
@@ -313,7 +373,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
         </Div>
       )}
 
-      {/* ── Pagination footer ── */}
+      {/* -- Pagination footer -- */}
       <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
         <Span>
           {t("widget.pagination.info", {

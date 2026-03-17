@@ -459,9 +459,9 @@ export class PulseHealthRepository {
       const pulseId = crypto.randomUUID();
       const now = new Date();
 
-      const { getLocalInstanceId } =
+      const { deriveDefaultSelfInstanceId } =
         await import("@/app/api/[locale]/user/remote-connection/repository");
-      const instanceId = await getLocalInstanceId();
+      const instanceId = deriveDefaultSelfInstanceId();
 
       const tasksDue: string[] = [];
       const tasksExecuted: string[] = [];
@@ -686,12 +686,17 @@ export class PulseHealthRepository {
                       threadId: undefined,
                       aiMessageId: undefined,
                       currentToolMessageId: undefined,
-                      characterId: undefined,
+                      callerToolCallId: undefined,
+                      pendingToolMessages: undefined,
+                      pendingTimeoutMs: undefined,
+                      leafMessageId: undefined,
+                      skillId: undefined,
                       modelId: undefined,
                       favoriteId: undefined,
                       headless: undefined,
                       waitingForRemoteResult: undefined,
                       abortSignal: undefined,
+                      escalateToTask: undefined,
                     },
                   }),
                   new Promise<never>((...[, reject]) => {
@@ -818,7 +823,6 @@ export class PulseHealthRepository {
               .set({
                 lastExecutedAt: startedAt,
                 lastExecutionStatus: finalStatus,
-                lastExecutionError: finalMessage,
                 lastExecutionDuration: finalDurationMs,
                 executionCount: sql`${cronTasksTable.executionCount} + 1`,
                 consecutiveFailures: newConsecutiveFailures,
@@ -834,12 +838,11 @@ export class PulseHealthRepository {
 
             // If task has callback context (set by wait-for-task or execute-tool AI path),
             // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
+            // Read from typed wakeUp* columns — not from untyped taskInput JSON blob.
             const taskCallbackMode =
-              (taskInput.callbackMode as CallbackModeValue | undefined) ?? null;
-            const taskThreadId =
-              (taskInput.threadId as string | undefined) ?? null;
-            const taskToolMessageId =
-              (taskInput.toolMessageId as string | undefined) ?? null;
+              (dbTask.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
+            const taskThreadId = dbTask.wakeUpThreadId ?? null;
+            const taskToolMessageId = dbTask.wakeUpToolMessageId ?? null;
             const completionUserId = cronUser.id;
 
             if (taskToolMessageId && completionUserId) {
@@ -852,7 +855,10 @@ export class PulseHealthRepository {
                   ? ((finalOutput as JsonValue) ?? null)
                   : null,
                 taskId: dbTask.id,
-                taskInput: taskInput as Record<string, JsonValue>,
+                modelId: dbTask.wakeUpModelId ?? null,
+                skillId: dbTask.wakeUpSkillId ?? null,
+                favoriteId: dbTask.wakeUpFavoriteId ?? null,
+                leafMessageId: dbTask.wakeUpLeafMessageId ?? null,
                 userId: completionUserId,
                 logger,
               }).catch((completionErr: Error) => {
@@ -901,7 +907,6 @@ export class PulseHealthRepository {
               .update(cronTasksTable)
               .set({
                 lastExecutionStatus: CronTaskStatus.FAILED,
-                lastExecutionError: parseError(unexpectedError).message,
                 executionCount: sql`${cronTasksTable.executionCount} + 1`,
                 errorCount: sql`${cronTasksTable.errorCount} + 1`,
                 consecutiveFailures: catchConsecutiveFailures,

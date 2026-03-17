@@ -226,9 +226,9 @@ Most platforms treat AI as a chatbot widget bolted on. NextVibe is built around 
 
 When Thea calls your contact endpoint, she uses the same definition a user sees in their browser. Same validation. Same permissions. No special API.
 
-### Characters & Skills
+### Skills & Skills
 
-Every AI character in NextVibe is two things at once: a **persona** for the user (name, avatar, personality, memory context) and a **skill set** for the AI (which endpoints it can call, which models it uses, what it's optimized for). The `.md` skill file is what other platforms — Claude Code, Cursor — read to discover the character's capabilities. A stats analyst character can call `ema_GET`, `rsi_GET`, `bollinger-bands_GET` directly as AI tools.
+Every AI skill in NextVibe is two things at once: a **persona** for the user (name, avatar, personality, memory context) and a **skill set** for the AI (which endpoints it can call, which models it uses, what it's optimized for). The `.md` skill file is what other platforms — Claude Code, Cursor — read to discover the skill's capabilities. A stats analyst skill can call `ema_GET`, `rsi_GET`, `bollinger-bands_GET` directly as AI tools.
 
 ### Central Thea + Local Hermes
 
@@ -250,7 +250,7 @@ Every AI character in NextVibe is two things at once: a **persona** for the user
 
 **Hermes** is the local worker. Connect via `vibe remote-connect`. The pulse syncs memories, capabilities, and tasks every 60 seconds. Thea discovers local tools via `help(instanceId="hermes")`, executes them remotely, and routes Claude Code tasks to the right machine. No Jira. No standup.
 
-**What Thea can do:** 42+ AI models · Characters & skills · Persistent memories · Tool calling (any endpoint) · Task scheduling · MCP · Voice (TTS + STT)
+**What Thea can do:** 42+ AI models · skill.ts files · Persistent memories · Tool calling (any endpoint) · Task scheduling · MCP · Voice (TTS + STT)
 
 ---
 
@@ -267,7 +267,7 @@ An EMA node is just `vibe analytics/indicators/ema --period=14 --source=leads-cr
 **Ships with graph seeds:** lead funnel monitoring, credit economy health, user growth tracking. Ready on first boot.
 
 Use cases: business metric monitoring · trading strategy execution · IoT anomaly detection · email deliverability health · any process that can be described as data → conditions → actions.
-
+Chara
 The graph builder canvas is live in the admin panel. Backtest: replay any strategy over history — evaluator calls are intercepted so nothing fires. Multi-resolution: mix 5-minute and daily timeframes in the same graph.
 
 → [Vibe Sense docs](docs/vibe-sense/)
@@ -293,7 +293,7 @@ NextVibe is the engine. **[Unbottled.ai](https://unbottled.ai)** is the product 
 
 Free speech AI — 42+ models, user-controlled content filtering. Users choose their own censorship level.
 
-- **AI Chat** — Multi-model, branching message trees, characters, memories, curated favorites
+- **AI Chat** — Multi-model, branching message trees, skills, memories, curated favorites
 - **Payments** — Stripe + NowPayments (crypto), credits, referral program
 - **Communication** — React Email, full SMTP/IMAP client, automated campaigns
 - **Lead System** — Journey workflows, CSV import, engagement analytics

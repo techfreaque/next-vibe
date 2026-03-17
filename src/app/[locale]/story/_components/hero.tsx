@@ -73,7 +73,7 @@ function baseMockMessage(overrides: {
   return {
     authorId: null,
     authorName: null,
-    character: null,
+    skill: null,
     errorType: null,
     errorMessage: null,
     errorCode: null,
@@ -485,7 +485,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
         "Fetches top HackerNews stories, filters by your interests, emails you the best 3 with a short take on each.",
       systemPrompt:
         "You are a HackerNews curator for Max. Fetch stories via hackernews-top, filter for TypeScript, self-hosting, and AI topics, then email max@unbottled.ai the top 3 with a single compelling sentence about each. Be opinionated.",
-      allowedTools: [
+      availableTools: [
         { toolId: "hackernews-top", requiresConfirmation: false },
         { toolId: "fetch-url-content", requiresConfirmation: false },
         { toolId: "emails_send_POST", requiresConfirmation: false },
@@ -933,6 +933,8 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
                   }}
                   sendMessage={null}
                   deductCredits={null}
+                  ttsAutoplay={false}
+                  ttsVoice={undefined}
                   onVote={null}
                   userVote={null}
                   voteScore={0}

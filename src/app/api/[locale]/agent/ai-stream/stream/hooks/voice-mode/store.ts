@@ -30,10 +30,10 @@ interface VoiceModeState {
   // Settings actions
   setInputMode: (mode: VoiceInputMode) => void;
   setAutoPlayTTS: (autoPlay: boolean) => void;
-  /** Set call mode for a specific model+character combination */
-  setCallMode: (modelId: string, characterId: string, enabled: boolean) => void;
-  /** Get call mode for a specific model+character combination */
-  getCallMode: (modelId: string, characterId: string) => boolean;
+  /** Set call mode for a specific model+skill combination */
+  setCallMode: (modelId: string, skillId: string, enabled: boolean) => void;
+  /** Get call mode for a specific model+skill combination */
+  getCallMode: (modelId: string, skillId: string) => boolean;
 
   // Runtime actions
   setRecording: (recording: boolean) => void;
@@ -67,8 +67,8 @@ export const useVoiceModeStore = create<VoiceModeState>()(
         }));
       },
 
-      setCallMode: (modelId, characterId, enabled): void => {
-        const key = getCallModeKey(modelId, characterId);
+      setCallMode: (modelId, skillId, enabled): void => {
+        const key = getCallModeKey(modelId, skillId);
         set((state) => ({
           settings: {
             ...state.settings,
@@ -80,8 +80,8 @@ export const useVoiceModeStore = create<VoiceModeState>()(
         }));
       },
 
-      getCallMode: (modelId, characterId): boolean => {
-        const key = getCallModeKey(modelId, characterId);
+      getCallMode: (modelId, skillId): boolean => {
+        const key = getCallModeKey(modelId, skillId);
         return (
           useVoiceModeStore.getState().settings.callModeByConfig[key] ?? false
         );

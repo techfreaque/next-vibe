@@ -156,8 +156,8 @@ export const translations = {
     },
   },
 
-  createCharacter: {
-    title: "Create Custom Character",
+  createSkill: {
+    title: "Create Custom Skill",
     description:
       "Design your own AI character with custom characterlity, expertise, and behavior.",
     icon: "Icon",
@@ -172,7 +172,7 @@ export const translations = {
       "Define how this character should behave. Be specific about its characterlity, expertise, and how it should respond.",
     voice: "Voice",
     voicePlaceholder: "Select a voice for text-to-speech",
-    create: "Create Character",
+    create: "Create Skill",
     creating: "Creating...",
     charCount: "{{current}} / {{max}}",
     errors: {
@@ -188,8 +188,8 @@ export const translations = {
     female: "Female",
   },
 
-  editCharacter: {
-    title: "Edit as Custom Character",
+  editSkill: {
+    title: "Edit as Custom Skill",
     description:
       "Create a custom character based on this character. You can modify any settings.",
     loginRequired:
@@ -406,15 +406,15 @@ export const translations = {
     },
   },
   characterSelector: {
-    placeholder: "Select Character",
-    addNewLabel: "Create Custom Character",
+    placeholder: "Select Skill",
+    addNewLabel: "Create Custom Skill",
     defaultIcon: "✨",
     grouping: {
       bySource: "By Source",
       byCategory: "By Category",
       sourceLabels: {
         builtIn: "Built-in",
-        my: "My Characters",
+        my: "My Skills",
         community: "Community",
       },
       sourceIcons: {
@@ -441,7 +441,7 @@ export const translations = {
       create: "Create",
     },
     addDialog: {
-      title: "Create Custom Character",
+      title: "Create Custom Skill",
       createCategory: "+ New Category",
       fields: {
         name: {
@@ -470,7 +470,7 @@ export const translations = {
         },
       },
       cancel: "Cancel",
-      create: "Create Character",
+      create: "Create Skill",
     },
   },
   searchToggle: {
@@ -489,31 +489,33 @@ export const translations = {
   combinedSelector: {
     tabs: {
       quick: "Quick",
-      character: "Character",
+      skill: "Skill",
       model: "Model",
     },
     current: "Current",
-    favoriteCharacters: "Favorite Characters",
+    favoriteSkills: "Favorite Skills",
     favoriteModels: "Favorite Models",
     showAll: "Show all",
     selectModel: "Select Model",
-    forCharacter: "for {{character}}",
+    forSkill: "for {{character}}",
     recommended: "Recommended",
     favorites: "Favorites",
     all: "All",
     noFavorites: "No favorites yet. Star some to add them here.",
     noModels: "No models available",
-    filteredByCharacter:
+    filteredBySkill:
       "Showing {{compatible}} of {{total}} models (filtered by character)",
-    selectCharacter: "Select Character",
-    allCharacters: "All",
+    selectSkill: "Select Skill",
+    allSkills: "All",
   },
   selector: {
     noResults: "No results found",
     tabs: {
       quick: "Quick",
-      characters: "Characters",
+      characters: "Skills",
       build: "Build",
+      favorites: "My Favorites",
+      browse: "Browse Skills",
     },
     tiers: {
       quick: "Quick",
@@ -536,9 +538,9 @@ export const translations = {
     suggested: "Suggested",
     noFavorites: "No favorites yet",
     noFavoritesHint: "Save your go-to characters for quick access",
-    browseAllCharacters: "Browse all characters...",
+    browseAllSkills: "Browse all characters...",
     customSetup: "Custom setup...",
-    selectCharacter: "Select Character",
+    selectSkill: "Select Skill",
     modelCreditDisplay: {
       tokenBased: {
         header: "Cost per message",
@@ -574,7 +576,7 @@ export const translations = {
     },
     all: "All",
     buildMode: "Build Mode",
-    forCharacter: "for {{character}}",
+    forSkill: "for {{character}}",
     intelligence: "Intelligence",
     contentLevel: "Content Level",
     speed: "Speed",
@@ -588,14 +590,14 @@ export const translations = {
     currentConfig: "Currently chatting with",
     switchModel: "Switch Model",
     keepsConversation: "(keeps conversation)",
-    switchCharacter: "Switch Character",
+    switchSkill: "Switch Skill",
     startsNewChat: "(starts new chat)",
     start: "Start",
     addFav: "Add",
-    searchCharacters: "Search characters...",
-    noCharactersFound: "No characters found",
+    searchSkills: "Search characters...",
+    noSkillsFound: "No characters found",
     createCustom: "Create custom character",
-    character: "Character",
+    skill: "Skill",
     savePreset: "Save",
     perMessage: "per message",
     compatibleModels: "{{count}} compatible models",
@@ -656,19 +658,19 @@ export const translations = {
     yourSetups: "Your Setups",
     setup: "Setup",
     delete: "Delete",
-    editCharacter: "Edit as custom character",
-    switchCharacterBtn: "Switch Character",
-    editCharacterBtn: "Edit Character",
+    editSkill: "Edit as custom character",
+    switchSkillBtn: "Switch Skill",
+    editSkillBtn: "Edit Skill",
     autoSelectedModel: "Auto-selected:",
     manualSelectedModel: "Selected:",
-    characterSelectedModel: "Character's model:",
+    skillSelectedModel: "Skill's model:",
     selectModelBelow: "Select a model below",
     chooseYourPath: "Choose Your Path",
     twoWaysToChat: "Two flexible ways to start chatting",
     directModels: "Direct Model Access",
     directModelsDesc:
       "Configure filters or manually select from {{count}} models. Full control over AI selection.",
-    characterPresets: "Character Presets",
+    skillPresets: "Skill Presets",
     characterPresetsDesc:
       "Pick a character below. Each has optimized settings you can customize anytime.",
     startWithDirectModels: "Start with Direct Models",
@@ -686,7 +688,7 @@ export const translations = {
     useOnce: "Use Once",
     saveAsDefault: "Add to favorites",
     deleteSetup: "Delete Setup",
-    characterSetup: "Character Setup",
+    skillSetup: "Skill Setup",
     separator: " • ",
     sortBy: "Sort by",
     // UX improvements v21
@@ -699,7 +701,7 @@ export const translations = {
     modelSelection: "Model Selection",
     autoMode: "Auto-Select",
     manualMode: "Manual Pick",
-    characterMode: "Character Default",
+    skillMode: "Skill Default",
     autoModeDescription:
       "Automatically picks the best model based on your preferences",
     manualModeDescription: "Choose any model you want",
@@ -715,9 +717,9 @@ export const translations = {
     adjustSettings: "Adjust Settings",
     addAnotherSetup: "Add another setup",
     comingSoon: "Coming soon",
-    // Character requirements
+    // Skill requirements
     requirements: {
-      characterConflict: "Character conflict",
+      skillConflict: "Skill conflict",
       max: "Maximum",
       min: "Minimum",
       tooHigh: "Too high",
@@ -729,9 +731,9 @@ export const translations = {
       allMet: "Meets all requirements",
       violations: "{{count}} requirement violations",
     },
-    // Character switch modal
+    // Skill switch modal
     characterSwitchModal: {
-      title: "Switch Character",
+      title: "Switch Skill",
       description:
         "Switch to a different character without losing your settings",
       searchPlaceholder: "Search characters...",
@@ -740,28 +742,88 @@ export const translations = {
       keepSettingsDesc:
         "Use your current intelligence, price, and content filters with the new character",
       cancel: "Cancel",
-      confirm: "Switch Character",
+      confirm: "Switch Skill",
     },
   },
   onboarding: {
     back: "Back",
-    // Screen 1: Story
-    story: {
-      title: "Think of us as your team.",
-      line1: "Most people start with a companion - someone to chat with daily.",
-      line2: "When you need specific help, switch to a specialist.",
-      line3: "It's like having experts on speed dial.",
-      continue: "Meet the Team",
+    // Screen 1: Welcome
+    welcome: {
+      title: "Think of us as your AI team.",
+      line1:
+        "Your companion handles everyday chat. Specialists step in for coding, research, writing — whatever the task needs.",
+      line2: "The AI switches between them automatically. You just talk.",
+      line3: "Let's get you set up in under a minute.",
+      continue: "Get Started",
     },
-    // Screen 2: Pick companion
-    pick: {
-      title: "Who's your daily companion?",
-      subtitle: "For everyday chat & conversation",
-      continue: "Continue",
+    // Screen 2: Guest warning (logged-out users only)
+    guest: {
+      title: "You're browsing as a guest",
+      line1:
+        "Your settings, companion, and chat history are saved locally on this device only.",
+      line2:
+        "Sign in to keep everything synced across devices — and make sure you never lose your setup.",
+      signIn: "Sign In / Create Account",
+      continueAnyway: "Continue as Guest",
+      note: "You can sign in later from the menu at any time.",
+    },
+    // Screen 3: Companion + Budget
+    companion: {
+      title: "Choose your companion",
+      subtitle: "Your main chat partner for everyday use",
+      budgetTitle: "How capable should your AI be?",
+      budgetSubtitle: "You can change this anytime in settings",
+      next: "Next",
       selectFirst: "Pick a companion to continue",
-      saving: "Saving...",
+      budget: {
+        smart: {
+          label: "Smart",
+          desc: "Fast, efficient, handles most things well",
+        },
+        brilliant: {
+          label: "Brilliant",
+          desc: "Best quality — great for complex questions, writing, and analysis",
+        },
+        max: {
+          label: "Max",
+          desc: "Highest reasoning, no compromises — for when it really matters",
+        },
+      },
     },
-    // Companion characterlities
+    // Screen 4: Use-cases
+    usecases: {
+      title: "What will you mostly use it for?",
+      subtitle:
+        "We'll add the right specialists to your AI's toolkit automatically.",
+      saving: "Setting up...",
+      start: "Start Chatting",
+      skip: "Skip — I'll set it up later",
+      coding: {
+        label: "Coding & Tech",
+        hint: "Vibe Coder, Coder",
+      },
+      research: {
+        label: "Research & Analysis",
+        hint: "Researcher, Data Analyst",
+      },
+      writing: {
+        label: "Writing & Editing",
+        hint: "Writer, Editor",
+      },
+      business: {
+        label: "Business & Strategy",
+        hint: "Business Advisor, Product Manager",
+      },
+      learning: {
+        label: "Learning & Study",
+        hint: "Tutor, Socratic Questioner",
+      },
+      chat: {
+        label: "Just Chatting",
+        hint: "Your companion is enough",
+      },
+    },
+    // Companion personalities (kept for skills i18n)
     thea: {
       tagline: "Warm & wise",
       description: "Like a supportive friend who really gets you.",
@@ -769,19 +831,6 @@ export const translations = {
     hermes: {
       tagline: "Bold & direct",
       description: "Like a coach who pushes you to be your best.",
-    },
-    // Screen 3: Specialists - add to team
-    specialists: {
-      title: "Add specialists for specific tasks",
-      subtitle:
-        "Each expert is optimized for their specialty. Add as many as you like.",
-      chosen: "{{name}} is ready",
-      add: "Add",
-      added: "Added",
-      switchTip:
-        "Switch between your team members anytime. You can customize or add more later.",
-      start: "Start Chatting",
-      browseAll: "Browse All Characters",
     },
     // Legacy keys (for backwards compat)
     startChatting: "Start Chatting",
@@ -1147,7 +1196,7 @@ export const translations = {
     imageGen: "Image Generation",
     uncensored: "Uncensored",
     legacy: "Legacy Models",
-    // Character categories
+    // Skill categories
     technical: "Technical",
     education: "Education",
     controversial: "Controversial",
@@ -1358,7 +1407,7 @@ export const translations = {
     incognitoDescription:
       "Stored only in your browser. Never saved to your account or synced.",
     more: "More",
-    selectCharacter: "Select a Character",
+    selectSkill: "Select a Skill",
     noPrompts: "No suggested prompts for this character",
     showDetails: "Show details",
     hideDetails: "Hide details",
@@ -1731,23 +1780,23 @@ export const translations = {
         "Browse models grouped by company (OpenAI, Anthropic, Gab) or purpose (Uncensored, Coding, Creative). See what each provider offers.",
     },
     characterSelector: {
-      title: "Customize AI Characterlity",
+      title: "Customize AI Skilllity",
       description:
-        "Characters control how AI responds. Choose from built-in styles or create custom characters with specific instructions, tone, and preferred models. Make AI work your way.",
+        "Skills control how AI responds. Choose from built-in styles or create custom characters with specific instructions, tone, and preferred models. Make AI work your way.",
       tip: "Pair any character with any model. Professional tone with uncensored model? Done.",
     },
     characterSelectorFavorites: {
-      title: "Star Your Characters",
+      title: "Star Your Skills",
       description:
         "Quick access to your go-to conversation styles. Star the characters you use most.",
     },
     characterSelectorShowAll: {
-      title: "Expand to See All Characters",
+      title: "Expand to See All Skills",
       description:
         "Browse the complete character library. Create unlimited custom characters for different tasks and workflows.",
     },
     characterSelectorSearch: {
-      title: "Search Characters",
+      title: "Search Skills",
       description:
         "Find the right style fast. Search by name, category, or description.",
     },

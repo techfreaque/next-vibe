@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger, t }) =>
-      connectRemote(data, user, logger, t),
+    handler: ({ data, user, logger, t, locale }) =>
+      connectRemote(data, user, logger, t, locale),
   },
 });

@@ -31,6 +31,11 @@ export const translations: typeof enTranslations = {
         description: "Uwzględnij ukryte zadania (domyślnie: wszystkie zadania)",
         placeholder: "Wszystkie zadania",
       },
+      search: {
+        label: "Szukaj",
+        description: "Filtruj zadania według nazwy, trasy lub kategorii",
+        placeholder: "Szukaj w kolejce...",
+      },
       limit: {
         label: "Limit",
         description: "Maksymalna liczba zadań do zwrócenia",
@@ -131,6 +136,8 @@ export const translations: typeof enTranslations = {
     header: {
       tasks: "Wszystkie zadania",
       history: "Historia",
+      stats: "Statystyki",
+      create: "Nowe zadanie",
       refresh: "Odśwież",
     },
     filter: {
@@ -164,6 +171,20 @@ export const translations: typeof enTranslations = {
       history: "Pokaż historię",
       edit: "Edytuj zadanie",
       run: "Uruchom teraz",
+    },
+    bulk: {
+      selected: "{count} zaznaczono",
+      selectAll: "Zaznacz wszystkie",
+      clearSelection: "Wyczyść zaznaczenie",
+      enable: "Włącz",
+      disable: "Wyłącz",
+      runNow: "Uruchom teraz",
+      delete: "Usuń",
+      confirmDeleteTitle: "Usunąć zadania?",
+      confirmDelete:
+        "Usunąć {count} zadanie(a)? Tej operacji nie można cofnąć.",
+      cancel: "Anuluj",
+      success: "{succeeded} udanych, {failed} nieudanych",
     },
     empty: {
       noTasks: "Kolejka jest pusta",

@@ -28,6 +28,7 @@ import { CREDITS_TRANSACTIONS_COUNT_ALIAS } from "./data-sources/credits-transac
 import { CREDITS_AVG_TRANSACTION_ALIAS } from "./data-sources/credits-avg-transaction/constants";
 import { CREDITS_WALLETS_TOTAL_ALIAS } from "./data-sources/credits-wallets-total/constants";
 import { CREDITS_USAGE_WITH_FEATURE_ALIAS } from "./data-sources/credits-usage-with-feature/constants";
+import { CREDITS_PACKS_CREATED_ALIAS } from "./data-sources/credits-packs-created/constants";
 import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
@@ -531,6 +532,102 @@ const creditTransactionAnalyticsConfig: GraphConfig = {
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
+// ─── Pack & Supply Analytics ──────────────────────────────────────────────────
+
+const packSupplyAnalyticsConfig: GraphConfig = {
+  nodes: {
+    packs_created: {
+      endpointPath: CREDITS_PACKS_CREATED_ALIAS,
+      pane: 0,
+      color: BLUE,
+    },
+    purchased: {
+      endpointPath: CREDITS_PURCHASED_ALIAS,
+      pane: 0,
+      color: GREEN,
+    },
+    wallets_total: {
+      endpointPath: CREDITS_WALLETS_TOTAL_ALIAS,
+      pane: 0,
+      color: CYAN,
+    },
+    balance_total: {
+      endpointPath: CREDITS_BALANCE_TOTAL_ALIAS,
+      pane: 0,
+      color: PURPLE,
+    },
+
+    packs_ema7: {
+      endpointPath: EMA_ALIAS,
+      params: { period: 7 },
+      pane: 0,
+      color: BLUE,
+    },
+
+    packs_per_wallet: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: AMBER,
+    },
+    purchase_per_pack: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: GREEN,
+    },
+
+    eval_no_packs: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 1 },
+      visible: false,
+    },
+    eval_low_pack_conversion: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 0.1 },
+      visible: false,
+    },
+
+    action_notify_no_packs: {
+      endpointPath: COMPLETE_TASK_ALIAS,
+      persist: "never",
+      visible: false,
+      params: {
+        taskId: "vibe-sense-alert",
+        status: "status.completed",
+        summary:
+          "ALERT: No new credit packs created in the past week. Pack catalog may be stale or pricing unattractive. Review pack offerings and promotion strategy.",
+      },
+    },
+  },
+
+  edges: [
+    { from: "packs_created", to: "packs_ema7" },
+    { from: "packs_created", to: "packs_per_wallet", toHandle: "a" },
+    { from: "wallets_total", to: "packs_per_wallet", toHandle: "b" },
+    { from: "purchased", to: "purchase_per_pack", toHandle: "a" },
+    { from: "packs_created", to: "purchase_per_pack", toHandle: "b" },
+    { from: "packs_ema7", to: "eval_no_packs" },
+    { from: "purchase_per_pack", to: "eval_low_pack_conversion" },
+    { from: "eval_no_packs", to: "action_notify_no_packs" },
+  ],
+
+  positions: {
+    packs_created: { x: 0, y: 0 },
+    purchased: { x: 0, y: 120 },
+    wallets_total: { x: 0, y: 240 },
+    balance_total: { x: 0, y: 360 },
+    packs_ema7: { x: 300, y: 0 },
+    packs_per_wallet: { x: 300, y: 120 },
+    purchase_per_pack: { x: 300, y: 240 },
+    eval_no_packs: { x: 600, y: 0 },
+    eval_low_pack_conversion: { x: 600, y: 240 },
+    action_notify_no_packs: { x: 900, y: 0 },
+  },
+
+  trigger: { type: "cron", schedule: "0 */6 * * *" },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const graphSeeds: GraphSeedEntry[] = [
@@ -568,5 +665,12 @@ export const graphSeeds: GraphSeedEntry[] = [
     description:
       "Tracks transaction volume, average transaction size, wallet count, and feature-attributed usage. Alerts on volume drops and unusual transaction sizes.",
     config: creditTransactionAnalyticsConfig,
+  },
+  {
+    slug: "pack-supply-analytics",
+    name: "Pack & Supply Analytics",
+    description:
+      "Tracks credit pack creation velocity, packs per wallet, and purchase-per-pack conversion. Alerts when pack creation stalls or conversion drops.",
+    config: packSupplyAnalyticsConfig,
   },
 ];

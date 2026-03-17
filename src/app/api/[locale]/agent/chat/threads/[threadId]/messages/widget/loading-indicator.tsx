@@ -4,28 +4,12 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
-import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
-
-import { useStreamingMessagesStore } from "../hooks/streaming-messages-store";
-
 export function LoadingIndicator({
-  sequenceId,
+  isStreaming,
 }: {
-  sequenceId: string | null;
+  isStreaming: boolean;
 }): JSX.Element | null {
-  const globalIsStreaming = useAIStreamStore((state) => state.isStreaming);
-  const isActivelyStreaming = useStreamingMessagesStore((state) => {
-    if (!globalIsStreaming) {
-      return false;
-    }
-    if (!sequenceId) {
-      return false;
-    }
-    return Object.values(state.streamingMessages).some(
-      (msg) => msg.sequenceId === sequenceId && msg.isStreaming,
-    );
-  });
-  return isActivelyStreaming ? (
+  return isStreaming ? (
     <Div className={cn("flex items-start gap-3", "animate-fade-in")}>
       <Div className="flex-1">
         <Div className="flex items-center gap-2">

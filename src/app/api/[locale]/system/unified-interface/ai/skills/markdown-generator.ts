@@ -5,7 +5,7 @@
  * Generates two tier files (AGENT.md is a lean gateway document, not a tool list):
  *   - PUBLIC_USER_SKILL.md       → PUBLIC + CUSTOMER endpoints (default for all agents)
  *   - USER_WITH_ACCOUNT_SKILL.md → CUSTOMER-only endpoints (account required)
- *   - [character-id]-skill.md    → per-character skill files (dynamic route)
+ *   - [skill-id]-skill.md    → per-skill skill files (dynamic route)
  *
  * Uses generated endpoints-meta for fast filtering (no registry load).
  * Schema rendering uses getEndpoint() per-tool (lazy). All endpoints are included
@@ -374,16 +374,16 @@ function groupByCategory(
 const AI_RUN_PARAMS_TABLE = `
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| \`prompt\` | \`string\` | ✅ | Your task or question for the character |
-| \`character\` | \`string\` | — | Character ID. Omit to use the default assistant |
-| \`model\` | \`string\` | — | Model ID (e.g. \`claude-sonnet-4-6\`). Character may have a preferred model |
-| \`instructions\` | \`string\` | — | Extra system-level instructions appended after the character's system prompt |
-| \`allowedTools\` | \`array\` | — | Restrict which tools the AI may call. Omit to use the character's full tool set |
+| \`prompt\` | \`string\` | ✅ | Your task or question for the skill |
+| \`skill\` | \`string\` | — | Skill ID. Omit to use the default assistant |
+| \`model\` | \`string\` | — | Model ID (e.g. \`claude-sonnet-4-6\`). Skill may have a preferred model |
+| \`instructions\` | \`string\` | — | Extra system-level instructions appended after the skill's system prompt |
+| \`availableTools\` | \`array\` | — | Restrict which tools the AI may call. Omit to use the skill's full tool set |
 | \`maxTurns\` | \`number\` | — | Max agentic turns before stopping. Omit for no limit |
 | \`preCalls\` | \`array\` | — | Endpoints to call before the prompt — results are injected as context |
 | \`rootFolderId\` | \`string\` | — | Where to store the thread: \`"cron"\` (persisted), \`"incognito"\` (no persistence), \`"private"\`, \`"public"\` |
 | \`appendThreadId\` | \`string\` | — | UUID of an existing thread to continue |
-| \`excludeMemories\` | \`boolean\` | — | Set \`true\` to skip injecting the character's stored memories |
+| \`excludeMemories\` | \`boolean\` | — | Set \`true\` to skip injecting the skill's stored memories |
 `.trim();
 
 const AI_RUN_RESPONSE_TABLE = `
@@ -404,7 +404,7 @@ const AI_RUN_RESPONSE_TABLE = `
  */
 function renderInlineAiRunSection(opts: {
   runUrl: string;
-  characterId?: string;
+  skillId?: string;
   exampleModel: string;
   exampleFolder: "cron" | "incognito";
   exampleMaxTurns: number;
@@ -412,7 +412,7 @@ function renderInlineAiRunSection(opts: {
 }): string {
   const {
     runUrl,
-    characterId,
+    skillId,
     exampleModel,
     exampleFolder,
     exampleMaxTurns,
@@ -422,13 +422,13 @@ function renderInlineAiRunSection(opts: {
   const authLine = requiresAuth
     ? "\nAuthorization: Bearer <YOUR_JWT_TOKEN>"
     : "";
-  const characterLine = characterId ? `\n  "character": "${characterId}",` : "";
+  const characterLine = skillId ? `\n  "skill": "${skillId}",` : "";
   const folderNote =
     exampleFolder === "incognito"
       ? "> 💡 `incognito` — no thread stored, context-saving for stateless queries."
       : "> 💡 `cron` — thread persisted for auditing agentic tool calls.";
 
-  const delegateTarget = characterId ? "this character" : "an AI character";
+  const delegateTarget = skillId ? "this skill" : "an AI skill";
 
   return [
     "---",
@@ -515,11 +515,11 @@ export async function generateTierAiRunMarkdown(
     "",
     "> 💡 `incognito` — no thread stored, ideal for stateless one-shot queries.",
     "",
-    "## With a Specific Character",
+    "## With a Specific Skill",
     "",
     "```json",
     "{",
-    `  "character": "research-agent",`,
+    `  "skill": "research-agent",`,
     `  "prompt": "Find the latest news on AI regulation and summarise key points",`,
     `  "model": "claude-sonnet-4-6",`,
     `  "rootFolderId": "cron",`,
@@ -527,7 +527,7 @@ export async function generateTierAiRunMarkdown(
     "}",
     "```",
     "",
-    `> See [AGENT.md](${agentUrl}) for all available characters and their skill files.`,
+    `> See [AGENT.md](${agentUrl}) for all available skills and their skill files.`,
     "",
     "---",
     "",
@@ -549,11 +549,11 @@ export async function generateTierAiRunMarkdown(
 }
 
 // ============================================================================
-// CHARACTER AI RUN GENERATOR
+// SKILL AI RUN GENERATOR
 // ============================================================================
 
 /**
- * Derive the best example model string from a character's modelSelection.
+ * Derive the best example model string from a skill's modelSelection.
  * Uses the max intelligence range to pick the most capable allowed model.
  */
 function pickExampleModel(
@@ -572,28 +572,28 @@ function pickExampleModel(
   return "claude-haiku-4-5-20251001";
 }
 
-export async function generateCharacterAiRunMarkdown(
-  characterId: string,
+export async function generateSkillAiRunMarkdown(
+  skillId: string,
   locale: CountryLanguage,
 ): Promise<string | null> {
-  const charInfo = await getCharacterSkillInfo(characterId, locale);
+  const charInfo = await getSkillSkillInfo(skillId, locale);
   if (!charInfo) {
     return null;
   }
 
-  const { DEFAULT_CHARACTERS } =
-    await import("@/app/api/[locale]/agent/chat/characters/config");
-  const defaultChar = DEFAULT_CHARACTERS.find((c) => c.id === characterId);
+  const { DEFAULT_SKILLS } =
+    await import("@/app/api/[locale]/agent/chat/skills/config");
+  const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const modelSelection = defaultChar?.modelSelection ?? null;
 
   const now = new Date().toISOString();
   const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const runUrl = `${apiBase}/agent/ai-stream/run`;
-  const skillUrl = `${baseUrl}/api/${locale}/system/unified-interface/ai/skills/${characterId}-skill.md`;
+  const skillUrl = `${baseUrl}/api/${locale}/system/unified-interface/ai/skills/${skillId}-skill.md`;
 
   const hasTools =
-    charInfo.activeTools !== null && charInfo.activeTools.length > 0;
+    charInfo.availableTools !== null && charInfo.availableTools.length > 0;
   const exampleModel = pickExampleModel(
     modelSelection as Parameters<typeof pickExampleModel>[0],
   );
@@ -607,7 +607,7 @@ export async function generateCharacterAiRunMarkdown(
     `# ${charInfo.name} — AI Run Quick Reference`,
     `## ${charInfo.tagline}`,
     "",
-    `> The **[${characterId}-skill.md](${skillUrl})** skill file is self-contained — it includes the tool listing and this AI Run section inline.`,
+    `> The **[${skillId}-skill.md](${skillUrl})** skill file is self-contained — it includes the tool listing and this AI Run section inline.`,
     `> Load that file for the full reference. This file is a quick standalone guide for \`POST ${runUrl}\`.`,
     "",
     "---",
@@ -620,7 +620,7 @@ export async function generateCharacterAiRunMarkdown(
     "```",
     "```json",
     "{",
-    `  "character": "${characterId}",`,
+    `  "skill": "${skillId}",`,
     `  "prompt": "Your task here",`,
     `  "model": "${exampleModel}",`,
     `  "rootFolderId": "${exampleFolder}",`,
@@ -631,12 +631,12 @@ export async function generateCharacterAiRunMarkdown(
     exampleFolder === "incognito"
       ? "> 💡 `incognito` — no thread stored, context-saving for stateless queries."
       : "> 💡 `cron` — thread persisted for auditing agentic tool calls.",
-    ...(hasTools && charInfo.activeTools
+    ...(hasTools && charInfo.availableTools
       ? [
           "",
-          "## Tools this character uses",
+          "## Tools this skill uses",
           "",
-          ...charInfo.activeTools.map((t) => {
+          ...charInfo.availableTools.map((t) => {
             const confirmNote = t.requiresConfirmation
               ? " *(requires confirmation)*"
               : "";
@@ -659,7 +659,7 @@ export async function generateCharacterAiRunMarkdown(
     "",
     "---",
     "",
-    `*Generated: \`${now}\` · Character: \`${characterId}\` · Locale: \`${locale}\`*`,
+    `*Generated: \`${now}\` · Skill: \`${skillId}\` · Locale: \`${locale}\`*`,
     "",
   ].join("\n");
 }
@@ -850,39 +850,42 @@ function buildEmptyManifest(config: SkillTierConfig): string {
 }
 
 // ============================================================================
-// CHARACTER SKILL GENERATOR
+// SKILL MANIFEST GENERATOR
 // ============================================================================
 
 /**
- * Describes a character's tool set and metadata for skill generation.
- * Covers both default (system) characters and custom (DB) characters.
+ * Describes a skill's tool set and metadata for skill generation.
+ * Covers both default (system) skills and custom (DB) skills.
  */
-export interface CharacterSkillInfo {
+export interface SkillSkillInfo {
   id: string;
   name: string;
   tagline: string;
   description: string;
   category: string;
-  /** null = inherits all tools (generic character) */
-  activeTools: Array<{ toolId: string; requiresConfirmation: boolean }> | null;
-  /** true if character requires CUSTOMER role */
+  /** null = inherits all tools (generic skill) */
+  availableTools: Array<{
+    toolId: string;
+    requiresConfirmation: boolean;
+  }> | null;
+  /** true if skill requires CUSTOMER role */
   requiresAuth: boolean;
 }
 
 /**
- * Look up a character for skill generation.
- * Handles default (system) characters and public custom (DB) characters.
- * Returns null if the character doesn't exist, is admin-only, or is a private custom character.
+ * Look up a skill for skill generation.
+ * Handles default (system) skills and public custom (DB) skills.
+ * Returns null if the skill doesn't exist, is admin-only, or is a private custom skill.
  */
-export async function getCharacterSkillInfo(
-  characterId: string,
+export async function getSkillSkillInfo(
+  skillId: string,
   locale: CountryLanguage,
-): Promise<CharacterSkillInfo | null> {
-  const { DEFAULT_CHARACTERS } =
-    await import("@/app/api/[locale]/agent/chat/characters/config");
+): Promise<SkillSkillInfo | null> {
+  const { DEFAULT_SKILLS } =
+    await import("@/app/api/[locale]/agent/chat/skills/config");
 
-  // Check default/system characters first
-  const defaultChar = DEFAULT_CHARACTERS.find((c) => c.id === characterId);
+  // Check default/system skills first
+  const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   if (defaultChar) {
     const { UserPermissionRole } =
       await import("@/app/api/[locale]/user/user-roles/enum");
@@ -892,7 +895,7 @@ export async function getCharacterSkillInfo(
       UserPermissionRole.ADMIN,
     ];
 
-    // Exclude admin-only characters (only ADMIN role, no CUSTOMER or PUBLIC)
+    // Exclude admin-only skills (only ADMIN role, no CUSTOMER or PUBLIC)
     const hasCustomer = roles.includes(UserPermissionRole.CUSTOMER);
     const hasPublic = roles.includes(UserPermissionRole.PUBLIC);
     const hasAdmin = roles.includes(UserPermissionRole.ADMIN);
@@ -900,13 +903,8 @@ export async function getCharacterSkillInfo(
       return null;
     }
 
-    // Also exclude instance-filtered characters (hermes-only)
-    if (defaultChar.instanceFilter && defaultChar.instanceFilter.length > 0) {
-      return null;
-    }
-
     const { scopedTranslation: charTranslation } =
-      await import("@/app/api/[locale]/agent/chat/characters/i18n");
+      await import("@/app/api/[locale]/agent/chat/skills/i18n");
     const { t } = charTranslation.scopedT(locale);
 
     return {
@@ -915,8 +913,8 @@ export async function getCharacterSkillInfo(
       tagline: t(defaultChar.tagline),
       description: t(defaultChar.description),
       category: defaultChar.category,
-      activeTools: defaultChar.activeTools
-        ? defaultChar.activeTools.map((tool) => ({
+      availableTools: defaultChar.availableTools
+        ? defaultChar.availableTools.map((tool) => ({
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           }))
@@ -925,21 +923,21 @@ export async function getCharacterSkillInfo(
     };
   }
 
-  // Fall back to DB — only PUBLIC custom characters are accessible without auth
+  // Fall back to DB — only PUBLIC custom skills are accessible without auth
   const { db } = await import("@/app/api/[locale]/system/db");
-  const { customCharacters } =
-    await import("@/app/api/[locale]/agent/chat/characters/db");
-  const { CharacterOwnershipType } =
-    await import("@/app/api/[locale]/agent/chat/characters/enum");
+  const { customSkills } =
+    await import("@/app/api/[locale]/agent/chat/skills/db");
+  const { SkillOwnershipType } =
+    await import("@/app/api/[locale]/agent/chat/skills/enum");
   const { eq, and } = await import("drizzle-orm");
 
   const [row] = await db
     .select()
-    .from(customCharacters)
+    .from(customSkills)
     .where(
       and(
-        eq(customCharacters.id, characterId),
-        eq(customCharacters.ownershipType, CharacterOwnershipType.PUBLIC),
+        eq(customSkills.id, skillId),
+        eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
       ),
     )
     .limit(1);
@@ -954,29 +952,29 @@ export async function getCharacterSkillInfo(
     tagline: row.tagline,
     description: row.description,
     category: row.category,
-    activeTools: row.activeTools
-      ? row.activeTools.map(
+    availableTools: row.availableTools
+      ? row.availableTools.map(
           (t: { toolId: string; requiresConfirmation?: boolean }) => ({
             toolId: t.toolId,
             requiresConfirmation: t.requiresConfirmation ?? false,
           }),
         )
       : null,
-    requiresAuth: true, // custom characters always require auth
+    requiresAuth: true, // custom skills always require auth
   };
 }
 
 /**
- * Generate a character-scoped skill markdown file.
- * - If character has activeTools: only those tool aliases appear
- * - If character has no activeTools: falls back to full public-user tier
- * - Returns null if character not found or is admin-only
+ * Generate a skill-scoped skill markdown file.
+ * - If skill has availableTools: only those tool aliases appear
+ * - If skill has no availableTools: falls back to full public-user tier
+ * - Returns null if skill not found or is admin-only
  */
-export async function generateCharacterSkillMarkdown(
-  characterId: string,
+export async function generateSkillSkillMarkdown(
+  skillId: string,
   locale: CountryLanguage,
 ): Promise<string | null> {
-  const charInfo = await getCharacterSkillInfo(characterId, locale);
+  const charInfo = await getSkillSkillInfo(skillId, locale);
   if (!charInfo) {
     return null;
   }
@@ -985,13 +983,13 @@ export async function generateCharacterSkillMarkdown(
 
   let endpoints: SkillEndpointInfo[];
 
-  if (charInfo.activeTools && charInfo.activeTools.length > 0) {
-    // Build a set of alias IDs this character uses
-    const toolIdSet = new Set(charInfo.activeTools.map((t) => t.toolId));
+  if (charInfo.availableTools && charInfo.availableTools.length > 0) {
+    // Build a set of alias IDs this skill uses
+    const toolIdSet = new Set(charInfo.availableTools.map((t) => t.toolId));
 
     // Map alias → requiresConfirmation for rendering
     const confirmationMap = new Map(
-      charInfo.activeTools.map((t) => [t.toolId, t.requiresConfirmation]),
+      charInfo.availableTools.map((t) => [t.toolId, t.requiresConfirmation]),
     );
 
     // Filter REMOTE_SKILL endpoints to only those whose toolName or aliases match
@@ -1002,7 +1000,7 @@ export async function generateCharacterSkillMarkdown(
           ep.aliases.some((alias) => toolIdSet.has(alias)),
       )
       .map((ep) => {
-        // Apply character-level requiresConfirmation override
+        // Apply skill-level requiresConfirmation override
         const alias = ep.aliases.find((a) => toolIdSet.has(a));
         const toolId = toolIdSet.has(ep.toolName) ? ep.toolName : alias;
         const charConfirm = toolId ? confirmationMap.get(toolId) : undefined;
@@ -1011,21 +1009,21 @@ export async function generateCharacterSkillMarkdown(
           : ep;
       });
   } else {
-    // No activeTools — generic character, use full public-user tier
+    // No availableTools — generic skill, use full public-user tier
     endpoints = filterForTier(allRemoteSkill, "public-user");
   }
 
   // Fetch model selection for accurate AI Run example
-  const { DEFAULT_CHARACTERS } =
-    await import("@/app/api/[locale]/agent/chat/characters/config");
-  const defaultChar = DEFAULT_CHARACTERS.find((c) => c.id === characterId);
+  const { DEFAULT_SKILLS } =
+    await import("@/app/api/[locale]/agent/chat/skills/config");
+  const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
   const modelSelection = defaultChar?.modelSelection ?? null;
 
   const now = new Date().toISOString();
   const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const apiBase = `${baseUrl}/api/${locale}`;
   const hasTools =
-    charInfo.activeTools !== null && charInfo.activeTools.length > 0;
+    charInfo.availableTools !== null && charInfo.availableTools.length > 0;
   const exampleModel = pickExampleModel(
     modelSelection as Parameters<typeof pickExampleModel>[0],
   );
@@ -1045,7 +1043,7 @@ export async function generateCharacterSkillMarkdown(
     lines.push("## Authentication Required");
     lines.push("");
     lines.push(
-      "This character requires a signed-in account. Include your JWT token on every request:",
+      "This skill requires a signed-in account. Include your JWT token on every request:",
     );
     lines.push("");
     lines.push("```http");
@@ -1059,7 +1057,7 @@ export async function generateCharacterSkillMarkdown(
     lines.push("## Authentication");
     lines.push("");
     lines.push(
-      "🌐 This character's tools are publicly accessible — no authentication required.",
+      "🌐 This skill's tools are publicly accessible — no authentication required.",
     );
     lines.push("");
     lines.push(
@@ -1075,10 +1073,10 @@ export async function generateCharacterSkillMarkdown(
   lines.push("");
   lines.push("| Field | Value |");
   lines.push("|-------|-------|");
-  lines.push(`| **Character** | ${charInfo.name} |`);
+  lines.push(`| **Skill** | ${charInfo.name} |`);
   lines.push(`| **Category** | ${charInfo.category} |`);
   lines.push(
-    `| **Tool scope** | ${charInfo.activeTools ? `${endpoints.length} character-specific tools` : "All available tools (generic character)"} |`,
+    `| **Tool scope** | ${charInfo.availableTools ? `${endpoints.length} skill-specific tools` : "All available tools (generic skill)"} |`,
   );
   lines.push(
     `| **Authentication** | ${charInfo.requiresAuth ? "Required (Bearer JWT)" : "Optional"} |`,
@@ -1094,7 +1092,7 @@ export async function generateCharacterSkillMarkdown(
     lines.push("## No tools available");
     lines.push("");
     lines.push(
-      "No tools are available for this character. All tools are included by default — add `UserRole.SKILL_OFF` to exclude an endpoint.",
+      "No tools are available for this skill. All tools are included by default — add `UserRole.SKILL_OFF` to exclude an endpoint.",
     );
     return lines.join("\n");
   }
@@ -1103,7 +1101,7 @@ export async function generateCharacterSkillMarkdown(
   lines.push(
     renderInlineAiRunSection({
       runUrl: `${apiBase}/agent/ai-stream/run`,
-      characterId,
+      skillId,
       exampleModel,
       exampleFolder: hasTools ? "cron" : "incognito",
       exampleMaxTurns: hasTools ? 5 : 1,
@@ -1160,7 +1158,7 @@ export async function generateCharacterSkillMarkdown(
   lines.push("---");
   lines.push("");
   lines.push(
-    `*This manifest was auto-generated for character **${charInfo.name}** on ${now}. ` +
+    `*This manifest was auto-generated for skill **${charInfo.name}** on ${now}. ` +
       `Do not edit manually — it will be regenerated on the next request.*`,
   );
   lines.push("");
@@ -1169,14 +1167,14 @@ export async function generateCharacterSkillMarkdown(
 }
 
 // ============================================================================
-// AGENT.MD CHARACTER LISTING HELPER
+// AGENT.MD SKILL LISTING HELPER
 // ============================================================================
 
 /**
- * Returns all non-admin, non-instance-filtered default characters
+ * Returns all non-admin, non-instance-filtered default skills
  * suitable for listing in AGENT.md.
  */
-export async function getListableCharacters(locale: CountryLanguage): Promise<
+export async function getListableSkills(locale: CountryLanguage): Promise<
   Array<{
     id: string;
     name: string;
@@ -1185,20 +1183,17 @@ export async function getListableCharacters(locale: CountryLanguage): Promise<
     requiresAuth: boolean;
   }>
 > {
-  const { DEFAULT_CHARACTERS } =
-    await import("@/app/api/[locale]/agent/chat/characters/config");
+  const { DEFAULT_SKILLS } =
+    await import("@/app/api/[locale]/agent/chat/skills/config");
   const { UserPermissionRole } =
     await import("@/app/api/[locale]/user/user-roles/enum");
   const { scopedTranslation: charTranslation } =
-    await import("@/app/api/[locale]/agent/chat/characters/i18n");
+    await import("@/app/api/[locale]/agent/chat/skills/i18n");
   const { t } = charTranslation.scopedT(locale);
 
-  return DEFAULT_CHARACTERS.filter((char) => {
-    // Exclude instance-filtered characters
-    if (char.instanceFilter && char.instanceFilter.length > 0) {
-      return false;
-    }
+  return DEFAULT_SKILLS.filter((char) => {
     const roles = char.userRole ?? [
+      UserPermissionRole.PUBLIC,
       UserPermissionRole.CUSTOMER,
       UserPermissionRole.ADMIN,
     ];

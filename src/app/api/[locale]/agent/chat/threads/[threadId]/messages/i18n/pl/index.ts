@@ -33,6 +33,10 @@ export const translations: typeof enTranslations = {
       description:
         "Folder główny wątku (używany do routingu po stronie klienta)",
     },
+    leafMessageId: {
+      label: "ID wiadomości liścia",
+      description: "ID wiadomości liścia aktywnej gałęzi",
+    },
     response: {
       title: "Messages Response",
       description: "List of messages in the thread",
@@ -63,7 +67,7 @@ export const translations: typeof enTranslations = {
           model: {
             content: "Model",
           },
-          character: {
+          skill: {
             content: "Postać",
           },
           tokens: {
@@ -172,7 +176,7 @@ export const translations: typeof enTranslations = {
       label: "Model",
       description: "AI model to use for response",
     },
-    character: {
+    skill: {
       label: "Postać",
       description: "Postać/persona AI dla wiadomości",
     },
@@ -267,6 +271,8 @@ export const translations: typeof enTranslations = {
     systemPromptTitle: "Systemowy monit",
     copied: "Skopiowano!",
     systemMessageHint: "Wiadomość systemowa (ukryta przed użytkownikami)",
+    systemPromptLabel: "monit systemowy · wiodący · buforowany",
+    upcomingContextLabel: "nadchodzący kontekst asystenta · ostatnia wiadomość",
   },
   widget: {
     common: {

@@ -139,7 +139,7 @@ export function ThreadedMessageContent({
             </Button>
           </Span>
 
-          {/* Character - only for AI messages */}
+          {/* Skill - only for AI messages */}
           {message.role === "assistant" && characterName && (
             <>
               <Span>•</Span>

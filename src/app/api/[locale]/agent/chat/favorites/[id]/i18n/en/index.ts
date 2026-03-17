@@ -20,8 +20,8 @@ export const translations = {
     deleteButton: {
       label: "Delete Favorite",
     },
-    customizeCharacterButton: {
-      label: "Customize Character's Personality",
+    customizeSkillButton: {
+      label: "Customize Skill's Personality",
     },
     signupPrompt: {
       title: "Customize the character's personality",
@@ -35,8 +35,8 @@ export const translations = {
       label: "Favorite ID",
     },
     response: {
-      characterId: {
-        content: "Character: {{value}}",
+      skillId: {
+        content: "Skill: {{value}}",
       },
       customName: {
         content: "Custom Name: {{value}}",
@@ -163,11 +163,11 @@ export const translations = {
     deleteButton: {
       label: "Delete Favorite",
     },
-    customizeCharacterButton: {
-      label: "Customize Character's Personality",
+    customizeSkillButton: {
+      label: "Customize Skill's Personality",
     },
-    useThisCharacterButton: {
-      label: "Use This Character",
+    useThisSkillButton: {
+      label: "Use This Skill",
     },
     useThisModelButton: {
       label: "Use This Model",
@@ -194,8 +194,8 @@ export const translations = {
     id: {
       label: "Favorite ID",
     },
-    characterId: {
-      label: "Character",
+    skillId: {
+      label: "Skill",
     },
     customName: {
       label: "Custom Name",
@@ -215,7 +215,7 @@ export const translations = {
     },
     selectionType: {
       label: "Selection Type",
-      characterBased: "Based on Character",
+      characterBased: "Based on Skill",
 
       manual: "Specific Model",
       filters: "Filter Criteria",
@@ -289,7 +289,7 @@ export const translations = {
       description:
         "Override the character's default icon for this favorite slot",
     },
-    allowedTools: {
+    availableTools: {
       label: "Allowed Tools",
       description:
         "Override allowed tools for this slot. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to fall through to character or global settings.",
@@ -299,16 +299,32 @@ export const translations = {
       description:
         "Override pinned toolbar tools for this slot. Pass null to fall through to character or global settings.",
     },
+    deniedTools: {
+      label: "Denied Tools",
+      description:
+        "Block specific tools for this slot on top of the skill's own denied list. These tools cannot be called regardless of other settings.",
+    },
+    promptAppend: {
+      label: "Prompt Append",
+      description:
+        "Extra instructions appended to the skill's system prompt for this slot only. Use this to personalise the AI's behavior without changing the shared skill.",
+      placeholder: "e.g. Always reply in a friendly, casual tone.",
+    },
     compactTrigger: {
       label: "Compact Trigger (tokens)",
       description:
         "Override the token count that triggers conversation compaction for this slot. Pass null to fall through to character or global default.",
     },
-    changeCharacter: {
-      label: "Change Character",
+    memoryLimit: {
+      label: "Memory Limit (tokens)",
+      description:
+        "Override the maximum total tokens of memory content injected per turn for this slot. Pass null to fall through to skill or global default.",
     },
-    modifyCharacter: {
-      label: "Modify Character",
+    changeSkill: {
+      label: "Change Skill",
+    },
+    modifySkill: {
+      label: "Modify Skill",
     },
     response: {
       success: {

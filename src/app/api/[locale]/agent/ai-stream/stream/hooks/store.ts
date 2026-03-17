@@ -4,8 +4,8 @@
  * Tracks which threads are streaming, local vs remote, and drain state.
  * Pure lifecycle — NO message content, NO message state.
  *
- * All message content (StreamingMessage, deltas, tokens) lives in:
- * messages/hooks/streaming-messages-store.ts
+ * Message content (deltas, tokens, isStreaming flag) lives in the
+ * apiClient React Query cache via updateMessages / seedMessageItemCache.
  */
 
 import { create } from "zustand";

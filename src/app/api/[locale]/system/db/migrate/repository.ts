@@ -92,41 +92,44 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
         const generateResult = spawnSync("bunx", ["drizzle-kit", "generate"], {
           encoding: "utf8",
           cwd: process.cwd(),
+          stdio: "pipe",
         });
         const generateDuration = Date.now() - generateStartTime;
-        logger.info(
-          formatDatabase(
-            `${formatActionCommand("Generated migrations using:", "bunx drizzle-kit generate")} in ${formatDuration(generateDuration)}`,
-            "⚙️ ",
-          ),
-        );
 
         if (generateResult.error) {
           return fail({
             message: t("post.errors.network.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t("errors.generationFailed", {
-                message: generateResult.error.message,
-              }),
+              error: generateResult.error.message,
             },
           });
         }
 
         if (generateResult.status !== 0) {
-          const errorOutput =
-            generateResult.stderr || generateResult.stdout || "Unknown error";
+          const rawGenerateOutput = [
+            generateResult.stdout,
+            generateResult.stderr,
+          ]
+            .filter(Boolean)
+            .join("\n");
           return fail({
             message: t("post.errors.network.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t("errors.generationFailedWithCode", {
-                code: String(generateResult.status ?? "unknown"),
-                output: errorOutput,
-              }),
+              error:
+                rawGenerateOutput ||
+                `drizzle-kit generate exited with code ${String(generateResult.status ?? "unknown")}`,
             },
           });
         }
+
+        logger.info(
+          formatDatabase(
+            `${formatActionCommand("Generated migrations using:", "bunx drizzle-kit generate")} in ${formatDuration(generateDuration)}`,
+            "⚙️ ",
+          ),
+        );
       }
 
       // Run migrations
@@ -156,32 +159,26 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
           message: t("post.errors.network.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: t("errors.migrationFailed", {
-              message: pushResult.error.message,
-            }),
+            error: pushResult.error.message,
           },
         });
       }
 
-      const output = [pushResult.stdout, pushResult.stderr]
+      const rawOutput = [pushResult.stdout, pushResult.stderr]
         .filter(Boolean)
         .join("\n");
 
       if (pushResult.status !== 0) {
-        logger.error("Migration failed", { output });
-        // "already exists" usually means migrations were squashed/merged after being
-        // applied — the DB has the tables but the journal hash doesn't match.
-        // Manual fix required: INSERT the new migration hash into __drizzle_migrations__
-        // e.g.: INSERT INTO __drizzle_migrations__ (hash, created_at) VALUES ('<hash>', extract(epoch from now())*1000);
-        const hint = output.includes("already exists")
-          ? " Hint: migration journal out of sync — likely squashed migrations were already partially applied. Manually fix the migrations in __drizzle_migrations__."
-          : "";
+        logger.error(
+          `Migration failed with exit code ${String(pushResult.status)}`,
+        );
         return fail({
           message: t("post.errors.network.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: `Migration failed with exit code ${pushResult.status}.${hint}`,
-            output,
+            error:
+              rawOutput ||
+              `drizzle-kit migrate exited with code ${String(pushResult.status)}`,
           },
         });
       }
@@ -198,7 +195,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
         success: true,
         migrationsRun: 1,
         migrationsGenerated: data.generate ? 1 : 0,
-        output: output.trim(),
+        output: "",
         duration,
       });
     } catch (error) {

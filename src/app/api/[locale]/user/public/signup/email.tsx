@@ -960,7 +960,7 @@ export async function renderAdminNotificationByEmail(
     toEmail: contactClientRepository.getSupportEmail(locale),
     toName: globalT("config.appName"),
     subject: signupT("admin_notification.subject", {
-      userName: user.privateName,
+      privateName: user.privateName,
     }),
     jsx: renderAdminNotificationEmailContent(
       signupT,

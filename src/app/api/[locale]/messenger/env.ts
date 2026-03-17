@@ -18,17 +18,24 @@ export const {
     schema: z.string().email(),
     example: "noreply@example.com",
     commented: true,
+    fieldType: "email",
   },
   EMAIL_HOST: {
     schema: z.string(),
     example: "smtp.example.com",
     commented: true,
   },
-  EMAIL_PORT: { schema: z.coerce.number(), example: "587", commented: true },
+  EMAIL_PORT: {
+    schema: z.coerce.number(),
+    example: "587",
+    commented: true,
+    fieldType: "number",
+  },
   EMAIL_SECURE: {
     schema: z.string().transform((v) => v === "true"),
     example: "true",
     commented: true,
+    fieldType: "boolean",
   },
   EMAIL_USER: {
     schema: z.string(),

@@ -20,6 +20,11 @@ export const translations: typeof enTranslations = {
           "Maximale Wartezeit in Millisekunden. Bei 0 wird der Standard-Timeout verwendet",
         placeholder: "Timeout eingeben (ms)",
       },
+      captureSnapshot: {
+        label: "Snapshot aufnehmen",
+        description:
+          "Wenn aktiviert, wird der vollständige Barrierefreiheits-Snapshot in der Antwort eingeschlossen. Standardmäßig deaktiviert.",
+      },
     },
   },
 

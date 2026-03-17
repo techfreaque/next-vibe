@@ -27,6 +27,7 @@ import {
 } from "../shared/endpoints/definitions/registry";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
+import { formatValidationErrorDetails } from "../shared/utils/format-validation-error";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { scopedTranslation as mcpScopedTranslation } from "./i18n";
@@ -213,13 +214,18 @@ export class MCPRegistry {
           rootFolderId: DefaultFolderId.CRON,
           threadId: undefined,
           aiMessageId: undefined,
-          characterId: undefined,
+          skillId: undefined,
           modelId: undefined,
           headless: undefined,
           currentToolMessageId: undefined,
+          callerToolCallId: undefined,
+          pendingToolMessages: undefined,
+          pendingTimeoutMs: undefined,
+          leafMessageId: undefined,
           waitingForRemoteResult: undefined,
           favoriteId: undefined,
           abortSignal: undefined,
+          escalateToTask: undefined,
         },
       });
 
@@ -230,10 +236,15 @@ export class MCPRegistry {
         errorMessage: result.success ? undefined : result.message,
       });
 
-      // Load endpoint definition for rendering (optional, for pretty output)
-      // Only load if we have data to render
+      // Load endpoint definition for rendering (success) or error formatting (validation errors)
       let endpoint: CreateApiEndpointAny | null = null;
-      if (result.success && result.data) {
+      const needsEndpoint =
+        (result.success && result.data) ||
+        (!result.success &&
+          result.messageParams &&
+          "error" in result.messageParams &&
+          "errorCount" in result.messageParams);
+      if (needsEndpoint) {
         const endpointResult = await this.definitionLdr.load({
           identifier: context.toolName,
           platform: Platform.MCP,
@@ -382,9 +393,20 @@ export class MCPRegistry {
 
     // Error response
     const { t: globalT } = simpleT(locale);
-    const errorMessage = result.message
-      ? globalT(result.message, result.messageParams)
+    const baseMessage = result.message
+      ? globalT(result.message, undefined)
       : t("registry.toolExecutionFailed");
+
+    const validationDetails = formatValidationErrorDetails(
+      result.messageParams as Record<string, string | number> | undefined,
+      endpoint,
+    );
+
+    const errorMessage = validationDetails
+      ? `${baseMessage}\n\n${validationDetails}`
+      : result.message
+        ? globalT(result.message, result.messageParams)
+        : t("registry.toolExecutionFailed");
 
     return this.fail({
       error: errorMessage,

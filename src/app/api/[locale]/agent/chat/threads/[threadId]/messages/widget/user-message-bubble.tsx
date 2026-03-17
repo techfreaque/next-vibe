@@ -49,7 +49,7 @@ export function UserMessageBubble({
   const { group } = useMessageGroupName();
   const character =
     message.role === "user" || message.role === "assistant"
-      ? message.character
+      ? message.skill
       : undefined;
 
   return (

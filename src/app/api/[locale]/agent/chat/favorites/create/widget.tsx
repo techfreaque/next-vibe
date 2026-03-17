@@ -9,8 +9,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { useMemo, useState } from "react";
 
-import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/constants";
-import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
+import { SkillsRepositoryClient } from "@/app/api/[locale]/agent/chat/skills/repository-client";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
@@ -30,7 +30,7 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
-import { useCharacter } from "../../characters/[id]/hooks";
+import { useSkill } from "../../skills/[id]/hooks";
 import { useChatSettings } from "../../settings/hooks";
 import type definition from "./definition";
 import type { FavoriteCreateResponseOutput } from "./definition";
@@ -60,20 +60,20 @@ export function FavoriteCreateContainer({
   const [isApplying, setIsApplying] = useState(false);
 
   const emptyField = useMemo(() => ({}), []);
-  const characterId = form?.watch("characterId");
+  const skillId = form.watch("skillId");
   const voice = form.watch("voice");
-  const isNoCharacter = characterId === NO_CHARACTER_ID;
+  const isNoSkill = skillId === NO_SKILL_ID;
 
   const favoriteModelSelection: ModelSelectionSimple | undefined =
-    form?.watch("modelSelection") ?? undefined;
+    form.watch("modelSelection") ?? undefined;
 
-  const characterEndpoint = useCharacter(characterId ?? "", user, logger);
+  const characterEndpoint = useSkill(skillId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
 
   const { updateSettings } = useChatSettings(user, logger);
 
   const handleUseWithoutSaving = async (): Promise<void> => {
-    if (!form || !characterId) {
+    if (!form || !skillId) {
       return;
     }
 
@@ -87,7 +87,7 @@ export function FavoriteCreateContainer({
 
       if (modelSelection) {
         // Resolve model selection to actual ModelId
-        const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
+        const bestModel = SkillsRepositoryClient.getBestModelForSkill(
           modelSelection,
           user,
         );
@@ -97,7 +97,7 @@ export function FavoriteCreateContainer({
       // Apply settings without creating a favorite (activeFavoriteId = null)
       await updateSettings({
         activeFavoriteId: null,
-        selectedCharacter: characterId,
+        selectedSkill: skillId,
         selectedModel,
         ttsVoice: voice ?? characterData?.voice ?? undefined,
       });
@@ -127,7 +127,7 @@ export function FavoriteCreateContainer({
           variant="outline"
           size="sm"
           onClick={handleUseWithoutSaving}
-          disabled={isApplying || !characterId}
+          disabled={isApplying || !skillId}
           className="ml-auto h-8 text-xs"
         >
           {isApplying
@@ -155,8 +155,8 @@ export function FavoriteCreateContainer({
         />
 
         <Div className="flex flex-col gap-4">
-          {/* Character Info Card (hidden for default character) */}
-          {!isNoCharacter && (
+          {/* Skill Info Card (hidden for default character) */}
+          {!isNoSkill && (
             <Div className="flex items-start gap-4 p-4 rounded-lg border">
               <IconFieldWidget fieldName="icon" field={children.icon} />
               <Div className="flex-1 flex flex-col gap-2">
@@ -185,7 +185,7 @@ export function FavoriteCreateContainer({
                 form.setValue("modelSelection", selection)
               }
               characterModelSelection={
-                isNoCharacter ? undefined : characterData?.modelSelection
+                isNoSkill ? undefined : characterData?.modelSelection
               }
               locale={locale}
               user={user}

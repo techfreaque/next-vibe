@@ -8,86 +8,126 @@
  * so `getLocalInstanceId()` returns the cloud's own instanceId on cloud instances.
  *
  * Collision detection: if instanceId already exists for this user → CONFLICT.
- * The unique constraint (userId, instanceId) on user_remote_connections enforces
+ * The unique constraint (userId, instanceId) on remote_connections enforces
  * this at DB level too, but we check first for a clear error message.
  */
 
 import "server-only";
 
+import { and, eq } from "drizzle-orm";
 import {
+  ErrorResponseTypes,
   type ResponseType,
+  fail,
   success,
 } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { envClient } from "@/config/env-client";
 
-import { userRemoteConnections } from "../db";
-import { invalidateInstanceIdCache } from "../repository";
+import { instanceIdentities, remoteConnections } from "../db";
+import {
+  deriveDefaultSelfInstanceId,
+  encryptToken,
+  invalidateInstanceIdCache,
+} from "../repository";
 import type { RemoteRegisterPostRequestInput } from "./definition";
+import type { RemoteRegisterT } from "./i18n";
 
 /**
- * Derive a default instanceId for this host from its app URL.
- * - localhost:3001 (preview) → "hermes"
- * - localhost:3000 (main dev) → "hermes-dev"
- * - In production → "thea"
- * This is only used as the initial self-identity — can be renamed by user.
+ * Ping a localUrl to check if it is directly reachable via HTTP.
+ * Used at connect time and on re-sync to set isDirectlyAccessible.
+ * Tries GET /api/health with a 5s timeout. Returns true only if 2xx response.
  */
-function deriveDefaultSelfInstanceId(): string {
-  // IS_PREVIEW_MODE is set at runtime by vibe start (not baked in at build time
-  // like NEXT_PUBLIC_* vars), so it correctly reflects which server is running.
-  if (process.env["IS_PREVIEW_MODE"] === "true") {
-    return "hermes";
+export async function checkDirectAccessibility(
+  localUrl: string | null | undefined,
+  logger: EndpointLogger,
+): Promise<boolean> {
+  if (!localUrl) {
+    return false;
   }
-
-  // In production (real cloud instance)
   try {
-    const parsed = new URL(envClient.NEXT_PUBLIC_APP_URL);
-    const hostname = parsed.hostname;
-    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
-      return "thea";
-    }
+    const healthUrl = `${localUrl.replace(/\/$/, "")}/api/health`;
+    const resp = await fetch(healthUrl, {
+      method: "GET",
+      signal: AbortSignal.timeout(5000),
+    });
+    return resp.ok;
   } catch {
-    // ignore
+    logger.debug(
+      "[REGISTER] Accessibility ping failed (expected for NAT/private networks)",
+      {
+        localUrl,
+      },
+    );
+    return false;
   }
-
-  // Local dev (vibe dev, port 3000)
-  return "hermes-dev";
 }
 
 export async function registerLocalInstance(
   data: RemoteRegisterPostRequestInput,
   user: JwtPrivatePayloadType,
   logger: EndpointLogger,
-): Promise<ResponseType<{ registered: boolean; remoteInstanceId: string }>> {
-  const { instanceId, localUrl } = data;
+  t: RemoteRegisterT,
+): Promise<
+  ResponseType<{
+    registered: boolean;
+    remoteInstanceId: string;
+    remoteFriendlyName: string | null;
+  }>
+> {
+  const { instanceId, localUrl, reverseToken, reverseLeadId } = data;
 
-  // Upsert cloud-side record: token=null (cloud never calls local), localUrl set.
+  // Reject if the remote's instanceId collides with our own self-identity.
+  const selfInstanceId = deriveDefaultSelfInstanceId();
+  if (instanceId === selfInstanceId) {
+    logger.warn("[REGISTER] Instance ID collides with cloud self-identity", {
+      userId: user.id,
+      instanceId,
+      selfInstanceId,
+    });
+    return fail({
+      message: t("post.errors.conflict.title"),
+      errorType: ErrorResponseTypes.CONFLICT,
+    });
+  }
+
+  // Upsert cloud-side record with optional reverse token for bidirectional auth.
   // remoteInstanceId = instanceId: the connecting client's own identity, used by
   // execute-tool to set targetInstance correctly when routing tasks back to this client.
+  // reverseToken: JWT from the connecting instance, encrypted before storage. Enables
+  // this instance to call /report on the connector (push task completion status back).
   // Reconnect is allowed — update localUrl/isActive if the record already exists.
+  const encryptedReverseToken = reverseToken
+    ? encryptToken(reverseToken)
+    : null;
+
   await db
-    .insert(userRemoteConnections)
+    .insert(remoteConnections)
     .values({
       userId: user.id,
       instanceId,
-      friendlyName: instanceId,
+      friendlyName: data.friendlyName ?? instanceId,
+      remoteFriendlyName: data.friendlyName ?? null,
       remoteUrl: localUrl, // from cloud's perspective, the local IS the remote
       localUrl,
-      token: null,
+      token: encryptedReverseToken,
+      leadId: reverseLeadId ?? null,
       isActive: true,
       remoteInstanceId: instanceId,
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
-      target: [userRemoteConnections.userId, userRemoteConnections.instanceId],
+      target: [remoteConnections.userId, remoteConnections.instanceId],
       set: {
         localUrl,
         remoteUrl: localUrl,
+        remoteFriendlyName: data.friendlyName ?? null,
         isActive: true,
         remoteInstanceId: instanceId,
+        ...(encryptedReverseToken ? { token: encryptedReverseToken } : {}),
+        ...(reverseLeadId ? { leadId: reverseLeadId } : {}),
         updatedAt: new Date(),
       },
     });
@@ -98,28 +138,88 @@ export async function registerLocalInstance(
     localUrl,
   });
 
-  // ── Also set the cloud's own self-identity record (if not already set) ──
-  // token = "self" is a sentinel — not a real JWT, but non-empty so
-  // getLocalInstanceId() (which filters token IS NOT NULL AND token != '')
-  // can discover this instance's own ID from DB.
-  const selfInstanceId = deriveDefaultSelfInstanceId();
-  const cloudUrl = envClient.NEXT_PUBLIC_APP_URL;
+  // Ping localUrl to check direct accessibility.
+  // If reachable: set isDirectlyAccessible=true so execute-tool can use direct HTTP.
+  // If not reachable (NAT, firewall): keep false, fall back to task-queue pull.
+  // Fire-and-forget: registration succeeds regardless of ping result.
+  void (async (): Promise<void> => {
+    const isDirectlyAccessible = await checkDirectAccessibility(
+      localUrl,
+      logger,
+    );
+    if (isDirectlyAccessible) {
+      try {
+        await db
+          .update(remoteConnections)
+          .set({ isDirectlyAccessible: true, updatedAt: new Date() })
+          .where(
+            and(
+              eq(remoteConnections.userId, user.id),
+              eq(remoteConnections.instanceId, instanceId),
+            ),
+          );
+        logger.info("[REGISTER] Local instance is directly accessible", {
+          instanceId,
+          localUrl,
+        });
+      } catch (updateErr) {
+        logger.warn(
+          "[REGISTER] Failed to update isDirectlyAccessible (non-fatal)",
+          {
+            instanceId,
+            error:
+              updateErr instanceof Error
+                ? updateErr.message
+                : String(updateErr),
+          },
+        );
+      }
+    } else {
+      logger.info(
+        "[REGISTER] Local instance not directly accessible — using task-queue",
+        {
+          instanceId,
+          localUrl,
+        },
+      );
+    }
+  })();
 
-  await db
-    .insert(userRemoteConnections)
+  // ── Also set the cloud's own self-identity record (if not already set) ──
+  // Reuses selfInstanceId from the collision check above.
+  const [selfIdentity] = await db
+    .insert(instanceIdentities)
     .values({
       userId: user.id,
       instanceId: selfInstanceId,
       friendlyName: selfInstanceId,
-      remoteUrl: cloudUrl,
-      localUrl: null,
-      token: "self",
-      isActive: true,
+      isDefault: true,
       updatedAt: new Date(),
     })
-    .onConflictDoNothing(); // if self-record already exists, keep it (overridable by user)
+    .onConflictDoNothing()
+    .returning({ friendlyName: instanceIdentities.friendlyName });
+
+  // If onConflictDoNothing fired (record exists), fetch the existing name
+  let selfFriendlyName = selfIdentity?.friendlyName ?? null;
+  if (!selfFriendlyName) {
+    const [existing] = await db
+      .select({ friendlyName: instanceIdentities.friendlyName })
+      .from(instanceIdentities)
+      .where(
+        and(
+          eq(instanceIdentities.userId, user.id),
+          eq(instanceIdentities.instanceId, selfInstanceId),
+        ),
+      )
+      .limit(1);
+    selfFriendlyName = existing?.friendlyName ?? selfInstanceId;
+  }
 
   invalidateInstanceIdCache();
 
-  return success({ registered: true, remoteInstanceId: selfInstanceId });
+  return success({
+    registered: true,
+    remoteInstanceId: selfInstanceId,
+    remoteFriendlyName: selfFriendlyName,
+  });
 }

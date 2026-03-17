@@ -212,7 +212,7 @@ export class MessagePathRepositoryClient {
           authorName: msg.authorName,
           isAI: msg.isAI,
           model: msg.model,
-          character: msg.character,
+          skill: msg.skill,
           errorType: msg.errorType,
           errorMessage: msg.errorMessage,
           errorCode: msg.errorCode,

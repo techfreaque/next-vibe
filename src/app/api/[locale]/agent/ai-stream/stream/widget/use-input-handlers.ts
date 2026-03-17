@@ -4,7 +4,7 @@
  */
 
 import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
@@ -324,12 +324,21 @@ export function useInputHandlers({
     return Promise.resolve();
   }, [logger]);
 
-  return {
-    submitMessage,
-    submitWithContent,
-    submitWithAudio,
-    handleSubmit: submitMessage,
-    handleKeyDown,
-    handleScreenshot,
-  };
+  return useMemo(
+    () => ({
+      submitMessage,
+      submitWithContent,
+      submitWithAudio,
+      handleSubmit: submitMessage,
+      handleKeyDown,
+      handleScreenshot,
+    }),
+    [
+      submitMessage,
+      submitWithContent,
+      submitWithAudio,
+      handleKeyDown,
+      handleScreenshot,
+    ],
+  );
 }

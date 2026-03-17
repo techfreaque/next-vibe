@@ -4,7 +4,9 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+
+const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -114,23 +116,31 @@ export function LoginForm({
   devSeedPassword,
   devSeedUsers,
 }: LoginFormProps): React.JSX.Element {
+  const formRef = useRef<HTMLDivElement>(null);
+
   return (
     <>
-      <EndpointsPage
-        endpoint={loginEndpoints}
-        locale={locale}
-        user={user}
-        endpointOptions={{
-          create: {
-            mutationOptions: {
-              onSuccess: () => {
-                // Redirect after successful login
-                window.location.assign(callbackUrl ?? `/${locale}`);
+      <Div ref={formRef}>
+        <EndpointsPage
+          endpoint={loginEndpoints}
+          locale={locale}
+          user={user}
+          endpointOptions={{
+            create: {
+              mutationOptions: {
+                onSuccess: ({ requestData }) => {
+                  const usedDefaultPassword =
+                    requestData.password === DEFAULT_PASSWORD_SENTINEL;
+                  const target = usedDefaultPassword
+                    ? `/${locale}/admin/settings`
+                    : (callbackUrl ?? `/${locale}`);
+                  window.location.assign(target);
+                },
               },
             },
-          },
-        }}
-      />
+          }}
+        />
+      </Div>
       {envClient.NODE_ENV === "development" && (
         <DevQuickLogin
           locale={locale}

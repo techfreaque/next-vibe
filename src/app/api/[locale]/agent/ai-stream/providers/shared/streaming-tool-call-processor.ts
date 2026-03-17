@@ -104,9 +104,6 @@ export async function processStreamingResponseWithToolCalls(
     if (toolCalls && toolCalls.length > 0) {
       // Send each tool call in a separate chunk with proper index
       toolCalls.forEach((tc, idx) => {
-        // Extract noLoop from arguments (it will be stripped by AI SDK validation otherwise)
-        // We DON'T remove it from arguments - let it pass through
-        // The AI SDK will strip it during validation, but we keep it in the JSON string
         const toolCallChunk: OpenAIResponse = {
           id: baseId,
           object: "chat.completion.chunk",
@@ -140,7 +137,6 @@ export async function processStreamingResponseWithToolCalls(
 
     // Send finish chunk with usage data
     // Use "tool_calls" if we have tool calls, otherwise use "stop"
-    // The noLoop parameter in tool arguments will be handled by tool-call-handler
     const effectiveFinishReason =
       toolCalls && toolCalls.length > 0 ? "tool_calls" : finishReason || "stop";
 

@@ -38,13 +38,13 @@ contact/
 
 No mental map required. An AI coding agent opens one folder, understands the full contract, and ships a correct change. This is how our AI admin (Thea) extends the platform autonomously today — and how Claude Code works on this codebase without breaking things.
 
-**Security by design, not by accident.** Role-based access is defined in the contract — `allowedRoles` per endpoint, tool access scoped per character and user role at the framework level. The opposite of OpenClaw's bolt-on approach.
+**Security by design, not by accident.** Role-based access is defined in the contract — `allowedRoles` per endpoint, tool access scoped per skill and user role at the framework level. The opposite of OpenClaw's bolt-on approach.
 
 ### The Products
 
-**[unbottled.ai](https://unbottled.ai)** — the hosted consumer platform. 42 models (GPT-5.2, Claude, Gemini + genuinely uncensored options). Zero setup. User-controlled censorship. Full agent loop, characters with persistent memory, skills, cron tasks, multi-model comparison. No terminal access — safe by design for general users.
+**[unbottled.ai](https://unbottled.ai)** — the hosted consumer platform. 42 models (GPT-5.2, Claude, Gemini + genuinely uncensored options). Zero setup. User-controlled censorship. Full agent loop, skills, persistent memory, cron tasks, multi-model comparison. No terminal access — safe by design for general users.
 
-**next-vibe self-hosted** — the full power-user platform. Everything above plus terminal access, SSH, browser automation, Claude Code integration, and direct system access. Role-based tool permissions mean admins control exactly what each user or character can touch. The real OpenClaw alternative — multi-user, type-safe, and secure by design.
+**next-vibe self-hosted** — the full power-user platform. Everything above plus terminal access, SSH, browser automation, Claude Code integration, and direct system access. Role-based tool permissions mean admins control exactly what each user or skill can touch. The real OpenClaw alternative — multi-user, type-safe, and secure by design.
 
 ---
 
@@ -68,6 +68,6 @@ OpenClaw proved the demand. We built the architecture — for both audiences.
 
 The infrastructure is built. 18 months of foundational work. OpenClaw's audience is actively looking for something that scales beyond a solo developer's mac mini.
 
-Investment goes toward user acquisition and the community layer — shared characters, public threads, forums — that creates the network effect moat.
+Investment goes toward user acquisition and the community layer — shared skills, public threads, forums — that creates the network effect moat.
 
 **[hi@unbottled.ai](mailto:hi@unbottled.ai) · [unbottled.ai](https://unbottled.ai) · [github](https://github.com/techfreaque/next-vibe)**

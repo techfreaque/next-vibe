@@ -84,10 +84,7 @@ export function SubmitButtonWidget<
 
   return (
     <Button
-      type="button"
-      onClick={(): void => {
-        form.handleSubmit(onSubmit)();
-      }}
+      type="submit"
       disabled={isSubmitting}
       variant={variant === "primary" ? "default" : variant}
       size={size}

@@ -21,6 +21,17 @@ export const translations: typeof enTranslations = {
     title: "Erinnerungen auflisten",
     dynamicTitle: "Memories ({{count}})",
     description: "Ruft alle Erinnerungen für den aktuellen Benutzer ab",
+    fields: {
+      search: {
+        label: "Suche",
+        description: "Erinnerungen nach Inhalt oder Tags filtern",
+        placeholder: "Erinnerungen suchen...",
+      },
+      tag: {
+        label: "Tag-Filter",
+        description: "Erinnerungen nach einem bestimmten Tag filtern",
+      },
+    },
     container: {
       title: "Erinnerungen",
     },

@@ -388,6 +388,7 @@ const { DELETE } = createEndpoint({
           },
           {
             urlPathParams: { threadId: data.pathParams.threadId },
+            requestData: { rootFolderId: data.requestData.rootFolderId },
           },
         );
       },

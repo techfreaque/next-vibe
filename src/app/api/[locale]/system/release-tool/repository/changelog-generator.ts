@@ -5,8 +5,6 @@
 
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -66,7 +64,9 @@ export class ChangelogGenerator implements IChangelogGenerator {
 
     logger.info(MESSAGES.CHANGELOG_GENERATING);
 
-    const changelogPath = join(cwd, changelogConfig.file ?? "CHANGELOG.md");
+    // Use template string to prevent Turbopack from statically tracing paths
+    const changelogFile = changelogConfig.file ?? "CHANGELOG.md";
+    const changelogPath = `${cwd}/${changelogFile}`;
     const repo = gitService.getRepoUrl();
 
     try {

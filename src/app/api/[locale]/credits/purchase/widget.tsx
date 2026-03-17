@@ -104,7 +104,7 @@ export function CreditsPurchaseContainer({
   const hasActiveSubscription =
     currentSubscription?.status === SubscriptionStatus.ACTIVE;
 
-  const quantity: number = Number(form?.watch("quantity") ?? 1) || 1;
+  const quantity = form.watch("quantity") ?? 1;
   const totalPrice = packPrice * quantity;
   const totalCredits = packCredits * quantity;
 
@@ -112,7 +112,7 @@ export function CreditsPurchaseContainer({
 
   function setQuantity(next: number): void {
     const clamped = Math.max(MIN_QTY, next);
-    form?.setValue("quantity", clamped, { shouldValidate: true });
+    form.setValue("quantity", clamped, { shouldValidate: true });
   }
 
   function handleBuy(): void {
@@ -123,7 +123,7 @@ export function CreditsPurchaseContainer({
 
   function handleProviderSelect(provider: typeof PaymentProviderValue): void {
     setIsProviderModalOpen(false);
-    form?.setValue("provider", provider);
+    form.setValue("provider", provider);
     onSubmit?.();
   }
 

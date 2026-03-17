@@ -73,6 +73,6 @@ export const translations = {
   category: "Browser",
   tags: {
     browserAutomation: "Browser Automation",
-    chromeDevTools: "Chrome DevTools",
+    navigationAutomation: "Navigation Automation",
   },
 };

@@ -91,12 +91,5 @@ export function getTtsRefs(messageId: string): TtsRefs {
 }
 
 export function resetTtsRefs(messageId: string): void {
-  const refs = getTtsRefs(messageId);
-  refs.audioQueue = [];
-  refs.chunks = [];
-  refs.currentPlayingIndex = 0;
-  refs.currentFetchingIndex = 0;
-  refs.isProcessing = false;
-  refs.abortController = null;
-  refs.prefetchTimer = null;
+  refsMap.delete(messageId);
 }

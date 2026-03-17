@@ -44,9 +44,11 @@ import type {
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   filterUserPermissionRoles,
+  PlatformMarker,
   UserPermissionRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import {
   findFilesRecursively,
@@ -168,9 +170,8 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
       );
 
       // ── 1. Discover definition files ────────────────────────────────────
-      // eslint-disable-next-line i18next/no-literal-string
-      const apiCorePath = ["src", "app", "api", "[locale]"];
-      const startDir = join(process.cwd(), ...apiCorePath);
+      // Use template string to prevent Turbopack from statically tracing paths
+      const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
       const definitionFiles = findFilesRecursively(startDir, "definition.ts");
       const routeFiles = findFilesRecursively(startDir, "route.ts");
@@ -198,10 +199,12 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
 
       // ── 4. Generate per-locale × per-role files ─────────────────────────
       let filesWritten = 0;
+      let maxFilteredCount = 0;
 
       for (const locale of GENERATE_LOCALES) {
         const localeName = LOCALE_FILE_NAMES[locale] ?? locale;
-        const localeDir = join(data.outputDir, localeName);
+        // Use template string to prevent Turbopack from statically tracing paths
+        const localeDir = `${data.outputDir}/${localeName}`;
 
         for (const role of GENERATE_ROLES) {
           const roleName = ROLE_FILE_NAMES[role] ?? role;
@@ -210,6 +213,10 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
           const roleEndpoints = loadedEndpoints.filter(({ definition }) =>
             this.isAccessibleByRole(definition, role),
           );
+
+          if (roleEndpoints.length > maxFilteredCount) {
+            maxFilteredCount = roleEndpoints.length;
+          }
 
           const capabilities = this.serializeForLocaleRole(
             roleEndpoints,
@@ -244,7 +251,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
 
       logger.info(
         formatGenerator(
-          `Generated remote capabilities for ${GENERATE_LOCALES.length} locales × ${GENERATE_ROLES.length} roles with ${formatCount(loadedEndpoints.length, "endpoint")} in ${formatDuration(duration)} (version: ${version})`,
+          `Generated remote capabilities for ${GENERATE_LOCALES.length} locales × ${GENERATE_ROLES.length} roles with ${formatCount(maxFilteredCount, "endpoint")} in ${formatDuration(duration)} (version: ${version})`,
           "🔌",
         ),
       );
@@ -252,7 +259,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
       return success({
         success: true,
         message: t("success.generated"),
-        endpointsFound: loadedEndpoints.length,
+        endpointsFound: maxFilteredCount,
         filesWritten,
         duration,
         version,
@@ -305,8 +312,10 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
   }
 
   /**
-   * Check if an endpoint is accessible by this role (web platform, not web-off).
-   * Filters out platform markers and checks allowed roles.
+   * Check if an endpoint is accessible by this role via AI tool / Next API platforms.
+   * Remote tool execution goes through the AI platform (execute-tool route),
+   * so we only include endpoints that are accessible on AI + NEXT_API —
+   * i.e. not marked WEB_OFF and not marked AI_TOOL_OFF.
    */
   private isAccessibleByRole(
     definition: CreateApiEndpointAny,
@@ -317,8 +326,13 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
     }
     const allowedRoles = definition.allowedRoles as readonly string[];
 
-    // Exclude web-off endpoints (remote execution goes through HTTP)
-    if (allowedRoles.includes("WEB_OFF")) {
+    // Exclude web-off endpoints (remote execution goes through HTTP / Next API)
+    if (allowedRoles.includes(PlatformMarker.WEB_OFF)) {
+      return false;
+    }
+
+    // Exclude AI-tool-off endpoints (remote execution uses the AI platform)
+    if (allowedRoles.includes(PlatformMarker.AI_TOOL_OFF)) {
       return false;
     }
 
@@ -354,6 +368,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
     locale: CountryLanguage,
   ): RemoteToolCapability[] {
     const capabilities: RemoteToolCapability[] = [];
+    const { t: globalT } = simpleT(locale);
 
     for (const { definition } of loaded) {
       try {
@@ -373,6 +388,30 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
           /* missing translation — keep raw key */
         }
 
+        // Translate category via global i18n (category keys are global, e.g. "app.endpointCategories.chat")
+        let category: string | undefined;
+        if (definition.category) {
+          try {
+            category = globalT(definition.category);
+          } catch {
+            category = definition.category;
+          }
+        }
+
+        // Translate tags via scoped i18n
+        const tags = (definition.tags ?? []).map((tag: string) => {
+          try {
+            return t(tag);
+          } catch {
+            return tag;
+          }
+        });
+
+        // Aliases (all aliases from definition)
+        const aliases: string[] = definition.aliases
+          ? [...definition.aliases]
+          : [];
+
         // Serialize fields — JSON.stringify drops render/function refs,
         // then walk the result and resolve all translatable string values.
         const fields = this.translateFieldStrings(
@@ -389,6 +428,10 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
           isAsync: true,
           // instanceId is tagged by the receiving side at sync time
           instanceId: "local",
+          category,
+          tags: tags.length > 0 ? tags : undefined,
+          aliases: aliases.length > 0 ? aliases : undefined,
+          credits: definition.credits ?? 0,
         });
       } catch {
         // Skip endpoints that fail to serialize

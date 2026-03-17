@@ -160,7 +160,7 @@ export const translations: typeof enTranslations = {
     },
   },
 
-  createCharacter: {
+  createSkill: {
     title: "Utwórz własną postać",
     description:
       "Zaprojektuj własną postać AI z niestandardową osobowością, wiedzą i zachowaniem.",
@@ -192,7 +192,7 @@ export const translations: typeof enTranslations = {
     female: "Żeński",
   },
 
-  editCharacter: {
+  editSkill: {
     title: "Edytuj jako własną postać",
     description:
       "Utwórz własną postać na podstawie tej persony. Możesz zmodyfikować dowolne ustawienia.",
@@ -493,24 +493,24 @@ export const translations: typeof enTranslations = {
   combinedSelector: {
     tabs: {
       quick: "Szybki",
-      character: "Character",
+      skill: "Skill",
       model: "Model",
     },
     current: "Aktualny",
-    favoriteCharacters: "Ulubione persony",
+    favoriteSkills: "Ulubione persony",
     favoriteModels: "Ulubione modele",
     showAll: "Pokaż wszystkie",
     selectModel: "Wybierz model",
-    forCharacter: "dla {{character}}",
+    forSkill: "dla {{character}}",
     recommended: "Polecane",
     favorites: "Ulubione",
     all: "Wszystkie",
     noFavorites: "Brak ulubionych. Oznacz je gwiazdką.",
     noModels: "Brak dostępnych modeli",
-    filteredByCharacter:
+    filteredBySkill:
       "Pokazuję {{compatible}} z {{total}} modeli (filtrowane przez postać)",
-    selectCharacter: "Wybierz postać",
-    allCharacters: "Wszystkie",
+    selectSkill: "Wybierz postać",
+    allSkills: "Wszystkie",
   },
   selector: {
     noResults: "Nie znaleziono wyników",
@@ -518,6 +518,8 @@ export const translations: typeof enTranslations = {
       quick: "Szybki",
       characters: "Persony",
       build: "Utwórz",
+      favorites: "Moje ulubione",
+      browse: "Przeglądaj skill",
     },
     tiers: {
       quick: "Szybki",
@@ -540,9 +542,9 @@ export const translations: typeof enTranslations = {
     suggested: "Sugerowane",
     noFavorites: "Brak ulubionych",
     noFavoritesHint: "Zapisz ulubione postacie dla szybkiego dostępu",
-    browseAllCharacters: "Przeglądaj wszystkie postacie...",
+    browseAllSkills: "Przeglądaj wszystkie postacie...",
     customSetup: "Niestandardowa konfiguracja...",
-    selectCharacter: "Wybierz postać",
+    selectSkill: "Wybierz postać",
     modelCreditDisplay: {
       tokenBased: {
         header: "Koszt za wiadomość",
@@ -578,7 +580,7 @@ export const translations: typeof enTranslations = {
     },
     all: "Wszystkie",
     buildMode: "Tryb budowania",
-    forCharacter: "dla {{character}}",
+    forSkill: "dla {{character}}",
     intelligence: "Inteligencja",
     contentLevel: "Poziom treści",
     speed: "Szybkość",
@@ -592,14 +594,14 @@ export const translations: typeof enTranslations = {
     currentConfig: "Aktualnie rozmawiasz z",
     switchModel: "Zmień model",
     keepsConversation: "(zachowuje rozmowę)",
-    switchCharacter: "Zmień postać",
+    switchSkill: "Zmień postać",
     startsNewChat: "(rozpoczyna nowy czat)",
     start: "Start",
     addFav: "Dodaj",
-    searchCharacters: "Szukaj postaci...",
-    noCharactersFound: "Nie znaleziono postaci",
+    searchSkills: "Szukaj postaci...",
+    noSkillsFound: "Nie znaleziono postaci",
     createCustom: "Utwórz",
-    character: "Postać",
+    skill: "Postać",
     savePreset: "Zapisz",
     perMessage: "za wiadomość",
     compatibleModels: "{{count}} kompatybilnych modeli",
@@ -660,17 +662,17 @@ export const translations: typeof enTranslations = {
     yourSetups: "Twoje zestawy",
     setup: "Zestaw",
     delete: "Usuń",
-    editCharacter: "Edytuj jako własną postać",
+    editSkill: "Edytuj jako własną postać",
     autoSelectedModel: "Auto-wybrany:",
     manualSelectedModel: "Wybrany:",
-    characterSelectedModel: "Model postaci:",
+    skillSelectedModel: "Model postaci:",
     selectModelBelow: "Wybierz model poniżej",
     chooseYourPath: "Wybierz swoją ścieżkę",
     twoWaysToChat: "Dwa elastyczne sposoby na rozpoczęcie rozmowy",
     directModels: "Bezpośredni dostęp do modeli",
     directModelsDesc:
       "Skonfiguruj filtry lub wybierz ręcznie spośród {{count}} modeli. Pełna kontrola nad wyborem AI.",
-    characterPresets: "Presety postaci",
+    skillPresets: "Presety postaci",
     characterPresetsDesc:
       "Wybierz postać poniżej. Każda ma zoptymalizowane ustawienia, które możesz dostosować w dowolnym momencie.",
     startWithDirectModels: "Rozpocznij z bezpośrednimi modelami",
@@ -688,7 +690,7 @@ export const translations: typeof enTranslations = {
     useOnce: "Użyj raz",
     saveAsDefault: "Dodaj do ulubionych",
     deleteSetup: "Usuń konfigurację",
-    characterSetup: "Konfiguracja persony",
+    skillSetup: "Konfiguracja persony",
     separator: " • ",
     sortBy: "Sortuj według",
     // UX improvements v21
@@ -701,7 +703,7 @@ export const translations: typeof enTranslations = {
     modelSelection: "Wybór modelu",
     autoMode: "Automatyczny wybór",
     manualMode: "Wybór ręczny",
-    characterMode: "Domyślny postaci",
+    skillMode: "Domyślny postaci",
     autoModeDescription:
       "Automatycznie wybiera najlepszy model według Twoich preferencji",
     manualModeDescription: "Wybierz dowolny model samodzielnie",
@@ -717,11 +719,11 @@ export const translations: typeof enTranslations = {
     adjustSettings: "Dostosuj ustawienia",
     addAnotherSetup: "Dodaj kolejną konfigurację",
     comingSoon: "Wkrótce dostępne",
-    switchCharacterBtn: "Zmień personę",
-    editCharacterBtn: "Edytuj personę",
-    // Character requirements
+    switchSkillBtn: "Zmień personę",
+    editSkillBtn: "Edytuj personę",
+    // Skill requirements
     requirements: {
-      characterConflict: "Konflikt postaci",
+      skillConflict: "Konflikt postaci",
       max: "Maksimum",
       min: "Minimum",
       tooHigh: "Zbyt wysoki",
@@ -733,7 +735,7 @@ export const translations: typeof enTranslations = {
       allMet: "Spełnia wszystkie wymagania",
       violations: "{{count}} naruszenia wymagań",
     },
-    // Character switch modal
+    // Skill switch modal
     characterSwitchModal: {
       title: "Zmień personę",
       description: "Przełącz się na inną personę bez utraty ustawień",
@@ -748,23 +750,84 @@ export const translations: typeof enTranslations = {
   },
   onboarding: {
     back: "Wstecz",
-    // Screen 1: Story
-    story: {
-      title: "Pomyśl o nas jak o swoim zespole.",
-      line1: "Większość zaczyna od towarzysza - kogoś do codziennych rozmów.",
-      line2: "Gdy potrzebujesz konkretnej pomocy, przełącz się na specjalistę.",
-      line3: "To jak mieć ekspertów pod ręką.",
-      continue: "Poznaj zespół",
+    // Screen 1: Welcome
+    welcome: {
+      title: "Pomyśl o nas jak o swoim zespole AI.",
+      line1:
+        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu — cokolwiek jest potrzebne.",
+      line2:
+        "AI przełącza się między nimi automatycznie. Ty po prostu rozmawiasz.",
+      line3: "Skonfigurujmy cię w mniej niż minutę.",
+      continue: "Zaczynamy",
     },
-    // Screen 2: Pick companion
-    pick: {
-      title: "Kto jest twoim codziennym towarzyszem?",
-      subtitle: "Do codziennych rozmów i pogawędek",
-      continue: "Dalej",
+    // Screen 2: Guest warning (only for logged-out users)
+    guest: {
+      title: "Przeglądasz jako gość",
+      line1:
+        "Twoje ustawienia, towarzysz i historia czatu są zapisywane lokalnie tylko na tym urządzeniu.",
+      line2:
+        "Zaloguj się, aby synchronizować wszystko między urządzeniami — i mieć pewność, że nigdy nie stracisz swojej konfiguracji.",
+      signIn: "Zaloguj się / Utwórz konto",
+      continueAnyway: "Kontynuuj jako gość",
+      note: "Możesz zalogować się później z menu w dowolnym momencie.",
+    },
+    // Screen 3: Companion + Budget
+    companion: {
+      title: "Wybierz swojego towarzysza",
+      subtitle: "Twój główny partner do codziennych rozmów",
+      budgetTitle: "Jak zaawansowana ma być twoja AI?",
+      budgetSubtitle: "Możesz to zmienić w dowolnym momencie w ustawieniach",
+      next: "Dalej",
       selectFirst: "Wybierz towarzysza, aby kontynuować",
-      saving: "Zapisywanie...",
+      budget: {
+        smart: {
+          label: "Smart",
+          desc: "Szybka, wydajna, dobrze radzi sobie z większością zadań",
+        },
+        brilliant: {
+          label: "Brilliant",
+          desc: "Najlepsza jakość — świetna do złożonych pytań, pisania i analizy",
+        },
+        max: {
+          label: "Max",
+          desc: "Najwyższe możliwości rozumowania, bez kompromisów — gdy naprawdę ma znaczenie",
+        },
+      },
     },
-    // Companion characterlities
+    // Screen 4: Use-cases
+    usecases: {
+      title: "Do czego głównie będziesz tego używać?",
+      subtitle:
+        "Automatycznie dodamy odpowiednich specjalistów do zestawu narzędzi twojej AI.",
+      saving: "Konfigurowanie...",
+      start: "Rozpocznij czat",
+      skip: "Pomiń — skonfigruję to później",
+      coding: {
+        label: "Kodowanie & Technika",
+        hint: "Vibe Coder, Coder",
+      },
+      research: {
+        label: "Badania & Analiza",
+        hint: "Researcher, Data Analyst",
+      },
+      writing: {
+        label: "Pisanie & Edycja",
+        hint: "Writer, Editor",
+      },
+      business: {
+        label: "Biznes & Strategia",
+        hint: "Business Advisor, Product Manager",
+      },
+      learning: {
+        label: "Nauka & Edukacja",
+        hint: "Tutor, Socratic Questioner",
+      },
+      chat: {
+        label: "Po prostu rozmowy",
+        hint: "Twój towarzysz wystarczy",
+      },
+    },
+    // Companion personalities
     thea: {
       tagline: "Ciepła & mądra",
       description: "Jak wspierająca przyjaciółka, która naprawdę cię rozumie.",
@@ -772,19 +835,6 @@ export const translations: typeof enTranslations = {
     hermes: {
       tagline: "Odważny & bezpośredni",
       description: "Jak trener, który popycha cię do bycia najlepszym.",
-    },
-    // Screen 3: Specialists - add to team
-    specialists: {
-      title: "Dodaj specjalistów do określonych zadań",
-      subtitle:
-        "Każdy ekspert jest zoptymalizowany dla swojej specjalności. Dodaj tyle, ile chcesz.",
-      chosen: "{{name}} jest gotowy",
-      add: "Dodaj",
-      added: "Dodano",
-      switchTip:
-        "Przełączaj się między członkami zespołu w dowolnym momencie. Możesz dostosować lub dodać więcej później.",
-      start: "Rozpocznij czat",
-      browseAll: "Przeglądaj wszystkie postacie",
     },
     // Legacy keys
     startChatting: "Rozpocznij czat",
@@ -1113,7 +1163,7 @@ export const translations: typeof enTranslations = {
     imageGen: "Generowanie Obrazów",
     uncensored: "Niecenzurowany",
     legacy: "Modele Legacy",
-    // Character categories
+    // Skill categories
     technical: "Techniczne",
     education: "Edukacja",
     controversial: "Kontrowersyjne",
@@ -1327,7 +1377,7 @@ export const translations: typeof enTranslations = {
     incognitoDescription:
       "Przechowywane tylko w przeglądarce. Nigdy nie zapisywane na koncie ani synchronizowane.",
     more: "Więcej",
-    selectCharacter: "Wybierz postać",
+    selectSkill: "Wybierz postać",
     noPrompts: "Brak sugestii dla tej postaci",
     showDetails: "Pokaż szczegóły",
     hideDetails: "Ukryj szczegóły",

@@ -63,8 +63,8 @@ export class ChatThreadByIdRepositoryClient {
         status: thread.status ?? ThreadStatus.ACTIVE,
         defaultModel:
           (thread.defaultModel as string | null | undefined) ?? null,
-        defaultCharacter:
-          (thread.defaultCharacter as string | null | undefined) ?? null,
+        defaultSkill:
+          (thread.defaultSkill as string | null | undefined) ?? null,
         systemPrompt:
           (thread.systemPrompt as string | null | undefined) ?? null,
         pinned: thread.pinned ?? false,
@@ -103,7 +103,7 @@ export class ChatThreadByIdRepositoryClient {
       folderId?: string | null;
       status?: string;
       defaultModel?: string | null;
-      defaultCharacter?: string | null;
+      defaultSkill?: string | null;
       systemPrompt?: string;
       pinned?: boolean;
       archived?: boolean;

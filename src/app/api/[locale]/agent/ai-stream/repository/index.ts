@@ -33,6 +33,10 @@ import type {
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { clearStreamingState } from "./core/stream-registry";
+import {
+  subscribeWakeUpSignal,
+  type WakeUpPayload,
+} from "./core/wake-up-channel";
 import { serializeError } from "./error-utils";
 import { CompactingHandler } from "./handlers/compacting-handler";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
@@ -204,7 +208,7 @@ export class AiStreamRepository {
                 parentId: data.parentMessageId ?? null,
                 sequenceId: null,
                 model: null,
-                character: null,
+                skill: null,
               }).data,
             },
             logger,
@@ -249,6 +253,46 @@ export class AiStreamRepository {
     // Captured refs so headless path can read lastAiMessageId + content after runStream completes
     let capturedLastAiMessageId: string = aiMessageId;
     let capturedLastAiMessageContent: string | null = null;
+    // Captured wakeUp payload — written by the signal handler, read in finally for deferred insertion + revival
+    let capturedWakeUpPayload: WakeUpPayload | null = null;
+
+    // Extracted to a named function so narrowing works correctly outside finally blocks
+    const handleWakeUpRevival = async (
+      payload: WakeUpPayload,
+    ): Promise<void> => {
+      const { insertDeferredWakeUpMessage } =
+        await import("./core/deferred-inserter");
+      const wakeUpDeferredId = await insertDeferredWakeUpMessage(
+        threadResultThreadId,
+        payload,
+        logger,
+      );
+      logger.info("[WakeUp] Firing revival after stream yield", {
+        threadId: threadResultThreadId,
+        deferredId: wakeUpDeferredId,
+      });
+      const { runHeadlessAiStream } = await import("./headless");
+      await runHeadlessAiStream({
+        favoriteId: payload.favoriteId,
+        model: payload.resolvedModel,
+        skill: payload.resolvedSkill,
+        prompt: "",
+        wakeUpRevival: true,
+        explicitParentMessageId: wakeUpDeferredId,
+        threadMode: "append",
+        threadId: threadResultThreadId,
+        rootFolderId: data.rootFolderId,
+        user,
+        locale,
+        logger,
+        t: aiStreamT,
+      }).catch((err: Error) => {
+        logger.error("[WakeUp] Revival failed", {
+          threadId: threadResultThreadId,
+          error: err.message,
+        });
+      });
+    };
 
     // Create emitter on the messages channel — events are owned by messages endpoint
     const wsEmit: WsEmitCallback = createMessagesEmitter(
@@ -279,6 +323,33 @@ export class AiStreamRepository {
             wsEmit,
             sequenceIdOverride,
           });
+
+        // Wire StreamContext.pendingToolMessages into ToolExecutionContext so
+        // tools-loader can inject the correct currentToolMessageId per toolCallId
+        // before calling each tool's execute() — parallel-safe, no polling needed.
+        streamContext.pendingToolMessages = ctx.pendingToolMessages;
+
+        // Wire stop-signal into Agent SDK provider so it can abort its internal loop
+        // when endLoop / approve / wakeUp flags are set. The Agent SDK doesn't emit
+        // finish-step between turns, so this callback replaces the finish-step abort.
+
+        // Subscribe to wake-up signal so resume-stream can signal this live stream
+        // to yield after the current step finishes (wakeUp callback mode).
+        const unsubscribeWakeUp = subscribeWakeUpSignal(
+          threadResultThreadId,
+          (payload) => {
+            logger.info(
+              "[WakeUp] Signal received — will yield at next step boundary",
+              {
+                threadId: threadResultThreadId,
+                toolMessageId: payload.toolMessageId,
+              },
+            );
+            capturedWakeUpPayload = payload;
+            ctx.shouldYieldForWakeUp = true;
+          },
+        );
+        ctx.onCleanup(unsubscribeWakeUp);
 
         try {
           // Check if compacting is needed (fetches branch messages from DB/storage)
@@ -323,7 +394,7 @@ export class AiStreamRepository {
               effectiveParentMessageId,
               effectiveContent,
               model: data.model,
-              character: data.character,
+              skill: data.skill,
               user,
               dbWriter: ctx.dbWriter,
               logger,
@@ -364,7 +435,7 @@ export class AiStreamRepository {
               userId,
               user,
               model: data.model,
-              character: data.character,
+              skill: data.skill,
               providerModel: provider.chat(modelConfig.providerModel),
               abortSignal: streamAbortController.signal,
               logger,
@@ -398,7 +469,7 @@ export class AiStreamRepository {
                 upcomingAssistantMessageId: aiMessageId,
                 upcomingAssistantMessageCreatedAt: new Date(),
                 model: data.model,
-                character: data.character,
+                skill: data.skill,
                 timezone: data.timezone,
                 rootFolderId: data.rootFolderId,
                 trailingSystemMessage,
@@ -482,7 +553,7 @@ export class AiStreamRepository {
             ctx,
             threadId: threadResultThreadId,
             model: data.model,
-            character: data.character,
+            skill: data.skill,
             isIncognito,
             userId,
             emittedToolResultIds,
@@ -516,16 +587,28 @@ export class AiStreamRepository {
             ttsHandler.cancel();
           }
 
-          await StreamErrorCatchHandler.handleError({
-            error: error as Error | JSONValue,
-            ctx,
-            maxDuration,
-            model: data.model,
-            threadId: threadResultThreadId,
-            userId,
-            logger,
-            t: aiStreamT,
-          });
+          if (streamAbortController.signal.aborted) {
+            // AbortErrorHandler should have already run in StreamExecutionHandler.
+            // Log and continue — the finally block will emit STREAM_FINISHED.
+            logger.info(
+              "[AI Stream] Post-abort error in outer catch (abort already handled)",
+              {
+                abortHandled: ctx.abortHandled,
+                error: error instanceof Error ? error.message : String(error),
+              },
+            );
+          } else {
+            await StreamErrorCatchHandler.handleError({
+              error: error as Error | JSONValue,
+              ctx,
+              maxDuration,
+              model: data.model,
+              threadId: threadResultThreadId,
+              userId,
+              logger,
+              t: aiStreamT,
+            });
+          }
         }
       };
 
@@ -535,6 +618,10 @@ export class AiStreamRepository {
           await runStream();
         } finally {
           await clearStreamingState(threadResultThreadId);
+          // wakeUp revival: insert deferred (single stream = no race) then revive.
+          if (capturedWakeUpPayload) {
+            await handleWakeUpRevival(capturedWakeUpPayload);
+          }
         }
 
         logger.info("[AI Stream] Headless execution complete", {
@@ -594,12 +681,20 @@ export class AiStreamRepository {
             }),
           );
 
-          void clearStreamingState(threadResultThreadId).catch((err) => {
-            logger.error("[AI Stream] Failed to clear streaming state", {
-              error: err instanceof Error ? err.message : String(err),
-              threadId: threadResultThreadId,
+          void clearStreamingState(threadResultThreadId)
+            .then(() =>
+              // wakeUp revival: if a pub/sub signal arrived mid-stream, insert the deferred
+              // message now (stream is done, single-inserter guarantee holds) then fire revival.
+              capturedWakeUpPayload
+                ? handleWakeUpRevival(capturedWakeUpPayload)
+                : Promise.resolve(),
+            )
+            .catch((err) => {
+              logger.error("[AI Stream] Failed to clear streaming state", {
+                error: err instanceof Error ? err.message : String(err),
+                threadId: threadResultThreadId,
+              });
             });
-          });
         });
 
       logger.debug("[AI Stream] Interactive stream started (fire-and-forget)", {

@@ -6,7 +6,7 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -53,7 +53,7 @@ export function useEdenAISpeech({
   logger,
   deductCredits,
 }: UseEdenAISpeechOptions): UseEdenAISpeechReturn {
-  const { t } = simpleT(locale);
+  const { t } = useMemo(() => simpleT(locale), [locale]);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -65,6 +65,10 @@ export function useEdenAISpeech({
   const streamRef = useRef<MediaStream | null>(null);
 
   // Use endpoint for type-safe API calls
+  // Use a ref so processRecording doesn't need endpoint in its dep array
+  const endpointRef = useRef<ReturnType<
+    typeof useEndpoint<typeof speechToTextDefinitions>
+  > | null>(null);
   const endpoint = useEndpoint(
     speechToTextDefinitions,
     {
@@ -77,6 +81,8 @@ export function useEdenAISpeech({
     logger,
     user,
   );
+
+  endpointRef.current = endpoint;
 
   // Cleanup function
   const cleanup = useCallback((): void => {
@@ -100,11 +106,12 @@ export function useEdenAISpeech({
   }, []);
 
   const processRecording = useCallback(async (): Promise<void> => {
+    const currentEndpoint = endpointRef.current;
     logger.debug("STT: Processing recording", {
-      hasEndpointCreate: !!endpoint.create,
+      hasEndpointCreate: !!currentEndpoint?.create,
     });
 
-    if (!endpoint.create) {
+    if (!currentEndpoint?.create) {
       const errorMsg = t("app.chat.hooks.stt.endpoint-not-available");
       logger.error("STT: Endpoint not available", errorMsg);
       setError(errorMsg);
@@ -134,10 +141,10 @@ export function useEdenAISpeech({
       });
 
       // Set form values - set the nested object structure directly
-      endpoint.create.form.setValue("fileUpload", { file: audioFile });
+      currentEndpoint.create.form.setValue("fileUpload", { file: audioFile });
 
       // Submit form with callbacks
-      await endpoint.create.submitForm({
+      await currentEndpoint.create.submitForm({
         onSuccess: ({ responseData }) => {
           logger.debug("STT: Response received", {
             responseData: JSON.stringify(responseData),
@@ -197,7 +204,7 @@ export function useEdenAISpeech({
       setIsProcessing(false);
       cleanup();
     }
-  }, [endpoint, logger, t, onTranscript, onError, cleanup, deductCredits]);
+  }, [logger, t, onTranscript, onError, cleanup, deductCredits]);
 
   const startRecording = useCallback(async (): Promise<void> => {
     try {

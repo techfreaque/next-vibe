@@ -5,8 +5,6 @@
 
 import "server-only";
 
-import { join } from "node:path";
-
 import type { ResponseType as BaseResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -87,9 +85,8 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
         routeFiles = [...liveIndex.routeFiles];
         definitionFiles = [...liveIndex.definitionFiles];
       } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        const apiCorePath = ["src", "app", "api", "[locale]"];
-        const startDir = join(process.cwd(), ...apiCorePath);
+        // Use template string to prevent Turbopack from statically tracing paths
+        const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
         logger.debug("Discovering route files");
         routeFiles = findFilesRecursively(startDir, "route.ts");
@@ -274,7 +271,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       if (methods.length === 0) {
         logger.warn(
           formatWarning(
-            `No methods found: ${routeFile.replace(process.cwd(), "").replace(/^\//, "")}`,
+            ` No methods found: ${routeFile.replace(process.cwd(), "").replace(/^\//, "")}`,
           ),
         );
         continue;

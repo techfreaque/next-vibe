@@ -2,11 +2,12 @@
  * Complete Task API Definition
  * MCP tool for Claude Code to mark a cron task as completed/failed/cancelled.
  * Supports custom output payloads for structured result reporting.
- * Dev-only (PRODUCTION_OFF) — not available on production instances.
+ * MCP-visible only on local/prod instances (NODE_ENV=production).
  */
 
 import { z } from "zod";
 
+import { envClient } from "@/config/env-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -35,7 +36,10 @@ const { POST } = createEndpoint({
   icon: "check-circle",
   category: "app.endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
-  allowedRoles: [UserRole.ADMIN, UserRole.MCP_VISIBLE, UserRole.PRODUCTION_OFF],
+  allowedRoles: [
+    UserRole.ADMIN,
+    ...(envClient.NODE_ENV === "production" ? [UserRole.MCP_VISIBLE] : []),
+  ],
   aliases: ["complete-task"],
 
   fields: objectField(scopedTranslation, {

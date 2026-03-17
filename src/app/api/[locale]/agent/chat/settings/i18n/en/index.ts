@@ -62,8 +62,8 @@ export const translations = {
     selectedModel: {
       label: "Selected Model",
     },
-    selectedCharacter: {
-      label: "Selected Character",
+    selectedSkill: {
+      label: "Selected Skill",
     },
     activeFavoriteId: {
       label: "Active Favorite",
@@ -77,7 +77,7 @@ export const translations = {
     viewMode: {
       label: "View Mode",
     },
-    allowedTools: {
+    availableTools: {
       label: "Allowed Tools",
     },
     pinnedTools: {
@@ -85,6 +85,11 @@ export const translations = {
     },
     compactTrigger: {
       label: "Compact Trigger (tokens)",
+    },
+    memoryLimit: {
+      label: "Memory Limit (tokens)",
+      description:
+        "Maximum total tokens of memory content injected per turn. Leave empty to use the system default (1000 tokens).",
     },
     errors: {
       validation: {

@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -42,7 +42,7 @@ interface FileUploadButtonProps {
   onRemoveFile: (index: number) => void;
 }
 
-export function FileUploadButton({
+export const FileUploadButton = memo(function FileUploadButton({
   disabled,
   locale,
   attachments,
@@ -201,4 +201,4 @@ export function FileUploadButton({
       )}
     </>
   );
-}
+});

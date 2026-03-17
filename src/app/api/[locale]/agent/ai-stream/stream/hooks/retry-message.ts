@@ -3,30 +3,28 @@
  * Handles retrying messages in both incognito and server modes
  */
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { createAndSendUserMessage } from "./shared";
-import type { UseAIStreamReturn } from "./use-ai-stream";
+import type { StartStreamFn } from "./shared";
 
 export interface RetryMessageDeps {
   logger: EndpointLogger;
-  aiStream: UseAIStreamReturn;
+  startStream: StartStreamFn;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
-  chatStore: {
-    messages: Record<string, ChatMessage>;
-    setLoading: (loading: boolean) => void;
-    getThreadMessages: (threadId: string) => ChatMessage[];
-  };
+  /** Active thread ID — needed to look up message in apiClient cache */
+  activeThreadId: string | null;
   settings: {
     selectedModel: ModelId;
-    selectedCharacter: string;
-    allowedTools: ToolConfigItem[] | null;
+    selectedSkill: string;
+    availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
@@ -39,9 +37,35 @@ export async function retryMessage(
   attachments: File[] | undefined,
   deps: RetryMessageDeps,
 ): Promise<void> {
-  const message = deps.chatStore.messages[messageId];
+  const { logger, currentRootFolderId, activeThreadId } = deps;
+
+  if (!activeThreadId) {
+    logger.error("retryMessage: no active thread", { messageId });
+    return;
+  }
+
+  // Look up message from apiClient cache
+  const cached = apiClient.getEndpointData(messagesDefinition.GET, logger, {
+    urlPathParams: { threadId: activeThreadId },
+    requestData: { rootFolderId: currentRootFolderId },
+  });
+  let message = cached?.success
+    ? cached.data.messages.find((m) => m.id === messageId)
+    : undefined;
+
+  // Fallback: incognito storage (not in apiClient cache after page reload)
+  if (!message && currentRootFolderId === DefaultFolderId.INCOGNITO) {
+    const { getMessagesForThread } =
+      await import("@/app/api/[locale]/agent/chat/incognito/storage");
+    const msgs = await getMessagesForThread(activeThreadId);
+    message = msgs.find((m) => m.id === messageId);
+  }
+
   if (!message) {
-    deps.logger.error("Message not found", { messageId });
+    logger.error("retryMessage: message not found", {
+      messageId,
+      activeThreadId,
+    });
     return;
   }
 
@@ -53,6 +77,6 @@ export async function retryMessage(
       attachments,
       operation: "retry",
     },
-    { ...deps, setLeafMessageId: deps.setLeafMessageId },
+    deps,
   );
 }

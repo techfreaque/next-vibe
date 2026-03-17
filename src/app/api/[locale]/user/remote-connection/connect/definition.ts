@@ -22,6 +22,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 
+import type { RemoteConnectionsListResponseOutput } from "../list/definition";
 import { scopedTranslation } from "./i18n";
 import { RemoteConnectWidget } from "./widget";
 import { Environment } from "../../../shared/utils";
@@ -205,14 +206,17 @@ const { POST } = createEndpoint({
             if (!prev?.success) {
               return undefined;
             }
-            const newConn = {
-              instanceId: data.requestData.instanceId,
-              friendlyName: data.requestData.friendlyName,
-              remoteUrl: data.requestData.remoteUrl,
-              isActive: true,
-              lastSyncedAt: new Date().toISOString(),
-              hasToken: true,
-            };
+            const newConn: RemoteConnectionsListResponseOutput["connections"][number] =
+              {
+                instanceId: data.requestData.instanceId,
+                friendlyName: data.requestData.friendlyName,
+                remoteFriendlyName: null,
+                remoteUrl: data.requestData.remoteUrl,
+                isActive: true,
+                lastSyncedAt: new Date().toISOString(),
+                hasToken: true,
+                healthStatus: "healthy",
+              };
             // Replace if exists (reconnect), otherwise append
             const exists = prev.data.connections.some(
               (c) => c.instanceId === newConn.instanceId,

@@ -43,13 +43,18 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   rootFolderId: DefaultFolderId.CRON,
   threadId: undefined,
   aiMessageId: undefined,
-  characterId: undefined,
+  skillId: undefined,
   modelId: undefined,
   headless: undefined,
   currentToolMessageId: undefined,
+  callerToolCallId: undefined,
+  pendingToolMessages: undefined,
+  pendingTimeoutMs: undefined,
+  leafMessageId: undefined,
   waitingForRemoteResult: undefined,
   favoriteId: undefined,
   abortSignal: undefined,
+  escalateToTask: undefined,
 };
 
 // ─── Execution Context ────────────────────────────────────────────────────────
@@ -133,6 +138,18 @@ export async function executeNode(
     const upstream = ctx.resolvedSeries.get(seriesKey);
     if (upstream) {
       inputs[toField] = upstream;
+    }
+  }
+
+  // If this node expects upstream series (has incoming edges) but none resolved,
+  // skip execution — calling the endpoint with missing source would fail validation.
+  if (incomingEdges.length > 0 && !("source" in inputs)) {
+    const hasAnyInput = incomingEdges.some((e) => {
+      const toField = e.toHandle ?? "source";
+      return toField in inputs;
+    });
+    if (!hasAnyInput) {
+      return;
     }
   }
 

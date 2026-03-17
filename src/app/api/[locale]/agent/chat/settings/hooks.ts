@@ -31,14 +31,14 @@ interface UseChatSettingsReturn {
   // Convenience setters
   setActiveFavorite: (
     favoriteId: string,
-    characterId: string,
+    skillId: string,
     modelId: ModelId,
     voice: typeof TtsVoiceValue,
   ) => void;
   setTTSAutoplay: (autoplay: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
   setTools: (
-    allowedTools: ChatSettingsUpdateRequestOutput["allowedTools"],
+    availableTools: ChatSettingsUpdateRequestOutput["availableTools"],
     pinnedTools: ChatSettingsUpdateRequestOutput["pinnedTools"],
   ) => void;
   setCompactTrigger: (value: number | null) => void;
@@ -59,11 +59,8 @@ export function useChatSettings(
     () => user !== undefined && !user.isPublic,
     [user],
   );
-
-  // Set up endpoint - automatically uses client routes for public users
-  const endpoint = useEndpoint(
-    settingsDefinition,
-    {
+  const endpointOptions = useMemo(
+    () => ({
       read: {
         queryOptions: {
           enabled: true,
@@ -71,7 +68,14 @@ export function useChatSettings(
         },
         initialData: initialData ?? undefined,
       },
-    },
+    }),
+    [initialData],
+  );
+
+  // Set up endpoint - automatically uses client routes for public users
+  const endpoint = useEndpoint(
+    settingsDefinition,
+    endpointOptions,
     logger,
     user,
   );
@@ -110,11 +114,8 @@ export function useChatSettings(
       if (updates.selectedModel !== undefined) {
         endpoint.create?.setValue("selectedModel", updates.selectedModel);
       }
-      if (updates.selectedCharacter !== undefined) {
-        endpoint.create?.setValue(
-          "selectedCharacter",
-          updates.selectedCharacter,
-        );
+      if (updates.selectedSkill !== undefined) {
+        endpoint.create?.setValue("selectedSkill", updates.selectedSkill);
       }
       if (updates.activeFavoriteId !== undefined) {
         endpoint.create?.setValue("activeFavoriteId", updates.activeFavoriteId);
@@ -128,8 +129,8 @@ export function useChatSettings(
       if (updates.viewMode !== undefined) {
         endpoint.create?.setValue("viewMode", updates.viewMode);
       }
-      if (updates.allowedTools !== undefined) {
-        endpoint.create?.setValue("allowedTools", updates.allowedTools);
+      if (updates.availableTools !== undefined) {
+        endpoint.create?.setValue("availableTools", updates.availableTools);
       }
       if (updates.pinnedTools !== undefined) {
         endpoint.create?.setValue("pinnedTools", updates.pinnedTools);
@@ -159,10 +160,10 @@ export function useChatSettings(
 
   const setTools = useCallback(
     (
-      allowedTools: ChatSettingsUpdateRequestOutput["allowedTools"],
+      availableTools: ChatSettingsUpdateRequestOutput["availableTools"],
       pinnedTools: ChatSettingsUpdateRequestOutput["pinnedTools"],
     ) => {
-      void updateSettings({ allowedTools, pinnedTools });
+      void updateSettings({ availableTools, pinnedTools });
     },
     [updateSettings],
   );
@@ -177,13 +178,13 @@ export function useChatSettings(
   const setActiveFavorite = useCallback(
     (
       favoriteId: string,
-      characterId: string,
+      skillId: string,
       modelId: ModelId,
       voice: typeof TtsVoiceValue,
     ) => {
       void updateSettings({
         activeFavoriteId: favoriteId,
-        selectedCharacter: characterId,
+        selectedSkill: skillId,
         selectedModel: modelId,
         ttsVoice: voice,
       });

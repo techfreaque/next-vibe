@@ -143,6 +143,6 @@ export function chunkTextForTTS(text: string): string[] {
  * Calculate total character count across all chunks
  * Useful for cost estimation
  */
-export function getTotalCharacterCount(chunks: string[]): number {
+export function getTotalSkillCount(chunks: string[]): number {
   return chunks.reduce((total, chunk) => total + chunk.length, 0);
 }

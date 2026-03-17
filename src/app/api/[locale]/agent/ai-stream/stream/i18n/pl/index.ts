@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "Uruchom agenta AI",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Uruchom headless agenta AI i otrzymaj pełną odpowiedź tekstową. Użyj do delegowania zadań, podsumowywania wyników narzędzi, generowania treści lub łączenia narzędzi w jedną odpowiedź AI. Kredyty są pobierane w zależności od modelu. SZYBKI START: Przekaż favoriteId, aby załadować postać + model + konfigurację narzędzi z zapisanego ulubionego. Nadpisz dowolne pole (model, character, tools, allowedTools) przekazując je jawnie. KONFIGURACJA: Przed uruchomieniem skonfiguruj odpowiednią postać + ulubiony. Postacie definiują personę i prompt systemowy (utwórz za pomocą agent_chat_characters_create_POST). Ulubione łączą postać z nadpisaniem modelu i konfiguracją narzędzi (utwórz za pomocą agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} lub {selectionType:'FILTERS',...}). Workflow: 1) Listuj ulubione (agent_chat_favorites_GET) lub postacie (agent_chat_characters_GET). 2) Jeśli żaden nie pasuje, utwórz postać, potem ulubiony. 3) Przekaż favoriteId. DOSTĘP DO NARZĘDZI: Standardowe ustawienie: allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać narzędzia.",
+        "Uruchom headless agenta AI i otrzymaj pełną odpowiedź tekstową. Użyj do delegowania zadań, podsumowywania wyników narzędzi, generowania treści lub łączenia narzędzi w jedną odpowiedź AI. Kredyty są pobierane w zależności od modelu. SZYBKI START: Przekaż favoriteId, aby załadować postać + model + konfigurację narzędzi z zapisanego ulubionego. Nadpisz dowolne pole (model, skill, tools, availableTools) przekazując je jawnie. KONFIGURACJA: Przed uruchomieniem skonfiguruj odpowiednią postać + ulubiony. Postacie definiują personę i prompt systemowy (utwórz za pomocą agent_chat_skills_create_POST). Ulubione łączą postać z nadpisaniem modelu i konfiguracją narzędzi (utwórz za pomocą agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} lub {selectionType:'FILTERS',...}). Workflow: 1) Listuj ulubione (agent_chat_favorites_GET) lub postacie (agent_chat_skills_GET). 2) Jeśli żaden nie pasuje, utwórz postać, potem ulubiony. 3) Przekaż favoriteId. DOSTĘP DO NARZĘDZI: Standardowe ustawienie: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać narzędzia.",
       container: {
         title: "Uruchomienie agenta AI",
         description:
@@ -28,18 +28,18 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "ID ulubionego",
           description:
-            "UUID zapisanego ulubionego do załadowania postaci, modelu i konfiguracji narzędzi. Postać, model (z modelSelection) i konfiguracja narzędzi (activeTools/visibleTools) ulubionego są używane jako wartości domyślne. Jawne pola w tym żądaniu nadpisują wartości ulubionego. Użyj agent_chat_favorites_GET do listowania.",
+            "UUID zapisanego ulubionego do załadowania postaci, modelu i konfiguracji narzędzi. Postać, model (z modelSelection) i konfiguracja narzędzi (availableTools/pinnedTools) ulubionego są używane jako wartości domyślne. Jawne pola w tym żądaniu nadpisują wartości ulubionego. Użyj agent_chat_favorites_GET do listowania.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Model",
           description:
-            "Model AI. Opcjonalny gdy ustawiono favoriteId lub character (rozwiązywany z ich modelSelection). Szybki & tani: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.6, gpt-5-pro. Darmowy: qwen3_235b-free, gpt-oss-120b-free. Nadpisuje model z favoriteId/character.",
+            "Model AI. Opcjonalny gdy ustawiono favoriteId lub skill (rozwiązywany z ich modelSelection). Szybki & tani: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.6, gpt-5-pro. Darmowy: qwen3_235b-free, gpt-oss-120b-free. Nadpisuje model z favoriteId/skill.",
         },
-        character: {
-          label: "Postać",
+        skill: {
+          label: "Umiejętność",
           description:
-            "ID postaci (UUID) lub 'default'. Opcjonalny gdy ustawiono favoriteId (rozwiązywany z ulubionego). Postacie definiują personę AI, prompt systemowy i domyślny model. Nadpisuje postać z favoriteId. Użyj agent_chat_characters_GET do listowania.",
+            "ID umiejętności (UUID) lub 'default'. Opcjonalny gdy ustawiono favoriteId (rozwiązywany z ulubionego). Umiejętności definiują personę AI, prompt systemowy i domyślny model. Nadpisuje umiejętność z favoriteId. Użyj agent_chat_skills_GET do listowania.",
           placeholder: "default",
         },
         prompt: {
@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
           routeId: {
             label: "ID narzędzia",
             description:
-              "Alias lub pełna nazwa narzędzia do wywołania (np. 'web-search', 'agent_chat_characters_GET'). Użyj system_help_GET do odkrywania.",
+              "Alias lub pełna nazwa narzędzia do wywołania (np. 'web-search', 'agent_chat_skills_GET'). Użyj system_help_GET do odkrywania.",
             placeholder: "web-search",
           },
           args: {
@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
               'Płaskie argumenty klucz-wartość — urlPathParams i pola body połączone w jeden obiekt (np. {"query": "najnowsze wiadomości", "maxResults": 5}).',
           },
         },
-        allowedTools: {
+        availableTools: {
           label: "Może wykonywać (warstwa uprawnień)",
           description:
             "Brama uprawnień do wykonania — kontroluje które narzędzia AI faktycznie może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione narzędzia (inne blokowane z 'wyłączone przez użytkownika'). Standardowe ustawienie: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatchuje dowolny zarejestrowany endpoint, system_help_GET pozwala odkrywać narzędzia. Nie trzeba powtarzać narzędzi z pola tools.",
@@ -85,10 +85,10 @@ export const translations: typeof enTranslations = {
               "Jeśli true, wykonanie zatrzymuje się i czeka na potwierdzenie użytkownika. Używaj dla destrukcyjnych lub kosztownych akcji.",
           },
         },
-        tools: {
+        pinnedTools: {
           label: "W kontekście (AI to widzi)",
           description:
-            "Narzędzia załadowane do okna kontekstu modelu — co AI zna i nad czym może rozumować. null = domyślny zestaw narzędzi użytkownika (zalecane). Podaj tablicę tylko dla skupionego, minimalnego kontekstu. Uwaga: allowedTools kontroluje co faktycznie się wykonuje — to pole wpływa tylko na to, co model widzi.",
+            "Narzędzia załadowane do okna kontekstu modelu — co AI zna i nad czym może rozumować. null = domyślny zestaw narzędzi użytkownika (zalecane). Podaj tablicę tylko dla skupionego, minimalnego kontekstu. Uwaga: availableTools kontroluje co faktycznie się wykonuje — to pole wpływa tylko na to, co model widzi.",
           toolId: {
             label: "ID narzędzia",
             description:
@@ -219,6 +219,10 @@ export const translations: typeof enTranslations = {
       label: "ID wiadomości nadrzędnej",
       description: "ID wiadomości nadrzędnej dla rozgałęzienia/wątku",
     },
+    leafMessageId: {
+      label: "ID wiadomości liścia",
+      description: "ID wiadomości liścia aktywnej gałęzi",
+    },
     messageHistory: {
       label: "Historia wiadomości",
       description: "Opcjonalna historia wiadomości dla trybu incognito",
@@ -273,9 +277,9 @@ export const translations: typeof enTranslations = {
       label: "Model",
       description: "Model AI do użycia podczas generowania",
     },
-    character: {
-      label: "Postać",
-      description: "Opcjonalna postać dla AI",
+    skill: {
+      label: "Umiejętność",
+      description: "Opcjonalna umiejętność dla AI",
     },
     systemPrompt: {
       label: "Prompt systemowy",
@@ -295,7 +299,7 @@ export const translations: typeof enTranslations = {
       label: "Strefa czasowa",
       description: "Strefa czasowa użytkownika dla stabilnych znaczników czasu",
     },
-    activeTool: {
+    availableTools: {
       label: "Może wykonywać",
       description:
         "Warstwa uprawnień wykonania — które narzędzia AI może faktycznie uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione.",
@@ -304,10 +308,10 @@ export const translations: typeof enTranslations = {
         description: "Alias lub pełna nazwa narzędzia, które AI może wykonać",
       },
     },
-    tools: {
+    pinnedTools: {
       label: "W kontekście (AI to widzi)",
       description:
-        "Narzędzia w oknie kontekstu modelu — co AI zna. null = domyślny zestaw użytkownika. allowedTools kontroluje rzeczywiste wykonanie.",
+        "Narzędzia w oknie kontekstu modelu — co AI zna. null = domyślny zestaw użytkownika. availableTools kontroluje rzeczywiste wykonanie.",
       toolId: {
         label: "ID narzędzia",
         description: "Alias lub pełna nazwa narzędzia w kontekście",
@@ -466,7 +470,7 @@ export const translations: typeof enTranslations = {
         "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
       noIdentifier: "Nie podano identyfikatora użytkownika lub leada",
       insufficientCredits:
-        "Niewystarczająca liczba kredytów do wykonania żądania",
+        "Niewystarczająca liczba kredytów do wykonania żądania (koszt: {{cost}}, saldo: {{balance}})",
       noResponseBody: "Nie otrzymano treści odpowiedzi ze strumienia",
     },
   },
@@ -491,6 +495,8 @@ export const translations: typeof enTranslations = {
     toolDisabledByUser:
       "To narzędzie zostało wyłączone przez użytkownika. Nie próbuj go ponownie wywoływać.",
     userDeclinedTool: "Wykonanie narzędzia zostało anulowane.",
+    pendingToolCall:
+      "Narzędzie jest nadal uruchomione w tle. Poczekaj na jego zakończenie przed kontynuowaniem.",
     streamError: "Odpowiedź AI nie mogła zostać ukończona. Spróbuj ponownie.",
     streamProcessingError:
       "Nie udało się przetworzyć odpowiedzi AI. Spróbuj ponownie.",
@@ -527,7 +533,7 @@ export const translations: typeof enTranslations = {
   },
   headless: {
     errors: {
-      missingModelOrCharacter:
+      missingModelOrSkill:
         "Model i charakter są wymagane — podaj je bezpośrednio lub podaj favoriteId z rozwiązywalnym wyborem modelu",
       favoriteNotFound:
         "Ulubiony nie znaleziony lub nie należy do tego użytkownika",
@@ -552,14 +558,27 @@ export const translations: typeof enTranslations = {
           title: "ID modelu",
           description: "Model AI dla wznowionego kroku.",
         },
-        characterId: {
+        skillId: {
           title: "ID postaci",
           description: "Postać/persona dla wznowionego kroku.",
         },
+        callbackMode: {
+          title: "Tryb callback",
+          description:
+            "Tryb callback oryginalnego wywołania narzędzia (wait lub wakeUp).",
+        },
         wakeUpToolMessageId: {
           title: "ID wiadomości narzędzia wakeUp",
+          description: "ID oryginalnej wiadomości narzędzia z wynikiem.",
+        },
+        wakeUpTaskId: {
+          title: "ID zadania wakeUp",
+          description: "ID zdalnego zadania cron, usuwane po wznowieniu.",
+        },
+        resumeTaskId: {
+          title: "ID zadania resume",
           description:
-            "ID oryginalnej wiadomości wywołania narzędzia wakeUp. Używane do wstrzyknięcia opóźnionej wiadomości z wynikiem.",
+            "ID tego zadania resume-stream cron, usuwane po wznowieniu.",
         },
         resumed: {
           title: "Wznowiony",
@@ -609,6 +628,84 @@ export const translations: typeof enTranslations = {
     uncensoredHandler: {
       errors: {
         apiError: "Błąd API Uncensored.ai ({{status}}): {{errorText}}",
+      },
+    },
+  },
+  onboarding: {
+    back: "Wstecz",
+    welcome: {
+      title: "Pomyśl o nas jak o swoim zespole AI.",
+      line1:
+        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu — cokolwiek jest potrzebne.",
+      line2:
+        "AI przełącza się między nimi automatycznie. Ty po prostu rozmawiasz.",
+      line3: "Skonfigurujmy cię w mniej niż minutę.",
+      continue: "Zaczynamy",
+    },
+    guest: {
+      title: "Przeglądasz jako gość",
+      line1:
+        "Twoje ustawienia, towarzysz i historia czatu są zapisywane lokalnie tylko na tym urządzeniu.",
+      line2:
+        "Zaloguj się, aby synchronizować wszystko między urządzeniami — i mieć pewność, że nigdy nie stracisz swojej konfiguracji.",
+      signIn: "Zaloguj się / Utwórz konto",
+      continueAnyway: "Kontynuuj jako gość",
+      note: "Możesz zalogować się później z menu w dowolnym momencie.",
+    },
+    companion: {
+      title: "Wybierz swojego towarzysza",
+      subtitle: "Twój główny partner do codziennych rozmów",
+      budgetTitle: "Jak zaawansowana ma być twoja AI?",
+      budgetSubtitle: "Możesz to zmienić w dowolnym momencie w ustawieniach",
+      next: "Dalej",
+      selectFirst: "Wybierz towarzysza, aby kontynuować",
+      budget: {
+        smart: {
+          label: "Smart",
+          desc: "Szybka, wydajna, dobrze radzi sobie z większością zadań",
+        },
+        brilliant: {
+          label: "Brilliant",
+          desc: "Najlepsza jakość — świetna do złożonych pytań, pisania i analizy",
+        },
+        max: {
+          label: "Max",
+          desc: "Najwyższe możliwości rozumowania, bez kompromisów — gdy naprawdę ma znaczenie",
+        },
+      },
+    },
+    usecases: {
+      title: "Do czego głównie będziesz tego używać?",
+      subtitle:
+        "Automatycznie dodamy odpowiednich specjalistów do zestawu narzędzi twojej AI.",
+      saving: "Konfigurowanie...",
+      start: "Rozpocznij czat",
+      skip: "Pomiń — skonfigruję to później",
+      noProviderAvailable:
+        "Brak skonfigurowanego dostawcy AI. Dodaj OPENROUTER_API_KEY lub włącz Claude Code (CLAUDE_CODE_ENABLED=true) aby kontynuować.",
+      coding: {
+        label: "Kodowanie & Technika",
+        hint: "Vibe Coder, Coder",
+      },
+      research: {
+        label: "Badania & Analiza",
+        hint: "Researcher, Data Analyst",
+      },
+      writing: {
+        label: "Pisanie & Edycja",
+        hint: "Writer, Editor",
+      },
+      business: {
+        label: "Biznes & Strategia",
+        hint: "Business Advisor, Product Manager",
+      },
+      learning: {
+        label: "Nauka & Edukacja",
+        hint: "Tutor, Socratic Questioner",
+      },
+      chat: {
+        label: "Po prostu rozmowy",
+        hint: "Twój towarzysz wystarczy",
       },
     },
   },

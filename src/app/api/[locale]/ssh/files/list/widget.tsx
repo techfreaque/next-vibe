@@ -67,7 +67,7 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
     (name: string): void => {
       const newPath =
         currentPath === "~" ? `~/${name}` : `${currentPath}/${name}`;
-      form?.setValue("path", newPath);
+      form.setValue("path", newPath);
       onSubmit?.();
     },
     [currentPath, form, onSubmit],
@@ -80,12 +80,12 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
     const parent = currentPath.includes("/")
       ? currentPath.slice(0, currentPath.lastIndexOf("/")) || "/"
       : "~";
-    form?.setValue("path", parent);
+    form.setValue("path", parent);
     onSubmit?.();
   }, [currentPath, form, onSubmit]);
 
   const handleGoHome = useCallback((): void => {
-    form?.setValue("path", "~");
+    form.setValue("path", "~");
     onSubmit?.();
   }, [form, onSubmit]);
 

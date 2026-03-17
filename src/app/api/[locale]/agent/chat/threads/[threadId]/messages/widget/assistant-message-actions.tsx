@@ -13,13 +13,12 @@ import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
 
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
-import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import {
   prepareTextForTTS,
   stripThinkTags,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
+import type { TtsVoice } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -28,7 +27,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useStreamingMessagesStore } from "../hooks/streaming-messages-store";
+import { useMessageItem } from "../hooks/use-message-item";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
@@ -55,6 +54,10 @@ interface AssistantMessageActionsProps {
   readOnly: boolean;
   /** User for TTS */
   user: JwtPayloadType;
+  /** TTS autoplay setting */
+  ttsAutoplay: boolean;
+  /** TTS voice preference */
+  ttsVoice: (typeof TtsVoice)[keyof typeof TtsVoice] | undefined;
   /** Credit deduction callback (null in read-only mode) */
   deductCredits: ((creditCost: number, feature: string) => void) | null;
   /** Vote callback — null when voting is not available */
@@ -82,6 +85,8 @@ export function AssistantMessageActions({
   creditCost,
   readOnly,
   user,
+  ttsAutoplay,
+  ttsVoice,
   deductCredits,
   onVote,
   userVote,
@@ -105,17 +110,9 @@ export function AssistantMessageActions({
     })();
   };
 
-  // Get settings directly
-  const { initialSettingsData } = useChatBootContext();
-  const { settings } = useChatSettings(user, logger, initialSettingsData);
-  const ttsAutoplay = settings?.ttsAutoplay ?? false;
-  const ttsVoice = settings?.ttsVoice;
-
-  // Check if this message is currently streaming
-  const streamingMessage = useStreamingMessagesStore(
-    (state) => state.streamingMessages[messageId],
-  );
-  const isMessageStreaming = streamingMessage?.isStreaming ?? false;
+  // Check if this message is currently streaming via per-item cache (O(1) per delta)
+  const liveMessage = useMessageItem(messageId);
+  const isMessageStreaming = liveMessage?.metadata?.isStreaming ?? false;
 
   // Prepare content for TTS (strip think tags, markdown, convert line breaks)
   const ttsText = prepareTextForTTS(stripThinkTags(content));

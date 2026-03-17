@@ -84,9 +84,8 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
         logger.debug("Using live index for file discovery");
         seedFiles = [...liveIndex.seedFiles];
       } else {
-        // eslint-disable-next-line i18next/no-literal-string
-        const apiCorePath = ["src", "app", "api", "[locale]"];
-        const startDir = join(process.cwd(), ...apiCorePath);
+        // Use template string to prevent Turbopack from statically tracing paths
+        const startDir = `${process.cwd()}/src/app/api/[locale]`;
 
         logger.debug("Discovering seed files");
         seedFiles = findFilesRecursively(startDir, "seeds.ts");

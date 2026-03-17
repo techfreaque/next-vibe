@@ -322,12 +322,17 @@ export class UnifiedTaskRunnerRepositoryImpl {
           threadId: undefined,
           aiMessageId: undefined,
           currentToolMessageId: undefined,
-          characterId: undefined,
+          callerToolCallId: undefined,
+          pendingToolMessages: undefined,
+          pendingTimeoutMs: undefined,
+          leafMessageId: undefined,
+          skillId: undefined,
           modelId: undefined,
           favoriteId: undefined,
           headless: undefined,
           waitingForRemoteResult: undefined,
           abortSignal: undefined,
+          escalateToTask: undefined,
         },
       });
 
@@ -378,7 +383,6 @@ export class UnifiedTaskRunnerRepositoryImpl {
             {
               lastExecutedAt: startedAt,
               lastExecutionStatus: CronTaskStatus.FAILED,
-              lastExecutionError: errorMsg,
               lastExecutionDuration: durationMs,
               executionCount: dbTask.executionCount + 1,
               errorCount: dbTask.errorCount + 1,
@@ -455,7 +459,6 @@ export class UnifiedTaskRunnerRepositoryImpl {
           {
             lastExecutedAt: startedAt,
             lastExecutionStatus: CronTaskStatus.COMPLETED,
-            lastExecutionError: null,
             lastExecutionDuration: durationMs,
             executionCount: newCount,
             successCount: dbTask.successCount + 1,
@@ -514,7 +517,6 @@ export class UnifiedTaskRunnerRepositoryImpl {
           {
             lastExecutedAt: startedAt,
             lastExecutionStatus: CronTaskStatus.FAILED,
-            lastExecutionError: errorMsg,
             lastExecutionDuration: durationMs,
             executionCount: dbTask.executionCount + 1,
             errorCount: dbTask.errorCount + 1,

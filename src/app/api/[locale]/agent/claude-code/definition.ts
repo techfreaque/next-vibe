@@ -1,8 +1,8 @@
 /**
  * Claude Code Run API Definition
  * POST endpoint that spawns `claude` CLI.
- * - headless:false (default) → interactive session (stdio inherited, user can participate)
- * - headless:true → non-interactive -p print mode, output collected and returned
+ * - interactiveMode:false (DEFAULT) → non-interactive `-p` print mode; output collected and returned programmatically. Use this for all automated tasks, cron jobs, and AI tool calls.
+ * - interactiveMode:true → interactive session; stdio inherited, user can watch/participate live. Only use when Max is actively watching the terminal.
  */
 
 import { z } from "zod";
@@ -112,7 +112,7 @@ const { POST } = createEndpoint({
         label: "claudeCode.run.post.fields.interactiveMode.label",
         description: "claudeCode.run.post.fields.interactiveMode.description",
         columns: 6,
-        schema: z.boolean().default(true),
+        schema: z.boolean().default(false),
       }),
       timeoutSeconds: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -191,7 +191,7 @@ const { POST } = createEndpoint({
       default: {
         prompt:
           "Add a new feature to the claude-code endpoint that tracks how many times it has been called.",
-        interactiveMode: true,
+        interactiveMode: false,
       },
       batch: {
         prompt:

@@ -6,6 +6,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { formatFavoritesSummary } from "../favorites-formatter";
+import type { FavoriteSummaryItem } from "../system-prompt/prompt";
 import { useChatFavorites } from "./hooks";
 
 /**
@@ -20,6 +21,7 @@ export function useFavoritesSummary(params: {
   user: JwtPayloadType;
   logger: EndpointLogger;
 }): {
+  favorites: FavoriteSummaryItem[];
   favoritesSummary: string;
   isLoading: boolean;
   error: string | null;
@@ -31,35 +33,40 @@ export function useFavoritesSummary(params: {
     activeFavoriteId: null,
   });
 
-  const favoritesSummary = useMemo(() => {
+  const favorites = useMemo((): FavoriteSummaryItem[] => {
     if (!shouldFetch) {
-      return "";
+      return [];
     }
 
     const response = favoritesHook.endpoint.read?.response;
     if (!response?.success) {
-      return "";
+      return [];
     }
 
-    const favorites = response.data?.favorites ?? [];
-
-    return formatFavoritesSummary(
-      favorites.map((fav) => ({
-        id: fav.id,
-        name: fav.name,
-        characterId: fav.characterId,
-        characterName: fav.name ?? null,
-        modelId: fav.modelId,
-        modelInfo: fav.modelInfo,
-        isActive: fav.activeBadge !== null,
-        position: fav.position,
-        useCount: 0,
-        lastUsedAt: null,
-      })),
-    );
+    return (response.data?.favorites ?? []).map((fav) => ({
+      id: fav.id,
+      name: fav.name,
+      skillId: fav.skillId,
+      characterName: fav.name ?? null,
+      modelId: fav.modelId,
+      modelInfo: fav.modelInfo,
+      isActive: fav.activeBadge !== null,
+      position: fav.position,
+      useCount: 0,
+      lastUsedAt: null,
+    }));
   }, [shouldFetch, favoritesHook.endpoint.read?.response]);
 
+  const favoritesSummary = useMemo(
+    () =>
+      favorites.length > 0 || shouldFetch
+        ? formatFavoritesSummary(favorites)
+        : "",
+    [favorites, shouldFetch],
+  );
+
   return {
+    favorites,
     favoritesSummary,
     isLoading: favoritesHook.isInitialLoading,
     error: null,

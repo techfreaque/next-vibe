@@ -64,7 +64,7 @@ export function CampaignStarterConfigContainer({
   const hasBeenSaved = savedData !== null && savedData !== undefined;
   const isPending = endpointMutations?.update?.isSubmitting;
 
-  const leadsPerWeek = form?.watch("leadsPerWeek") ?? {};
+  const leadsPerWeek = form.watch("leadsPerWeek") ?? {};
   const activeLocales = Object.keys(leadsPerWeek).filter(
     (loc) => typeof leadsPerWeek[loc] === "number" && leadsPerWeek[loc] > 0,
   );
@@ -150,10 +150,10 @@ export function CampaignStarterConfigContainer({
               {t("post.schedule.description")}
             </Span>
             <ScheduleAutocomplete
-              value={form?.watch("schedule") ?? ""}
-              onChange={(value) => form?.setValue("schedule", value)}
+              value={form.watch("schedule") ?? ""}
+              onChange={(value) => form.setValue("schedule", value)}
               onBlur={() => {
-                void form?.trigger("schedule");
+                void form.trigger("schedule");
               }}
               locale={locale}
             />
@@ -205,13 +205,13 @@ export function CampaignStarterConfigContainer({
                     value={leadsPerWeek[loc] ?? 0}
                     onChange={(e) => {
                       const num = e.target.value;
-                      const current = form?.getValues("leadsPerWeek") ?? {};
+                      const current = form.getValues("leadsPerWeek") ?? {};
                       if (Number.isNaN(num) || num < 1) {
                         const updated = { ...current };
                         delete updated[loc];
-                        form?.setValue("leadsPerWeek", updated);
+                        form.setValue("leadsPerWeek", updated);
                       } else {
-                        form?.setValue("leadsPerWeek", {
+                        form.setValue("leadsPerWeek", {
                           ...current,
                           [loc]: num,
                         });
@@ -230,8 +230,8 @@ export function CampaignStarterConfigContainer({
                     if (!loc) {
                       return;
                     }
-                    const current = form?.getValues("leadsPerWeek") ?? {};
-                    form?.setValue("leadsPerWeek", { ...current, [loc]: 50 });
+                    const current = form.getValues("leadsPerWeek") ?? {};
+                    form.setValue("leadsPerWeek", { ...current, [loc]: 50 });
                   }}
                 >
                   <SelectTrigger className="w-48 h-8 text-sm">

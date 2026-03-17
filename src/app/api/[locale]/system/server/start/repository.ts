@@ -15,6 +15,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { createNextjsFormatter } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { WebSocketServerHandle } from "@/app/api/[locale]/system/unified-interface/websocket/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
@@ -807,11 +808,12 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       this.nextServerProcess = nextProcess;
 
       // Pipe Next.js output so crashes are never silent
+      const formatNextjs = createNextjsFormatter();
       nextProcess.stdout?.on("data", (chunk: Buffer) => {
-        process.stdout.write(chunk);
+        process.stdout.write(formatNextjs(chunk.toString()));
       });
       nextProcess.stderr?.on("data", (chunk: Buffer) => {
-        process.stderr.write(chunk);
+        process.stderr.write(formatNextjs(chunk.toString()));
       });
       nextProcess.on("exit", (code, signal) => {
         if (code !== 0 && code !== null) {

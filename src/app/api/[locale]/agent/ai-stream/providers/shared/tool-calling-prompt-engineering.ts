@@ -102,22 +102,22 @@ MULTI-STEP WORKFLOW:
 - You may call the same tool again with DIFFERENT arguments (e.g. a refined search query, a different URL). Do NOT repeat the exact same call.
 - When your task requires multiple steps (search → read → summarize), work through each step. Call tools as needed, then write your final answer once you have all the information.
 
-STOP LOOP — noLoop:
-When a tool call needs no follow-up response (e.g. saving a memory), add "noLoop": true to the arguments. The system stops after that tool completes.
+STOP LOOP — callbackMode endLoop:
+When a tool call needs no follow-up response (e.g. saving a memory), add "callbackMode": "endLoop" to the arguments. The system stops after that tool completes.
 - Use for: ${MEMORY_ADD_ALIAS}, ${MEMORY_UPDATE_ALIAS}, ${MEMORY_DELETE_ALIAS}
-- Example: {"name": "${MEMORY_ADD_ALIAS}", "arguments": {"content": "...", "noLoop": true}}
+- Example: {"name": "${MEMORY_ADD_ALIAS}", "arguments": {"content": "...", "callbackMode": "endLoop"}}
 
 EXAMPLES:
 - Search: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
 - Multiple: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
 - With text: Let me search for that.\n<tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- With noLoop: I'll remember that.\n<tool_calls>[{"name": "${MEMORY_ADD_ALIAS}", "arguments": ${JSON.stringify({ ...memoryExample, noLoop: true })}}]</tool_calls>`;
+- With endLoop: I'll remember that.\n<tool_calls>[{"name": "${MEMORY_ADD_ALIAS}", "arguments": ${JSON.stringify({ ...memoryExample, callbackMode: "endLoop" })}}]</tool_calls>`;
 }
 
 /**
  * Parse tool calls from model response
  * Returns { textContent, toolCalls }
- * Note: noLoop is handled via tool arguments, not a separate flag
+ * Note: callbackMode endLoop is handled via tool arguments, not a separate flag
  */
 export function parseToolCalls(
   content: string,

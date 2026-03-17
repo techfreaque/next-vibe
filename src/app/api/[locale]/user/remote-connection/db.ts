@@ -1,6 +1,9 @@
 /**
- * User Remote Connection Database Schema
- * Stores per-user remote instance connection config (URL + JWT token)
+ * Remote Connection Database Schema
+ *
+ * Two tables:
+ * - `instance_identities` — per-user self-identity records (who am I?)
+ * - `remote_connections`  — actual outbound connections with tokens (who do I talk to?)
  */
 
 import { relations } from "drizzle-orm";
@@ -44,17 +47,23 @@ export interface RemoteToolCapability {
   isAsync: true;
   /** Tagged by the receiving side at sync time — not set by the generator */
   instanceId: string;
+  /** Pre-translated category label (e.g. "Chat", "System") */
+  category?: string;
+  /** Pre-translated tag labels */
+  tags?: string[];
+  /** Tool aliases (e.g. ["web-search"]) — first alias is preferred name */
+  aliases?: string[];
+  /** Credit cost per invocation (0 = free). Defaults to 0 when absent. */
+  credits?: number;
 }
 
-/**
- * User Remote Connection Table
- * One record per user+instance — supports multiple remote instances per user.
- * Token is stored as-is (caller responsible for secure transport).
- */
-export const userRemoteConnections = pgTable(
-  "user_remote_connections",
+// ─── Instance Identities ──────────────────────────────────────────────────────
+// Per-user self-identity records. Replaces the old token="self" pattern.
+// Each user can have their own instance identities (e.g. "hermes", "thea").
+
+export const instanceIdentities = pgTable(
+  "instance_identities",
   {
-    // Primary key
     id: uuid("id").primaryKey().defaultRandom(),
 
     // Owner
@@ -62,49 +71,112 @@ export const userRemoteConnections = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
 
-    // User-chosen identifier for this instance (e.g. "hermes", "raspi")
-    instanceId: text("instance_id").notNull().default("hermes"),
+    // Canonical identifier for this instance (e.g. "hermes", "thea")
+    instanceId: text("instance_id").notNull(),
 
-    // User-chosen friendly display name (e.g. "My Work Laptop")
-    friendlyName: text("friendly_name").notNull().default("hermes"),
+    // Human-friendly display name (e.g. "Hermes Dev", "Thea Cloud")
+    friendlyName: text("friendly_name").notNull(),
+
+    // Whether this is the default identity for this user
+    isDefault: boolean("is_default").notNull().default(false),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    unique("instance_identities_user_instance_unique").on(
+      t.userId,
+      t.instanceId,
+    ),
+  ],
+);
+
+export const instanceIdentitiesRelations = relations(
+  instanceIdentities,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [instanceIdentities.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const selectInstanceIdentitySchema =
+  createSelectSchema(instanceIdentities);
+export const insertInstanceIdentitySchema =
+  createInsertSchema(instanceIdentities);
+export type InstanceIdentity = z.infer<typeof selectInstanceIdentitySchema>;
+export type NewInstanceIdentity = z.infer<typeof insertInstanceIdentitySchema>;
+
+// ─── Remote Connections ───────────────────────────────────────────────────────
+// Actual outbound connections with encrypted JWT tokens.
+// No more token="self" rows — those live in instance_identities.
+
+export const remoteConnections = pgTable(
+  "remote_connections",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // Owner
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    // Local label for the remote (e.g. "thea" when hermes connects to thea)
+    instanceId: text("instance_id").notNull(),
+
+    // User-chosen friendly display name for this connection
+    friendlyName: text("friendly_name").notNull(),
 
     // Remote instance URL (e.g. "https://unbottled.ai")
     remoteUrl: text("remote_url").notNull(),
 
-    // JWT token from remote login (null on cloud-side records — cloud never calls local)
+    // JWT token from remote login (encrypted with AES-256-GCM)
     token: text("token"),
 
-    // Lead cookie ID preserved across token refreshes (local-side only)
+    // Lead cookie ID preserved across token refreshes
     leadId: text("lead_id"),
 
-    // URL of the local instance (cloud-side records only — so cloud knows where local lives)
+    // URL of the local instance (cloud-side records: so cloud knows where local lives)
     localUrl: text("local_url"),
 
-    // The instanceId that the remote uses to identify itself (returned by register endpoint).
-    // Dev stores cloud's instanceId here so the AI can call execute-tool(instanceId="hermes").
+    // The instanceId the remote uses to identify itself (from register endpoint)
     remoteInstanceId: text("remote_instance_id"),
+
+    // What the remote calls itself — synced bidirectionally
+    remoteFriendlyName: text("remote_friendly_name"),
+
+    // Whether the local instance is directly reachable via HTTP (not behind NAT).
+    // Set at connect time by pinging localUrl; re-checked on each sync.
+    // true  → prefer direct HTTP for remote tool calls (fast path).
+    // false → fall back to task-queue pull (~1 min latency).
+    isDirectlyAccessible: boolean("is_directly_accessible")
+      .notNull()
+      .default(false),
 
     // Whether this connection is active
     isActive: boolean("is_active").notNull().default(true),
 
+    // Whether this is the default connection for --remote (one per user)
+    isDefault: boolean("is_default").notNull().default(false),
+
     // Last time a sync was triggered
     lastSyncedAt: timestamp("last_synced_at"),
 
-    // Tool manifest snapshot from local instance — updated on capability version change
+    // Tool manifest snapshot — updated on capability version change
     capabilities: jsonb("capabilities").$type<RemoteToolCapability[]>(),
 
-    // Build version string from local instance (git SHA / package version)
-    // Changes only on deploy — used to skip unchanged capability snapshots
+    // Build version string from remote (git SHA / package version)
     capabilitiesVersion: text("capabilities_version"),
 
-    // SHA256 of sorted "id:updatedAt" pairs for all shared memories on this side
-    // Stored so the sync handler can diff without a full table scan
+    // SHA256 of sorted "id:updatedAt" pairs for shared memories
     memoriesHash: text("memories_hash"),
 
-    // Last memoriesHash received from the remote side — for diffing their state
+    // Last memoriesHash received from the remote side
     remoteMemoriesHash: text("remote_memories_hash"),
 
-    // ISO timestamp — return REMOTE_TOOL_CALL tasks created after this cursor on next sync
+    // ISO timestamp — return REMOTE_TOOL_CALL tasks after this cursor
     taskCursor: text("task_cursor"),
 
     // Timestamps
@@ -112,50 +184,26 @@ export const userRemoteConnections = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (t) => [
-    unique("user_remote_connections_user_instance_unique").on(
+    unique("remote_connections_user_instance_unique").on(
       t.userId,
       t.instanceId,
     ),
   ],
 );
 
-/**
- * Relations
- */
-export const userRemoteConnectionsRelations = relations(
-  userRemoteConnections,
+export const remoteConnectionsRelations = relations(
+  remoteConnections,
   ({ one }) => ({
     user: one(users, {
-      fields: [userRemoteConnections.userId],
+      fields: [remoteConnections.userId],
       references: [users.id],
     }),
   }),
 );
 
-/**
- * Schema for selecting remote connections
- */
-export const selectUserRemoteConnectionSchema = createSelectSchema(
-  userRemoteConnections,
-);
-
-/**
- * Schema for inserting remote connections
- */
-export const insertUserRemoteConnectionSchema = createInsertSchema(
-  userRemoteConnections,
-);
-
-/**
- * Type for remote connection model
- */
-export type UserRemoteConnection = z.infer<
-  typeof selectUserRemoteConnectionSchema
->;
-
-/**
- * Type for new remote connection model
- */
-export type NewUserRemoteConnection = z.infer<
-  typeof insertUserRemoteConnectionSchema
->;
+export const selectRemoteConnectionSchema =
+  createSelectSchema(remoteConnections);
+export const insertRemoteConnectionSchema =
+  createInsertSchema(remoteConnections);
+export type RemoteConnection = z.infer<typeof selectRemoteConnectionSchema>;
+export type NewRemoteConnection = z.infer<typeof insertRemoteConnectionSchema>;

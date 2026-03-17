@@ -8,17 +8,23 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { Input } from "next-vibe-ui/ui/input";
+import { Label } from "next-vibe-ui/ui/label";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
+import { Textarea } from "next-vibe-ui/ui/textarea";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/constants";
+import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -40,9 +46,13 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 import type { ModelSelectionSimple } from "../../../models/types";
 import {
   ToolsConfigEdit,
+  type ToolEntry,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
-import { useCharacter } from "../../characters/[id]/hooks";
+import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+
+import { useSkill } from "../../skills/[id]/hooks";
 import { useChatSettings } from "../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import { CompactTriggerEdit } from "../../settings/widget";
@@ -74,48 +84,64 @@ export function FavoriteEditContainer({
   const navigation = useWidgetNavigation();
   const isSubmitting = useWidgetIsSubmitting();
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
-  const characterId = form?.watch("characterId");
-  const isNoCharacter = characterId === NO_CHARACTER_ID;
+  const skillId = form.watch("skillId");
+  const isNoSkill = skillId === NO_SKILL_ID;
   const isPublic = user.isPublic;
 
   const favoriteModelSelection: ModelSelectionSimple | undefined =
-    form?.watch("modelSelection") ?? undefined;
+    form.watch("modelSelection") ?? undefined;
 
-  const characterEndpoint = useCharacter(characterId ?? "", user, logger);
+  const characterEndpoint = useSkill(skillId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
 
   // Get settings to check if this favorite is active
   const settingsOps = useChatSettings(user, logger);
 
   // Check if this favorite is currently active
-  const favoriteId = form?.watch("id");
+  const favoriteId = form.watch("id");
   const isActiveFavorite =
     settingsOps.settings?.activeFavoriteId === favoriteId;
 
   // Stable props
   const emptyField = useMemo(() => ({}), []);
 
-  const watchedAllowedTools = form?.watch("allowedTools") ?? null;
-  const watchedPinnedTools = form?.watch("pinnedTools") ?? null;
+  const watchedAllowedTools = form.watch("availableTools") ?? null;
+  const watchedPinnedTools = form.watch("pinnedTools") ?? null;
+  const watchedDeniedTools = form.watch("deniedTools") ?? null;
+  const watchedPromptAppend = form.watch("promptAppend") ?? "";
 
   const toolsValue = useMemo(
     () => ({
-      allowedTools: watchedAllowedTools,
+      availableTools: watchedAllowedTools,
       pinnedTools: watchedPinnedTools,
     }),
     [watchedAllowedTools, watchedPinnedTools],
   );
 
   const handleToolsChange = useCallback(
-    ({ allowedTools, pinnedTools }: ToolsConfigValue) => {
-      form?.setValue("allowedTools", allowedTools, { shouldDirty: true });
-      form?.setValue("pinnedTools", pinnedTools, { shouldDirty: true });
+    ({ availableTools, pinnedTools }: ToolsConfigValue) => {
+      form.setValue("availableTools", availableTools, { shouldDirty: true });
+      form.setValue("pinnedTools", pinnedTools, { shouldDirty: true });
     },
     [form],
   );
 
-  const handleCustomizeCharacter = async (): Promise<void> => {
-    if (!characterId || isNoCharacter) {
+  const handleDeniedToolsChange = useCallback(
+    (denied: ToolEntry[] | null) => {
+      form.setValue("deniedTools", denied, { shouldDirty: true });
+    },
+    [form],
+  );
+
+  const handlePromptAppendChange = useCallback(
+    (value: string) => {
+      form.setValue("promptAppend", value || null, { shouldDirty: true });
+    },
+    [form],
+  );
+
+  const handleCustomizeSkill = async (): Promise<void> => {
+    if (!skillId || isNoSkill) {
       return;
     }
 
@@ -125,11 +151,10 @@ export function FavoriteEditContainer({
       setShowSignupPrompt(true);
     } else {
       // Navigate to character edit for authenticated users
-      const characterDefinitions =
-        await import("../../characters/[id]/definition");
+      const characterDefinitions = await import("../../skills/[id]/definition");
 
       navigation.push(characterDefinitions.default.PATCH, {
-        urlPathParams: { id: characterId },
+        urlPathParams: { id: skillId },
         getEndpoint: characterDefinitions.default.GET,
         popNavigationOnSuccess: 1,
         prefillFromGet: true,
@@ -154,8 +179,7 @@ export function FavoriteEditContainer({
   };
 
   const handleUseThisFavorite = async (): Promise<void> => {
-    const activatingFavoriteId = navigation.current?.params?.urlPathParams
-      ?.id as string | undefined;
+    const activatingFavoriteId = navigation.current?.params?.urlPathParams?.id;
 
     if (!activatingFavoriteId) {
       logger.error("Cannot activate favorite - missing favorite ID");
@@ -180,13 +204,13 @@ export function FavoriteEditContainer({
       : undefined;
 
     const modelId = favorite?.modelId ?? null;
-    const currentCharacterId = favorite?.characterId ?? null;
+    const currentSkillId = favorite?.skillId ?? null;
     const currentVoice = favorite?.voice ?? null;
 
     await ChatSettingsRepositoryClient.selectFavorite({
       favoriteId: activatingFavoriteId,
       modelId,
-      characterId: currentCharacterId,
+      skillId: currentSkillId,
       voice: currentVoice,
       logger,
       locale,
@@ -267,7 +291,7 @@ export function FavoriteEditContainer({
             label: undefined,
           }}
         />
-        {(form?.formState.isDirty || isSubmitting) && (
+        {(form.formState.isDirty || isSubmitting) && (
           <>
             <SubmitButtonWidget<typeof definitionPatch.PATCH>
               field={{
@@ -302,8 +326,8 @@ export function FavoriteEditContainer({
         />
 
         <Div className="flex flex-col gap-4">
-          {/* Character Info Card with Editable Icon integrated */}
-          {!isNoCharacter && (
+          {/* Skill Info Card with Editable Icon integrated */}
+          {!isNoSkill && (
             <Div className="flex flex-col gap-3">
               <Div className="flex items-start gap-4 p-6 rounded-xl border bg-card transition-colors">
                 {/* Editable Icon Field in icon position */}
@@ -311,7 +335,7 @@ export function FavoriteEditContainer({
                   <IconFieldWidget fieldName="icon" field={children.icon} />
                 </Div>
 
-                {/* Character Content */}
+                {/* Skill Content */}
                 <Div className="flex-1 min-w-0 space-y-2">
                   <Div className="flex items-baseline gap-2 flex-wrap">
                     <Span className="text-lg font-semibold text-foreground">
@@ -344,16 +368,16 @@ export function FavoriteEditContainer({
 
               {/* Action Buttons */}
               <Div className="flex flex-col gap-2">
-                {/* Customize Character Button */}
+                {/* Customize Skill Button */}
                 <Button
                   type="button"
                   variant="outline"
                   size="default"
-                  onClick={handleCustomizeCharacter}
+                  onClick={handleCustomizeSkill}
                   className="gap-2"
                 >
                   <Settings className="h-4 w-4" />
-                  {t("patch.customizeCharacterButton.label")}
+                  {t("patch.customizeSkillButton.label")}
                 </Button>
               </Div>
             </Div>
@@ -371,9 +395,9 @@ export function FavoriteEditContainer({
             <CheckCircle className="h-4 w-4" />
             {isActiveFavorite
               ? t("patch.currentlyActiveButton.label")
-              : isNoCharacter
+              : isNoSkill
                 ? t("patch.useThisModelButton.label")
-                : t("patch.useThisCharacterButton.label")}
+                : t("patch.useThisSkillButton.label")}
           </Button>
 
           <SelectFieldWidget fieldName="voice" field={children.voice} />
@@ -386,7 +410,7 @@ export function FavoriteEditContainer({
                 })
               }
               characterModelSelection={
-                isNoCharacter ? undefined : characterData?.modelSelection
+                isNoSkill ? undefined : characterData?.modelSelection
               }
               locale={locale}
               user={user}
@@ -415,15 +439,209 @@ export function FavoriteEditContainer({
               user={user}
               logger={logger}
               label={t("patch.slotOverride.label")}
-              characterAllowedTools={characterData?.allowedTools ?? null}
-              characterPinnedTools={characterData?.pinnedTools ?? null}
+              skillAvailableTools={characterData?.availableTools ?? null}
+              skillPinnedTools={characterData?.pinnedTools ?? null}
             />
+          )}
+
+          {/* Denied tools — block specific tools for this slot */}
+          {form && (
+            <DeniedToolsEdit
+              value={watchedDeniedTools}
+              onChange={handleDeniedToolsChange}
+              user={user}
+              logger={logger}
+              label={t("patch.deniedTools.label")}
+              description={t("patch.deniedTools.description")}
+            />
+          )}
+
+          {/* Prompt append — extra instructions for this slot */}
+          {form && (
+            <Div className="flex flex-col gap-2">
+              <Label className="text-sm font-medium">
+                {t("patch.promptAppend.label")}
+              </Label>
+              <Span className="text-xs text-muted-foreground">
+                {t("patch.promptAppend.description")}
+              </Span>
+              <Textarea
+                value={watchedPromptAppend ?? ""}
+                onChange={(e) => handlePromptAppendChange(e.target.value)}
+                placeholder={t("patch.promptAppend.placeholder")}
+                minRows={3}
+                maxRows={10}
+              />
+            </Div>
           )}
         </Div>
       </Div>
     </Div>
   );
 }
+
+// ─── Denied Tools Edit ────────────────────────────────────────────────────────
+
+/* eslint-disable oxlint-plugin-i18n/no-literal-string */
+function DeniedToolsEdit({
+  value,
+  onChange,
+  user,
+  logger,
+  label,
+  description,
+}: {
+  value: ToolEntry[] | null;
+  onChange: (denied: ToolEntry[] | null) => void;
+  user: ReturnType<typeof useWidgetUser>;
+  logger: ReturnType<typeof useWidgetLogger>;
+  label: string;
+  description: string;
+}): JSX.Element {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const helpEndpoint = useEndpoint(
+    helpDefinitions,
+    {
+      read: {
+        queryOptions: {
+          staleTime: 5 * 60 * 1000,
+          refetchOnWindowFocus: false,
+        },
+      },
+    },
+    logger,
+    user,
+  );
+
+  const availableTools = useMemo(
+    () => helpEndpoint.read?.data?.tools ?? [],
+    [helpEndpoint.read?.data],
+  );
+
+  const deniedSet = useMemo(
+    () => new Set((value ?? []).map((t) => t.toolId)),
+    [value],
+  );
+
+  const filteredTools = useMemo(() => {
+    if (!searchQuery) {
+      return availableTools;
+    }
+    const q = searchQuery.toLowerCase();
+    return availableTools.filter(
+      (t) =>
+        t.name.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        t.aliases?.some((a) => a.toLowerCase().includes(q)),
+    );
+  }, [availableTools, searchQuery]);
+
+  const handleToggle = (toolId: string): void => {
+    if (deniedSet.has(toolId)) {
+      const next = (value ?? []).filter((t) => t.toolId !== toolId);
+      onChange(next.length === 0 ? null : next);
+    } else {
+      onChange([...(value ?? []), { toolId, requiresConfirmation: false }]);
+    }
+  };
+
+  const handleReset = (): void => {
+    onChange(null);
+  };
+
+  const deniedCount = value?.length ?? 0;
+
+  return (
+    <Div className="rounded-xl border bg-card flex flex-col">
+      <Div
+        className="flex items-center gap-3 p-4 cursor-pointer hover:bg-accent/30 transition-colors rounded-xl"
+        onClick={() => setIsExpanded((v) => !v)}
+      >
+        <X className="h-4 w-4 text-destructive flex-shrink-0" />
+        <Div className="flex-1 flex flex-col gap-0.5">
+          <Span className="text-sm font-semibold">{label}</Span>
+          {!isExpanded && (
+            <Span className="text-xs text-muted-foreground">{description}</Span>
+          )}
+        </Div>
+        {deniedCount > 0 && (
+          <Span className="text-xs text-destructive font-medium">
+            {deniedCount} blocked
+          </Span>
+        )}
+        {isExpanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        )}
+      </Div>
+
+      {isExpanded && (
+        <Div className="border-t flex flex-col gap-3 p-4">
+          <Div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Search tools..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1"
+            />
+            {deniedCount > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+              >
+                Clear all
+              </Button>
+            )}
+          </Div>
+
+          <Div className="flex flex-col divide-y border rounded-lg overflow-y-auto max-h-[30dvh]">
+            {filteredTools.length === 0 ? (
+              <Div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                No tools found
+              </Div>
+            ) : (
+              filteredTools.map((tool) => {
+                const isDenied = deniedSet.has(tool.id);
+                return (
+                  <Div
+                    key={tool.id}
+                    className="flex items-center gap-3 px-3 py-2 hover:bg-accent/20 cursor-pointer transition-colors"
+                    onClick={() => handleToggle(tool.id)}
+                  >
+                    <Div className="flex-1 min-w-0">
+                      <Span className="text-xs font-medium block truncate">
+                        {tool.title || tool.aliases?.[0] || tool.id}
+                      </Span>
+                      <Span className="text-[10px] text-muted-foreground block truncate">
+                        {tool.description}
+                      </Span>
+                    </Div>
+                    {isDenied && (
+                      <Span className="text-[10px] text-destructive font-medium shrink-0">
+                        blocked
+                      </Span>
+                    )}
+                  </Div>
+                );
+              })
+            )}
+          </Div>
+
+          <Span className="text-[10px] text-muted-foreground">
+            Blocked tools cannot be called regardless of other settings.
+          </Span>
+        </Div>
+      )}
+    </Div>
+  );
+}
+/* eslint-enable oxlint-plugin-i18n/no-literal-string */
 
 /**
  * Save & Use Button Component
@@ -480,9 +698,9 @@ function SaveAndUseButton({
         // Determine the model to use
         let modelId = null;
         if (favoriteData.modelSelection) {
-          const { CharactersRepositoryClient } =
-            await import("../../characters/repository-client");
-          const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
+          const { SkillsRepositoryClient } =
+            await import("../../skills/repository-client");
+          const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
             favoriteData.modelSelection,
             undefined,
             user,
@@ -494,7 +712,7 @@ function SaveAndUseButton({
         await ChatSettingsRepositoryClient.selectFavorite({
           favoriteId,
           modelId,
-          characterId: favoriteData.characterId || null,
+          skillId: favoriteData.skillId || null,
           voice: favoriteData.voice || null,
           logger,
           locale,

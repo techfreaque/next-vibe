@@ -56,7 +56,7 @@ export const translations = {
       description: "Private, Incognito, Shared, Public",
     },
     characters: {
-      title: "AI Characters",
+      title: "AI Skills",
       description: "Custom & community characters",
     },
   },

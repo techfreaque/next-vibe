@@ -8,9 +8,16 @@ import "./reconciler-polyfill";
 
 import { Chalk } from "chalk";
 import cliBoxes from "cli-boxes";
+import { parseError } from "next-vibe/shared/utils/parse-error";
+
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { BoxProps, StaticProps, TextProps } from "ink";
 import { Box, Static, Text } from "ink";
-import type { JSXElementConstructor, ReactElement, ReactNode } from "react";
+import React, {
+  type JSXElementConstructor,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import Reconciler from "react-reconciler";
 import {
   DefaultEventPriority,
@@ -19,6 +26,44 @@ import {
 
 // NoEventPriority is available at runtime but not in type definitions
 const NoEventPriority = 0;
+
+// ============================================================================
+// ERROR BOUNDARY - Catches render errors so they can be logged
+// ============================================================================
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  onError: (error: Error) => void;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class RenderErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error): void {
+    this.props.onError(error);
+  }
+
+  render(): ReactNode {
+    if (this.state.hasError) {
+      return null;
+    }
+    return this.props.children;
+  }
+}
 
 // Force chalk to output ANSI codes (level 3 = TrueColor support)
 const chalk = new Chalk({ level: 3 });
@@ -1167,7 +1212,10 @@ let reconciler: ExtendedReconciler | null = null;
  * Error callbacks on createContainer surface reconciler-internal errors that
  * would otherwise be swallowed silently (e.g. missing dispatcher methods).
  */
-function renderWithReconciler(element: ReactElement): RenderNode | null {
+function renderWithReconciler(
+  element: ReactElement,
+  logger: EndpointLogger,
+): RenderNode | null {
   if (!reconciler) {
     reconciler = createStaticReconciler() as ExtendedReconciler;
   }
@@ -1181,16 +1229,44 @@ function renderWithReconciler(element: ReactElement): RenderNode | null {
     false,
     null,
     "fast-renderer",
-    noop,
+    (err: Error) => {
+      logger.error(
+        "[Fast Renderer] Reconciler recoverable error:",
+        parseError(err),
+      );
+    },
     null,
   );
 
+  let boundaryError: Error | null = null;
+  const boundaryProps: ErrorBoundaryProps = {
+    onError: (err: Error) => {
+      boundaryError = err;
+    },
+    children: element,
+  };
+  const wrapped = React.createElement(RenderErrorBoundary, boundaryProps);
+
   try {
     // Use same render pattern as Ink: updateContainerSync then flushSyncWork
-    reconciler.updateContainerSync(element, root, null, noop);
+    reconciler.updateContainerSync(wrapped, root, null, noop);
     reconciler.flushSyncWork();
-  } catch {
+  } catch (err) {
+    logger.error("[Fast Renderer] Reconciler error:", parseError(err));
     return null;
+  }
+
+  if (boundaryError) {
+    logger.error(
+      "[Fast Renderer] Render error caught by boundary:",
+      parseError(boundaryError),
+    );
+  }
+
+  if (!container.node) {
+    logger.error(
+      "[Fast Renderer] Reconciler produced no output (container.node is null)",
+    );
   }
 
   return container.node;
@@ -1265,9 +1341,12 @@ function renderNode(node: RenderNode): string {
  * console.log(output);
  * ```
  */
-export function renderToString(element: ReactElement): string {
+export function renderToString(
+  element: ReactElement,
+  logger: EndpointLogger,
+): string {
   // ALWAYS use reconciler for everything - it handles contexts, hooks, everything properly
-  const resolved = renderWithReconciler(element);
+  const resolved = renderWithReconciler(element, logger);
 
   if (!resolved) {
     return "";

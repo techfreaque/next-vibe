@@ -88,6 +88,11 @@ export const translations: typeof enTranslations = {
         description:
           "Filtruj do narzędzi z określonej zdalnej instancji. Zwraca narzędzia z przechowywanego snapshotu możliwości.",
       },
+      statsFilter: {
+        label: "Filtr narzędzi",
+        description:
+          "Pokaż wszystkie, tylko przypięte lub tylko dozwolone narzędzia",
+      },
     },
     success: {
       title: "Narzędzia pobrane pomyślnie",
@@ -309,12 +314,20 @@ export const translations: typeof enTranslations = {
       confirmOn: "Prosi o potwierdzenie — kliknij aby wyłączyć",
       confirmOff: "Uruchamia automatycznie — kliknij aby wymagać potwierdzenia",
     },
+
     platformFilter: {
       all: "Wszystkie platformy",
       cli: "CLI",
+      cliPackage: "CLI Pkg",
       mcp: "MCP",
       ai: "AI",
       web: "Web",
+      cron: "Cron",
+      electron: "Desktop",
+      frame: "Frame",
+      skill: "Skill",
+      nextPage: "Next Page",
+      nextApi: "Next API",
     },
     envFilter: {
       development: "Rozwojowe",

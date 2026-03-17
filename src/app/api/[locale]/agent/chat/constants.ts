@@ -13,12 +13,6 @@ import { SQL_ALIAS } from "../../system/db/sql/constants";
 import { TOOL_HELP_ALIAS } from "../../system/help/constants";
 import { REBUILD_ALIAS } from "../../system/server/rebuild/constants";
 import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/constants";
-import { COMPLETE_TASK_ALIAS } from "../../system/unified-interface/tasks/complete-task/constants";
-import { CRON_DASHBOARD_ALIAS } from "../../system/unified-interface/tasks/cron/dashboard/constants";
-import {
-  CRON_CREATE_ALIAS,
-  CRON_LIST_ALIAS,
-} from "../../system/unified-interface/tasks/cron/tasks/constants";
 import { WAIT_FOR_TASK_ALIAS } from "../../system/unified-interface/tasks/wait-for-task/constants";
 import { AI_RUN_ALIAS } from "../ai-stream/run/constants";
 import { CLAUDE_CODE_ALIAS } from "../claude-code/constants";
@@ -80,20 +74,16 @@ export const DEFAULT_TOOL_IDS = [
 /**
  * Default remote tools made available (enabled) when a remote instance is connected.
  * These are unprefixed tool IDs — the instanceId prefix (e.g. "hermes__") is added
- * at connect time when writing into the user's allowedTools setting.
+ * at connect time when writing into the user's availableTools setting.
  *
  * Mirrors DEFAULT_TOOL_IDS: same pinned/available distinction, same reset-to-defaults
  * behaviour. User can add/remove tools and promote any to pinned via the tool settings UI.
  */
 export const DEFAULT_REMOTE_TOOL_IDS = [
   CLAUDE_CODE_ALIAS,
-  CRON_LIST_ALIAS,
-  CRON_CREATE_ALIAS,
   SSH_EXEC_ALIAS,
   SSH_FILES_READ_ALIAS,
   SSH_FILES_WRITE_ALIAS,
-  MEMORY_LIST_ALIAS,
-  MEMORY_ADD_ALIAS,
 ] as const;
 
 /**
@@ -112,8 +102,6 @@ const LOCAL_ADMIN_EXTRA_TOOL_IDS = [
   CLAUDE_CODE_ALIAS,
   SQL_ALIAS,
   REBUILD_ALIAS,
-  CRON_DASHBOARD_ALIAS,
-  COMPLETE_TASK_ALIAS,
 ] as const;
 
 /**

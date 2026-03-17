@@ -13,7 +13,7 @@ import {
   ModelSortField,
   PriceLevel,
   SpeedLevel,
-} from "@/app/api/[locale]/agent/chat/characters/enum";
+} from "@/app/api/[locale]/agent/chat/skills/enum";
 import { ModelId } from "@/app/api/[locale]/agent/models/models";
 
 /**

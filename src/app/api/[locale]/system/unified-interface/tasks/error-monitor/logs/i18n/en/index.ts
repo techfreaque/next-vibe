@@ -4,6 +4,13 @@ export const translations = {
   errors: {
     repositoryInternalError: "An internal error occurred",
     fetchErrorLogs: "Failed to fetch error logs",
+    updateErrorLog: "Failed to update error log status",
+  },
+
+  statusFilter: {
+    all: "All",
+    active: "Active",
+    resolved: "Resolved",
   },
 
   get: {
@@ -13,36 +20,19 @@ export const translations = {
       monitoring: "Monitoring",
     },
     fields: {
-      source: {
-        label: "Source",
-        description: "Filter by error source",
-        options: {
-          backend: "Backend",
-          task: "Task",
-          chat: "Chat",
-        },
+      status: {
+        label: "Status",
+        description: "Filter by resolved status",
       },
-      level: {
-        label: "Level",
-        description: "Filter by error level",
-        options: {
-          error: "Error",
-          warn: "Warning",
-        },
-      },
-      endpoint: {
-        label: "Endpoint",
-        description: "Filter by endpoint path (partial match)",
-        placeholder: "Enter endpoint",
+      search: {
+        label: "Search",
+        description: "Search in error messages",
+        placeholder: "Search messages...",
       },
       errorType: {
         label: "Error Type",
         description: "Filter by error type classification",
         placeholder: "e.g. INTERNAL_ERROR",
-      },
-      fingerprint: {
-        label: "Fingerprint",
-        description: "Filter by error group fingerprint",
       },
       startDate: {
         label: "From",
@@ -119,6 +109,79 @@ export const translations = {
     },
   },
 
+  patch: {
+    title: "Update Error Log",
+    description: "Resolve or reopen an error log by fingerprint",
+    tags: {
+      monitoring: "Monitoring",
+    },
+    fields: {
+      fingerprint: {
+        label: "Fingerprint",
+        description: "The fingerprint of the error log",
+        placeholder: "Enter fingerprint",
+      },
+      resolved: {
+        label: "Resolved",
+        description: "Set to true to resolve, false to reopen",
+      },
+    },
+    response: {
+      fingerprint: {
+        title: "Fingerprint",
+      },
+      resolved: {
+        title: "Resolved",
+      },
+      affectedRows: {
+        title: "Affected Rows",
+      },
+    },
+    success: {
+      title: "Log Updated",
+      description: "Error log status updated successfully",
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request parameters",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Access denied",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Error log not found",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred",
+      },
+      server: {
+        title: "Server Error",
+        description: "Failed to update error log",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      unsavedChanges: {
+        titleChanges: "Unsaved Changes",
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "Data conflict occurred",
+      },
+    },
+  },
+
   widget: {
     title: "Error Logs",
     loading: "Loading logs...",
@@ -126,14 +189,23 @@ export const translations = {
     header: {
       refresh: "Refresh",
       runScan: "Run Scan",
+      back: "Back",
+      activeCount: "active",
     },
     col: {
-      level: "Level",
-      source: "Source",
       message: "Message",
-      endpoint: "Endpoint",
       errorType: "Error Type",
-      createdAt: "Time",
+      occurrences: "Occurrences",
+      firstSeen: "First Seen",
+      createdAt: "Last Seen",
+    },
+    status: {
+      active: "Active",
+      resolved: "Resolved",
+    },
+    action: {
+      resolve: "Resolve",
+      reopen: "Reopen",
     },
     detail: {
       stackTrace: "Stack Trace",

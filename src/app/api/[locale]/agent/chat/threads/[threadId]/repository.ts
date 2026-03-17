@@ -95,7 +95,7 @@ export class ThreadByIdRepository {
         folderId: thread.folderId,
         status: thread.status,
         defaultModel: thread.defaultModel,
-        defaultCharacter: thread.defaultCharacter,
+        defaultSkill: thread.defaultSkill,
         systemPrompt: thread.systemPrompt,
         pinned: thread.pinned,
         archived: thread.archived,

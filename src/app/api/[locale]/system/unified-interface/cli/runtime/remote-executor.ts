@@ -2,7 +2,7 @@
  * Remote Executor (CLI)
  *
  * Executes commands on a remote host via HTTP.
- * Session is always DB-backed via user_remote_connections table.
+ * Session is always DB-backed via remote_connections table.
  * No file-based session storage for remote.
  *
  * Login: bootstraps leadId, POSTs credentials to remote, stores JWT in DB.
@@ -36,7 +36,7 @@ import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { Methods } from "../../shared/types/enums";
 import { getRemoteSession } from "../auth/remote-session-cache";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
-import type { CliRequestData } from "./parsing";
+import type { CliRequestData } from "./cli-request-data";
 
 interface DecodedJwtPayload {
   id?: string;
@@ -195,7 +195,7 @@ interface RemoteResponse {
 export class RemoteExecutor {
   /**
    * Execute an endpoint on a remote host via HTTP.
-   * Session is always read from user_remote_connections DB table.
+   * Session is always read from remote_connections DB table.
    * userId is required — remote execution requires an authenticated local user.
    */
   static async execute(params: {
@@ -286,12 +286,17 @@ export class RemoteExecutor {
 
     if (isLogoutEndpoint && response.ok && userId) {
       const { db } = await import("@/app/api/[locale]/system/db");
-      const { userRemoteConnections } =
+      const { remoteConnections } =
         await import("@/app/api/[locale]/user/remote-connection/db");
-      const { eq } = await import("drizzle-orm");
+      const { eq, and } = await import("drizzle-orm");
       await db
-        .delete(userRemoteConnections)
-        .where(eq(userRemoteConnections.userId, userId));
+        .delete(remoteConnections)
+        .where(
+          and(
+            eq(remoteConnections.userId, userId),
+            eq(remoteConnections.remoteUrl, resolvedRemoteUrl),
+          ),
+        );
 
       logger.info(`[REMOTE] Logged out from ${resolvedRemoteUrl}`);
     }

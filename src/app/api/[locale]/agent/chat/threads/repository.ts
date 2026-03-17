@@ -50,11 +50,7 @@ import type {
 } from "./definition";
 import { scopedTranslation, type ThreadsT } from "./i18n";
 
-/**
- * Generate thread title from first message
- * Truncates content to max 50 characters at word boundary
- */
-export function generateThreadTitle(content: string): string {
+function generateThreadTitle(content: string): string {
   const maxLength = 50;
   const minLastSpace = 20;
   const ellipsis = "...";
@@ -137,11 +133,7 @@ async function verifyExistingThread(params: {
   return success(threadId);
 }
 
-/**
- * Ensure thread exists or create new one with permission checks
- * Used by AI streaming to get or create a thread before posting messages
- */
-export async function ensureThread({
+async function ensureThread({
   threadId,
   rootFolderId,
   subFolderId,
@@ -322,16 +314,33 @@ export async function ensureThread({
 }
 
 /**
- * 24h cache for total conversations count
- */
-let totalConversationsCountCache: { count: number; timestamp: number } | null =
-  null;
-const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-/**
  * Threads Repository - Static class pattern
  */
 export class ThreadsRepository {
+  /**
+   * Generate thread title from first message
+   * Truncates content to max 50 characters at word boundary
+   */
+  static generateThreadTitle(content: string): string {
+    return generateThreadTitle(content);
+  }
+
+  /**
+   * Ensure thread exists or create new one with permission checks
+   * Used by AI streaming to get or create a thread before posting messages
+   */
+  static async ensureThread(
+    params: Parameters<typeof ensureThread>[0],
+  ): Promise<{ threadId: string; isNew: boolean }> {
+    return ensureThread(params);
+  }
+
+  /** 24h cache for total conversations count */
+  private static totalConversationsCountCache: {
+    count: number;
+    timestamp: number;
+  } | null = null;
+  private static readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
   /**
    * List threads with pagination and filtering
    */
@@ -736,7 +745,7 @@ export class ThreadsRepository {
         folderId: data.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
         defaultModel: data.model ?? null,
-        defaultCharacter: data.character ?? null,
+        defaultSkill: data.character ?? null,
         systemPrompt: data.systemPrompt ?? null,
         pinned: false,
         archived: false,
@@ -779,14 +788,15 @@ export class ThreadsRepository {
 
       // Check if cache exists and is still valid (within 24h)
       if (
-        totalConversationsCountCache &&
-        now - totalConversationsCountCache.timestamp < CACHE_DURATION_MS
+        ThreadsRepository.totalConversationsCountCache &&
+        now - ThreadsRepository.totalConversationsCountCache.timestamp <
+          ThreadsRepository.CACHE_DURATION_MS
       ) {
         logger.debug("Returning cached total conversations count", {
-          count: totalConversationsCountCache.count,
-          age: `${Math.floor((now - totalConversationsCountCache.timestamp) / 1000 / 60 / 60)}h`,
+          count: ThreadsRepository.totalConversationsCountCache.count,
+          age: `${Math.floor((now - ThreadsRepository.totalConversationsCountCache.timestamp) / 1000 / 60 / 60)}h`,
         });
-        return success(totalConversationsCountCache.count);
+        return success(ThreadsRepository.totalConversationsCountCache.count);
       }
 
       // Cache is invalid or doesn't exist - query database
@@ -795,7 +805,7 @@ export class ThreadsRepository {
       const [{ total }] = await db.select({ total: count() }).from(chatThreads);
 
       // Update cache
-      totalConversationsCountCache = {
+      ThreadsRepository.totalConversationsCountCache = {
         count: total,
         timestamp: now,
       };

@@ -38,6 +38,8 @@ import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
+import { generateRoleFilteredRequestSchema } from "../../field/utils";
+import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import { permissionsRegistry } from "../permissions/registry";
 import {
   validateHandlerRequestData,
@@ -398,8 +400,18 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     // 3. Validate request data using request validator
+    // Build a role-filtered schema so fields gated by `visibleFor` are stripped
+    // for callers who don't have the required role — schema-level security guarantee.
+    const permissionRoles = filterUserPermissionRoles(user.roles);
+    const roleFilteredRequestSchema = generateRoleFilteredRequestSchema(
+      endpoint.fields,
+      permissionRoles,
+    );
     const validationResult = validateHandlerRequestData(
-      endpoint,
+      {
+        requestSchema: roleFilteredRequestSchema,
+        requestUrlPathParamsSchema: endpoint.requestUrlPathParamsSchema,
+      },
       {
         method: endpoint.method,
         requestData: data as z.input<typeof endpoint.requestSchema>,
@@ -409,6 +421,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         locale,
       },
       logger,
+      platform,
     );
 
     if (!validationResult.success) {
@@ -505,7 +518,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     // 7. Validate response data using request validator
     const responseValidation = validateResponseData<
       T["types"]["ResponseOutput"]
-    >(result.data, endpoint.responseSchema, logger, locale);
+    >(result.data, endpoint.responseSchema, logger, locale, platform);
 
     if (!responseValidation.success) {
       return responseValidation;

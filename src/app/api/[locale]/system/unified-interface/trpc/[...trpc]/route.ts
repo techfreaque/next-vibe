@@ -11,6 +11,7 @@ import { validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { createTRPCContext } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
@@ -51,6 +52,7 @@ async function handler(
     z.string(),
     logger,
     rawLocale,
+    Platform.NEXT_API,
   ) as ResponseType<CountryLanguage>;
   const locale = localeValidation.success
     ? localeValidation.data

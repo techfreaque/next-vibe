@@ -161,7 +161,14 @@ const { POST } = createEndpoint({
         columns: 3,
         schema: z.uuid().nullable().optional(),
       }),
-
+      leafMessageId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "post.leafMessageId.label",
+        description: "post.leafMessageId.description",
+        columns: 3,
+        schema: z.uuid().nullable().optional(),
+      }),
       // === MESSAGE CONTENT ===
       content: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -171,7 +178,7 @@ const { POST } = createEndpoint({
         columns: 12,
         placeholder: "post.content.placeholder",
         // Allow empty content for answer-as-ai operation (AI generates its own response)
-        // For other operations, content must be at least 1 character
+        // For other operations, content must be at least 1 skill
         schema: z.string().max(AGENT_MESSAGE_LENGTH),
       }),
       role: requestField(scopedTranslation, {
@@ -194,23 +201,23 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.enum(ModelId),
       }),
-      character: requestField(scopedTranslation, {
+      skill: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "post.character.label",
-        description: "post.character.description",
+        label: "post.skill.label",
+        description: "post.skill.description",
         columns: 4,
         schema: z.string(),
       }),
 
       // optional allowed tools - null/undefined = all tools permitted
       // allowed tools = permission gate (what the model is allowed to call)
-      allowedTools: requestDataArrayOptionalField(
+      availableTools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "post.activeTool.label",
-          description: "post.activeTool.description",
+          title: "post.availableTools.label",
+          description: "post.availableTools.description",
         },
         objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
@@ -221,31 +228,31 @@ const { POST } = createEndpoint({
             toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "post.activeTool.toolId.label",
-              description: "post.activeTool.toolId.description",
+              label: "post.availableTools.toolId.label",
+              description: "post.availableTools.toolId.description",
               columns: 6,
               schema: z.string(),
             }),
             requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label: "post.tools.requiresConfirmation.label",
-              description: "post.tools.requiresConfirmation.description",
+              label: "post.pinnedTools.requiresConfirmation.label",
+              description: "post.pinnedTools.requiresConfirmation.description",
               columns: 6,
               schema: z.boolean().default(false),
             }),
           },
         }),
       ),
-      // required array of tools - null/undefined = no tools enabled
-      // Enabled tools are the ones the model sees and is able to execute
-      // They are in the tools array and are part of the context window
-      tools: requestDataArrayOptionalField(
+      // optional pinned tools - null/undefined = use default set
+      // Pinned tools are the ones the model sees and is able to execute
+      // They are loaded into the AI context window
+      pinnedTools: requestDataArrayOptionalField(
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "post.tools.label",
-          description: "post.tools.description",
+          title: "post.pinnedTools.label",
+          description: "post.pinnedTools.description",
         },
         objectField(scopedTranslation, {
           type: WidgetType.CONTAINER,
@@ -256,16 +263,16 @@ const { POST } = createEndpoint({
             toolId: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "post.tools.toolId.label",
-              description: "post.tools.toolId.description",
+              label: "post.pinnedTools.toolId.label",
+              description: "post.pinnedTools.toolId.description",
               columns: 6,
               schema: z.string(),
             }),
             requiresConfirmation: requestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.BOOLEAN,
-              label: "post.tools.requiresConfirmation.label",
-              description: "post.tools.requiresConfirmation.description",
+              label: "post.pinnedTools.requiresConfirmation.label",
+              description: "post.pinnedTools.requiresConfirmation.description",
               columns: 6,
               schema: z.boolean().default(false),
             }),
@@ -526,9 +533,9 @@ const { POST } = createEndpoint({
         content: "Hello, can you help me write a professional email?",
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5_MINI,
-        character: "default",
-        allowedTools: null,
-        tools: null,
+        skill: "default",
+        availableTools: null,
+        pinnedTools: null,
         toolConfirmations: null,
         messageHistory: [],
         attachments: [],
@@ -537,7 +544,7 @@ const { POST } = createEndpoint({
         audioInput: { file: null },
         timezone: "America/New_York",
       },
-      withCharacter: {
+      withSkill: {
         operation: "send",
         rootFolderId: DefaultFolderId.PRIVATE,
         subFolderId: null,
@@ -547,9 +554,9 @@ const { POST } = createEndpoint({
         content: "Write a marketing email for our new product launch",
         role: ChatMessageRole.USER,
         model: ModelId.GPT_5,
-        character: "professional",
-        allowedTools: null,
-        tools: null,
+        skill: "professional",
+        availableTools: null,
+        pinnedTools: null,
         toolConfirmations: null,
         messageHistory: [],
         attachments: [],
@@ -568,9 +575,9 @@ const { POST } = createEndpoint({
         content: "Can you try that again with more detail?",
         role: ChatMessageRole.USER,
         model: ModelId.CLAUDE_SONNET_4_5,
-        character: "default",
-        allowedTools: null,
-        tools: null,
+        skill: "default",
+        availableTools: null,
+        pinnedTools: null,
         toolConfirmations: null,
         messageHistory: [],
         attachments: [],
@@ -588,7 +595,7 @@ const { POST } = createEndpoint({
         totalTokens: 245,
         finishReason: "stop",
       },
-      withCharacter: {
+      withSkill: {
         success: true,
         messageId: "msg_456e7890-e89b-12d3-a456-426614174001",
         responseThreadId: "thread_456e7890-e89b-12d3-a456-426614174001",

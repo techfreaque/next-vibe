@@ -36,7 +36,7 @@ export function ConnectionCreateContainer({
   const form = useWidgetForm<typeof endpoints.POST>();
   const emptyField = useMemo(() => ({}), []);
 
-  const authType = form?.watch("authType");
+  const authType = form.watch("authType");
   const isLocal = authType === SshAuthType.LOCAL;
   const isKeyAgent = authType === SshAuthType.KEY_AGENT;
 

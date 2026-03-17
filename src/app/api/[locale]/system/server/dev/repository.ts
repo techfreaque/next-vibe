@@ -21,6 +21,7 @@ import {
   formatDuration,
   formatError,
   formatHint,
+  createNextjsFormatter,
   formatSkip,
   formatStartup,
   formatTask,
@@ -471,7 +472,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           logger.vibe(formatSkip("Migrations skipped"));
         } else {
           const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-          await databaseMigrationRepository.runMigrations(
+          const migrateResult = await databaseMigrationRepository.runMigrations(
             {
               generate: !data.skipMigrationGeneration,
               redo: false,
@@ -481,6 +482,14 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
             migrateT,
             logger,
           );
+          if (!migrateResult.success) {
+            this.logDatabaseError(
+              new Error(migrateResult.message ?? "Migration failed"),
+              logger,
+            );
+            cleanupPidFile(VIBE_DEV_PID_FILE);
+            process.exit(1);
+          }
         }
       }
 
@@ -499,7 +508,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       return true;
     } catch (error) {
       this.logDatabaseError(error, logger);
-      return false; // Critical failure
+      cleanupPidFile(VIBE_DEV_PID_FILE);
+      process.exit(1);
     }
   }
 
@@ -524,7 +534,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       logger.vibe(formatSkip("Migrations skipped"));
     } else {
       const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-      await databaseMigrationRepository.runMigrations(
+      const migrateResult = await databaseMigrationRepository.runMigrations(
         {
           generate: !data.skipMigrationGeneration,
           redo: false,
@@ -534,6 +544,14 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         migrateT,
         logger,
       );
+      if (!migrateResult.success) {
+        this.logDatabaseError(
+          new Error(migrateResult.message ?? "Migration failed"),
+          logger,
+        );
+        cleanupPidFile(VIBE_DEV_PID_FILE);
+        process.exit(1);
+      }
     }
   }
 
@@ -584,10 +602,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error handling: Database errors can be any type (Drizzle errors, connection errors, etc), so unknown is correct before narrowing.
   private logDatabaseError(error: unknown, logger: EndpointLogger): void {
     const parsedError = parseError(error);
-    logger.vibe(formatError("Database operation failed"));
-    logger.error("Database error details", parsedError);
-    logger.vibe(`💡 Error: ${parsedError.message}`);
-    logger.vibe(`� Try running: ${formatCommand("vibe dev -r")}`);
+    logger.vibe(
+      formatError(`Database operation failed: ${parsedError.message}`),
+    );
+    logger.vibe(`💡 Try running: ${formatCommand("vibe dev -r")}`);
   }
 
   /**
@@ -604,9 +622,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     }
 
     try {
-      logger.info(formatTask("Starting task runner"));
+      logger.debug(formatTask("Starting task runner"));
       await this.startUnifiedTaskRunner(locale, logger, data);
-      logger.info(formatTask("Task runner started"));
+      logger.debug(formatTask("Task runner started"));
     } catch (error) {
       const parsedError = parseError(error);
       logger.vibe(
@@ -825,7 +843,18 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         ["run", "next", "dev", "--port", String(nextPort)],
         {
           stdio: ["ignore", "pipe", "pipe"],
-          env: { ...process.env, ...profilingEnv },
+          env: {
+            ...process.env,
+            ...profilingEnv,
+            // Cap V8 heap to force GC before memory balloons unboundedly.
+            // 8GB is enough for dev; without this Node grows until OOM.
+            NODE_OPTIONS: [
+              process.env.NODE_OPTIONS,
+              "--max-old-space-size=8192",
+            ]
+              .filter(Boolean)
+              .join(" "),
+          },
           cwd: process.cwd(),
         },
       );
@@ -836,17 +865,24 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         addPidToFile(VIBE_DEV_PID_FILE, nextProcess.pid);
       }
 
+      const formatNextjs = createNextjsFormatter();
       if (!disableProxy) {
         const rewritePort = (chunk: Buffer): void => {
           process.stdout.write(
-            chunk.toString().replaceAll(String(nextPort), String(port)),
+            formatNextjs(
+              chunk.toString().replaceAll(String(nextPort), String(port)),
+            ),
           );
         };
         nextProcess.stdout?.on("data", rewritePort);
         nextProcess.stderr?.on("data", rewritePort);
       } else {
-        nextProcess.stdout?.pipe(process.stdout);
-        nextProcess.stderr?.pipe(process.stderr);
+        nextProcess.stdout?.on("data", (chunk: Buffer) => {
+          process.stdout.write(formatNextjs(chunk.toString()));
+        });
+        nextProcess.stderr?.on("data", (chunk: Buffer) => {
+          process.stderr.write(formatNextjs(chunk.toString()));
+        });
       }
 
       nextProcess.on("exit", (code) => {

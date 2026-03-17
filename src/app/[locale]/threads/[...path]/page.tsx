@@ -16,7 +16,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
-import { CharactersRepository } from "@/app/api/[locale]/agent/chat/characters/repository";
+import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { scopedTranslation as folderContentsScopedTranslation } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/i18n";
@@ -200,7 +200,7 @@ export default async function ThreadsPathPage({
   let initialMessagesData = null;
   let initialPathData = null;
   let initialSettingsData = null;
-  let initialCharacterData = null;
+  let initialSkillData = null;
   let initialPublicFeedData = null;
   let initialFolderContentsData = null;
   let initialSubFolderContentsData = null;
@@ -269,7 +269,7 @@ export default async function ThreadsPathPage({
     }
 
     // Fetch path + character in parallel (character depends on settings, path depends on thread)
-    const selectedCharacter = initialSettingsData?.selectedCharacter ?? null;
+    const selectedSkill = initialSettingsData?.selectedSkill ?? null;
 
     const [pathResult, characterResult] = await Promise.all([
       activeThreadIdForFetch
@@ -285,9 +285,9 @@ export default async function ThreadsPathPage({
             locale,
           )
         : Promise.resolve(null),
-      selectedCharacter
-        ? CharactersRepository.getCharacterById(
-            { id: selectedCharacter },
+      selectedSkill
+        ? SkillsRepository.getSkillById(
+            { id: selectedSkill },
             user,
             logger,
             locale,
@@ -299,7 +299,7 @@ export default async function ThreadsPathPage({
       initialPathData = pathResult.data;
     }
     if (characterResult && characterResult.success) {
-      initialCharacterData = characterResult.data;
+      initialSkillData = characterResult.data;
     }
 
     // Fetch public feed data server-side when on the public folder with no active thread
@@ -364,7 +364,7 @@ export default async function ThreadsPathPage({
         activeThreadId={initialThreadId}
         currentRootFolderId={initialRootFolderId}
         currentSubFolderId={initialSubFolderId}
-        leafMessageId={leafMessageId}
+        leafMessageId={initialPathData?.resolvedLeafMessageId ?? leafMessageId}
       >
         <ChatBootProvider
           activeThreadId={initialThreadId}
@@ -378,7 +378,7 @@ export default async function ThreadsPathPage({
           initialMessagesData={initialMessagesData}
           initialPathData={initialPathData}
           initialSettingsData={initialSettingsData}
-          initialCharacterData={initialCharacterData}
+          initialSkillData={initialSkillData}
           initialPublicFeedData={initialPublicFeedData}
           initialFolderContentsData={initialFolderContentsData}
           initialSubFolderContentsData={initialSubFolderContentsData}

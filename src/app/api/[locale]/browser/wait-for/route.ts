@@ -5,25 +5,14 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { BrowserTool } from "../enum";
-import { executeWaitFor, filterUndefinedArgs } from "../shared/repository";
 import waitForEndpoints from "./definition";
+import { WaitForRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: waitForEndpoints,
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeWaitFor(
-        {
-          toolName: BrowserTool.WAIT_FOR,
-          args: filterUndefinedArgs({
-            text: data.text,
-            timeout: data.timeout,
-          }),
-        },
-        t,
-        logger,
-      ),
+      WaitForRepository.waitFor(data, t, logger),
   },
 });

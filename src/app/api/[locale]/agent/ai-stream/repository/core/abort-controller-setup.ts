@@ -4,6 +4,8 @@
 
 import "server-only";
 
+import { AbortReason, StreamAbortError } from "./constants";
+
 export class AbortControllerSetup {
   /**
    * Create abort controller with timeout handling
@@ -19,7 +21,9 @@ export class AbortControllerSetup {
 
     // Abort our controller when timeout fires
     const timeoutAbortHandler = (): void => {
-      streamAbortController.abort(new Error("Stream timeout"));
+      streamAbortController.abort(
+        new StreamAbortError(AbortReason.STREAM_TIMEOUT),
+      );
     };
     timeoutAbortController.addEventListener("abort", timeoutAbortHandler);
 

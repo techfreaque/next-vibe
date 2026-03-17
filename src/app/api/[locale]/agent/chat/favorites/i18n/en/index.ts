@@ -8,7 +8,7 @@ export const translations = {
   },
   active: "Active",
   fallbacks: {
-    unknownCharacter: "Unknown Character",
+    unknownSkill: "Unknown Skill",
     unknownModel: "Unknown Model",
     unknown: "Unknown",
     unknownProvider: "unknown",
@@ -22,7 +22,7 @@ export const translations = {
   },
   enums: {
     selectionType: {
-      characterBased: "Based on Character",
+      characterBased: "Based on Skill",
       manual: "Specific Model",
       filters: "Filter Criteria",
     },
@@ -76,14 +76,44 @@ export const translations = {
   get: {
     title: "Get Favorites",
     description: "Retrieve all your saved favorite character configurations",
+    userId: {
+      label: "User ID",
+      description:
+        "Admin only: fetch favorites for a specific user. Leave empty to fetch your own favorites.",
+    },
+    fields: {
+      query: {
+        label: "Search",
+        description: "Search favorites by name, tagline, or skill ID.",
+      },
+      page: {
+        label: "Page",
+        description:
+          "Page number for paginated results (AI/MCP: default page size 25).",
+      },
+      pageSize: {
+        label: "Page Size",
+        description:
+          "Number of favorites per page (1–500). AI/MCP callers default to 25; human callers return all.",
+      },
+    },
     addVariant: "Add Variant",
     emptyState: "You haven't added any favorites yet",
+    tabs: {
+      myFavorites: "My Favorites",
+      browseSkills: "Browse Skills",
+    },
+    sections: {
+      companion: "Companions",
+      skills: "Skills",
+      model: "Direct Models",
+    },
     container: {
       title: "Your Favorites",
       description: "Manage your favorite character and model configurations",
     },
     createButton: {
-      label: "Explore Characters",
+      label: "Explore Skills",
     },
     response: {
       favorite: {
@@ -91,8 +121,8 @@ export const translations = {
         id: {
           content: "ID: {{value}}",
         },
-        characterId: {
-          content: "Character: {{value}}",
+        skillId: {
+          content: "Skill: {{value}}",
         },
         customName: {
           content: "Custom Name: {{value}}",
@@ -232,8 +262,8 @@ export const translations = {
       label: "Add to Favorites",
       loadingText: "Adding...",
     },
-    characterId: {
-      label: "Character",
+    skillId: {
+      label: "Skill",
       description: "Select the character for this favorite",
     },
     customName: {

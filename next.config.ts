@@ -3,10 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   typedRoutes: true,
   experimental: {
-    webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
-    turbopackFileSystemCacheForDev: true,
     optimizePackageImports: [
       "lucide-react",
       "@radix-ui/react-icons",

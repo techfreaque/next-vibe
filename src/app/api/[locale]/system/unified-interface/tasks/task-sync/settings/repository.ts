@@ -45,6 +45,7 @@ export async function updateTaskSyncSettings(
       .insert(cronTasks)
       .values({
         id: TASK_SYNC_PULL_ID,
+        shortId: TASK_SYNC_PULL_ID,
         routeId: TASK_SYNC_ALIAS,
         displayName: "taskSync.name",
         description: "taskSync.description",

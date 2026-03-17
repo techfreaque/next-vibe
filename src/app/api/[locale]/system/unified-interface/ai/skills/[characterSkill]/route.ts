@@ -1,16 +1,16 @@
 /**
- * Character Skill Manifest — Dynamic Route
- * GET /api/[locale]/system/unified-interface/ai/skills/[character-id]-skill.md
+ * Skill Skill Manifest — Dynamic Route
+ * GET /api/[locale]/system/unified-interface/ai/skills/[skill-id]-skill.md
  *
- * Returns a per-character skill manifest listing only the tools that character
- * has configured in its activeTools list. For generic characters (no activeTools),
+ * Returns a per-skill manifest listing only the tools that skill
+ * has configured in its availableTools list. For generic skills (no availableTools),
  * falls back to the full public-user tier.
  *
  * Examples:
  *   /api/en/system/unified-interface/ai/skills/research-agent-skill.md
  *   /api/en/system/unified-interface/ai/skills/writer-skill.md
  *
- * Returns 404 for unknown, admin-only, or instance-filtered characters.
+ * Returns 404 for unknown, admin-only, or instance-filtered skills.
  */
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -19,8 +19,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
 import {
-  generateCharacterAiRunMarkdown,
-  generateCharacterSkillMarkdown,
+  generateSkillAiRunMarkdown,
+  generateSkillSkillMarkdown,
 } from "../markdown-generator";
 
 const CACHE_MAX_AGE = 300; // 5 minutes
@@ -32,7 +32,7 @@ type SegmentType = "skill" | "ai-run";
  *   "research-agent-skill.md"  → { id: "research-agent", type: "skill" }
  *   "research-agent-ai-run.md" → { id: "research-agent", type: "ai-run" }
  */
-function parseCharacterSegment(
+function parseSkillSegment(
   segment: string,
 ): { id: string; type: SegmentType } | null {
   if (segment.endsWith("-skill.md")) {
@@ -51,17 +51,17 @@ export async function GET(
   request: Request,
   {
     params,
-  }: { params: Promise<{ locale: CountryLanguage; characterSkill: string }> },
+  }: { params: Promise<{ locale: CountryLanguage; skillSlug: string }> },
 ): Promise<Response> {
-  const { locale, characterSkill } = await params.catch(() => ({
+  const { locale, skillSlug } = await params.catch(() => ({
     locale: defaultLocale,
-    characterSkill: "",
+    skillSlug: "",
   }));
 
-  const parsed = parseCharacterSegment(characterSkill);
+  const parsed = parseSkillSegment(skillSlug);
   if (!parsed) {
     return new Response(
-      "# Not Found\n\nInvalid file name. Expected `[character-id]-skill.md` or `[character-id]-ai-run.md`.",
+      "# Not Found\n\nInvalid file name. Expected `[skill-id]-skill.md` or `[skill-id]-ai-run.md`.",
       {
         status: 404,
         headers: { "Content-Type": "text/markdown; charset=utf-8" },
@@ -69,23 +69,17 @@ export async function GET(
     );
   }
 
-  const { id: characterId, type: docType } = parsed;
+  const { id: skillId, type: docType } = parsed;
 
   try {
     const markdown =
       docType === "ai-run"
-        ? await generateCharacterAiRunMarkdown(
-            characterId,
-            locale ?? defaultLocale,
-          )
-        : await generateCharacterSkillMarkdown(
-            characterId,
-            locale ?? defaultLocale,
-          );
+        ? await generateSkillAiRunMarkdown(skillId, locale ?? defaultLocale)
+        : await generateSkillSkillMarkdown(skillId, locale ?? defaultLocale);
 
     if (!markdown) {
       return new Response(
-        `# Not Found\n\nCharacter \`${characterId}\` does not exist, is admin-only, or is not publicly accessible.`,
+        `# Not Found\n\nSkill \`${skillId}\` does not exist, is admin-only, or is not publicly accessible.`,
         {
           status: 404,
           headers: { "Content-Type": "text/markdown; charset=utf-8" },
@@ -98,14 +92,14 @@ export async function GET(
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
         "Cache-Control": `public, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=60`,
-        "X-Skill-Tier": docType === "ai-run" ? "character-ai-run" : "character",
-        "X-Skill-Character": characterId,
+        "X-Skill-Tier": docType === "ai-run" ? "skill-ai-run" : "skill",
+        "X-Skill-Id": skillId,
       },
     });
   } catch (error) {
     const parsedErr = parseError(error);
     return new Response(
-      `# Error\n\nFailed to generate \`${characterSkill}\`.\n\n\`\`\`\n${parsedErr.message}\n\`\`\``,
+      `# Error\n\nFailed to generate \`${skillSlug}\`.\n\n\`\`\`\n${parsedErr.message}\n\`\`\``,
       {
         status: 500,
         headers: { "Content-Type": "text/markdown; charset=utf-8" },

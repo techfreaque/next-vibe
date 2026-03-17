@@ -32,6 +32,11 @@ export const translations: typeof enTranslations = {
           "Versteckte Aufgaben einbeziehen (Standard: alle Aufgaben)",
         placeholder: "Alle Aufgaben",
       },
+      search: {
+        label: "Suche",
+        description: "Aufgaben nach Name, Route oder Kategorie filtern",
+        placeholder: "Warteschlange durchsuchen...",
+      },
       limit: {
         label: "Limit",
         description: "Maximale Anzahl der zurückzugebenden Aufgaben",
@@ -136,6 +141,8 @@ export const translations: typeof enTranslations = {
     header: {
       tasks: "Alle Aufgaben",
       history: "Verlauf",
+      stats: "Statistiken",
+      create: "Neue Aufgabe",
       refresh: "Aktualisieren",
     },
     filter: {
@@ -169,6 +176,20 @@ export const translations: typeof enTranslations = {
       history: "Verlauf anzeigen",
       edit: "Aufgabe bearbeiten",
       run: "Jetzt ausführen",
+    },
+    bulk: {
+      selected: "{count} ausgewählt",
+      selectAll: "Alle auswählen",
+      clearSelection: "Auswahl aufheben",
+      enable: "Aktivieren",
+      disable: "Deaktivieren",
+      runNow: "Jetzt ausführen",
+      delete: "Löschen",
+      confirmDeleteTitle: "Aufgaben löschen?",
+      confirmDelete:
+        "{count} Aufgabe(n) löschen? Dies kann nicht rückgängig gemacht werden.",
+      cancel: "Abbrechen",
+      success: "{succeeded} erfolgreich, {failed} fehlgeschlagen",
     },
     empty: {
       noTasks: "Warteschlange ist leer",

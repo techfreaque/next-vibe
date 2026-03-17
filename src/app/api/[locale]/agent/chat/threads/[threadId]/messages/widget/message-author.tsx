@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+import { useEffect, useState } from "react";
 
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -15,6 +16,25 @@ import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/wid
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
+
+function RelativeTimestamp({
+  timestamp,
+  locale,
+}: {
+  timestamp: Date;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const [label, setLabel] = useState<string>("");
+
+  useEffect(() => {
+    setLabel(formatRelativeTime(timestamp.getTime(), locale));
+  }, [timestamp, locale]);
+
+  return (
+    <Span className="text-xs text-muted-foreground shrink-0">{label}</Span>
+  );
+}
+
 interface MessageAuthorProps {
   authorName: string | null;
   authorId: string | null;
@@ -25,9 +45,9 @@ interface MessageAuthorProps {
   edited?: boolean;
   compact?: boolean;
   className?: string;
-  /** Character used for this message */
+  /** Skill used for this message */
   character?: string | null;
-  /** Character name from API data */
+  /** Skill name from API data */
   characterName?: string | null;
   locale: CountryLanguage;
   rootFolderId: DefaultFolderId;
@@ -90,18 +110,16 @@ export function MessageAuthorInfo({
 
         {/* Show character for both AI and user messages */}
         {characterName && (
-          <Span className="text-xs text-muted-foreground truncate">
+          <Span
+            className="text-xs text-muted-foreground truncate"
+            suppressHydrationWarning
+          >
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
             {`(${characterName})`}
           </Span>
         )}
 
-        <Span
-          className="text-xs text-muted-foreground shrink-0"
-          suppressHydrationWarning
-        >
-          {formatRelativeTime(timestamp.getTime(), locale)}
-        </Span>
+        <RelativeTimestamp timestamp={timestamp} locale={locale} />
 
         {edited && (
           <Span className="text-xs text-muted-foreground italic shrink-0">

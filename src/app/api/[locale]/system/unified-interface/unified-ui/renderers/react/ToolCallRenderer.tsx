@@ -357,17 +357,28 @@ export function ToolCallRenderer({
   // (remote async tasks may complete with no result payload)
   const isTerminalStatus =
     toolCall.status === "completed" || toolCall.status === "failed";
-  // detach: async fire-and-forget — this message stays pending forever, result arrives in task history
-  const isBackground =
-    toolCall.callbackMode === "detach" && toolCall.status === "pending";
-  // deferred: result arrived async after original stream ended (wakeUp/endLoop)
-  const isDeferred = Boolean(toolCall.isDeferred);
+  // detach: fire-and-forget, result in task history only
+  const isSentToBackground =
+    toolCall.callbackMode === "detach" && !toolCall.isDeferred;
+  // wakeUp: result will be injected back into thread when ready
+  const isWakeUpBackground =
+    toolCall.callbackMode === "wakeUp" && !toolCall.isDeferred;
+  // wait: stream paused while remote executes
+  const isWaitingForRemote =
+    toolCall.callbackMode === "wait" && toolCall.status === "pending";
+  // deferred: result arrived async after original stream ended
+  const isDeferred = Boolean(toolCall.isDeferred) && !toolCall.isConfirmed;
+  // confirmed by user (approve mode): tool was manually approved and executed
+  const isConfirmedByUser = Boolean(toolCall.isConfirmed);
   const isLoading =
     !hasResult &&
     !hasError &&
     !isWaitingForConfirmation &&
     !isTerminalStatus &&
-    !isBackground;
+    !isSentToBackground &&
+    !isWakeUpBackground &&
+    !isWaitingForRemote &&
+    !isConfirmedByUser;
 
   /** Extract a displayable error message from toolCall.error or toolCall.result (when it's an ErrorResponseType) */
   const getErrorMessage = (): string => {
@@ -652,24 +663,43 @@ export function ToolCallRenderer({
                   {t("widgets.toolCall.status.executing")}
                 </Span>
               )}
-              {isBackground && (
+              {isSentToBackground && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  {t("widgets.toolCall.status.background")}
+                  {t("widgets.toolCall.status.sentToBackground")}
                 </Span>
               )}
-              {(hasResult || isTerminalStatus) &&
-                !hasError &&
-                !isWaitingForConfirmation &&
-                !isBackground && (
-                  <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
-                    {t("widgets.toolCall.status.complete")}
-                  </Span>
-                )}
+              {isWakeUpBackground && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                  {t("widgets.toolCall.status.wakeUpBackground")}
+                </Span>
+              )}
+              {isWaitingForRemote && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500">
+                  {t("widgets.toolCall.status.waitingForRemote")}
+                </Span>
+              )}
+              {isConfirmedByUser && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
+                  {t("widgets.toolCall.status.confirmed")}
+                </Span>
+              )}
               {isDeferred && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500">
                   {t("widgets.toolCall.status.deferred")}
                 </Span>
               )}
+              {(hasResult || isTerminalStatus) &&
+                !hasError &&
+                !isWaitingForConfirmation &&
+                !isSentToBackground &&
+                !isWakeUpBackground &&
+                !isWaitingForRemote &&
+                !isDeferred &&
+                !isConfirmedByUser && (
+                  <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
+                    {t("widgets.toolCall.status.complete")}
+                  </Span>
+                )}
             </Div>
           </Div>
         </CollapsibleTrigger>
@@ -919,7 +949,9 @@ export function ToolCallRenderer({
                                 variant:
                                   decision?.type === "confirmed"
                                     ? "default"
-                                    : "ghost",
+                                    : decision?.type === "declined"
+                                      ? "ghost"
+                                      : "default",
                               }
                             : undefined
                         }
@@ -929,7 +961,7 @@ export function ToolCallRenderer({
                                 variant:
                                   decision?.type === "declined"
                                     ? "destructive"
-                                    : "ghost",
+                                    : "outline",
                               }
                             : undefined
                         }

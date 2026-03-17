@@ -26,8 +26,8 @@ export const translations = {
       label: "Use Without Saving",
       loadingText: "Applying...",
     },
-    characterId: {
-      label: "Character",
+    skillId: {
+      label: "Skill",
       description: "Select the character for this favorite",
     },
     customName: {
@@ -54,7 +54,7 @@ export const translations = {
     },
     selectionType: {
       label: "Selection Type",
-      characterBased: "Based on Character",
+      characterBased: "Based on Skill",
       manual: "Specific Model",
       filters: "Filter Criteria",
     },
@@ -146,7 +146,7 @@ export const translations = {
       description:
         "Override the token count that triggers conversation compaction. Pass null to fall through to character or global default.",
     },
-    allowedTools: {
+    availableTools: {
       label: "Allowed Tools",
       description:
         "Override allowed tools for this slot. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to fall through to character or global settings.",
@@ -203,11 +203,11 @@ export const translations = {
       title: "Success",
       description: "Favorite created successfully",
     },
-    changeCharacter: {
-      label: "Change Character",
+    changeSkill: {
+      label: "Change Skill",
     },
-    modifyCharacter: {
-      label: "Modify Character",
+    modifySkill: {
+      label: "Modify Skill",
     },
     character: {
       name: "Name",

@@ -16,7 +16,7 @@ export const translations = {
       title: "Run AI Agent",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Run a headless AI agent and get back the full text response. Pass favoriteId to load character + model + tools in one shot (recommended), or set model + character + allowedTools explicitly. For tool access, add allowedTools: [{toolId:'execute-tool'},{toolId:'tool-help'}]. Use tool-help to discover available tools. Credits consumed based on model.",
+        "Run a headless AI agent and get back the full text response. Pass favoriteId to load skill + model + tools in one shot (recommended), or set model + skill + availableTools explicitly. For tool access, add availableTools: [{toolId:'execute-tool'},{toolId:'tool-help'}]. Use tool-help to discover available tools. Credits consumed based on model.",
       container: {
         title: "AI Agent Run",
         description: "Configure pre-calls and prompt for headless AI execution",
@@ -25,18 +25,18 @@ export const translations = {
         favoriteId: {
           label: "Favorite ID",
           description:
-            "UUID of a saved favorite to load character, model, and tool configuration from. When set, the favorite's character, model (from modelSelection), and tool config (activeTools/visibleTools) are used as defaults. Explicit character, model, tools, or allowedTools fields in this request override the favorite's values. Use agent_chat_favorites_GET to list available favorites.",
+            "UUID of a saved favorite to load skill, model, and tool configuration from. When set, the favorite's skill, model (from modelSelection), and tool config (availableTools/pinnedTools) are used as defaults. Explicit skill, model, tools, or availableTools fields in this request override the favorite's values. Use agent_chat_favorites_GET to list available favorites.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Model",
           description:
-            "AI model to use. Optional when favoriteId or character is provided (resolved from their modelSelection). Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. Overrides the model from favoriteId or character when set.",
+            "AI model to use. Optional when favoriteId or skill is provided (resolved from their modelSelection). Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. Overrides the model from favoriteId or skill when set.",
         },
-        character: {
-          label: "Character",
+        skill: {
+          label: "Skill",
           description:
-            "Character ID (UUID) or 'default'. Optional when favoriteId is provided (resolved from the favorite). Characters define the AI persona, system prompt, and default model. Overrides the character from favoriteId when set. Use agent_chat_characters_GET to list available characters.",
+            "Skill ID (UUID) or 'default'. Optional when favoriteId is provided (resolved from the favorite). Skills define the AI persona, system prompt, and default model. Overrides the skill from favoriteId when set. Use agent_chat_skills_GET to list available skills.",
           placeholder: "default",
         },
         prompt: {
@@ -58,7 +58,7 @@ export const translations = {
           routeId: {
             label: "Tool ID",
             description:
-              "Alias or full tool name to call (e.g. 'web-search', 'agent_chat_characters_GET'). Use tool-help to discover tools.",
+              "Alias or full tool name to call (e.g. 'web-search', 'agent_chat_skills_GET'). Use tool-help to discover tools.",
             placeholder: "web-search",
           },
           args: {
@@ -67,7 +67,7 @@ export const translations = {
               'Flat key-value args for the tool — merge urlPathParams and body fields into one object (e.g. {"query": "latest news", "maxResults": 5}).',
           },
         },
-        allowedTools: {
+        availableTools: {
           label: "Allowed to Execute",
           description:
             "Execution permission gate — controls which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only (any other call is blocked with 'disabled by user'). Standard agentic setup: [{toolId:'execute-tool'},{toolId:'tool-help'}] — execute-tool dispatches any registered endpoint, tool-help lets the agent discover available tools. No need to repeat tools already listed in the tools field.",
@@ -82,10 +82,10 @@ export const translations = {
               "If true, execution pauses and waits for user confirmation before running this tool. Use for destructive or expensive actions.",
           },
         },
-        tools: {
+        pinnedTools: {
           label: "In Context (model sees these)",
           description:
-            "Tools loaded into the model's context window — what the AI knows about and can reason over. null = use the user's default tool set (recommended). Provide an array only if you need a focused, minimal context. Note: allowedTools controls what can actually execute — this field only affects what the model sees.",
+            "Tools loaded into the model's context window — what the AI knows about and can reason over. null = use the user's default tool set (recommended). Provide an array only if you need a focused, minimal context. Note: availableTools controls what can actually execute — this field only affects what the model sees.",
           toolId: {
             label: "Tool ID",
             description:
@@ -208,7 +208,8 @@ export const translations = {
       unknownError: "An error occurred",
       creditValidationFailed: "Failed to validate credit balance",
       noIdentifier: "No user or lead identifier provided",
-      insufficientCredits: "Insufficient credits to complete this request",
+      insufficientCredits:
+        "Insufficient credits to complete this request (cost: {{cost}}, balance: {{balance}})",
       noResponseBody: "No response body received from stream",
       authenticationRequired:
         "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
@@ -252,6 +253,11 @@ export const translations = {
     parentMessageId: {
       label: "Parent Message ID",
       description: "Parent message ID for branching/threading",
+    },
+    leafMessageId: {
+      label: "Leaf Message ID",
+      description:
+        "Current branch leaf message ID — tracks active branch without relying on URL",
     },
     messageHistory: {
       label: "Message History",
@@ -307,9 +313,9 @@ export const translations = {
       label: "Model",
       description: "AI model to use for generation",
     },
-    character: {
-      label: "Character",
-      description: "Optional character to use for the AI",
+    skill: {
+      label: "Skill",
+      description: "Optional skill to use for the AI",
     },
     systemPrompt: {
       label: "System Prompt",
@@ -328,7 +334,7 @@ export const translations = {
       label: "Timezone",
       description: "User timezone for cache-stable timestamps",
     },
-    activeTool: {
+    availableTools: {
       label: "Allowed to Execute",
       description:
         "Execution permission gate — which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only.",
@@ -337,10 +343,10 @@ export const translations = {
         description: "Alias or full tool name the AI is permitted to execute",
       },
     },
-    tools: {
+    pinnedTools: {
       label: "In Context (model sees these)",
       description:
-        "Tools loaded into the model's context window — what the AI knows about. null = user's default set. allowedTools controls what can actually execute.",
+        "Tools loaded into the model's context window — what the AI knows about. null = user's default set. availableTools controls what can actually execute.",
       toolId: {
         label: "Tool ID",
         description: "Alias or full tool name to load into the model's context",
@@ -509,6 +515,8 @@ export const translations = {
       "This tool has been disabled by the user. Do not attempt to call it again.",
     userDeclinedTool: "Tool execution was cancelled.",
     streamError: "The AI response failed to complete. Please try again.",
+    pendingToolCall:
+      "A tool is still running in the background. Please wait for it to complete before continuing.",
     streamProcessingError:
       "Failed to process the AI response. Please try again.",
     timeout:
@@ -532,11 +540,11 @@ export const translations = {
   },
   headless: {
     errors: {
-      // Thrown when runHeadlessAiStream() is called without a resolvable model+character.
-      // Either pass model+character directly, or pass favoriteId pointing to a favorite
-      // that has a MANUAL or FILTERS modelSelection (not CHARACTER_BASED with no character).
-      missingModelOrCharacter:
-        "model and character are required — pass them directly or provide a favoriteId with a resolvable model selection",
+      // Thrown when runHeadlessAiStream() is called without a resolvable model+skill.
+      // Either pass model+skill directly, or pass favoriteId pointing to a favorite
+      // that has a MANUAL or FILTERS modelSelection (not SKILL_BASED with no skill).
+      missingModelOrSkill:
+        "model and skill are required — pass them directly or provide a favoriteId with a resolvable model selection",
       favoriteNotFound: "Favorite not found or does not belong to this user",
     },
   },
@@ -544,7 +552,7 @@ export const translations = {
     post: {
       title: "Resume AI Stream",
       description:
-        "Continue an existing thread by running a headless AI turn. Used after an async remote task completes (callbackMode=wait or wakeUp). Pass favoriteId to load model+character in one shot, or set modelId+characterId explicitly.",
+        "Continue an existing thread by running a headless AI turn. Used after an async remote task completes (callbackMode=wait or wakeUp). Pass favoriteId to load model+skill in one shot, or set modelId+skillId explicitly.",
       fields: {
         threadId: {
           title: "Thread ID",
@@ -553,22 +561,37 @@ export const translations = {
         favoriteId: {
           title: "Favorite ID",
           description:
-            "UUID of a saved favorite to load model and character from. Overrides modelId/characterId when both are set.",
+            "UUID of a saved favorite to load model and skill from. Overrides modelId/skillId when both are set.",
         },
         modelId: {
           title: "Model ID",
           description:
             "AI model to use for the resumed turn. Optional when favoriteId is provided.",
         },
-        characterId: {
-          title: "Character ID",
+        skillId: {
+          title: "Skill ID",
           description:
-            "Character/persona for the resumed turn. Optional when favoriteId is provided.",
+            "Skill/persona for the resumed turn. Optional when favoriteId is provided.",
+        },
+        callbackMode: {
+          title: "Callback Mode",
+          description:
+            "Callback mode from the originating tool call (wait or wakeUp). Determines resume behavior.",
         },
         wakeUpToolMessageId: {
           title: "WakeUp Tool Message ID",
           description:
-            "ID of the original wakeUp tool call message. When provided, a deferred result message is injected into the thread before the headless append.",
+            "ID of the original tool call message with the backfilled result.",
+        },
+        wakeUpTaskId: {
+          title: "WakeUp Task ID",
+          description:
+            "ID of the originating remote cron task, deleted after revival.",
+        },
+        resumeTaskId: {
+          title: "Resume Task ID",
+          description:
+            "ID of this resume-stream cron task itself, deleted after revival.",
         },
         resumed: {
           title: "Resumed",
@@ -628,6 +651,83 @@ export const translations = {
     uncensoredHandler: {
       errors: {
         apiError: "Uncensored.ai API error ({{status}}): {{errorText}}",
+      },
+    },
+  },
+  onboarding: {
+    back: "Back",
+    welcome: {
+      title: "Think of us as your AI team.",
+      line1:
+        "Your companion handles everyday chat. Specialists step in for coding, research, writing — whatever the task needs.",
+      line2: "The AI switches between them automatically. You just talk.",
+      line3: "Let's get you set up in under a minute.",
+      continue: "Get Started",
+    },
+    guest: {
+      title: "You're browsing as a guest",
+      line1:
+        "Your settings, companion, and chat history are saved locally on this device only.",
+      line2:
+        "Sign in to keep everything synced across devices — and make sure you never lose your setup.",
+      signIn: "Sign In / Create Account",
+      continueAnyway: "Continue as Guest",
+      note: "You can sign in later from the menu at any time.",
+    },
+    companion: {
+      title: "Choose your companion",
+      subtitle: "Your main chat partner for everyday use",
+      budgetTitle: "How capable should your AI be?",
+      budgetSubtitle: "You can change this anytime in settings",
+      next: "Next",
+      selectFirst: "Pick a companion to continue",
+      budget: {
+        smart: {
+          label: "Smart",
+          desc: "Fast, efficient, handles most things well",
+        },
+        brilliant: {
+          label: "Brilliant",
+          desc: "Best quality — great for complex questions, writing, and analysis",
+        },
+        max: {
+          label: "Max",
+          desc: "Highest reasoning, no compromises — for when it really matters",
+        },
+      },
+    },
+    usecases: {
+      title: "What will you mostly use it for?",
+      subtitle:
+        "We'll add the right specialists to your AI's toolkit automatically.",
+      saving: "Setting up...",
+      start: "Start Chatting",
+      skip: "Skip — I'll set it up later",
+      noProviderAvailable:
+        "No AI provider configured. Add OPENROUTER_API_KEY or enable Claude Code (CLAUDE_CODE_ENABLED=true) to continue.",
+      coding: {
+        label: "Coding & Tech",
+        hint: "Vibe Coder, Coder",
+      },
+      research: {
+        label: "Research & Analysis",
+        hint: "Researcher, Data Analyst",
+      },
+      writing: {
+        label: "Writing & Editing",
+        hint: "Writer, Editor",
+      },
+      business: {
+        label: "Business & Strategy",
+        hint: "Business Advisor, Product Manager",
+      },
+      learning: {
+        label: "Learning & Study",
+        hint: "Tutor, Socratic Questioner",
+      },
+      chat: {
+        label: "Just Chatting",
+        hint: "Your companion is enough",
       },
     },
   },

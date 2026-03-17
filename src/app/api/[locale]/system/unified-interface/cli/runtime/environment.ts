@@ -133,6 +133,11 @@ export function loadEnvironment(): EnvironmentResult {
     }
   }
 
+  // Snapshot all caller-provided env vars before dotenv overwrites them.
+  // These are intentional overrides (e.g. from .mcp.json "env" block)
+  // that must take priority over .env file values.
+  const callerEnv = { ...process.env };
+
   // Load the .env file if found.
   // Use override: true so .env values always win over inherited shell env vars.
   // This prevents stale DATABASE_URL (e.g. from a previous `vibe start` session
@@ -142,6 +147,14 @@ export function loadEnvironment(): EnvironmentResult {
   } else {
     // Fallback to default dotenv behavior
     config({ quiet: true, override: true });
+  }
+
+  // Re-apply caller env vars that dotenv overwrote.
+  // Explicit process env (e.g. NODE_ENV=production from .mcp.json) wins over .env file.
+  for (const key in callerEnv) {
+    if (callerEnv[key] !== undefined && process.env[key] !== callerEnv[key]) {
+      process.env[key] = callerEnv[key];
+    }
   }
 
   // Activate local/preview mode for `vibe build` / `vibe start` (or --preview).
@@ -155,7 +168,7 @@ export function loadEnvironment(): EnvironmentResult {
   const isPreviewMode =
     !isProduction &&
     (args.includes("--preview") ||
-      args.includes("--remote") ||
+      args.includes("--local") ||
       args.includes(START_ALIAS) ||
       args.includes(START_SERVER_ALIAS) ||
       args.includes(BUILD_ALIAS) ||
@@ -165,6 +178,13 @@ export function loadEnvironment(): EnvironmentResult {
   // Expose preview mode flag so tasks can distinguish vibe start from vibe dev.
   // Explicitly set to "false" when not in preview mode to clear any stale shell env.
   process.env["IS_PREVIEW_MODE"] = isPreviewMode ? "true" : "false";
+
+  // vibe start/build/rebuild always run in production mode — force NODE_ENV so
+  // dev-only task runners (e.g. devWatcher) stay disabled.
+  if (isPreviewMode) {
+    // eslint-disable-next-line i18next/no-literal-string
+    (process.env as Record<string, string>)["NODE_ENV"] = "production";
+  }
 
   if (isPreviewMode && !args.includes("--skip-db-setup")) {
     const previewDbPort = process.env["PREVIEW_DB_PORT"] || "5433";

@@ -880,7 +880,6 @@ export class AuthRepository {
         return success(createPublicUser(leadId || ""));
       }
 
-      // For Next.js platforms (both page and API), validate session against database
       if (
         context.platform === Platform.NEXT_PAGE ||
         context.platform === Platform.NEXT_API

@@ -69,11 +69,12 @@ export function LeadsExportContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const isLoading = endpointMutations?.read?.isLoading;
 
-  const dateFrom = String(form?.watch("dateFrom") ?? "");
-  const dateTo = String(form?.watch("dateTo") ?? "");
-  const includeMetadata: boolean = form?.watch("includeMetadata") ?? true;
-  const includeEngagementData: boolean =
-    form?.watch("includeEngagementData") ?? false;
+  const dateFromRaw = form.watch("dateFrom");
+  const dateToRaw = form.watch("dateTo");
+  const dateFrom = dateFromRaw ? dateFromRaw.toISOString().slice(0, 10) : "";
+  const dateTo = dateToRaw ? dateToRaw.toISOString().slice(0, 10) : "";
+  const includeMetadata = form.watch("includeMetadata") ?? true;
+  const includeEngagementData = form.watch("includeEngagementData") ?? false;
 
   const [copied, setCopied] = useState(false);
 
@@ -199,7 +200,7 @@ export function LeadsExportContainer({
               type="date"
               value={dateFrom}
               onChange={(e) => {
-                form?.setValue("dateFrom", new Date(e.target.value));
+                form.setValue("dateFrom", new Date(e.target.value));
               }}
               className="h-9"
             />
@@ -212,7 +213,7 @@ export function LeadsExportContainer({
               type="date"
               value={dateTo}
               onChange={(e) => {
-                form?.setValue("dateTo", new Date(e.target.value));
+                form.setValue("dateTo", new Date(e.target.value));
               }}
               className="h-9"
             />
@@ -223,7 +224,7 @@ export function LeadsExportContainer({
             <Checkbox
               checked={includeMetadata}
               onCheckedChange={(checked) => {
-                form?.setValue("includeMetadata", checked === true);
+                form.setValue("includeMetadata", checked === true);
               }}
             />
             <Span className="text-sm">{t(children.includeMetadata.label)}</Span>
@@ -232,7 +233,7 @@ export function LeadsExportContainer({
             <Checkbox
               checked={includeEngagementData}
               onCheckedChange={(checked) => {
-                form?.setValue("includeEngagementData", checked === true);
+                form.setValue("includeEngagementData", checked === true);
               }}
             />
             <Span className="text-sm">

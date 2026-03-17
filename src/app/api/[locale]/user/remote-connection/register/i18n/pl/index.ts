@@ -26,6 +26,14 @@ export const translations: typeof enTranslations = {
         invalid: "Proszę podać prawidłowy URL",
       },
     },
+    reverseToken: {
+      label: "Token zwrotny",
+      description: "Token JWT do uwierzytelnienia zwrotnego zdalnej instancji",
+    },
+    reverseLeadId: {
+      label: "Zwrotny ID leadu",
+      description: "ID leadu dla połączenia zwrotnego",
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

@@ -6,7 +6,7 @@
  * Used as a cron task by handleTaskCompletion to resume a paused AI stream
  * after an async remote task completes (callbackMode=wait or callbackMode=wakeUp).
  *
- * The taskInput carries: threadId, modelId (or favoriteId), characterId.
+ * The taskInput carries: threadId, modelId (or favoriteId), skillId.
  * handleTaskCompletion creates a one-shot cron task with routeId="resume-stream"
  * and all needed context flows through taskInput — no DB columns needed.
  */
@@ -65,7 +65,7 @@ const { POST } = createEndpoint({
         schema: z.string().uuid(),
       }),
 
-      // ── Favorite shortcut (loads model + character in one shot) ─────────
+      // ── Favorite shortcut (loads model + skill in one shot) ─────────
       favoriteId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -76,7 +76,7 @@ const { POST } = createEndpoint({
           .transform((v) => (v === "" ? undefined : v)),
       }),
 
-      // ── Explicit model / character (override or use instead of favorite) ─
+      // ── Explicit model / skill (override or use instead of favorite) ─
       modelId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -85,7 +85,17 @@ const { POST } = createEndpoint({
         schema: z.enum(ModelId).optional(),
       }),
 
-      characterId: requestField(scopedTranslation, {
+      skillId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+
+      // ── callbackMode: determines resume behavior ──────────────────────
+      // "wait" → just emit tool-result WS + fire headless stream (no deferred pairs)
+      // "wakeUp" → insert deferred message pair + fire headless stream
+      callbackMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -100,6 +110,24 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
+        schema: z.string().optional(),
+      }),
+
+      // ── wakeUp: task result to inject as deferred TOOL message ─────────
+      // Passed from task-completion-handler as JSON.stringify(output).
+      // deepParseJsonStrings in request-validator auto-parses it back to an object,
+      // so the schema must accept the parsed form (record), not the raw string.
+      wakeUpResult: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 12,
+        schema: z.record(z.string(), z.any()).optional(),
+      }),
+
+      wakeUpStatus: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 6,
         schema: z.string().optional(),
       }),
 
@@ -119,6 +147,16 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
+      }),
+
+      // ── Branch tracking: the branch leaf at tool-call time ────────────────
+      // Stored by execute-tool/wait-for-task so revival appends the deferred
+      // result to the correct branch even if the user switched branches.
+      leafMessageId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 12,
+        schema: z.string().uuid().optional(),
       }),
 
       // ── Response ────────────────────────────────────────────────────────
@@ -187,7 +225,7 @@ const { POST } = createEndpoint({
       withExplicit: {
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         modelId: ModelId["CLAUDE_HAIKU_4_5"],
-        characterId: "default",
+        skillId: "default",
       },
     },
     responses: {

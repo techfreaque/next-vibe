@@ -19,7 +19,7 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
   const { t } = scopedTranslation.scopedT(locale);
   const form = useWidgetForm();
   // Watch password value for strength indicator
-  const password = form?.watch("password") || "";
+  const password = form.watch("password") || "";
 
   if (!password) {
     return null;

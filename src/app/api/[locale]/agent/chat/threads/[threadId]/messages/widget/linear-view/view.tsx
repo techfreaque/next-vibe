@@ -8,21 +8,15 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
-import {
-  chatAnimations,
-  chatProse,
-  chatShadows,
-} from "@/app/[locale]/chat/lib/design-tokens";
-import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/message-metadata";
+import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
+import type { TtsVoice } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -32,23 +26,20 @@ import { BRANCH_INDEX_KEY } from "../../hooks/use-branch-management";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { scopedTranslation } from "../../i18n";
 import { BranchNavigator } from "../branch-navigator";
-import { DebugSystemPrompt, DebugTrailingContext } from "../debug-component";
 import { ErrorMessageBubble } from "../error-message-bubble";
 import { GroupedAssistantMessage } from "../grouped-assistant-message";
-import { MessageAuthorInfo } from "../message-author";
 import { MessageEditor } from "../message-editor";
 import { groupMessagesBySequence } from "../message-grouping";
-import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
+import { ModelSkillSelectorModal } from "../model-skill-selector-modal";
 import { UserMessageBubble } from "../user-message-bubble";
 
-interface LinearMessageViewProps {
+export interface LinearMessageViewProps {
   messages: ChatMessage[];
   branchInfo: Record<string, { siblings: ChatMessage[]; currentIndex: number }>;
   locale: CountryLanguage;
   logger: EndpointLogger;
   currentUserId: string | null;
   user: JwtPayloadType;
-  viewMode: (typeof ViewMode)[keyof typeof ViewMode];
   collapseState: CollapseStateStore | null;
   rootFolderId: DefaultFolderId;
   subFolderId: string | null;
@@ -82,7 +73,7 @@ interface LinearMessageViewProps {
   onSetAnswerContent: ((content: string) => void) | null;
   editorAttachments: File[];
   isLoadingRetryAttachments: boolean;
-  selectedCharacter: string | null;
+  selectedSkill: string | null;
   selectedModel: string | null;
   /** Send message for tool confirmations (null in read-only mode) */
   sendMessage: ((params: SendMessageParams) => void) | null;
@@ -96,6 +87,16 @@ interface LinearMessageViewProps {
   onVoteMessage:
     | ((messageId: string, vote: 1 | -1 | 0) => Promise<void>)
     | null;
+  ttsAutoplay: boolean;
+  ttsVoice: (typeof TtsVoice)[keyof typeof TtsVoice] | undefined;
+  /** Optional debug slots — only provided by DebugLinearMessageView */
+  debugLeading?: JSX.Element;
+  renderDebugBeforeMessage?: (
+    message: ChatMessage,
+    isEditing: boolean,
+    isRetrying: boolean,
+  ) => JSX.Element | null;
+  debugTrailing?: JSX.Element;
 }
 
 export const LinearMessageView = React.memo(function LinearMessageView({
@@ -105,10 +106,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   logger,
   currentUserId,
   user,
-  viewMode,
   collapseState,
   rootFolderId,
-  subFolderId,
   onRetryMessage,
   onSwitchBranch,
   onBranchMessage,
@@ -124,23 +123,24 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   onSetAnswerContent,
   editorAttachments,
   isLoadingRetryAttachments,
-  selectedCharacter,
-  selectedModel,
   sendMessage,
   deductCredits,
   onLoadNewerHistory,
   isLoadingNewerHistory,
   onVoteMessage,
+  ttsAutoplay,
+  ttsVoice,
+  debugLeading,
+  renderDebugBeforeMessage,
+  debugTrailing,
 }: LinearMessageViewProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
-  // Group messages by sequence for proper display (memoized)
   const messageGroups = useMemo(
     () => groupMessagesBySequence(messages),
     [messages],
   );
 
-  // Create a map of message IDs to their groups for quick lookup (memoized)
   const messageToGroupMap = useMemo(() => {
     const map = new Map<string, (typeof messageGroups)[0]>();
     for (const group of messageGroups) {
@@ -152,19 +152,11 @@ export const LinearMessageView = React.memo(function LinearMessageView({
     return map;
   }, [messageGroups]);
 
-  // Check for root-level branches (multiple root messages)
   const rootBranches = branchInfo[BRANCH_INDEX_KEY];
   const hasRootBranches = rootBranches && rootBranches.siblings.length > 1;
 
-  // Get user's timezone from browser (stable — timezone doesn't change during session)
-  const timezone = useMemo(
-    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
-    [],
-  );
-
   return (
     <>
-      {/* Show root-level branch navigator if there are multiple root messages */}
       {hasRootBranches && onSwitchBranch && (
         <Div className="md:flex md:justify-end">
           <Div className="mb-3 md:w-[75%]">
@@ -188,18 +180,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
         </Div>
       )}
 
-      {/* Show System Prompt in Debug Mode */}
-      {viewMode === ViewMode.DEBUG && (
-        <DebugSystemPrompt
-          locale={locale}
-          rootFolderId={rootFolderId}
-          subFolderId={subFolderId}
-          characterId={selectedCharacter}
-          selectedModel={selectedModel ?? undefined}
-          user={user}
-          logger={logger}
-        />
-      )}
+      {debugLeading}
 
       {messages.map((message, index) => {
         const isEditing = editingMessageId === message.id;
@@ -207,26 +188,19 @@ export const LinearMessageView = React.memo(function LinearMessageView({
           retryingMessageId === message.id && !isLoadingRetryAttachments;
         const isAnswering = answeringMessageId === message.id;
 
-        // Check if this message has branches (multiple children)
         const branches = branchInfo[message.id];
         const hasBranches = branches && branches.siblings.length > 1;
 
-        // Get the next message in the path (the child we're following)
         const nextMessage =
           index < messages.length - 1 ? messages[index + 1] : null;
 
-        // Check if this is a continuation message (part of a sequence but not the primary)
         const group = messageToGroupMap.get(message.id);
         const isContinuation = group && group.primary.id !== message.id;
 
-        // Skip rendering continuation messages - they'll be rendered with their primary
         if (isContinuation) {
           return null;
         }
 
-        // Check hasNewerHistory on this message OR any of its continuations.
-        // The flag may land on a continuation (e.g. the last tool call in a sequence)
-        // rather than on the primary assistant message.
         const allGroupMessages = group
           ? [group.primary, ...group.continuations]
           : [message];
@@ -241,42 +215,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
 
         return (
           <React.Fragment key={message.id}>
-            {/* Show Message Metadata in Debug Mode */}
-            {viewMode === ViewMode.DEBUG &&
-              (message.role === ChatMessageRole.USER ||
-                message.role === ChatMessageRole.ASSISTANT) && (
-                <Div className={cn(chatAnimations.slideIn, "mb-2")}>
-                  <Div
-                    className={cn(
-                      "rounded-lg px-3 py-2 text-xs font-mono",
-                      "bg-blue-500/10 border border-blue-500/20",
-                      "text-blue-300",
-                      chatShadows.sm,
-                    )}
-                  >
-                    {createMetadataSystemMessage(
-                      message,
-                      rootFolderId,
-                      timezone,
-                    )}
-                  </Div>
-                </Div>
-              )}
-
-            {/* In debug mode: trailing system message + context appear before edit/retry,
-                because the AI receives history up to (not including) the edited message,
-                then trailing, then context — matching the actual messages array order. */}
-            {viewMode === ViewMode.DEBUG && (isEditing || isRetrying) && (
-              <DebugTrailingContext
-                locale={locale}
-                rootFolderId={rootFolderId}
-                subFolderId={subFolderId}
-                characterId={selectedCharacter}
-                selectedModel={selectedModel ?? undefined}
-                user={user}
-                logger={logger}
-              />
-            )}
+            {renderDebugBeforeMessage?.(message, isEditing, isRetrying)}
 
             <ErrorBoundary locale={locale}>
               <Div className={cn(chatAnimations.slideIn, "group")}>
@@ -293,7 +232,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                   </Div>
                 ) : isRetrying && onCancelAction ? (
                   <Div className="flex justify-end">
-                    <ModelCharacterSelectorModal
+                    <ModelSkillSelectorModal
                       titleKey="widget.linearView.retryModal.title"
                       descriptionKey="widget.linearView.retryModal.description"
                       onConfirm={async (): Promise<void> => {
@@ -317,8 +256,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 ) : (
                   <>
                     {message.role === "user" && (
-                      // First message: on md+ has left margin to align next to sticky logo (same line)
-                      // Below md: no margin (logo is above on separate line)
                       <Div className={index === 0 ? "md:ml-18" : undefined}>
                         <UserMessageBubble
                           message={message}
@@ -356,6 +293,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           user={user}
                           sendMessage={sendMessage}
                           deductCredits={deductCredits}
+                          ttsAutoplay={ttsAutoplay}
+                          ttsVoice={ttsVoice}
                           className={index === 0 ? "md:mt-10" : undefined}
                           onVote={onVoteMessage}
                           userVote={
@@ -378,54 +317,14 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         rootFolderId={rootFolderId}
                       />
                     )}
-                    {/* Debug mode: Show system messages inline */}
-                    {viewMode === ViewMode.DEBUG &&
-                      message.role === ChatMessageRole.SYSTEM && (
-                        <Div className="flex items-start gap-3">
-                          <Div className="flex-1 max-w-full">
-                            <Div className="mb-2">
-                              <MessageAuthorInfo
-                                authorName={t(
-                                  "widget.debugView.systemMessageHint",
-                                )}
-                                authorId={null}
-                                currentUserId={undefined}
-                                isAI={true}
-                                model={message.model}
-                                timestamp={message.createdAt}
-                                edited={false}
-                                character={null}
-                                locale={locale}
-                                rootFolderId={rootFolderId}
-                                compact
-                              />
-                            </Div>
-
-                            <Div
-                              className={cn(
-                                chatProse.all,
-                                "pl-2 py-2.5 sm:py-3",
-                                "border border-blue-500/30 bg-blue-500/5 rounded-md",
-                              )}
-                            >
-                              <Markdown content={message.content ?? ""} />
-                            </Div>
-
-                            <Div className="mt-1 text-xs text-muted-foreground pl-2">
-                              {t("widget.debugView.systemMessageHint")}
-                            </Div>
-                          </Div>
-                        </Div>
-                      )}
                   </>
                 )}
               </Div>
             </ErrorBoundary>
 
-            {/* Show Answer-as-AI dialog below the message */}
             {isAnswering && onCancelAction && (
               <Div className="my-3">
-                <ModelCharacterSelectorModal
+                <ModelSkillSelectorModal
                   titleKey="widget.linearView.answerModal.title"
                   descriptionKey="widget.linearView.answerModal.description"
                   showInput={true}
@@ -447,7 +346,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
               </Div>
             )}
 
-            {/* Show branch navigator if this message has multiple children */}
             {hasBranches && nextMessage && onSwitchBranch && (
               <Div className="my-3">
                 <BranchNavigator
@@ -470,7 +368,6 @@ export const LinearMessageView = React.memo(function LinearMessageView({
               </Div>
             )}
 
-            {/* Show newer messages button — this message has a newer chunk beyond it */}
             {hasNewerHistory &&
               newerAnchorId &&
               onLoadNewerHistory &&
@@ -492,21 +389,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
         );
       })}
 
-      {/* Trailing system message + upcoming context — shown after all messages when not editing/retrying.
-          When editing/retrying, it appears inline before the editor above. */}
-      {viewMode === ViewMode.DEBUG &&
-        !editingMessageId &&
-        !retryingMessageId && (
-          <DebugTrailingContext
-            locale={locale}
-            rootFolderId={rootFolderId}
-            subFolderId={subFolderId}
-            characterId={selectedCharacter}
-            selectedModel={selectedModel ?? undefined}
-            user={user}
-            logger={logger}
-          />
-        )}
+      {debugTrailing}
     </>
   );
 });

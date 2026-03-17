@@ -8,9 +8,28 @@ import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 import { z as zod } from "zod";
 
+import { decryptEnvObject, loadOrCreateKey } from "./env-crypto";
+
+/**
+ * Lazily decrypted process.env — computed once, reused across all defineEnv calls.
+ * Decrypts vibe:enc:* values using the project key file.
+ */
+let _decryptedEnv: NodeJS.ProcessEnv | undefined;
+function getDecryptedEnv(): NodeJS.ProcessEnv {
+  if (!_decryptedEnv) {
+    _decryptedEnv = decryptEnvObject(
+      process.env as Record<string, string | undefined>,
+      loadOrCreateKey(),
+    ) as NodeJS.ProcessEnv;
+  }
+  return _decryptedEnv;
+}
+
 import { defaultLocale } from "@/i18n/core/config";
 
 import { envValidationLogger } from "./validation-logger";
+
+type EnvFieldType = "text" | "boolean" | "number" | "select" | "url" | "email";
 
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   schema: T;
@@ -18,6 +37,22 @@ interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   comment?: string;
   /** When true, the key is commented out in .env.example (still present but inactive) */
   commented?: boolean;
+  /** When true, the value is masked in admin settings views. Falls back to name-pattern heuristic if not set. */
+  sensitive?: boolean;
+  /** Grouping within a module (e.g. "auth", "database"). Used by the settings UI. */
+  category?: string;
+  /** When true, the onboarding flow highlights this field as must-configure. */
+  onboardingRequired?: boolean;
+  /** UI field type hint for the settings widget. Defaults to "text". */
+  fieldType?: EnvFieldType;
+  /** Available choices for "select" field type. */
+  options?: readonly string[];
+  /** Which step of the setup wizard this field appears on (1-based). */
+  onboardingStep?: number;
+  /** Human-readable group label for wizard step grouping (e.g. "admin", "database", "security", "ai"). */
+  onboardingGroup?: string;
+  /** When set, the settings UI shows a "Generate" button that fills the field with a random value of this type. */
+  autoGenerate?: "hex32" | "hex64";
 }
 
 type Fields = Record<string, FieldDef>;
@@ -59,6 +94,14 @@ export interface EnvExample {
   example: string | false;
   comment?: string;
   commented?: boolean;
+  sensitive?: boolean;
+  category?: string;
+  onboardingRequired?: boolean;
+  fieldType?: EnvFieldType;
+  options?: readonly string[];
+  onboardingStep?: number;
+  onboardingGroup?: string;
+  autoGenerate?: "hex32" | "hex64";
 }
 
 export function defineEnv<T extends Fields>(
@@ -129,7 +172,7 @@ export function defineEnv(
 
     // Validate using discriminated union
     const env = validateEnv(
-      process.env,
+      getDecryptedEnv(),
       discriminatedUnionSchema,
       envValidationLogger,
       defaultLocale,
@@ -166,6 +209,14 @@ export function defineEnv(
             example: def.example,
             comment: def.comment,
             commented: def.commented,
+            sensitive: def.sensitive,
+            category: def.category,
+            onboardingRequired: def.onboardingRequired,
+            fieldType: def.fieldType,
+            options: def.options,
+            onboardingStep: def.onboardingStep,
+            onboardingGroup: def.onboardingGroup,
+            autoGenerate: def.autoGenerate,
           });
         }
       }
@@ -186,6 +237,14 @@ export function defineEnv(
       example: def.example,
       comment: def.comment,
       commented: def.commented,
+      sensitive: def.sensitive,
+      category: def.category,
+      onboardingRequired: def.onboardingRequired,
+      fieldType: def.fieldType,
+      options: def.options,
+      onboardingStep: def.onboardingStep,
+      onboardingGroup: def.onboardingGroup,
+      autoGenerate: def.autoGenerate,
     });
   }
   const schema = zod.object(schemaShape);
@@ -195,7 +254,7 @@ export function defineEnv(
     hints[key] = { example: def.example, comment: def.comment };
   }
   const env = validateEnv(
-    process.env,
+    getDecryptedEnv(),
     schema,
     envValidationLogger,
     defaultLocale,

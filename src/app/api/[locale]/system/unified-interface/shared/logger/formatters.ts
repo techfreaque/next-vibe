@@ -55,6 +55,68 @@ export function formatTask(message: string, icon = "⚡"): string {
 }
 
 /**
+ * Format a vibe-sense message (bright red for analytics pipeline)
+ */
+export function formatSense(message: string, icon = "📊"): string {
+  return `${icon} ${maybeColorize(message, semantic.sense)}`;
+}
+
+/**
+ * Create a stateful Next.js output formatter.
+ *
+ * Behaviour:
+ *  - "▲ Next.js …" header block (the banner + its indented sub-lines) → no timestamp
+ *  - "✓ Starting…" and every line that follows → prepend [X.XXXs] / ISO timestamp
+ *
+ * Returns a function that accepts raw stdout/stderr chunks and returns the
+ * formatted string ready for process.stdout.write().
+ */
+export function createNextjsFormatter(): (chunk: string) => string {
+  const isProduction = process.env["NODE_ENV"] === "production";
+
+  const getTimePrefix = (): string => {
+    if (isProduction) {
+      return new Date().toISOString().slice(11, 23);
+    }
+    return `${process.uptime().toFixed(3)}s`;
+  };
+
+  let lastPrefix = "";
+
+  return (chunk: string): string => {
+    const lines = chunk.split("\n");
+    const out: string[] = [];
+
+    for (const raw of lines) {
+      if (raw.trim().length === 0) {
+        out.push(raw);
+        continue;
+      }
+
+      const prefix = `[${getTimePrefix()}] `;
+      if (prefix === lastPrefix) {
+        // Same timestamp as previous line — indent instead to visually group
+        out.push(
+          maybeColorize(`${" ".repeat(prefix.length)}${raw}`, semantic.nextjs),
+        );
+      } else {
+        lastPrefix = prefix;
+        out.push(maybeColorize(`${prefix}${raw}`, semantic.nextjs));
+      }
+    }
+
+    return out.join("\n");
+  };
+}
+
+/**
+ * Format a Next.js output line (simple, no timestamp — use createNextjsFormatter for stateful timestamping)
+ */
+export function formatNextjs(line: string): string {
+  return maybeColorize(line, semantic.nextjs);
+}
+
+/**
  * Format a generator message
  */
 export function formatGenerator(message: string, icon = "⚙️"): string {

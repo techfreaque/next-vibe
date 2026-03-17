@@ -354,7 +354,7 @@ export const translations: typeof enTranslations = {
     upgrade: {
       title: "Mehr haben?",
       desc: "8 €/Monat gibt dir 800 Credits - das ist 40× mehr. Dazu kannst du extra Credit-Pakete kaufen, die niemals ablaufen. Perfekt für tägliche KI-Nutzung.",
-      cta: "Unlimited Plan ansehen",
+      cta: "Auf Pro upgraden",
     },
     signoff: "Viel Spaß beim Chatten,\nDas {{appName}} Team",
     ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten – wir speichern sie niemals auf unseren Servern.",

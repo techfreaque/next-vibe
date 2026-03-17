@@ -42,9 +42,9 @@ export function MessengerAccountEditContainer({
   const t = useWidgetTranslation<typeof definition.PUT>();
   const form = useWidgetForm();
 
-  const channel: string = form?.watch("channel") ?? "";
+  const channel = form.watch("channel") ?? "";
   const isEmail = channel === MessageChannel.EMAIL;
-  const isSmtp = isEmail && form?.watch("provider") === "enums.provider.smtp";
+  const isSmtp = isEmail && form.watch("provider") === "enums.provider.smtp";
   const isApiProvider = !isSmtp && channel !== "";
 
   const validProviders = channel ? CHANNEL_TO_PROVIDERS[channel] : undefined;

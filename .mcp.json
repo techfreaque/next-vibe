@@ -7,18 +7,21 @@
         "/home/max/projects/next-vibe/src/app/api/[locale]/system/unified-interface/cli/runtime/env-preload.ts",
         "/home/max/projects/next-vibe/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
         "mcp",
-        "--preview"
+        "--local"
       ],
       "env": {
-        "PROJECT_ROOT": "/home/max/projects/next-vibe"
+        "NODE_ENV": "production"
       }
     },
-    "vibe-check": {
-      "command": "npx",
-      "args": ["--yes", "@next-vibe/checker@latest", "mcp"],
-      "env": {
-        "PROJECT_ROOT": "/home/max/projects/next-vibe"
-      }
+    "vibe-dev": {
+      "command": "bun",
+      "args": [
+        "--preload",
+        "/home/max/projects/next-vibe/src/app/api/[locale]/system/unified-interface/cli/runtime/env-preload.ts",
+        "/home/max/projects/next-vibe/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+        "mcp"
+      ],
+      "env": {}
     }
   }
 }

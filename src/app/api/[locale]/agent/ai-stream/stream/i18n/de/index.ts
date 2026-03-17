@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "KI-Agent ausführen",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Einen headless KI-Agenten ausführen und die vollständige Textantwort erhalten. Verwende dies, um Aufgaben zu delegieren, Tool-Ergebnisse zusammenzufassen, Inhalte zu generieren oder Tools zu einer einzigen KI-Antwort zu verketten. Credits werden je nach Modell verbraucht. SCHNELLSTART: Übergib favoriteId, um Charakter + Modell + Tool-Konfiguration aus einem gespeicherten Favoriten zu laden. Überschreibe jedes Feld (model, character, tools, allowedTools) durch explizite Angabe. EINRICHTUNG: Vor der Ausführung den richtigen Charakter + Favoriten einrichten. Charaktere definieren Persona und System-Prompt (erstellen mit agent_chat_characters_create_POST). Favoriten bündeln Charakter mit Modellüberschreibung und Tool-Konfiguration (erstellen mit agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} oder {selectionType:'FILTERS',...}). Workflow: 1) Favoriten (agent_chat_favorites_GET) oder Charaktere (agent_chat_characters_GET) auflisten. 2) Falls keiner passt, Charakter erstellen, dann Favorit dafür anlegen. 3) favoriteId an diesen Aufruf übergeben. TOOL-ZUGRIFF: Standard-Setup: allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool führt jeden Endpunkt aus, system_help_GET ermöglicht Tool-Entdeckung.",
+        "Einen headless KI-Agenten ausführen und die vollständige Textantwort erhalten. Verwende dies, um Aufgaben zu delegieren, Tool-Ergebnisse zusammenzufassen, Inhalte zu generieren oder Tools zu einer einzigen KI-Antwort zu verketten. Credits werden je nach Modell verbraucht. SCHNELLSTART: Übergib favoriteId, um Charakter + Modell + Tool-Konfiguration aus einem gespeicherten Favoriten zu laden. Überschreibe jedes Feld (model, skill, tools, availableTools) durch explizite Angabe. EINRICHTUNG: Vor der Ausführung den richtigen Charakter + Favoriten einrichten. Charaktere definieren Persona und System-Prompt (erstellen mit agent_chat_skills_create_POST). Favoriten bündeln Charakter mit Modellüberschreibung und Tool-Konfiguration (erstellen mit agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} oder {selectionType:'FILTERS',...}). Workflow: 1) Favoriten (agent_chat_favorites_GET) oder Charaktere (agent_chat_skills_GET) auflisten. 2) Falls keiner passt, Charakter erstellen, dann Favorit dafür anlegen. 3) favoriteId an diesen Aufruf übergeben. TOOL-ZUGRIFF: Standard-Setup: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool führt jeden Endpunkt aus, system_help_GET ermöglicht Tool-Entdeckung.",
       container: {
         title: "KI-Agent-Ausführung",
         description:
@@ -28,18 +28,18 @@ export const translations: typeof enTranslations = {
         favoriteId: {
           label: "Favoriten-ID",
           description:
-            "UUID eines gespeicherten Favoriten zum Laden von Charakter, Modell und Tool-Konfiguration. Charakter, Modell (aus modelSelection) und Tool-Konfiguration (activeTools/visibleTools) des Favoriten werden als Standardwerte verwendet. Explizite Felder in dieser Anfrage überschreiben die Favoriten-Werte. Verwende agent_chat_favorites_GET zum Auflisten.",
+            "UUID eines gespeicherten Favoriten zum Laden von Charakter, Modell und Tool-Konfiguration. Charakter, Modell (aus modelSelection) und Tool-Konfiguration (availableTools/pinnedTools) des Favoriten werden als Standardwerte verwendet. Explizite Felder in dieser Anfrage überschreiben die Favoriten-Werte. Verwende agent_chat_favorites_GET zum Auflisten.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Modell",
           description:
-            "KI-Modell. Optional wenn favoriteId oder character gesetzt (aus deren modelSelection aufgelöst). Schnell & günstig: claude-haiku-4.5, gemini-2.5-flash. Ausgewogen: claude-sonnet-4.6, gpt-5. Leistungsstark: claude-opus-4.6, gpt-5-pro. Kostenlos: qwen3_235b-free, gpt-oss-120b-free. Überschreibt das Modell aus favoriteId/character.",
+            "KI-Modell. Optional wenn favoriteId oder skill gesetzt (aus deren modelSelection aufgelöst). Schnell & günstig: claude-haiku-4.5, gemini-2.5-flash. Ausgewogen: claude-sonnet-4.6, gpt-5. Leistungsstark: claude-opus-4.6, gpt-5-pro. Kostenlos: qwen3_235b-free, gpt-oss-120b-free. Überschreibt das Modell aus favoriteId/skill.",
         },
-        character: {
-          label: "Charakter",
+        skill: {
+          label: "Skill",
           description:
-            "Charakter-ID (UUID) oder 'default'. Optional wenn favoriteId gesetzt (aus dem Favoriten aufgelöst). Charaktere definieren KI-Persona, System-Prompt und Standard-Modell. Überschreibt den Charakter aus favoriteId. Verwende agent_chat_characters_GET zum Auflisten.",
+            "Skill-ID (UUID) oder 'default'. Optional wenn favoriteId gesetzt (aus dem Favoriten aufgelöst). Skills definieren KI-Persona, System-Prompt und Standard-Modell. Überschreibt den Skill aus favoriteId. Verwende agent_chat_skills_GET zum Auflisten.",
           placeholder: "default",
         },
         prompt: {
@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
           routeId: {
             label: "Tool-ID",
             description:
-              "Alias oder vollständiger Tool-Name (z.B. 'web-search', 'agent_chat_characters_GET'). Verwende system_help_GET zur Tool-Entdeckung.",
+              "Alias oder vollständiger Tool-Name (z.B. 'web-search', 'agent_chat_skills_GET'). Verwende system_help_GET zur Tool-Entdeckung.",
             placeholder: "web-search",
           },
           args: {
@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
               'Flache Schlüssel-Wert-Argumente — urlPathParams und Body-Felder zusammengeführt (z.B. {"query": "neueste Nachrichten", "maxResults": 5}).',
           },
         },
-        allowedTools: {
+        availableTools: {
           label: "Ausführbar (Berechtigungsschicht)",
           description:
             "Ausführungs-Berechtigungsschicht — kontrolliert welche Tools die KI tatsächlich ausführen darf. null = alle Tools erlaubt. Array = nur aufgelistete Tools (andere werden mit 'vom Benutzer deaktiviert' blockiert). Standard-Agent-Setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatcht jeden registrierten Endpunkt, system_help_GET ermöglicht Tool-Entdeckung. Tools aus dem tools-Feld müssen nicht wiederholt werden.",
@@ -85,10 +85,10 @@ export const translations: typeof enTranslations = {
               "Bei true wartet die Ausführung auf Benutzerbestätigung. Für destruktive oder kostenintensive Aktionen verwenden.",
           },
         },
-        tools: {
+        pinnedTools: {
           label: "Im Kontext (KI sieht diese)",
           description:
-            "Tools im Kontextfenster des Modells — was die KI kennt und worüber sie nachdenken kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten, minimalen Kontext. Hinweis: allowedTools kontrolliert die tatsächliche Ausführung — dieses Feld beeinflusst nur, was das Modell sieht.",
+            "Tools im Kontextfenster des Modells — was die KI kennt und worüber sie nachdenken kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten, minimalen Kontext. Hinweis: availableTools kontrolliert die tatsächliche Ausführung — dieses Feld beeinflusst nur, was das Modell sieht.",
           toolId: {
             label: "Tool-ID",
             description:
@@ -224,6 +224,10 @@ export const translations: typeof enTranslations = {
       label: "Eltern-Nachrichten-ID",
       description: "Eltern-Nachrichten-ID für Verzweigung/Threading",
     },
+    leafMessageId: {
+      label: "Blatt-Nachrichten-ID",
+      description: "Aktuelle Zweig-Blatt-Nachrichten-ID",
+    },
     messageHistory: {
       label: "Nachrichtenverlauf",
       description: "Optionaler Nachrichtenverlauf für Inkognito-Modus",
@@ -278,9 +282,9 @@ export const translations: typeof enTranslations = {
       label: "Modell",
       description: "KI-Modell für die Generierung verwenden",
     },
-    character: {
-      label: "Charakter",
-      description: "Optionaler Charakter für die KI",
+    skill: {
+      label: "Skill",
+      description: "Optionaler Skill für die KI",
     },
     systemPrompt: {
       label: "System-Prompt",
@@ -300,7 +304,7 @@ export const translations: typeof enTranslations = {
       label: "Zeitzone",
       description: "Benutzer-Zeitzone für cache-stabile Zeitstempel",
     },
-    activeTool: {
+    availableTools: {
       label: "Ausführbar",
       description:
         "Ausführungs-Berechtigungsschicht — welche Tools die KI tatsächlich ausführen darf. null = alle erlaubt. Array = nur diese Tools.",
@@ -309,10 +313,10 @@ export const translations: typeof enTranslations = {
         description: "Alias oder vollständiger Name des erlaubten Tools",
       },
     },
-    tools: {
+    pinnedTools: {
       label: "Im Kontext (KI sieht diese)",
       description:
-        "Tools im Kontextfenster des Modells — was die KI kennt. null = Standard-Set des Benutzers. allowedTools steuert die tatsächliche Ausführung.",
+        "Tools im Kontextfenster des Modells — was die KI kennt. null = Standard-Set des Benutzers. availableTools steuert die tatsächliche Ausführung.",
       toolId: {
         label: "Tool-ID",
         description: "Alias oder vollständiger Name des Tools im Kontext",
@@ -469,7 +473,8 @@ export const translations: typeof enTranslations = {
       unknownError: "Ein Fehler ist aufgetreten",
       creditValidationFailed: "Fehler bei der Validierung des Guthabens",
       noIdentifier: "Keine Benutzer- oder Lead-Kennung angegeben",
-      insufficientCredits: "Nicht genügend Guthaben für diese Anfrage",
+      insufficientCredits:
+        "Nicht genügend Guthaben für diese Anfrage (Kosten: {{cost}}, Guthaben: {{balance}})",
       authenticationRequired:
         "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
       noResponseBody: "Kein Antworttext vom Stream erhalten",
@@ -496,6 +501,8 @@ export const translations: typeof enTranslations = {
     toolDisabledByUser:
       "Dieses Werkzeug wurde vom Benutzer deaktiviert. Versuche nicht, es erneut aufzurufen.",
     userDeclinedTool: "Werkzeug-Ausführung wurde abgebrochen.",
+    pendingToolCall:
+      "Ein Werkzeug läuft noch im Hintergrund. Bitte warten Sie, bis es abgeschlossen ist.",
     streamError:
       "Die KI-Antwort konnte nicht vollständig verarbeitet werden. Bitte versuchen Sie es erneut.",
     streamProcessingError:
@@ -534,7 +541,7 @@ export const translations: typeof enTranslations = {
   },
   headless: {
     errors: {
-      missingModelOrCharacter:
+      missingModelOrSkill:
         "Modell und Charakter sind erforderlich — direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
       favoriteNotFound:
         "Favorit nicht gefunden oder gehört nicht diesem Benutzer",
@@ -559,14 +566,27 @@ export const translations: typeof enTranslations = {
           title: "Modell-ID",
           description: "KI-Modell für den fortgesetzten Schritt.",
         },
-        characterId: {
+        skillId: {
           title: "Charakter-ID",
           description: "Charakter/Persona für den fortgesetzten Schritt.",
+        },
+        callbackMode: {
+          title: "Callback-Modus",
+          description:
+            "Callback-Modus des ursprünglichen Tool-Aufrufs (wait oder wakeUp).",
         },
         wakeUpToolMessageId: {
           title: "WakeUp-Tool-Nachrichten-ID",
           description:
-            "ID der ursprünglichen wakeUp-Tool-Aufruf-Nachricht. Wird für das Einfügen einer verzögerten Ergebnisnachricht verwendet.",
+            "ID der ursprünglichen Tool-Aufruf-Nachricht mit dem Ergebnis.",
+        },
+        wakeUpTaskId: {
+          title: "WakeUp-Aufgaben-ID",
+          description: "ID der auslösenden Remote-Cron-Aufgabe.",
+        },
+        resumeTaskId: {
+          title: "Resume-Aufgaben-ID",
+          description: "ID dieser Resume-Stream-Cron-Aufgabe.",
         },
         resumed: {
           title: "Fortgesetzt",
@@ -622,6 +642,83 @@ export const translations: typeof enTranslations = {
     uncensoredHandler: {
       errors: {
         apiError: "Uncensored.ai API-Fehler ({{status}}): {{errorText}}",
+      },
+    },
+  },
+  onboarding: {
+    back: "Zurück",
+    welcome: {
+      title: "Stell dir uns als dein KI-Team vor.",
+      line1:
+        "Dein Begleiter kümmert sich um alltägliche Gespräche. Spezialisten übernehmen für Coding, Recherche, Schreiben — was auch immer gebraucht wird.",
+      line2: "Die KI wechselt automatisch zwischen ihnen. Du redest einfach.",
+      line3: "Lass uns dich in unter einer Minute einrichten.",
+      continue: "Los geht's",
+    },
+    guest: {
+      title: "Du surfst als Gast",
+      line1:
+        "Deine Einstellungen, dein Begleiter und dein Chatverlauf werden nur lokal auf diesem Gerät gespeichert.",
+      line2:
+        "Melde dich an, um alles geräteübergreifend zu synchronisieren — und dein Setup nie zu verlieren.",
+      signIn: "Anmelden / Konto erstellen",
+      continueAnyway: "Als Gast fortfahren",
+      note: "Du kannst dich jederzeit über das Menü anmelden.",
+    },
+    companion: {
+      title: "Wähle deinen Begleiter",
+      subtitle: "Dein täglicher Gesprächspartner",
+      budgetTitle: "Wie leistungsfähig soll deine KI sein?",
+      budgetSubtitle: "Du kannst das jederzeit in den Einstellungen ändern",
+      next: "Weiter",
+      selectFirst: "Wähle einen Begleiter zum Fortfahren",
+      budget: {
+        smart: {
+          label: "Smart",
+          desc: "Schnell, effizient, bewältigt die meisten Aufgaben gut",
+        },
+        brilliant: {
+          label: "Brilliant",
+          desc: "Beste Qualität — ideal für komplexe Fragen, Schreiben und Analysen",
+        },
+        max: {
+          label: "Max",
+          desc: "Höchstes Denkvermögen, keine Kompromisse — für wenn es wirklich darauf ankommt",
+        },
+      },
+    },
+    usecases: {
+      title: "Wofür wirst du es hauptsächlich nutzen?",
+      subtitle:
+        "Wir fügen automatisch die richtigen Spezialisten zu deinem KI-Toolkit hinzu.",
+      saving: "Einrichtung...",
+      start: "Chat starten",
+      skip: "Überspringen — ich richte es später ein",
+      noProviderAvailable:
+        "Kein KI-Anbieter konfiguriert. Füge OPENROUTER_API_KEY hinzu oder aktiviere Claude Code (CLAUDE_CODE_ENABLED=true) um fortzufahren.",
+      coding: {
+        label: "Coding & Technik",
+        hint: "Vibe Coder, Coder",
+      },
+      research: {
+        label: "Recherche & Analyse",
+        hint: "Researcher, Data Analyst",
+      },
+      writing: {
+        label: "Schreiben & Bearbeiten",
+        hint: "Writer, Editor",
+      },
+      business: {
+        label: "Business & Strategie",
+        hint: "Business Advisor, Product Manager",
+      },
+      learning: {
+        label: "Lernen & Studium",
+        hint: "Tutor, Socratic Questioner",
+      },
+      chat: {
+        label: "Einfach chatten",
+        hint: "Dein Begleiter reicht aus",
       },
     },
   },

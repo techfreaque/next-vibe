@@ -8,9 +8,6 @@ import type { FieldPath, FieldValues } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 import { View } from "react-native";
 
-import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 // ============================================================================
 // IMPORT ALL TYPES FROM WEB - DO NOT REDEFINE ANY TYPES
 // ============================================================================
@@ -219,27 +216,22 @@ FormDescription.displayName = "FormDescription";
  * We accept all props and filter to native-compatible ones internally.
  */
 function FormMessage({
-  className,
   children,
+  t,
 }: FormMessageProps): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
-  const { t } = useTranslation();
   const body = error ? String(error.message) : children;
 
   if (!body || body === "undefined") {
     return null;
   }
 
-  // Note: style prop is not passed due to StyleType discriminated union
   return (
     <P
       id={formMessageId}
-      className={cn(
-        "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
-        className,
-      )}
+      className="text-[0.8rem] font-medium text-red-600 dark:text-red-400"
     >
-      {t(body as TranslationKey)}
+      {t(String(body))}
     </P>
   );
 }

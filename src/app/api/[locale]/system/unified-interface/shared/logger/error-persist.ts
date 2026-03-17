@@ -18,7 +18,11 @@ import {
   type NewErrorLog,
 } from "@/app/api/[locale]/system/unified-interface/tasks/error-monitor/db";
 
-import { type LoggerMetadata, registerErrorSink } from "./endpoint";
+import {
+  type ErrorLogLevel,
+  type LoggerMetadata,
+  registerErrorSink,
+} from "./endpoint";
 
 /** Truncate a string to maxLen, appending "..." if truncated */
 function truncate(str: string | undefined | null, maxLen: number): string {
@@ -75,10 +79,11 @@ function extractMessage(
 
 /** Compute a deterministic fingerprint for error grouping/deduplication */
 function computeFingerprint(
+  level: ErrorLogLevel,
   errorType: string | null | undefined,
   message: string,
 ): string {
-  const key = `${errorType ?? "unknown"}:${message.slice(0, 100)}`;
+  const key = `${level}:${errorType ?? "unknown"}:${message.slice(0, 100)}`;
   return Bun.hash(key).toString(36);
 }
 
@@ -87,13 +92,10 @@ function computeFingerprint(
  * Never throws — all errors are silently caught.
  */
 export function persistErrorLog(
-  source: NewErrorLog["source"],
+  level: ErrorLogLevel,
   message: string,
-  error?: LoggerMetadata,
-  context?: {
-    endpoint?: string;
-    level?: "error" | "warn";
-  },
+  error: LoggerMetadata | undefined,
+  extraMeta: LoggerMetadata[],
 ): void {
   // Fire-and-forget — do not await
   void (async (): Promise<void> => {
@@ -105,20 +107,21 @@ export function persistErrorLog(
 
       const errorType = extractErrorType(error) ?? null;
       const truncatedMessage = extractMessage(message, error);
-      const fingerprint = computeFingerprint(errorType, truncatedMessage);
+      const fingerprint = computeFingerprint(
+        level,
+        errorType,
+        truncatedMessage,
+      );
 
       const row: NewErrorLog = {
-        source,
-        level: context?.level ?? "error",
         message: truncatedMessage,
-        endpoint: context?.endpoint ?? null,
         errorType,
-        errorCode: null,
         stackTrace: extractStack(error) ?? null,
-        metadata: {},
+        metadata: extraMeta,
         fingerprint,
         occurrences: 1,
         resolved: false,
+        level,
       };
 
       // Upsert: if same fingerprint exists, increment occurrences and update timestamp
@@ -130,6 +133,7 @@ export function persistErrorLog(
           set: {
             occurrences: sql`${errorLogs.occurrences} + 1`,
             stackTrace: row.stackTrace,
+            metadata: extraMeta,
             resolved: false,
             createdAt: sql`now()`,
           },
@@ -151,7 +155,7 @@ const isProduction = process.env["NODE_ENV"] === "production";
 const isPreview = process.env["IS_PREVIEW_MODE"] === "true";
 
 if (isProduction || isPreview) {
-  registerErrorSink((message, error) => {
-    persistErrorLog("backend", message, error);
+  registerErrorSink((level, message, error, metadata) => {
+    persistErrorLog(level, message, error, metadata);
   });
 }

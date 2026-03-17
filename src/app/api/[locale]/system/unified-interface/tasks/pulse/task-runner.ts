@@ -43,11 +43,11 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
     cronUser: JwtPrivatePayloadType;
   }): Promise<void> {
     const { signal, logger, systemLocale } = props;
-    logger.info(formatTask("Starting pulse task runner...", "💓"));
-
     const PULSE_INTERVAL = (env.PULSE_INTERVAL_MINUTES ?? 1) * 60 * 1000;
     logger.info(
-      formatTask(`Pulse interval: ${env.PULSE_INTERVAL_MINUTES ?? 1}min`, "💓"),
+      formatTask(
+        `💓 Started task runner with pulse of ${env.PULSE_INTERVAL_MINUTES ?? 1}min`,
+      ),
     );
 
     // Import once outside the loop — dynamic to avoid circular dependencies at module load time

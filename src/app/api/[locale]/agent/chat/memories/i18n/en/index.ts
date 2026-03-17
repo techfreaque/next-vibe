@@ -20,6 +20,17 @@ export const translations = {
     title: "List Memories",
     dynamicTitle: "Memories ({{count}})",
     description: "Retrieves all memories for the current user",
+    fields: {
+      search: {
+        label: "Search",
+        description: "Filter memories by content or tags",
+        placeholder: "Search memories...",
+      },
+      tag: {
+        label: "Tag Filter",
+        description: "Filter memories by a specific tag",
+      },
+    },
     container: {
       title: "Memories",
     },

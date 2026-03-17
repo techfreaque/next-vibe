@@ -1,6 +1,6 @@
 /**
  * Remote Connection by Instance ID Widget
- * Shows status, refresh, rename, disconnect for a specific connection.
+ * Shows status, re-authenticate, rename, disconnect for a specific connection.
  */
 
 "use client";
@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { Key } from "next-vibe-ui/ui/icons/Key";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
@@ -34,8 +35,11 @@ import {
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 
 import connectDefinitions from "../connect/definition";
+import disconnectDefinition from "./disconnect/definition";
+import reauthDefinition from "./reauth/definition";
+import renameDefinition from "./rename/definition";
 import type { RemoteConnectionByIdGetResponseOutput } from "./definition";
-import definitions from "./definition";
+import type definitions from "./definition";
 import { scopedTranslation } from "./i18n";
 
 interface RemoteConnectionByIdWidgetProps {
@@ -64,7 +68,7 @@ export function RemoteConnectionByIdWidget({
     e.stopPropagation();
     setIsDisconnecting(true);
     try {
-      navigate(definitions.DELETE, {
+      navigate(disconnectDefinition.DELETE, {
         urlPathParams: { instanceId },
         renderInModal: true,
         popNavigationOnSuccess: 1,
@@ -145,7 +149,7 @@ export function RemoteConnectionByIdWidget({
                 </P>
               </Div>
             )}
-            <Div className="flex gap-2 pt-2">
+            <Div className="flex gap-2 pt-2 flex-wrap">
               <Button
                 type="button"
                 variant="outline"
@@ -155,6 +159,35 @@ export function RemoteConnectionByIdWidget({
               >
                 <RefreshCw className="h-4 w-4" />
                 {t("widget.connected.refresh")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  navigate(reauthDefinition.POST, {
+                    urlPathParams: { instanceId },
+                    renderInModal: true,
+                  })
+                }
+                className="gap-2"
+              >
+                <Key className="h-4 w-4" />
+                {t("widget.connected.reauth")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  navigate(renameDefinition.PATCH, {
+                    urlPathParams: { instanceId },
+                    renderInModal: true,
+                  })
+                }
+                className="gap-2"
+              >
+                {t("widget.connected.rename")}
               </Button>
               <Button
                 type="button"

@@ -133,11 +133,20 @@ export class MessageConverter {
         // consistent format between current messages and history messages.
         return { content: contentParts, role: "user" };
       }
-      case ChatMessageRole.ASSISTANT:
+      case ChatMessageRole.ASSISTANT: {
         if (!message.content || !message.content.trim()) {
           return null;
         }
-        return { content: message.content.trim(), role: "assistant" };
+        // Strip <think>...</think> blocks — kept in DB for UI display but
+        // must not be re-sent to the AI as part of history.
+        const strippedContent = message.content
+          .replace(/<think>[\s\S]*?<\/think>/g, "")
+          .trim();
+        if (!strippedContent) {
+          return null;
+        }
+        return { content: strippedContent, role: "assistant" };
+      }
       case ChatMessageRole.SYSTEM:
         return { content: message.content ?? "", role: "system" };
       case ChatMessageRole.TOOL:
@@ -159,27 +168,32 @@ export class MessageConverter {
               : 0,
           });
 
-          // Check if this TOOL message has a result or error (executed)
-          // If yes, we need to return BOTH: ASSISTANT with tool-call AND TOOL with tool-result
-          // If no, return only ASSISTANT with tool-call
-          if (toolCall.result || toolCall.error) {
-            // Tool has been executed - return BOTH messages for AI SDK
-            // Message 1: ASSISTANT message with tool-call (the request)
-            // Message 2: TOOL message with tool-result (the response)
+          // Always return BOTH: ASSISTANT with tool-call AND TOOL with tool-result.
+          // Tools awaiting confirmation have no result/error yet — emit the
+          // waiting_for_confirmation status as a placeholder result so the AI SDK
+          // never sees a tool-call without a matching tool-result.
+          const output = toolCall.error
+            ? {
+                type: "error-text" as const,
+                value: MessageConverter.translateErrorRecursive(
+                  toolCall.error,
+                  locale,
+                ),
+              }
+            : toolCall.result
+              ? MessageConverter.buildToolResultOutput(toolCall.result)
+              : toolCall.waitingForConfirmation
+                ? {
+                    type: "json" as const,
+                    value: {
+                      status: "waiting_for_confirmation",
+                      toolName: toolCall.toolName,
+                    },
+                  }
+                : null;
 
-            // Translate error messages recursively for AI using the caller's locale
-            const output = toolCall.error
-              ? {
-                  type: "error-text" as const,
-                  value: MessageConverter.translateErrorRecursive(
-                    toolCall.error,
-                    locale,
-                  ),
-                }
-              : MessageConverter.buildToolResultOutput(toolCall.result);
-
+          if (output !== null) {
             return [
-              // Message 1: Assistant's tool call
               {
                 role: "assistant",
                 content: [
@@ -191,7 +205,6 @@ export class MessageConverter {
                   },
                 ],
               },
-              // Message 2: Tool result
               {
                 role: "tool",
                 content: [
@@ -204,20 +217,19 @@ export class MessageConverter {
                 ],
               },
             ];
-          } else {
-            // Tool has not been executed yet - convert to ASSISTANT message with tool-call only
-            return {
-              role: "assistant",
-              content: [
-                {
-                  type: "tool-call",
-                  toolCallId: toolCall.toolCallId,
-                  toolName: toolCall.toolName,
-                  input: toolCall.args,
-                },
-              ],
-            };
           }
+          // No result, no error, not waiting — tool-call only (shouldn't normally happen)
+          return {
+            role: "assistant",
+            content: [
+              {
+                type: "tool-call",
+                toolCallId: toolCall.toolCallId,
+                toolName: toolCall.toolName,
+                input: toolCall.args,
+              },
+            ],
+          };
         }
         // Skip TOOL messages without toolCall metadata
         logger.error(
@@ -289,17 +301,23 @@ export class MessageConverter {
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
 
+    // Track sequenceIds for which we have already emitted a metadata system message.
+    // Each logical AI turn shares a sequenceId across its placeholder ASSISTANT + TOOL chain.
+    // We only emit one [Context:] system message per sequenceId so sequential tool calls
+    // that share a sequenceId don't produce redundant system messages between each pair.
+    const emittedMetadataSequenceIds = new Set<string>();
+
     // Pre-pass: collect toolCallIds that have been superseded by a deferred result message.
-    // When a background/noLoop result arrives late, a second TOOL message is inserted with
-    // originalToolCallId pointing back to the original pending call. The original pending
-    // call (no result) must be suppressed from AI context so the AI sees the deferred
-    // result message as the authoritative tool call+result pair.
+    // When a background/wakeUp result arrives, a deferred TOOL message is inserted with
+    // originalToolCallId pointing back to the original call. The original must be
+    // suppressed from AI context so the AI sees the deferred result as authoritative.
     const supersededToolCallIds = new Set<string>();
     for (const msg of messages) {
       if (
         msg.role === ChatMessageRole.TOOL &&
         "metadata" in msg &&
-        msg.metadata?.toolCall?.originalToolCallId
+        msg.metadata?.toolCall?.originalToolCallId &&
+        msg.metadata.toolCall.isDeferred
       ) {
         supersededToolCallIds.add(msg.metadata.toolCall.originalToolCallId);
       }
@@ -314,20 +332,35 @@ export class MessageConverter {
         "metadata" in msg &&
         msg.metadata?.toolCall
       ) {
-        // Look ahead to find all consecutive TOOL messages
+        // Look ahead to find all TOOL messages in this step.
+        // Empty placeholder ASSISTANT messages (no content) between tools do NOT
+        // break the group — they are just DB artifacts from sequential tool calls.
+        // A group ends at: a USER message, or an ASSISTANT message with real text content.
         const toolMessages: ChatMessage[] = [msg];
         let j = i + 1;
-        while (
-          j < messages.length &&
-          messages[j]?.role === ChatMessageRole.TOOL &&
-          "metadata" in messages[j] &&
-          messages[j].metadata?.toolCall
-        ) {
-          toolMessages.push(messages[j]);
-          j++;
+        while (j < messages.length) {
+          const next = messages[j];
+          if (
+            next?.role === ChatMessageRole.TOOL &&
+            "metadata" in next &&
+            next.metadata?.toolCall
+          ) {
+            // Another tool message — add to group
+            toolMessages.push(next);
+            j++;
+          } else if (
+            next?.role === ChatMessageRole.ASSISTANT &&
+            (!next.content || !next.content.trim())
+          ) {
+            // Empty placeholder ASSISTANT — skip over it (don't add to toolMessages)
+            j++;
+          } else {
+            // Real content boundary (USER, or ASSISTANT with text, or SYSTEM, etc.) — stop
+            break;
+          }
         }
 
-        // Skip ahead past the tool messages we just collected
+        // Skip ahead past all consumed messages (tools + skipped empty assistants)
         i = j - 1;
 
         // Check if the last message in result is an ASSISTANT message with text content
@@ -355,11 +388,16 @@ export class MessageConverter {
         for (const toolMsg of toolMessages) {
           const toolCall = toolMsg.metadata!.toolCall!;
 
-          // Skip original pending calls that have been superseded by a deferred result message.
-          // The deferred message (with originalToolCallId set) replaces the original in AI context.
-          if (supersededToolCallIds.has(toolCall.toolCallId)) {
+          // Skip original tool calls that have been superseded by a deferred result.
+          // The deferred message (isDeferred=true) is the authoritative one with the
+          // real async result. The original stays in DB for UI display but is excluded
+          // from AI context.
+          if (
+            supersededToolCallIds.has(toolCall.toolCallId) &&
+            !toolCall.isDeferred
+          ) {
             logger.info(
-              "[MessageConverter] Skipping superseded pending tool call — deferred result message takes over",
+              "[MessageConverter] Skipping superseded tool call — deferred result takes over",
               {
                 toolCallId: toolCall.toolCallId,
                 toolName: toolCall.toolName,
@@ -386,12 +424,20 @@ export class MessageConverter {
           seenToolCallIds.add(toolCall.toolCallId);
 
           // Add tool call to assistant message content.
-          // wakeUp: suppress args from AI context — result may arrive days later,
-          // args could be stale or already compacted. Result is what matters.
+          // For deferred wakeUp results: strip the full execute-tool args and only
+          // pass {taskId} so the AI isn't flooded with the duplicated request data.
+          // The deferred TOOL message (with the real result) takes the original's place.
           const inputForAi =
-            toolCall.callbackMode === "wakeUp" &&
-            (toolCall.result || toolCall.error)
-              ? {}
+            toolCall.isDeferred && toolCall.callbackMode === "wakeUp"
+              ? {
+                  taskId:
+                    typeof toolCall.args === "object" &&
+                    toolCall.args !== null &&
+                    !Array.isArray(toolCall.args) &&
+                    "taskId" in toolCall.args
+                      ? (toolCall.args as { taskId: ToolCallResult }).taskId
+                      : toolCall.toolCallId,
+                }
               : toolCall.args;
           toolCallContent.push({
             type: "tool-call",
@@ -400,19 +446,31 @@ export class MessageConverter {
             input: inputForAi,
           });
 
-          // If tool was executed, create separate tool result message
-          // AI SDK format: one tool message per result
-          if (toolCall.result || toolCall.error) {
-            const output = toolCall.error
-              ? {
-                  type: "error-text" as const,
-                  value: MessageConverter.translateErrorRecursive(
-                    toolCall.error,
-                    locale,
-                  ),
-                }
-              : MessageConverter.buildToolResultOutput(toolCall.result);
+          // Create tool result message.
+          // Tools awaiting confirmation have no result/error yet — emit the
+          // waiting_for_confirmation status as a placeholder result so the AI SDK
+          // never sees a tool-call without a matching tool-result.
+          const output = toolCall.error
+            ? {
+                type: "error-text" as const,
+                value: MessageConverter.translateErrorRecursive(
+                  toolCall.error,
+                  locale,
+                ),
+              }
+            : toolCall.result
+              ? MessageConverter.buildToolResultOutput(toolCall.result)
+              : toolCall.waitingForConfirmation
+                ? {
+                    type: "json" as const,
+                    value: {
+                      status: "waiting_for_confirmation",
+                      toolName: toolCall.toolName,
+                    },
+                  }
+                : null;
 
+          if (output !== null) {
             toolResultMessages.push({
               role: "tool",
               content: [
@@ -465,22 +523,28 @@ export class MessageConverter {
         continue;
       }
 
-      // Inject metadata system message before user/assistant messages
-      // Only for full ChatMessage objects (not simple { role, content } objects)
+      // Inject metadata system message before user/assistant messages.
+      // Only for full ChatMessage objects (not simple { role, content } objects).
+      // Only emit once per sequenceId — sequential tool calls share a sequenceId across
+      // their placeholder ASSISTANT + TOOL chain, so we skip duplicate injections.
       if (
         MessageConverter.isChatMessage(msg) &&
         (msg.role === ChatMessageRole.USER ||
           msg.role === ChatMessageRole.ASSISTANT)
       ) {
-        const metadataContent = createMetadataSystemMessage(
-          msg,
-          rootFolderId,
-          timezone,
-        );
-        result.push({
-          role: "system",
-          content: metadataContent,
-        });
+        const seqKey = msg.sequenceId ?? msg.id;
+        if (!emittedMetadataSequenceIds.has(seqKey)) {
+          emittedMetadataSequenceIds.add(seqKey);
+          const metadataContent = createMetadataSystemMessage(
+            msg,
+            rootFolderId,
+            timezone,
+          );
+          result.push({
+            role: "system",
+            content: metadataContent,
+          });
+        }
       }
 
       // Convert and add the actual message

@@ -627,17 +627,17 @@ static async submit(
 Auth is handled at route level via roles. Only use user checks for **conditional responses**:
 
 ```typescript
-static async getCharacters(user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<CharactersResponseOutput>> {
+static async getSkills(user: JwtPayloadType, logger: EndpointLogger): Promise<ResponseType<SkillsResponseOutput>> {
   if (user.id) {
-    const charactersResult = await this.getAllCharacters(user.id, logger);
-    if (!charactersResult.success) return charactersResult;
-    return success({ characters: charactersResult.data });
+    const skillsResult = await this.getAllSkills(user.id, logger);
+    if (!skillsResult.success) return skillsResult;
+    return success({ skills: skillsResult.data });
   }
-  return this.getDefaultCharacters(logger);
+  return this.getDefaultSkills(logger);
 }
 
-private static async getDefaultCharacters(logger: EndpointLogger): Promise<ResponseType<CharactersResponseOutput>> {
-  return success({ characters: DEFAULT_PERSONAS });
+private static async getDefaultSkills(logger: EndpointLogger): Promise<ResponseType<SkillsResponseOutput>> {
+  return success({ skills: DEFAULT_PERSONAS });
 }
 ```
 

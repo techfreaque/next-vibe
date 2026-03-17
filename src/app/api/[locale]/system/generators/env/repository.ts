@@ -116,11 +116,8 @@ class EnvGeneratorRepositoryImpl {
     try {
       logger.debug(`Starting env generation: ${data.outputDir}`);
 
-      // eslint-disable-next-line i18next/no-literal-string
-      const apiCorePath = ["src", "app", "api", "[locale]"];
-      const apiDir = join(process.cwd(), ...apiCorePath);
-      // eslint-disable-next-line i18next/no-literal-string
-      const configDir = join(process.cwd(), "src", "config");
+      const apiDir = `${process.cwd()}/src/app/api/[locale]`;
+      const configDir = `${process.cwd()}/src/config`;
 
       const excludeDirs = [
         "node_modules",
@@ -406,6 +403,13 @@ class EnvGeneratorRepositoryImpl {
       const needsAlias =
         RESERVED.has(m.exportName) || RESERVED.has(m.schemaExportName);
       const prefix = needsAlias ? `${m.moduleName}_` : "";
+      const examplesNeedsAlias =
+        RESERVED.has(m.examplesExportName) ||
+        sortedModules.some(
+          (other) =>
+            other !== m && other.examplesExportName === m.examplesExportName,
+        );
+      const examplesPrefix = examplesNeedsAlias ? `${m.moduleName}_` : "";
       return {
         ...m,
         importedEnvName: needsAlias
@@ -414,30 +418,39 @@ class EnvGeneratorRepositoryImpl {
         importedSchemaName: needsAlias
           ? `${m.schemaExportName} as ${prefix}${m.schemaExportName}`
           : m.schemaExportName,
+        importedExamplesName: examplesNeedsAlias
+          ? `${m.examplesExportName} as ${examplesPrefix}${m.examplesExportName}`
+          : m.examplesExportName,
         localEnvName: `${prefix}${m.exportName}`,
         localSchemaName: `${prefix}${m.schemaExportName}`,
+        localExamplesName: `${examplesPrefix}${m.examplesExportName}`,
       };
     });
 
-    // Generate imports
+    // Generate imports (including examples)
     const imports: string[] = [];
     for (const mod of aliasedModules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      const singleLineImport = `import { ${mod.importedEnvName}, ${mod.importedSchemaName} } from "${relativePath}";`;
+      const importNames = [
+        mod.importedEnvName,
+        mod.importedSchemaName,
+        mod.importedExamplesName,
+      ];
+      const singleLineImport = `import { ${importNames.join(", ")} } from "${relativePath}";`;
       if (singleLineImport.length > 80) {
         imports.push(
-          `import {\n  ${mod.importedEnvName},\n  ${mod.importedSchemaName},\n} from "${relativePath}";`,
+          `import {\n  ${importNames.join(",\n  ")},\n} from "${relativePath}";`,
         );
       } else {
         imports.push(singleLineImport);
       }
     }
 
-    // Generate module names for registry
+    // Generate module names for registry (including examples)
     const moduleEntries = aliasedModules
       .map(
         (m) =>
-          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName} },`,
+          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName}, examples: ${m.localExamplesName} },`,
       )
       .join("\n");
 
@@ -469,6 +482,7 @@ import "server-only";
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
+import type { EnvExample } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -483,9 +497,9 @@ const platform = {
 };
 
 // Module registry for introspection
-export const envModules = {
+export const envModules: Record<string, { env: Record<string, unknown>; schema: z.ZodObject<Record<string, z.ZodTypeAny>>; examples: EnvExample[] }> = {
 ${moduleEntries}
-} as const;
+};
 
 // Combined schema using merge
 export const envSchema = ${serverSchemaChain || "z.object({})"};
@@ -558,6 +572,13 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
       const needsAlias =
         RESERVED.has(m.exportName) || RESERVED.has(m.schemaExportName);
       const prefix = needsAlias ? `${m.moduleName}_` : "";
+      const examplesNeedsAlias =
+        RESERVED.has(m.examplesExportName) ||
+        sortedModules.some(
+          (other) =>
+            other !== m && other.examplesExportName === m.examplesExportName,
+        );
+      const examplesPrefix = examplesNeedsAlias ? `${m.moduleName}_` : "";
       return {
         ...m,
         importedEnvName: needsAlias
@@ -566,30 +587,39 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
         importedSchemaName: needsAlias
           ? `${m.schemaExportName} as ${prefix}${m.schemaExportName}`
           : m.schemaExportName,
+        importedExamplesName: examplesNeedsAlias
+          ? `${m.examplesExportName} as ${examplesPrefix}${m.examplesExportName}`
+          : m.examplesExportName,
         localEnvName: `${prefix}${m.exportName}`,
         localSchemaName: `${prefix}${m.schemaExportName}`,
+        localExamplesName: `${examplesPrefix}${m.examplesExportName}`,
       };
     });
 
-    // Generate imports
+    // Generate imports (including examples)
     const imports: string[] = [];
     for (const mod of aliasedModules) {
       const relativePath = getRelativeImportPath(mod.filePath, outputFile);
-      const singleLineImport = `import { ${mod.importedEnvName}, ${mod.importedSchemaName} } from "${relativePath}";`;
+      const importNames = [
+        mod.importedEnvName,
+        mod.importedSchemaName,
+        mod.importedExamplesName,
+      ];
+      const singleLineImport = `import { ${importNames.join(", ")} } from "${relativePath}";`;
       if (singleLineImport.length > 80) {
         imports.push(
-          `import {\n  ${mod.importedEnvName},\n  ${mod.importedSchemaName},\n} from "${relativePath}";`,
+          `import {\n  ${importNames.join(",\n  ")},\n} from "${relativePath}";`,
         );
       } else {
         imports.push(singleLineImport);
       }
     }
 
-    // Generate module names for registry
+    // Generate module names for registry (including examples)
     const moduleEntries = aliasedModules
       .map(
         (m) =>
-          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName} },`,
+          `  ${m.moduleName}: { env: ${m.localEnvName}, schema: ${m.localSchemaName}, examples: ${m.localExamplesName} },`,
       )
       .join("\n");
 

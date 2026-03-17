@@ -112,12 +112,11 @@ export class CreditValidatorHandler {
       });
 
       return fail({
-        message: t("route.errors.insufficientCredits"),
-        errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
+        message: t("route.errors.insufficientCredits", {
           cost: modelCost.toString(),
           balance: validationResult.data.balance.toString(),
-        },
+        }),
+        errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 

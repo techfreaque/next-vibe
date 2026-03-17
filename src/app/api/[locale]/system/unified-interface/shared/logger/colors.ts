@@ -50,9 +50,11 @@ export const semantic = {
 
   // Component colors
   server: colors.magenta,
-  database: colors.brightCyan,
+  database: colors.brightGreen,
   task: colors.brightMagenta,
   generator: colors.magenta,
+  sense: colors.brightRed,
+  nextjs: colors.brightCyan,
 
   // Accent colors
   highlight: colors.white,

@@ -10,8 +10,6 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
 import { db } from "../../../../system/db";
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, MessageMetadata, ToolCall } from "../../../chat/db";
@@ -123,7 +121,7 @@ export class MessageContextBuilder {
     messageHistory?: ChatMessage[];
     logger: EndpointLogger;
     timezone: string;
-    upcomingResponseContext?: { model: ModelId; character: string | null };
+    upcomingResponseContext?: { model: ModelId; skill: string | null };
     userMessageMetadata?: {
       attachments?: Array<{
         id: string;
@@ -271,11 +269,10 @@ export class MessageContextBuilder {
 
     const contextMessages: ChatMessage[] = [...history];
 
-    // Add current user message to context (unless it's answer-as-ai, wakeup-resume, or tool confirmations)
+    // Add current user message to context (unless it's answer-as-ai or wakeup-resume)
     const shouldAddCurrentMessage =
       params.operation !== "answer-as-ai" &&
       params.operation !== "wakeup-resume" &&
-      !params.hasToolConfirmations &&
       params.content.trim();
 
     if (shouldAddCurrentMessage) {
@@ -292,7 +289,7 @@ export class MessageContextBuilder {
         content: params.content,
         metadata: params.userMessageMetadata || null,
         model: null,
-        character: null,
+        skill: null,
         upvotes: 0,
         downvotes: 0,
         authorId: params.userId || null,
@@ -314,6 +311,28 @@ export class MessageContextBuilder {
           hasMetadata: !!params.userMessageMetadata,
           attachmentCount: params.userMessageMetadata?.attachments?.length ?? 0,
         },
+      );
+    }
+
+    // When processing tool confirmations, strip any waitingForConfirmation tool messages
+    // from history — they'll be replaced by the confirmed results via toolConfirmationResults.
+    // This ensures AI never sees the waiting_for_confirmation placeholder.
+    if (params.hasToolConfirmations && contextMessages.length > 0) {
+      const before = contextMessages.length;
+      for (let i = contextMessages.length - 1; i >= 0; i--) {
+        const msg = contextMessages[i];
+        if (
+          msg &&
+          msg.role === ChatMessageRole.TOOL &&
+          "metadata" in msg &&
+          msg.metadata?.toolCall?.waitingForConfirmation === true
+        ) {
+          contextMessages.splice(i, 1);
+        }
+      }
+      params.logger.debug(
+        "[BuildMessageContext] Stripped waitingForConfirmation tool messages from confirm stream",
+        { before, after: contextMessages.length },
       );
     }
 
@@ -372,65 +391,9 @@ export class MessageContextBuilder {
       });
     }
 
-    if (params.hasToolConfirmations && params.toolConfirmationResults?.length) {
-      params.logger.debug(
-        "[BuildMessageContext] Adding tool confirmation results",
-        {
-          count: params.toolConfirmationResults.length,
-        },
-      );
-      const { t } = simpleT(params.locale);
-
-      for (const result of params.toolConfirmationResults) {
-        const toolCall = result.toolCall;
-
-        // Convert to AI SDK format - BOTH assistant tool-call AND tool result
-        // Error messages are already translated via t() when stored
-        const output = toolCall.error
-          ? {
-              type: "error-text" as const,
-              value: t(toolCall.error.message, toolCall.error.messageParams),
-            }
-          : { type: "json" as const, value: toolCall.result ?? null };
-
-        // Add ASSISTANT message with tool-call
-        messages.push({
-          role: "assistant",
-          content: [
-            {
-              type: "tool-call",
-              toolCallId: toolCall.toolCallId,
-              toolName: toolCall.toolName,
-              input: toolCall.args,
-            },
-          ],
-        });
-
-        // Add TOOL message with tool-result
-        messages.push({
-          role: "tool",
-          content: [
-            {
-              type: "tool-result",
-              toolCallId: toolCall.toolCallId,
-              toolName: toolCall.toolName,
-              output,
-            },
-          ],
-        });
-      }
-
-      params.logger.debug(
-        "[BuildMessageContext] Added tool confirmation results",
-        {
-          totalMessages: messages.length,
-        },
-      );
-    }
-
     if (params.operation === "answer-as-ai") {
       const { CONTINUE_CONVERSATION_PROMPT } =
-        await import("../system-prompt/generator");
+        await import("../system-prompt/assembler");
       const systemContent = params.content.trim()
         ? `${CONTINUE_CONVERSATION_PROMPT}\n\nAdditional instructions: ${params.content}`
         : CONTINUE_CONVERSATION_PROMPT;
@@ -452,10 +415,8 @@ export class MessageContextBuilder {
       const shortId = params.upcomingAssistantMessageId.slice(-8);
       const metadataParts: string[] = [`ID:${shortId}`];
       metadataParts.push(`Model:${params.upcomingResponseContext.model}`);
-      if (params.upcomingResponseContext.character) {
-        metadataParts.push(
-          `Character:${params.upcomingResponseContext.character}`,
-        );
+      if (params.upcomingResponseContext.skill) {
+        metadataParts.push(`Skill:${params.upcomingResponseContext.skill}`);
       }
       const timestamp = formatAbsoluteTimestamp(
         params.upcomingAssistantMessageCreatedAt,
@@ -472,42 +433,6 @@ export class MessageContextBuilder {
     // [Context:] line — always last
     if (contextLine) {
       messages.push({ role: "system", content: contextLine });
-    }
-
-    const messageHashes = messages.map((msg, idx) => {
-      const content = JSON.stringify(msg);
-      const hash = Buffer.from(content).toString("base64").slice(0, 16);
-      const hasCacheControl = !!msg.providerOptions?.openrouter?.cacheControl;
-      return {
-        idx,
-        role: msg.role,
-        hash,
-        contentLength: content.length,
-        hasCacheControl,
-        preview:
-          msg.role === "user" ||
-          msg.role === "assistant" ||
-          msg.role === "system"
-            ? typeof msg.content === "string"
-              ? msg.content.slice(0, 100)
-              : "[complex content]"
-            : "[tool content]",
-      };
-    });
-
-    const cacheBreakpoints = messageHashes
-      .filter((m: { hasCacheControl: boolean }) => m.hasCacheControl)
-      .map((m: { idx: number; role: string }) => `${m.idx}:${m.role}`);
-
-    let lastAssistantIdx = -1;
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i]?.role === "assistant") {
-        lastAssistantIdx = i;
-        break;
-      }
-    }
-    if (lastAssistantIdx >= 0) {
-      cacheBreakpoints.push(`${lastAssistantIdx}:assistant (auto)`);
     }
 
     return messages;
@@ -769,7 +694,7 @@ export class MessageContextBuilder {
             content: currentUserContent,
             metadata: currentUserMetadata || null,
             model: null,
-            character: null,
+            skill: null,
             upvotes: 0,
             downvotes: 0,
             authorId: userId || null,
@@ -881,7 +806,7 @@ export class MessageContextBuilder {
     upcomingAssistantMessageId: string;
     upcomingAssistantMessageCreatedAt: Date;
     model: ModelId;
-    character: string | null;
+    skill: string | null;
     timezone: string;
     rootFolderId: DefaultFolderId;
     /** Pre-built trailing system message string, built in builder.ts via generator.ts */
@@ -947,8 +872,8 @@ export class MessageContextBuilder {
     const shortId = params.upcomingAssistantMessageId.slice(-8);
     const metadataParts: string[] = [`ID:${shortId}`];
     metadataParts.push(`Model:${params.model}`);
-    if (params.character) {
-      metadataParts.push(`Character:${params.character}`);
+    if (params.skill) {
+      metadataParts.push(`Skill:${params.skill}`);
     }
     const timestamp = formatAbsoluteTimestamp(
       params.upcomingAssistantMessageCreatedAt,

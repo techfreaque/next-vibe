@@ -12,9 +12,6 @@ import type {
 } from "react-hook-form";
 import { Controller, FormProvider, useFormContext } from "react-hook-form";
 
-import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 import type { LabelRootProps } from "../label";
 import { Label } from "../label";
 
@@ -68,9 +65,11 @@ export interface FormDescriptionProps {
   className?: string;
 }
 
+// bivariant hack: method syntax disables strict function type checking,
+// allowing both global t(globalKey) and scoped t(scopedKey) to be passed
 export interface FormMessageProps {
   children?: React.ReactNode;
-  className?: string;
+  t(key: string): string;
 }
 
 export type FormFieldProps<
@@ -247,27 +246,22 @@ export function FormDescription({
 FormDescription.displayName = "FormDescription";
 
 export function FormMessage({
-  className,
   children,
-  ...props
+  t,
 }: FormMessageProps): React.JSX.Element | null {
   const { error, formMessageId } = useFormField();
-  const { t } = useTranslation();
   const body = error ? String(error.message) : children;
 
   if (!body || body === "undefined") {
     return null;
   }
+
   return (
     <p
       id={formMessageId}
-      className={cn(
-        "text-[0.8rem] font-medium text-red-600 dark:text-red-400",
-        className,
-      )}
-      {...props}
+      className="text-[0.8rem] font-medium text-red-600 dark:text-red-400"
     >
-      {t(body as TranslationKey)}
+      {t(String(body))}
     </p>
   );
 }

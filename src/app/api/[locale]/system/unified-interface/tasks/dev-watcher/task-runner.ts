@@ -8,8 +8,6 @@
 
 import "server-only";
 
-import { join } from "node:path";
-
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -163,11 +161,11 @@ const startSmartFileWatcher = async (
   // Base directory for resolving absolute paths from fs.watch relative filenames.
   // Use process.env.PWD (opaque to Turbopack's static analysis) instead of
   // process.cwd() so the bundler doesn't try to match the path as a file glob.
-  // eslint-disable-next-line i18next/no-literal-string, no-useless-concat
-  const localeSegment = "[" + "locale]";
   // eslint-disable-next-line i18next/no-literal-string
   const cwd = process.env["PWD"] ?? process.cwd();
-  const watchRoot = join(cwd, "src", "app", "api", localeSegment);
+  // Use template string + split bracket to prevent Turbopack from statically tracing paths
+  // eslint-disable-next-line i18next/no-literal-string, no-useless-concat
+  const watchRoot = `${cwd}/src/app/api/[` + `locale]`;
 
   const watchPaths = [watchRoot];
   const watchers: ReturnType<typeof fs.watch>[] = [];
@@ -226,7 +224,82 @@ const startSmartFileWatcher = async (
   liveIndex.dirty.seeds = false;
   await runDirtyGenerators();
 
-  // Wait for abort signal
+  // In non-continuous mode: only run once on startup, then listen for 'r' to re-run
+  if (!env.DEV_WATCHER_CONTINUOUS) {
+    logger.debug(
+      "📌 One-shot mode (DEV_WATCHER_CONTINUOUS=false). Press 'r' to regenerate.",
+    );
+
+    // Close all fs.watch watchers — we don't need them in one-shot mode
+    for (const watcher of watchers) {
+      try {
+        watcher.close();
+      } catch (error) {
+        logger.debug("Error closing watcher:", { error: String(error) });
+      }
+    }
+    watchers.length = 0;
+
+    // Listen for 'r' keypress to trigger a full regeneration
+    await new Promise<void>((resolve) => {
+      let done = false;
+      const finish = (): void => {
+        if (done) {
+          return;
+        }
+        done = true;
+        resolve();
+      };
+
+      const onData = (chunk: Buffer): void => {
+        const key = chunk.toString();
+        // Ctrl+C — restore terminal and re-raise SIGINT
+        if (key === "\x03") {
+          if (process.stdin.isTTY) {
+            process.stdin.setRawMode(false);
+          }
+          process.kill(process.pid, "SIGINT");
+          return;
+        }
+        if (key === "r" || key === "R") {
+          logger.debug("🔄 'r' pressed — re-running generators...");
+          liveIndex.dirty.endpoints = true;
+          liveIndex.dirty.clientRoutes = true;
+          liveIndex.dirty.taskIndex = true;
+          liveIndex.dirty.emailTemplates = true;
+          liveIndex.dirty.seeds = false;
+          void runDirtyGenerators();
+        }
+      };
+
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(true);
+      }
+      process.stdin.resume();
+      process.stdin.on("data", onData);
+
+      signal.addEventListener(
+        "abort",
+        () => {
+          if (debounceTimer) {
+            clearTimeout(debounceTimer);
+          }
+          process.stdin.off("data", onData);
+          if (process.stdin.isTTY) {
+            process.stdin.setRawMode(false);
+          }
+          process.stdin.pause();
+          logger.debug("✅ One-shot watcher stopped");
+          finish();
+        },
+        { once: true },
+      );
+    });
+
+    return;
+  }
+
+  // Wait for abort signal (continuous mode)
   await new Promise<void>((resolve) => {
     let done = false;
     const finish = (): void => {

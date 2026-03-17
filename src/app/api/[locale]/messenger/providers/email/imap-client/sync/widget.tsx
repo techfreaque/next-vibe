@@ -46,15 +46,12 @@ export function ImapSyncContainer({
   const accounts: MessengerAccountsListGETResponseOutput["accounts"] =
     accountsResult.read.data?.accounts ?? [];
 
-  const selectedIds: string[] = form?.watch("accountIds") ?? [];
+  const selectedIds = form.watch("accountIds") ?? [];
 
   function toggleAccount(id: string): void {
-    if (!form) {
-      return;
-    }
-    const current: string[] = form.getValues("accountIds") ?? [];
+    const current = form.getValues("accountIds") ?? [];
     const next = current.includes(id)
-      ? current.filter((x) => x !== id)
+      ? current.filter((x: string) => x !== id)
       : [...current, id];
     form.setValue("accountIds", next, { shouldDirty: true });
   }

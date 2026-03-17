@@ -78,7 +78,7 @@ export function TriggerWidget({ field }: CustomWidgetProps): React.JSX.Element {
             onChangeText={(v) => {
               setLocalFrom(v);
               if (v) {
-                form?.setValue("rangeFrom", new Date(v).toISOString());
+                form.setValue("rangeFrom", new Date(v).toISOString());
               }
             }}
           />
@@ -93,7 +93,7 @@ export function TriggerWidget({ field }: CustomWidgetProps): React.JSX.Element {
             onChangeText={(v) => {
               setLocalTo(v);
               if (v) {
-                form?.setValue("rangeTo", new Date(v).toISOString());
+                form.setValue("rangeTo", new Date(v).toISOString());
               }
             }}
           />

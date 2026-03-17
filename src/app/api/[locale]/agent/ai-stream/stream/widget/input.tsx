@@ -72,7 +72,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   // Boot context
   const bootContext = useChatBootContext();
-  const { envAvailability, initialSettingsData, initialCharacterData } =
+  const { envAvailability, initialSettingsData, initialSkillData } =
     bootContext;
 
   // Input store
@@ -94,12 +94,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // Chat store
   const isLoading = useChatStore((s) => s.isLoading);
   const threads = useChatStore((s) => s.threads);
-  const allMessages = useChatStore((s) => s.messages);
   const folders = useChatStore((s) => s.folders);
-  const chatSetLoading = useChatStore((s) => s.setLoading);
-  const chatGetThreadMessages = useChatStore((s) => s.getThreadMessages);
-  const chatDeleteMessage = useChatStore((s) => s.deleteMessage);
-  const chatUpdateMessage = useChatStore((s) => s.updateMessage);
   const activeThread = activeThreadId
     ? (threads[activeThreadId] ?? null)
     : null;
@@ -113,7 +108,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const defaults = ChatSettingsRepositoryClient.getDefaults();
   const effectiveSettings = settings ?? defaults;
   const ttsAutoplay = effectiveSettings.ttsAutoplay;
-  const selectedCharacter = effectiveSettings.selectedCharacter;
+  const selectedSkill = effectiveSettings.selectedSkill;
   const selectedModel = effectiveSettings.selectedModel;
 
   // Credits
@@ -208,39 +203,60 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     [rawSetAttachments, draftKey, logger],
   );
 
-  // AI stream
-  const aiStream = useAIStream();
+  // AI stream — destructure callbacks directly so they are stable useCallback refs
+  const { startStream: aiStartStream, cancelStream: aiCancelStream } =
+    useAIStream();
 
   // Streaming state from navigation store
   const isStreaming = useChatNavigationStore((s) => s.isStreaming);
   const startStream = useChatNavigationStore((s) => s.startStream);
   const stopStream = useChatNavigationStore((s) => s.stopStream);
 
-  // Message operations
-  const messageOps = useMessageOperations({
-    aiStream,
-    activeThreadId,
-    currentRootFolderId,
-    currentSubFolderId,
-    chatStore: {
-      messages: allMessages,
-      threads,
-      setLoading: chatSetLoading,
-      getThreadMessages: chatGetThreadMessages,
-      deleteMessage: chatDeleteMessage,
-      updateMessage: chatUpdateMessage,
-    },
-    settings: {
+  // leafMessageId from nav store (set by messages widget on branch switch, syncs URL)
+  const leafMessageId = useChatNavigationStore((s) => s.leafMessageId);
+
+  // Memoize settings object to avoid new reference on every render
+  const messageOpSettings = useMemo(
+    () => ({
       selectedModel: effectiveSettings.selectedModel,
-      selectedCharacter: effectiveSettings.selectedCharacter,
-      allowedTools: effectiveSettings.allowedTools,
+      selectedSkill: effectiveSettings.selectedSkill,
+      availableTools: effectiveSettings.availableTools,
       pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
       ttsVoice: effectiveSettings.ttsVoice,
-    },
-    setInput,
-    setAttachments,
-  });
+    }),
+    [
+      effectiveSettings.selectedModel,
+      effectiveSettings.selectedSkill,
+      effectiveSettings.availableTools,
+      effectiveSettings.pinnedTools,
+      effectiveSettings.ttsAutoplay,
+      effectiveSettings.ttsVoice,
+    ],
+  );
+
+  const messageOpsDeps = useMemo(() => {
+    return {
+      startStream: aiStartStream,
+      cancelStream: aiCancelStream,
+      activeThreadId,
+      currentRootFolderId,
+      currentSubFolderId,
+      leafMessageId,
+      settings: messageOpSettings,
+    };
+  }, [
+    aiStartStream,
+    aiCancelStream,
+    activeThreadId,
+    currentRootFolderId,
+    currentSubFolderId,
+    leafMessageId,
+    messageOpSettings,
+  ]);
+
+  // Message operations
+  const messageOps = useMessageOperations(messageOpsDeps);
 
   // Wrap sendMessage to notify navigation store when a local stream starts
   const sendMessageWithStreamNotify = useCallback(
@@ -465,11 +481,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         {/* Left: Selector + Tools + File Upload */}
         <Div className="flex flex-row items-center gap-0.5 @sm:gap-1 @md:gap-1.5 flex-1 min-w-0">
           <Selector
-            characterId={selectedCharacter}
+            skillId={selectedSkill}
             modelId={selectedModel}
             locale={locale}
             buttonClassName="px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9"
-            initialCharacterData={initialCharacterData}
+            initialSkillData={initialSkillData}
           />
 
           {modelSupportsTools && (

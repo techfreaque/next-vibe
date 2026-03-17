@@ -22,6 +22,7 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import type { AiStreamTranslationKey } from "../../stream/i18n";
+import { isStreamAbort, type StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
 import { clearStreamingState } from "../core/stream-registry";
 
@@ -33,7 +34,7 @@ type AiStreamModuleT = (
 /**
  * Flatten a ModelMessage into a plain string the way the model actually sees it.
  * Handles text, tool-call, tool-result, and image content parts.
- * ~3.5 characters per token for English text.
+ * ~3.5 skills per token for English text.
  */
 function flattenMessage(msg: ModelMessage): string {
   const parts: string[] = [];
@@ -104,7 +105,7 @@ function flattenTools(tools: Record<string, CoreTool>): string {
  * Flattens everything to plain text before measuring, mirroring what the model tokenises.
  * Includes: system prompt + tool definitions (names/descriptions/params) +
  *           full message history (all content parts) + partial AI response so far.
- * Rough approximation: ~3.5 characters per token for English text.
+ * Rough approximation: ~3.5 skills per token for English text.
  */
 function estimateTokensFromContext(params: {
   systemPrompt?: string;
@@ -173,32 +174,29 @@ export class AbortErrorHandler {
       t,
     } = params;
 
-    // Check if this is a graceful abort
-    if (
-      !(
-        error.name === "AbortError" ||
-        error.message === "Client disconnected" ||
-        error.message === "Tool requires user confirmation" ||
-        error.message === "Model requested loop stop" ||
-        error.message === "User cancelled stream" ||
-        error.message === "Superseded by new stream"
-      )
-    ) {
+    // Check if this is a graceful abort (our StreamAbortError or generic AbortError from the runtime)
+    const streamAbort: StreamAbortError | null = isStreamAbort(error)
+      ? error
+      : null;
+    if (!streamAbort && error.name !== "AbortError") {
       return { wasHandled: false };
     }
 
-    const isToolConfirmation =
-      error.message === "Tool requires user confirmation";
-    const isLoopStop = error.message === "Model requested loop stop";
+    // Idempotency: if already handled, skip
+    if (ctx.abortHandled) {
+      logger.info("[AI Stream] AbortErrorHandler already ran, skipping", {
+        reason: streamAbort?.reason ?? error.name,
+      });
+      return { wasHandled: true };
+    }
+
+    const isToolConfirmation = streamAbort?.isToolPause ?? false;
+    const isLoopStop = streamAbort?.isLoopStop ?? false;
 
     logger.info("[AI Stream] Stream aborted", {
-      message: error.message,
-      errorName: error.name,
-      reason: isToolConfirmation
-        ? "waiting_for_tool_confirmation"
-        : isLoopStop
-          ? "model_requested_loop_stop"
-          : "client_disconnected",
+      reason: streamAbort?.reason ?? error.name,
+      isToolConfirmation,
+      isLoopStop,
       hasPartialContent: !!ctx.currentAssistantContent,
       contentLength: ctx.currentAssistantContent.length,
     });
@@ -317,7 +315,7 @@ export class AbortErrorHandler {
               authorId: userId ?? null,
               isAI: true,
               model: model,
-              character: null,
+              skill: null,
               metadata: { toolCall: toolCall },
             });
 

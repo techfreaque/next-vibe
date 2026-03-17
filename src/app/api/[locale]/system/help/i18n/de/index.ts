@@ -88,6 +88,10 @@ export const translations: typeof enTranslations = {
         description:
           "Filter auf Tools einer bestimmten Remote-Instanz. Gibt Tools aus dem gespeicherten Capability-Snapshot zurück.",
       },
+      statsFilter: {
+        label: "Tool-Filter",
+        description: "Alle Tools, nur angeheftete oder nur erlaubte anzeigen",
+      },
     },
     success: {
       title: "Tools erfolgreich abgerufen",
@@ -311,12 +315,20 @@ export const translations: typeof enTranslations = {
       confirmOn: "Fragt nach Bestätigung — klicken zum Deaktivieren",
       confirmOff: "Läuft automatisch — klicken um Bestätigung zu erfordern",
     },
+
     platformFilter: {
       all: "Alle Plattformen",
       cli: "CLI",
+      cliPackage: "CLI-Pkg",
       mcp: "MCP",
       ai: "KI",
       web: "Web",
+      cron: "Cron",
+      electron: "Desktop",
+      frame: "Frame",
+      skill: "Skill",
+      nextPage: "Next Page",
+      nextApi: "Next API",
     },
     envFilter: {
       development: "Entwicklung",

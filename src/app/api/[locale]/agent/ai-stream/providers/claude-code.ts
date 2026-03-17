@@ -22,6 +22,7 @@ import type {
   LanguageModelV2Content,
   LanguageModelV2FinishReason,
   LanguageModelV2StreamPart,
+  LanguageModelV2ToolResultOutput,
   LanguageModelV2Usage,
 } from "@ai-sdk/provider";
 import type { BetaRawMessageStreamEvent } from "@anthropic-ai/sdk/resources/beta/messages/messages.mjs";
@@ -29,6 +30,7 @@ import type { BetaRawMessageStreamEvent } from "@anthropic-ai/sdk/resources/beta
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { AgentToolExecutorRegistry } from "./anthropic-agent-tool-bridge";
+import { logProviderRequest } from "./shared/debug-file-logger";
 
 /**
  * Create an Anthropic Agent SDK provider conforming to the standard provider interface.
@@ -190,12 +192,38 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               providerExecuted: true,
             });
 
-            // Execute the tool via our registry (which holds CoreTool execute functions)
-            const executionResult = await toolExecutors.execute(
-              t.name,
-              args,
-              logger,
-            );
+            // Record callbackMode directly from args — stream-part-handler may not
+            // have processed the tool-call event yet, so ctx flags aren't reliable here.
+            const callbackMode =
+              typeof args["callbackMode"] === "string"
+                ? args["callbackMode"]
+                : null;
+            if (callbackMode) {
+              toolExecutors.batchStopModes.add(callbackMode);
+            }
+
+            logger.info("[AnthropicAgent] MCP handler invoked", {
+              toolName: t.name,
+              toolCallId,
+              callbackMode,
+              batchRemaining: toolExecutors.batchRemaining,
+              batchStopModes: [...toolExecutors.batchStopModes],
+            });
+
+            // approve tools must NOT execute — stream-part-handler emits TOOL_WAITING
+            // and the user confirms separately. Return a placeholder so the Agent SDK
+            // gets a result (which we'll discard via abort anyway).
+            const isApprove = callbackMode === "approve";
+
+            const { isLastInBatch, ...executionResult } = isApprove
+              ? {
+                  // eslint-disable-next-line i18next/no-literal-string -- placeholder for approve tools
+                  content: [
+                    { type: "text" as const, text: "awaiting confirmation" },
+                  ],
+                  isLastInBatch: toolExecutors.consumeOne(),
+                }
+              : await toolExecutors.execute(t.name, args, logger, toolCallId);
 
             // Emit tool-result AFTER execution so frontend updates with result
             streamController?.enqueue({
@@ -204,6 +232,20 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               toolName: t.name,
               result: executionResult.content[0]?.text ?? "",
             });
+
+            // Only abort after the full parallel batch completes (isLastInBatch).
+            // Check stop modes directly from args (not ctx) — ctx flags may not be
+            // set yet since stream-part-handler runs asynchronously.
+            const stopModes = toolExecutors.batchStopModes;
+            const shouldStop =
+              stopModes.has("endLoop") || stopModes.has("approve");
+            if (isLastInBatch && shouldStop) {
+              logger.info(
+                "[AnthropicAgent] Stop condition met after batch — aborting agent loop",
+                { toolName: t.name, toolCallId, stopModes: [...stopModes] },
+              );
+              agentAbortController.abort();
+            }
 
             return executionResult;
           },
@@ -236,6 +278,21 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
       async start(controller): Promise<void> {
         // Expose controller to MCP handlers so they can emit tool events in real-time
         streamController = controller;
+        // Log full prompt in verbose mode so we can diagnose what the AI actually received.
+        // Placed here (inside start()) so it fires when the stream is actually consumed,
+        // not just when doStream() returns the stream object (which may be lazy in the AI SDK).
+        logProviderRequest(
+          "claude-code",
+          JSON.stringify(
+            {
+              systemPrompt,
+              userPrompt,
+              tools: mcpTools.map((t) => t.name),
+            },
+            null,
+            2,
+          ),
+        );
 
         let totalInputTokens = 0;
         let totalOutputTokens = 0;
@@ -337,6 +394,14 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               case "assistant": {
                 // Accumulate usage from complete messages
                 const msg = message.message;
+                // Count tool_use blocks so the registry knows batch size before
+                // any MCP handlers fire — needed for isLastInBatch accuracy.
+                const toolUseCount = msg.content.filter(
+                  (b) => b.type === "tool_use",
+                ).length;
+                if (toolUseCount > 0) {
+                  toolExecutors.setBatchSize(toolUseCount);
+                }
                 if (msg.usage) {
                   totalInputTokens += msg.usage.input_tokens;
                   totalOutputTokens += msg.usage.output_tokens;
@@ -436,6 +501,27 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 }
 
 /**
+ * Convert a LanguageModelV2ToolResultOutput to a plain text string
+ * for inclusion in the claude-code Agent SDK text prompt.
+ */
+function toolResultOutputToText(
+  output: LanguageModelV2ToolResultOutput,
+): string {
+  switch (output.type) {
+    case "text":
+      return output.value;
+    case "json":
+      return JSON.stringify(output.value, null, 2);
+    case "error-text":
+      return output.value;
+    case "error-json":
+      return JSON.stringify(output.value, null, 2);
+    default:
+      return JSON.stringify(output, null, 2);
+  }
+}
+
+/**
  * Extract system prompt and user prompt from AI SDK prompt format
  */
 function extractPromptParts(prompt: LanguageModelV2CallOptions["prompt"]): {
@@ -459,6 +545,17 @@ function extractPromptParts(prompt: LanguageModelV2CallOptions["prompt"]): {
         if (part.type === "text") {
           // Include assistant context as part of the prompt
           userParts.push(part.text);
+        }
+        // tool-call parts are handled by tool-result below — no text to extract
+      }
+    } else if (message.role === "tool") {
+      // Tool results must be included as text context so the Agent SDK knows
+      // the tool already ran and can respond naturally without re-calling it.
+      for (const part of message.content) {
+        if (part.type === "tool-result") {
+          const resultText = toolResultOutputToText(part.output);
+          // eslint-disable-next-line i18next/no-literal-string -- technical context label
+          userParts.push(`[Tool result for ${part.toolName}]:\n${resultText}`);
         }
       }
     }

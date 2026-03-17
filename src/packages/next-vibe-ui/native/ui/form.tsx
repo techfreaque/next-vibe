@@ -154,8 +154,8 @@ FormDescription.displayName = "FormDescription";
 
 function FormMessage({
   children,
-  className,
-}: Pick<FormMessageProps, "children" | "className">): JSX.Element | null {
+  t,
+}: Pick<FormMessageProps, "children" | "t">): JSX.Element | null {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message) : children;
 
@@ -168,9 +168,9 @@ function FormMessage({
       entering={FadeInDown}
       exiting={FadeOut.duration(275)}
       nativeID={formMessageId}
-      className={className ?? "text-sm font-medium text-destructive"}
+      className="text-sm font-medium text-destructive"
     >
-      {body}
+      {t(String(body))}
     </StyledAnimatedText>
   );
 }
@@ -188,10 +188,12 @@ function FormInput({
   disabled,
   type,
   id,
+  t,
 }: Omit<React.ComponentPropsWithoutRef<typeof Input>, "onChangeText"> & {
   label?: string;
   description?: string;
   onChange?: (value: string) => void;
+  t: FormMessageProps["t"];
 }): JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
@@ -218,7 +220,7 @@ function FormInput({
         id={id}
       />
       {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
+      <FormMessage t={t} />
     </FormItem>
   );
 }
@@ -240,10 +242,12 @@ function FormTextarea({
   rows,
   minRows,
   maxLength,
+  t,
 }: Omit<React.ComponentPropsWithoutRef<typeof Textarea>, "onChangeText"> & {
   label?: string;
   description?: string;
   onChange?: (value: string) => void;
+  t: FormMessageProps["t"];
 }): JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
@@ -273,7 +277,7 @@ function FormTextarea({
         maxLength={maxLength}
       />
       {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
+      <FormMessage t={t} />
     </FormItem>
   );
 }
@@ -288,6 +292,7 @@ function FormCheckbox({
   style,
   className,
   disabled,
+  t,
 }: Omit<
   React.ComponentPropsWithoutRef<typeof Checkbox>,
   "checked" | "onCheckedChange"
@@ -296,6 +301,7 @@ function FormCheckbox({
   description?: string;
   value?: boolean;
   onChange?: (value: boolean) => void;
+  t: FormMessageProps["t"];
 }): JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
@@ -322,7 +328,7 @@ function FormCheckbox({
         {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       </StyledView>
       {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
+      <FormMessage t={t} />
     </FormItem>
   );
 }
@@ -334,7 +340,8 @@ function FormDatePicker({
   description,
   value,
   onChange,
-}: FormDatePickerProps): JSX.Element {
+  t,
+}: FormDatePickerProps & { t: FormMessageProps["t"] }): JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
@@ -386,7 +393,7 @@ function FormDatePicker({
         </BottomSheetContent>
       </BottomSheet>
       {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
+      <FormMessage t={t} />
     </FormItem>
   );
 }
@@ -403,6 +410,7 @@ function FormRadioGroup({
   disabled,
   defaultValue,
   children,
+  t,
 }: Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroup>,
   "onValueChange" | "value"
@@ -411,6 +419,7 @@ function FormRadioGroup({
   description?: string;
   value?: string;
   onChange?: (value: string) => void;
+  t: FormMessageProps["t"];
 }): JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
@@ -437,7 +446,7 @@ function FormRadioGroup({
       >
         {children}
       </RadioGroup>
-      <FormMessage />
+      <FormMessage t={t} />
     </FormItem>
   );
 }
@@ -510,6 +519,7 @@ function FormSelect({
   description,
   onChange,
   value,
+  t,
   ...props
 }: Omit<
   React.ComponentPropsWithoutRef<typeof Select>,
@@ -519,6 +529,7 @@ function FormSelect({
   description?: string;
   value?: Partial<Option>;
   onChange: (value: { label: string; value: string }) => void;
+  t: FormMessageProps["t"];
 }): JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
@@ -539,7 +550,7 @@ function FormSelect({
         {...props}
       />
       {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
+      <FormMessage t={t} />
     </FormItem>
   );
 }
@@ -556,6 +567,7 @@ function FormSwitch({
   disabled,
   defaultChecked,
   id,
+  t,
 }: Omit<
   React.ComponentPropsWithoutRef<typeof Switch>,
   "checked" | "onCheckedChange"
@@ -564,6 +576,7 @@ function FormSwitch({
   description?: string;
   value?: boolean;
   onChange?: (value: boolean) => void;
+  t: FormMessageProps["t"];
 }): JSX.Element {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
@@ -592,7 +605,7 @@ function FormSwitch({
         {!!label && <FormLabel htmlFor={formItemId}>{label}</FormLabel>}
       </StyledView>
       {!!description && <FormDescription>{description}</FormDescription>}
-      <FormMessage />
+      <FormMessage t={t} />
     </FormItem>
   );
 }

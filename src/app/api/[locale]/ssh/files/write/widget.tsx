@@ -35,7 +35,7 @@ export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
 
   const value = field.value;
   const isLoading = endpointMutations?.read?.isLoading ?? false;
-  const content = form?.watch("content") ?? "";
+  const content = form.watch("content") ?? "";
 
   const handleWrite = useCallback((): void => {
     onSubmit?.();
@@ -71,7 +71,7 @@ export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
       {/* Editor */}
       <Textarea
         value={content}
-        onChange={(e) => form?.setValue("content", e.target.value)}
+        onChange={(e) => form.setValue("content", e.target.value)}
         placeholder={t("widget.placeholder")}
         className="flex-1 font-mono text-xs rounded-none border-0 resize-none min-h-[300px]"
         disabled={isLoading}

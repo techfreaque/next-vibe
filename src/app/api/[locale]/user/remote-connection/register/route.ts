@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      registerLocalInstance(data, user, logger),
+    handler: ({ data, user, logger, t }) =>
+      registerLocalInstance(data, user, logger, t),
   },
 });

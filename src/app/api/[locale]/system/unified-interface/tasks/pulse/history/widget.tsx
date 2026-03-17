@@ -355,8 +355,8 @@ export function PulseHistoryContainer({
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const statusFilter: string = form?.watch("status") ?? "ALL";
-  const offset = Number(form?.watch("offset") ?? 0);
+  const statusFilter = form.watch("status") ?? "ALL";
+  const offset = form.watch("offset") ?? 0;
 
   const value = field.value;
   const summary = value?.summary;
@@ -392,7 +392,7 @@ export function PulseHistoryContainer({
 
   const handlePageChange = useCallback(
     (newOffset: number): void => {
-      form?.setValue("offset", newOffset);
+      form.setValue("offset", newOffset);
       if (onSubmit) {
         onSubmit();
       } else {
@@ -426,7 +426,7 @@ export function PulseHistoryContainer({
         filter === "widget.filter.all"
           ? ""
           : (FILTER_TO_PULSE_STATUS[filter] ?? "");
-      form?.setValue("status", statusValue);
+      form.setValue("status", statusValue);
       setExpandedId(null);
       endpointMutations?.read?.refetch?.();
     },

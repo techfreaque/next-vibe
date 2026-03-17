@@ -191,7 +191,7 @@ export function NavigateButtonWidget<
         }
 
         // Build structured source data for extractParams
-        const requestData = form?.getValues() ?? {};
+        const requestData = form.getValues() ?? {};
         const responseData =
           response?.success && response.data ? response.data : {};
         const urlPathParams = navigation?.current?.params?.urlPathParams ?? {};

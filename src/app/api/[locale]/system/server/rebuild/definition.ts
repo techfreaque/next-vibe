@@ -7,7 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   objectField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -20,6 +22,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { REBUILD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+import { RebuildWidget } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -43,17 +46,47 @@ const { POST } = createEndpoint({
     "rebuild-and-restart",
   ],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "post.form.title",
-    description: "post.form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: RebuildWidget,
+    usage: { response: true } as const,
     children: {
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
+      }),
+
+      duration: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "post.fields.duration.title",
+        schema: z.coerce.number(),
+      }),
+
+      steps: responseArrayOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            label: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            ok: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.boolean(),
+            }),
+            skipped: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.boolean(),
+            }),
+            durationMs: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.coerce.number(),
+            }),
+          },
+        }),
       }),
 
       errors: responseField(scopedTranslation, {
@@ -113,11 +146,32 @@ const { POST } = createEndpoint({
   examples: {
     responses: {
       default: {
-        success: "Rebuild completed successfully. Server restarted.",
+        success: "Rebuild Complete",
+        duration: 107000,
+        steps: [
+          {
+            label: "Code generation",
+            ok: true,
+            skipped: false,
+            durationMs: 13000,
+          },
+          { label: "Vibe check", ok: true, skipped: false, durationMs: 11000 },
+          {
+            label: "Next.js build",
+            ok: true,
+            skipped: false,
+            durationMs: 75000,
+          },
+          { label: "Migrations", ok: true, skipped: false, durationMs: 656 },
+          { label: "Seeding", ok: true, skipped: false, durationMs: 858 },
+          { label: "Restart", ok: true, skipped: false, durationMs: 0 },
+        ],
       },
     },
   },
 });
 
 const rebuildDefinition = { POST };
+export type RebuildResponseOutput = typeof POST.types.ResponseOutput;
+export type RebuildStep = NonNullable<RebuildResponseOutput["steps"]>[number];
 export default rebuildDefinition;

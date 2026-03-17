@@ -9,7 +9,7 @@ export const translations = {
         title: "Run Claude Code",
         dynamicTitle: "Claude Code: {{prompt}}",
         description:
-          "Launch a Claude Code session on Hermes (the local dev machine). PREFER interactiveMode:true (default) — this opens a full back-and-forth Claude Code session where Max can actively participate. Use interactiveMode:false only for fully automated batch tasks that need no human input and must return output programmatically (e.g. cron jobs, automated review). In interactive mode the session streams live to the terminal and waits for the user; in batch mode it runs `claude -p`, collects all output, and returns when done. Always runs with --dangerously-skip-permissions so no confirmation prompts interrupt the flow.",
+          "Launch a Claude Code session on Hermes (the local dev machine). DEFAULT: interactiveMode:false — runs `claude -p` (non-interactive print mode), collects all output, and returns it programmatically when done. Use this default for ALL automated tasks, cron jobs, pipelines, and AI tool calls. Only set interactiveMode:true for live back-and-forth sessions where Max is actively watching the terminal — output will NOT be returned in this mode. Always runs with --dangerously-skip-permissions so no confirmation prompts interrupt the flow.",
         fields: {
           prompt: {
             label: "Prompt",
@@ -31,7 +31,7 @@ export const translations = {
             description:
               "Maximum spend limit in USD for this run. Prevents runaway tool-use costs. Omit for no limit.",
           },
-          allowedTools: {
+          availableTools: {
             label: "Allowed Tools",
             description:
               "Comma-separated list of tools Claude Code may use (e.g. Read,Edit,Bash). Omit to allow all default tools.",
@@ -44,7 +44,7 @@ export const translations = {
           interactiveMode: {
             label: "Interactive Mode",
             description:
-              "PREFER true (default). Interactive mode opens a full Claude Code session — Max can see output live and participate. Set to false only for fully automated batch tasks (cron jobs, pipelines) where no human interaction is needed and output must be returned as a value.",
+              "Use interactiveMode:true only when you want a live back-and-forth session with the user watching. Use interactiveMode:false (default) for automated batch tasks where output must be returned programmatically (cron jobs, pipelines, tool calls).",
           },
           timeoutSeconds: {
             label: "Timeout (seconds)",

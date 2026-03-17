@@ -14,6 +14,12 @@ export const translations: typeof enTranslations = {
           "Reqid żądania sieciowego (pomiń, aby pobrać aktualnie wybrane żądanie w DevTools)",
         placeholder: "Wprowadź ID żądania",
       },
+      maxBodyLength: {
+        label: "Maks. długość treści",
+        description:
+          "Maksymalna liczba znaków zwracanych z treści żądania/odpowiedzi. Nadmiar jest obcinany z powiadomieniem.",
+        placeholder: "np. 10000",
+      },
     },
   },
   response: {

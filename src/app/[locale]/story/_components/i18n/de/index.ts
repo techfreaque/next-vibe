@@ -443,7 +443,7 @@ export const translations: typeof enTranslations = {
           credits: "{{credits}} Credits zum Start",
           models: "Zugriff auf alle {{modelCount}} KI-Modelle",
           folders: "Alle Ordnertypen (privat, inkognito, geteilt, öffentlich)",
-          characters: "Community-Characters verwenden",
+          characters: "Community-Skills verwenden",
           support: "Community-Support",
         },
         cta: "Kostenlos starten",
@@ -457,7 +457,7 @@ export const translations: typeof enTranslations = {
           unlimited: "Unbegrenzte KI-Gespräche",
           models: "Alle {{modelCount}} KI-Modelle",
           folders: "Alle Ordnertypen",
-          characters: "Unbegrenzte Characters erstellen",
+          characters: "Unbegrenzte Skills erstellen",
           priority: "Prioritäts-Support",
           analytics: "Erweiterte Analysen",
         },
@@ -545,9 +545,9 @@ export const translations: typeof enTranslations = {
         publishingManagement: {
           title: "Beginnen Sie zu chatten",
           description:
-            "Führen Sie ehrliche, uneingeschränkte Gespräche. Erstellen Sie Characters, organisieren Sie in Ordnern oder gehen Sie inkognito.",
+            "Führen Sie ehrliche, uneingeschränkte Gespräche. Erstellen Sie Skills, organisieren Sie in Ordnern oder gehen Sie inkognito.",
           tags: {
-            optimalTiming: "Benutzerdefinierte Characters",
+            optimalTiming: "Benutzerdefinierte Skills",
             communityBuilding: "Ordnerverwaltung",
           },
         },
@@ -598,7 +598,7 @@ export const translations: typeof enTranslations = {
         collaboration: {
           title: "Community-getrieben",
           description:
-            "Gebaut mit Feedback unserer Nutzer. Teilen Sie Characters, Tipps und helfen Sie, die Plattform zu gestalten.",
+            "Gebaut mit Feedback unserer Nutzer. Teilen Sie Skills, Tipps und helfen Sie, die Plattform zu gestalten.",
         },
       },
       team: {
@@ -1169,7 +1169,7 @@ export const translations: typeof enTranslations = {
       features: "Funktionen",
       subscription: "Abonnement",
       aiModels: "KI-Modelle",
-      characters: "Characters",
+      characters: "Skills",
     },
     product: {
       title: "Produkt",

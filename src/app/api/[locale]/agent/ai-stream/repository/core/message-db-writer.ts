@@ -89,18 +89,11 @@ export class MessageDbWriter {
     parentId: string | null;
     userId: string | undefined;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string | null;
   }): Promise<void> {
-    const {
-      messageId,
-      threadId,
-      content,
-      parentId,
-      model,
-      character,
-      sequenceId,
-    } = params;
+    const { messageId, threadId, content, parentId, model, skill, sequenceId } =
+      params;
 
     this.lastAssistantMessageId = messageId;
 
@@ -112,7 +105,7 @@ export class MessageDbWriter {
       content: "",
       parentId,
       model,
-      character,
+      skill: skill,
       sequenceId,
     });
     this.enqueue(messageEvent);
@@ -131,7 +124,7 @@ export class MessageDbWriter {
         parentId,
         userId: params.userId,
         model,
-        character,
+        skill: skill,
         sequenceId,
         logger: this.logger,
         locale: this.locale,
@@ -313,11 +306,10 @@ export class MessageDbWriter {
     parentId: string | null;
     userId: string | undefined;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string | null;
   }): Promise<void> {
-    const { messageId, threadId, parentId, model, character, sequenceId } =
-      params;
+    const { messageId, threadId, parentId, model, skill, sequenceId } = params;
 
     this.lastAssistantMessageId = messageId;
 
@@ -329,7 +321,7 @@ export class MessageDbWriter {
       content: "",
       parentId,
       model,
-      character,
+      skill: skill,
       sequenceId,
     });
     this.enqueue(messageEvent);
@@ -343,7 +335,7 @@ export class MessageDbWriter {
         parentId,
         userId: params.userId,
         model,
-        character,
+        skill: skill,
         sequenceId,
         logger: this.logger,
         locale: this.locale,
@@ -378,7 +370,7 @@ export class MessageDbWriter {
     parentId: string | null;
     userId: string | undefined;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string | null;
     toolCall: ToolCall;
   }): Promise<void> {
@@ -387,7 +379,7 @@ export class MessageDbWriter {
       threadId,
       parentId,
       model,
-      character,
+      skill,
       sequenceId,
       toolCall,
     } = params;
@@ -402,7 +394,7 @@ export class MessageDbWriter {
       sequenceId,
       toolCall,
       model,
-      character,
+      skill: skill,
     });
     this.enqueue(toolMessageEvent);
 
@@ -416,7 +408,7 @@ export class MessageDbWriter {
 
     // DB: create tool message immediately
     if (!this.isIncognito) {
-      await createToolMessage({
+      const createResult = await createToolMessage({
         messageId: toolMessageId,
         threadId,
         toolCall,
@@ -424,9 +416,16 @@ export class MessageDbWriter {
         userId: params.userId,
         sequenceId,
         model,
-        character,
+        skill: skill,
         logger: this.logger,
+        locale: this.locale,
       });
+      if (!createResult.success) {
+        this.logger.error("[MessageDbWriter] Failed to create tool message", {
+          messageId: toolMessageId,
+          error: createResult.message,
+        });
+      }
     }
   }
 
@@ -456,7 +455,7 @@ export class MessageDbWriter {
     parentId: string | null;
     userId: string | undefined;
     model: ModelId;
-    character: string;
+    skill: string;
     sequenceId: string | null;
     toolCall: ToolCall; // updated with result/error
     toolName: string;
@@ -470,7 +469,7 @@ export class MessageDbWriter {
       threadId,
       parentId,
       model,
-      character,
+      skill,
       sequenceId,
       toolCall,
       toolName,
@@ -488,7 +487,7 @@ export class MessageDbWriter {
       content: null,
       parentId,
       model,
-      character,
+      skill: skill,
       sequenceId,
       toolCall,
     });
@@ -513,7 +512,7 @@ export class MessageDbWriter {
           },
         );
         // Fallback: create if update failed
-        await createToolMessage({
+        const fallbackResult = await createToolMessage({
           messageId: toolMessageId,
           threadId,
           toolCall,
@@ -521,9 +520,19 @@ export class MessageDbWriter {
           userId: params.userId,
           sequenceId,
           model,
-          character,
+          skill: skill,
           logger: this.logger,
+          locale: this.locale,
         });
+        if (!fallbackResult.success) {
+          this.logger.error(
+            "[MessageDbWriter] Fallback tool message creation also failed",
+            {
+              messageId: toolMessageId,
+              error: fallbackResult.message,
+            },
+          );
+        }
       }
     }
 
@@ -665,18 +674,11 @@ export class MessageDbWriter {
     content: string;
     parentId: string | null;
     model: ModelId;
-    character: string | null;
+    skill: string | null;
     metadata?: MessageMetadata;
   }): void {
-    const {
-      messageId,
-      threadId,
-      content,
-      parentId,
-      model,
-      character,
-      metadata,
-    } = params;
+    const { messageId, threadId, content, parentId, model, skill, metadata } =
+      params;
     const event = createStreamEvent.messageCreated({
       messageId,
       threadId,
@@ -684,7 +686,7 @@ export class MessageDbWriter {
       content,
       parentId,
       model,
-      character,
+      skill,
       metadata,
     });
     this.enqueue(event);
@@ -699,7 +701,7 @@ export class MessageDbWriter {
     parentId: string | null;
     sequenceId: string;
     model: ModelId;
-    character: string | null;
+    skill: string | null;
     userId: string | undefined;
     messagesToCompact: Array<{ createdAt: Date; id: string }>;
     createdAt: Date;
@@ -710,7 +712,7 @@ export class MessageDbWriter {
       parentId,
       sequenceId,
       model,
-      character,
+      skill,
       messagesToCompact,
       createdAt,
     } = params;
@@ -724,7 +726,7 @@ export class MessageDbWriter {
       parentId,
       sequenceId,
       model,
-      character,
+      skill,
       metadata: {
         isCompacting: true,
         compactedMessageCount: messagesToCompact.length,
@@ -743,7 +745,7 @@ export class MessageDbWriter {
         sequenceId,
         authorId: params.userId ?? null,
         model,
-        character: character ?? null,
+        skill: skill ?? null,
         isAI: true,
         metadata: {
           isCompacting: true,
@@ -829,6 +831,7 @@ export class MessageDbWriter {
         .set({
           metadata: {
             isCompacting: true,
+            isStreaming: false,
             compactedMessageCount: messagesToCompact.length,
             promptTokens: inputTokens,
             completionTokens: outputTokens,
@@ -916,7 +919,7 @@ export class MessageDbWriter {
       parentId,
       sequenceId,
       model: null,
-      character: null,
+      skill: null,
     });
     this.enqueue(errorMessageEvent);
 

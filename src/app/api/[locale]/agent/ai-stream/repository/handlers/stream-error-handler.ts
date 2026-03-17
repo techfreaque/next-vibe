@@ -55,7 +55,13 @@ export class StreamErrorHandler {
     let translationKey: AiStreamTranslationKey;
     let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
 
-    if (errorMessage.toLowerCase().includes("rate limit")) {
+    if (
+      errorName === "AI_MissingToolResultsError" ||
+      errorMessage.toLowerCase().includes("missing tool results")
+    ) {
+      translationKey = "errors.pendingToolCall";
+      errorType = ErrorResponseTypes.BAD_REQUEST;
+    } else if (errorMessage.toLowerCase().includes("rate limit")) {
       translationKey = "errors.rateLimitExceeded";
       errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
     } else if (

@@ -18,10 +18,14 @@ import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/to
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 /**
- * Tool executor function type — matches CoreTool's execute signature
+ * Tool executor function type — matches CoreTool's execute signature (with options)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, oxlint-plugin-restricted/restricted-syntax -- tool args are dynamic
-type ToolExecutor = (args: any) => Promise<unknown>;
+type ToolExecutor = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- tool args are dynamic
+  args: any,
+  options?: { toolCallId?: string },
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic executor return
+) => Promise<unknown>;
 
 /**
  * Per-request tool executor registry.
@@ -29,6 +33,35 @@ type ToolExecutor = (args: any) => Promise<unknown>;
  */
 export class AgentToolExecutorRegistry {
   private executors = new Map<string, ToolExecutor>();
+  batchRemaining = 0;
+
+  /**
+   * Set of callbackMode values seen in the current batch that require stopping
+   * the Agent SDK loop after the batch completes.
+   * The MCP handler populates this directly from tool args — no dependency on
+   * stream-part-handler having processed the tool-call events yet.
+   */
+  batchStopModes = new Set<string>();
+
+  /**
+   * Called when an assistant message with tool_use is received, before any MCP handlers fire.
+   * Sets the expected number of tools in this parallel batch so isLastInBatch is accurate.
+   */
+  setBatchSize(count: number): void {
+    this.batchRemaining = count;
+    this.batchStopModes.clear();
+  }
+
+  /**
+   * Decrement and return whether this is the last tool in the batch.
+   * Used by the MCP handler for tools that skip execute() (e.g. approve).
+   */
+  consumeOne(): boolean {
+    if (this.batchRemaining > 0) {
+      this.batchRemaining--;
+    }
+    return this.batchRemaining === 0;
+  }
 
   /**
    * Register all CoreTools from the AI SDK tools map
@@ -51,17 +84,23 @@ export class AgentToolExecutorRegistry {
 
   /**
    * Execute a tool by name. Called by the Agent SDK MCP handler.
+   * Returns the result plus `isLastInBatch` — true when no other tool calls
+   * remain pending in the current batch (mirrors finish-step pendingToolMessages check).
    */
   async execute(
     toolName: string,
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- MCP tool args are dynamic
     args: Record<string, unknown>,
     logger: EndpointLogger,
+    toolCallId: string,
   ): Promise<{
     content: Array<{ type: "text"; text: string }>;
     isError?: boolean;
+    isLastInBatch: boolean;
   }> {
     const executor = this.executors.get(toolName);
+    const isLastInBatch = this.consumeOne();
+
     if (!executor) {
       logger.error("[AgentToolBridge] Tool not found in registry", {
         toolName,
@@ -76,11 +115,15 @@ export class AgentToolExecutorRegistry {
           },
         ],
         isError: true,
+        isLastInBatch,
       };
     }
 
     try {
-      const result = await executor(args);
+      const result = await executor(
+        args,
+        toolCallId ? { toolCallId } : undefined,
+      );
       return {
         content: [
           {
@@ -91,6 +134,7 @@ export class AgentToolExecutorRegistry {
                 : JSON.stringify(result, null, 2),
           },
         ],
+        isLastInBatch,
       };
     } catch (error) {
       const parsed = parseError(error);
@@ -107,6 +151,7 @@ export class AgentToolExecutorRegistry {
           },
         ],
         isError: true,
+        isLastInBatch,
       };
     }
   }

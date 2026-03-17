@@ -52,6 +52,15 @@ export const translations = {
         description: "Filter by hidden status (default: visible only)",
         placeholder: "Visible tasks",
       },
+      search: {
+        label: "Search",
+        description: "Filter tasks by name, route, description, or category",
+        placeholder: "Search tasks...",
+      },
+      sort: {
+        label: "Sort",
+        description: "Sort order for the task list",
+      },
       limit: {
         label: "Limit",
         description: "Maximum number of tasks to return",
@@ -196,6 +205,11 @@ export const translations = {
         label: "Enabled",
         description: "Enable or disable the task",
       },
+      hidden: {
+        label: "Hidden",
+        description:
+          "Hide this task from AI system prompts and default task listings",
+      },
       timeout: {
         label: "Timeout (ms)",
         description: "Maximum execution time in milliseconds",
@@ -330,6 +344,19 @@ export const translations = {
       edit: "Edit task",
       delete: "Delete task",
       runNow: "Run Now",
+    },
+    bulk: {
+      selected: "{count} selected",
+      selectAll: "Select all",
+      clearSelection: "Clear selection",
+      enable: "Enable",
+      disable: "Disable",
+      runNow: "Run now",
+      delete: "Delete",
+      confirmDeleteTitle: "Delete tasks?",
+      confirmDelete: "Delete {count} task(s)? This cannot be undone.",
+      cancel: "Cancel",
+      success: "{succeeded} succeeded, {failed} failed",
     },
     empty: {
       noTasks: "No cron tasks",

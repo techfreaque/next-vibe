@@ -19,7 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { CharactersRepository } from "../../characters/repository";
+import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
   FavoriteCreateRequestOutput,
@@ -55,11 +55,11 @@ export class FavoritesCreateRepository {
     try {
       logger.debug("Creating favorite", {
         userId,
-        characterId: data.characterId,
+        skillId: data.skillId,
       });
 
-      // Validate characterId is not empty
-      if (!data.characterId || data.characterId.trim() === "") {
+      // Validate skillId is not empty
+      if (!data.skillId || data.skillId.trim() === "") {
         return fail({
           message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -68,9 +68,9 @@ export class FavoritesCreateRepository {
 
       // Get character to compare defaults
       let character = null;
-      if (data.characterId) {
-        const characterResult = await CharactersRepository.getCharacterById(
-          { id: data.characterId },
+      if (data.skillId) {
+        const characterResult = await SkillsRepository.getSkillById(
+          { id: data.skillId },
           user,
           logger,
           locale,
@@ -103,14 +103,14 @@ export class FavoritesCreateRepository {
         .insert(chatFavorites)
         .values({
           userId,
-          characterId: data.characterId,
+          skillId: data.skillId,
           customName: null,
           customIcon: null,
           voice: voiceToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
-          activeTools: data.allowedTools ?? null,
-          visibleTools: data.pinnedTools ?? null,
+          availableTools: data.availableTools ?? null,
+          pinnedTools: data.pinnedTools ?? null,
           position: nextPosition,
           color: null,
           useCount: 0,

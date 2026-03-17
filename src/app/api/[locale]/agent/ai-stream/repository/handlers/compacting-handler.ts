@@ -44,7 +44,7 @@ function buildCompactingInstructions(): string {
 - Results of tool calls and actions taken
 
 **What to omit:**
-- System instructions, character personas, or role-play framing
+- System instructions, skill personas, or role-play framing
 - Tool definitions, function signatures, or available-tool descriptions
 - Greetings, pleasantries, and filler exchanges
 - Redundant or superseded information
@@ -77,7 +77,7 @@ export class CompactingHandler {
     userId: string | undefined;
     user: JwtPayloadType;
     model: ModelId;
-    character: string | null;
+    skill: string | null;
     providerModel: Parameters<typeof streamText>[0]["model"];
     abortSignal: AbortSignal;
     logger: EndpointLogger;
@@ -106,7 +106,7 @@ export class CompactingHandler {
       userId,
       user,
       model,
-      character,
+      skill,
       providerModel,
       abortSignal,
       logger,
@@ -139,8 +139,8 @@ export class CompactingHandler {
 
     const metadataParts: string[] = [`ID:${shortId}`];
     metadataParts.push(`Model:${model}`);
-    if (character) {
-      metadataParts.push(`Character:${character}`);
+    if (skill) {
+      metadataParts.push(`Skill:${skill}`);
     }
     metadataParts.push(`Mode:compacting`);
     metadataParts.push(`Posted:${timestamp}`);
@@ -160,7 +160,7 @@ export class CompactingHandler {
       parentId,
       sequenceId,
       model,
-      character: character ?? null,
+      skill: skill ?? null,
       userId,
       messagesToCompact,
       createdAt: compactingMessageCreatedAt,
@@ -185,7 +185,7 @@ export class CompactingHandler {
         content: currentUserMessage.content ?? "",
         parentId: compactingMessageId,
         model,
-        character,
+        skill: skill,
         metadata: currentUserMessage.metadata ?? undefined,
       });
     }
@@ -196,7 +196,7 @@ export class CompactingHandler {
       const streamResult = await streamText({
         model: providerModel,
         // Do NOT pass system prompt or tools — compacting is a pure summarization
-        // task that should not be influenced by character personas, tool definitions,
+        // task that should not be influenced by skill personas, tool definitions,
         // or other system-level instructions that would bloat the context.
         messages: compactingMessages,
         temperature: 0.3,

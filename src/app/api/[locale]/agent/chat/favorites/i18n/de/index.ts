@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   },
   active: "Aktiv",
   fallbacks: {
-    unknownCharacter: "Unbekannter Charakter",
+    unknownSkill: "Unbekannter Charakter",
     unknownModel: "Unbekanntes Modell",
     unknown: "Unbekannt",
     unknownProvider: "unbekannt",
@@ -77,8 +77,38 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Favoriten abrufen",
     description: "Alle gespeicherten Favoriten-Konfigurationen abrufen",
+    userId: {
+      label: "Benutzer-ID",
+      description:
+        "Nur für Admins: Favoriten eines bestimmten Benutzers abrufen. Leer lassen für eigene Favoriten.",
+    },
+    fields: {
+      query: {
+        label: "Suche",
+        description: "Favoriten nach Name, Tagline oder Skill-ID suchen.",
+      },
+      page: {
+        label: "Seite",
+        description:
+          "Seitenzahl für paginierte Ergebnisse (KI/MCP: Standard-Seitengröße 25).",
+      },
+      pageSize: {
+        label: "Seitengröße",
+        description:
+          "Anzahl der Favoriten pro Seite (1–500). KI/MCP-Aufrufer verwenden standardmäßig 25; menschliche Aufrufer erhalten alle.",
+      },
+    },
     addVariant: "Variante hinzufügen",
     emptyState: "Sie haben noch keine Favoriten hinzugefügt",
+    tabs: {
+      myFavorites: "Meine Favoriten",
+      browseSkills: "Skills durchsuchen",
+    },
+    sections: {
+      companion: "Begleiter",
+      skills: "Skills",
+      model: "Direkte Modelle",
+    },
     container: {
       title: "Ihre Favoriten",
       description:
@@ -93,7 +123,7 @@ export const translations: typeof enTranslations = {
         id: {
           content: "ID: {{value}}",
         },
-        characterId: {
+        skillId: {
           content: "Charakter: {{value}}",
         },
         customName: {
@@ -237,7 +267,7 @@ export const translations: typeof enTranslations = {
       label: "Zu Favoriten hinzufügen",
       loadingText: "Hinzufügen...",
     },
-    characterId: {
+    skillId: {
       label: "Charakter",
       description: "Wählen Sie den Charakter für diesen Favoriten",
     },

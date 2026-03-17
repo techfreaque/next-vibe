@@ -16,6 +16,7 @@ import type { AgentEnvAvailability } from "./env-availability";
 /** Fallback: assume everything is available (safe default for non-local-mode or unknown). */
 const ALL_AVAILABLE: AgentEnvAvailability = {
   openRouter: true,
+  claudeCode: true,
   voice: true,
   braveSearch: true,
   kagiSearch: true,

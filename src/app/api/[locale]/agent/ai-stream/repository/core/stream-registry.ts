@@ -12,10 +12,13 @@ import { eq } from "drizzle-orm";
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
 
+import { AbortReason, StreamAbortError } from "./constants";
+
 interface StreamEntry {
   controller: AbortController;
   userId: string | undefined;
   leadId: string | undefined;
+  registeredAt: number;
 }
 
 const activeStreams = new Map<string, StreamEntry>();
@@ -32,9 +35,24 @@ export const StreamRegistry = {
   ): void {
     const existing = activeStreams.get(threadId);
     if (existing) {
-      existing.controller.abort(new Error("Superseded by new stream"));
+      existing.controller.abort(new StreamAbortError(AbortReason.SUPERSEDED));
     }
-    activeStreams.set(threadId, { controller, userId, leadId });
+
+    // Evict stale entries that were never unregistered (e.g. crashed handlers).
+    // Streams lasting more than 30 minutes are almost certainly orphaned.
+    const staleThreshold = Date.now() - 30 * 60 * 1000;
+    for (const [id, entry] of activeStreams) {
+      if (entry.registeredAt < staleThreshold) {
+        activeStreams.delete(id);
+      }
+    }
+
+    activeStreams.set(threadId, {
+      controller,
+      userId,
+      leadId,
+      registeredAt: Date.now(),
+    });
   },
 
   /**
@@ -46,7 +64,7 @@ export const StreamRegistry = {
     if (!entry) {
       return false;
     }
-    entry.controller.abort(new Error("User cancelled stream"));
+    entry.controller.abort(new StreamAbortError(AbortReason.USER_CANCELLED));
     activeStreams.delete(threadId);
     return true;
   },

@@ -3,12 +3,14 @@
  * Shared utilities for browser tool route handlers
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ContentResponse,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   isContentResponse,
-  success,
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -81,7 +83,7 @@ export async function executeMCPTool<T>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   try {
     // Prepare request data for main browser repository
     const requestData: { tool: string; arguments?: string } = {
@@ -92,9 +94,10 @@ export async function executeMCPTool<T>(
     // Call main browser repository
     const result = await browserRepository.executeTool(requestData, t, logger);
 
-    // Content responses (e.g. screenshots) are wrapped in success for MCP/AI consumers
+    // Content responses (e.g. inline screenshots) must be propagated directly —
+    // wrapping them in success() would break serialization in the execute-tool pipeline.
     if (isContentResponse(result)) {
-      return success(result as T & typeof result);
+      return result;
     }
 
     // Return the result directly - it already has the correct structure
@@ -113,13 +116,16 @@ export async function executeMCPTool<T>(
 
 // ============================================================================
 // Type-Safe Wrapper Functions
+// All wrappers return Promise<ResponseType<T> | ContentResponse> because
+// tools that return images (e.g. take_screenshot without filePath) produce
+// a ContentResponse that must be propagated directly to the platform handler.
 // ============================================================================
 
 export function executeClick<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -127,7 +133,7 @@ export function executeClosePage<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -135,7 +141,7 @@ export function executeDrag<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -143,7 +149,7 @@ export function executeFill<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -151,7 +157,7 @@ export function executeEmulate(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -159,7 +165,7 @@ export function executeEvaluateScript(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -167,7 +173,7 @@ export function executeFillForm(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -175,7 +181,7 @@ export function executeGetConsoleMessage(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -183,7 +189,7 @@ export function executeGetNetworkRequest<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -191,7 +197,7 @@ export function executeHandleDialog(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -199,7 +205,7 @@ export function executeHover(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -207,7 +213,7 @@ export function executeListConsoleMessages(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -215,7 +221,7 @@ export function executeListNetworkRequests(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -223,7 +229,7 @@ export function executeListPages(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -231,7 +237,7 @@ export function executeNavigatePage(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -239,7 +245,7 @@ export function executeNewPage(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -247,7 +253,7 @@ export function executePerformanceAnalyzeInsight(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -255,7 +261,7 @@ export function executePerformanceStartTrace(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -263,7 +269,7 @@ export function executePerformanceStopTrace(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool<BrowserToolResponse>(params, t, logger);
 }
 
@@ -271,7 +277,7 @@ export function executePressKey<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -279,7 +285,7 @@ export function executeResizePage<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -287,7 +293,7 @@ export function executeSelectPage<T = BrowserToolResponse>(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<T>> {
+): Promise<ResponseType<T> | ContentResponse> {
   return executeMCPTool<T>(params, t, logger);
 }
 
@@ -295,7 +301,7 @@ export function executeTakeScreenshot(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -303,7 +309,7 @@ export function executeTakeSnapshot(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -311,7 +317,7 @@ export function executeUploadFile(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -319,6 +325,6 @@ export function executeWaitFor(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<ResponseType<BrowserToolResponse>> {
+): Promise<ResponseType<BrowserToolResponse> | ContentResponse> {
   return executeMCPTool(params, t, logger);
 }

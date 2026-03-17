@@ -75,14 +75,15 @@ export class ChatSettingsRepositoryClient {
   static getDefaults(): ChatSettingsGetResponseOutput {
     return {
       selectedModel: defaultModel,
-      selectedCharacter: "thea",
+      selectedSkill: "thea",
       activeFavoriteId: null,
       ttsAutoplay: false,
       ttsVoice: DEFAULT_TTS_VOICE,
       viewMode: ViewMode.LINEAR,
-      allowedTools: null,
+      availableTools: null,
       pinnedTools: null,
       compactTrigger: COMPACT_TRIGGER,
+      memoryLimit: null,
     };
   }
 
@@ -107,8 +108,7 @@ export class ChatSettingsRepositoryClient {
       // Use 'in' check for nullable fields to distinguish "explicitly set to null" from "not set"
       return {
         selectedModel: overrides.selectedModel ?? defaults.selectedModel,
-        selectedCharacter:
-          overrides.selectedCharacter ?? defaults.selectedCharacter,
+        selectedSkill: overrides.selectedSkill ?? defaults.selectedSkill,
         activeFavoriteId:
           "activeFavoriteId" in overrides
             ? overrides.activeFavoriteId
@@ -116,15 +116,19 @@ export class ChatSettingsRepositoryClient {
         ttsAutoplay: overrides.ttsAutoplay ?? defaults.ttsAutoplay,
         ttsVoice: overrides.ttsVoice ?? defaults.ttsVoice,
         viewMode: overrides.viewMode ?? defaults.viewMode,
-        allowedTools:
-          "allowedTools" in overrides
-            ? overrides.allowedTools
-            : defaults.allowedTools,
+        availableTools:
+          "availableTools" in overrides
+            ? overrides.availableTools
+            : defaults.availableTools,
         pinnedTools:
           "pinnedTools" in overrides
             ? overrides.pinnedTools
             : defaults.pinnedTools,
         compactTrigger: overrides.compactTrigger ?? defaults.compactTrigger,
+        memoryLimit:
+          "memoryLimit" in overrides
+            ? overrides.memoryLimit
+            : defaults.memoryLimit,
       };
     } catch {
       return this.getDefaults();
@@ -146,8 +150,8 @@ export class ChatSettingsRepositoryClient {
     if (settings.selectedModel !== defaults.selectedModel) {
       overrides.selectedModel = settings.selectedModel;
     }
-    if (settings.selectedCharacter !== defaults.selectedCharacter) {
-      overrides.selectedCharacter = settings.selectedCharacter;
+    if (settings.selectedSkill !== defaults.selectedSkill) {
+      overrides.selectedSkill = settings.selectedSkill;
     }
     if (settings.activeFavoriteId !== defaults.activeFavoriteId) {
       overrides.activeFavoriteId = settings.activeFavoriteId;
@@ -162,10 +166,10 @@ export class ChatSettingsRepositoryClient {
       overrides.viewMode = settings.viewMode;
     }
     if (
-      JSON.stringify(settings.allowedTools) !==
-      JSON.stringify(defaults.allowedTools)
+      JSON.stringify(settings.availableTools) !==
+      JSON.stringify(defaults.availableTools)
     ) {
-      overrides.allowedTools = settings.allowedTools;
+      overrides.availableTools = settings.availableTools;
     }
     if (
       JSON.stringify(settings.pinnedTools) !==
@@ -175,6 +179,9 @@ export class ChatSettingsRepositoryClient {
     }
     if (settings.compactTrigger !== defaults.compactTrigger) {
       overrides.compactTrigger = settings.compactTrigger;
+    }
+    if (settings.memoryLimit !== defaults.memoryLimit) {
+      overrides.memoryLimit = settings.memoryLimit;
     }
 
     if (Object.keys(overrides).length === 0) {
@@ -193,7 +200,7 @@ export class ChatSettingsRepositoryClient {
     const current = this.loadLocalSettings();
     const updated: ChatSettingsGetResponseOutput = {
       selectedModel: updates.selectedModel ?? current.selectedModel,
-      selectedCharacter: updates.selectedCharacter ?? current.selectedCharacter,
+      selectedSkill: updates.selectedSkill ?? current.selectedSkill,
       activeFavoriteId:
         updates.activeFavoriteId !== undefined
           ? updates.activeFavoriteId
@@ -204,10 +211,10 @@ export class ChatSettingsRepositoryClient {
           : current.ttsAutoplay,
       ttsVoice: updates.ttsVoice ?? current.ttsVoice,
       viewMode: updates.viewMode ?? current.viewMode,
-      allowedTools:
-        updates.allowedTools !== undefined
-          ? updates.allowedTools
-          : current.allowedTools,
+      availableTools:
+        updates.availableTools !== undefined
+          ? updates.availableTools
+          : current.availableTools,
       pinnedTools:
         updates.pinnedTools !== undefined
           ? updates.pinnedTools
@@ -216,6 +223,10 @@ export class ChatSettingsRepositoryClient {
         updates.compactTrigger !== undefined
           ? updates.compactTrigger
           : current.compactTrigger,
+      memoryLimit:
+        updates.memoryLimit !== undefined
+          ? updates.memoryLimit
+          : current.memoryLimit,
     };
 
     this.saveLocalSettings(updated);
@@ -239,13 +250,13 @@ export class ChatSettingsRepositoryClient {
   static async selectFavorite(params: {
     favoriteId: string;
     modelId: ModelId | null;
-    characterId: string | null;
+    skillId: string | null;
     voice: typeof TtsVoiceValue | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
     user: JwtPayloadType;
   }): Promise<void> {
-    const { favoriteId, modelId, characterId, voice, logger, locale, user } =
+    const { favoriteId, modelId, skillId, voice, logger, locale, user } =
       params;
 
     const { apiClient } =
@@ -270,8 +281,8 @@ export class ChatSettingsRepositoryClient {
         if (modelId) {
           updatedData.selectedModel = modelId;
         }
-        if (characterId) {
-          updatedData.selectedCharacter = characterId;
+        if (skillId) {
+          updatedData.selectedSkill = skillId;
         }
         if (voice) {
           updatedData.ttsVoice = voice;
@@ -290,7 +301,7 @@ export class ChatSettingsRepositoryClient {
       logger,
       (oldData) => {
         if (!oldData?.success || !oldData.data?.favorites) {
-          return oldData;
+          return undefined;
         }
 
         // Update all favorites: remove active badge from others, add to selected one
@@ -299,12 +310,7 @@ export class ChatSettingsRepositoryClient {
           activeBadge: fav.id === favoriteId ? ("active" as const) : null,
         }));
 
-        return {
-          success: true,
-          data: {
-            favorites: updatedList,
-          },
-        };
+        return success({ ...oldData.data, favorites: updatedList });
       },
     );
 
@@ -317,7 +323,7 @@ export class ChatSettingsRepositoryClient {
         {
           activeFavoriteId: favoriteId,
           ...(modelId && { selectedModel: modelId }),
-          ...(characterId && { selectedCharacter: characterId }),
+          ...(skillId && { selectedSkill: skillId }),
           ...(voice && { ttsVoice: voice }),
         },
         undefined,

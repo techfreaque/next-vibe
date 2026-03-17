@@ -216,11 +216,11 @@ export function UsersListContainer({
       status: (typeof UserStatusFilter)[keyof typeof UserStatusFilter],
     ): void => {
       const current: (typeof UserStatusFilter)[keyof typeof UserStatusFilter][] =
-        form?.getValues("searchFilters.status") ?? [];
+        form.getValues("searchFilters.status") ?? [];
       const next = current.includes(status)
         ? current.filter((s) => s !== status)
         : [...current, status];
-      form?.setValue("searchFilters.status", next);
+      form.setValue("searchFilters.status", next);
       if (onSubmit) {
         onSubmit();
       }
@@ -231,11 +231,11 @@ export function UsersListContainer({
   const handleToggleRole = useCallback(
     (role: (typeof UserRoleFilter)[keyof typeof UserRoleFilter]): void => {
       const current: (typeof UserRoleFilter)[keyof typeof UserRoleFilter][] =
-        form?.getValues("searchFilters.role") ?? [];
+        form.getValues("searchFilters.role") ?? [];
       const next = current.includes(role)
         ? current.filter((r) => r !== role)
         : [...current, role];
-      form?.setValue("searchFilters.role", next);
+      form.setValue("searchFilters.role", next);
       if (onSubmit) {
         onSubmit();
       }
@@ -244,9 +244,9 @@ export function UsersListContainer({
   );
 
   const handleClearFilters = useCallback((): void => {
-    form?.setValue("searchFilters.status", []);
-    form?.setValue("searchFilters.role", []);
-    form?.setValue("searchFilters.search", "");
+    form.setValue("searchFilters.status", []);
+    form.setValue("searchFilters.role", []);
+    form.setValue("searchFilters.search", "");
     if (onSubmit) {
       onSubmit();
     }
@@ -254,7 +254,7 @@ export function UsersListContainer({
 
   const handleSortByChange = useCallback(
     (value: typeof UserSortFieldValue): void => {
-      form?.setValue("sortingOptions.sortBy", value);
+      form.setValue("sortingOptions.sortBy", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -274,7 +274,7 @@ export function UsersListContainer({
 
   const handlePageChange = useCallback(
     (page: number): void => {
-      form?.setValue("paginationInfo.page", page);
+      form.setValue("paginationInfo.page", page);
       if (onSubmit) {
         onSubmit();
       }

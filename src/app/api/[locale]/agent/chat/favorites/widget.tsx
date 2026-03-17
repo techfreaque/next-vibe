@@ -1,6 +1,6 @@
 /**
  * Custom Widget for Favorites List
- * Groups favorites by characterId with compact variant rows:
+ * Groups favorites by skillId with compact variant rows:
  * - Single-item groups: full card (same as before)
  * - Multi-item groups: character header + slim model rows per variant
  * Two-level DnD: group-level + item-level reorder
@@ -28,9 +28,11 @@ import {
 } from "@dnd-kit/sortable";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
+import { Compass } from "next-vibe-ui/ui/icons/Compass";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Star } from "next-vibe-ui/ui/icons/Star";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
@@ -48,7 +50,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/icon/react";
 import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
-import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -58,13 +59,16 @@ import {
   Icon,
   type IconKey,
 } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { NO_CHARACTER_ID } from "../characters/constants";
+import { DEFAULT_SKILLS } from "../skills/config";
+import { SkillCategory } from "../skills/enum";
+import { NO_SKILL_ID } from "../skills/constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import definition, {
   type FavoriteCard,
   type FavoritesListResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
+import { scopedTranslation as ttsScopedTranslation } from "../../text-to-speech/i18n";
 import reorderDefinition from "./reorder/definition";
 
 /**
@@ -79,11 +83,11 @@ interface CustomWidgetProps {
 const FAVORITES_FIELD = "favorites";
 
 /**
- * Character group — favorites grouped by characterId
+ * Skill group — favorites grouped by skillId
  */
-interface CharacterGroup {
-  id: string; // "group-{characterId}"
-  characterId: string;
+interface SkillGroup {
+  id: string; // "group-{skillId}"
+  skillId: string;
   name: string;
   icon: IconKey;
   tagline: string | null;
@@ -94,15 +98,14 @@ interface CharacterGroup {
 const GROUP_PREFIX = "group-";
 
 /**
- * Group favorites by characterId, preserving position order.
+ * Group favorites by skillId, preserving position order.
  * Groups ordered by the minimum position of their members.
  */
-function groupByCharacter(favorites: FavoriteCard[]): CharacterGroup[] {
+function groupBySkill(favorites: FavoriteCard[]): SkillGroup[] {
   const map = new Map<string, FavoriteCard[]>();
   for (const fav of favorites) {
     // Default (model-only) favorites are never grouped — each gets its own entry
-    const groupKey =
-      fav.characterId === NO_CHARACTER_ID ? fav.id : fav.characterId;
+    const groupKey = fav.skillId === NO_SKILL_ID ? fav.id : fav.skillId;
     const group = map.get(groupKey);
     if (group) {
       group.push(fav);
@@ -113,7 +116,7 @@ function groupByCharacter(favorites: FavoriteCard[]): CharacterGroup[] {
   return [...map.entries()]
     .map(([groupKey, items]) => ({
       id: `${GROUP_PREFIX}${groupKey}`,
-      characterId: items[0].characterId,
+      skillId: items[0].skillId,
       name: items[0].name,
       icon: items[0].icon,
       tagline: items[0].tagline,
@@ -130,7 +133,7 @@ function groupByCharacter(favorites: FavoriteCard[]): CharacterGroup[] {
 /**
  * Flatten groups back to a flat list with sequential positions
  */
-function flattenGroups(groups: CharacterGroup[]): FavoriteCard[] {
+function flattenGroups(groups: SkillGroup[]): FavoriteCard[] {
   return groups
     .flatMap((g) => g.items)
     .map((item, i) => ({
@@ -138,6 +141,27 @@ function flattenGroups(groups: CharacterGroup[]): FavoriteCard[] {
       position: i,
     }));
 }
+
+type FavoriteSectionType = "companion" | "skills" | "model";
+
+/**
+ * Classify a group into its section based on skill category.
+ * - companion: COMPANION category skills
+ * - model: no-skill (model-only) favorites
+ * - skills: everything else (specialists, tool bundles, etc.)
+ */
+function getSectionType(group: SkillGroup): FavoriteSectionType {
+  if (group.skillId === NO_SKILL_ID) {
+    return "model";
+  }
+  const skill = DEFAULT_SKILLS.find((s) => s.id === group.skillId);
+  if (skill?.category === SkillCategory.COMPANION) {
+    return "companion";
+  }
+  return "skills";
+}
+
+const SECTION_ORDER: FavoriteSectionType[] = ["companion", "skills", "model"];
 
 // ============================================================================
 // Full card — used for single-item groups (no own useSortable — parent handles it)
@@ -312,9 +336,9 @@ const FullCard = React.memo(function FullCard({
             <Zap className="h-4 w-4" />
           </Button>
         )}
-        {item.characterId !== NO_CHARACTER_ID && (
+        {item.skillId !== NO_SKILL_ID && (
           <AddVariantButton
-            characterId={item.characterId}
+            skillId={item.skillId}
             navigate={navigate}
             logger={logger}
             user={user}
@@ -420,36 +444,43 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
               fieldName={arrayFieldPath(FAVORITES_FIELD, index, "activeBadge")}
             />
           </Div>
-          <Div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <TextWidget
-              field={withValue(
-                fieldChildren.favorites.child.children.modelProvider,
-                item.modelProvider,
-                item,
-              )}
-              fieldName={arrayFieldPath(
-                FAVORITES_FIELD,
-                index,
-                "modelProvider",
-              )}
-            />
-            {item.modelId ? (
-              <>
-                <TextWidget
-                  field={fieldChildren.favorites.child.children.separator2}
-                  fieldName={arrayFieldPath(
-                    FAVORITES_FIELD,
-                    index,
-                    "separator2",
-                  )}
-                />
-                <ModelCreditDisplay
-                  modelId={item.modelId}
-                  variant="text"
-                  className="text-xs text-muted-foreground"
-                  locale={locale}
-                />
-              </>
+          <Div className="flex flex-col gap-0">
+            <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <TextWidget
+                field={withValue(
+                  fieldChildren.favorites.child.children.modelProvider,
+                  item.modelProvider,
+                  item,
+                )}
+                fieldName={arrayFieldPath(
+                  FAVORITES_FIELD,
+                  index,
+                  "modelProvider",
+                )}
+              />
+              {item.modelId ? (
+                <>
+                  <TextWidget
+                    field={fieldChildren.favorites.child.children.separator2}
+                    fieldName={arrayFieldPath(
+                      FAVORITES_FIELD,
+                      index,
+                      "separator2",
+                    )}
+                  />
+                  <ModelCreditDisplay
+                    modelId={item.modelId}
+                    variant="text"
+                    className="text-xs text-muted-foreground"
+                    locale={locale}
+                  />
+                </>
+              ) : null}
+            </Div>
+            {item.voice ? (
+              <Span className="text-xs text-muted-foreground opacity-60">
+                {ttsScopedTranslation.scopedT(locale).t(item.voice)}
+              </Span>
             ) : null}
           </Div>
         </Div>
@@ -513,7 +544,7 @@ const SortableGroup = React.memo(function SortableGroup({
   logger,
   user,
 }: {
-  group: CharacterGroup;
+  group: SkillGroup;
   allFavorites: FavoriteCard[];
   fieldChildren: (typeof definition.GET)["fields"]["children"];
   handleSelectFavorite: (item: FavoriteCard) => Promise<void>;
@@ -639,7 +670,7 @@ const SortableGroup = React.memo(function SortableGroup({
               <Icon icon="grip" className="h-4 w-4" />
             </Div>
             <AddVariantButton
-              characterId={group.characterId}
+              skillId={group.skillId}
               navigate={navigate}
               logger={logger}
               user={user}
@@ -718,7 +749,7 @@ export function FavoritesListContainer({
       await ChatSettingsRepositoryClient.selectFavorite({
         favoriteId: item.id,
         modelId: item.modelId,
-        characterId: item.characterId,
+        skillId: item.skillId,
         voice: item.voice,
         logger,
         locale,
@@ -733,10 +764,37 @@ export function FavoritesListContainer({
     () => dragOverride ?? field.value?.favorites ?? [],
     [dragOverride, field.value?.favorites],
   );
-  const groups = useMemo(
-    () => groupByCharacter(favoritesList),
-    [favoritesList],
-  );
+  const groups = useMemo(() => groupBySkill(favoritesList), [favoritesList]);
+
+  const { t: tFav } = scopedTranslation.scopedT(locale);
+
+  // Group sections: companion → skills → model
+  const sections = useMemo((): Array<{
+    type: FavoriteSectionType;
+    label: string;
+    groups: SkillGroup[];
+  }> => {
+    const bySection = new Map<FavoriteSectionType, SkillGroup[]>(
+      SECTION_ORDER.map((type) => [type, []]),
+    );
+    for (const group of groups) {
+      bySection.get(getSectionType(group))?.push(group);
+    }
+    return SECTION_ORDER.filter(
+      (type) => (bySection.get(type)?.length ?? 0) > 0,
+    ).map((type) => {
+      const sectionKey = {
+        companion: "get.sections.companion" as const,
+        skills: "get.sections.skills" as const,
+        model: "get.sections.model" as const,
+      }[type];
+      return {
+        type,
+        label: tFav(sectionKey),
+        groups: bySection.get(type) ?? [],
+      };
+    });
+  }, [groups, tFav]);
 
   /**
    * Persist updated positions to server/client.
@@ -749,9 +807,16 @@ export function FavoritesListContainer({
       setDragOverride(updatedItems);
 
       // Update store + fire API, then clear override
-      apiClient.updateEndpointData(definition.GET, logger, () => ({
+      apiClient.updateEndpointData(definition.GET, logger, (oldData) => ({
         success: true,
-        data: { favorites: updatedItems },
+        data: {
+          totalCount: oldData?.success ? oldData.data.totalCount : null,
+          matchedCount: oldData?.success ? oldData.data.matchedCount : null,
+          currentPage: oldData?.success ? oldData.data.currentPage : null,
+          totalPages: oldData?.success ? oldData.data.totalPages : null,
+          hint: oldData?.success ? oldData.data.hint : null,
+          favorites: updatedItems,
+        },
       }));
 
       void apiClient
@@ -839,17 +904,32 @@ export function FavoritesListContainer({
     [groups, persistPositions],
   );
 
+  const handleBrowseSkills = useCallback(async (): Promise<void> => {
+    const skillsDef = await import("../skills/definition");
+    navigate(skillsDef.default.GET, {});
+  }, [navigate]);
+
   return (
     <Div className="flex flex-col gap-0">
-      {/* Top Actions: Back + Title + Create */}
-      <Div className="flex flex-row items-center gap-2 p-4">
-        <NavigateButtonWidget field={children.backButton} />
-        <TextWidget field={children.title} fieldName="title" />
-        <NavigateButtonWidget field={children.createButton} />
+      {/* Tab bar: My Favorites | Browse Skills */}
+      <Div className="flex border-b border-border shrink-0">
+        <Div className="flex-1 flex items-center justify-center gap-1.5 h-10 text-sm font-medium border-b-2 border-primary text-primary">
+          <Star className="h-4 w-4" />
+          {tFav("get.tabs.myFavorites")}
+        </Div>
+        <Button
+          type="button"
+          variant="ghost"
+          className="flex-1 rounded-none border-b-2 border-transparent h-10 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5"
+          onClick={() => void handleBrowseSkills()}
+        >
+          <Compass className="h-4 w-4" />
+          {tFav("get.tabs.browseSkills")}
+        </Button>
       </Div>
 
       {/* Favorites List — grouped by character */}
-      <Div className="px-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
+      <Div className="px-4 pt-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
         {!field.value ? (
           <Div className="h-[300px] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -865,20 +945,48 @@ export function FavoritesListContainer({
               strategy={verticalListSortingStrategy}
             >
               <Div className="flex flex-col gap-3">
-                {groups.map((group) => (
-                  <SortableGroup
-                    key={group.id}
-                    group={group}
-                    allFavorites={favoritesList}
-                    fieldChildren={children}
-                    handleSelectFavorite={handleSelectFavorite}
-                    navigate={navigate}
-                    locale={locale}
-                    onItemDragEnd={handleItemDragEnd}
-                    isTouch={isTouch}
-                    logger={logger}
-                    user={user}
-                  />
+                {sections.map((section, sectionIdx) => (
+                  <Div key={section.type}>
+                    {/* Section header — only shown when multiple sections exist */}
+                    {sections.length > 1 && (
+                      <Div
+                        className={cn(
+                          "flex items-center gap-2 mb-2",
+                          sectionIdx > 0 &&
+                            "mt-2 pt-2 border-t border-border/40",
+                        )}
+                      >
+                        <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          {section.label}
+                        </Span>
+                        <Span className="text-xs text-muted-foreground/60">
+                          (
+                          {section.groups.reduce(
+                            (n, g) => n + g.items.length,
+                            0,
+                          )}
+                          )
+                        </Span>
+                      </Div>
+                    )}
+                    <Div className="flex flex-col gap-3">
+                      {section.groups.map((group) => (
+                        <SortableGroup
+                          key={group.id}
+                          group={group}
+                          allFavorites={favoritesList}
+                          fieldChildren={children}
+                          handleSelectFavorite={handleSelectFavorite}
+                          navigate={navigate}
+                          locale={locale}
+                          onItemDragEnd={handleItemDragEnd}
+                          isTouch={isTouch}
+                          logger={logger}
+                          user={user}
+                        />
+                      ))}
+                    </Div>
+                  </Div>
                 ))}
               </Div>
             </SortableContext>
@@ -905,14 +1013,14 @@ export function FavoritesListContainer({
  * Allows adding another variant of the same character from the favorites list
  */
 function AddVariantButton({
-  characterId,
+  skillId,
   navigate,
   logger,
   user,
   locale,
   size,
 }: {
-  characterId: string;
+  skillId: string;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   logger: ReturnType<typeof useWidgetContext>["logger"];
   user: ReturnType<typeof useWidgetContext>["user"];
@@ -928,7 +1036,7 @@ function AddVariantButton({
 
     try {
       const characterSingleDefinitions =
-        await import("../characters/[id]/definition");
+        await import("../skills/[id]/definition");
       const createFavoriteDefinitions = await import("./create/definition");
       const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
 
@@ -937,14 +1045,14 @@ function AddVariantButton({
         characterSingleDefinitions.default.GET,
         logger,
         {
-          urlPathParams: { id: characterId },
+          urlPathParams: { id: skillId },
         },
       );
 
       if (cachedData?.success) {
         navigate(createFavoriteDefinitions.default.POST, {
           data: {
-            characterId,
+            skillId,
             icon: cachedData.data.icon ?? undefined,
             voice: cachedData.data.voice ?? DEFAULT_TTS_VOICE,
             modelSelection: null,
@@ -959,7 +1067,7 @@ function AddVariantButton({
         logger,
         user,
         undefined,
-        { id: characterId },
+        { id: skillId },
         locale,
       );
       if (!characterResponse.success) {
@@ -968,7 +1076,7 @@ function AddVariantButton({
 
       navigate(createFavoriteDefinitions.default.POST, {
         data: {
-          characterId,
+          skillId,
           icon: characterResponse.data.icon ?? undefined,
           voice: characterResponse.data.voice ?? DEFAULT_TTS_VOICE,
           modelSelection: null,
@@ -1022,7 +1130,7 @@ function EditFavoriteButton({
       navigate(favoriteDetailDefinitions.default.PATCH, {
         urlPathParams: { id: item.id },
         data: {
-          characterId: item.characterId ?? undefined,
+          skillId: item.skillId ?? undefined,
           icon: item.icon,
         },
         prefillFromGet: true,

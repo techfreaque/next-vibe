@@ -206,7 +206,7 @@ export function TextFieldWidget<
             {fieldState.error && (
               <Div className={styleClassName.errorClassName}>
                 <AlertCircle className="h-4 w-4" />
-                <FormMessage />
+                <FormMessage t={tField} />
               </Div>
             )}
           </FormItem>

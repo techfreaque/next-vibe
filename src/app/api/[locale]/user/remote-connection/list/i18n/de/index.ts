@@ -107,6 +107,11 @@ export const translations: typeof enTranslations = {
       noConnectionsYet: "Noch keine Verbindungen.",
       connectionsTitle: "Verknüpfte Verbindungen",
     },
+    selfIdentity: {
+      title: "Deine Instanz-ID",
+      description:
+        "Andere Instanzen sehen diesen Server unter dieser ID. Muss über alle verbundenen Instanzen eindeutig sein.",
+    },
     syncSettings: {
       title: "Auto-Sync",
       description:

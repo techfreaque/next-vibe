@@ -429,7 +429,7 @@ export const ICON_REGISTRY = {
   // Special: 1A icon (custom component)
   "1a": OneAIcon,
 
-  // Emoji Icons (AI Model Providers & Characters)
+  // Emoji Icons (AI Model Providers & Skills)
   whale: createEmojiIcon("🐋"),
   ocean: createEmojiIcon("🌊"),
   "robot-face": createEmojiIcon("🤖"),

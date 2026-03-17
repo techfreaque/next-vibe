@@ -36,7 +36,7 @@ type SettingsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
  * Returns null if the tool list equals the given defaultIds set (i.e. it IS the default),
  * otherwise returns the normalized list (sorted, only toolId + requiresConfirmation).
  *
- * - For allowedTools: defaultIds = full available set (null = all tools allowed)
+ * - For availableTools: defaultIds = full available set (null = all tools allowed)
  * - For pinnedTools: defaultIds = DEFAULT_TOOL_IDS (null = load the standard 9 tools)
  */
 function normalizeToolsOrNull(
@@ -99,23 +99,23 @@ export class ChatSettingsRepository {
       const defaults = ChatSettingsRepositoryClient.getDefaults();
       const result: ChatSettingsGetResponseOutput = {
         selectedModel: setting.selectedModel ?? defaults.selectedModel,
-        selectedCharacter:
-          setting.selectedCharacter ?? defaults.selectedCharacter,
+        selectedSkill: setting.selectedSkill ?? defaults.selectedSkill,
         activeFavoriteId: setting.activeFavoriteId ?? defaults.activeFavoriteId,
         ttsAutoplay: setting.ttsAutoplay ?? defaults.ttsAutoplay,
         ttsVoice: setting.ttsVoice ?? defaults.ttsVoice,
         viewMode: setting.viewMode ?? defaults.viewMode,
-        allowedTools:
-          (setting.activeTools ?? defaults.allowedTools)?.map((tool) => ({
+        availableTools:
+          (setting.availableTools ?? defaults.availableTools)?.map((tool) => ({
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
         pinnedTools:
-          (setting.visibleTools ?? defaults.pinnedTools)?.map((tool) => ({
+          (setting.pinnedTools ?? defaults.pinnedTools)?.map((tool) => ({
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
         compactTrigger: setting.compactTrigger ?? defaults.compactTrigger,
+        memoryLimit: setting.memoryLimit ?? defaults.memoryLimit,
       };
 
       return success(result);
@@ -151,9 +151,9 @@ export class ChatSettingsRepository {
       const defaults = ChatSettingsRepositoryClient.getDefaults();
 
       // Normalize tools — null passthrough means "all allowed"
-      const allowedToolsToStore =
-        data.allowedTools !== undefined
-          ? normalizeToolsOrNull(data.allowedTools, null)
+      const availableToolsToStore =
+        data.availableTools !== undefined
+          ? normalizeToolsOrNull(data.availableTools, null)
           : undefined;
       // pinnedTools: null = load the DEFAULT_TOOL_IDS set → compare against those
       const pinnedToolsToStore =
@@ -176,11 +176,11 @@ export class ChatSettingsRepository {
                 : data.selectedModel === defaults.selectedModel
                   ? null
                   : undefined,
-            selectedCharacter:
-              data.selectedCharacter &&
-              data.selectedCharacter !== defaults.selectedCharacter
-                ? data.selectedCharacter
-                : data.selectedCharacter === defaults.selectedCharacter
+            selectedSkill:
+              data.selectedSkill &&
+              data.selectedSkill !== defaults.selectedSkill
+                ? data.selectedSkill
+                : data.selectedSkill === defaults.selectedSkill
                   ? null
                   : undefined,
             activeFavoriteId:
@@ -209,8 +209,8 @@ export class ChatSettingsRepository {
                 : data.viewMode === defaults.viewMode
                   ? null
                   : undefined,
-            activeTools: allowedToolsToStore,
-            visibleTools: pinnedToolsToStore,
+            availableTools: availableToolsToStore,
+            pinnedTools: pinnedToolsToStore,
             compactTrigger:
               data.compactTrigger !== undefined &&
               data.compactTrigger !== null &&
@@ -220,6 +220,8 @@ export class ChatSettingsRepository {
                     data.compactTrigger === null
                   ? null
                   : undefined,
+            memoryLimit:
+              data.memoryLimit !== undefined ? data.memoryLimit : undefined,
           })
           .where(eq(chatSettings.userId, userId))
           .returning();
@@ -234,10 +236,10 @@ export class ChatSettingsRepository {
               data.selectedModel !== defaults.selectedModel
                 ? data.selectedModel
                 : null,
-            selectedCharacter:
-              data.selectedCharacter &&
-              data.selectedCharacter !== defaults.selectedCharacter
-                ? data.selectedCharacter
+            selectedSkill:
+              data.selectedSkill &&
+              data.selectedSkill !== defaults.selectedSkill
+                ? data.selectedSkill
                 : null,
             activeFavoriteId:
               data.activeFavoriteId !== undefined &&
@@ -257,14 +259,16 @@ export class ChatSettingsRepository {
               data.viewMode && data.viewMode !== defaults.viewMode
                 ? data.viewMode
                 : null,
-            activeTools: allowedToolsToStore ?? null,
-            visibleTools: pinnedToolsToStore ?? null,
+            availableTools: availableToolsToStore ?? null,
+            pinnedTools: pinnedToolsToStore ?? null,
             compactTrigger:
               data.compactTrigger !== undefined &&
               data.compactTrigger !== null &&
               data.compactTrigger !== COMPACT_TRIGGER
                 ? data.compactTrigger
                 : null,
+            memoryLimit:
+              data.memoryLimit !== undefined ? data.memoryLimit : null,
           })
           .returning();
       }

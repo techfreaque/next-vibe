@@ -49,6 +49,12 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
+import type {
+  LeadSortFieldValues,
+  LeadSourceFilterValues,
+  LeadStatusFilterValues,
+  SortOrderValues,
+} from "../enum";
 import {
   LeadSortField,
   LeadSortFieldOptions,
@@ -323,13 +329,15 @@ export function LeadsListContainer({
   const onSubmit = useWidgetOnSubmit();
   const navigation = useWidgetNavigation();
 
-  const activeStatuses: string[] = form?.watch("statusFilters.status") ?? [];
-  const activeSources: string[] = form?.watch("statusFilters.source") ?? [];
-  const searchValue: string = form?.watch("statusFilters.search") ?? "";
-  const sortBy: string =
-    form?.watch("sortingOptions.sortBy") ?? LeadSortField.CREATED_AT;
-  const sortOrder: string =
-    form?.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
+  const activeStatuses: (typeof LeadStatusFilterValues)[] =
+    form.watch("statusFilters.status") ?? [];
+  const activeSources: (typeof LeadSourceFilterValues)[] =
+    form.watch("statusFilters.source") ?? [];
+  const searchValue = form.watch("statusFilters.search") ?? "";
+  const sortBy: typeof LeadSortFieldValues =
+    form.watch("sortingOptions.sortBy") ?? LeadSortField.CREATED_AT;
+  const sortOrder: typeof SortOrderValues =
+    form.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
 
   const leads = useMemo(
     () => field.value?.response?.leads ?? [],
@@ -353,7 +361,7 @@ export function LeadsListContainer({
 
   const handleToggleStatus = useCallback(
     (status: string): void => {
-      const current = form?.getValues("statusFilters.status") ?? [];
+      const current = form.getValues("statusFilters.status") ?? [];
       // status may be a LeadStatus key ("enums.leadStatus.xxx") or already a LeadStatusFilter key
       // Normalize to LeadStatusFilter key space ("enums.leadStatusFilter.xxx")
       const filterKey = status.replace(
@@ -365,8 +373,8 @@ export function LeadsListContainer({
       const next = current.includes(typed)
         ? current.filter((s) => s !== typed)
         : [...current, typed];
-      form?.setValue("statusFilters.status", next);
-      form?.setValue("paginationInfo.page", 1);
+      form.setValue("statusFilters.status", next);
+      form.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -379,11 +387,11 @@ export function LeadsListContainer({
       const typed =
         value as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter];
       if (value === SOURCE_ALL) {
-        form?.setValue("statusFilters.source", []);
+        form.setValue("statusFilters.source", []);
       } else {
-        form?.setValue("statusFilters.source", [typed]);
+        form.setValue("statusFilters.source", [typed]);
       }
-      form?.setValue("paginationInfo.page", 1);
+      form.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -393,11 +401,11 @@ export function LeadsListContainer({
 
   const handleSortByChange = useCallback(
     (value: string): void => {
-      form?.setValue(
+      form.setValue(
         "sortingOptions.sortBy",
         value as (typeof LeadSortField)[keyof typeof LeadSortField],
       );
-      form?.setValue("paginationInfo.page", 1);
+      form.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -407,11 +415,11 @@ export function LeadsListContainer({
 
   const handleSortOrderChange = useCallback(
     (value: string): void => {
-      form?.setValue(
+      form.setValue(
         "sortingOptions.sortOrder",
         value as (typeof SortOrder)[keyof typeof SortOrder],
       );
-      form?.setValue("paginationInfo.page", 1);
+      form.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -493,7 +501,7 @@ export function LeadsListContainer({
     void (async (): Promise<void> => {
       const exportDef =
         await import("@/app/api/[locale]/leads/export/definition");
-      const currentSearch = form?.getValues("statusFilters.search") ?? "";
+      const currentSearch = form.getValues("statusFilters.search") ?? "";
       navigation.push(exportDef.default.GET, {
         renderInModal: true,
         data: {
@@ -515,11 +523,11 @@ export function LeadsListContainer({
     void (async (): Promise<void> => {
       const batchDef =
         await import("@/app/api/[locale]/leads/batch/definition");
-      const currentSearch = form?.getValues("statusFilters.search") ?? "";
-      const currentStatus = form?.getValues("statusFilters.status") ?? [];
-      const currentSource = form?.getValues("statusFilters.source") ?? [];
+      const currentSearch = form.getValues("statusFilters.search") ?? "";
+      const currentStatus = form.getValues("statusFilters.status") ?? [];
+      const currentSource = form.getValues("statusFilters.source") ?? [];
       const currentCampaignStage =
-        form?.getValues("statusFilters.currentCampaignStage") ?? [];
+        form.getValues("statusFilters.currentCampaignStage") ?? [];
       navigation.push(batchDef.default.PATCH, {
         renderInModal: true,
         data: {
@@ -550,8 +558,8 @@ export function LeadsListContainer({
 
   const handleSearchChange = useCallback(
     (text: string): void => {
-      form?.setValue("statusFilters.search", text);
-      form?.setValue("paginationInfo.page", 1);
+      form.setValue("statusFilters.search", text);
+      form.setValue("paginationInfo.page", 1);
       if (onSubmit) {
         onSubmit();
       }
@@ -560,14 +568,14 @@ export function LeadsListContainer({
   );
 
   // Pagination
-  const currentPage: number = form?.watch("paginationInfo.page") ?? 1;
+  const currentPage = form.watch("paginationInfo.page") ?? 1;
   const totalCount = paginationInfo?.totalCount ?? 0;
-  const limit: number = form?.watch("paginationInfo.limit") ?? 20;
+  const limit = form.watch("paginationInfo.limit") ?? 20;
   const totalPages = Math.ceil(totalCount / limit) || 1;
 
   const handlePageChange = useCallback(
     (newPage: number): void => {
-      form?.setValue("paginationInfo.page", newPage);
+      form.setValue("paginationInfo.page", newPage);
       if (onSubmit) {
         onSubmit();
       } else {
@@ -692,8 +700,8 @@ export function LeadsListContainer({
               size="sm"
               onClick={() => {
                 if (tab.value === null) {
-                  form?.setValue("statusFilters.status", []);
-                  form?.setValue("paginationInfo.page", 1);
+                  form.setValue("statusFilters.status", []);
+                  form.setValue("paginationInfo.page", 1);
                   if (onSubmit) {
                     onSubmit();
                   }

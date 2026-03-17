@@ -18,7 +18,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { ModelSelectionSimple } from "../../../models/types";
 import type { TtsVoiceValue } from "../../../text-to-speech/enum";
-import characterSingleDefinitions from "../../characters/[id]/definition";
+import characterSingleDefinitions from "../../skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";
 import favoritesDefinition, {
   type FavoriteCreateRequestOutput,
@@ -62,7 +62,7 @@ export function useFavoriteCreate(
   };
 }
 
-export interface CharacterDataForFavorite {
+export interface SkillDataForFavorite {
   id: string;
   icon: IconKey | null;
   name: string | null;
@@ -73,7 +73,7 @@ export interface CharacterDataForFavorite {
 }
 
 export interface UseAddToFavoritesOptions {
-  characterId: string;
+  skillId: string;
   logger: EndpointLogger;
   user: JwtPayloadType;
   locale: CountryLanguage;
@@ -81,7 +81,7 @@ export interface UseAddToFavoritesOptions {
    * Optional character data if already available (e.g., from character view)
    * If not provided, will be fetched from cache or API
    */
-  characterData?: CharacterDataForFavorite;
+  characterData?: SkillDataForFavorite;
   /**
    * Callback when favorite is successfully added
    */
@@ -98,7 +98,7 @@ export interface UseAddToFavoritesReturn {
  * Handles fetching character data, creating the favorite, and optimistically updating caches
  */
 export function useAddToFavorites({
-  characterId,
+  skillId,
   logger,
   user,
   locale,
@@ -113,7 +113,7 @@ export function useAddToFavorites({
 
     try {
       // Get character data - use provided data, cache, or fetch
-      let fullChar: CharacterDataForFavorite | undefined = characterData;
+      let fullChar: SkillDataForFavorite | undefined = characterData;
 
       if (!fullChar) {
         // Try cache first
@@ -121,13 +121,13 @@ export function useAddToFavorites({
           characterSingleDefinitions.GET,
           logger,
           {
-            urlPathParams: { id: characterId },
+            urlPathParams: { id: skillId },
           },
         );
 
         if (cachedData?.success) {
           fullChar = {
-            id: characterId,
+            id: skillId,
             icon: cachedData.data.icon,
             name: cachedData.data.name,
             tagline: cachedData.data.tagline,
@@ -142,7 +142,7 @@ export function useAddToFavorites({
             logger,
             user,
             undefined,
-            { id: characterId },
+            { id: skillId },
             locale,
           );
 
@@ -152,7 +152,7 @@ export function useAddToFavorites({
           }
 
           fullChar = {
-            id: characterId,
+            id: skillId,
             icon: characterResponse.data.icon,
             name: characterResponse.data.name,
             tagline: characterResponse.data.tagline,
@@ -165,7 +165,7 @@ export function useAddToFavorites({
 
       // At this point fullChar is guaranteed to be defined
       if (!fullChar) {
-        logger.error("Character data not available");
+        logger.error("Skill data not available");
         return;
       }
 
@@ -179,7 +179,7 @@ export function useAddToFavorites({
         logger,
         user,
         {
-          characterId: characterId,
+          skillId: skillId,
           icon: charData.icon ?? undefined,
           voice: null,
           modelSelection: null,
@@ -197,7 +197,7 @@ export function useAddToFavorites({
       const favoritesListDefinition = await import("../definition");
       const newFavoriteConfig = {
         id: createResponse.data.id,
-        characterId: characterId,
+        skillId: skillId,
         customIcon: null,
         voice: null,
         modelSelection: null,
@@ -229,6 +229,7 @@ export function useAddToFavorites({
           return {
             success: true,
             data: {
+              ...oldData.data,
               favorites: [...oldData.data.favorites, newFavorite],
             },
           };

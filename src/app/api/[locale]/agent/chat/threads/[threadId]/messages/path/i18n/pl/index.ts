@@ -67,7 +67,7 @@ export const translations: typeof enTranslations = {
           model: {
             content: "Model",
           },
-          character: {
+          skill: {
             content: "Postać",
           },
           errorType: {

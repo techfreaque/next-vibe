@@ -81,7 +81,7 @@ export function JsonFieldWidgetInk<
   }
 
   const isRequired = !field.schema.isOptional();
-  const errorMessage = form?.errors?.[fieldName];
+  const errorMessage = form.errors?.[fieldName];
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -105,7 +105,7 @@ export function JsonFieldWidgetInk<
             setInputValue(newValue);
             try {
               const parsed = JSON.parse(newValue);
-              form?.setValue(fieldName, parsed);
+              form.setValue(fieldName, parsed);
             } catch {
               // Invalid JSON, don't update form
             }

@@ -5,7 +5,18 @@
 
 import "server-only";
 
-import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNull,
+  or,
+} from "drizzle-orm";
+import { nanoid } from "nanoid";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -25,10 +36,12 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "../../cron/db";
+import { fetchLastExecutionSummaries } from "../../cron/repository";
 import {
   CronTaskEnabledFilter,
   CronTaskHiddenFilter,
   CronTaskPriority,
+  CronTaskStatus,
   TaskCategory,
   TaskCategoryDB,
   TaskOutputMode,
@@ -97,6 +110,7 @@ function formatTaskResponse(
 
   const formatted: CronTaskResponseType = {
     id: task.id,
+    shortId: task.shortId,
     routeId: task.routeId,
     displayName: task.displayName,
     description: task.description ?? null,
@@ -118,7 +132,7 @@ function formatTaskResponse(
     notificationTargets: task.notificationTargets,
     lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
     lastExecutionStatus: task.lastExecutionStatus ?? null,
-    lastExecutionError: task.lastExecutionError ?? null,
+    lastExecutionError: null, // populated by caller from execution history
     lastExecutionDuration: task.lastExecutionDuration ?? null,
     nextExecutionAt,
     executionCount: task.executionCount,
@@ -222,28 +236,173 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
+      // Server-side search filter — applied after base filters, not counted in status counts
+      const searchTerm = data.search?.trim();
+      const searchCondition = searchTerm
+        ? or(
+            ilike(cronTasks.displayName, `%${searchTerm}%`),
+            ilike(cronTasks.routeId, `%${searchTerm}%`),
+            ilike(cronTasks.description, `%${searchTerm}%`),
+            ilike(cronTasks.category, `%${searchTerm}%`),
+          )
+        : undefined;
+
+      const fullWhereClause =
+        whereClause && searchCondition
+          ? and(whereClause, searchCondition)
+          : (searchCondition ?? whereClause);
+
       // Get total count (separate query before applying limit/offset)
       const [countRow] = await db
         .select({ total: count(cronTasks.id) })
         .from(cronTasks)
-        .where(whereClause);
+        .where(fullWhereClause);
       const totalTasks = countRow?.total ?? 0;
+
+      // Re-derive base conditions without status for counting all statuses
+      const countConditions = [];
+      if (!isAdmin) {
+        const userId = !user.isPublic ? user.id : null;
+        if (userId) {
+          countConditions.push(eq(cronTasks.userId, userId));
+        } else {
+          countConditions.push(isNull(cronTasks.id));
+        }
+      }
+      if (data.hidden === CronTaskHiddenFilter.HIDDEN) {
+        countConditions.push(eq(cronTasks.hidden, true));
+      } else if (!data.hidden || data.hidden === CronTaskHiddenFilter.VISIBLE) {
+        countConditions.push(eq(cronTasks.hidden, false));
+      }
+      if (data.priority && data.priority.length > 0) {
+        countConditions.push(inArray(cronTasks.priority, data.priority));
+      }
+      if (data.category && data.category.length > 0) {
+        countConditions.push(inArray(cronTasks.category, data.category));
+      }
+      const countBaseWhere =
+        countConditions.length > 0 ? and(...countConditions) : undefined;
+
+      const makeStatusWhere = (
+        statusCond: Parameters<typeof and>[0],
+      ): Parameters<typeof and>[0][] =>
+        countBaseWhere ? [countBaseWhere, statusCond] : [statusCond];
+
+      const [
+        countAll,
+        countRunning,
+        countCompleted,
+        countFailed,
+        countPending,
+        countDisabled,
+      ] = await Promise.all([
+        db
+          .select({ n: count(cronTasks.id) })
+          .from(cronTasks)
+          .where(countBaseWhere)
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count(cronTasks.id) })
+          .from(cronTasks)
+          .where(
+            and(
+              ...makeStatusWhere(
+                eq(cronTasks.lastExecutionStatus, CronTaskStatus.RUNNING),
+              ),
+            ),
+          )
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count(cronTasks.id) })
+          .from(cronTasks)
+          .where(
+            and(
+              ...makeStatusWhere(
+                eq(cronTasks.lastExecutionStatus, CronTaskStatus.COMPLETED),
+              ),
+            ),
+          )
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count(cronTasks.id) })
+          .from(cronTasks)
+          .where(
+            and(
+              ...makeStatusWhere(
+                or(
+                  eq(cronTasks.lastExecutionStatus, CronTaskStatus.FAILED),
+                  eq(cronTasks.lastExecutionStatus, CronTaskStatus.ERROR),
+                ),
+              ),
+            ),
+          )
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count(cronTasks.id) })
+          .from(cronTasks)
+          .where(
+            and(
+              ...makeStatusWhere(
+                eq(cronTasks.lastExecutionStatus, CronTaskStatus.PENDING),
+              ),
+            ),
+          )
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count(cronTasks.id) })
+          .from(cronTasks)
+          .where(and(...makeStatusWhere(eq(cronTasks.enabled, false))))
+          .then(([r]) => r?.n ?? 0),
+      ]);
+
+      const countsByStatus = {
+        all: countAll,
+        running: countRunning,
+        completed: countCompleted,
+        failed: countFailed,
+        pending: countPending,
+        disabled: countDisabled,
+      };
+
+      // Server-side sort
+      const sortOrder = (() => {
+        switch (data.sort) {
+          case "name_asc":
+            return asc(cronTasks.displayName);
+          case "name_desc":
+            return desc(cronTasks.displayName);
+          case "schedule":
+            return asc(cronTasks.schedule);
+          case "last_run_desc":
+            return desc(cronTasks.lastExecutedAt);
+          case "executions_desc":
+            return desc(cronTasks.executionCount);
+          default:
+            return asc(cronTasks.displayName);
+        }
+      })();
 
       // Execute query with pagination
       const tasks = await db
         .select()
         .from(cronTasks)
-        .where(whereClause)
-        .orderBy(desc(cronTasks.createdAt))
+        .where(fullWhereClause)
+        .orderBy(sortOrder)
         .limit(limit)
         .offset(offset);
 
       logger.info("Retrieved tasks from database", { count: tasks.length });
 
+      // Batch-load last execution summaries for all tasks
+      const summaries = await fetchLastExecutionSummaries(
+        tasks.map((task) => task.id),
+      );
+
       // Format tasks with computed fields and translate displayName/description
       const formattedTasks = await Promise.all(
         tasks.map(async (task) => {
           const formatted = formatTaskResponse(task, logger);
+          formatted.lastExecutionError = summaries.get(task.id) ?? null;
           return translateTaskFields(formatted, locale);
         }),
       );
@@ -251,6 +410,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       const response: CronTaskListResponseOutput = {
         tasks: formattedTasks,
         totalTasks,
+        countsByStatus,
       };
 
       logger.vibe("🚀 Successfully retrieved cron tasks list");
@@ -321,8 +481,13 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       }
 
       // Prepare task data for insertion
+      const fullId = data.id || crypto.randomUUID();
+      // shortId: caller-provided ids (system slugs) are already short — mirror them.
+      // Generated UUIDs get a compact nanoid(8) scoped per user.
+      const shortId = data.id ? data.id : nanoid(8);
       const taskData = {
-        id: data.id || crypto.randomUUID(),
+        id: fullId,
+        shortId,
         routeId: data.routeId,
         displayName: data.displayName,
         description: data.description || null,
@@ -333,6 +498,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         timeout: data.timeout ?? 300000,
         retries: data.retries ?? 3,
         retryDelay: data.retryDelay ?? 5000,
+        hidden: data.hidden ?? false,
         version: "1.0.0",
         taskInput: data.taskInput,
         runOnce: data.runOnce ?? false,

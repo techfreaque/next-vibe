@@ -1,7 +1,7 @@
 /**
  * Vibe Sense — Computation Cache
  *
- * In-memory + DB (pipeline_snapshots) cache for on-demand computation.
+ * DB (pipeline_snapshots) cache for on-demand computation.
  * First render pays computation cost; subsequent renders within TTL are instant.
  *
  * Cache key: SHA-256 of (nodeId + rangeFrom.toISO + rangeTo.toISO + resolution)
@@ -29,39 +29,8 @@ export function buildCacheKey(
   return createHash("sha256").update(raw).digest("hex");
 }
 
-// ─── In-Memory Cache ──────────────────────────────────────────────────────────
-
-interface MemCacheEntry {
-  nodeId: string;
-  points: DataPoint[];
-  expiresAt: number;
-}
-
-const _memCache = new Map<string, MemCacheEntry>();
-
 /** Default TTL for snapshot cache entries: 5 minutes */
 const DEFAULT_SNAPSHOT_TTL_MS = 5 * 60 * 1000;
-
-function getFromMemCache(key: string): DataPoint[] | null {
-  const entry = _memCache.get(key);
-  if (!entry) {
-    return null;
-  }
-  if (Date.now() > entry.expiresAt) {
-    _memCache.delete(key);
-    return null;
-  }
-  return entry.points;
-}
-
-function setInMemCache(
-  nodeId: string,
-  key: string,
-  points: DataPoint[],
-  ttlMs = DEFAULT_SNAPSHOT_TTL_MS,
-): void {
-  _memCache.set(key, { nodeId, points, expiresAt: Date.now() + ttlMs });
-}
 
 // ─── DB Snapshot Cache ────────────────────────────────────────────────────────
 
@@ -127,24 +96,11 @@ export async function getCached(
   resolution: Resolution,
 ): Promise<DataPoint[] | null> {
   const key = buildCacheKey(nodeId, range, resolution);
-
-  const memResult = getFromMemCache(key);
-  if (memResult !== null) {
-    return memResult;
-  }
-
-  const dbResult = await getFromDbCache(key);
-  if (dbResult !== null) {
-    // Populate memory cache
-    setInMemCache(nodeId, key, dbResult);
-    return dbResult;
-  }
-
-  return null;
+  return getFromDbCache(key);
 }
 
 /**
- * Store datapoints in cache (memory + DB).
+ * Store datapoints in DB snapshot cache.
  */
 export async function setCached(
   nodeId: string,
@@ -154,7 +110,6 @@ export async function setCached(
   ttlMs = DEFAULT_SNAPSHOT_TTL_MS,
 ): Promise<void> {
   const key = buildCacheKey(nodeId, range, resolution);
-  setInMemCache(nodeId, key, points, ttlMs);
   await setInDbCache(nodeId, key, points, ttlMs);
 }
 
@@ -162,14 +117,6 @@ export async function setCached(
  * Invalidate all cached entries for a node.
  */
 export async function invalidateNode(nodeId: string): Promise<void> {
-  // Clear memory cache entries for this node
-  for (const [key, entry] of _memCache) {
-    if (entry.nodeId === nodeId) {
-      _memCache.delete(key);
-    }
-  }
-
-  // Clear DB snapshots for this node
   await db
     .delete(pipelineSnapshots)
     .where(eq(pipelineSnapshots.nodeId, nodeId));

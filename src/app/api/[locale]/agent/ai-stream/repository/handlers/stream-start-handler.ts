@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
+import type { ModelMessage, ToolResultPart } from "ai";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -104,6 +104,45 @@ export class StreamStartHandler {
       wsEmit,
       sequenceIdOverride,
     });
+
+    // Pre-set stepHasToolsAwaitingConfirmation if the loaded message history already
+    // contains a waiting_for_confirmation tool result. This happens in wakeUp revival
+    // streams where the approve tool's placeholder is in the DB history — the tool-call
+    // handler never fires for history messages so the flag would stay false, causing
+    // the AI SDK stopWhen predicate to never trigger and spawning extra turns.
+    const hasHistoryPendingConfirmation = messages.some((msg) => {
+      if (msg.role !== "tool") {
+        return false;
+      }
+      const content = msg.content;
+      if (!Array.isArray(content)) {
+        return false;
+      }
+      return content.some((part) => {
+        if (typeof part !== "object" || part === null) {
+          return false;
+        }
+        const p = part as ToolResultPart;
+        if (p.type !== "tool-result") {
+          return false;
+        }
+        const output = p.output;
+        if (!output || typeof output !== "object" || Array.isArray(output)) {
+          return false;
+        }
+        const o = output as { type?: string; value?: { status?: string } };
+        if (o.type !== "json") {
+          return false;
+        }
+        return o.value?.status === "waiting_for_confirmation";
+      });
+    });
+    if (hasHistoryPendingConfirmation) {
+      ctx.stepHasToolsAwaitingConfirmation = true;
+      logger.debug(
+        "[AI Stream] Pre-set stepHasToolsAwaitingConfirmation=true from history (wakeUp revival with pending approve)",
+      );
+    }
 
     // Create streaming TTS handler if voice mode enabled
     let ttsHandler: StreamingTTSHandler | null = null;

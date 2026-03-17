@@ -50,6 +50,7 @@ import { CronTasksContainer } from "./widget";
 /** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
 export const cronTaskResponseSchema = z.object({
   id: z.string(),
+  shortId: z.string(),
   routeId: z.string(),
   displayName: z.string(),
   description: z.string().nullable(),
@@ -176,6 +177,23 @@ const { GET } = createEndpoint({
           .optional()
           .default(CronTaskHiddenFilter.VISIBLE),
       }),
+      search: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.search.label",
+        description: "get.fields.search.description",
+        placeholder: "get.fields.search.placeholder",
+        columns: 8,
+        schema: z.string().optional(),
+      }),
+      sort: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.sort.label",
+        description: "get.fields.sort.description",
+        columns: 4,
+        schema: z.string().optional().default("name_asc"),
+      }),
       limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -207,6 +225,11 @@ const { GET } = createEndpoint({
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.id",
+              schema: z.string(),
+            }),
+            shortId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.shortId",
               schema: z.string(),
             }),
             routeId: responseField(scopedTranslation, {
@@ -352,6 +375,18 @@ const { GET } = createEndpoint({
         content: "get.response.totalTasks",
         schema: z.coerce.number(),
       }),
+      countsByStatus: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.totalTasks",
+        schema: z.object({
+          all: z.number(),
+          running: z.number(),
+          completed: z.number(),
+          failed: z.number(),
+          pending: z.number(),
+          disabled: z.number(),
+        }),
+      }),
     },
   }),
 
@@ -405,6 +440,14 @@ const { GET } = createEndpoint({
       default: {
         tasks: [],
         totalTasks: 0,
+        countsByStatus: {
+          all: 0,
+          running: 0,
+          completed: 0,
+          failed: 0,
+          pending: 0,
+          disabled: 0,
+        },
       },
     },
   },
@@ -508,6 +551,14 @@ const { POST } = createEndpoint({
         description: "post.fields.enabled.description",
         columns: 6,
         schema: z.boolean().default(true),
+      }),
+      hidden: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.hidden.label",
+        description: "post.fields.hidden.description",
+        columns: 6,
+        schema: z.boolean().default(false),
       }),
       outputMode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -615,6 +666,28 @@ const { POST } = createEndpoint({
       description: "post.errors.unsaved.description",
     },
   },
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ responseData, logger }) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const newTask = responseData.task;
+        apiClient.updateEndpointData(GET, logger, (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return {
+            success: true as const,
+            data: {
+              ...old.data,
+              tasks: [newTask, ...old.data.tasks],
+              totalTasks: old.data.totalTasks + 1,
+            },
+          };
+        });
+      },
+    },
+  },
   successTypes: {
     title: "post.success.created.title",
     description: "post.success.created.description",
@@ -641,6 +714,7 @@ const { POST } = createEndpoint({
       default: {
         task: {
           id: "task-123",
+          shortId: "task-123",
           routeId: "newsletter_unsubscribe_GET",
           displayName: "Daily Cleanup Task",
           description: "Cleans up old data",

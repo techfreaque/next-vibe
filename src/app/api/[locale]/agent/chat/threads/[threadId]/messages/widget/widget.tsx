@@ -14,7 +14,6 @@ import React, { useContext, useMemo } from "react";
 import { buildMessagePath } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -117,7 +116,6 @@ function ReadOnlyMessages({
         logger={logger}
         currentUserId={null}
         user={user}
-        viewMode={ViewMode.LINEAR}
         collapseState={null}
         rootFolderId={DefaultFolderId.PRIVATE}
         subFolderId={null}
@@ -136,13 +134,15 @@ function ReadOnlyMessages({
         onSetAnswerContent={null}
         editorAttachments={emptyAttachments}
         isLoadingRetryAttachments={false}
-        selectedCharacter={null}
+        selectedSkill={null}
         selectedModel={null}
         sendMessage={null}
         deductCredits={null}
         onLoadNewerHistory={null}
         isLoadingNewerHistory={false}
         onVoteMessage={null}
+        ttsAutoplay={false}
+        ttsVoice={undefined}
       />
     </Div>
   );

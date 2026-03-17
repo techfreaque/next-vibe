@@ -8,27 +8,26 @@ import { parseError } from "next-vibe/shared/utils";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
+import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { UseAIStreamReturn } from "./use-ai-stream";
+import type { StartStreamFn } from "./shared";
 
 export interface AnswerAsAIDeps {
   logger: EndpointLogger;
-  aiStream: UseAIStreamReturn;
+  startStream: StartStreamFn;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
-  chatStore: {
-    messages: Record<string, ChatMessage>;
-    setLoading: (loading: boolean) => void;
-    getThreadMessages: (threadId: string) => ChatMessage[];
-  };
+  /** Active thread ID — needed to look up message in apiClient cache */
+  activeThreadId: string | null;
   settings: {
     selectedModel: ModelId;
-    selectedCharacter: string;
-    allowedTools: ToolConfigItem[] | null;
+    selectedSkill: string;
+    availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
   };
 }
@@ -41,47 +40,55 @@ export async function answerAsAI(
 ): Promise<void> {
   const {
     logger,
-    aiStream,
+    startStream,
     currentRootFolderId,
     currentSubFolderId,
-    chatStore,
+    activeThreadId,
     settings,
   } = deps;
 
-  logger.debug("Answer as AI operation", {
-    messageId,
-    content,
-  });
+  logger.debug("Answer as AI operation", { messageId, content });
 
-  const message = chatStore.messages[messageId];
-  if (!message) {
-    logger.error("Message not found", { messageId });
+  if (!activeThreadId) {
+    logger.error("answerAsAI: no active thread", { messageId });
     return;
   }
 
-  chatStore.setLoading(true);
+  // Look up message from apiClient cache
+  const cached = apiClient.getEndpointData(messagesDefinition.GET, logger, {
+    urlPathParams: { threadId: activeThreadId },
+    requestData: { rootFolderId: currentRootFolderId },
+  });
+  let allMessages: ChatMessage[] = cached?.success ? cached.data.messages : [];
+
+  // Fallback: incognito storage
+  if (
+    allMessages.length === 0 &&
+    currentRootFolderId === DefaultFolderId.INCOGNITO
+  ) {
+    const { getMessagesForThread } =
+      await import("@/app/api/[locale]/agent/chat/incognito/storage");
+    allMessages = await getMessagesForThread(activeThreadId);
+  }
+
+  const message = allMessages.find((m) => m.id === messageId);
+  if (!message) {
+    logger.error("answerAsAI: message not found", {
+      messageId,
+      activeThreadId,
+    });
+    return;
+  }
 
   try {
     const aiMessageId = crypto.randomUUID();
 
-    // Load thread messages
-    let threadMessages: ChatMessage[];
-    if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const { getMessagesForThread } =
-        await import("@/app/api/[locale]/agent/chat/incognito/storage");
-      threadMessages = await getMessagesForThread(message.threadId);
-    } else {
-      threadMessages = chatStore.getThreadMessages(message.threadId);
-    }
-
     // Build message history (incognito only - server fetches from DB)
     let messageHistory: ChatMessage[] | null = null;
     if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const parentIndex = threadMessages.findIndex(
-        (msg) => msg.id === messageId,
-      );
+      const parentIndex = allMessages.findIndex((msg) => msg.id === messageId);
       if (parentIndex !== -1) {
-        messageHistory = threadMessages.slice(0, parentIndex + 1);
+        messageHistory = allMessages.slice(0, parentIndex + 1);
       }
     }
 
@@ -89,7 +96,7 @@ export async function answerAsAI(
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     // Start AI stream
-    await aiStream.startStream({
+    await startStream({
       operation: "answer-as-ai" as const,
       rootFolderId: currentRootFolderId,
       subFolderId: currentSubFolderId ?? null,
@@ -99,13 +106,13 @@ export async function answerAsAI(
       content,
       role: ChatMessageRole.ASSISTANT,
       model: settings.selectedModel,
-      character: settings.selectedCharacter ?? null,
-      allowedTools:
-        settings.allowedTools?.map((t) => ({
+      skill: settings.selectedSkill ?? null,
+      availableTools:
+        settings.availableTools?.map((t) => ({
           toolId: t.toolId,
           requiresConfirmation: t.requiresConfirmation ?? false,
         })) ?? null,
-      tools:
+      pinnedTools:
         settings.pinnedTools?.map((t) => ({
           toolId: t.toolId,
           requiresConfirmation: t.requiresConfirmation ?? false,
@@ -119,7 +126,5 @@ export async function answerAsAI(
     });
   } catch (error) {
     logger.error("Failed to answer as AI", parseError(error));
-  } finally {
-    chatStore.setLoading(false);
   }
 }

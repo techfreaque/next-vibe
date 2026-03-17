@@ -79,7 +79,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
   const value = field.value;
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
-  const command = form?.watch("command") ?? "";
+  const command = form.watch("command") ?? "";
 
   const handleRun = useCallback((): void => {
     if (!command.trim() || isLoading) {
@@ -91,7 +91,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
   }, [command, isLoading, onSubmit]);
 
   const handleClear = useCallback((): void => {
-    form?.setValue("command", "");
+    form.setValue("command", "");
   }, [form]);
 
   const handleKeyDown = useCallback(
@@ -120,7 +120,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
 
   const handleHistoryClick = useCallback(
     (cmd: string): void => {
-      form?.setValue("command", cmd);
+      form.setValue("command", cmd);
       setShowHistory(false);
     },
     [form],
@@ -176,7 +176,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
       <Div className="flex flex-col gap-2 px-4 py-3 border-b">
         <Textarea
           value={command}
-          onChange={(e) => form?.setValue("command", e.target.value)}
+          onChange={(e) => form.setValue("command", e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={t("widget.placeholder")}
           className="font-mono text-sm min-h-[80px] resize-none"

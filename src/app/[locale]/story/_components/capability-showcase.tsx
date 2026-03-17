@@ -112,7 +112,7 @@ function baseMockMsg(overrides: {
   return {
     authorId: null,
     authorName: null,
-    character: null,
+    skill: null,
     errorType: null,
     errorMessage: null,
     errorCode: null,
@@ -370,6 +370,8 @@ function AutonomousVisual({
           }}
           sendMessage={null}
           deductCredits={null}
+          ttsAutoplay={false}
+          ttsVoice={undefined}
           onVote={null}
           userVote={null}
           voteScore={0}

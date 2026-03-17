@@ -4,7 +4,6 @@
  */
 
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -31,7 +30,8 @@ export class ConfigLoader {
     locale: CountryLanguage,
     configPath: string = DEFAULT_CONFIG_PATH,
   ): Promise<ResponseType<ReleaseConfig>> {
-    const resolvedConfigPath = resolve(process.cwd(), configPath);
+    // Use template string to prevent Turbopack from statically tracing paths
+    const resolvedConfigPath = `${process.cwd()}/${configPath}`;
     const { t } = scopedTranslation.scopedT(locale);
 
     if (!existsSync(resolvedConfigPath)) {
@@ -82,7 +82,8 @@ export class ConfigLoader {
    * Check if config file exists
    */
   exists(configPath: string = DEFAULT_CONFIG_PATH): boolean {
-    const resolvedConfigPath = resolve(process.cwd(), configPath);
+    // Use template string to prevent Turbopack from statically tracing paths
+    const resolvedConfigPath = `${process.cwd()}/${configPath}`;
     return existsSync(resolvedConfigPath);
   }
 }

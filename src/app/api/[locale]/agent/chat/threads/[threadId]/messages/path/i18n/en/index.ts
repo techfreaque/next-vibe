@@ -64,8 +64,8 @@ export const translations = {
           model: {
             content: "Model",
           },
-          character: {
-            content: "Character",
+          skill: {
+            content: "Skill",
           },
           errorType: {
             content: "Error Type",

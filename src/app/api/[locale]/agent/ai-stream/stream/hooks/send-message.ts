@@ -7,10 +7,10 @@ import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { ChatMessage, ChatThread } from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
-import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
+import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
@@ -18,8 +18,10 @@ import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
+
 import { createAndSendUserMessage } from "./shared";
-import type { UseAIStreamReturn } from "./use-ai-stream";
+import type { StartStreamFn } from "./shared";
 
 export interface SendMessageParams {
   content: string;
@@ -36,26 +38,20 @@ export interface SendMessageParams {
 
 export interface SendMessageDeps {
   logger: EndpointLogger;
-  aiStream: UseAIStreamReturn;
+  startStream: StartStreamFn;
   activeThreadId: string | null;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
-  chatStore: {
-    messages: Record<string, ChatMessage>;
-    threads: Record<string, { rootFolderId: DefaultFolderId }>;
-    setLoading: (loading: boolean) => void;
-    getThreadMessages: (threadId: string) => ChatMessage[];
-  };
+  /** leafMessageId from the navigation store — used as starting point for branch-aware parent resolution */
+  leafMessageId: string | null;
   settings: {
     selectedModel: ModelId;
-    selectedCharacter: string;
-    allowedTools: ToolConfigItem[] | null;
+    selectedSkill: string;
+    availableTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
-  setInput: (input: string) => void;
-  setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
 }
 
 export async function sendMessage(
@@ -69,14 +65,12 @@ export async function sendMessage(
 ): Promise<{ success: boolean; createdThreadId: string | null }> {
   const {
     logger,
-    aiStream,
+    startStream,
     activeThreadId,
     currentRootFolderId,
     currentSubFolderId,
-    chatStore,
+    leafMessageId,
     settings,
-    setInput,
-    setAttachments,
   } = deps;
   const { content } = params;
 
@@ -85,8 +79,6 @@ export async function sendMessage(
     activeThreadId,
     currentRootFolderId,
   });
-
-  chatStore.setLoading(true);
 
   try {
     // Determine thread ID to use
@@ -99,11 +91,6 @@ export async function sendMessage(
       threadIdToUse = activeThreadId === "new" ? null : activeThreadId;
     }
 
-    // Note: we intentionally do NOT null-out threadIdToUse if it's missing from the store.
-    // The thread may exist in the DB but not yet in the client store (e.g., direct URL navigation).
-    // The server-side ensureThread() will verify existence and permissions.
-    // We only use the store to load message history for the parent message ID resolution.
-
     let parentMessageId: string | null = null;
     let messageHistory: ChatMessage[] | null | undefined;
 
@@ -115,25 +102,63 @@ export async function sendMessage(
           await import("@/app/api/[locale]/agent/chat/incognito/storage");
         threadMessages = await getMessagesForThread(threadIdToUse);
       } else {
-        threadMessages = chatStore.getThreadMessages(threadIdToUse);
+        // Read from apiClient cache
+        const cached = apiClient.getEndpointData(
+          messagesDefinition.GET,
+          logger,
+          {
+            urlPathParams: { threadId: threadIdToUse },
+            requestData: { rootFolderId: currentRootFolderId },
+          },
+        );
+        threadMessages = cached?.success ? cached.data.messages : [];
       }
 
       if (params.parentId) {
         parentMessageId = params.parentId;
       } else if (threadMessages.length > 0) {
-        // leafMessageId is synced from URL ?message= by useBranchManagement.
-        // It IS the parent for new messages — no branch map traversal needed.
-        const leafMessageId =
-          useChatStore.getState().leafMessageIds[threadIdToUse] ?? null;
-        const leafMsg = leafMessageId
-          ? chatStore.messages[leafMessageId]
-          : null;
-        if (leafMsg) {
-          parentMessageId = leafMessageId;
-        } else {
-          // Fall back to last message in thread
-          const fallback = threadMessages[threadMessages.length - 1];
-          parentMessageId = fallback?.id ?? null;
+        // Walk DOWN from leafMessageId following the latest child at each level.
+        // leafMessageId is kept up-to-date by auto-switch (including wakeUp revival chains),
+        // so it always points to the current branch's true leaf.
+        const byId = new Map(threadMessages.map((m) => [m.id, m]));
+        const childrenByParent = new Map<string | null, ChatMessage[]>();
+        for (const msg of threadMessages) {
+          const key = msg.parentId ?? null;
+          const arr = childrenByParent.get(key) ?? [];
+          arr.push(msg);
+          childrenByParent.set(key, arr);
+        }
+        for (const [key, arr] of childrenByParent.entries()) {
+          childrenByParent.set(
+            key,
+            arr.toSorted(
+              (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+            ),
+          );
+        }
+
+        // Start from leafMessageId if present, otherwise last by createdAt
+        const startMsg = leafMessageId ? byId.get(leafMessageId) : null;
+        const startId = startMsg
+          ? startMsg.id
+          : (threadMessages.toSorted(
+              (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+            )[0]?.id ?? null);
+
+        if (startId) {
+          let currentId: string = startId;
+          while (true) {
+            const kids = childrenByParent.get(currentId);
+            if (!kids || kids.length === 0) {
+              break;
+            }
+            const latestKid = kids[kids.length - 1];
+            if (!latestKid) {
+              break;
+            }
+            currentId = latestKid.id;
+          }
+          parentMessageId = currentId;
         }
       }
 
@@ -152,40 +177,13 @@ export async function sendMessage(
       createdThreadIdForNewThread = crypto.randomUUID();
       const newThreadId: string = createdThreadIdForNewThread;
 
-      // CRITICAL: Add thread to store BEFORE navigation and BEFORE creating messages
-      // This ensures the thread exists when messages are filtered by thread ID
-      const newThread: ChatThread = {
-        id: createdThreadIdForNewThread,
-        userId: null,
-        leadId: null,
-        title: content.slice(0, 50) || "New Chat",
-        rootFolderId: currentRootFolderId,
-        folderId: currentSubFolderId,
-        status: ThreadStatus.ACTIVE,
-        defaultModel: null,
-        defaultCharacter: null,
-        systemPrompt: null,
-        pinned: false,
-        archived: false,
-        tags: [],
-        preview: null,
-        metadata: {},
-        rolesView: null,
-        rolesEdit: null,
-        rolesPost: null,
-        rolesModerate: null,
-        rolesAdmin: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        searchVector: null,
-        published: false,
-        isStreaming: false,
-        sortOrder: 0,
-      };
-      useChatStore.getState().addThread(newThread);
-      useChatStore
-        .getState()
-        .markThreadPendingCreate(createdThreadIdForNewThread);
+      // Mark thread as pending create so path/messages queries don't fire until
+      // the thread is persisted in DB (i.e., after STREAM_FINISHED).
+      if (currentRootFolderId !== DefaultFolderId.INCOGNITO) {
+        useChatStore
+          .getState()
+          .markThreadPendingCreate(createdThreadIdForNewThread);
+      }
 
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         const { createIncognitoThread } =
@@ -333,12 +331,10 @@ export async function sendMessage(
       },
       {
         logger,
-        aiStream,
+        startStream,
         currentRootFolderId,
         currentSubFolderId,
         settings,
-        setInput,
-        setAttachments,
       },
     );
 
@@ -347,9 +343,6 @@ export async function sendMessage(
       logger.warn("Stream failed — reverting optimistic new thread", {
         threadId: createdThreadIdForNewThread,
       });
-
-      // Remove from chat store
-      useChatStore.getState().deleteThread(createdThreadIdForNewThread);
 
       // Remove from threads sidebar cache
       apiClient.updateEndpointData(
@@ -401,11 +394,12 @@ export async function sendMessage(
       return { success: false, createdThreadId: createdThreadIdForNewThread };
     }
 
-    return { success: true, createdThreadId: createdThreadIdForNewThread };
+    return {
+      success: streamStarted,
+      createdThreadId: createdThreadIdForNewThread,
+    };
   } catch (error) {
     logger.error("Failed to send message", parseError(error));
     return { success: false, createdThreadId: null };
-  } finally {
-    chatStore.setLoading(false);
   }
 }

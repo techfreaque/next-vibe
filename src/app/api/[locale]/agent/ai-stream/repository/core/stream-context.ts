@@ -46,10 +46,30 @@ export class StreamContext {
   /** All toolCallIds ever seen in this stream — prevents duplicate DB rows
    *  when a provider reuses IDs across steps or retries. */
   allSeenToolCallIds = new Set<string>();
+  /** Set when any approve-mode tool is called. Persists across steps so that
+   *  sequential approve tool calls all complete before the stream aborts at
+   *  the AI-response turn boundary (finish-step with no pending tools). */
   stepHasToolsAwaitingConfirmation = false;
 
   // Loop control - set to true when model requests to stop the tool loop
   shouldStopLoop = false;
+
+  /** Set when a wake-up-ready pub/sub signal arrives mid-stream.
+   *  Causes the stream to yield at the next finish-step boundary (same as endLoop)
+   *  so a headless revival can take over with the deferred result in DB context. */
+  shouldYieldForWakeUp = false;
+
+  /** The deferredId from a wake-up-ready signal — set alongside shouldYieldForWakeUp.
+   *  Stream cleanup fires runHeadlessAiStream with this as explicitParentMessageId. */
+  pendingWakeUpDeferredId: string | null = null;
+
+  // Idempotency guard: set to true after AbortErrorHandler runs
+  // Prevents double-execution if both inner and outer catch blocks fire
+  abortHandled = false;
+
+  /** Callbacks registered by setup code (e.g. pub/sub unsubscribe).
+   *  All are called in cleanup(). */
+  private cleanupCallbacks: Array<() => void> = [];
 
   // Time-to-first-token tracking: set when first text delta arrives
   streamStartTime: number | null = null;
@@ -116,6 +136,14 @@ export class StreamContext {
   }
 
   /**
+   * Register a callback to run when the stream ends.
+   * Used to unsubscribe from pub/sub channels set up during stream initialization.
+   */
+  onCleanup(cb: () => void): void {
+    this.cleanupCallbacks.push(cb);
+  }
+
+  /**
    * Update error tracking
    */
   updateErrorTracking(): void {
@@ -133,5 +161,14 @@ export class StreamContext {
     this.currentAssistantContent = "";
     this.currentAssistantMessageId = null;
     this.pendingToolMessages.clear();
+    // Run registered cleanup callbacks (e.g. pub/sub unsubscribe)
+    for (const cb of this.cleanupCallbacks) {
+      try {
+        cb();
+      } catch {
+        // non-fatal
+      }
+    }
+    this.cleanupCallbacks = [];
   }
 }

@@ -4,7 +4,7 @@
  */
 
 import { relations } from "drizzle-orm";
-import { jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
+import { integer, jsonb, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -32,7 +32,7 @@ export const chatSettings = pgTable("chat_settings", {
 
   // Selected model and character - only store if different from default
   selectedModel: jsonb("selected_model").$type<ModelId>(),
-  selectedCharacter: jsonb("selected_character").$type<string>(),
+  selectedSkill: jsonb("selected_character").$type<string>(),
   activeFavoriteId: jsonb("active_favorite_id").$type<string | null>(),
 
   // TTS settings - only store if different from default
@@ -42,13 +42,16 @@ export const chatSettings = pgTable("chat_settings", {
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),
 
-  // Tool configuration — code uses allowedTools/pinnedTools; DB columns are active_tools/visible_tools
+  // Tool configuration — DB columns are active_tools/visible_tools
   // null = default (all allowed, default pinned set); array = user customized
-  activeTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
-  visibleTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
+  availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
+  pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
 
   // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
   compactTrigger: jsonb("compact_trigger").$type<number>(),
+
+  // Memory budget in tokens (null = use DEFAULT_MEMORY_BUDGET_TOKENS; cascades to skill → favorite → subagent)
+  memoryLimit: integer("memory_limit"),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

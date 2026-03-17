@@ -21,6 +21,11 @@ import { CountryLanguageValues } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
+import {
+  isAgentPlatform,
+  isCliPlatform,
+  type Platform,
+} from "../../types/platform";
 import type { WidgetData } from "../../widgets/widget-data";
 
 /**
@@ -29,12 +34,14 @@ import type { WidgetData } from "../../widgets/widget-data";
 export function validateLocale(
   locale: CountryLanguage,
   logger: EndpointLogger,
+  platform: Platform,
 ): ResponseType<CountryLanguage> {
   const localeValidation = validateData(
     locale,
     z.enum(CountryLanguageValues).optional(),
     logger,
     locale,
+    platform,
   );
   const validatedLocale = localeValidation.success
     ? localeValidation.data
@@ -133,12 +140,13 @@ export function validateHandlerRequestData<
     z.input<TUrlSchema>
   >,
   logger: EndpointLogger,
+  platform: Platform,
 ): ResponseType<
   ValidatedRequestData<z.output<TRequestSchema>, z.output<TUrlSchema>>
 > {
   try {
     // Validate locale
-    const localeResult = validateLocale(context.locale, logger);
+    const localeResult = validateLocale(context.locale, logger, platform);
     if (!localeResult.success) {
       return localeResult;
     }
@@ -149,13 +157,17 @@ export function validateHandlerRequestData<
       endpoint.requestUrlPathParamsSchema,
       logger,
       context.locale,
+      platform,
     );
     if (!urlValidation.success) {
-      logger.error("URL validation failed", {
+      const logUrl =
+        isCliPlatform(platform) || isAgentPlatform(platform)
+          ? logger.debug.bind(logger)
+          : logger.error.bind(logger);
+      logUrl("URL validation failed", {
         error: urlValidation.message,
         messageParams: urlValidation.messageParams,
       });
-      // Return the validation error directly with proper message and params
       return urlValidation;
     }
 
@@ -171,13 +183,17 @@ export function validateHandlerRequestData<
       endpoint.requestSchema,
       logger,
       context.locale,
+      platform,
     );
     if (!requestValidation.success) {
-      logger.error("Request validation failed", {
+      const logReq =
+        isCliPlatform(platform) || isAgentPlatform(platform)
+          ? logger.debug.bind(logger)
+          : logger.error.bind(logger);
+      logReq("Request validation failed", {
         error: requestValidation.message,
         messageParams: requestValidation.messageParams,
       });
-      // Return the validation error directly with proper message and params
       return requestValidation;
     }
 
@@ -213,9 +229,10 @@ export function validateResponseData<TResponseOutput>(
   schema: z.ZodTypeAny,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  platform: Platform,
 ): ResponseType<TResponseOutput> {
   const { t } = sharedScopedTranslation.scopedT(locale);
-  const validation = validateData(data, schema, logger, locale);
+  const validation = validateData(data, schema, logger, locale, platform);
 
   if (!validation.success) {
     logger.error("[Request Validator] Response validation failed", {

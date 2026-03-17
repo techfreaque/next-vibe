@@ -1747,27 +1747,22 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
                     <Input
                       type="email"
                       placeholder={t("patch.email.placeholder")}
-                      value={(form?.watch("email") as string | undefined) ?? ""}
-                      onChangeText={(v) => form?.setValue("email", v)}
+                      value={form.watch("email") ?? ""}
+                      onChangeText={(v) => form.setValue("email", v)}
                     />
                   </FormField>
                   <FormField label={t("patch.businessName.label")}>
                     <Input
                       placeholder={t("patch.businessName.placeholder")}
-                      value={
-                        (form?.watch("businessName") as string | undefined) ??
-                        ""
-                      }
-                      onChangeText={(v) => form?.setValue("businessName", v)}
+                      value={form.watch("businessName") ?? ""}
+                      onChangeText={(v) => form.setValue("businessName", v)}
                     />
                   </FormField>
                   <FormField label={t("patch.contactName.label")}>
                     <Input
                       placeholder={t("patch.contactName.placeholder")}
-                      value={
-                        (form?.watch("contactName") as string | undefined) ?? ""
-                      }
-                      onChangeText={(v) => form?.setValue("contactName", v)}
+                      value={form.watch("contactName") ?? ""}
+                      onChangeText={(v) => form.setValue("contactName", v)}
                     />
                   </FormField>
                   <FormField label={t("patch.status.label")}>
@@ -1798,18 +1793,16 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
                     <Input
                       type="tel"
                       placeholder={t("patch.phone.placeholder")}
-                      value={(form?.watch("phone") as string | undefined) ?? ""}
-                      onChangeText={(v) => form?.setValue("phone", v)}
+                      value={form.watch("phone") ?? ""}
+                      onChangeText={(v) => form.setValue("phone", v)}
                     />
                   </FormField>
                   <FormField label={t("patch.website.label")}>
                     <Input
                       type="url"
                       placeholder={t("patch.website.placeholder")}
-                      value={
-                        (form?.watch("website") as string | undefined) ?? ""
-                      }
-                      onChangeText={(v) => form?.setValue("website", v)}
+                      value={form.watch("website") ?? ""}
+                      onChangeText={(v) => form.setValue("website", v)}
                     />
                   </FormField>
                   <FormField label={t("patch.country.label")}>
@@ -1925,8 +1918,8 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
                   <Textarea
                     className="min-h-[80px]"
                     placeholder={t("patch.notes.placeholder")}
-                    value={(form?.watch("notes") as string | undefined) ?? ""}
-                    onChange={(e) => form?.setValue("notes", e.target.value)}
+                    value={form.watch("notes") ?? ""}
+                    onChange={(e) => form.setValue("notes", e.target.value)}
                   />
                 </FormField>
               </CardContent>
@@ -1940,12 +1933,9 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
                 <FormField label={t("patch.convertedUserId.label")}>
                   <Input
                     placeholder={t("patch.convertedUserId.placeholder")}
-                    value={
-                      (form?.watch("convertedUserId") as string | undefined) ??
-                      ""
-                    }
+                    value={form.watch("convertedUserId") ?? ""}
                     onChangeText={(v) =>
-                      form?.setValue("convertedUserId", v || null)
+                      form.setValue("convertedUserId", v || null)
                     }
                   />
                 </FormField>
@@ -1953,12 +1943,12 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
                   <Input
                     type="datetime-local"
                     value={
-                      (form?.watch("subscriptionConfirmedAt") as
+                      (form.watch("subscriptionConfirmedAt") as
                         | string
                         | undefined) ?? ""
                     }
                     onChangeText={(v) =>
-                      form?.setValue(
+                      form.setValue(
                         "subscriptionConfirmedAt",
                         v ? new Date(v) : null,
                       )
@@ -1970,7 +1960,7 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
                     className="min-h-[100px] font-mono"
                     placeholder={t("patch.metadata.placeholder")}
                     value={(() => {
-                      const v = form?.watch("metadata");
+                      const v = form.watch("metadata");
                       if (!v) {
                         return "";
                       }
@@ -1986,7 +1976,7 @@ export function LeadEditContainer(props: PatchWidgetProps): React.JSX.Element {
                           string,
                           string | number | boolean
                         >;
-                        form?.setValue("metadata", parsed);
+                        form.setValue("metadata", parsed);
                       } catch {
                         // ignore parse errors while typing
                       }

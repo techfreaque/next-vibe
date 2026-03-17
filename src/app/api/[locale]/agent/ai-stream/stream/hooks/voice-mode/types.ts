@@ -22,17 +22,17 @@ export interface VoiceMode {
   /** Auto-play TTS for AI responses */
   autoPlayTTS: boolean;
   /**
-   * Call mode enabled per model+character combination
-   * Key format: `${modelId}:${characterId}`
+   * Call mode enabled per model+skill combination
+   * Key format: `${modelId}:${skillId}`
    */
   callModeByConfig: Record<string, boolean>;
 }
 
 /**
- * Create a key for model+character combination
+ * Create a key for model+skill combination
  */
-export function getCallModeKey(modelId: string, characterId: string): string {
-  return `${modelId}:${characterId}`;
+export function getCallModeKey(modelId: string, skillId: string): string {
+  return `${modelId}:${skillId}`;
 }
 
 /**

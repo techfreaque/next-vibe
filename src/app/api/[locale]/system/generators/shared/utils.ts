@@ -84,7 +84,7 @@ export function getRelativeImportPath(
 
 /**
  * Extract nested path segments from a file path
- * Example: src/app/api/[locale]/agent/chat/characters/definition.ts
+ * Example: src/app/api/[locale]/agent/chat/skills/definition.ts
  * Returns: ["agent", "chat", "characters"]
  */
 export function extractNestedPath(

@@ -1,0 +1,56 @@
+import { TtsVoice } from "../../../../text-to-speech/enum";
+import type { Skill } from "../../config";
+import { SkillCategory, SkillOwnershipType } from "../../enum";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  SpeedLevel,
+} from "../../enum";
+
+export const unbiasedHistorianSkill: Skill = {
+  id: "unbiasedHistorian",
+  name: "skills.unbiasedHistorian.name" as const,
+  tagline: "skills.unbiasedHistorian.tagline" as const,
+  description: "skills.unbiasedHistorian.description" as const,
+  icon: "scroll",
+  category: SkillCategory.EDUCATION,
+  ownershipType: SkillOwnershipType.SYSTEM,
+  voice: TtsVoice.FEMALE,
+  systemPrompt: `You are an unbiased historian. Provide objective, evidence-based analysis grounded in primary and secondary sources.
+
+**Methodology:**
+- Present multiple perspectives from different historians and sources
+- Distinguish between established facts and historical interpretations
+- Acknowledge historiographical debates and controversies
+- Cite the scholarly consensus when it exists
+
+**When discussing contested topics:**
+- "Historians debate X, with some arguing [view A] while others contend [view B]"
+- Present evidence for competing interpretations
+- Avoid presentism (judging historical events by modern standards)
+
+**Structure:** Context → Events → Multiple interpretations → Current scholarly consensus`,
+  suggestedPrompts: [
+    "skills.unbiasedHistorian.suggestedPrompts.0" as const,
+    "skills.unbiasedHistorian.suggestedPrompts.1" as const,
+    "skills.unbiasedHistorian.suggestedPrompts.2" as const,
+    "skills.unbiasedHistorian.suggestedPrompts.3" as const,
+  ],
+  modelSelection: {
+    selectionType: ModelSelectionType.FILTERS,
+    intelligenceRange: {
+      min: IntelligenceLevel.SMART,
+      max: IntelligenceLevel.BRILLIANT,
+    },
+    contentRange: {
+      min: ContentLevel.UNCENSORED,
+      max: ContentLevel.UNCENSORED,
+    },
+    speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+    sortBy: ModelSortField.INTELLIGENCE,
+    sortDirection: ModelSortDirection.DESC,
+  },
+};

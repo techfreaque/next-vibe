@@ -75,10 +75,10 @@ export function LeadsBatchUpdateContainer({
     Boolean(response) && preview.length > 0 && totalMatched > 100;
 
   // Read active filters from the hidden prefilled fields
-  const activeSearch = form?.watch("search") ?? "";
-  const activeStatus = form?.watch("status") ?? [];
-  const activeCampaignStage = form?.watch("currentCampaignStage") ?? [];
-  const activeSource = form?.watch("source") ?? [];
+  const activeSearch = form.watch("search") ?? "";
+  const activeStatus = form.watch("status") ?? [];
+  const activeCampaignStage = form.watch("currentCampaignStage") ?? [];
+  const activeSource = form.watch("source") ?? [];
   const hasActiveFilters =
     Boolean(activeSearch) ||
     activeStatus.length > 0 ||
@@ -402,10 +402,10 @@ export function LeadsBatchDeleteContainer({
   const totalMatched = response?.totalMatched ?? 0;
 
   // Read active filters from the hidden prefilled fields
-  const activeSearch = form?.watch("search") ?? "";
-  const activeStatus = form?.watch("status") ?? [];
-  const activeCampaignStage = form?.watch("currentCampaignStage") ?? [];
-  const activeSource = form?.watch("source") ?? [];
+  const activeSearch = form.watch("search") ?? "";
+  const activeStatus = form.watch("status") ?? [];
+  const activeCampaignStage = form.watch("currentCampaignStage") ?? [];
+  const activeSource = form.watch("source") ?? [];
   const hasActiveFilters =
     Boolean(activeSearch) ||
     activeStatus.length > 0 ||

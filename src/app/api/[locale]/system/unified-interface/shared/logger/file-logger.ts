@@ -10,7 +10,9 @@ import type { LoggerMetadata } from "./endpoint";
  * File logger configuration
  */
 // Use runtime concatenation to prevent Turbopack from statically tracing these paths
-const DEBUG_DIR = [".tmp"].join("");
+// Split across a variable reference so Turbopack cannot fold this to a static path
+const _dot = process.env.DEBUG_DOT ?? ".";
+const DEBUG_DIR = `${_dot}tmp`;
 const DEBUG_FILE = "vibe-mcp.log";
 
 /**

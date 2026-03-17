@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Usuń ulubiony",
     },
-    customizeCharacterButton: {
+    customizeSkillButton: {
       label: "Dostosuj osobowość postaci",
     },
     signupPrompt: {
@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
       label: "ID ulubionego",
     },
     response: {
-      characterId: {
+      skillId: {
         content: "Postać: {{value}}",
       },
       customName: {
@@ -165,10 +165,10 @@ export const translations: typeof enTranslations = {
     deleteButton: {
       label: "Usuń ulubiony",
     },
-    customizeCharacterButton: {
+    customizeSkillButton: {
       label: "Dostosuj osobowość postaci",
     },
-    useThisCharacterButton: {
+    useThisSkillButton: {
       label: "Użyj tej postaci",
     },
     useThisModelButton: {
@@ -196,7 +196,7 @@ export const translations: typeof enTranslations = {
     id: {
       label: "ID ulubionego",
     },
-    characterId: {
+    skillId: {
       label: "Postać",
     },
     customName: {
@@ -294,7 +294,7 @@ export const translations: typeof enTranslations = {
       description:
         "Liczba tokenów wyzwalająca automatyczną kompresję rozmowy. Null = postać lub domyślna globalna.",
     },
-    allowedTools: {
+    availableTools: {
       label: "Dozwolone narzędzia",
       description:
         "Zastąp narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = postać lub ustawienia globalne.",
@@ -304,10 +304,26 @@ export const translations: typeof enTranslations = {
       description:
         "Zastąp przypięte narzędzia paska narzędzi dla tego slotu. Null = postać lub ustawienia globalne.",
     },
-    changeCharacter: {
+    deniedTools: {
+      label: "Zablokowane narzędzia",
+      description:
+        "Zablokuj określone narzędzia dla tego slotu – dodatkowo do listy blokad skilla. Te narzędzia nie mogą być wywoływane niezależnie od innych ustawień.",
+    },
+    promptAppend: {
+      label: "Dołączenie do promptu",
+      description:
+        "Dodatkowe instrukcje dołączane do systemowego promptu skilla tylko dla tego slotu. Pozwala spersonalizować zachowanie AI bez zmiany wspólnego skilla.",
+      placeholder: "np. Zawsze odpowiadaj w przyjaznym, swobodnym tonie.",
+    },
+    memoryLimit: {
+      label: "Limit pamięci (tokeny)",
+      description:
+        "Maksymalna łączna liczba tokenów treści pamięci dla tego slotu. Null = skill lub domyślna globalna.",
+    },
+    changeSkill: {
       label: "Zmień postać",
     },
-    modifyCharacter: {
+    modifySkill: {
       label: "Modyfikuj postać",
     },
     response: {

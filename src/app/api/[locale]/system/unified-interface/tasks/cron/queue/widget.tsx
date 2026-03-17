@@ -5,9 +5,22 @@
 
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "next-vibe-ui/ui/alert-dialog";
 import { Button } from "next-vibe-ui/ui/button";
+import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Circle } from "next-vibe-ui/ui/icons/Circle";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
@@ -16,8 +29,10 @@ import { List } from "next-vibe-ui/ui/icons/List";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Play } from "next-vibe-ui/ui/icons/Play";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Input } from "next-vibe-ui/ui/input";
 import {
@@ -37,12 +52,15 @@ import React, {
 } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
@@ -51,7 +69,13 @@ import cronTaskIdDefinition from "../[id]/definition";
 import cronTasksDefinition from "../tasks/definition";
 import cronHistoryDefinition from "../history/definition";
 import executeDefinition from "../../execute/definition";
-import type { CronTaskPriorityDB, TaskCategoryDB } from "../../enum";
+import bulkEndpoints from "../bulk/definition";
+import type {
+  CronTaskPriorityDB,
+  TaskCategoryDB,
+  CronTaskPriorityFilterValue,
+  TaskCategoryValue,
+} from "../../enum";
 import {
   CronTaskHiddenFilter,
   CronTaskPriority,
@@ -260,6 +284,8 @@ function CountdownCell({
 function QueueRow({
   task,
   position,
+  selected,
+  onToggleSelect,
   onEdit,
   onHistory,
   onRun,
@@ -269,6 +295,8 @@ function QueueRow({
 }: {
   task: Task;
   position: number;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
   onEdit: (task: Task) => void;
   onHistory: (task: Task) => void;
   onRun: (task: Task) => void;
@@ -285,7 +313,21 @@ function QueueRow({
     task.lastExecutionStatus === CronTaskStatus.ERROR;
 
   return (
-    <Div className="group flex items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors border-b last:border-b-0">
+    <Div
+      className={cn(
+        "group flex items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors border-b last:border-b-0",
+        selected && "bg-primary/5",
+      )}
+    >
+      {/* Checkbox */}
+      <Div className="flex-shrink-0 mt-1">
+        <Checkbox
+          checked={selected}
+          onCheckedChange={() => onToggleSelect(task.id)}
+          aria-label={`Select ${task.displayName}`}
+        />
+      </Div>
+
       {/* Position number */}
       <Div className="flex-shrink-0 w-6 text-center mt-0.5">
         <Span className="text-xs text-muted-foreground font-mono">
@@ -437,6 +479,150 @@ function QueueRow({
 }
 
 // ---------------------------------------------------------------------------
+// Bulk action toolbar
+// ---------------------------------------------------------------------------
+
+function BulkToolbar({
+  selectedCount,
+  totalCount,
+  allSelected,
+  isBulkLoading,
+  onSelectAll,
+  onClearSelection,
+  onBulkEnable,
+  onBulkDisable,
+  onBulkRun,
+  onBulkDelete,
+  t,
+}: {
+  selectedCount: number;
+  totalCount: number;
+  allSelected: boolean;
+  isBulkLoading: boolean;
+  onSelectAll: () => void;
+  onClearSelection: () => void;
+  onBulkEnable: () => void;
+  onBulkDisable: () => void;
+  onBulkRun: () => void;
+  onBulkDelete: () => void;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+}): React.JSX.Element {
+  return (
+    <Div className="flex items-center gap-2 px-4 py-2 border-b bg-primary/5 flex-wrap">
+      {/* Checkbox + count */}
+      <Div className="flex items-center gap-2">
+        <Checkbox
+          checked={allSelected}
+          onCheckedChange={allSelected ? onClearSelection : onSelectAll}
+          aria-label={
+            allSelected
+              ? t("widget.bulk.clearSelection")
+              : t("widget.bulk.selectAll")
+          }
+        />
+        <Span className="text-xs font-medium text-primary">
+          {t("widget.bulk.selected").replace("{count}", String(selectedCount))}
+        </Span>
+        <Span className="text-xs text-muted-foreground">/ {totalCount}</Span>
+      </Div>
+
+      <Div className="w-px bg-border self-stretch mx-1" />
+
+      {/* Action buttons */}
+      <Div className="flex items-center gap-1 flex-wrap">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-7 px-2.5 text-xs gap-1.5"
+          onClick={onBulkEnable}
+          disabled={isBulkLoading}
+        >
+          {t("widget.bulk.enable")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-7 px-2.5 text-xs gap-1.5"
+          onClick={onBulkDisable}
+          disabled={isBulkLoading}
+        >
+          {t("widget.bulk.disable")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-7 px-2.5 text-xs gap-1.5 text-green-600 hover:text-green-700 border-green-200 hover:border-green-300"
+          onClick={onBulkRun}
+          disabled={isBulkLoading}
+        >
+          <Play className="h-3 w-3" />
+          {t("widget.bulk.runNow")}
+        </Button>
+
+        {/* Delete with AlertDialog confirmation */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 px-2.5 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:border-destructive/50"
+              disabled={isBulkLoading}
+            >
+              <Trash2 className="h-3 w-3" />
+              {t("widget.bulk.delete")}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("widget.bulk.confirmDeleteTitle")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("widget.bulk.confirmDelete").replace(
+                  "{count}",
+                  String(selectedCount),
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("widget.bulk.cancel")}</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                onClick={onBulkDelete}
+              >
+                {t("widget.bulk.delete")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </Div>
+
+      {/* Loading indicator */}
+      {isBulkLoading && (
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-auto" />
+      )}
+
+      {/* Clear selection */}
+      {!isBulkLoading && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs text-muted-foreground ml-auto"
+          onClick={onClearSelection}
+        >
+          {t("widget.bulk.clearSelection")}
+        </Button>
+      )}
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main widget
 // ---------------------------------------------------------------------------
 
@@ -452,12 +638,20 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
 
   const isLoading = endpointMutations?.read?.isLoading;
   const isTouch = useTouchDevice();
+  const logger = useWidgetLogger();
+  const user = useWidgetUser();
 
   const tasks: Task[] = useMemo(() => data?.tasks ?? [], [data?.tasks]);
   const totalTasks = data?.totalTasks ?? 0;
 
-  // ── Local state ───────────────────────────────────────────────────────────
-  const [search, setSearch] = useState("");
+  // ── Bulk selection state ──────────────────────────────────────────────────
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // ── Bulk mutation ─────────────────────────────────────────────────────────
+  const bulkMutation = useApiMutation(bulkEndpoints.POST, logger, user);
+
+  // ── Search from form state ────────────────────────────────────────────────
+  const search = form.watch("search") ?? "";
 
   // ── Patch form helper ─────────────────────────────────────────────────────
   const patchForm = useCallback(
@@ -493,8 +687,8 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
   );
 
   // ── Priority filter ───────────────────────────────────────────────────────
-  const priorityValue = form?.watch("priority");
-  const activePriority: string = useMemo(
+  const priorityValue = form.watch("priority");
+  const activePriority: typeof CronTaskPriorityFilterValue | "" = useMemo(
     () =>
       Array.isArray(priorityValue) && priorityValue.length === 1
         ? (priorityValue[0] ?? "")
@@ -509,12 +703,12 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
   );
 
   // ── Category filter ───────────────────────────────────────────────────────
-  const categoryValue = form?.watch("category");
-  const activeCategory: string = useMemo(
+  const categoryValue = form.watch("category");
+  const activeCategory: typeof TaskCategoryValue | "all" = useMemo(
     () =>
       Array.isArray(categoryValue) && categoryValue.length === 1
         ? (categoryValue[0] ?? "")
-        : "",
+        : "all",
     [categoryValue],
   );
   const handleCategoryChange = useCallback(
@@ -525,23 +719,134 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
   );
 
   // ── Hidden filter ─────────────────────────────────────────────────────────
-  const hiddenValue = form?.watch("hidden");
+  const hiddenValue = form.watch("hidden");
   const activeHiddenFilter = hiddenValue ?? CronTaskHiddenFilter.ALL;
 
-  // ── Client-side search filter ─────────────────────────────────────────────
-  const filteredTasks = useMemo(() => {
-    if (!search.trim()) {
-      return tasks;
-    }
-    const q = search.toLowerCase();
-    return tasks.filter(
-      (task) =>
-        task.displayName.toLowerCase().includes(q) ||
-        task.routeId.toLowerCase().includes(q) ||
-        (task.description?.toLowerCase().includes(q) ?? false) ||
-        task.category.toLowerCase().includes(q),
-    );
-  }, [tasks, search]);
+  // All filtering is server-side; tasks from server are already filtered
+  const filteredTasks = tasks;
+
+  // ── Derived selection state ───────────────────────────────────────────────
+  const allFilteredSelected =
+    filteredTasks.length > 0 &&
+    filteredTasks.every((task) => selectedIds.has(task.id));
+
+  // ── Bulk selection handlers ───────────────────────────────────────────────
+  const handleToggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    setSelectedIds(new Set(filteredTasks.map((task) => task.id)));
+  }, [filteredTasks]);
+
+  const handleClearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  // ── Bulk action executor ──────────────────────────────────────────────────
+  const executeBulkAction = useCallback(
+    (action: "enable" | "disable" | "run" | "delete") => {
+      const ids = [...selectedIds];
+      void bulkMutation
+        .mutateAsync({ requestData: { ids, action } })
+        .then(async () => {
+          handleClearSelection();
+          // Update caches optimistically — no refetch needed
+          const { apiClient } =
+            await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+          const tasksDef = await import("../tasks/definition");
+          const queueDef = await import("./definition");
+          if (action === "delete") {
+            apiClient.updateEndpointData(
+              tasksDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.filter(
+                      (task) => !ids.includes(task.id),
+                    ),
+                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
+                  },
+                };
+              },
+            );
+            apiClient.updateEndpointData(
+              queueDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.filter(
+                      (task) => !ids.includes(task.id),
+                    ),
+                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
+                  },
+                };
+              },
+            );
+          } else if (action === "enable" || action === "disable") {
+            const enabled = action === "enable";
+            apiClient.updateEndpointData(
+              tasksDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.map((task) =>
+                      ids.includes(task.id) ? { ...task, enabled } : task,
+                    ),
+                  },
+                };
+              },
+            );
+            apiClient.updateEndpointData(
+              queueDef.default.GET,
+              logger,
+              (old) => {
+                if (!old?.success) {
+                  return old;
+                }
+                return {
+                  success: true as const,
+                  data: {
+                    ...old.data,
+                    tasks: old.data.tasks.map((task) =>
+                      ids.includes(task.id) ? { ...task, enabled } : task,
+                    ),
+                  },
+                };
+              },
+            );
+          }
+          return undefined;
+        });
+    },
+    [selectedIds, bulkMutation, handleClearSelection, logger],
+  );
 
   // ── Navigation handlers ───────────────────────────────────────────────────
   const handleRefresh = useCallback((): void => {
@@ -556,6 +861,19 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
     navigate(cronHistoryDefinition.GET, {});
   }, [navigate]);
 
+  const handleNavigateStats = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const m = await import("../stats/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
+
+  const handleCreate = useCallback((): void => {
+    navigate(cronTasksDefinition.POST, {
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate]);
+
   const handleEdit = useCallback(
     (task: Task): void => {
       navigate(cronTaskIdDefinition.PUT, {
@@ -565,10 +883,12 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
           description: task.description ?? undefined,
           schedule: task.schedule,
           enabled: task.enabled,
+          hidden: task.hidden,
           priority: task.priority,
           outputMode: task.outputMode,
           timeout: task.timeout ?? undefined,
           retries: task.retries ?? undefined,
+          retryDelay: task.retryDelay ?? undefined,
         },
         popNavigationOnSuccess: 1,
       });
@@ -590,19 +910,26 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
       navigate(executeDefinition.POST, {
         data: { taskId: task.id },
         renderInModal: true,
+        popNavigationOnSuccess: 1,
       });
     },
     [navigate],
   );
 
   const handleClearFilters = useCallback((): void => {
-    setSearch("");
+    if (form) {
+      form.setValue("search", "", {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    }
     patchForm({
       priority: [],
       category: [],
       hidden: CronTaskHiddenFilter.ALL,
     });
-  }, [patchForm]);
+  }, [form, patchForm]);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -621,6 +948,16 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
         </Div>
 
         <Div className="flex items-center gap-1.5 flex-shrink-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2.5 gap-1.5 text-xs"
+            onClick={handleNavigateStats}
+          >
+            <BarChart3 className="h-3.5 w-3.5" />
+            <Span className="hidden sm:inline">{t("widget.header.stats")}</Span>
+          </Button>
           <Button
             type="button"
             variant="ghost"
@@ -653,11 +990,48 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
           >
             <RefreshCw className="h-3.5 w-3.5" />
           </Button>
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            className="h-8 px-2.5 gap-1.5 text-xs"
+            onClick={handleCreate}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <Span className="hidden sm:inline">
+              {t("widget.header.create")}
+            </Span>
+          </Button>
         </Div>
       </Div>
 
+      {/* ── Bulk toolbar (shown when items are selected) ─────────────── */}
+      {selectedIds.size > 0 && (
+        <BulkToolbar
+          selectedCount={selectedIds.size}
+          totalCount={filteredTasks.length}
+          allSelected={allFilteredSelected}
+          isBulkLoading={bulkMutation.isPending}
+          onSelectAll={handleSelectAll}
+          onClearSelection={handleClearSelection}
+          onBulkEnable={() => executeBulkAction("enable")}
+          onBulkDisable={() => executeBulkAction("disable")}
+          onBulkRun={() => executeBulkAction("run")}
+          onBulkDelete={() => executeBulkAction("delete")}
+          t={t}
+        />
+      )}
+
       {/* ── Filters row ─────────────────────────────────────────────── */}
       <Div className="flex items-center gap-2 px-4 py-2 border-b flex-wrap">
+        {/* Select-all checkbox */}
+        <Checkbox
+          checked={allFilteredSelected}
+          onCheckedChange={
+            allFilteredSelected ? handleClearSelection : handleSelectAll
+          }
+        />
+
         {/* Search */}
         <Div className="relative flex-1 min-w-[140px]">
           <Div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -666,7 +1040,13 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
           <Input
             type="text"
             value={search}
-            onChangeText={setSearch}
+            onChangeText={(val) =>
+              form.setValue("search", val, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+              })
+            }
             placeholder={t("widget.search.placeholder")}
             className="pl-8 h-8 text-sm"
           />
@@ -723,13 +1103,9 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
         </Select>
 
         {/* Category filter */}
-        <Select
-          value={activeCategory || "ALL"}
-          onValueChange={(v) =>
-            handleCategoryChange(
-              v === "ALL" ? "" : (v as (typeof TaskCategoryDB)[number]),
-            )
-          }
+        <Select<typeof TaskCategoryValue | "all">
+          value={activeCategory}
+          onValueChange={(v) => handleCategoryChange(v === "all" ? "" : v)}
         >
           <SelectTrigger className="h-8 w-auto min-w-[110px] text-xs">
             <SelectValue />
@@ -765,6 +1141,8 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
               key={task.id}
               task={task}
               position={index + 1}
+              selected={selectedIds.has(task.id)}
+              onToggleSelect={handleToggleSelect}
               onEdit={handleEdit}
               onHistory={handleTaskHistory}
               onRun={handleRun}

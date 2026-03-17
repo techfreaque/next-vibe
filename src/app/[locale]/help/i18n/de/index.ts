@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
           q1: {
             question: "Was ist {{appName}}?",
             answer:
-              "{{appName}} ist eine unzensierte KI-Chat-Plattform mit Zugang zu {{modelCount}} KI-Modellen. Wir kombinieren ehrliche KI-Gespräche mit erweiterten Funktionen wie Ordnerverwaltung, benutzerdefinierten Characters und Multi-Modell-Unterstützung.",
+              "{{appName}} ist eine unzensierte KI-Chat-Plattform mit Zugang zu {{modelCount}} KI-Modellen. Wir kombinieren ehrliche KI-Gespräche mit erweiterten Funktionen wie Ordnerverwaltung, benutzerdefinierten Skills und Multi-Modell-Unterstützung.",
           },
           q2: {
             question: "Welche Zahlungsmethoden akzeptieren Sie?",

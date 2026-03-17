@@ -11,7 +11,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -120,13 +120,18 @@ export async function sendTestRequest<
         rootFolderId: DefaultFolderId.CRON,
         threadId: undefined,
         aiMessageId: undefined,
-        characterId: undefined,
+        skillId: undefined,
         modelId: undefined,
         headless: undefined,
         currentToolMessageId: undefined,
+        callerToolCallId: undefined,
+        pendingToolMessages: undefined,
+        pendingTimeoutMs: undefined,
+        leafMessageId: undefined,
         waitingForRemoteResult: undefined,
         favoriteId: undefined,
         abortSignal: undefined,
+        escalateToTask: undefined,
       },
     });
 

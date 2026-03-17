@@ -69,7 +69,7 @@ export const translations = {
           reasoning2:
             "Tool is registered. Rather than a raw cron, I'll create a character first — that way the filtering logic and tool access are persistent and easy to update later.",
           reasoning3:
-            "Character ready. Now wiring up the daily cron with preCalls: it'll fetch HN stories first, then the character filters and emails you.",
+            "Skill ready. Now wiring up the daily cron with preCalls: it'll fetch HN stories first, then the character filters and emails you.",
           reasoning4:
             "Cron is set. Running it now so you get today's digest without waiting until tomorrow.",
           cronResult:
@@ -367,7 +367,7 @@ export const translations = {
           "Private (server-stored), Incognito (local-only), Shared (collaborative), Public (forum). You control your data.",
       },
       characters: {
-        title: "Custom Characters",
+        title: "Custom Skills",
         description:
           "Create AI personas with unique personalities. Use community characters or build your own.",
       },
@@ -1160,7 +1160,7 @@ export const translations = {
       features: "Features",
       subscription: "Subscription",
       aiModels: "AI Models",
-      characters: "Characters",
+      characters: "Skills",
     },
     product: {
       title: "Product",

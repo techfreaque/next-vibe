@@ -95,7 +95,7 @@ export interface ToolCall {
   /** callbackMode used for this tool call — determines continuation behavior */
   callbackMode?: CallbackModeValue;
   /**
-   * For deferred result messages (background/noLoop): the toolCallId of the
+   * For deferred result messages (endLoop): the toolCallId of the
    * original pending call that this message supersedes. The original message
    * has no result; this message has both args (copied) and result. The AI
    * sees this as a fresh tool call+result pair (new unique toolCallId) and
@@ -340,7 +340,7 @@ export const chatThreads = pgTable(
 
     // Settings
     defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
-    defaultCharacter: text("default_tone"), // Character ID (can be default character or custom UUID)
+    defaultSkill: text("default_tone"), // Skill ID (can be default character or custom UUID)
     systemPrompt: text("system_prompt"),
 
     // Ordering within a folder (alongside sibling folders)
@@ -461,7 +461,7 @@ export const chatMessages = pgTable(
 
     // AI-specific fields
     model: text("model").$type<ModelId | null>(), // ModelId if AI message
-    character: text("tone"),
+    skill: text("tone"),
 
     // Error information (for error messages)
     errorType: text("error_type"),

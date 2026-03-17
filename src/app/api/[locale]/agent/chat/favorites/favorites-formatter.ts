@@ -6,10 +6,7 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import {
-  CHARACTER_CREATE_ALIAS,
-  CHARACTERS_LIST_ALIAS,
-} from "../characters/constants";
+import { SKILL_CREATE_ALIAS, SKILLS_LIST_ALIAS } from "../skills/constants";
 import {
   FAVORITE_CREATE_ALIAS,
   FAVORITE_DELETE_ALIAS,
@@ -20,7 +17,7 @@ import {
 export interface FavoriteSummaryItem {
   id: string;
   name: string;
-  characterId: string;
+  skillId: string;
   /** Localized character display name (resolved from i18n or custom character name) */
   characterName: string | null;
   modelId: string | null;
@@ -45,9 +42,9 @@ function fullLine(fav: FavoriteSummaryItem): string {
     ? ` last:${typeof fav.lastUsedAt === "string" ? fav.lastUsedAt.slice(0, 10) : fav.lastUsedAt.toISOString().slice(0, 10)}`
     : "";
   const charLabel = fav.characterName
-    ? `char:${fav.characterName} (${fav.characterId})`
-    : `char:${fav.characterId}`;
-  return `- [${fav.id.slice(-8)}] ${fav.name}${active} | ${charLabel} | ${model}${uses}${lastUsed}`;
+    ? `char:${fav.characterName} (${fav.skillId})`
+    : `char:${fav.skillId}`;
+  return `- [${fav.id}] ${fav.name}${active} | ${charLabel} | ${model}${uses}${lastUsed}`;
 }
 
 /**
@@ -55,7 +52,7 @@ function fullLine(fav: FavoriteSummaryItem): string {
  */
 function compactLine(fav: FavoriteSummaryItem): string {
   const active = fav.isActive ? " ★" : "";
-  return `- [${fav.id.slice(-8)}] ${fav.name}${active}`;
+  return `- [${fav.id}] ${fav.name}${active}`;
 }
 
 /**
@@ -82,7 +79,7 @@ You have no saved favorites. Favorites let you save character + model + tool com
 - Use \`favoriteId\` in API/CLI/cron calls for zero-config AI runs
 
 **Quick setup:**
-1. Help the user find or create a character that fits their workflow (\`${CHARACTERS_LIST_ALIAS}\`, \`${CHARACTER_CREATE_ALIAS}\`)
+1. Help the user find or create a character that fits their workflow (\`${SKILLS_LIST_ALIAS}\`, \`${SKILL_CREATE_ALIAS}\`)
 2. Create a favorite linking that character to a model (\`${FAVORITE_CREATE_ALIAS}\`)
 3. Set it as active so it loads by default
 
@@ -113,7 +110,7 @@ export function formatFavoritesSummary(
     : "";
 
   const header = `## Favorites (${favorites.length})${activeNote}`;
-  const footer = `\nTools: \`${FAVORITES_LIST_ALIAS}\` (list) · \`${FAVORITE_CREATE_ALIAS}\` (create) · \`${FAVORITE_UPDATE_ALIAS}\` (edit) · \`${FAVORITE_DELETE_ALIAS}\` (delete) · \`${CHARACTER_CREATE_ALIAS}\` (new character)
+  const footer = `\nTools: \`${FAVORITES_LIST_ALIAS}\` (list) · \`${FAVORITE_CREATE_ALIAS}\` (create) · \`${FAVORITE_UPDATE_ALIAS}\` (edit) · \`${FAVORITE_DELETE_ALIAS}\` (delete) · \`${SKILL_CREATE_ALIAS}\` (new character)
 
 **Proactive optimization:** Continuously improve the user's character + favorites setup:
 - Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite

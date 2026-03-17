@@ -15,6 +15,11 @@ import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  formatCount,
+  formatDuration,
+  formatSense,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import { pipelineGraphs } from "../db";
 import { getLatestRun } from "../store/runs";
@@ -53,6 +58,8 @@ export async function runDueGraphs(
 
   let executed = 0;
   const errors: SchedulerResult["errors"] = [];
+  const startTime = Date.now();
+  const ran: string[] = [];
 
   for (const graph of scheduledGraphs) {
     try {
@@ -72,14 +79,28 @@ export async function runDueGraphs(
       const now = new Date();
       const from = lastRun?.finishedAt ?? lastRun?.startedAt ?? dayAgo(now);
 
-      logger.info(`[scheduler] Running graph ${graph.slug} (${graph.id})`);
+      logger.debug(`[sense] Running graph ${graph.slug} (${graph.id})`);
       await runGraph(graph.id, config, { from, to: now });
+      ran.push(graph.slug);
       executed++;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       errors.push({ graphId: graph.id, slug: graph.slug, error: msg });
-      logger.error(`[scheduler] Graph ${graph.slug} failed: ${msg}`);
+      logger.error(formatSense(`Graph ${graph.slug} failed: ${msg}`, "❌"));
     }
+  }
+
+  if (executed > 0 || errors.length > 0) {
+    const duration = Date.now() - startTime;
+    const parts: string[] = [
+      `${formatCount(executed, "graph")} executed`,
+      `of ${String(scheduledGraphs.length)} scheduled`,
+      formatDuration(duration),
+    ];
+    if (errors.length > 0) {
+      parts.push(`${String(errors.length)} failed`);
+    }
+    logger.info(formatSense(parts.join(" · "), "📈"));
   }
 
   return {

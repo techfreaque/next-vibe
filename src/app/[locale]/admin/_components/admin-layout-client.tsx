@@ -11,6 +11,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Frame } from "next-vibe-ui/ui/icons/Frame";
 import { Home } from "next-vibe-ui/ui/icons/Home";
@@ -19,6 +20,7 @@ import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Menu } from "next-vibe-ui/ui/icons/Menu";
 import { PanelLeft } from "next-vibe-ui/ui/icons/PanelLeft";
 import { Send } from "next-vibe-ui/ui/icons/Send";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { Users } from "next-vibe-ui/ui/icons/Users";
@@ -144,10 +146,31 @@ export function AdminLayoutClient({
       hidden: false,
     },
     {
+      name: t("app.admin.components.navigation.memories"),
+      href: `/${locale}/admin/memories` as const,
+      icon: Brain,
+      current: pathname.startsWith(`/${locale}/admin/memories`),
+      hidden: false,
+    },
+    {
       name: t("app.admin.components.navigation.errorMonitor"),
       href: `/${locale}/admin/error-monitor` as const,
       icon: AlertTriangle,
       current: pathname.startsWith(`/${locale}/admin/error-monitor`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.skillsModeration"),
+      href: `/${locale}/admin/skills-moderation` as const,
+      icon: Shield,
+      current: pathname.startsWith(`/${locale}/admin/skills-moderation`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.settings"),
+      href: `/${locale}/admin/settings` as const,
+      icon: Settings,
+      current: pathname.startsWith(`/${locale}/admin/settings`),
       hidden: false,
     },
   ];

@@ -16,7 +16,7 @@ export const translations = {
     free: "Bezpłatny",
     autoSelectedModel: "Auto-wybrany:",
     manualSelectedModel: "Wybrany:",
-    characterSelectedModel: "Model postaci:",
+    skillSelectedModel: "Model postaci:",
     selectModelBelow: "Wybierz model poniżej",
     sortBy: "Sortuj według",
     showLess: "Pokaż mniej",
@@ -24,7 +24,7 @@ export const translations = {
     showLegacyModels: "Pokaż {{count}} Modeli Legacy",
     autoMode: "Automatyczny wybór",
     manualMode: "Wybór ręczny",
-    characterMode: "Domyślny postaci",
+    skillMode: "Domyślny postaci",
     autoModeDescription:
       "Automatycznie wybiera najlepszy model według Twoich preferencji",
     manualModeDescription: "Wybierz dowolny model samodzielnie",

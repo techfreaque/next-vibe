@@ -158,7 +158,6 @@ export class TaskExecuteRepository {
         .update(cronTasks)
         .set({
           lastExecutionStatus: CronTaskStatus.FAILED,
-          lastExecutionError: "Failed to resolve user context",
           updatedAt: new Date(),
         })
         .where(eq(cronTasks.id, task.id));
@@ -181,7 +180,6 @@ export class TaskExecuteRepository {
         .update(cronTasks)
         .set({
           lastExecutionStatus: CronTaskStatus.FAILED,
-          lastExecutionError: `No handler for routeId: ${task.routeId}`,
           updatedAt: new Date(),
         })
         .where(eq(cronTasks.id, task.id));
@@ -197,9 +195,11 @@ export class TaskExecuteRepository {
     const maxRetries = task.retries ?? 0;
     const retryDelayMs = task.retryDelay ?? 30000;
 
-    const { getLocalInstanceId } =
+    const { getLocalInstanceId, deriveDefaultSelfInstanceId } =
       await import("@/app/api/[locale]/user/remote-connection/repository");
-    const instanceId = await getLocalInstanceId();
+    const instanceId = user.id
+      ? await getLocalInstanceId(user.id)
+      : deriveDefaultSelfInstanceId();
 
     // Fire-and-forget: notify remote RUNNING
     if (task.targetInstance) {
@@ -261,12 +261,17 @@ export class TaskExecuteRepository {
               threadId: undefined,
               aiMessageId: undefined,
               currentToolMessageId: undefined,
+              callerToolCallId: undefined,
+              pendingToolMessages: undefined,
+              pendingTimeoutMs: undefined,
+              leafMessageId: undefined,
               favoriteId: undefined,
-              characterId: undefined,
+              skillId: undefined,
               modelId: undefined,
               headless: undefined,
               waitingForRemoteResult: undefined,
               abortSignal: undefined,
+              escalateToTask: undefined,
             },
           }),
           new Promise<never>((...[, reject]) => {
@@ -359,7 +364,6 @@ export class TaskExecuteRepository {
       .set({
         lastExecutedAt: startedAt,
         lastExecutionStatus: finalStatus,
-        lastExecutionError: finalMessage,
         lastExecutionDuration: finalDurationMs,
         executionCount: sql`${cronTasks.executionCount} + 1`,
         consecutiveFailures: newConsecutiveFailures,
@@ -372,16 +376,20 @@ export class TaskExecuteRepository {
       .where(eq(cronTasks.id, task.id));
 
     // 8. If task has callback context (set by execute-tool AI path), emit
-    //    TASK_COMPLETED WS event + insert deferred result message for background/noLoop,
+    //    TASK_COMPLETED WS event + insert deferred result message for endLoop,
     //    or schedule resume-stream for wakeUp/wait.
+    // Read from typed wakeUp* columns — not from untyped taskInput JSON blob.
     const taskCallbackMode =
-      (taskInput.callbackMode as CallbackModeValue | undefined) ?? null;
-    const taskThreadId = (taskInput.threadId as string | undefined) ?? null;
-    const taskToolMessageId =
-      (taskInput.toolMessageId as string | undefined) ?? null;
+      (task.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
+    const taskThreadId = task.wakeUpThreadId ?? null;
+    const taskToolMessageId = task.wakeUpToolMessageId ?? null;
     const completionUserId = taskUserContext?.user.id ?? currentUserId ?? null;
 
-    if (taskToolMessageId && completionUserId) {
+    // Skip handleTaskCompletion for remote tasks (targetInstance set) — the
+    // originator receives the result via /report and runs handleTaskCompletion
+    // there. Running it here would create resume-stream on the wrong instance
+    // and try to backfill a toolMessageId that doesn't exist locally.
+    if (taskToolMessageId && completionUserId && !task.targetInstance) {
       await handleTaskCompletion({
         toolMessageId: taskToolMessageId,
         threadId: taskThreadId,
@@ -389,9 +397,14 @@ export class TaskExecuteRepository {
         status: finalStatus,
         output: taskSucceeded ? finalResult : null,
         taskId: task.id,
-        taskInput: taskInput as Record<string, JsonValue>,
+        modelId: task.wakeUpModelId ?? null,
+        skillId: task.wakeUpSkillId ?? null,
+        favoriteId: task.wakeUpFavoriteId ?? null,
+        leafMessageId: task.wakeUpLeafMessageId ?? null,
         userId: completionUserId,
         logger,
+        directResumeUser: taskUserContext?.user ?? user,
+        directResumeLocale: locale,
       }).catch((completionErr: Error) => {
         logger.error("handleTaskCompletion failed", {
           taskId: task.id,
@@ -408,6 +421,7 @@ export class TaskExecuteRepository {
         summary: finalMessage ?? "",
         durationMs: finalDurationMs,
         executionId: firstExecutionId ?? undefined,
+        output: finalResult as Record<string, JsonValue> | undefined,
         startedAt: startedAt.toISOString(),
         serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         executedByInstance: instanceId,

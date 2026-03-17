@@ -3,6 +3,7 @@ import type z from "zod";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
@@ -234,6 +235,13 @@ export interface BaseWidgetConfig<
   columns?: number;
   schemaType: TSchemaType;
   usage: TUsage;
+  /**
+   * Whitelist of user permission roles that can see this field.
+   * If set, only users with at least one of these roles will see the field.
+   * Empty array means no one sees the field (same as hidden: true).
+   * If omitted, the field is visible to all users who can access the endpoint.
+   */
+  visibleFor?: readonly (typeof UserPermissionRoleValue)[];
 }
 
 export interface BasePrimitiveWidgetConfig<

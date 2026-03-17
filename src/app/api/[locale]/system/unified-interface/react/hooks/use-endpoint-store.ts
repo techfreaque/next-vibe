@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { create } from "zustand";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -17,158 +17,189 @@ import type {
 import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import { useEndpoint as useEndpointOriginal } from "./use-endpoint-implementation";
 
-/**
- * Endpoint instance metadata stored in the registry
- */
-interface EndpointInstanceMetadata {
-  /** Number of active subscribers */
+type AnyEndpointMap = Partial<Record<Methods, CreateApiEndpointAny>>;
+
+// ---------------------------------------------------------------------------
+// Module-level value registry
+// Owner writes here; subscribers read via useSyncExternalStore
+// ---------------------------------------------------------------------------
+
+interface ValueEntry {
+  value: EndpointReturn<AnyEndpointMap>;
+  listeners: Set<() => void>;
+}
+
+const valueRegistry = new Map<string, ValueEntry>();
+
+// Stable empty fallback — prevents useSyncExternalStore tearing loop when entry not yet set
+const EMPTY_ENDPOINT_RETURN = {} as EndpointReturn<AnyEndpointMap>;
+
+function getEntry(key: string): ValueEntry | undefined {
+  return valueRegistry.get(key);
+}
+
+function setEntryValue(
+  key: string,
+  value: EndpointReturn<AnyEndpointMap>,
+  notify: boolean,
+): void {
+  let entry = valueRegistry.get(key);
+  if (!entry) {
+    entry = { value, listeners: new Set() };
+    valueRegistry.set(key, entry);
+  } else {
+    entry.value = value;
+  }
+  if (notify) {
+    entry.listeners.forEach((l) => l());
+  }
+}
+
+function notifyListeners(key: string): void {
+  const entry = valueRegistry.get(key);
+  if (entry) {
+    entry.listeners.forEach((l) => l());
+  }
+}
+
+function subscribeToKey(key: string, listener: () => void): () => void {
+  let entry = valueRegistry.get(key);
+  if (!entry) {
+    // Create placeholder so subscriber can attach before owner renders
+    entry = {
+      value: {} as EndpointReturn<AnyEndpointMap>,
+      listeners: new Set(),
+    };
+    valueRegistry.set(key, entry);
+  }
+  entry.listeners.add(listener);
+  return (): void => {
+    entry?.listeners.delete(listener);
+    // If no listeners remain and no owner has registered this key, clean it up
+    if (
+      entry?.listeners.size === 0 &&
+      !useEndpointInstanceStore.getState().instances.has(key)
+    ) {
+      valueRegistry.delete(key);
+    }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Ref-count store — ownership + cleanup tracking only
+// ---------------------------------------------------------------------------
+
+interface RefCountEntry {
   refCount: number;
-  /** Timestamp of last access */
+  ownerCount: number;
   lastAccessed: number;
-  /** Cleanup timer */
   cleanupTimer?: ReturnType<typeof setTimeout>;
 }
 
-/**
- * Store for managing endpoint instance metadata
- * Note: We only store metadata here (refCount, timers), not the actual hook return values
- * The actual values come from React Query's cache, ensuring reactivity
- */
-interface EndpointInstanceStore {
-  /** Map of query key -> instance metadata */
-  instances: Map<string, EndpointInstanceMetadata>;
-
-  /** Get instance metadata by key */
-  getMetadata: (key: string) => EndpointInstanceMetadata | undefined;
-
-  /** Initialize or update instance metadata */
-  initInstance: (key: string) => void;
-
-  /** Increment reference count */
-  incrementRef: (key: string) => void;
-
-  /** Decrement reference count and schedule cleanup if needed */
-  decrementRef: (key: string) => void;
-
-  /** Remove instance metadata from the registry */
+interface RefCountStore {
+  instances: Map<string, RefCountEntry>;
+  /** Register a subscriber. Returns true if this should be the owner (first ever, or no current owner) */
+  register: (key: string, asOwner: boolean) => void;
+  unregister: (key: string, wasOwner: boolean) => void;
+  hasOwner: (key: string) => boolean;
   removeInstance: (key: string) => void;
-
-  /** Clear all instances */
   clearAll: () => void;
 }
 
-/** Time in ms before cleaning up unused instances (5 minutes) */
 const CLEANUP_DELAY = 5 * 60 * 1000;
 
-/**
- * Zustand store for endpoint instance metadata
- * This tracks which instances are active and manages cleanup
- */
-export const useEndpointInstanceStore = create<EndpointInstanceStore>(
-  (set, get) => ({
-    instances: new Map(),
+export const useEndpointInstanceStore = create<RefCountStore>((set, get) => ({
+  instances: new Map(),
 
-    getMetadata: (key: string): EndpointInstanceMetadata | undefined => {
-      return get().instances.get(key);
-    },
-
-    initInstance: (key: string): void => {
-      set((state) => {
-        const newInstances = new Map(state.instances);
-        const existing = newInstances.get(key);
-
-        if (!existing) {
-          newInstances.set(key, {
-            refCount: 0,
-            lastAccessed: Date.now(),
-          });
-        } else {
-          // Update last accessed time
-          existing.lastAccessed = Date.now();
+  register: (key: string, asOwner: boolean): void => {
+    set((state) => {
+      const next = new Map(state.instances);
+      const inst = next.get(key);
+      if (inst) {
+        if (inst.cleanupTimer) {
+          clearTimeout(inst.cleanupTimer);
         }
-
-        return { instances: newInstances };
-      });
-    },
-
-    incrementRef: (key: string): void => {
-      set((state) => {
-        const newInstances = new Map(state.instances);
-        const instance = newInstances.get(key);
-
-        if (instance) {
-          // Clear cleanup timer when ref count increases
-          if (instance.cleanupTimer) {
-            clearTimeout(instance.cleanupTimer);
-            instance.cleanupTimer = undefined;
-          }
-
-          instance.refCount++;
-          instance.lastAccessed = Date.now();
-          newInstances.set(key, instance);
-        }
-
-        return { instances: newInstances };
-      });
-    },
-
-    decrementRef: (key: string): void => {
-      set((state) => {
-        const newInstances = new Map(state.instances);
-        const instance = newInstances.get(key);
-
-        if (instance) {
-          instance.refCount = Math.max(0, instance.refCount - 1);
-          instance.lastAccessed = Date.now();
-
-          // Schedule cleanup if no more subscribers
-          if (instance.refCount === 0) {
-            instance.cleanupTimer = setTimeout(() => {
-              get().removeInstance(key);
-            }, CLEANUP_DELAY);
-          }
-
-          newInstances.set(key, instance);
-        }
-
-        return { instances: newInstances };
-      });
-    },
-
-    removeInstance: (key: string): void => {
-      set((state) => {
-        const newInstances = new Map(state.instances);
-        const instance = newInstances.get(key);
-
-        // Clear any cleanup timer
-        if (instance?.cleanupTimer) {
-          clearTimeout(instance.cleanupTimer);
-        }
-
-        newInstances.delete(key);
-        return { instances: newInstances };
-      });
-    },
-
-    clearAll: (): void => {
-      const instances = get().instances;
-
-      // Clear all cleanup timers
-      for (const instance of instances.values()) {
-        if (instance.cleanupTimer) {
-          clearTimeout(instance.cleanupTimer);
-        }
+        next.set(key, {
+          refCount: inst.refCount + 1,
+          ownerCount: asOwner ? inst.ownerCount + 1 : inst.ownerCount,
+          lastAccessed: Date.now(),
+        });
+      } else {
+        next.set(key, {
+          refCount: 1,
+          ownerCount: asOwner ? 1 : 0,
+          lastAccessed: Date.now(),
+        });
       }
+      return { instances: next };
+    });
+  },
 
-      set({ instances: new Map() });
-    },
-  }),
-);
+  unregister: (key: string, wasOwner: boolean): void => {
+    set((state) => {
+      const next = new Map(state.instances);
+      const inst = next.get(key);
+      if (!inst) {
+        return state;
+      }
+      const newCount = Math.max(0, inst.refCount - 1);
+      const newOwnerCount = wasOwner
+        ? Math.max(0, inst.ownerCount - 1)
+        : inst.ownerCount;
+      if (newCount === 0) {
+        const timer = setTimeout(() => {
+          get().removeInstance(key);
+        }, CLEANUP_DELAY);
+        next.set(key, {
+          refCount: 0,
+          ownerCount: 0,
+          lastAccessed: Date.now(),
+          cleanupTimer: timer,
+        });
+      } else {
+        next.set(key, {
+          refCount: newCount,
+          ownerCount: newOwnerCount,
+          lastAccessed: Date.now(),
+        });
+      }
+      return { instances: next };
+    });
+  },
 
-/**
- * Generate a unique key for endpoint instance
- * Key format: endpoint-path-method-urlPathParams
- */
+  hasOwner: (key: string): boolean => {
+    return (get().instances.get(key)?.ownerCount ?? 0) > 0;
+  },
+
+  removeInstance: (key: string): void => {
+    set((state) => {
+      const next = new Map(state.instances);
+      const inst = next.get(key);
+      if (inst?.cleanupTimer) {
+        clearTimeout(inst.cleanupTimer);
+      }
+      next.delete(key);
+      valueRegistry.delete(key);
+      return { instances: next };
+    });
+  },
+
+  clearAll: (): void => {
+    const { instances } = get();
+    for (const inst of instances.values()) {
+      if (inst.cleanupTimer) {
+        clearTimeout(inst.cleanupTimer);
+      }
+    }
+    valueRegistry.clear();
+    set({ instances: new Map() });
+  },
+}));
+
+// ---------------------------------------------------------------------------
+// Key generation
+// ---------------------------------------------------------------------------
+
 function generateInstanceKey<
   T extends Partial<Record<Methods, CreateApiEndpointAny>>,
   TGetEndpoint extends CreateApiEndpointAny,
@@ -181,14 +212,10 @@ function generateInstanceKey<
   logger: EndpointLogger,
   requestData: CacheKeyRequestData<TGetEndpoint>,
 ): string {
-  // Use the first available endpoint to generate the base key
   const firstEndpoint = Object.values(endpoints)[0];
-
   if (!firstEndpoint) {
     return "endpoint-empty";
   }
-
-  // Use buildKey for consistent key generation
   return buildKey(
     "endpoint",
     firstEndpoint,
@@ -198,28 +225,10 @@ function generateInstanceKey<
   );
 }
 
-/**
- * New useEndpoint hook - drop-in replacement with instance management
- *
- * This wrapper ensures that only ONE instance exists per unique combination of:
- * - Endpoint definitions
- * - URL path parameters
- *
- * The instance tracking works by:
- * 1. All components with the same endpoint+params call the underlying hook
- * 2. React Query deduplicates the actual API calls
- * 3. We track how many components are using each instance
- * 4. When all components unmount, we schedule cleanup
- *
- * This approach relies on React Query for the actual deduplication and caching,
- * while we just track metadata for cleanup purposes.
- *
- * @param endpoints - Object containing endpoint definitions (e.g., { GET: endpoint, POST: endpoint })
- * @param options - Configuration options for forms and queries
- * @param logger - Logger instance for debugging
- * @param user - User authentication payload
- * @returns Endpoint instance with all CRUD operations
- */
+// ---------------------------------------------------------------------------
+// Main hook
+// ---------------------------------------------------------------------------
+
 export function useEndpointManaged<
   T extends Partial<Record<Methods, CreateApiEndpointAny>>,
   TOptional extends boolean = OptionsOptional<T>,
@@ -235,17 +244,14 @@ export function useEndpointManaged<
     ? E
     : CreateApiEndpointAny;
 
-  // Extract urlPathParams from options (try different locations)
   const urlPathParams =
     options?.read?.urlPathParams ??
     options?.create?.urlPathParams ??
     options?.update?.urlPathParams ??
     options?.delete?.urlPathParams;
 
-  // Cache key request data lives in read.initialState (only the includeInCacheKey fields matter)
   const readInitialState = options?.read?.initialState;
 
-  // Generate unique instance key
   const instanceKey = useMemo(
     () =>
       generateInstanceKey<T, TGetEndpoint>(
@@ -259,56 +265,138 @@ export function useEndpointManaged<
     [endpoints, urlPathParams, logger, readInitialState],
   );
 
-  // Initialize instance metadata on first render
-  useEffect((): (() => void) => {
-    const store = useEndpointInstanceStore.getState();
-    store.initInstance(instanceKey);
-    store.incrementRef(instanceKey);
+  const isOwnerRef = useRef<boolean | null>(null);
+  // Track previous instanceKey to detect navigation (key change mid-lifecycle).
+  const prevInstanceKeyRef = useRef<string | null>(null);
 
-    return (): void => {
-      store.decrementRef(instanceKey);
-    };
-  }, [instanceKey]);
+  // Re-evaluate ownership when instanceKey changes (e.g. navigating user1 → user2).
+  // On key change: unregister from old key synchronously and reset ownership.
+  if (prevInstanceKeyRef.current !== instanceKey) {
+    if (prevInstanceKeyRef.current !== null) {
+      useEndpointInstanceStore
+        .getState()
+        .unregister(prevInstanceKeyRef.current, isOwnerRef.current === true);
+    }
+    prevInstanceKeyRef.current = instanceKey;
+    isOwnerRef.current = null; // force re-evaluation below
+  }
 
-  // Call the original hook - React Query handles deduplication
-  // All components with the same query key will share the same cache
-  const endpointReturn = useEndpointOriginal(
+  if (isOwnerRef.current === null) {
+    isOwnerRef.current = !useEndpointInstanceStore
+      .getState()
+      .hasOwner(instanceKey);
+  }
+  const isOwner = isOwnerRef.current;
+
+  // Always call useEndpointOriginal unconditionally — same hook order every render.
+  // Owner's result gets published; subscriber's result is discarded.
+  const ownResult = useEndpointOriginal(
     endpoints,
     options as UseEndpointOptionsBase<T> | undefined,
     logger,
     user,
   );
 
-  return endpointReturn;
+  // Owner: write latest value into registry during render (no setState = no loop).
+  // Do NOT notify listeners here — defer to useEffect to avoid render-phase side effects.
+  if (isOwner) {
+    setEntryValue(
+      instanceKey,
+      ownResult as EndpointReturn<AnyEndpointMap>,
+      false,
+    );
+  }
+
+  // Owner: notify subscribers via microtask after render, but only when
+  // meaningful data changed. We compare read.data + read.isLoading by reference only —
+  // form.watch() creates new objects every render even with identical data,
+  // so including create.values in the comparison would always notify and cause a loop.
+  // Cast to a concrete map type so TypeScript resolves "read" (not "never").
+  interface ConcreteMap {
+    GET: CreateApiEndpointAny;
+    POST: CreateApiEndpointAny;
+  }
+  type ConcreteReturn = EndpointReturn<ConcreteMap>;
+  const prevReadDataRef = useRef<ConcreteReturn["read"]["data"]>(undefined);
+  const prevReadIsLoadingRef = useRef<boolean | undefined>(undefined);
+  if (isOwner) {
+    const current = ownResult as ConcreteReturn;
+    const readData = current.read?.data;
+    const readIsLoading = current.read?.isLoading;
+    const meaningfullyChanged =
+      prevReadDataRef.current !== readData ||
+      prevReadIsLoadingRef.current !== readIsLoading;
+    if (meaningfullyChanged) {
+      prevReadDataRef.current = readData;
+      prevReadIsLoadingRef.current = readIsLoading;
+      // Defer notification outside render phase — avoids setState-during-render loops
+      queueMicrotask(() => {
+        notifyListeners(instanceKey);
+      });
+    }
+  }
+
+  // Lifecycle: register on mount/key-change, unregister on unmount only.
+  // Key-change unregistration is handled synchronously above (prevInstanceKeyRef).
+  const registeredKeyRef = useRef<string | null>(null);
+  useEffect((): (() => void) => {
+    useEndpointInstanceStore.getState().register(instanceKey, isOwner);
+    registeredKeyRef.current = instanceKey;
+    return (): void => {
+      // Only unregister if we haven't already done so synchronously (key change)
+      if (registeredKeyRef.current === instanceKey) {
+        if (isOwner) {
+          isOwnerRef.current = null;
+        }
+        useEndpointInstanceStore.getState().unregister(instanceKey, isOwner);
+        registeredKeyRef.current = null;
+      }
+    };
+  }, [instanceKey, isOwner]);
+
+  // Subscribers: read from registry reactively.
+  // Owner uses a no-op subscribe so useSyncExternalStore never re-renders it
+  // (the owner already re-renders when its own hooks change; subscribing to its
+  // own notifications would create an infinite loop via queueMicrotask).
+  const noopSubscribe = useRef<(listener: () => void) => () => void>(
+    (): (() => void) => (): void => undefined,
+  );
+  const sharedValue = useSyncExternalStore(
+    isOwner
+      ? noopSubscribe.current
+      : (listener): (() => void) => subscribeToKey(instanceKey, listener),
+    (): EndpointReturn<AnyEndpointMap> =>
+      getEntry(instanceKey)?.value ?? EMPTY_ENDPOINT_RETURN,
+    (): EndpointReturn<AnyEndpointMap> =>
+      getEntry(instanceKey)?.value ?? EMPTY_ENDPOINT_RETURN,
+  );
+
+  // Owner returns own result directly (no round-trip lag).
+  // Subscriber returns shared value from registry.
+  return (isOwner ? ownResult : sharedValue) as EndpointReturn<T>;
 }
 
-/**
- * Utility function to manually clear all endpoint instances
- * Useful for testing or when you need to reset all cached instances
- */
+// ---------------------------------------------------------------------------
+// Debug utilities
+// ---------------------------------------------------------------------------
+
 export function clearEndpointInstances(): void {
   useEndpointInstanceStore.getState().clearAll();
 }
 
-/**
- * Utility function to get current instance count (for debugging)
- */
 export function getEndpointInstanceCount(): number {
   return useEndpointInstanceStore.getState().instances.size;
 }
 
-/**
- * Utility function to get instance details (for debugging)
- */
 export function getEndpointInstanceDetails(): Array<{
   key: string;
   refCount: number;
   lastAccessed: Date;
 }> {
-  const instances = useEndpointInstanceStore.getState().instances;
-  return [...instances.entries()].map(([key, instance]) => ({
+  const { instances } = useEndpointInstanceStore.getState();
+  return [...instances.entries()].map(([key, inst]) => ({
     key,
-    refCount: instance.refCount,
-    lastAccessed: new Date(instance.lastAccessed),
+    refCount: inst.refCount,
+    lastAccessed: new Date(inst.lastAccessed),
   }));
 }

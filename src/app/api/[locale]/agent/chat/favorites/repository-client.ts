@@ -27,10 +27,10 @@ import {
   DEFAULT_TTS_VOICE,
   type TtsVoiceValue,
 } from "../../text-to-speech/enum";
-import { DEFAULT_CHARACTERS } from "../characters/config";
-import { ModelSelectionType } from "../characters/enum";
-import { scopedTranslation as charactersScopedTranslation } from "../characters/i18n";
-import { CharactersRepositoryClient } from "../characters/repository-client";
+import { DEFAULT_SKILLS } from "../skills/config";
+import { ModelSelectionType } from "../skills/enum";
+import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
+import { SkillsRepositoryClient } from "../skills/repository-client";
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import type {
@@ -49,11 +49,11 @@ import type { FavoritesReorderRequestOutput } from "./reorder/definition";
 
 /**
  * Minimal favorite data stored in localStorage
- * Character data is filled in from DEFAULT_CHARACTERS on read
+ * Skill data is filled in from DEFAULT_SKILLS on read
  */
 interface StoredLocalFavorite {
   id: string;
-  characterId: string;
+  skillId: string;
   customIcon: IconKey | null;
   voice: typeof TtsVoiceValue | null;
   modelSelection: FavoriteGetModelSelection | null;
@@ -81,12 +81,10 @@ export class ChatFavoritesRepositoryClient {
       // Load stored minimal configs
       const storedConfigs = this.loadAllLocalFavorites();
 
-      // For PUBLIC users (localStorage), get character data from DEFAULT_CHARACTERS
+      // For PUBLIC users (localStorage), get character data from DEFAULT_SKILLS
       const { t: tChar } = charactersScopedTranslation.scopedT(locale);
       const cards = storedConfigs.map((config): FavoriteCard => {
-        const character = DEFAULT_CHARACTERS.find(
-          (c) => c.id === config.characterId,
-        );
+        const character = DEFAULT_SKILLS.find((c) => c.id === config.skillId);
         return this.computeFavoriteDisplayFields(
           config,
           character?.modelSelection,
@@ -104,7 +102,14 @@ export class ChatFavoritesRepositoryClient {
       // Sort by position (ascending)
       const favorites = cards.toSorted((a, b) => a.position - b.position);
 
-      return success({ favorites });
+      return success({
+        favorites,
+        totalCount: null,
+        matchedCount: null,
+        currentPage: null,
+        totalPages: null,
+        hint: null,
+      });
     } catch (error) {
       logger.error("Failed to load favorites", parseError(error));
       return fail({
@@ -129,7 +134,7 @@ export class ChatFavoritesRepositoryClient {
 
       const newConfig: StoredLocalFavorite = {
         id,
-        characterId: data.characterId ?? "default",
+        skillId: data.skillId ?? "default",
         voice: data.voice ?? null,
         modelSelection: data.modelSelection,
         customIcon: null,
@@ -200,8 +205,8 @@ export class ChatFavoritesRepositoryClient {
         });
       }
 
-      const characterId = data.characterId ?? existing.characterId;
-      const character = DEFAULT_CHARACTERS.find((c) => c.id === characterId);
+      const skillId = data.skillId ?? existing.skillId;
+      const character = DEFAULT_SKILLS.find((c) => c.id === skillId);
 
       // Extract icon from character.info.icon in request data
       const iconFromRequest = data.icon;
@@ -214,7 +219,7 @@ export class ChatFavoritesRepositoryClient {
 
       const updated: StoredLocalFavorite = {
         ...existing,
-        characterId,
+        skillId,
         customIcon: customIconToStore,
         voice: data.voice ?? null,
         modelSelection: data.modelSelection,
@@ -314,17 +319,17 @@ export class ChatFavoritesRepositoryClient {
     user: JwtPayloadType,
   ): FavoriteCard {
     const { t } = scopedTranslation.scopedT(locale);
-    const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
+    const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
       stored.modelSelection,
       characterModelSelection ?? undefined,
       user,
     );
-    const hasCharacter = stored.characterId !== "default";
+    const hasSkill = stored.skillId !== "default";
 
     // Flattened structure - no nested content/titleRow/modelRow
     return {
       id: stored.id,
-      characterId: stored.characterId,
+      skillId: stored.skillId,
       modelId: bestModel?.id ?? null,
       voice: stored.voice ?? characterVoice ?? DEFAULT_TTS_VOICE,
       position: stored.position,
@@ -335,7 +340,7 @@ export class ChatFavoritesRepositoryClient {
       description: characterDescription ?? null,
       ...(bestModel
         ? {
-            modelIcon: hasCharacter ? bestModel.icon : ("sparkles" as const),
+            modelIcon: hasSkill ? bestModel.icon : ("sparkles" as const),
             modelInfo: getModelDisplayName(
               bestModel,
               !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
@@ -353,7 +358,7 @@ export class ChatFavoritesRepositoryClient {
   }
 
   /**
-   * Enrich minimal stored favorite with DEFAULT_CHARACTERS data
+   * Enrich minimal stored favorite with DEFAULT_SKILLS data
    * Returns flattened structure matching FavoriteGetResponseOutput
    */
   static enrichLocalFavorite(
@@ -362,16 +367,14 @@ export class ChatFavoritesRepositoryClient {
   ): FavoriteGetResponseOutput {
     const { t } = scopedTranslation.scopedT(locale);
     const { t: tChar } = charactersScopedTranslation.scopedT(locale);
-    const character = DEFAULT_CHARACTERS.find(
-      (c) => c.id === stored.characterId,
-    );
+    const character = DEFAULT_SKILLS.find((c) => c.id === stored.skillId);
 
     if (!character) {
       // Flattened structure - no character found
       return {
-        characterId: stored.characterId,
+        skillId: stored.skillId,
         icon: "user" as const,
-        name: t("fallbacks.unknownCharacter"),
+        name: t("fallbacks.unknownSkill"),
         tagline: t("fallbacks.noTagline"),
         description: t("fallbacks.noDescription"),
         voice: stored.voice,
@@ -380,14 +383,17 @@ export class ChatFavoritesRepositoryClient {
           selectionType: ModelSelectionType.FILTERS,
         },
         compactTrigger: null,
-        allowedTools: null,
+        availableTools: null,
         pinnedTools: null,
+        deniedTools: null,
+        promptAppend: null,
+        memoryLimit: null,
       };
     }
 
     // Flattened structure — translate default character keys using characters scope
     return {
-      characterId: stored.characterId,
+      skillId: stored.skillId,
       icon: stored.customIcon ?? character.icon,
       name: character.name ? tChar(character.name) : t("fallbacks.unknown"),
       tagline: character.tagline ? tChar(character.tagline) : "",
@@ -398,8 +404,11 @@ export class ChatFavoritesRepositoryClient {
         selectionType: ModelSelectionType.FILTERS,
       },
       compactTrigger: null,
-      allowedTools: null,
+      availableTools: null,
       pinnedTools: null,
+      deniedTools: null,
+      promptAppend: null,
+      memoryLimit: null,
     };
   }
 

@@ -56,6 +56,15 @@ export const translations: typeof enTranslations = {
         description: "Filtruj według widoczności (domyślnie: tylko widoczne)",
         placeholder: "Widoczne zadania",
       },
+      search: {
+        label: "Szukaj",
+        description: "Filtruj zadania według nazwy, trasy, opisu lub kategorii",
+        placeholder: "Szukaj zadań...",
+      },
+      sort: {
+        label: "Sortowanie",
+        description: "Kolejność sortowania listy zadań",
+      },
       limit: {
         label: "Limit",
         description: "Maksymalna liczba zadań do zwrócenia",
@@ -200,6 +209,11 @@ export const translations: typeof enTranslations = {
         label: "Włączone",
         description: "Włącz lub wyłącz zadanie",
       },
+      hidden: {
+        label: "Ukryte",
+        description:
+          "Ukryj to zadanie w promptach systemowych AI i domyślnych listach zadań",
+      },
       timeout: {
         label: "Limit czasu (ms)",
         description: "Maksymalny czas wykonania w milisekundach",
@@ -334,6 +348,20 @@ export const translations: typeof enTranslations = {
       edit: "Edytuj zadanie",
       delete: "Usuń zadanie",
       runNow: "Uruchom teraz",
+    },
+    bulk: {
+      selected: "{count} zaznaczono",
+      selectAll: "Zaznacz wszystkie",
+      clearSelection: "Wyczyść zaznaczenie",
+      enable: "Włącz",
+      disable: "Wyłącz",
+      runNow: "Uruchom teraz",
+      delete: "Usuń",
+      confirmDeleteTitle: "Usunąć zadania?",
+      confirmDelete:
+        "Usunąć {count} zadanie(a)? Tej operacji nie można cofnąć.",
+      cancel: "Anuluj",
+      success: "{succeeded} udanych, {failed} nieudanych",
     },
     empty: {
       noTasks: "Brak zadań cron",

@@ -10,7 +10,7 @@
 
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { toast } from "next-vibe-ui/hooks/use-toast";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
@@ -55,8 +55,14 @@ export function useAIStream(): UseAIStreamReturn {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
-  const { t } = scopedTranslation.scopedT(locale);
-  const store = useAIStreamStore();
+  const { t } = useMemo(() => scopedTranslation.scopedT(locale), [locale]);
+  // Select only actions (stable across renders) and the minimal state needed
+  const storeStartStream = useAIStreamStore((s) => s.startStream);
+  const storeStopStream = useAIStreamStore((s) => s.stopStream);
+  const storeSetDraining = useAIStreamStore((s) => s.setDraining);
+  const isStreaming = useAIStreamStore((s) => s.isStreaming);
+  const isStreamingThread = useAIStreamStore((s) => s.isStreamingThread);
+  const threads = useAIStreamStore((s) => s.threads);
   const streamMutation = useApiMutation(definitions.POST, logger, user);
   const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
@@ -79,7 +85,7 @@ export function useAIStream(): UseAIStreamReturn {
 
       // Generate stream ID and register in store (per-thread)
       const streamId = crypto.randomUUID();
-      store.startStream(threadId, streamId);
+      storeStartStream(threadId, streamId);
 
       // ================================================================
       // Pre-warm the WS channel BEFORE the POST so the connection is
@@ -118,10 +124,12 @@ export function useAIStream(): UseAIStreamReturn {
         if (activeThreadId) {
           addErrorMessageToChat(
             activeThreadId,
+            data.rootFolderId,
             serializeError(failResult),
             "HTTP_ERROR",
             null,
             null,
+            logger,
           );
         }
 
@@ -132,7 +140,7 @@ export function useAIStream(): UseAIStreamReturn {
           duration: Infinity,
         });
 
-        store.stopStream(threadId);
+        storeStopStream(threadId);
         return false;
       }
 
@@ -145,10 +153,12 @@ export function useAIStream(): UseAIStreamReturn {
         if (activeThreadId) {
           addErrorMessageToChat(
             activeThreadId,
+            data.rootFolderId,
             serializeError(result),
             "HTTP_ERROR",
             null,
             null,
+            logger,
           );
         }
 
@@ -159,7 +169,7 @@ export function useAIStream(): UseAIStreamReturn {
           duration: Infinity,
         });
 
-        store.stopStream(threadId);
+        storeStopStream(threadId);
         return false;
       }
 
@@ -170,7 +180,7 @@ export function useAIStream(): UseAIStreamReturn {
       });
       return true;
     },
-    [logger, store, t, streamMutation],
+    [logger, storeStartStream, storeStopStream, t, streamMutation],
   );
 
   /**
@@ -189,7 +199,7 @@ export function useAIStream(): UseAIStreamReturn {
       getAudioQueue().stop();
 
       // Set drain mode in store — suppresses delta events while server finalizes
-      store.setDraining(threadId, true);
+      storeSetDraining(threadId, true);
 
       // Call server-side cancel endpoint via typesafe mutation
       try {
@@ -206,7 +216,7 @@ export function useAIStream(): UseAIStreamReturn {
           });
 
           // Even if cancel endpoint fails, stop the UI
-          store.stopStream(threadId);
+          storeStopStream(threadId);
         }
       } catch (error) {
         logger.error("Failed to call cancel endpoint", {
@@ -215,20 +225,20 @@ export function useAIStream(): UseAIStreamReturn {
         });
 
         // Even if cancel endpoint fails, stop the UI
-        store.stopStream(threadId);
+        storeStopStream(threadId);
       }
 
       // Server will send STREAM_FINISHED which triggers final cleanup
       // via useMessagesSubscription.
     },
-    [logger, store, cancelMutation],
+    [logger, storeSetDraining, storeStopStream, cancelMutation],
   );
 
   return {
     startStream,
     cancelStream,
-    isStreaming: store.isStreaming,
-    isStreamingThread: store.isStreamingThread,
-    threads: store.threads,
+    isStreaming,
+    isStreamingThread,
+    threads,
   };
 }

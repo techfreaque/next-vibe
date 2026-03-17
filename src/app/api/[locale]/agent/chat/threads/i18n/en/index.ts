@@ -208,7 +208,7 @@ export const translations = {
       description: "Default AI model for this thread",
     },
     defaultTone: {
-      label: "Default Character",
+      label: "Default Skill",
       description: "Default character for this thread",
     },
     systemPrompt: {

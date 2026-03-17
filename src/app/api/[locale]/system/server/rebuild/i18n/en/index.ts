@@ -18,8 +18,20 @@ export const translations = {
       errors: {
         title: "Errors",
       },
+      duration: {
+        title: "Duration",
+      },
+      steps: {
+        title: "Steps",
+      },
     },
     steps: {
+      codegen: "Code generation",
+      vibeCheck: "Vibe check",
+      nextBuild: "Next.js build",
+      migrate: "Migrations",
+      seed: "Seeding",
+      restart: "Restart",
       codegenFailed: "Code generation failed: {{error}}",
       vibeCheckFailed:
         "Vibe check: {{errors}} errors, {{warnings}} warnings. Use 'vibe check' or the MCP check tool to see details.",
@@ -66,6 +78,14 @@ export const translations = {
     success: {
       title: "Rebuild Complete",
       description: "Application rebuilt and server restarted successfully",
+    },
+    widget: {
+      rebuildComplete: "Rebuild complete",
+      rebuildFailed: "Rebuild failed",
+      errors: "Errors:",
+      runRebuild: "Run Rebuild",
+      runAgain: "Run again",
+      skipped: "skipped",
     },
   },
 };

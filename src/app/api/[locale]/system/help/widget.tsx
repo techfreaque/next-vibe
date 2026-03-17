@@ -23,6 +23,9 @@ import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
@@ -43,6 +46,7 @@ import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
@@ -52,6 +56,7 @@ import {
   useWidgetOnSubmit,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type definition from "./definition";
@@ -60,6 +65,7 @@ import type {
   HelpToolMetadataSerialized,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
+import { Platform } from "../unified-interface/shared/types/platform";
 
 /**
  * Props for custom widget — follows the CustomWidgetProps pattern
@@ -80,7 +86,10 @@ const isIdSegment = (s: string): boolean =>
   s === "id" || s.endsWith("Id") || /^\d+$/.test(s);
 
 function getSubcategory(toolName: string): string {
-  const parts = toolName.split("_");
+  // Strip instanceId__ prefix for remote tools (e.g. "hermes__agent_chat_GET" → "agent_chat_GET")
+  const sepIdx = toolName.indexOf("__");
+  const effectiveName = sepIdx !== -1 ? toolName.slice(sepIdx + 2) : toolName;
+  const parts = effectiveName.split("_");
   const pathParts = parts.slice(0, -1);
   if (pathParts.length <= 3) {
     return "General";
@@ -109,6 +118,17 @@ async function navigateToTool(
   toolName: string,
   navigate: ReturnType<typeof useWidgetNavigation>["push"],
 ): Promise<void> {
+  // Remote tools (instanceId__toolName) → navigate to execute-tool with toolName prefilled
+  if (toolName.includes("__")) {
+    const { getEndpoint } =
+      await import("@/app/api/[locale]/system/generated/endpoint");
+    const executeTool = await getEndpoint("execute-tool");
+    if (executeTool) {
+      navigate(executeTool, { data: { toolName } });
+    }
+    return;
+  }
+
   const { getEndpoint } =
     await import("@/app/api/[locale]/system/generated/endpoint");
   const endpointDef = await getEndpoint(toolName);
@@ -124,7 +144,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
 
@@ -135,16 +155,16 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     [settingsOps.settings],
   );
   const enabledTools = useMemo((): EnabledTool[] | null => {
-    const { allowedTools, pinnedTools } = effectiveSettings;
-    if (allowedTools === null && pinnedTools === null) {
+    const { availableTools, pinnedTools } = effectiveSettings;
+    if (availableTools === null && pinnedTools === null) {
       return null;
     }
     const allIds = new Set([
-      ...(allowedTools ?? []).map((t) => t.toolId),
+      ...(availableTools ?? []).map((t) => t.toolId),
       ...(pinnedTools ?? []).map((t) => t.toolId),
     ]);
     return [...allIds].map((id) => {
-      const allowed = allowedTools?.find((t) => t.toolId === id);
+      const allowed = availableTools?.find((t) => t.toolId === id);
       const pinned = pinnedTools?.find((t) => t.toolId === id);
       return {
         id,
@@ -165,7 +185,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         settingsOps.setTools(null, null);
         return;
       }
-      const allowedTools = tools.map(({ id, requiresConfirmation }) => ({
+      const availableTools = tools.map(({ id, requiresConfirmation }) => ({
         toolId: id,
         requiresConfirmation,
       }));
@@ -175,22 +195,20 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           toolId: id,
           requiresConfirmation,
         }));
-      settingsOps.setTools(allowedTools, pinnedTools);
+      settingsOps.setTools(availableTools, pinnedTools);
     },
     [settingsOps],
   );
   const { t } = scopedTranslation.scopedT(locale);
 
-  const searchQuery = (form.watch("query") as string | undefined) ?? "";
+  const searchQuery = form.watch("query") ?? "";
   const setSearchQuery = useCallback(
     (value: string) => {
       form.setValue("query", value);
     },
     [form],
   );
-  const [statsFilter, setStatsFilter] = useState<"all" | "pinned" | "allowed">(
-    "pinned",
-  );
+  const statsFilter = form.watch("statsFilter") ?? "pinned";
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
   );
@@ -215,11 +233,32 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     [user],
   );
 
-  // Platform filter state
-  const [activePlatform, setActivePlatform] = useState<string | undefined>(
-    undefined,
+  // Platform / prodOnly / instanceId — read from form (already requestFields in definition)
+  const activePlatform = form.watch("platform");
+  const prodOnly = form.watch("includeProdOnly") ?? false;
+
+  // Instance switcher — fetch connected remote instances
+  const activeInstanceId = form.watch("instanceId");
+  const connectionsState = useEndpoint(
+    remoteConnectionListDefinition,
+    {
+      read: {
+        queryOptions: {
+          refetchOnWindowFocus: false,
+          staleTime: 5 * 60 * 1000,
+        },
+      },
+    },
+    logger,
+    user,
   );
-  const [prodOnly, setProdOnly] = useState(false);
+  const connectedInstances = useMemo(() => {
+    const resp = connectionsState?.read?.response;
+    if (!resp || resp.success !== true) {
+      return [];
+    }
+    return resp.data.connections.filter((c) => c.isActive);
+  }, [connectionsState?.read?.response]);
 
   const effectiveEnabledTools = useMemo((): EnabledTool[] => {
     if (enabledTools !== null) {
@@ -406,14 +445,17 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     }
   }, [onSubmit, endpointMutations]);
 
+  const handleInstanceChange = useCallback(
+    (instanceId: string | undefined): void => {
+      form.setValue("instanceId", instanceId);
+      setTimeout(triggerRefetch, 50);
+    },
+    [form, triggerRefetch],
+  );
+
   const handlePlatformChange = useCallback(
-    (platform: string | undefined): void => {
-      setActivePlatform(platform);
-      form?.setValue(
-        "platform",
-        platform as "cli" | "mcp" | "ai" | "web" | "all" | undefined,
-      );
-      // Small delay to let form state propagate to Zustand store
+    (platform: Platform | undefined): void => {
+      form.setValue("platform", platform);
       setTimeout(triggerRefetch, 50);
     },
     [form, triggerRefetch],
@@ -421,8 +463,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
   const handleProdToggle = useCallback(
     (checked: boolean): void => {
-      setProdOnly(checked);
-      form?.setValue("includeProdOnly", checked || undefined);
+      form.setValue("includeProdOnly", checked || undefined);
       setTimeout(triggerRefetch, 50);
     },
     [form, triggerRefetch],
@@ -497,11 +538,14 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                     variant="outline"
                     className={cn(
                       "text-[10px] px-1.5 py-0 font-mono",
-                      p === "cli" && "border-amber-500/30 text-amber-600",
-                      p === "mcp" && "border-violet-500/30 text-violet-600",
-                      p === "ai" && "border-blue-500/30 text-blue-600",
-                      p === "web" && "border-emerald-500/30 text-emerald-600",
-                      p === "cron" && "border-gray-500/30 text-gray-600",
+                      p === Platform.CLI &&
+                        "border-amber-500/30 text-amber-600",
+                      p === Platform.MCP &&
+                        "border-violet-500/30 text-violet-600",
+                      p === Platform.AI && "border-blue-500/30 text-blue-600",
+                      p === Platform.TRPC &&
+                        "border-emerald-500/30 text-emerald-600",
+                      p === Platform.CRON && "border-gray-500/30 text-gray-600",
                     )}
                   >
                     {p}
@@ -535,6 +579,83 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       </Div>
     );
   }
+  const platformTabs = [
+    {
+      key: undefined,
+      label: t("aiTools.platformFilter.all"),
+      icon: <Globe className="h-3 w-3" />,
+    },
+    {
+      key: Platform.CLI,
+      label: t("aiTools.platformFilter.cli"),
+      icon: <Terminal className="h-3 w-3" />,
+    },
+    {
+      key: Platform.CLI_PACKAGE,
+      label: t("aiTools.platformFilter.cliPackage"),
+      icon: <Terminal className="h-3 w-3" />,
+    },
+    {
+      key: Platform.MCP,
+      label: t("aiTools.platformFilter.mcp"),
+      icon: <Zap className="h-3 w-3" />,
+    },
+    {
+      key: Platform.AI,
+      label: t("aiTools.platformFilter.ai"),
+      icon: <Monitor className="h-3 w-3" />,
+    },
+    {
+      key: Platform.TRPC,
+      label: t("aiTools.platformFilter.web"),
+      icon: <Globe className="h-3 w-3" />,
+    },
+    {
+      key: Platform.CRON,
+      label: t("aiTools.platformFilter.cron"),
+      icon: <Clock className="h-3 w-3" />,
+    },
+    {
+      key: Platform.ELECTRON,
+      label: t("aiTools.platformFilter.electron"),
+      icon: <Monitor className="h-3 w-3" />,
+    },
+    {
+      key: Platform.FRAME,
+      label: t("aiTools.platformFilter.frame"),
+      icon: <MessageSquare className="h-3 w-3" />,
+    },
+    {
+      key: Platform.REMOTE_SKILL,
+      label: t("aiTools.platformFilter.skill"),
+      icon: <Bot className="h-3 w-3" />,
+    },
+    {
+      key: Platform.NEXT_PAGE,
+      label: t("aiTools.platformFilter.nextPage"),
+      icon: <Globe className="h-3 w-3" />,
+    },
+    {
+      key: Platform.NEXT_API,
+      label: t("aiTools.platformFilter.nextApi"),
+      icon: <Globe className="h-3 w-3" />,
+    },
+  ] as const satisfies Array<{
+    key: Platform | undefined;
+    label: string;
+    icon: JSX.Element;
+  }>;
+  // Exhaustive check: compile error if a Platform value is missing from the array above
+  type _PlatformTabKeys = Exclude<
+    (typeof platformTabs)[number]["key"],
+    undefined
+  >;
+  const _exhaustiveCheck: [_PlatformTabKeys] extends [Platform]
+    ? [Platform] extends [_PlatformTabKeys]
+      ? true
+      : never
+    : never = true;
+  void _exhaustiveCheck;
 
   // Full list mode (web)
   return (
@@ -566,50 +687,24 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
           {/* Platform Tabs */}
           <Div className="flex items-center gap-1">
-            {(
-              [
-                {
-                  key: undefined,
-                  label: t("aiTools.platformFilter.all"),
-                  icon: <Globe className="h-3 w-3" />,
-                },
-                {
-                  key: "cli",
-                  label: t("aiTools.platformFilter.cli"),
-                  icon: <Terminal className="h-3 w-3" />,
-                },
-                {
-                  key: "mcp",
-                  label: t("aiTools.platformFilter.mcp"),
-                  icon: <Zap className="h-3 w-3" />,
-                },
-                {
-                  key: "ai",
-                  label: t("aiTools.platformFilter.ai"),
-                  icon: <Monitor className="h-3 w-3" />,
-                },
-                {
-                  key: "web",
-                  label: t("aiTools.platformFilter.web"),
-                  icon: <Globe className="h-3 w-3" />,
-                },
-              ] as const
-            ).map(({ key, label, icon }) => (
-              <Button
-                key={key ?? "all"}
-                variant={activePlatform === key ? "default" : "outline"}
-                size="sm"
-                className={cn(
-                  "h-7 text-xs gap-1.5 px-2.5",
-                  activePlatform === key &&
-                    "bg-primary text-primary-foreground",
-                )}
-                onClick={() => handlePlatformChange(key)}
-              >
-                {icon}
-                <Span>{label}</Span>
-              </Button>
-            ))}
+            {platformTabs
+
+              .map(({ key, label, icon }) => (
+                <Button
+                  key={key ?? "all"}
+                  variant={activePlatform === key ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "h-7 text-xs gap-1.5 px-2.5",
+                    activePlatform === key &&
+                      "bg-primary text-primary-foreground",
+                  )}
+                  onClick={() => handlePlatformChange(key)}
+                >
+                  {icon}
+                  <Span>{label}</Span>
+                </Button>
+              ))}
 
             {/* Dev/Prod Toggle (only visible in dev) */}
             {currentEnv === "development" && (
@@ -625,6 +720,58 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               </Div>
             )}
           </Div>
+        </Div>
+      )}
+
+      {/* Instance Switcher — shows when remote instances are connected */}
+      {connectedInstances.length > 0 && (
+        <Div className="flex items-center gap-1 px-4 pt-3">
+          <Button
+            variant={activeInstanceId === undefined ? "default" : "outline"}
+            size="sm"
+            className={cn(
+              "h-7 text-xs gap-1.5 px-2.5",
+              activeInstanceId === undefined &&
+                "bg-primary text-primary-foreground",
+            )}
+            onClick={() => handleInstanceChange(undefined)}
+          >
+            <Monitor className="h-3 w-3" />
+          </Button>
+          {connectedInstances.map((conn) => (
+            <Button
+              key={conn.instanceId}
+              variant={
+                activeInstanceId === conn.instanceId ? "default" : "outline"
+              }
+              size="sm"
+              className={cn(
+                "h-7 text-xs gap-1.5 px-2.5",
+                activeInstanceId === conn.instanceId &&
+                  "bg-primary text-primary-foreground",
+              )}
+              onClick={() => handleInstanceChange(conn.instanceId)}
+            >
+              <Globe className="h-3 w-3" />
+              <Span>{conn.friendlyName}</Span>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-[9px] px-1 py-0",
+                  conn.healthStatus === "healthy" &&
+                    "border-emerald-500/30 text-emerald-600",
+                  conn.healthStatus === "warning" &&
+                    "border-amber-500/30 text-amber-600",
+                  conn.healthStatus === "critical" &&
+                    "border-red-500/30 text-red-600",
+                  conn.healthStatus === "disconnected" &&
+                    "border-gray-500/30 text-gray-400",
+                )}
+              >
+                {conn.healthStatus}
+              </Badge>
+            </Button>
+          ))}
         </Div>
       )}
 
@@ -657,7 +804,13 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => setStatsFilter(key)}
+            onClick={() =>
+              form.setValue("statsFilter", key, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+              })
+            }
             className={cn(
               "h-7 px-2.5 gap-1.5 text-xs rounded-full transition-all border",
               statsFilter === key
@@ -978,11 +1131,14 @@ function ToolRow({
                     variant="outline"
                     className={cn(
                       "text-[9px] px-1 py-0 font-mono leading-tight",
-                      p === "cli" && "border-amber-500/30 text-amber-600",
-                      p === "mcp" && "border-violet-500/30 text-violet-600",
-                      p === "ai" && "border-blue-500/30 text-blue-600",
-                      p === "web" && "border-emerald-500/30 text-emerald-600",
-                      p === "cron" && "border-gray-500/30 text-gray-600",
+                      p === Platform.CLI &&
+                        "border-amber-500/30 text-amber-600",
+                      p === Platform.MCP &&
+                        "border-violet-500/30 text-violet-600",
+                      p === Platform.AI && "border-blue-500/30 text-blue-600",
+                      p === Platform.TRPC &&
+                        "border-emerald-500/30 text-emerald-600",
+                      p === Platform.CRON && "border-gray-500/30 text-gray-600",
                     )}
                   >
                     {p}

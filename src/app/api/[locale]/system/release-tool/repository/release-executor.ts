@@ -3,8 +3,6 @@
  * Main orchestrator for the release process
  */
 
-import { join } from "node:path";
-
 import { confirm, select } from "@inquirer/prompts";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -269,7 +267,8 @@ export class ReleaseExecutor implements IReleaseExecutor {
             (pkg.updateDeps === true || pkg.updateDeps === "force") &&
             !isCI
           ) {
-            const cwd = join(originalCwd, pkg.directory);
+            // Use template string to prevent Turbopack from statically tracing paths
+            const cwd = `${originalCwd}/${pkg.directory}`;
             const pkgJsonResult = packageService.getPackageJson(
               cwd,
               logger,
@@ -359,7 +358,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
 
       // Process each package
       for (const pkg of packages) {
-        const cwd = join(originalCwd, pkg.directory);
+        const cwd = `${originalCwd}/${pkg.directory}`;
         const packageJsonResult = packageService.getPackageJson(
           cwd,
           logger,

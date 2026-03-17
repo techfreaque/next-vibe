@@ -10,7 +10,8 @@ import type { FieldValues } from "react-hook-form";
 
 import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import { useCharacter } from "@/app/api/[locale]/agent/chat/characters/[id]/hooks";
+import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
+import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import {
@@ -23,6 +24,7 @@ import {
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { type TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -58,6 +60,10 @@ interface GroupedAssistantMessageProps {
   sendMessage: ((params: SendMessageParams) => void) | null;
   /** Credit deduction callback (null in read-only mode) */
   deductCredits: ((creditCost: number, feature: string) => void) | null;
+  /** TTS autoplay setting */
+  ttsAutoplay: boolean;
+  /** TTS voice preference */
+  ttsVoice: typeof TtsVoiceValue | undefined;
   /** Extra class on root element */
   className?: string;
   /** Vote callback — null when voting is not available */
@@ -239,7 +245,8 @@ interface MessagesListProps {
   allMessages: ChatMessage[];
   primaryId: string;
   primaryThreadId: string;
-  sequenceId: string | null;
+  /** True when at least one message in the group has metadata.isStreaming = true */
+  isGroupStreaming: boolean;
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -253,7 +260,7 @@ const MessagesList = memo(function MessagesList({
   allMessages,
   primaryId,
   primaryThreadId,
-  sequenceId,
+  isGroupStreaming,
   locale,
   user,
   logger,
@@ -273,6 +280,7 @@ const MessagesList = memo(function MessagesList({
         )
         .map((msg) => ({
           messageId: msg.id,
+          parentId: msg.parentId,
           toolCall: msg.metadata!.toolCall!,
         })),
     [allMessages],
@@ -288,19 +296,28 @@ const MessagesList = memo(function MessagesList({
   // Track if we've already submitted to prevent double submission
   const hasSubmittedRef = useRef(false);
 
-  // Initialize batch decisions when tools arrive
+  // Initialize/update batch decisions when tools arrive.
+  // Re-runs whenever the tool list changes so that tools arriving after the
+  // first one (sequential streaming) are also added to the batch map.
   useEffect(() => {
-    if (toolsWaitingForConfirmation.length > 0 && batchDecisions.size === 0) {
-      setBatchDecisions(
-        new Map(
-          toolsWaitingForConfirmation.map((tool) => [
-            tool.messageId,
-            { type: "pending" },
-          ]),
-        ),
-      );
+    if (toolsWaitingForConfirmation.length === 0) {
+      return;
     }
-  }, [toolsWaitingForConfirmation, batchDecisions.size]);
+    const hasNewTools = toolsWaitingForConfirmation.some(
+      (tool) => !batchDecisions.has(tool.messageId),
+    );
+    if (hasNewTools) {
+      setBatchDecisions((prev) => {
+        const next = new Map(prev);
+        for (const tool of toolsWaitingForConfirmation) {
+          if (!next.has(tool.messageId)) {
+            next.set(tool.messageId, { type: "pending" });
+          }
+        }
+        return next;
+      });
+    }
+  }, [toolsWaitingForConfirmation, batchDecisions]);
 
   // Batch confirmation handlers
   const handleBatchConfirm = useCallback(
@@ -357,11 +374,19 @@ const MessagesList = memo(function MessagesList({
           })
           .filter((conf): conf is NonNullable<typeof conf> => conf !== null);
 
+        // Pass the tool message's parentId as the confirm stream's parent.
+        // All approve tools in a batch share the same parentId (children of the
+        // same assistant placeholder). Using this ensures the confirm stream
+        // always continues from the correct branch — even if a wakeUp revival
+        // has added new messages to the thread since the approve was issued.
+        // If parentId is null (incognito / root), send-message falls back to leafMessageId.
+        const confirmParentId =
+          toolsWaitingForConfirmation[0]?.parentId ?? null;
         sendMessage?.({
           content: "",
           attachments: [],
           threadId: primaryThreadId,
-          parentId: primaryId,
+          parentId: confirmParentId ?? undefined,
           toolConfirmations,
         });
       }
@@ -371,7 +396,6 @@ const MessagesList = memo(function MessagesList({
       toolsWaitingForConfirmation,
       sendMessage,
       primaryThreadId,
-      primaryId,
     ],
   );
 
@@ -414,11 +438,13 @@ const MessagesList = memo(function MessagesList({
           })
           .filter((conf): conf is NonNullable<typeof conf> => conf !== null);
 
+        // Same as handleBatchConfirm: use the tool message's parentId.
+        const cancelParentId = toolsWaitingForConfirmation[0]?.parentId ?? null;
         sendMessage?.({
           content: "",
           attachments: [],
           threadId: primaryThreadId,
-          parentId: primaryId,
+          parentId: cancelParentId ?? undefined,
           toolConfirmations,
         });
       }
@@ -428,7 +454,6 @@ const MessagesList = memo(function MessagesList({
       toolsWaitingForConfirmation,
       sendMessage,
       primaryThreadId,
-      primaryId,
     ],
   );
 
@@ -451,16 +476,16 @@ const MessagesList = memo(function MessagesList({
     [handleBatchCancel],
   );
 
+  // Index of the first tool waiting for confirmation (for banner placement)
+  const firstPendingToolIndex = useMemo(() => {
+    return allMessages.findIndex(
+      (msg) =>
+        msg.role === "tool" && msg.metadata?.toolCall?.waitingForConfirmation,
+    );
+  }, [allMessages]);
+
   return (
     <>
-      {/* Batch confirmation status banner - only show for multiple tools */}
-      {toolsWaitingForConfirmation.length > 1 && (
-        <BatchConfirmationBanner
-          batchDecisions={batchDecisions}
-          locale={locale}
-        />
-      )}
-
       {allMessages.map((message, index) => {
         const hasContentAfter = allMessages
           .slice(index + 1)
@@ -471,27 +496,36 @@ const MessagesList = memo(function MessagesList({
             ? (batchDecisions.get(message.id) ?? null)
             : null;
           return (
-            <ToolMessage
-              key={message.id}
-              message={message}
-              locale={locale}
-              user={user}
-              primaryId={primaryId}
-              decision={decision}
-              onConfirm={
-                hasToolWaitingForConfirmation
-                  ? createConfirmHandler(message.id)
-                  : null
-              }
-              onCancel={
-                hasToolWaitingForConfirmation
-                  ? createCancelHandler(message.id)
-                  : null
-              }
-              collapseState={collapseState}
-              logger={logger}
-              platformOverride={platformOverride}
-            />
+            <Div key={message.id}>
+              {/* Batch confirmation status banner — rendered just above the first pending tool */}
+              {toolsWaitingForConfirmation.length > 1 &&
+                index === firstPendingToolIndex && (
+                  <BatchConfirmationBanner
+                    batchDecisions={batchDecisions}
+                    locale={locale}
+                  />
+                )}
+              <ToolMessage
+                message={message}
+                locale={locale}
+                user={user}
+                primaryId={primaryId}
+                decision={decision}
+                onConfirm={
+                  hasToolWaitingForConfirmation
+                    ? createConfirmHandler(message.id)
+                    : null
+                }
+                onCancel={
+                  hasToolWaitingForConfirmation
+                    ? createCancelHandler(message.id)
+                    : null
+                }
+                collapseState={collapseState}
+                logger={logger}
+                platformOverride={platformOverride}
+              />
+            </Div>
           );
         }
 
@@ -509,9 +543,13 @@ const MessagesList = memo(function MessagesList({
           // Check if this is a compacting message
           if (message.metadata?.isCompacting) {
             const isFailed = message.metadata.compactingFailed === true;
-            // Derive streaming state from content presence — never rely on metadata.isStreaming
-            // which is not persisted to DB (would show stuck loading on refresh).
-            const isStreaming = !isFailed && !message.content;
+            // Use metadata.isStreaming during live session (set by COMPACTING_DELTA/DONE handlers).
+            // Fall back to !content for page refresh where metadata.isStreaming is not persisted.
+            const isStreaming =
+              !isFailed &&
+              (message.metadata.isStreaming === true ||
+                (message.metadata.isStreaming === undefined &&
+                  !message.content));
             return (
               <CompactingMessage
                 key={message.id}
@@ -540,7 +578,7 @@ const MessagesList = memo(function MessagesList({
       {/* Show streaming placeholder when no content yet — skip for compacting groups
           since the compacting card already renders its own spinner */}
       {!allMessages.some((m) => m.metadata?.isCompacting) && (
-        <LoadingIndicator sequenceId={sequenceId} />
+        <LoadingIndicator isStreaming={isGroupStreaming} />
       )}
     </>
   );
@@ -568,6 +606,8 @@ interface MessageActionsWrapperProps {
   serverCreditCost: number | null;
   readOnly: boolean;
   user: JwtPayloadType;
+  ttsAutoplay: boolean;
+  ttsVoice: typeof TtsVoiceValue | undefined;
   deductCredits: ((creditCost: number, feature: string) => void) | null;
   onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
   userVote: "up" | "down" | null;
@@ -591,6 +631,8 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   serverCreditCost,
   readOnly,
   user,
+  ttsAutoplay,
+  ttsVoice,
   deductCredits,
   onVote,
   userVote,
@@ -672,6 +714,8 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       creditCost={creditCost}
       readOnly={readOnly}
       user={user}
+      ttsAutoplay={ttsAutoplay}
+      ttsVoice={ttsVoice}
       deductCredits={deductCredits}
       onVote={onVote}
       userVote={userVote}
@@ -703,11 +747,19 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
   // Get character for assistant messages
   const character =
     primary.role === "assistant" || primary.role === "user"
-      ? primary.character
+      ? primary.skill
       : null;
 
-  // Fetch character name from character ID
-  const characterHook = useCharacter(character || undefined, user, logger);
+  // Fetch character name from character ID — seed from SSR boot data to avoid hydration mismatch
+  const { initialSkillData } = useChatBootContext();
+  const skillInitialData =
+    character && initialSkillData ? initialSkillData : null;
+  const characterHook = useSkill(
+    character || undefined,
+    user,
+    logger,
+    skillInitialData,
+  );
   const characterName = characterHook.read?.data?.name ?? null;
 
   // Get display name for assistant
@@ -753,6 +805,8 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   user,
   sendMessage,
   deductCredits,
+  ttsAutoplay,
+  ttsVoice,
   className: extraClassName,
   onVote,
   userVote,
@@ -765,6 +819,10 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
     () => [primary, ...continuations],
     [primary, continuations],
   );
+
+  // True when any message in the group is still streaming (metadata.isStreaming).
+  // Derived from the messages props — no separate store subscription needed.
+  const isGroupStreaming = allMessages.some((m) => m.metadata?.isStreaming);
 
   // Calculate group totals by summing all messages in the sequence
   const groupTotals = useMemo(() => {
@@ -839,7 +897,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             allMessages={allMessages}
             primaryId={primary.id}
             primaryThreadId={primary.threadId}
-            sequenceId={primary.sequenceId}
+            isGroupStreaming={isGroupStreaming}
             locale={locale}
             user={user}
             logger={logger}
@@ -869,6 +927,8 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             serverCreditCost={groupTotals.creditCost}
             readOnly={readOnly}
             user={user}
+            ttsAutoplay={ttsAutoplay}
+            ttsVoice={ttsVoice}
             deductCredits={deductCredits}
             onVote={onVote}
             userVote={userVote}

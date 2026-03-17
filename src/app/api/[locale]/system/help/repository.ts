@@ -30,12 +30,13 @@ import {
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CliRequestData } from "../unified-interface/cli/runtime/parsing";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { generateSchemaForUsage } from "../unified-interface/shared/field/utils";
 import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "../unified-interface/shared/types/enums";
 import { Platform } from "../unified-interface/shared/types/platform";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+
 import type { HelpGetRequestOutput, HelpGetResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -166,21 +167,10 @@ function filterMetaForUser(
 
 // ─── Platform badge helpers (admin only) ─────────────────────────────────────
 
-function getMetaPlatforms(roles: string[]): string[] {
-  const out = new Set<string>();
-  if (!roles.includes(ROLE_CLI_OFF)) {
-    out.add("cli");
-  }
-  if (!roles.includes(ROLE_MCP_OFF) && !roles.includes(ROLE_CLI_OFF)) {
-    out.add("mcp");
-  }
-  if (!roles.includes(ROLE_AI_TOOL_OFF) && !roles.includes(ROLE_WEB_OFF)) {
-    out.add("ai");
-  }
-  if (!roles.includes(ROLE_WEB_OFF)) {
-    out.add("web");
-  }
-  return [...out].toSorted();
+function getMetaPlatforms(roles: string[]): Platform[] {
+  return (Object.values(Platform) as Platform[]).filter((p) =>
+    checkPlatformAccess(roles, p),
+  );
 }
 
 // ─── Constants ──────────────────────────────────────────────────────────────
@@ -193,7 +183,11 @@ const COMPACT_FULL_DETAIL_THRESHOLD = 5;
 // ─── Tool serialization helpers ──────────────────────────────────────────────
 
 function isCompactPlatform(platform: Platform): boolean {
-  return platform === Platform.AI || platform === Platform.MCP;
+  return (
+    platform === Platform.AI ||
+    platform === Platform.MCP ||
+    platform === Platform.CRON
+  );
 }
 
 function getParameterSchema(
@@ -289,7 +283,7 @@ function serializeMeta(
   tool: EndpointMeta,
   parameters?: ToolItem["parameters"],
   includeExamples = false,
-  platforms?: string[],
+  platforms?: Platform[],
 ): ToolItem {
   return {
     name: tool.toolName,
@@ -310,7 +304,7 @@ function serializeMeta(
 
 function serializeMetaMinimal(
   tool: EndpointMeta,
-  platforms?: string[],
+  platforms?: Platform[],
 ): ToolItem {
   return {
     name: tool.toolName,
@@ -370,19 +364,21 @@ export class HelpRepository {
 
   static async getToolsFromRemoteInstance(
     instanceId: string,
+    query: string | undefined,
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
     locale: CountryLanguage,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
-    if (user.isPublic) {
-      return fail({
-        message: t("get.errors.unauthorized.title"),
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-      });
-    }
-    const { getCapabilities } =
+    const { getCapabilities, getCapabilitiesAnyUser } =
       await import("@/app/api/[locale]/user/remote-connection/repository");
-    const capabilities = await getCapabilities(user.id, instanceId);
+
+    // Try user-scoped lookup first, fall back to any-user lookup for CLI/system users
+    // whose userId doesn't own the connection.
+    const capabilities = user.isPublic
+      ? await getCapabilitiesAnyUser(instanceId)
+      : ((await getCapabilities(user.id, instanceId)) ??
+        (await getCapabilitiesAnyUser(instanceId)));
+
     if (!capabilities) {
       return success({
         tools: [],
@@ -392,25 +388,40 @@ export class HelpRepository {
       });
     }
 
-    const tools: ToolItem[] = capabilities.map((cap) => {
+    const allTools: ToolItem[] = capabilities.map((cap) => {
       const prefixedId = `${instanceId}__${cap.toolName}`;
       return {
         name: prefixedId,
         title: cap.title,
         id: prefixedId,
         description: cap.description,
-        category: t("category"),
-        tags: [],
+        category: cap.category ?? t("category"),
+        tags: cap.tags ?? [],
+        aliases: cap.aliases,
         executionMode: "via-execute-route" as const,
         instanceId,
       };
     });
 
+    // Apply query filter if provided
+    const lowerQuery = query?.toLowerCase();
+    const tools = lowerQuery
+      ? allTools.filter(
+          (tool) =>
+            tool.name.toLowerCase().includes(lowerQuery) ||
+            tool.title.toLowerCase().includes(lowerQuery) ||
+            tool.description.toLowerCase().includes(lowerQuery) ||
+            tool.category.toLowerCase().includes(lowerQuery) ||
+            tool.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
+            tool.aliases?.some((a) => a.toLowerCase().includes(lowerQuery)),
+        )
+      : allTools;
+
     return success({
       tools,
-      totalCount: tools.length,
+      totalCount: allTools.length,
       matchedCount: tools.length,
-      hint: `${tools.length} tools from remote instance "${instanceId}". Use prefixed ID directly: execute-tool toolName="${instanceId}__<name>".`,
+      hint: `${tools.length} of ${allTools.length} tools from remote instance "${instanceId}". Use prefixed ID directly: execute-tool toolName="${instanceId}__<name>".`,
     });
   }
 
@@ -424,6 +435,7 @@ export class HelpRepository {
     if (data.instanceId) {
       return HelpRepository.getToolsFromRemoteInstance(
         data.instanceId,
+        data.query,
         user,
         locale,
       );
@@ -477,16 +489,16 @@ export class HelpRepository {
     );
 
     // Admin platform badges — derived directly from allowedRoles in meta
-    const getToolPlatforms = (tool: EndpointMeta): string[] | undefined => {
+    const getToolPlatforms = (tool: EndpointMeta): Platform[] | undefined => {
       if (!isAdmin) {
         return undefined;
       }
       return getMetaPlatforms(tool.allowedRoles);
     };
 
-    // When admin filters by a specific platform (not "all"), additionally filter
+    // When admin filters by a specific platform, additionally filter
     let platformFilteredMeta = filteredByPlatform;
-    if (platformFilter && platformFilter !== "all") {
+    if (platformFilter) {
       platformFilteredMeta = filteredByPlatform.filter((m) =>
         getMetaPlatforms(m.allowedRoles).includes(platformFilter),
       );

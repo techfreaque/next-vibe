@@ -76,20 +76,35 @@ export interface EndpointLogger {
 }
 
 /**
- * Global error sink — set once on server startup to persist errors.
+ * Log level for error persistence
+ */
+export type ErrorLogLevel = "error" | "warn";
+
+/**
+ * Global error sink — set once on server startup to persist errors/warnings.
  * Client-side this stays null (no DB access).
  */
 let globalErrorSink:
-  | ((message: string, error?: LoggerMetadata) => void)
+  | ((
+      level: ErrorLogLevel,
+      message: string,
+      error: LoggerMetadata | undefined,
+      metadata: LoggerMetadata[],
+    ) => void)
   | null = null;
 
 /**
  * Register a global error persistence sink.
  * Called once from server-side initialization (e.g. launchpad).
- * All subsequent logger.error() calls will fire this sink.
+ * All subsequent logger.error() and logger.warn() calls will fire this sink.
  */
 export function registerErrorSink(
-  sink: (message: string, error?: LoggerMetadata) => void,
+  sink: (
+    level: ErrorLogLevel,
+    message: string,
+    error: LoggerMetadata | undefined,
+    metadata: LoggerMetadata[],
+  ) => void,
 ): void {
   globalErrorSink = sink;
 }
@@ -140,7 +155,7 @@ export function createEndpointLogger(
       ...metadata: LoggerMetadata[]
     ): void {
       // Fire global error sink if registered (server-only persistence)
-      globalErrorSink?.(message, error);
+      globalErrorSink?.("error", message, error, metadata);
 
       if (mcpSilentMode) {
         if (!(debugEnabled || enableDebugLogger)) {
@@ -189,6 +204,9 @@ export function createEndpointLogger(
       }
     },
     warn(message: string, ...metadata: LoggerMetadata[]): void {
+      // Fire global error sink for warnings too
+      globalErrorSink?.("warn", message, undefined, metadata);
+
       if (mcpSilentMode) {
         if (!(debugEnabled || enableDebugLogger)) {
           // use --verbose / or set src/config/debug.ts to true

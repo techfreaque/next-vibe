@@ -26,6 +26,7 @@ type SelectorView = "onboarding" | "favorites" | "loading";
 
 interface SelectorContentProps {
   locale: CountryLanguage;
+  onClose?: () => void;
 }
 
 function LoadingSpinner({ t }: { t: TFunction }): JSX.Element {
@@ -41,7 +42,10 @@ function LoadingSpinner({ t }: { t: TFunction }): JSX.Element {
   );
 }
 
-export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
+export function SelectorContent({
+  locale,
+  onClose,
+}: SelectorContentProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { t } = simpleT(locale);
@@ -53,7 +57,6 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
     },
   );
 
-  // Local state
   const [view, setView] = useState<SelectorView>("loading");
 
   const needsOnboarding = useMemo(() => {
@@ -64,7 +67,8 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
     if (!favoritesLoading && view !== "onboarding") {
       setView(needsOnboarding ? "onboarding" : "favorites");
     }
-  }, [favoritesLoading, needsOnboarding, view]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [favoritesLoading, needsOnboarding]);
 
   if (view === "loading") {
     return <LoadingSpinner t={t} />;
@@ -73,7 +77,13 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   if (view === "onboarding") {
     return (
       <Suspense fallback={<LoadingSpinner t={t} />}>
-        <SelectorOnboarding locale={locale} />
+        <SelectorOnboarding
+          locale={locale}
+          onDone={() => {
+            setView("favorites");
+            onClose?.();
+          }}
+        />
       </Suspense>
     );
   }

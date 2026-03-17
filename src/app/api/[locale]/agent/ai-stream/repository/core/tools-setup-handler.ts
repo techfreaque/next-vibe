@@ -26,15 +26,15 @@ export class ToolsSetupHandler {
   /**
    * Set up tools for AI streaming.
    *
-   * @param visibleTools - Tools loaded into AI SDK context (visible to model). null = load all.
-   * @param activeTools - Permission layer: tools the model is allowed to execute.
-   *                      null = all tools allowed. When model calls a tool not in visibleTools
-   *                      but in activeTools, it's executed via fallback in tool-error-handler.
+   * @param pinnedTools - Tools loaded into AI SDK context (visible to model). null = load all.
+   * @param availableTools - Permission layer: tools the model is allowed to execute.
+   *                      null = all tools allowed. When model calls a tool not in pinnedTools
+   *                      but in availableTools, it's executed via fallback in tool-error-handler.
    */
   static async setupStreamingTools(params: {
     modelConfig: ModelOption;
-    visibleTools: ToolConfigItem[] | null | undefined;
-    activeTools: ToolConfigItem[] | null | undefined;
+    pinnedTools: ToolConfigItem[] | null | undefined;
+    availableTools: ToolConfigItem[] | null | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -79,8 +79,8 @@ export class ToolsSetupHandler {
     // Keyed by preferred tool name for consistent lookup
     const clientConfirmationConfig = new Map<string, boolean>();
     const allToolConfigs = [
-      ...(params.visibleTools ?? []),
-      ...(params.activeTools ?? []),
+      ...(params.pinnedTools ?? []),
+      ...(params.availableTools ?? []),
     ];
     for (const toolConfig of allToolConfigs) {
       const preferredName = resolveToPreferredName(toolConfig.toolId);
@@ -104,14 +104,26 @@ export class ToolsSetupHandler {
 
     // Load only VISIBLE tools into the AI SDK to keep context compact.
     // AI can discover other tools via tool-help and execute them via fallback.
-    const isAgentMode = !params.visibleTools;
+    const isAgentMode = !params.pinnedTools;
 
     // Build visible tool IDs from client request, or use defaults in agent mode.
     // Always inject wait-for-task so AI can pause on background tasks regardless
     // of the user's saved tool list (it may predate the tool being added to defaults).
-    const visibleToolIdsFromClient = params.visibleTools
-      ? params.visibleTools.map((t) => getFullPath(t.toolId) ?? t.toolId)
+    const visibleToolIdsFromClient = params.pinnedTools
+      ? params.pinnedTools.map((t) => getFullPath(t.toolId) ?? t.toolId)
       : [...getDefaultToolIds()]; // agent mode = default tool set
+
+    // Inject pinned remote tools (from availableTools) into visible set.
+    // Remote tools use "instanceId__toolName" format and are only in availableTools
+    // (permissions). They must also be in pinnedTools for the AI to see them.
+    if (params.availableTools) {
+      const visibleSet = new Set(visibleToolIdsFromClient);
+      for (const tool of params.availableTools) {
+        if (tool.toolId.includes("__") && !visibleSet.has(tool.toolId)) {
+          visibleToolIdsFromClient.push(tool.toolId);
+        }
+      }
+    }
 
     const waitForTaskFullPath =
       getFullPath(WAIT_FOR_TASK_ALIAS) ?? WAIT_FOR_TASK_ALIAS;
@@ -154,9 +166,9 @@ export class ToolsSetupHandler {
     // Uses preferred names (matching what tool-error-handler receives as part.toolName)
     // null = all tools allowed (no restriction)
     let activeToolNames: Set<string> | null = null;
-    if (params.activeTools) {
+    if (params.availableTools) {
       activeToolNames = new Set<string>();
-      for (const toolConfig of params.activeTools) {
+      for (const toolConfig of params.availableTools) {
         activeToolNames.add(resolveToPreferredName(toolConfig.toolId));
       }
     }
@@ -168,7 +180,7 @@ export class ToolsSetupHandler {
       hasTools: !!toolsResult.tools,
       isAgentMode,
       toolsConfigSize: toolsConfig.size,
-      activeToolsCount: activeToolNames?.size ?? "all",
+      availableToolsCount: activeToolNames?.size ?? "all",
     });
 
     return {

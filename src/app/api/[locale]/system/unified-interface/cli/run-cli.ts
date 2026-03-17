@@ -31,11 +31,8 @@ import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
-import {
-  CliInputParser,
-  type CliRequestData,
-  type ParsedCliData,
-} from "./runtime/parsing";
+import type { CliRequestData } from "./runtime/cli-request-data";
+import { CliInputParser, type ParsedCliData } from "./runtime/parsing";
 import {
   type CliCompatiblePlatform,
   RouteDelegationHandler,
@@ -438,6 +435,11 @@ export function runCli({
             return;
           }
 
+          // Some commands are always interactive (no non-interactive mode)
+          const ALWAYS_INTERACTIVE = new Set(["init", "set-setting"]);
+          const forceInteractive =
+            options.interactive || ALWAYS_INTERACTIVE.has(command ?? "");
+
           performanceMonitor.mark("routeStart");
           const result = await RouteDelegationHandler.executeRoute(
             command,
@@ -453,7 +455,7 @@ export function runCli({
               platform: effectivePlatform,
               output: options.output ?? DEFAULT_OUTPUT,
               verbose: debug ?? false,
-              interactive: options.interactive ?? false,
+              interactive: forceInteractive,
               dryRun: options.dryRun ?? false,
               cliTarget,
               remoteUrl: resolvedRemoteUrl,

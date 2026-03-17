@@ -37,6 +37,13 @@ export const cronTasks = pgTable("cron_tasks", {
    */
   id: text("id").primaryKey(),
   /**
+   * shortId — short, user-scoped display identifier (nanoid ~8 chars).
+   * For system tasks (userId IS NULL): mirrors id (already a short slug).
+   * For user tasks: nanoid(8), unique per user via partial index.
+   * Use this for display/formatter output; use id for internal DB references.
+   */
+  shortId: text("short_id").notNull(),
+  /**
    * routeId — which handler to call.
    * NOT an identity key — multiple tasks can call the same endpoint.
    * Accepts: task name, endpoint alias, or full endpoint path.
@@ -85,7 +92,6 @@ export const cronTasks = pgTable("cron_tasks", {
   lastExecutionStatus: text("last_execution_status", {
     enum: CronTaskStatusDB,
   }),
-  lastExecutionError: text("last_execution_error"),
   lastExecutionDuration: integer("last_execution_duration"),
   nextExecutionAt: timestamp("next_execution_at"),
 
@@ -107,6 +113,17 @@ export const cronTasks = pgTable("cron_tasks", {
 
   // Instance routing — null means "run only on host instance"
   targetInstance: text("target_instance"),
+
+  // Revival context — typed columns for wakeUp/wait callback flow.
+  // Stored here (not in taskInput) so they are first-class typed fields
+  // that handleTaskCompletion can read without parsing untyped JSON.
+  wakeUpThreadId: text("wake_up_thread_id"),
+  wakeUpToolMessageId: text("wake_up_tool_message_id"),
+  wakeUpLeafMessageId: text("wake_up_leaf_message_id"),
+  wakeUpCallbackMode: text("wake_up_callback_mode"),
+  wakeUpModelId: text("wake_up_model_id"),
+  wakeUpSkillId: text("wake_up_skill_id"),
+  wakeUpFavoriteId: text("wake_up_favorite_id"),
 
   // Metadata
   tags: jsonb("tags").$type<string[]>().notNull().default([]),

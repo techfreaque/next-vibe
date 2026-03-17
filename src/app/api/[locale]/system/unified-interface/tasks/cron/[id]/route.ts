@@ -54,6 +54,12 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       if (data.retries !== undefined) {
         updates.retries = data.retries;
       }
+      if (data.retryDelay !== undefined) {
+        updates.retryDelay = data.retryDelay;
+      }
+      if (data.hidden !== undefined) {
+        updates.hidden = data.hidden;
+      }
       if (data.taskInput !== undefined) {
         updates.taskInput = data.taskInput;
       }

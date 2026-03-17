@@ -64,7 +64,7 @@ export const translations: typeof enTranslations = {
     selectedModel: {
       label: "Wybrany model",
     },
-    selectedCharacter: {
+    selectedSkill: {
       label: "Wybrany charakter",
     },
     activeFavoriteId: {
@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
     viewMode: {
       label: "Tryb widoku",
     },
-    allowedTools: {
+    availableTools: {
       label: "Dozwolone narzędzia",
     },
     pinnedTools: {
@@ -87,6 +87,11 @@ export const translations: typeof enTranslations = {
     },
     compactTrigger: {
       label: "Wyzwalacz kompresji (tokeny)",
+    },
+    memoryLimit: {
+      label: "Limit pamięci (tokeny)",
+      description:
+        "Maksymalna łączna liczba tokenów treści pamięci wstrzykiwanych na turę. Pozostaw puste, aby użyć domyślnego systemu (1000 tokenów).",
     },
     errors: {
       validation: {

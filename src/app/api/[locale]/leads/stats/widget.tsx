@@ -811,9 +811,14 @@ export function LeadsStatsContainer({
                 </Span>
                 <Input
                   type="date"
-                  value={String(form?.watch(key) ?? "")}
+                  value={((): string => {
+                    const v = form.watch(key);
+                    return v instanceof Date
+                      ? v.toISOString().slice(0, 10)
+                      : "";
+                  })()}
                   onChange={(e) => {
-                    form?.setValue(key, new Date(e.target.value));
+                    form.setValue(key, new Date(e.target.value));
                   }}
                   className="h-9"
                 />
@@ -854,9 +859,9 @@ export function LeadsStatsContainer({
                 className="flex items-center gap-2 cursor-pointer"
               >
                 <Checkbox
-                  checked={(form?.watch(key) as boolean | undefined) ?? false}
+                  checked={form.watch(key) ?? false}
                   onCheckedChange={(checked) => {
-                    form?.setValue(key, checked === true);
+                    form.setValue(key, checked === true);
                   }}
                 />
                 <Span className="text-sm">{t(children[key].label)}</Span>

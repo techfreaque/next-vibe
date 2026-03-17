@@ -14,14 +14,18 @@ export const translations: typeof enTranslations = {
       description: "Anwendung neu bauen und Server neustarten",
     },
     fields: {
-      success: {
-        title: "Ergebnis",
-      },
-      errors: {
-        title: "Fehler",
-      },
+      success: { title: "Ergebnis" },
+      errors: { title: "Fehler" },
+      duration: { title: "Dauer" },
+      steps: { title: "Schritte" },
     },
     steps: {
+      codegen: "Code-Generierung",
+      vibeCheck: "Vibe-Check",
+      nextBuild: "Next.js-Build",
+      migrate: "Migrationen",
+      seed: "Seeding",
+      restart: "Neustart",
       codegenFailed: "Code-Generierung fehlgeschlagen: {{error}}",
       vibeCheckFailed:
         "Vibe-Check: {{errors}} Fehler, {{warnings}} Warnungen. Verwende 'vibe check' oder das MCP-Check-Tool für Details.",
@@ -71,6 +75,14 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Rebuild abgeschlossen",
       description: "Anwendung neu gebaut und Server erfolgreich neugestartet",
+    },
+    widget: {
+      rebuildComplete: "Rebuild abgeschlossen",
+      rebuildFailed: "Rebuild fehlgeschlagen",
+      errors: "Fehler:",
+      runRebuild: "Rebuild starten",
+      runAgain: "Erneut ausführen",
+      skipped: "übersprungen",
     },
   },
 };

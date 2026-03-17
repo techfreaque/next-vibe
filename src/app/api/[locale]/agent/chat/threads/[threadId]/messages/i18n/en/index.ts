@@ -30,6 +30,10 @@ export const translations = {
       label: "Root Folder",
       description: "Root folder of the thread (used for client routing)",
     },
+    leafMessageId: {
+      label: "Leaf Message ID",
+      description: "Current branch leaf message ID",
+    },
     response: {
       title: "Messages Response",
       description: "List of messages in the thread",
@@ -60,8 +64,8 @@ export const translations = {
           model: {
             content: "Model",
           },
-          character: {
-            content: "Character",
+          skill: {
+            content: "Skill",
           },
           tokens: {
             content: "Tokens",
@@ -169,8 +173,8 @@ export const translations = {
       label: "Model",
       description: "AI model to use for response",
     },
-    character: {
-      label: "Character",
+    skill: {
+      label: "Skill",
       description: "AI character/persona for the message",
     },
     metadata: {
@@ -264,6 +268,8 @@ export const translations = {
     systemPromptTitle: "System Prompt",
     copied: "Copied!",
     systemMessageHint: "System message (hidden from users)",
+    systemPromptLabel: "system prompt · leading · cached",
+    upcomingContextLabel: "upcoming assistant context · last message",
   },
   widget: {
     common: {

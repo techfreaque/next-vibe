@@ -138,6 +138,11 @@ export const translations: typeof enTranslations = {
         label: "Dane wejściowe zadania",
         description: "Dane wejściowe JSON dla zadania",
       },
+      hidden: {
+        label: "Ukryte",
+        description:
+          "Ukryj to zadanie w promptach systemowych AI i domyślnych listach zadań",
+      },
       runOnce: {
         label: "Uruchom raz",
         description: "Uruchom to zadanie tylko raz, a następnie je wyłącz",

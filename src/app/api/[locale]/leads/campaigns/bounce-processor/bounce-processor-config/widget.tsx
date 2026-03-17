@@ -131,10 +131,10 @@ export function BounceProcessorConfigWidget({
               {t("post.schedule.description")}
             </Span>
             <ScheduleAutocomplete
-              value={form?.watch("schedule") ?? ""}
-              onChange={(value) => form?.setValue("schedule", value)}
+              value={form.watch("schedule") ?? ""}
+              onChange={(value) => form.setValue("schedule", value)}
               onBlur={() => {
-                void form?.trigger("schedule");
+                void form.trigger("schedule");
               }}
               locale={locale}
             />

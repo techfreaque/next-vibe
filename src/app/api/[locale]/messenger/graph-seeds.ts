@@ -17,6 +17,8 @@ import { MESSENGER_DELIVERED_ALIAS } from "./data-sources/messenger-delivered/co
 import { MESSENGER_OPENED_ALIAS } from "./data-sources/messenger-opened/constants";
 import { MESSENGER_CLICKED_ALIAS } from "./data-sources/messenger-clicked/constants";
 import { MESSENGER_BOUNCED_ALIAS } from "./data-sources/messenger-bounced/constants";
+import { MESSENGER_TOTAL_ALIAS } from "./data-sources/messenger-total/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
 import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
@@ -29,6 +31,7 @@ const GREEN = "#16a34a";
 const RED = "#ef4444";
 const PURPLE = "#9333ea";
 const CYAN = "#0891b2";
+const AMBER = "#ca8a04";
 
 // ─── Messenger Delivery Funnel ──────────────────────────────────────────────
 
@@ -160,6 +163,123 @@ const messengerDeliveryFunnelConfig: GraphConfig = {
   trigger: { type: "cron", schedule: "0 */6 * * *" },
 };
 
+// ─── Messenger Volume Health ─────────────────────────────────────────────────
+
+const messengerVolumeHealthConfig: GraphConfig = {
+  nodes: {
+    messenger_total: {
+      endpointPath: MESSENGER_TOTAL_ALIAS,
+      pane: 0,
+      color: BLUE,
+    },
+    sent: {
+      endpointPath: MESSENGER_SENT_ALIAS,
+      pane: 0,
+      color: GREEN,
+    },
+    delivered: {
+      endpointPath: MESSENGER_DELIVERED_ALIAS,
+      pane: 0,
+      color: CYAN,
+    },
+    bounced: {
+      endpointPath: MESSENGER_BOUNCED_ALIAS,
+      pane: 0,
+      color: RED,
+    },
+
+    total_ema7: {
+      endpointPath: EMA_ALIAS,
+      params: { period: 7 },
+      pane: 0,
+      color: BLUE,
+    },
+
+    sent_to_total_ratio: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: GREEN,
+    },
+    bounce_to_total_ratio: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: RED,
+    },
+    delivery_efficiency: {
+      endpointPath: TRANSFORMER_RATIO_ALIAS,
+      pane: 1,
+      color: AMBER,
+    },
+
+    eval_volume_drop: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_WEEK,
+      params: { op: "<", value: 5 },
+      visible: false,
+    },
+    eval_high_bounce_ratio: {
+      endpointPath: EVALUATOR_THRESHOLD_ALIAS,
+      resolution: GraphResolution.ONE_DAY,
+      params: { op: ">", value: 0.15 },
+      visible: false,
+    },
+
+    action_notify_volume_drop: {
+      endpointPath: COMPLETE_TASK_ALIAS,
+      persist: "never",
+      visible: false,
+      params: {
+        taskId: "vibe-sense-alert",
+        status: "status.completed",
+        summary:
+          "ALERT: Total messenger volume (7-day EMA) dropped below 5/day. Messaging pipeline may be stalled. Check queue workers, SMTP connectivity, and scheduled campaigns.",
+      },
+    },
+    action_notify_bounce_ratio: {
+      endpointPath: COMPLETE_TASK_ALIAS,
+      persist: "never",
+      visible: false,
+      params: {
+        taskId: "vibe-sense-alert",
+        status: "status.completed",
+        summary:
+          "ALERT: Bounce-to-total messenger ratio exceeded 15% today. Email infrastructure health is at risk. Review recipient lists and sender domain reputation.",
+      },
+    },
+  },
+
+  edges: [
+    { from: "messenger_total", to: "total_ema7" },
+    { from: "sent", to: "sent_to_total_ratio", toHandle: "a" },
+    { from: "messenger_total", to: "sent_to_total_ratio", toHandle: "b" },
+    { from: "bounced", to: "bounce_to_total_ratio", toHandle: "a" },
+    { from: "messenger_total", to: "bounce_to_total_ratio", toHandle: "b" },
+    { from: "delivered", to: "delivery_efficiency", toHandle: "a" },
+    { from: "sent", to: "delivery_efficiency", toHandle: "b" },
+    { from: "total_ema7", to: "eval_volume_drop" },
+    { from: "bounce_to_total_ratio", to: "eval_high_bounce_ratio" },
+    { from: "eval_volume_drop", to: "action_notify_volume_drop" },
+    { from: "eval_high_bounce_ratio", to: "action_notify_bounce_ratio" },
+  ],
+
+  positions: {
+    messenger_total: { x: 0, y: 0 },
+    sent: { x: 0, y: 120 },
+    delivered: { x: 0, y: 240 },
+    bounced: { x: 0, y: 360 },
+    total_ema7: { x: 300, y: 0 },
+    sent_to_total_ratio: { x: 300, y: 120 },
+    bounce_to_total_ratio: { x: 300, y: 240 },
+    delivery_efficiency: { x: 300, y: 360 },
+    eval_volume_drop: { x: 600, y: 0 },
+    eval_high_bounce_ratio: { x: 600, y: 240 },
+    action_notify_volume_drop: { x: 900, y: 0 },
+    action_notify_bounce_ratio: { x: 900, y: 240 },
+  },
+
+  trigger: { type: "cron", schedule: "0 */6 * * *" },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const graphSeeds: GraphSeedEntry[] = [
@@ -169,5 +289,12 @@ export const graphSeeds: GraphSeedEntry[] = [
     description:
       "Full email delivery funnel: sent → delivered → opened → clicked. Tracks bounce rate, open rate, and click-through with 7-day smoothing. Alerts on deliverability issues.",
     config: messengerDeliveryFunnelConfig,
+  },
+  {
+    slug: "messenger-volume-health",
+    name: "Messenger Volume Health",
+    description:
+      "Monitors total messenger volume, sent-to-total and bounce-to-total ratios, and delivery efficiency. Alerts on volume drops and high bounce ratios.",
+    config: messengerVolumeHealthConfig,
   },
 ];

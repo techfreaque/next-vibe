@@ -44,7 +44,7 @@ export function CampaignStarterWidget({
 
   // Always force=true from UI so manual runs bypass the day/hour schedule
   React.useEffect(() => {
-    form?.setValue("force", true);
+    form.setValue("force", true);
   }, [form]);
 
   return (

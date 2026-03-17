@@ -9,6 +9,16 @@ import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-
  *
  * Reads isEmbedded from the nearest ChatNavigationProvider.
  */
+
+const EMBEDDED_GROUP = {
+  group: "group/embed" as const,
+  groupHover: "group-hover/embed:opacity-100" as const,
+};
+const MESSAGE_GROUP = {
+  group: "group/message" as const,
+  groupHover: "group-hover/message:opacity-100" as const,
+};
+
 export function useMessageGroupName(): {
   group: "group/embed" | "group/message";
   groupHover:
@@ -16,14 +26,5 @@ export function useMessageGroupName(): {
     | "group-hover/message:opacity-100";
 } {
   const isEmbedded = useChatNavigationStore((s) => s.isEmbedded);
-  if (isEmbedded) {
-    return {
-      group: "group/embed",
-      groupHover: "group-hover/embed:opacity-100",
-    };
-  }
-  return {
-    group: "group/message",
-    groupHover: "group-hover/message:opacity-100",
-  };
+  return isEmbedded ? EMBEDDED_GROUP : MESSAGE_GROUP;
 }

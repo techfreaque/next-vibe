@@ -290,7 +290,8 @@ export function ImportStatusContainer({
 
   const isLoading = endpointMutations?.read?.isLoading;
 
-  const activeFilter: string | null = form?.watch("filters.status") ?? null;
+  const activeFilter: typeof CsvImportJobStatusValue | null =
+    form.watch("filters.status") ?? null;
 
   const allJobs: Job[] = data?.jobs?.items ?? [];
 
@@ -354,7 +355,7 @@ export function ImportStatusContainer({
             variant="ghost"
             size="sm"
             onClick={() => {
-              form?.setValue("filters.status", tab.value ?? undefined);
+              form.setValue("filters.status", tab.value ?? undefined);
               if (onSubmit) {
                 onSubmit();
               }

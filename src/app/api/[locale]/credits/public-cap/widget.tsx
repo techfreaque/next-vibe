@@ -166,11 +166,11 @@ export function PublicCapUpdateContainer({
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
-  const capAmount: number = Number(form?.watch("capAmount") ?? 500) || 500;
+  const capAmount = form.watch("capAmount") ?? 500;
 
   function setCap(next: number): void {
     const clamped = Math.max(1, next);
-    form?.setValue("capAmount", clamped, { shouldValidate: true });
+    form.setValue("capAmount", clamped, { shouldValidate: true });
   }
 
   return (

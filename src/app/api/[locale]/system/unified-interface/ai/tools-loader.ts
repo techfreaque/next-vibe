@@ -13,12 +13,13 @@ import { z } from "zod";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CliRequestData } from "../cli/runtime/parsing";
+import type { CliRequestData } from "../cli/runtime/cli-request-data";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
@@ -52,7 +53,12 @@ function createToolFromEndpoint(
   const description = t(endpoint.description || endpoint.title);
 
   // Generate Zod schema from fields (with transforms)
-  const zodSchemaWithTransforms = generateInputSchema(endpoint);
+  // Pass caller roles so `visibleFor`-gated fields are excluded from the AI tool schema
+  const permissionRoles = filterUserPermissionRoles(context.user.roles);
+  const zodSchemaWithTransforms = generateInputSchema(
+    endpoint,
+    permissionRoles,
+  );
 
   // Target draft-7 to ensure compatibility with AI SDK's JSONSchema7 type
   // io:"input" converts the input side of transforms (what AI should pass, not the output)
@@ -70,24 +76,61 @@ function createToolFromEndpoint(
     },
   });
 
+  // Preferred name (alias if available): Used for AI SDK, execution, and all lookups
+  const toolName = getPreferredToolName(endpoint);
+
+  // Inject optional control parameters into the JSON schema so the AI knows
+  // it can pass them alongside regular tool args. These are stripped during
+  // validation and handled separately by tool-call-handler and the execute handler.
+  //
+  // Skip injection for:
+  // - wait-for-task: has its own stream-pause mechanism, callbackMode would interfere
+  // - execute-tool: has callbackMode as a native field in its definition schema
+  const schemaObj = jsonSchemaObject as JSONSchema7 & {
+    properties?: Record<string, JSONSchema7>;
+  };
+  if (toolName !== "wait-for-task" && toolName !== "execute-tool") {
+    if (!schemaObj.properties) {
+      schemaObj.properties = {};
+    }
+    schemaObj.properties.callbackMode = {
+      type: "string",
+      enum: ["detach", "wakeUp", "endLoop", "approve"],
+      description:
+        "Optional. Controls post-execution behavior. " +
+        "'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. " +
+        "'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready — you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. " +
+        "'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop — AI will not make any further tool calls after this batch completes. " +
+        "'approve': require user confirmation before executing. " +
+        "Omit for default synchronous execution.",
+    };
+  }
+
   // Wrap JSON Schema in AI SDK's jsonSchema() function
   // This creates a FlexibleSchema that the AI SDK can use
   const inputSchema = jsonSchema(jsonSchemaObject as JSONSchema7, {
     validate: (value) => {
-      // Extract noLoop parameter before validation (it's not part of endpoint schema)
-      const noLoop =
+      // Extract callbackMode before validation (not part of endpoint schema).
+      // callbackMode is read by tool-call-handler for stream control (endLoop, approve)
+      // and by the execute handler below for async modes (detach, wakeUp).
+      const callbackModeRaw =
         typeof value === "object" &&
         value !== null &&
-        "noLoop" in value &&
-        value.noLoop === true;
+        "callbackMode" in value &&
+        typeof value.callbackMode === "string"
+          ? value.callbackMode
+          : undefined;
 
       // Use the original Zod schema (with transforms) for validation
       const result = zodSchemaWithTransforms.safeParse(value);
       if (result.success) {
-        // Add noLoop back to the validated data so it reaches tool-call-handler
+        // Add callbackMode back to the validated data so it reaches tool-call-handler
         return {
           success: true,
-          value: noLoop ? { ...result.data, noLoop: true } : result.data,
+          value:
+            callbackModeRaw !== undefined
+              ? { ...result.data, callbackMode: callbackModeRaw }
+              : result.data,
         };
       }
       return {
@@ -97,41 +140,194 @@ function createToolFromEndpoint(
     },
   });
 
-  // Preferred name (alias if available): Used for AI SDK, execution, and all lookups
-  const toolName = getPreferredToolName(endpoint);
-
   return tool({
     description,
     inputSchema,
-    execute: async (params) => {
-      // Execute using shared generic handler — it auto-splits urlPathParams from data
+    execute: async (params, options) => {
+      // Extract callbackMode from params — async modes (detach, wakeUp) route through
+      // RouteExecuteRepository which handles task creation, backfill, and resume-stream.
+      // For execute-tool itself, callbackMode must stay in restParams so the route
+      // handler receives it (execute-tool handles all callbackModes natively).
+      const { callbackMode: callbackModeParam, ...strippedParams } = (params ??
+        {}) as Record<string, JsonValue>;
+      const restParams =
+        toolName === "execute-tool" && callbackModeParam !== undefined
+          ? { ...strippedParams, callbackMode: callbackModeParam }
+          : strippedParams;
+
+      const { CallbackMode: CM } =
+        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+      const callbackMode =
+        typeof callbackModeParam === "string" &&
+        Object.values(CM).includes(callbackModeParam as never)
+          ? (callbackModeParam as (typeof CM)[keyof typeof CM])
+          : null;
+
       context.logger.debug("[ToolsLoader] CoreTool execute called", {
         toolName,
+        callbackMode,
         threadId: context.streamContext?.threadId,
         aiMessageId: context.streamContext?.aiMessageId,
         streamContextRef: !!context.streamContext,
       });
-      const { RouteExecutionExecutor } =
-        await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
-      const result = await RouteExecutionExecutor.executeGenericHandler({
-        toolName,
-        data: params as CliRequestData,
-        user: context.user,
-        locale: context.locale,
-        logger: context.logger,
-        platform: Platform.AI,
-        streamContext: context.streamContext,
-      });
 
-      if (!result.success) {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
-        // eslint-disable-next-line @typescript-eslint/only-throw-error -- Throwing ErrorResponseType so AI SDK marks isError=true with structured data
-        throw result;
+      // Race tool execution against the abort signal so cancellation
+      // kills even long-running tool calls immediately.
+      const abortSignal = context.streamContext?.abortSignal;
+      const executeToolInline = async (): Promise<JsonValue> => {
+        // Detach and wakeUp need task creation + backfill + resume-stream scheduling.
+        // Route through RouteExecuteRepository which handles both modes.
+        // execute-tool always routes through RouteExecuteRepository directly
+        // so callerToolCallId (options.toolCallId) is available for deduplication.
+        if (
+          callbackMode === CM.DETACH ||
+          callbackMode === CM.WAKE_UP ||
+          toolName === "execute-tool"
+        ) {
+          // Inject the correct toolMessageId for this specific parallel tool call.
+          // pendingToolMessages is keyed by AI SDK toolCallId — populated by stream-part-handler.
+          // The AI SDK may call execute() before stream-part-handler processes the tool-call event,
+          // so spin-wait up to 200ms (20 × 10ms) for the entry to appear.
+          // Resolve per-call toolMessageId BEFORE touching shared streamContext.
+          // Two parallel wakeUp tools each have a distinct options.toolCallId.
+          // We must NOT write to context.streamContext.callerToolCallId (shared) here —
+          // that would race with the sibling call and both would end up with the same ID.
+          // Instead, resolve the values locally and pass a per-call context snapshot.
+          let perCallToolMessageId: string | undefined;
+          let perCallLeafMessageId: string | null = null;
+
+          if (options?.toolCallId && context.streamContext) {
+            let pending = context.streamContext.pendingToolMessages?.get(
+              options.toolCallId,
+            );
+            if (!pending) {
+              // Brief spin-wait: stream-part-handler is processing the tool-call event concurrently.
+              // In practice this resolves within 1-2 ticks; 200ms cap is a generous safety bound.
+              for (let i = 0; i < 20 && !pending; i++) {
+                await new Promise<void>((resolve) => {
+                  setTimeout(resolve, 10);
+                });
+                pending = context.streamContext.pendingToolMessages?.get(
+                  options.toolCallId,
+                );
+              }
+            }
+            if (pending) {
+              perCallToolMessageId = pending.messageId;
+              perCallLeafMessageId =
+                pending.toolCallData?.parentId ??
+                context.streamContext.leafMessageId ??
+                null;
+            }
+          }
+
+          const { RouteExecuteRepository } =
+            await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
+          const { scopedTranslation: executeScopedT } =
+            await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
+          const { t: execT } = executeScopedT.scopedT(context.locale);
+
+          // execute-tool: restParams already has the correct shape ({ toolName, input, callbackMode, instanceId? })
+          // Other tools: wrap in { toolName, input: restParams, callbackMode }
+          const executeData = (
+            toolName === "execute-tool"
+              ? restParams
+              : { toolName, input: restParams, callbackMode }
+          ) as Parameters<typeof RouteExecuteRepository.execute>[0];
+
+          // Build a per-call context snapshot with the resolved IDs.
+          // This avoids mutating the shared streamContext which would race with sibling parallel calls.
+          const perCallStreamContext = context.streamContext
+            ? {
+                ...context.streamContext,
+                callerToolCallId: options?.toolCallId,
+                currentToolMessageId:
+                  perCallToolMessageId ??
+                  context.streamContext.currentToolMessageId,
+                leafMessageId:
+                  perCallLeafMessageId ?? context.streamContext.leafMessageId,
+              }
+            : context.streamContext;
+
+          context.logger.info(
+            "[ToolsLoader] wakeUp/detach via RouteExecuteRepository",
+            {
+              toolName,
+              callerToolCallId: options?.toolCallId,
+              currentToolMessageId: perCallStreamContext?.currentToolMessageId,
+              aiMessageId: context.streamContext?.aiMessageId,
+            },
+          );
+
+          const result = await RouteExecuteRepository.execute(
+            executeData,
+            context.user,
+            context.locale,
+            context.logger,
+            execT,
+            perCallStreamContext ?? context.streamContext,
+          );
+
+          if (!result.success) {
+            const errorMsg = result.message ?? "Tool execution failed";
+            // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
+            // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
+            throw new Error(errorMsg);
+          }
+
+          return result.data as JsonValue;
+        }
+
+        // Default path: execute inline (wait, endLoop, approve handled by stream layer)
+        const { RouteExecutionExecutor } =
+          await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
+        const result = await RouteExecutionExecutor.executeGenericHandler({
+          toolName,
+          data: restParams as CliRequestData,
+          user: context.user,
+          locale: context.locale,
+          logger: context.logger,
+          platform: Platform.AI,
+          streamContext: context.streamContext,
+        });
+
+        if (!result.success) {
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
+          // eslint-disable-next-line @typescript-eslint/only-throw-error -- Throwing ErrorResponseType so AI SDK marks isError=true with structured data
+          throw result;
+        }
+
+        // Return the data to AI SDK
+        // Must be JSON-serializable for streaming
+        return result.data as JsonValue;
+      };
+
+      // If no abort signal, just run inline
+      if (!abortSignal) {
+        return executeToolInline();
       }
 
-      // Return the data to AI SDK
-      // Must be JSON-serializable for streaming
-      return result.data;
+      // Already aborted — bail immediately
+      if (abortSignal.aborted) {
+        context.logger.info(
+          "[ToolsLoader] Stream already cancelled — skipping tool",
+          { toolName },
+        );
+        return { error: "Stream cancelled" };
+      }
+
+      // Race: tool execution vs abort signal
+      // When abort fires, the promise rejects immediately with AbortError.
+      // The tool may keep running in the background but the stream moves on.
+      return Promise.race([
+        executeToolInline(),
+        new Promise<never>((...[, reject]) => {
+          const onAbort = (): void => {
+            reject(new Error("User cancelled stream"));
+          };
+          abortSignal.addEventListener("abort", onAbort, { once: true });
+        }),
+      ]);
     },
   });
 }
@@ -139,9 +335,11 @@ function createToolFromEndpoint(
 /**
  * Generate Zod input schema from endpoint fields
  * Combines RequestData and RequestUrlParams for AI tools
+ * @param userRoles - Caller roles for field-level visibility enforcement
  */
 function generateInputSchema(
   endpoint: CreateApiEndpointAny,
+  userRoles?: ReturnType<typeof filterUserPermissionRoles>,
 ): z.ZodObject<Record<string, z.ZodTypeAny>> {
   if (!endpoint.fields) {
     return z.object({});
@@ -152,14 +350,14 @@ function generateInputSchema(
     const requestDataSchema = generateSchemaForUsage<
       typeof endpoint.fields,
       FieldUsage.RequestData
-    >(endpoint.fields, FieldUsage.RequestData) as
+    >(endpoint.fields, FieldUsage.RequestData, userRoles) as
       | z.ZodObject<Record<string, z.ZodTypeAny>>
       | z.ZodNever;
 
     const urlPathParamsSchema = generateSchemaForUsage<
       typeof endpoint.fields,
       FieldUsage.RequestUrlParams
-    >(endpoint.fields, FieldUsage.RequestUrlParams) as
+    >(endpoint.fields, FieldUsage.RequestUrlParams, userRoles) as
       | z.ZodObject<Record<string, z.ZodTypeAny>>
       | z.ZodNever;
 
@@ -215,53 +413,83 @@ function createRemoteTool(params: {
   return tool({
     description: cap.description || cap.title,
     inputSchema,
-    execute: async (input) => {
-      // Delegate to execute-tool which routes to the remote
-      const { RouteExecuteRepository } =
-        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
-      const { scopedTranslation: executeScopedT } =
-        await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
-      const { t } = executeScopedT.scopedT(locale);
+    execute: async (input, options) => {
+      const abortSignal = streamContext?.abortSignal;
 
-      // Extract callbackMode from input if AI passed it; default to wait
-      const { callbackMode: inputCallbackMode, ...restInput } = (input ??
-        {}) as Record<string, JsonValue>;
-      const { CallbackMode: CM } =
-        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
-      const callbackMode =
-        typeof inputCallbackMode === "string" &&
-        Object.values(CM).includes(inputCallbackMode as never)
-          ? (inputCallbackMode as (typeof CM)[keyof typeof CM])
-          : CM.WAIT;
+      const executeRemoteInline = async (): Promise<JsonValue> => {
+        // Delegate to execute-tool which routes to the remote
+        const { RouteExecuteRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
+        const { scopedTranslation: executeScopedT } =
+          await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
+        const { t } = executeScopedT.scopedT(locale);
 
-      const result = await RouteExecuteRepository.execute(
-        {
-          toolName,
-          input: restInput,
-          callbackMode,
-        },
-        user,
-        locale,
-        logger,
-        t,
-        streamContext,
-      );
+        // Extract callbackMode from input if AI passed it; default to wait
+        const { callbackMode: inputCallbackMode, ...restInput } = (input ??
+          {}) as Record<string, JsonValue>;
+        const { CallbackMode: CM } =
+          await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+        const callbackMode =
+          typeof inputCallbackMode === "string" &&
+          Object.values(CM).includes(inputCallbackMode as never)
+            ? (inputCallbackMode as (typeof CM)[keyof typeof CM])
+            : CM.WAIT;
 
-      if (!result.success) {
-        const errorMsg = result.message ?? "Remote tool execution failed";
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
-        // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
-        throw new Error(errorMsg);
+        if (options?.toolCallId && streamContext) {
+          streamContext.callerToolCallId = options.toolCallId;
+        }
+        const result = await RouteExecuteRepository.execute(
+          {
+            toolName,
+            input: restInput,
+            callbackMode,
+          },
+          user,
+          locale,
+          logger,
+          t,
+          streamContext,
+        );
+
+        if (!result.success) {
+          const errorMsg = result.message ?? "Remote tool execution failed";
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
+          // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
+          throw new Error(errorMsg);
+        }
+
+        // Signal the stream layer to pause when callbackMode=wait.
+        if (callbackMode === CM.WAIT && streamContext) {
+          streamContext.waitingForRemoteResult = true;
+        }
+
+        return result.data as JsonValue;
+      };
+
+      // If no abort signal, just run inline
+      if (!abortSignal) {
+        return executeRemoteInline();
       }
 
-      // Signal the stream layer to pause when callbackMode=wait.
-      // Stream aborts after this step; /report resumes via headless stream (wakeUp)
-      // or the user sees the pending tool message and the stream ends (other modes).
-      if (callbackMode === CM.WAIT && streamContext) {
-        streamContext.waitingForRemoteResult = true;
+      // Already aborted — bail immediately
+      if (abortSignal.aborted) {
+        logger.info(
+          "[ToolsLoader] Stream already cancelled — skipping remote tool",
+          { toolName },
+        );
+        return { error: "Stream cancelled" };
       }
 
-      return result.data;
+      // Race: tool execution vs abort signal
+      return Promise.race([
+        executeRemoteInline(),
+        new Promise<never>((...[, reject]) => {
+          const onAbort = (): void => {
+            reject(new Error("User cancelled stream"));
+          };
+          abortSignal.addEventListener("abort", onAbort, { once: true });
+        }),
+      ]);
     },
   });
 }
@@ -424,7 +652,10 @@ export async function loadTools(params: {
             });
 
             toolsMap.set(fullName, remoteTool);
-            toolsMeta.set(fullName, { requiresConfirmation, credits: 1 });
+            toolsMeta.set(fullName, {
+              requiresConfirmation,
+              credits: cap.credits ?? 0,
+            });
           } catch (error) {
             params.logger.error("[Tools Loader] Failed to create remote tool", {
               fullName,

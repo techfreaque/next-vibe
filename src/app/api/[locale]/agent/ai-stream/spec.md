@@ -1,126 +1,222 @@
 # AI Stream — callbackMode Spec
 
-## What is callbackMode?
+## Core Principle
 
-`callbackMode` is a parameter on `execute-tool` that controls what happens after a tool call fires. The AI sets it per tool call. Parallel tool calls each honor their own mode independently — except `endLoop` which stops the loop after its result lands, and `approve` which blocks its own execution without affecting parallel tools.
-
-Two things it controls:
-
-1. **Does the stream keep going** after this tool fires?
-2. **Does the AI get revived** when the result arrives?
+The AI sees identical behavior regardless of local/remote/transport. Every mode produces the same return shape and the same revival flow. The transport (inline, HTTP, task-queue) is invisible to the AI. The only difference is timing.
 
 ---
 
-## Parallel tool call behavior
+## Remote Execution — Two Tiers
 
-When the AI calls multiple tools at once, each runs with its own `callbackMode`. Rules:
+**Tier 1 — Direct HTTP** (preferred): If the remote instance has `isDirectlyAccessible=true` (set at connect time by pinging `localUrl`), the executing side calls the tool's HTTP route directly via `executeRemote()`.
 
-- All parallel tools execute concurrently regardless of mode
-- `endLoop` — loop stops after all results in the batch are done
-- `approve` — blocks only its own tool pending human confirmation; other parallel tools run; loop stops after the batch
-- `detach` — completes silently, result not injected into current loop
-- `wakeUp` — like `detach`, stream continues; `resume-stream` fires when result arrives whether loop is alive or dead
+**Tier 2 — Task-queue** (fallback): If `isDirectlyAccessible=false` (NAT, unreachable), create a `cron_task` with `targetInstance`. The remote picks it up on its next cron pulse (~1 min). Result arrives via `/report`.
+
+**No polling anywhere.** `/report` → `handleTaskCompletion` is the universal result delivery mechanism for the queue path.
 
 ---
 
 ## The 5 Modes
 
-### `detach` _(currently: `background`)_
+### `wait` (default)
 
-**Intent:** Fire and forget. Tool runs, result goes into task history. AI never sees the result inline — it learns about it on the next user message via the trailing task history in system prompt. Nothing is injected into the current thread.
+AI sees: tool result returned, loop continues — always.
 
-|            | Behavior                                                                                                                                                                                                                                       |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Local**  | Executes inline. AI gets `{ taskId, hint: "use wait-for-task with this taskId to block and get the result" }`. Stream continues. Result stored in task history only.                                                                           |
-| **Remote** | Task created on remote. Stream returns `{ taskId, status: "pending", hint: "use wait-for-task..." }` and continues. When remote finishes: `TASK_COMPLETED` WS event updates the tool bubble. No AI continuation, nothing injected into thread. |
+| Transport         | Behavior                                                                                                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Local**         | Inline execution. Result returned to AI immediately.                                                                               |
+| **Remote direct** | Blocking HTTP call via `executeRemote()`. Awaits response. No 90s timer — connection is alive and waiting. Result returned inline. |
+| **Remote queue**  | Task created. Stream pauses (`waitingForRemoteResult=true`), 90s timeout set. `/report` backfills result, resume-stream revives.   |
 
-> Result never enters the AI loop. No revival. No deferred message. AI picks it up organically on next user message via task history context.
-
----
-
-### `wakeUp` _(keep name)_
-
-**Intent:** Like `detach` — fire and don't block the current stream. But when the result arrives, always ensure the AI sees it and continues. Works whether the loop is still running or ended days later.
-
-|            | Behavior                                                                                                                                       |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Local**  | Executes inline. AI gets `{ taskId, hint }`. Stream continues normally. `resume-stream` scheduled immediately.                                 |
-| **Remote** | Task created. Stream returns `{ taskId, status: "pending", hint }` and continues. `resume-stream` scheduled when result arrives via `/report`. |
-
-**When `resume-stream` fires:**
-
-- Loop still running → intercepts next step, injects the tool result message into the loop, loop continues
-- Loop already ended → revives thread from last message, injects tool result message, AI continues
-
-**Tool message DB record:** stored with full `input + output` — complete fidelity for UI display and audit.
-
-**AI context (message-converter):** for wakeUp result messages, input args are **omitted** when building AI SDK messages. The AI sees the result but not the (potentially days-old / already-compacted) input. This prevents context bloat and stale arg confusion. Input is preserved in DB and shown in UI.
-
-> `resume-stream` always fires — it checks `isStreaming` and either intercepts the live loop or revives a dead one. The tool message is always created; only the AI-facing representation suppresses the args.
+Return to AI: `{ result }` — same in all cases.
 
 ---
 
-### `wait` _(keep name — this is the default)_
+### `detach`
 
-**Intent:** Default behavior. Stream keeps going. All parallel tool results come back, loop continues as normal. Nothing special.
+AI sees: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` — always.
 
-|            | Behavior                                                                                                                                                   |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Local**  | Executes inline. Result returned to AI. Loop continues normally.                                                                                           |
-| **Remote** | Task created. Stream returns `{ taskId, status: "pending" }` and **stays open**. When remote result arrives: backfilled into tool message, loop continues. |
+| Transport         | Behavior                                                                          |
+| ----------------- | --------------------------------------------------------------------------------- |
+| **Local**         | Inline execution (fire-and-forget). AI gets taskId immediately, stream continues. |
+| **Remote direct** | HTTP call (non-blocking), AI gets taskId immediately.                             |
+| **Remote queue**  | Task created, AI gets taskId immediately.                                         |
 
-> This is what happens when you don't specify `callbackMode`. Normal tool execution.
-
----
-
-### `endLoop` _(currently: `noLoop`)_
-
-**Intent:** Run the tool, return the result to the AI, then stop the tool-calling loop. AI wraps up its current response without calling more tools.
-
-|            | Behavior                                                                                                                                      |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Local**  | Executes inline. Result returned to AI. Loop stops after this step — no further tool calls. AI writes final response.                         |
-| **Remote** | Task created. Stream ends. When remote finishes: result backfilled into tool message, `TASK_COMPLETED` WS updates bubble. No AI continuation. |
-
-> Result always delivered. Loop just won't continue after.
+Result stored in task history only. No revival. No deferred message. AI can later call `wait-for-task(taskId)` to upgrade to wakeUp semantics.
 
 ---
 
-### `approve` _(currently: `requiresConfirmation`)_
+### `wakeUp`
 
-**Intent:** This tool needs human sign-off before it runs. Other parallel tools in the same batch execute normally. Loop stops after all parallel tools in this batch are done — the AI does not continue until the human acts.
+AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready — do NOT call wait-for-task" }` — always.
 
-|            | Behavior                                                                                                                                                                                                                                           |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Local**  | `TOOL_WAITING` emitted for this tool. UI shows Confirm / Cancel. Other parallel tools in the batch execute normally. Loop stops after this batch. On confirm → tool executes, AI turn resumes. On cancel → tool marked cancelled, AI turn resumes. |
-| **Remote** | Same — `TOOL_WAITING` for this tool only. Other parallel tools run. Loop stops after batch. On confirm → remote task created. On cancel → no task created.                                                                                         |
+| Transport         | Behavior                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Local**         | Inline execution (fire-and-forget). `handleTaskCompletion(WAKE_UP)` fires immediately → schedules resume-stream.    |
+| **Remote direct** | HTTP call (non-blocking). Remote calls `/report` when done → `handleTaskCompletion(WAKE_UP)` → resume-stream.       |
+| **Remote queue**  | Task created. Remote picks up on cron, executes, calls `/report` → `handleTaskCompletion(WAKE_UP)` → resume-stream. |
 
-> **AI can opt in** by passing `callbackMode: "approve"`. **AI cannot opt out** — if tool settings have `requiresConfirmation: true`, it always applies regardless of what the AI passes.
+**When resume-stream fires:**
+
+- Loop still live → pub/sub signal intercepts → `stopWhen` yields → result injected
+- Loop dead → headless revival from stored `leafMessageId`
+
+**AI context (message-converter):** for wakeUp deferred results, input args are suppressed — AI sees the result only. Input preserved in DB and shown in UI.
 
 ---
 
-## Name summary
+### `endLoop`
 
-| Old name               | New name  | One-line reason                                                                                                     |
-| ---------------------- | --------- | ------------------------------------------------------------------------------------------------------------------- |
-| `background`           | `detach`  | "background" sounds like it runs in background; truth is it fully detaches — result never comes back to this stream |
-| `wakeUp`               | `wakeUp`  | Like detach but always revives AI with result — intercepts live loop or revives dead one                            |
-| `wait`                 | `wait`    | Already clear — default, stream waits for result and continues                                                      |
-| `noLoop`               | `endLoop` | `noLoop` is negative; `endLoop` describes what it does                                                              |
-| `requiresConfirmation` | `approve` | Intent is human sign-off; stops loop after batch completes                                                          |
+AI sees: tool result returned, then loop stops — always.
+
+| Transport         | Behavior                                                                                            |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| **Local**         | Inline execution. Result to AI. Loop stops after step. AI writes final response.                    |
+| **Remote direct** | Blocking HTTP call. Result to AI. Loop stops.                                                       |
+| **Remote queue**  | Task created. Stream ends. Later: result backfilled, `TASK_COMPLETED` WS event. No AI continuation. |
+
+No resume-stream for endLoop remote.
+
+---
+
+### `approve`
+
+AI sees: tool blocked pending human confirmation; other parallel tools proceed — always.
+
+| Transport            | Behavior                                                                                                        |
+| -------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **All**              | `TOOL_WAITING` emitted. UI shows Confirm/Cancel. Other parallel tools execute normally. Loop stops after batch. |
+| **Confirm + wait**   | Tool executes inline (blocking), AI turn resumes via resume-stream with result.                                 |
+| **Confirm + wakeUp** | Tool executes fire-and-forget. `approve-tool` endpoint returns immediately. Revival fires when done.            |
+| **Cancel**           | Tool marked cancelled, AI turn resumes.                                                                         |
+
+AI cannot opt out if `requiresConfirmation=true` in tool settings.
+
+---
+
+## Tool Call Errors — Loop Always Continues
+
+Failed tool calls never stop the loop. `tool-result-handler.ts` marks the tool as failed and returns the error as a tool result. The AI receives:
+
+```json
+{ "success": false, "message": "...", "errorType": "..." }
+```
+
+The AI decides what to do (retry, skip, explain). Consistent with `ResponseType<T>` — no throw, always a result.
+
+---
+
+## `wait-for-task` Tool
+
+Works for **both** `detach` and `wakeUp` tasks:
+
+- Task **already complete**: returns result inline. Stream continues. Cleans up task + any pending revival.
+- Task **pending**: writes `callbackMode=WAKE_UP + threadId + toolMessageId` onto task row (upgrades detach to wakeUp semantics), sets `pendingTimeoutMs=90000` → stream pauses.
+- On timeout (`STREAM_TIMEOUT`): stream dies cleanly. When task completes, `handleTaskCompletion(WAKE_UP)` fires revival.
+- AI always sees: `{ taskId, status, result?, waiting }` — same shape for all cases.
+
+---
+
+## Stream Timeout (90 seconds)
+
+Any time the stream is waiting for a remote result (queue path or `wait-for-task`):
+
+- Set `pendingTimeoutMs=90000` on `ToolExecutionContext`
+- `finish-step-handler.ts` reads this and schedules `setTimeout` → `streamAbortController.abort(new StreamAbortError(AbortReason.STREAM_TIMEOUT))`
+- If result arrives before timeout: cancel the timer
+- 90s covers a full cron pulse cycle
+- Clean abort: no error shown to user; revival handles continuation
+
+**Direct HTTP `wait` mode does not use this timer** — the HTTP connection itself is the timeout.
+
+---
+
+## Branch Tracking for Revival
+
+Every wakeUp task stores `leafMessageId` (= `ctx.currentParentId` at tool-call time — the branch tip at the moment the tool was called).
+
+- `execute-tool/repository.ts` and `wait-for-task/repository.ts`: store `leafMessageId` in the dedicated `wakeUpLeafMessageId` column on the task row (NOT in the `taskInput` JSON blob)
+- `handleTaskCompletion` accepts `leafMessageId?: string | null` as a **first-class typed param** — callers pass it explicitly, never via `taskInput` spread
+- `resumeStreamRequestSchema.parse` receives only the known routing fields (`threadId`, `callbackMode`, `modelId`, `skillId`, `favoriteId`, `leafMessageId`) — never arbitrary tool input fields
+- `resume-stream/repository.ts` uses stored `leafMessageId` as the parent for the deferred message
+- Falls back to latest-message query only if `leafMessageId` not set (backwards compat)
+
+This ensures revival appends to the correct branch even if the user switched branches while the tool was running.
+
+---
+
+## Tool Self-Escalation (`context.escalateToTask()`)
+
+For tools that may run >90s (SSH, claude-code, etc.):
+
+**Fast path (default):** Tool returns within 90s → result returned normally. Zero overhead.
+
+**Slow path (>90s):**
+
+1. Tool calls `context.escalateToTask()` before blocking operation
+2. Creates cron task row (wakeUp semantics), stores `leafMessageId`, sets `pendingTimeoutMs`
+3. Tool goroutine continues running detached from HTTP scope
+4. Stream dies at 90s timeout (`STREAM_TIMEOUT`)
+5. Tool goroutine completes → `handleTaskCompletion(WAKE_UP)` → revival
+6. AI sees deferred result injected on correct branch — identical to wakeUp mode
+
+Tool authors only need this for operations that may exceed 90s. No overhead for fast tools.
+
+---
+
+## Parallel Mixed-Mode Rules
+
+All parallel tools execute concurrently. Rules for how results land:
+
+| Combination                  | Rule                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `wait + wait`                | Both results returned, loop continues.                                                                  |
+| `wakeUp + wakeUp`            | Both fire independently. Each schedules its own revival. Each revival is a fresh full-tool-access turn. |
+| `detach + detach`            | Both fire. Neither schedules revival. AI gets two taskIds.                                              |
+| `endLoop + anything`         | All parallel tools complete. Non-endLoop results returned to AI. Then loop stops.                       |
+| `approve + anything`         | approve blocks only itself. Other tools execute normally. Loop stops after batch.                       |
+| `wakeUp + endLoop`           | Both fire. endLoop stops loop. wakeUp revival fires later — fresh turn with full tool access.           |
+| `wakeUp + approve`           | approve blocks itself, wakeUp fires. Loop stops after batch. wakeUp revival fires when result arrives.  |
+| `detach + wakeUp`            | Both fire. Only wakeUp schedules revival.                                                               |
+| `wait + wakeUp`              | wait returns result to AI. wakeUp fires independently, schedules revival.                               |
+| `wait + endLoop`             | endLoop stops loop after step. wait result returned before stop.                                        |
+| `detach + endLoop`           | endLoop stops loop. detach fires, no revival.                                                           |
+| `approve + wakeUp + endLoop` | approve blocks. wakeUp fires, schedules revival. endLoop stops loop after batch.                        |
+
+---
+
+## Push-First Sync Architecture
+
+When `isDirectlyAccessible=true`, cloud pushes changes to local immediately instead of waiting for local's cron pull:
+
+- **Tasks**: after creating a task with `targetInstance`, immediately POST to local's task-sync endpoint via `executeRemote()`. On failure: fall back (task is already in DB, local pulls on next cron).
+- **Memories**: on `create`/`update`/`delete`, push delta to local's task-sync endpoint fire-and-forget.
+- **Capabilities**: on version bump, push updated capabilities to local immediately.
+
+Connecting side (local) always has `pullFromRemote()` as fallback — push is opportunistic.
+
+---
+
+## toolMessageId — No Polling
+
+Each `execute()` wrapper in `tools-loader.ts` injects `currentToolMessageId` from `ctx.pendingToolMessages.get(toolCallId)?.messageId` before calling execute. No shared map, no polling. By the time `execute()` is called, the `tool-call` event has already been processed and `pendingToolMessages` is populated.
 
 ---
 
 ## Related Files
 
-| File                                         | Role                                                                |
-| -------------------------------------------- | ------------------------------------------------------------------- |
-| `ai/execute-tool/constants.ts`               | `CallbackMode` enum + `TaskRoutingContext` type                     |
-| `ai/execute-tool/repository.ts`              | Local execution paths per mode                                      |
-| `tasks/task-completion-handler.ts`           | Backfill + WS event + resume-stream scheduling                      |
-| `tasks/execute/repository.ts`                | Cron task execution + `handleTaskCompletion` call                   |
-| `tasks/pulse/repository.ts`                  | Pulse loop (remote task pickup + `/report` push)                    |
-| `resume-stream/repository.ts`                | Headless AI turn (append mode)                                      |
-| `repository/handlers/finish-step-handler.ts` | Reads `shouldStopLoop` / `waitingForRemoteResult`                   |
-| `repository/handlers/tool-call-handler.ts`   | Sets `shouldStopLoop`, `requiresConfirmation`, emits `TOOL_WAITING` |
-| `repository/handlers/message-converter.ts`   | Deferred message handling in AI context                             |
+| File                                               | Role                                                                  |
+| -------------------------------------------------- | --------------------------------------------------------------------- |
+| `ai/execute-tool/constants.ts`                     | `CallbackMode` enum + `TaskRoutingContext` type                       |
+| `ai/execute-tool/repository.ts`                    | Local/remote execution paths per mode, transport routing              |
+| `tasks/task-completion-handler.ts`                 | Backfill + WS event + resume-stream scheduling, reads `leafMessageId` |
+| `tasks/execute/repository.ts`                      | Cron task execution + `handleTaskCompletion` call                     |
+| `tasks/pulse/repository.ts`                        | Pulse loop (remote task pickup + `/report` push)                      |
+| `tasks/wait-for-task/repository.ts`                | Blocks stream on pending task, upgrades detach→wakeUp                 |
+| `resume-stream/repository.ts`                      | Headless AI turn (append mode), uses `leafMessageId` for branch       |
+| `repository/handlers/finish-step-handler.ts`       | Reads `shouldStopLoop`, starts 90s timeout timer                      |
+| `repository/handlers/tool-call-handler.ts`         | Sets `shouldStopLoop`, `requiresConfirmation`, emits `TOOL_WAITING`   |
+| `repository/handlers/message-converter.ts`         | Deferred message handling in AI context, suppresses wakeUp args       |
+| `repository/handlers/tool-confirmation-handler.ts` | Confirm/cancel flow, wakeUp fire-and-forget on confirm                |
+| `user/remote-connection/db.ts`                     | `isDirectlyAccessible` field on `remote_connections`                  |
+| `tasks/task-sync/repository.ts`                    | Pull-from-remote, push-first on `isDirectlyAccessible=true`           |

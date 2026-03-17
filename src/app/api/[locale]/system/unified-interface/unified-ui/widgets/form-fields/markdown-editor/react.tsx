@@ -63,8 +63,7 @@ export function MarkdownEditorWidget<
   const editIconSizeClass = getIconSizeClassName(editIconSize);
 
   const form = useWidgetForm();
-  const rawValue =
-    form?.watch(fieldName) || "value" in field ? field.value : "";
+  const rawValue = form.watch(fieldName) || "value" in field ? field.value : "";
 
   const inputHeightClass =
     inputHeight === "xs"

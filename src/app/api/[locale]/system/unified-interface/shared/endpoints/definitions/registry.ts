@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -73,8 +73,27 @@ async function loadAllDefinitions(): Promise<CreateApiEndpointAny[]> {
   // Collect unique canonical paths (values in pathToAliasMap are canonical)
   const canonical = new Set(Object.values(pathToAliasMap));
 
+  // Bun TDZ race: dynamic imports may throw "Cannot access 'X' before initialization"
+  // on first load. Retry once with a short yield to let the module settle.
+  async function getEndpointWithRetry(
+    path: string,
+  ): Promise<CreateApiEndpointAny | null> {
+    try {
+      return await getEndpoint(path);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (msg.includes("before initialization")) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        return getEndpoint(path);
+      }
+      throw error;
+    }
+  }
+
   const results = await Promise.all(
-    [...canonical].map((path) => getEndpoint(path)),
+    [...canonical].map((path) => getEndpointWithRetry(path)),
   );
 
   allDefinitionsCache = results.filter(
@@ -218,6 +237,13 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
 
     if (cached && cached.expiresAt > now) {
       return cached.data;
+    }
+
+    // Evict all expired entries before writing a new one
+    for (const [key, entry] of this.toolsCache) {
+      if (entry.expiresAt <= now) {
+        this.toolsCache.delete(key);
+      }
     }
 
     const filteredEndpoints = await this.getEndpointsForUser(platform, user);

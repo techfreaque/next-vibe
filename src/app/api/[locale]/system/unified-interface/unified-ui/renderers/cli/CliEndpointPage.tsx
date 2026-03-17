@@ -220,6 +220,32 @@ export function InkEndpointPage<
     );
   }
 
+  // Response data for widgets — mirrors React EndpointsPage pattern
+  const responseData = response?.success === true ? response.data : initialData;
+
+  // Full-takeover CLI widget: skip header/border, render directly
+  const rootRender = (
+    activeEndpoint.fields as { render?: { cliWidget?: boolean } }
+  ).render;
+  if (rootRender?.cliWidget === true) {
+    return (
+      <InkEndpointRenderer
+        endpoint={activeEndpoint}
+        locale={locale}
+        data={responseData}
+        isSubmitting={isSubmitting}
+        logger={logger}
+        user={user}
+        platform={Platform.CLI}
+        response={response}
+        onFormChange={setFormValues}
+        onSubmit={(data): void => {
+          void handleSubmit(data as WidgetData);
+        }}
+      />
+    );
+  }
+
   const { t } = activeEndpoint.scopedTranslation.scopedT(locale);
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
@@ -227,9 +253,6 @@ export function InkEndpointPage<
   const title = t(activeEndpoint.title);
   const description = t(activeEndpoint.description);
   const method = activeEndpoint.method;
-
-  // Response data for widgets — mirrors React EndpointsPage pattern
-  const responseData = response?.success === true ? response.data : initialData;
 
   return (
     <Box flexDirection="column" paddingX={1} paddingY={1}>

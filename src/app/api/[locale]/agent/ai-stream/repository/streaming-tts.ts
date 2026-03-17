@@ -23,7 +23,7 @@ import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
 
 /**
- * Minimum characters before emitting a TTS chunk
+ * Minimum skills before emitting a TTS chunk
  * Avoids choppy audio from very short phrases
  */
 const MIN_CHUNK_SIZE = 50;
@@ -64,7 +64,7 @@ export class StreamingTTSHandler {
   private readonly user: JwtPayloadType;
   private isEnabled: boolean;
   private isCancelled = false;
-  private totalCharactersProcessed = 0;
+  private totalSkillsProcessed = 0;
   /**
    * Sequential generation chain: at most one TTS API call in-flight at a time.
    * The next chunk's generation starts as soon as the previous one resolves,
@@ -271,8 +271,8 @@ export class StreamingTTSHandler {
           audioDataLength: audioDataUrl.length,
         });
 
-        // Track character count for credit deduction
-        this.totalCharactersProcessed += cleanText.length;
+        // Track skill count for credit deduction
+        this.totalSkillsProcessed += cleanText.length;
 
         // Deduct credits for TTS
         const creditsNeeded = cleanText.length * TTS_COST_PER_CHARACTER;
@@ -297,13 +297,13 @@ export class StreamingTTSHandler {
               this.wsEmit(creditEvent);
             }
             this.logger.debug("[Streaming TTS] Credits deducted", {
-              characters: cleanText.length,
+              skills: cleanText.length,
               credits: creditsNeeded,
               partial: deductResult.partialDeduction,
             });
           } else {
             this.logger.warn("[Streaming TTS] Failed to deduct credits", {
-              characters: cleanText.length,
+              skills: cleanText.length,
               creditsNeeded,
             });
           }

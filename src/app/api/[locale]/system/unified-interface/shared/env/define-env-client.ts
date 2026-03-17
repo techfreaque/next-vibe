@@ -13,6 +13,12 @@ interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   comment?: string;
   /** When true, the key is commented out in .env.example (still present but inactive) */
   commented?: boolean;
+  /** When true, the value is masked in admin settings views. Falls back to name-pattern heuristic if not set. */
+  sensitive?: boolean;
+  /** Grouping within a module (e.g. "auth", "database"). Used by the settings UI. */
+  category?: string;
+  /** When true, the onboarding flow highlights this field as must-configure. */
+  onboardingRequired?: boolean;
 }
 
 type Fields = Record<string, FieldDef>;
@@ -26,6 +32,9 @@ export interface EnvExample {
   example: string | false;
   comment?: string;
   commented?: boolean;
+  sensitive?: boolean;
+  category?: string;
+  onboardingRequired?: boolean;
 }
 
 /**
@@ -65,6 +74,9 @@ export function defineEnvClient<T extends Fields>(
     example: def.example,
     comment: def.comment,
     commented: def.commented,
+    sensitive: def.sensitive,
+    category: def.category,
+    onboardingRequired: def.onboardingRequired,
   }));
 
   return { envClient, schema, examples };

@@ -107,7 +107,7 @@ export function HaltAllWidget({
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700 text-white"
               onClick={() => {
-                form?.setValue("confirm", true);
+                form.setValue("confirm", true);
                 onSubmit?.();
               }}
             >

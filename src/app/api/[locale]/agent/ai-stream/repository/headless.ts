@@ -21,24 +21,22 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { NO_CHARACTER_ID } from "../../chat/characters/constants";
+import { NO_SKILL_ID } from "../../chat/skills/constants";
 import {
   isFiltersSelection,
   isManualSelection,
-} from "../../chat/characters/create/definition";
-import { CharactersRepositoryClient } from "../../chat/characters/repository-client";
+} from "../../chat/skills/create/definition";
+import { SkillsRepositoryClient } from "../../chat/skills/repository-client";
 import { DefaultFolderId } from "../../chat/config";
 import type { MessageMetadata, ToolCallResult } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
-import { ensureThread } from "../../chat/threads/repository";
+import { ThreadsRepository } from "../../chat/threads/repository";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { AiStreamRepository } from "./index";
-
-/* eslint-disable i18next/no-literal-string */
 
 /** A pre-fetched tool call result to inject into the thread before the AI runs */
 export interface HeadlessPreCall {
@@ -52,9 +50,9 @@ export interface HeadlessPreCall {
 
 export interface HeadlessAiStreamParams {
   /**
-   * Favorite ID to load model + character from.
-   * When provided, model and character are resolved from the saved favorite.
-   * Explicit model/character fields override the favorite if also provided.
+   * Favorite ID to load model + skill from.
+   * When provided, model and skill are resolved from the saved favorite.
+   * Explicit model/skill fields override the favorite if also provided.
    */
   favoriteId?: string;
   /**
@@ -63,28 +61,28 @@ export interface HeadlessAiStreamParams {
    */
   model?: ModelId;
   /**
-   * Character/persona for system prompt. Required unless favoriteId is provided.
-   * Overrides the character from the favorite when both are given.
+   * Skill/persona for system prompt. Required unless favoriteId is provided.
+   * Overrides the skill from the favorite when both are given.
    */
-  character?: string;
+  skill?: string;
   /** User prompt — the main question/instruction */
   prompt: string;
   /**
-   * Visible tools — what the model sees and can call.
+   * Pinned tools — tools loaded into the AI context window (visible to model).
    * null/undefined = agent mode (all tools visible).
    * [] = no tools visible.
-   * Array of { toolId, requiresConfirmation } = specific tools visible.
+   * Array of { toolId, requiresConfirmation } = specific tools pinned to context.
    */
-  availableTools?: Array<{
+  pinnedTools?: Array<{
     toolId: string;
     requiresConfirmation: boolean;
   }> | null;
   /**
-   * Allowed tools — permission layer controlling which tools the model may execute.
+   * Available tools — permission layer controlling which tools the model may execute.
    * null/undefined = all tools permitted.
    * Array = restrict execution to listed toolIds.
    */
-  allowedTools?: Array<{
+  availableTools?: Array<{
     toolId: string;
     requiresConfirmation: boolean;
   }> | null;
@@ -123,6 +121,14 @@ export interface HeadlessAiStreamParams {
    */
   wakeUpRevival?: boolean;
   /**
+   * Explicit parent message ID for history loading.
+   * When provided, skips the "find last message by createdAt" query and uses
+   * this ID directly as the starting point for building message ancestry.
+   * Critical for WAIT mode resume where the tool message with backfilled result
+   * must be the ancestor chain root — not whatever message was created last.
+   */
+  explicitParentMessageId?: string;
+  /**
    * Force a specific sequenceId for the revival AI message.
    * Used by resume-stream so the revival response shares the same sequence
    * as the synthetic assistant + deferred tool pair that precede it.
@@ -153,9 +159,9 @@ export interface HeadlessAiStreamResult {
  * Returns the lastAiMessageId — caller reads message content from DB.
  */
 /**
- * Resolve model and character from a favorite ID.
- * Returns the model ID and character ID from the favorite's modelSelection.
- * Falls back to NO_CHARACTER_ID if the favorite has no character set.
+ * Resolve model and skill from a favorite ID.
+ * Returns the model ID and skill ID from the favorite's modelSelection.
+ * Falls back to NO_SKILL_ID if the favorite has no skill set.
  */
 export async function resolveFavorite(
   favoriteId: string,
@@ -163,7 +169,7 @@ export async function resolveFavorite(
   user: JwtPayloadType,
   logger: EndpointLogger,
   locale: CountryLanguage,
-): Promise<{ model: ModelId; character: string } | null> {
+): Promise<{ model: ModelId; skill: string } | null> {
   const [favorite] = await db
     .select()
     .from(chatFavorites)
@@ -177,45 +183,41 @@ export async function resolveFavorite(
     return null;
   }
 
-  const character = favorite.characterId || NO_CHARACTER_ID;
+  const skill = favorite.skillId || NO_SKILL_ID;
 
   // Resolve model from modelSelection
   const sel = favorite.modelSelection;
   if (sel && isManualSelection(sel) && "manualModelId" in sel) {
     return {
       model: sel.manualModelId as ModelId,
-      character,
+      skill,
     };
   }
   if (sel && isFiltersSelection(sel)) {
-    const best = CharactersRepositoryClient.getBestModelForCharacter(sel, user);
+    const best = SkillsRepositoryClient.getBestModelForSkill(sel, user);
     if (best) {
-      return { model: best.id as ModelId, character };
+      return { model: best.id as ModelId, skill };
     }
   }
 
-  // CHARACTER_BASED or no selection: load the character to get its modelSelection
-  if (character !== NO_CHARACTER_ID) {
-    const { CharactersRepository } =
-      await import("../../chat/characters/repository");
-    const characterResult = await CharactersRepository.getCharacterById(
-      { id: character },
+  // CHARACTER_BASED or no selection: load the skill to get its modelSelection
+  if (skill !== NO_SKILL_ID) {
+    const { SkillsRepository } = await import("../../chat/skills/repository");
+    const skillResult = await SkillsRepository.getSkillById(
+      { id: skill },
       user,
       logger,
       locale,
     );
-    if (characterResult.success) {
-      const charSel = characterResult.data.modelSelection;
+    if (skillResult.success) {
+      const charSel = skillResult.data.modelSelection;
       if (
         charSel &&
         (isManualSelection(charSel) || isFiltersSelection(charSel))
       ) {
-        const best = CharactersRepositoryClient.getBestModelForCharacter(
-          charSel,
-          user,
-        );
+        const best = SkillsRepositoryClient.getBestModelForSkill(charSel, user);
         if (best) {
-          return { model: best.id as ModelId, character };
+          return { model: best.id as ModelId, skill };
         }
       }
     }
@@ -225,7 +227,7 @@ export async function resolveFavorite(
     "[Headless AI] Favorite has no resolvable model — pass model explicitly",
     {
       favoriteId,
-      characterId: character,
+      skillId: skill,
     },
   );
   return null;
@@ -237,10 +239,10 @@ export async function runHeadlessAiStream(
   const {
     favoriteId,
     model: modelOverride,
-    character: characterOverride,
+    skill: skillOverride,
     prompt,
+    pinnedTools,
     availableTools,
-    allowedTools,
     headlessInstructions,
     threadMode,
     threadId: existingThreadId,
@@ -249,6 +251,7 @@ export async function runHeadlessAiStream(
     preCalls,
     excludeMemories,
     wakeUpRevival,
+    explicitParentMessageId,
     sequenceIdOverride,
     user,
     locale,
@@ -257,9 +260,9 @@ export async function runHeadlessAiStream(
   } = params;
 
   try {
-    // ── Resolve model + character ─────────────────────────────────────────────
+    // ── Resolve model + skill ─────────────────────────────────────────────────
     let model = modelOverride;
-    let character = characterOverride;
+    let skill = skillOverride;
 
     if (favoriteId) {
       const userId = "id" in user ? (user.id as string) : undefined;
@@ -279,41 +282,40 @@ export async function runHeadlessAiStream(
         }
         // Explicit params override favorite values
         model = modelOverride ?? resolved.model;
-        character = characterOverride ?? resolved.character;
+        skill = skillOverride ?? resolved.skill;
       }
     }
 
-    // ── Resolve model from character if only character is provided ────────────
-    if (!model && character && character !== NO_CHARACTER_ID) {
-      const { CharactersRepository } =
-        await import("../../chat/characters/repository");
-      const characterResult = await CharactersRepository.getCharacterById(
-        { id: character },
+    // ── Resolve model from skill if only skill is provided ────────────
+    if (!model && skill && skill !== NO_SKILL_ID) {
+      const { SkillsRepository } = await import("../../chat/skills/repository");
+      const skillResult = await SkillsRepository.getSkillById(
+        { id: skill },
         user,
         logger,
         locale,
       );
-      if (characterResult.success) {
-        const charSel = characterResult.data.modelSelection;
+      if (skillResult.success) {
+        const charSel = skillResult.data.modelSelection;
         if (charSel) {
           if (isManualSelection(charSel) && "manualModelId" in charSel) {
-            model = charSel.manualModelId as ModelId;
+            model = charSel.manualModelId;
           } else if (isFiltersSelection(charSel)) {
-            const best = CharactersRepositoryClient.getBestModelForCharacter(
+            const best = SkillsRepositoryClient.getBestModelForSkill(
               charSel,
               user,
             );
             if (best) {
-              model = best.id as ModelId;
+              model = best.id;
             }
           }
         }
       }
     }
 
-    if (!model || !character) {
+    if (!model || !skill) {
       return fail({
-        message: aiStreamT("headless.errors.missingModelOrCharacter"),
+        message: aiStreamT("headless.errors.missingModelOrSkill"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -335,7 +337,7 @@ export async function runHeadlessAiStream(
     if (preCalls && preCalls.length > 0 && !isIncognito) {
       // Ensure the thread exists first
       const userId = user.isPublic ? undefined : user.id;
-      await ensureThread({
+      await ThreadsRepository.ensureThread({
         threadId: effectiveThreadId,
         rootFolderId,
         subFolderId: subFolderId ?? null,
@@ -359,7 +361,7 @@ export async function runHeadlessAiStream(
         sequenceId: null,
         isAI: false,
         model: null,
-        character: null,
+        skill: null,
         metadata: {},
       });
 
@@ -378,7 +380,7 @@ export async function runHeadlessAiStream(
         sequenceId: preCallSequenceId,
         isAI: true,
         model,
-        character,
+        skill: skill,
         metadata: {},
       });
 
@@ -396,7 +398,7 @@ export async function runHeadlessAiStream(
           sequenceId: preCallSequenceId,
           isAI: true,
           model,
-          character,
+          skill: skill,
           metadata: {
             toolCall: {
               toolCallId: `precall_${toolMessageId}`,
@@ -413,19 +415,24 @@ export async function runHeadlessAiStream(
       parentMessageIdForAi = lastToolMessageId;
     }
 
-    // For "append" mode with no preCalls, find the last message in the thread
-    // so we can use "answer-as-ai"/"wakeup-resume" (which continues from an existing
-    // message) instead of "send" (which would create a new user message with empty content).
+    // For "append" mode with no preCalls, determine the parent message for history.
+    // explicitParentMessageId takes priority — critical for WAIT mode resume where
+    // the tool message with its backfilled result must be the history root, not
+    // whatever message was created most recently by timestamp.
     if (threadMode === "append" && !parentMessageIdForAi && existingThreadId) {
-      const [lastMsg] = await db
-        .select({ id: chatMessages.id })
-        .from(chatMessages)
-        .where(eq(chatMessages.threadId, existingThreadId))
-        .orderBy(desc(chatMessages.createdAt))
-        .limit(1);
+      if (explicitParentMessageId) {
+        parentMessageIdForAi = explicitParentMessageId;
+      } else {
+        const [lastMsg] = await db
+          .select({ id: chatMessages.id })
+          .from(chatMessages)
+          .where(eq(chatMessages.threadId, existingThreadId))
+          .orderBy(desc(chatMessages.createdAt))
+          .limit(1);
 
-      if (lastMsg) {
-        parentMessageIdForAi = lastMsg.id;
+        if (lastMsg) {
+          parentMessageIdForAi = lastMsg.id;
+        }
       }
     }
 
@@ -456,9 +463,9 @@ export async function runHeadlessAiStream(
       content: prompt,
       role: ChatMessageRole.USER,
       model,
-      character,
-      allowedTools: allowedTools ?? null,
-      tools: availableTools ?? null,
+      skill: skill,
+      availableTools: availableTools ?? null,
+      pinnedTools: pinnedTools ?? null,
       toolConfirmations: null,
       messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
       voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE },

@@ -35,7 +35,14 @@ export function AlertWidgetInk<
   const t = useInkWidgetTranslation<TEndpoint>();
   const { content, variant = "default" } = field;
 
-  const message = content ? t(content) : field.value;
+  const message = !field.value
+    ? content
+      ? t(content)
+      : ""
+    : typeof field.value === "string"
+      ? // oxlint-disable-next-line typescript/no-explicit-any
+        t(field.value as any)
+      : field.value;
 
   // Determine color based on variant
   let color: string;

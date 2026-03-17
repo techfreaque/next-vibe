@@ -10,6 +10,7 @@ import type { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/strea
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { AbortReason, isStreamAbort } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
 import { clearStreamingState } from "../core/stream-registry";
 import { StreamErrorHandler } from "./stream-error-handler";
@@ -37,7 +38,11 @@ export class StreamErrorCatchHandler {
     // Note: Abort errors are handled inline in stream-execution-handler.
     // This handler only receives non-abort errors.
 
-    if (error instanceof Error && error.message === "Stream timeout") {
+    if (
+      error instanceof Error &&
+      isStreamAbort(error) &&
+      error.reason === AbortReason.STREAM_TIMEOUT
+    ) {
       await TimeoutErrorHandler.handleTimeout({
         maxDuration,
         model,
