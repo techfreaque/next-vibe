@@ -25,10 +25,21 @@ interface FramePageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function VibeFramePage({
+export interface VibeFramePageData {
+  locale: CountryLanguage;
+  endpointId: string;
+  frameId: string;
+  theme: "light" | "dark" | "system";
+  authToken: string | undefined;
+  urlPathParams: Record<string, string>;
+  data: Record<string, string>;
+  user: JwtPayloadType;
+}
+
+export async function tanstackLoader({
   params,
   searchParams,
-}: FramePageProps): Promise<JSX.Element> {
+}: FramePageProps): Promise<VibeFramePageData> {
   const { locale, path } = await params;
   const search = await searchParams;
 
@@ -75,6 +86,28 @@ export default async function VibeFramePage({
     logger,
   );
 
+  return {
+    locale,
+    endpointId,
+    frameId,
+    theme,
+    authToken,
+    urlPathParams,
+    data,
+    user,
+  };
+}
+
+export function TanstackPage({
+  endpointId,
+  locale,
+  frameId,
+  theme,
+  authToken,
+  urlPathParams,
+  data,
+  user,
+}: VibeFramePageData): JSX.Element {
   return (
     <VibeFramePageClient
       endpointId={endpointId}
@@ -87,4 +120,12 @@ export default async function VibeFramePage({
       user={user}
     />
   );
+}
+
+export default async function VibeFramePage({
+  params,
+  searchParams,
+}: FramePageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params, searchParams });
+  return <TanstackPage {...data} />;
 }

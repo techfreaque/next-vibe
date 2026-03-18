@@ -32,10 +32,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function FrameworkPage(): Promise<JSX.Element> {
+export interface FrameworkPageData {
+  locale: CountryLanguage;
+  readmeContent: string;
+}
+
+export async function tanstackLoader({
+  params,
+}: Props): Promise<FrameworkPageData> {
+  const { locale } = await params;
   const readmePath = path.join(process.cwd(), "README.md");
   const readmeContent = fs.readFileSync(readmePath, "utf-8");
+  return { locale, readmeContent };
+}
 
+export function TanstackPage({
+  readmeContent,
+}: FrameworkPageData): JSX.Element {
   return (
     <Div className="min-h-screen">
       <Container size="lg" className="py-12">
@@ -45,4 +58,11 @@ export default async function FrameworkPage(): Promise<JSX.Element> {
       </Container>
     </Div>
   );
+}
+
+export default async function FrameworkPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

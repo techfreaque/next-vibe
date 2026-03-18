@@ -10,12 +10,27 @@ interface DesignTestPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function DesignTestPage({
+export interface DesignTestPageData {
+  locale: CountryLanguage;
+}
+
+export async function tanstackLoader({
   params,
-}: DesignTestPageProps): Promise<JSX.Element> {
+}: DesignTestPageProps): Promise<DesignTestPageData> {
   const { locale } = await params;
+  return { locale };
+}
+
+export function TanstackPage({ locale }: DesignTestPageData): JSX.Element {
   if (envClient.NODE_ENV === Environment.PRODUCTION) {
     return <></>;
   }
   return <DesignTestPageLayout locale={locale} />;
+}
+
+export default async function DesignTestPage({
+  params,
+}: DesignTestPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

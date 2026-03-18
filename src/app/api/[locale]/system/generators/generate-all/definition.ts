@@ -112,6 +112,15 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
+      skipTanstack: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.skipTanstack.label",
+        description: "post.fields.skipTanstack.description",
+        columns: 4,
+        schema: z.boolean().optional().default(false),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

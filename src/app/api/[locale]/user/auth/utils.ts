@@ -9,7 +9,6 @@ import { redirect } from "next-vibe-ui/lib/redirect";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { env as serverEnv } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../enum";
@@ -18,9 +17,6 @@ import type { CompleteUserType } from "../types";
 import { UserRole } from "../user-roles/enum";
 import { AuthRepository } from "./repository";
 import type { JwtPrivatePayloadType } from "./types";
-
-/** Sentinel password that triggers onboarding redirect */
-const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 
 /**
  * Require an authenticated admin user
@@ -43,16 +39,6 @@ export async function requireAdminUser(
       redirect(
         `/${locale}/user/login?callbackUrl=${encodeURIComponent(redirectPath || `/${locale}/admin`)}`,
       );
-    }
-
-    // Guard: redirect to settings page if default password is still set
-    // (skip if already on the settings page to avoid redirect loop)
-    const settingsPath = `/${locale}/admin/settings`;
-    if (
-      serverEnv.VIBE_ADMIN_USER_PASSWORD === DEFAULT_PASSWORD_SENTINEL &&
-      redirectPath !== settingsPath
-    ) {
-      redirect(settingsPath);
     }
 
     return minimalUser;

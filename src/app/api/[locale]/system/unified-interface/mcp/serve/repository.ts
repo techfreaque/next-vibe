@@ -8,6 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
@@ -25,6 +26,7 @@ class MCPServeRepository {
   async startServer(
     logger: EndpointLogger,
     locale: CountryLanguage,
+    user: JwtPayloadType,
     registry?: MCPRegistry,
     defRegistry?: IDefinitionsRegistry,
     definitionLdr?: IDefinitionLoader,
@@ -38,7 +40,7 @@ class MCPServeRepository {
     const mcpServer = new MCPServer(registry, defRegistry, definitionLdr);
 
     // This never returns - the MCP server takes over stdin/stdout
-    await mcpServer.start(logger, locale);
+    await mcpServer.start(logger, locale, user);
 
     // Never reached - server runs until process exits
     return success({

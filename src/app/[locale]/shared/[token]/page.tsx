@@ -25,9 +25,19 @@ interface SharedTokenPageProps {
   }>;
 }
 
-export default async function SharedTokenPage({
+type SharedTokenPageState =
+  | { kind: "userError"; errorTitle: string; errorMessage: string }
+  | { kind: "shareLinkError"; errorTitle: string; errorMessage: string }
+  | { kind: "redirect"; url: string };
+
+export interface SharedTokenPageData {
+  locale: CountryLanguage;
+  state: SharedTokenPageState;
+}
+
+export async function tanstackLoader({
   params,
-}: SharedTokenPageProps): Promise<JSX.Element> {
+}: SharedTokenPageProps): Promise<SharedTokenPageData> {
   const { locale, token } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
   const { t } = simpleT(locale);
@@ -45,18 +55,14 @@ export default async function SharedTokenPage({
 
   const user = userResponse.success ? userResponse.data : undefined;
   if (!user) {
-    return (
-      <Div className="flex items-center justify-center min-h-screen p-4">
-        <Div className="max-w-md text-center">
-          <P className="text-lg font-semibold mb-2">
-            {t("app.common.error.title")}
-          </P>
-          <P className="text-sm text-muted-foreground">
-            {t("app.common.error.message")}
-          </P>
-        </Div>
-      </Div>
-    );
+    return {
+      locale,
+      state: {
+        kind: "userError",
+        errorTitle: t("app.common.error.title"),
+        errorMessage: t("app.common.error.message"),
+      },
+    };
   }
 
   // Get share link by token
@@ -67,18 +73,15 @@ export default async function SharedTokenPage({
   );
 
   if (!shareLinkResponse.success || !shareLinkResponse.data) {
-    return (
-      <Div className="flex items-center justify-center min-h-screen p-4">
-        <Div className="max-w-md text-center">
-          <P className="text-lg font-semibold mb-2">
-            {t("app.common.error.title")}
-          </P>
-          <P className="text-sm text-muted-foreground">
-            {shareLinkResponse.message || t("app.common.error.message")}
-          </P>
-        </Div>
-      </Div>
-    );
+    return {
+      locale,
+      state: {
+        kind: "shareLinkError",
+        errorTitle: t("app.common.error.title"),
+        errorMessage:
+          shareLinkResponse.message ?? t("app.common.error.message"),
+      },
+    };
   }
 
   const { thread, shareLink } = shareLinkResponse.data;
@@ -87,10 +90,41 @@ export default async function SharedTokenPage({
   if (shareLink.requireAuth && user.isPublic) {
     // Redirect to login with return URL
     const returnUrl = encodeURIComponent(`/${locale}/shared/${token}`);
-    redirect(`/${locale}/user/auth?returnUrl=${returnUrl}`);
+    return {
+      locale,
+      state: {
+        kind: "redirect",
+        url: `/${locale}/user/auth?returnUrl=${returnUrl}`,
+      },
+    };
   }
 
   // Redirect to the actual thread
   // Format: /{locale}/threads/shared/{threadId}
-  redirect(`/${locale}/threads/shared/${thread.id}`);
+  return {
+    locale,
+    state: { kind: "redirect", url: `/${locale}/threads/shared/${thread.id}` },
+  };
+}
+
+export function TanstackPage({ state }: SharedTokenPageData): JSX.Element {
+  if (state.kind === "redirect") {
+    redirect(state.url);
+  }
+
+  return (
+    <Div className="flex items-center justify-center min-h-screen p-4">
+      <Div className="max-w-md text-center">
+        <P className="text-lg font-semibold mb-2">{state.errorTitle}</P>
+        <P className="text-sm text-muted-foreground">{state.errorMessage}</P>
+      </Div>
+    </Div>
+  );
+}
+
+export default async function SharedTokenPage({
+  params,
+}: SharedTokenPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

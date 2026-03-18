@@ -57,6 +57,10 @@ export const translations: typeof enTranslations = {
         title: "Build erzwingen",
         description: "Build auch bei Fehlern fortsetzen",
       },
+      tanstack: {
+        title: "TanStack-Build",
+        description: "TanStack/Vite-App statt Next.js erstellen",
+      },
       skipEndpoints: {
         title: "Endpunkt-Generierung überspringen",
         description: "Generierung von Endpunkt-Dateien überspringen",

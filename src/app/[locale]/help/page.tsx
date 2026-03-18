@@ -12,6 +12,7 @@ import {
 } from "@/app/api/[locale]/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
@@ -25,6 +26,15 @@ import HelpPageClient from "./page-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
+}
+
+export interface HelpPageData {
+  locale: CountryLanguage;
+  jwtUser: JwtPayloadType;
+  subPrice: string;
+  subCredits: number;
+  packPrice: string;
+  packCredits: number;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -51,14 +61,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function ContactPage({
-  params,
-}: Props): Promise<JSX.Element> {
+export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
   const { locale } = await params;
   if (env.NEXT_PUBLIC_LOCAL_MODE) {
     notFound();
   }
-  const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   const jwtUser = await AuthRepository.getAuthMinimalUser(
@@ -75,6 +82,26 @@ export default async function ContactPage({
   const packPrice = products[ProductIds.CREDIT_PACK].price;
   const packCredits = products[ProductIds.CREDIT_PACK].credits;
   const currencySymbol = countryInfo.symbol;
+
+  return {
+    locale,
+    jwtUser,
+    subPrice: `${currencySymbol}${subPrice}`,
+    subCredits,
+    packPrice: `${currencySymbol}${packPrice}`,
+    packCredits,
+  };
+}
+
+export function TanstackPage({
+  locale,
+  jwtUser,
+  subPrice,
+  subCredits,
+  packPrice,
+  packCredits,
+}: HelpPageData): JSX.Element {
+  const { t } = simpleT(locale);
 
   return (
     <Div
@@ -94,11 +121,18 @@ export default async function ContactPage({
         locale={locale}
         user={jwtUser}
         modelCount={TOTAL_MODEL_COUNT}
-        subPrice={`${currencySymbol}${subPrice}`}
+        subPrice={subPrice}
         subCredits={subCredits}
-        packPrice={`${currencySymbol}${packPrice}`}
+        packPrice={packPrice}
         packCredits={packCredits}
       />
     </Div>
   );
+}
+
+export default async function ContactPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

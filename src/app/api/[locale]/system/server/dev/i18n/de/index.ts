@@ -60,6 +60,10 @@ export const translations: typeof enTranslations = {
         title: "Seeding überspringen",
         description: "Datenbank-Seeding mit Anfangsdaten überspringen",
       },
+      tanstack: {
+        title: "TanStack",
+        description: "TanStack Router/Vite anstelle von Next.js verwenden",
+      },
       profile: {
         title: "Profiling",
         description:

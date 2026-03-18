@@ -20,6 +20,7 @@ import {
   translatePreviewFields,
 } from "@/app/api/[locale]/messenger/registry/generated";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -32,6 +33,31 @@ interface EmailTemplatePreviewPageProps {
   }>;
 }
 
+export interface EmailTemplatePreviewPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  templateId: string;
+  translatedName: string;
+  translatedDescription: string;
+  templateMeta: {
+    id: string;
+    version: string;
+    category: string;
+    path: string;
+  };
+  previewFields: ReturnType<typeof translatePreviewFields>;
+  exampleProps: Record<string, string | number | boolean>;
+  previousTemplateId: string | null;
+  nextTemplateId: string | null;
+  backLabel: string;
+  previousLabel: string;
+  nextLabel: string;
+  idLabel: string;
+  versionLabel: string;
+  categoryLabel: string;
+  pathLabel: string;
+}
+
 export async function generateStaticParams(): Promise<
   Array<{ templateId: string }>
 > {
@@ -39,9 +65,9 @@ export async function generateStaticParams(): Promise<
   return templateIds.map((id) => ({ templateId: id }));
 }
 
-export default async function EmailTemplatePreviewPage({
+export async function tanstackLoader({
   params,
-}: EmailTemplatePreviewPageProps): Promise<React.JSX.Element> {
+}: EmailTemplatePreviewPageProps): Promise<EmailTemplatePreviewPageData> {
   const { locale, templateId } = await params;
   const { t } = simpleT(locale);
   const user = await requireAdminUser(locale);
@@ -60,9 +86,6 @@ export default async function EmailTemplatePreviewPage({
   const previewFields = translatePreviewFields(template, locale);
   const exampleProps = template.exampleProps;
 
-  const translatedName = translatedMeta.name;
-  const translatedDescription = translatedMeta.description;
-
   // Get all templates for navigation
   const allTemplateIds = getAllTemplateIds();
   const currentIndex = allTemplateIds.indexOf(templateId);
@@ -73,6 +96,51 @@ export default async function EmailTemplatePreviewPage({
       ? allTemplateIds[currentIndex + 1]
       : null;
 
+  return {
+    locale,
+    user,
+    templateId,
+    translatedName: translatedMeta.name,
+    translatedDescription: translatedMeta.description,
+    templateMeta: {
+      id: translatedMeta.id,
+      version: translatedMeta.version,
+      category: translatedMeta.category,
+      path: translatedMeta.path,
+    },
+    previewFields,
+    exampleProps: exampleProps as Record<string, string | number | boolean>,
+    previousTemplateId,
+    nextTemplateId,
+    backLabel: t("app.admin.emails.templates.preview.back_to_templates"),
+    previousLabel: t("app.admin.emails.templates.preview.previous"),
+    nextLabel: t("app.admin.emails.templates.preview.next"),
+    idLabel: t("app.admin.emails.templates.preview.id"),
+    versionLabel: t("app.admin.emails.templates.preview.version"),
+    categoryLabel: t("app.admin.emails.templates.preview.category"),
+    pathLabel: t("app.admin.emails.templates.preview.path"),
+  };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  templateId,
+  translatedName,
+  translatedDescription,
+  templateMeta,
+  previewFields,
+  exampleProps,
+  previousTemplateId,
+  nextTemplateId,
+  backLabel,
+  previousLabel,
+  nextLabel,
+  idLabel,
+  versionLabel,
+  categoryLabel,
+  pathLabel,
+}: EmailTemplatePreviewPageData): React.JSX.Element {
   return (
     <Div className="flex flex-col gap-6">
       {/* Navigation Header */}
@@ -80,7 +148,7 @@ export default async function EmailTemplatePreviewPage({
         <Button asChild variant="outline" size="sm">
           <Link href={`/${locale}/admin/messenger/templates`}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t("app.admin.emails.templates.preview.back_to_templates")}
+            {backLabel}
           </Link>
         </Button>
 
@@ -90,7 +158,7 @@ export default async function EmailTemplatePreviewPage({
               <Link
                 href={`/${locale}/admin/messenger/templates/${previousTemplateId}`}
               >
-                {t("app.admin.emails.templates.preview.previous")}
+                {previousLabel}
               </Link>
             </Button>
           )}
@@ -99,7 +167,7 @@ export default async function EmailTemplatePreviewPage({
               <Link
                 href={`/${locale}/admin/messenger/templates/${nextTemplateId}`}
               >
-                {t("app.admin.emails.templates.preview.next")}
+                {nextLabel}
               </Link>
             </Button>
           )}
@@ -117,31 +185,23 @@ export default async function EmailTemplatePreviewPage({
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <Div>
-              <P className="text-gray-500 dark:text-gray-400">
-                {t("app.admin.emails.templates.preview.id")}
-              </P>
-              <P className="font-medium">{translatedMeta.id}</P>
+              <P className="text-gray-500 dark:text-gray-400">{idLabel}</P>
+              <P className="font-medium">{templateMeta.id}</P>
+            </Div>
+            <Div>
+              <P className="text-gray-500 dark:text-gray-400">{versionLabel}</P>
+              <P className="font-medium">{templateMeta.version}</P>
             </Div>
             <Div>
               <P className="text-gray-500 dark:text-gray-400">
-                {t("app.admin.emails.templates.preview.version")}
+                {categoryLabel}
               </P>
-              <P className="font-medium">{translatedMeta.version}</P>
+              <P className="font-medium capitalize">{templateMeta.category}</P>
             </Div>
             <Div>
-              <P className="text-gray-500 dark:text-gray-400">
-                {t("app.admin.emails.templates.preview.category")}
-              </P>
-              <P className="font-medium capitalize">
-                {translatedMeta.category}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-gray-500 dark:text-gray-400">
-                {t("app.admin.emails.templates.preview.path")}
-              </P>
+              <P className="text-gray-500 dark:text-gray-400">{pathLabel}</P>
               <Span className="font-mono text-xs text-gray-600">
-                {translatedMeta.path}
+                {templateMeta.path}
               </Span>
             </Div>
           </Div>
@@ -154,9 +214,16 @@ export default async function EmailTemplatePreviewPage({
         templateId={templateId}
         templateName={translatedName}
         previewFields={previewFields}
-        exampleProps={exampleProps as Record<string, string | number | boolean>}
+        exampleProps={exampleProps}
         user={user}
       />
     </Div>
   );
+}
+
+export default async function EmailTemplatePreviewPage({
+  params,
+}: EmailTemplatePreviewPageProps): Promise<React.JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

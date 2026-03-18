@@ -363,6 +363,7 @@ const startPollingWatcher = async (
           skipSeeds: watchCount !== 1,
           skipTaskIndex: false,
           enableTrpc: false,
+          skipTanstack: true,
         },
         logger,
         locale,

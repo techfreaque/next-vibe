@@ -16,10 +16,20 @@ interface AdminDashboardPageProps {
   }>;
 }
 
-export default async function AdminDashboardPage({
+export interface AdminDashboardPageData {
+  locale: CountryLanguage;
+}
+
+export async function tanstackLoader({
   params,
-}: AdminDashboardPageProps): Promise<React.JSX.Element> {
+}: AdminDashboardPageProps): Promise<AdminDashboardPageData> {
   const { locale } = await params;
+  return { locale };
+}
+
+export function TanstackPage({
+  locale,
+}: AdminDashboardPageData): React.JSX.Element {
   const { t } = simpleT(locale);
 
   return (
@@ -29,4 +39,11 @@ export default async function AdminDashboardPage({
       </P>
     </Div>
   );
+}
+
+export default async function AdminDashboardPage({
+  params,
+}: AdminDashboardPageProps): Promise<React.JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

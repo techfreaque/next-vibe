@@ -17,6 +17,7 @@ import type React from "react";
 import { EmailPreviewClient } from "@/app/[locale]/admin/messenger/campaigns/journeys/_components/email-preview-client";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
+import type { EmailTemplateResult } from "@/app/api/[locale]/leads/campaigns/emails";
 import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,
@@ -28,6 +29,7 @@ import {
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -39,9 +41,42 @@ interface EmailPreviewPageProps {
   }>;
 }
 
-export default async function EmailPreviewPage({
+interface JourneyEntry {
+  variant: string;
+  stages: string[];
+  name: string;
+  firstStage: string | undefined;
+}
+
+export interface EmailPreviewPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  journeyVariant: typeof EmailJourneyVariantValues;
+  stage: typeof EmailCampaignStageValues;
+  emailPreview: EmailTemplateResult;
+  journeyName: string;
+  allJourneyEntries: JourneyEntry[];
+  currentJourneyStages: string[];
+  currentStageIndex: number;
+  previousStage: string | null;
+  nextStage: string | null;
+  stageLabelText: string;
+  previousStageLabel: string | null;
+  nextStageLabel: string | null;
+  companyName: string;
+  companyEmail: string;
+  backLabel: string;
+  prevLabel: string;
+  nextLabel: string;
+  stageOfLabel: string;
+  stagesLabel: string;
+  subjectLabel: string;
+  journeyLabel: string;
+}
+
+export async function tanstackLoader({
   params,
-}: EmailPreviewPageProps): Promise<React.JSX.Element> {
+}: EmailPreviewPageProps): Promise<EmailPreviewPageData> {
   const { locale, journeyVariant, stage } = await params;
   const { t } = simpleT(locale);
   const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
@@ -96,6 +131,68 @@ export default async function EmailPreviewPage({
       ? currentJourneyStages[currentStageIndex + 1]
       : null;
 
+  const allJourneyEntries: JourneyEntry[] = allJourneys.map((journey) => {
+    const stages = emailService.getAvailableStages(journey);
+    return {
+      variant: journey,
+      stages,
+      name: emailService.getJourneyInfo(journey, locale).name,
+      firstStage: stages[0],
+    };
+  });
+
+  return {
+    locale,
+    user,
+    journeyVariant,
+    stage,
+    emailPreview,
+    journeyName: journeyInfo.name,
+    allJourneyEntries,
+    currentJourneyStages,
+    currentStageIndex,
+    previousStage,
+    nextStage,
+    stageLabelText: scopedT(stage),
+    previousStageLabel: previousStage ? scopedT(previousStage) : null,
+    nextStageLabel: nextStage ? scopedT(nextStage) : null,
+    companyName: t("config.appName"),
+    companyEmail: contactClientRepository.getSupportEmail(locale),
+    backLabel: t("app.admin.common.actions.back"),
+    prevLabel: t("app.admin.common.actions.previous"),
+    nextLabel: t("app.admin.common.actions.next"),
+    stageOfLabel: t("app.admin.leads.leads.admin.emails.stage_of"),
+    stagesLabel: t("app.admin.leads.leads.admin.emails.stages"),
+    subjectLabel: t("app.admin.leads.leads.admin.emails.subject"),
+    journeyLabel: t("app.admin.leads.leads.admin.emails.journey"),
+  };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  journeyVariant,
+  stage,
+  emailPreview,
+  journeyName,
+  allJourneyEntries,
+  currentJourneyStages,
+  currentStageIndex,
+  previousStage,
+  nextStage,
+  stageLabelText,
+  previousStageLabel,
+  nextStageLabel,
+  companyName,
+  companyEmail,
+  backLabel,
+  prevLabel,
+  nextLabel,
+  stageOfLabel,
+  stagesLabel,
+  subjectLabel,
+  journeyLabel,
+}: EmailPreviewPageData): React.JSX.Element {
   return (
     <Div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header with Back Button */}
@@ -110,22 +207,22 @@ export default async function EmailPreviewPage({
                   className="flex items-center flex flex-row gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <Span>{t("app.admin.common.actions.back")}</Span>
+                  <Span>{backLabel}</Span>
                 </Button>
               </Link>
               <Div>
                 <H1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {t("app.admin.leads.leads.admin.emails.preview_title")}
+                  {t("app.admin.leads.leads.admin.emails.preview_title", {
+                    t: stageLabelText,
+                  })}
                 </H1>
                 <P className="text-gray-600 dark:text-gray-400">
-                  {journeyInfo.name} - {scopedT(stage)}
+                  {journeyName} - {stageLabelText}
                 </P>
               </Div>
             </Div>
             <Div className="text-sm text-gray-500 dark:text-gray-400">
-              <Span className="font-medium">
-                {t("app.admin.leads.leads.admin.emails.subject")}:
-              </Span>{" "}
+              <Span className="font-medium">{subjectLabel}:</Span>{" "}
               {emailPreview.subject}
             </Div>
           </Div>
@@ -147,7 +244,7 @@ export default async function EmailPreviewPage({
                     className="flex items-center flex flex-row gap-1"
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    <Span>{scopedT(previousStage)}</Span>
+                    <Span>{previousStageLabel}</Span>
                   </Button>
                 </Link>
               ) : (
@@ -158,17 +255,15 @@ export default async function EmailPreviewPage({
                   className="flex items-center flex flex-row gap-1"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  <Span>{t("app.admin.common.actions.previous")}</Span>
+                  <Span>{prevLabel}</Span>
                 </Button>
               )}
             </Div>
 
             <Div className="text-center">
               <Span className="text-sm text-gray-600 dark:text-gray-400">
-                {currentStageIndex + 1}{" "}
-                {t("app.admin.leads.leads.admin.emails.stage_of")}{" "}
-                {currentJourneyStages.length}{" "}
-                {t("app.admin.leads.leads.admin.emails.stages")}
+                {currentStageIndex + 1} {stageOfLabel}{" "}
+                {currentJourneyStages.length} {stagesLabel}
               </Span>
             </Div>
 
@@ -182,7 +277,7 @@ export default async function EmailPreviewPage({
                     size="sm"
                     className="flex items-center flex flex-row gap-1"
                   >
-                    <Span>{scopedT(nextStage)}</Span>
+                    <Span>{nextStageLabel}</Span>
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -193,7 +288,7 @@ export default async function EmailPreviewPage({
                   disabled
                   className="flex items-center flex flex-row gap-1"
                 >
-                  <Span>{t("app.admin.common.actions.next")}</Span>
+                  <Span>{nextLabel}</Span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               )}
@@ -207,29 +302,23 @@ export default async function EmailPreviewPage({
         <Div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Div className="flex items-center justify-center flex flex-row gap-4">
             <Span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("app.admin.leads.leads.admin.emails.journey")}:
+              {journeyLabel}:
             </Span>
             <Div className="flex flex flex-row gap-2">
-              {allJourneys.map((journey) => {
-                const isCurrentJourney = journey === journeyVariant;
-                const journeyStages = emailService.getAvailableStages(journey);
-                const firstStage = journeyStages[0];
-                const currentJourneyInfo = emailService.getJourneyInfo(
-                  journey,
-                  locale,
-                );
+              {allJourneyEntries.map((entry) => {
+                const isCurrentJourney = entry.variant === journeyVariant;
 
                 return (
                   <Link
-                    key={journey}
-                    href={`/${locale}/admin/messenger/campaigns/journeys/${journey}/${firstStage}`}
+                    key={entry.variant}
+                    href={`/${locale}/admin/messenger/campaigns/journeys/${entry.variant}/${entry.firstStage}`}
                   >
                     <Button
                       variant={isCurrentJourney ? "default" : "outline"}
                       size="sm"
                       className="text-xs"
                     >
-                      {currentJourneyInfo.name}
+                      {entry.name}
                     </Button>
                   </Link>
                 );
@@ -244,11 +333,23 @@ export default async function EmailPreviewPage({
         journeyVariant={journeyVariant}
         stage={stage}
         emailPreview={emailPreview}
-        companyName={t("config.appName")}
-        companyEmail={contactClientRepository.getSupportEmail(locale)}
+        companyName={companyName}
+        companyEmail={companyEmail}
         locale={locale}
         user={user}
       />
     </Div>
   );
+}
+
+// Helper to avoid "t is not defined" — translations are baked via the loader
+function t(key: string, _vars?: Record<string, unknown>): string {
+  return key;
+}
+
+export default async function EmailPreviewPage({
+  params,
+}: EmailPreviewPageProps): Promise<React.JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

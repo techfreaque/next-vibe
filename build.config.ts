@@ -14,6 +14,7 @@ import {
   BunTargetEnum,
   OutputFormatEnum,
   SourcemapModeEnum,
+  ViteBuildTypeEnum,
 } from "@/app/api/[locale]/system/builder/enum";
 import type { BuildConfig } from "@/app/api/[locale]/system/builder/repository";
 
@@ -137,6 +138,32 @@ const config: BuildConfig = {
         sourcemap: SourcemapModeEnum.EXTERNAL,
         format: OutputFormatEnum.IIFE,
         minify: true,
+      },
+    },
+
+    // ── TanStack Start (SSR) ─────────────────────────────────────────────────
+    // Full-stack SSR build using @tanstack/react-start + nitro.
+    // `input` = srcDirectory for tanstackStart plugin (src/app-tanstack).
+    // `output` = .output (Nitro outputs .output/server/index.mjs).
+    {
+      input: "src/app-tanstack",
+      output: ".output",
+      type: ViteBuildTypeEnum.TANSTACK_START,
+      viteOptions: {
+        // Map Next.js imports → TanStack equivalents.
+        // Applied as resolve.alias so they work in both client and SSR module runner.
+        moduleAliases: {
+          "next/navigation":
+            "src/packages/next-vibe-ui/tanstack/hooks/use-navigation.tsx",
+          "next/link": "src/packages/next-vibe-ui/tanstack/ui/link.tsx",
+          "next/image": "src/packages/next-vibe-ui/tanstack/ui/image.tsx",
+          "next/script": "src/packages/next-vibe-ui/tanstack/ui/script.tsx",
+          // server-only throws in Vite SSR (no Next.js boundaries) — stub it out
+          "server-only":
+            "src/packages/next-vibe-ui/tanstack/lib/server-only.ts",
+          // next/headers — cookies()/headers() backed by TanStack getWebRequest()
+          "next/headers": "src/packages/next-vibe-ui/tanstack/lib/headers.ts",
+        },
       },
     },
   ],

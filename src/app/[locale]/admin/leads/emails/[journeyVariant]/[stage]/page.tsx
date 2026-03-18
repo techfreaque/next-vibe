@@ -12,9 +12,15 @@ interface LeadsEmailPreviewPageProps {
   }>;
 }
 
-export default async function LeadsEmailPreviewPage({
+export interface LeadsEmailPreviewPageData {
+  locale: CountryLanguage;
+  journeyVariant: string;
+  stage: string;
+}
+
+export async function tanstackLoader({
   params,
-}: LeadsEmailPreviewPageProps): Promise<React.JSX.Element> {
+}: LeadsEmailPreviewPageProps): Promise<never> {
   const { locale, journeyVariant, stage } = await params;
   await requireAdminUser(
     locale,
@@ -23,4 +29,15 @@ export default async function LeadsEmailPreviewPage({
   redirect(
     `/${locale}/admin/messenger/campaigns/journeys/${journeyVariant}/${stage}`,
   );
+}
+
+// oxlint-disable-next-line no-unused-vars
+export function TanstackPage(_props: LeadsEmailPreviewPageData): never {
+  redirect("/");
+}
+
+export default async function LeadsEmailPreviewPage({
+  params,
+}: LeadsEmailPreviewPageProps): Promise<React.JSX.Element> {
+  return tanstackLoader({ params }) as never;
 }

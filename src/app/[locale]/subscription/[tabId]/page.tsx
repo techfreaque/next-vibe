@@ -7,10 +7,14 @@ import { notFound } from "next/navigation";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 
+import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
+import type { CreditsHistoryGetResponseOutput } from "@/app/api/[locale]/credits/history/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import {
   UserPermissionRole,
@@ -29,12 +33,24 @@ interface SubscriptionPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+export interface SubscriptionTabPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  isAuthenticated: boolean;
+  activeTab: string;
+  initialSubscription: SubscriptionGetResponseOutput | null;
+  initialCredits: CreditsGetResponseOutput | null;
+  initialHistory: CreditsHistoryGetResponseOutput | null;
+  hasPaymentProvider: boolean;
+  isAdmin: boolean;
+}
+
 const BASE_TABS = ["overview", "buy", "history"];
 
-export default async function SubscriptionPage({
+export async function tanstackLoader({
   params,
   searchParams,
-}: SubscriptionPageProps): Promise<JSX.Element> {
+}: SubscriptionPageProps): Promise<SubscriptionTabPageData> {
   const { locale, tabId } = await params;
   const query = await searchParams;
 
@@ -95,7 +111,7 @@ export default async function SubscriptionPage({
   }
 
   // Fetch subscription data
-  let initialSubscription = null;
+  let initialSubscription: SubscriptionGetResponseOutput | null = null;
   if (isAuthenticated) {
     const subscriptionResponse = await SubscriptionRepository.getSubscription(
       user.id,
@@ -108,7 +124,7 @@ export default async function SubscriptionPage({
   }
 
   // Fetch credits data
-  let initialCredits = null;
+  let initialCredits: CreditsGetResponseOutput | null = null;
   if (isAuthenticated) {
     const creditsResponse = await CreditRepository.getBalance(
       { userId: user.id },
@@ -120,7 +136,7 @@ export default async function SubscriptionPage({
   }
 
   // Fetch history data if on history tab
-  let initialHistory = null;
+  let initialHistory: CreditsHistoryGetResponseOutput | null = null;
   if (isAuthenticated && tabId === "history") {
     const historyResponse = await CreditRepository.getTransactionHistory(
       { paginationInfo: { page: 1, limit: 50 } },
@@ -137,12 +153,36 @@ export default async function SubscriptionPage({
     process.env.NOWPAYMENTS_API_KEY
   );
 
+  return {
+    locale,
+    user,
+    isAuthenticated: !!isAuthenticated,
+    activeTab: tabId,
+    initialSubscription,
+    initialCredits,
+    initialHistory,
+    hasPaymentProvider,
+    isAdmin,
+  };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  isAuthenticated,
+  activeTab,
+  initialSubscription,
+  initialCredits,
+  initialHistory,
+  hasPaymentProvider,
+  isAdmin,
+}: SubscriptionTabPageData): JSX.Element {
   return (
     <SubscriptionPageClient
       locale={locale}
       user={user}
-      isAuthenticated={!!isAuthenticated}
-      activeTab={tabId}
+      isAuthenticated={isAuthenticated}
+      activeTab={activeTab}
       initialSubscription={initialSubscription}
       initialCredits={initialCredits}
       initialHistory={initialHistory}
@@ -150,4 +190,12 @@ export default async function SubscriptionPage({
       isAdmin={isAdmin}
     />
   );
+}
+
+export default async function SubscriptionPage({
+  params,
+  searchParams,
+}: SubscriptionPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params, searchParams });
+  return <TanstackPage {...data} />;
 }

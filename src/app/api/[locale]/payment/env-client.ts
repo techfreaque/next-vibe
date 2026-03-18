@@ -12,7 +12,7 @@ export const {
   examples: paymentClientEnvExamples,
 } = defineEnvClient({
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: {
-    schema: z.string().min(1),
+    schema: z.string().min(1).optional(),
     value: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     example: "pk_test_your_stripe_publishable_key",
     commented: true,

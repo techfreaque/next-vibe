@@ -25,12 +25,26 @@ interface LeadsEmailsPageProps {
   }>;
 }
 
-export default async function LeadsEmailsPage({
+type JourneyVariant = ReturnType<
+  typeof emailService.getAvailableJourneys
+>[number];
+
+interface JourneyDataItem {
+  variant: JourneyVariant;
+  info: ReturnType<typeof emailService.getJourneyInfo>;
+  stages: ReturnType<typeof emailService.getAvailableStages>;
+}
+
+export interface LeadsEmailsPageData {
+  locale: CountryLanguage;
+  availableJourneys: JourneyVariant[];
+  journeyData: JourneyDataItem[];
+}
+
+export async function tanstackLoader({
   params,
-}: LeadsEmailsPageProps): Promise<React.JSX.Element> {
+}: LeadsEmailsPageProps): Promise<LeadsEmailsPageData> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
-  const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
   await requireAdminUser(
     locale,
     `/${locale}/admin/messenger/campaigns/journeys`,
@@ -47,6 +61,17 @@ export default async function LeadsEmailsPage({
       stages,
     };
   });
+
+  return { locale, availableJourneys, journeyData };
+}
+
+export function TanstackPage({
+  locale,
+  availableJourneys,
+  journeyData,
+}: LeadsEmailsPageData): React.JSX.Element {
+  const { t } = simpleT(locale);
+  const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -123,4 +148,11 @@ export default async function LeadsEmailsPage({
       </Tabs>
     </Div>
   );
+}
+
+export default async function LeadsEmailsPage({
+  params,
+}: LeadsEmailsPageProps): Promise<React.JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

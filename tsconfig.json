@@ -61,7 +61,9 @@
     "to_migrate/**/*.ts",
     "to_migrate/**/*.tsx",
     "**/test-project/**",
-    "**/test-files/**"
+    "**/test-files/**",
+    ".dist-tanstack",
+    ".dist"
   ]
   // "extends": "expo/tsconfig.base"
 }

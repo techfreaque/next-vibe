@@ -6,6 +6,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -16,6 +17,12 @@ import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
+}
+
+export interface ResetPasswordPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType | null;
+  errorMessage: string | null;
 }
 
 /**
@@ -61,9 +68,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function ResetPasswordPage({
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<ResetPasswordPageData> {
   const { locale } = await params;
   const { t } = pageT.scopedT(locale);
 
@@ -84,13 +91,27 @@ export default async function ResetPasswordPage({
   }
 
   if (!user) {
-    return (
-      <Div>
-        {verifiedUserResponse.success
-          ? t("errors.unknown")
-          : verifiedUserResponse.message}
-      </Div>
-    );
+    return {
+      locale,
+      user: null,
+      errorMessage: verifiedUserResponse.success
+        ? t("errors.unknown")
+        : verifiedUserResponse.message,
+    };
+  }
+
+  return { locale, user, errorMessage: null };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  errorMessage,
+}: ResetPasswordPageData): JSX.Element {
+  const { t } = pageT.scopedT(locale);
+
+  if (errorMessage ?? !user) {
+    return <Div>{errorMessage ?? t("errors.unknown")}</Div>;
   }
 
   return (
@@ -106,4 +127,11 @@ export default async function ResetPasswordPage({
       <ResetPasswordForm locale={locale} user={user} />
     </>
   );
+}
+
+export default async function ResetPasswordPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

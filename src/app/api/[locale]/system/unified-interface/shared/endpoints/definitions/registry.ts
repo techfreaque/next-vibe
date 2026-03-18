@@ -6,6 +6,10 @@ import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { parseError } from "@/app/api/[locale]/shared/utils";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import { pathToAliasMap } from "../../../../generated/alias-map";
+import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Methods } from "../../types/enums";
 import type { Platform } from "../../types/platform";
@@ -37,16 +41,19 @@ export interface IDefinitionsRegistry {
   getEndpointsForUser(
     platform: Platform,
     user: JwtPayloadType,
+    logger: EndpointLogger,
   ): Promise<CreateApiEndpointAny[]>;
 
   getEndpointCountByCategory(
     platform: Platform,
+    logger: EndpointLogger,
   ): Promise<Record<string, number>>;
 
   getSerializedToolsForUser(
     platform: Platform,
     user: JwtPayloadType,
     locale: CountryLanguage,
+    logger: EndpointLogger,
   ): Promise<SerializableToolMetadata[]>;
 }
 
@@ -60,40 +67,18 @@ interface ToolsCacheEntry {
 /** All definitions loaded once at first call, then cached permanently. */
 let allDefinitionsCache: CreateApiEndpointAny[] | null = null;
 
-async function loadAllDefinitions(): Promise<CreateApiEndpointAny[]> {
+async function loadAllDefinitions(
+  logger: EndpointLogger,
+): Promise<CreateApiEndpointAny[]> {
   if (allDefinitionsCache !== null) {
     return allDefinitionsCache;
   }
 
-  const { pathToAliasMap } =
-    await import("@/app/api/[locale]/system/generated/alias-map");
-  const { getEndpoint } =
-    await import("@/app/api/[locale]/system/generated/endpoint");
-
   // Collect unique canonical paths (values in pathToAliasMap are canonical)
   const canonical = new Set(Object.values(pathToAliasMap));
 
-  // Bun TDZ race: dynamic imports may throw "Cannot access 'X' before initialization"
-  // on first load. Retry once with a short yield to let the module settle.
-  async function getEndpointWithRetry(
-    path: string,
-  ): Promise<CreateApiEndpointAny | null> {
-    try {
-      return await getEndpoint(path);
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      if (msg.includes("before initialization")) {
-        await new Promise<void>((resolve) => {
-          setTimeout(resolve, 10);
-        });
-        return getEndpoint(path);
-      }
-      throw error;
-    }
-  }
-
   const results = await Promise.all(
-    [...canonical].map((path) => getEndpointWithRetry(path)),
+    [...canonical].map((path) => getEndpointWithRetry(path, logger)),
   );
 
   allDefinitionsCache = results.filter(
@@ -102,15 +87,33 @@ async function loadAllDefinitions(): Promise<CreateApiEndpointAny[]> {
   return allDefinitionsCache;
 }
 
-export type GetAllDefinitionsFn = () => Promise<CreateApiEndpointAny[]>;
+// Bun TDZ race: dynamic imports may throw "Cannot access 'X' before initialization"
+// on first load. Retry once with a short yield to let the module settle.
+async function getEndpointWithRetry(
+  path: string,
+  logger: EndpointLogger,
+): Promise<CreateApiEndpointAny | null> {
+  try {
+    return await getEndpoint(path);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes("before initialization")) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 10);
+      });
+      return getEndpoint(path);
+    }
+    logger.error("[registry] Failed to load endpoint", parseError(error), path);
+    return null;
+  }
+}
+
+export type GetAllDefinitionsFn = (
+  logger: EndpointLogger,
+) => Promise<CreateApiEndpointAny[]>;
 
 export class DefinitionsRegistry implements IDefinitionsRegistry {
   private toolsCache = new Map<string, ToolsCacheEntry>();
-  private readonly getAllDefinitions: GetAllDefinitionsFn;
-
-  constructor(getAllDefinitions: GetAllDefinitionsFn = loadAllDefinitions) {
-    this.getAllDefinitions = getAllDefinitions;
-  }
 
   private getToolsCacheKey(
     platform: Platform,
@@ -123,8 +126,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
 
   private async getAllForPlatform(
     platform: Platform,
+    logger: EndpointLogger,
   ): Promise<CreateApiEndpointAny[]> {
-    const all = await this.getAllDefinitions();
+    const all = await loadAllDefinitions(logger);
     return all.filter((definition) => {
       if (!definition.allowedRoles) {
         return true;
@@ -139,8 +143,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
   async getEndpointsForUser(
     platform: Platform,
     user: JwtPayloadType,
+    logger: EndpointLogger,
   ): Promise<CreateApiEndpointAny[]> {
-    const discovered = await this.getAllForPlatform(platform);
+    const discovered = await this.getAllForPlatform(platform, logger);
     return permissionsRegistry.filterEndpointsByPermissions(
       discovered,
       user,
@@ -150,8 +155,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
 
   async getEndpointCountByCategory(
     platform: Platform,
+    logger: EndpointLogger,
   ): Promise<Record<string, number>> {
-    const allEndpoints = await this.getAllForPlatform(platform);
+    const allEndpoints = await this.getAllForPlatform(platform, logger);
     const counts: Record<string, number> = {};
     for (const endpoint of allEndpoints) {
       const category = endpoint.category;
@@ -230,6 +236,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     platform: Platform,
     user: JwtPayloadType,
     locale: CountryLanguage,
+    logger: EndpointLogger,
   ): Promise<SerializableToolMetadata[]> {
     const cacheKey = this.getToolsCacheKey(platform, user, locale);
     const cached = this.toolsCache.get(cacheKey);
@@ -246,7 +253,11 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
       }
     }
 
-    const filteredEndpoints = await this.getEndpointsForUser(platform, user);
+    const filteredEndpoints = await this.getEndpointsForUser(
+      platform,
+      user,
+      logger,
+    );
     const result = this.serializeEndpoints(filteredEndpoints, locale);
 
     this.toolsCache.set(cacheKey, {

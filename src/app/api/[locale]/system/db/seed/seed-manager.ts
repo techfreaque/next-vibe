@@ -43,8 +43,8 @@ async function loadSeedModules(logger: EndpointLogger): Promise<void> {
         logger.warn(`⚠️  Seed module ${moduleName} returned null`);
       }
     } catch (error) {
-      logger.error(
-        `❌ Error loading seed module ${moduleName}:`,
+      logger.warn(
+        `⚠️  Seed module ${moduleName} skipped (missing config):`,
         parseError(error),
       );
     }

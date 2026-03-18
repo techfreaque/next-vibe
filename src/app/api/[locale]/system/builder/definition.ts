@@ -878,6 +878,33 @@ const { POST } = createEndpoint({
                       },
                     }),
 
+                    // Path to tsconfig for vite-tsconfig-paths (SPA mode)
+                    tsconfigPath: requestField(scopedTranslation, {
+                      type: WidgetType.FORM_FIELD,
+                      fieldType: FieldDataType.TEXT,
+                      label: "post.fields.viteTsconfigPath.title",
+                      description: "post.fields.viteTsconfigPath.description",
+                      placeholder: "post.fields.viteTsconfigPath.placeholder",
+                      optional: true,
+                      icon: "file-json",
+                      colSpan: 12,
+                      schema: z.string().optional(),
+                    }),
+
+                    // Module aliases: maps import specifier → resolved file path.
+                    // Applied as resolve.alias in Vite (works for both client and SSR runner).
+                    // Example: { "next/navigation": "src/packages/next-vibe-ui/tanstack/hooks/use-navigation.tsx" }
+                    moduleAliases: requestField(scopedTranslation, {
+                      type: WidgetType.FORM_FIELD,
+                      fieldType: FieldDataType.JSON,
+                      label: "post.fields.viteModuleAliases.label",
+                      description: "post.fields.viteModuleAliases.description",
+                      optional: true,
+                      icon: "arrow-right-left",
+                      colSpan: 12,
+                      schema: z.record(z.string(), z.string()).optional(),
+                    }),
+
                     // Raw plugins passthrough (for programmatic config files)
                     plugins: requestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,

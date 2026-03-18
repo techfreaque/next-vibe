@@ -53,13 +53,25 @@ export async function generateMetadata(
   });
 }
 
-export default async function TermsOfServicePage({
+export interface TermsOfServicePageData {
+  locale: CountryLanguage;
+  supportEmail: string;
+}
+
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<TermsOfServicePageData> {
   const { locale } = await params;
+  const supportEmail = contactClientRepository.getSupportEmail(locale);
+  return { locale, supportEmail };
+}
+
+export function TanstackPage({
+  locale,
+  supportEmail,
+}: TermsOfServicePageData): JSX.Element {
   const { t } = simpleT(locale);
   const appName = t("config.appName");
-  const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -351,4 +363,11 @@ export default async function TermsOfServicePage({
       </Div>
     </Div>
   );
+}
+
+export default async function TermsOfServicePage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

@@ -79,12 +79,25 @@ export async function generateMetadata({
 export default async function StoryPage({
   params,
 }: HomePageProps): Promise<JSX.Element | never> {
-  const { locale } = await params;
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
+}
 
-  // Create logger for server-side operations
+interface StoryPageData {
+  locale: CountryLanguage;
+  totalToolCount: number;
+  totalEndpointCount: number;
+  subPrice: number;
+  subCurrency: string;
+  hasUser: boolean;
+}
+
+export async function tanstackLoader({
+  params,
+}: HomePageProps): Promise<StoryPageData> {
+  const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  // Get user with proper error handling
   const userResponse = await UserRepository.getUserByAuth(
     {
       roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
@@ -94,9 +107,31 @@ export default async function StoryPage({
     logger,
   );
 
-  const user = userResponse.success ? userResponse.data : undefined;
+  const totalToolCount = getMaxToolCountAllPlatforms();
+  const totalEndpointCount = endpointsMeta.length;
+  const products = productsRepository.getProducts(locale);
+  const country = getCountryFromLocale(locale);
+  const countryInfo = languageConfig.countryInfo[country];
 
-  if (!user) {
+  return {
+    locale,
+    totalToolCount,
+    totalEndpointCount,
+    subPrice: products[ProductIds.SUBSCRIPTION].price,
+    subCurrency: countryInfo.symbol,
+    hasUser: userResponse.success && !!userResponse.data,
+  };
+}
+
+export function TanstackPage({
+  locale,
+  totalToolCount,
+  totalEndpointCount,
+  subPrice,
+  subCurrency,
+  hasUser,
+}: StoryPageData): JSX.Element {
+  if (!hasUser) {
     const { t } = simpleT(locale);
     return (
       <Div>
@@ -114,46 +149,19 @@ export default async function StoryPage({
     );
   }
 
-  // Get dynamic counts for marketing display
-  const totalToolCount = getMaxToolCountAllPlatforms();
-  const totalEndpointCount = endpointsMeta.length;
-
-  // Get pricing information
-  const products = productsRepository.getProducts(locale);
-  const country = getCountryFromLocale(locale);
-  const countryInfo = languageConfig.countryInfo[country];
-
-  const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
-  const CURRENCY_SYMBOL = countryInfo.symbol;
-
   return (
     <Div role="main" className="flex min-h-screen flex-col w-full">
-      {/* Hero — "Your AI. Your Rules." */}
       <Hero locale={locale} totalToolCount={totalToolCount} />
-
-      {/* Problem Statement — "What's wrong with AI today" */}
       <ProblemStatement locale={locale} />
-
-      {/* Capability Showcase — 4 alternating feature blocks */}
       <CapabilityShowcase locale={locale} totalToolCount={totalToolCount} />
-
-      {/* Architecture — "One Definition. Five Interfaces." */}
       <Architecture locale={locale} />
-
-      {/* Honest Comparison — next-vibe vs OpenClaw */}
       <OpenClawComparison locale={locale} totalToolCount={totalToolCount} />
-
-      {/* Two Paths — Cloud vs Self-Host */}
       <CloudVsSelfHost
         locale={locale}
-        subPrice={SUBSCRIPTION_PRICE}
-        subCurrency={CURRENCY_SYMBOL}
+        subPrice={subPrice}
+        subCurrency={subCurrency}
       />
-
-      {/* Stats — Numbers that matter */}
       <StatsStrip locale={locale} totalEndpointCount={totalEndpointCount} />
-
-      {/* CTA — "Your AI. Your infrastructure. Your rules." */}
       <CallToAction locale={locale} />
     </Div>
   );

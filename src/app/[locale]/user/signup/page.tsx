@@ -7,6 +7,7 @@ import type { JSX } from "react";
 
 import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
@@ -18,6 +19,12 @@ import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
+}
+
+export interface SignUpPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType | null;
+  initialReferralCode: string | null;
 }
 
 /**
@@ -61,18 +68,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-/**
- * Signup Page Component
- * Fully definition-driven using EndpointsPage
- */
-export default async function SignUpPage({
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<SignUpPageData> {
   const { locale } = await params;
   if (env.NEXT_PUBLIC_LOCAL_MODE) {
     redirect(`/${locale}/user/login`);
   }
-  const { t } = pageT.scopedT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   const user = await UserRepository.getUserByAuth({}, locale, logger);
@@ -82,9 +84,13 @@ export default async function SignUpPage({
     redirect(`/${locale}/`);
   }
 
+  if (!user.success) {
+    return { locale, user: null, initialReferralCode: null };
+  }
+
   // Get the latest referral code for the lead (if any)
-  let initialReferralCode: string | undefined;
-  if (user.success && user.data.leadId) {
+  let initialReferralCode: string | null = null;
+  if (user.data.leadId) {
     const referralResult = await ReferralRepository.getLatestLeadReferralCode(
       user.data.leadId,
       logger,
@@ -94,7 +100,18 @@ export default async function SignUpPage({
       initialReferralCode = referralResult.data.referralCode;
     }
   }
-  if (!user.success) {
+
+  return { locale, user: user.data, initialReferralCode };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  initialReferralCode,
+}: SignUpPageData): JSX.Element {
+  const { t } = pageT.scopedT(locale);
+
+  if (!user) {
     return <Div>{t("errors.failedToLoadBrowserIdentity")}</Div>;
   }
 
@@ -109,9 +126,20 @@ export default async function SignUpPage({
       </Link>
       <SignUpForm
         locale={locale}
-        initialReferralCode={initialReferralCode ?? null}
-        user={user.data}
+        initialReferralCode={initialReferralCode}
+        user={user}
       />
     </>
   );
+}
+
+/**
+ * Signup Page Component
+ * Fully definition-driven using EndpointsPage
+ */
+export default async function SignUpPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

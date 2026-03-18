@@ -90,14 +90,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function JobPostingPage({
+export interface JobPostingPageData {
+  locale: CountryLanguage;
+  jobId: string;
+  job: JobType;
+  otherJobs: Array<{ key: string; job: JobType }>;
+}
+
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<JobPostingPageData> {
   const { locale, jobId } = await params;
   const { t } = simpleT(locale);
 
   // Mock job data - in a real app, this would come from an API or database
-  const jobs = {
+  const jobs: Record<string, JobType> = {
     socialMediaManager: {
       title: t(
         "app.story._components.home.careers.jobs.socialMediaManager.title",
@@ -272,11 +279,27 @@ export default async function JobPostingPage({
     },
   };
 
-  const job = jobs[jobId as keyof typeof jobs];
+  const job = jobs[jobId];
 
   if (!job) {
     notFound();
   }
+
+  const otherJobs = Object.entries(jobs)
+    .filter(([key]) => key !== jobId)
+    .slice(0, 2)
+    .map(([key, j]) => ({ key, job: j }));
+
+  return { locale, jobId, job, otherJobs };
+}
+
+export function TanstackPage({
+  locale,
+  jobId,
+  job,
+  otherJobs,
+}: JobPostingPageData): JSX.Element {
+  const { t } = simpleT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -551,25 +574,18 @@ export default async function JobPostingPage({
                       )}
                     </H3>
                     <Div className="flex flex-col gap-3">
-                      {Object.entries(jobs)
-                        .filter(([key]) => key !== jobId)
-                        .slice(0, 2)
-                        .map(([key, relatedJob]) => {
-                          const typedJob = relatedJob as JobType;
-
-                          return (
-                            <Link
-                              key={key}
-                              href={`/${locale}/story/careers/${key}`}
-                              className="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                            >
-                              <H3 className="font-medium">{typedJob.title}</H3>
-                              <P className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
-                                {typedJob.shortDescription}
-                              </P>
-                            </Link>
-                          );
-                        })}
+                      {otherJobs.map(({ key, job: relatedJob }) => (
+                        <Link
+                          key={key}
+                          href={`/${locale}/story/careers/${key}`}
+                          className="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          <H3 className="font-medium">{relatedJob.title}</H3>
+                          <P className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
+                            {relatedJob.shortDescription}
+                          </P>
+                        </Link>
+                      ))}
                     </Div>
                   </CardContent>
                 </Card>
@@ -580,4 +596,11 @@ export default async function JobPostingPage({
       </Div>
     </Div>
   );
+}
+
+export default async function JobPostingPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

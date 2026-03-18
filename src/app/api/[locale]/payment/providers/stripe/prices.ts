@@ -25,7 +25,7 @@ import {
 } from "../../../products/repository-client";
 import type { PaymentInterval } from "../types";
 import { scopedTranslation } from "./i18n";
-import { stripe } from "./repository";
+import { getStripe } from "./repository";
 
 export interface StripePriceResult {
   priceId: string;
@@ -52,6 +52,13 @@ export class StripePriceManager {
     logger: EndpointLogger,
   ): Promise<ResponseType<StripePriceResult>> {
     const { t: tStripe } = scopedTranslation.scopedT(locale);
+    const stripe = getStripe();
+    if (!stripe) {
+      return fail({
+        message: tStripe("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       // Get product definition from code with correct interval
       const product = productsRepository.getProduct(

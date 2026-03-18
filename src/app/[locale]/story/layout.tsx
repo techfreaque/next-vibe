@@ -18,22 +18,25 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { navItems } from "../story/_components/nav/nav-constants";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-interface SiteLayoutProps {
-  children: ReactNode;
-  params: Promise<{ locale: CountryLanguage }>;
+export interface SiteLayoutData {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  userProfile: StandardUserType | undefined;
+  hasSubscription: boolean;
+  children?: ReactNode;
 }
 
-export default async function SiteLayoutServer({
-  children,
+export async function tanstackLoader({
   params,
-}: SiteLayoutProps): Promise<JSX.Element> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<Omit<SiteLayoutData, "children">> {
   if (env.NEXT_PUBLIC_LOCAL_MODE) {
     notFound();
   }
   const { locale } = await params;
-
-  // Create logger for server-side operations
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   const user = await AuthRepository.getAuthMinimalUser(
@@ -42,7 +45,6 @@ export default async function SiteLayoutServer({
     logger,
   );
 
-  // Get subscription status for authenticated users
   let userProfile: StandardUserType | undefined = undefined;
   let hasSubscription = false;
   if (!user.isPublic) {
@@ -66,6 +68,16 @@ export default async function SiteLayoutServer({
       : undefined;
   }
 
+  return { locale, user, userProfile, hasSubscription };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  userProfile,
+  hasSubscription,
+  children,
+}: SiteLayoutData): JSX.Element {
   return (
     <PageLayout scrollable={true}>
       <Div role="main" className="min-h-screen ">
@@ -81,4 +93,17 @@ export default async function SiteLayoutServer({
       </Div>
     </PageLayout>
   );
+}
+
+interface SiteLayoutProps {
+  children: ReactNode;
+  params: Promise<{ locale: CountryLanguage }>;
+}
+
+export default async function SiteLayoutServer({
+  children,
+  params,
+}: SiteLayoutProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data}>{children}</TanstackPage>;
 }

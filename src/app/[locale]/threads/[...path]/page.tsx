@@ -26,6 +26,7 @@ import { ChatFoldersRepository } from "@/app/api/[locale]/agent/chat/folders/[ro
 import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/repository";
 import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/repository";
 import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { RootFolderPermissions } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { FeedSortMode } from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import { scopedTranslation as publicFeedScopedTranslation } from "@/app/api/[locale]/agent/chat/public-feed/i18n";
@@ -40,16 +41,27 @@ import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[thr
 import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
 import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { EnvAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
+import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { scopedTranslation as userScopedTranslation } from "@/app/api/[locale]/user/i18n";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { FolderContentsResponseOutput } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
+import type { FolderListResponseOutput } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
+import type { PublicFeedGetResponseOutput } from "@/app/api/[locale]/agent/chat/public-feed/definition";
+import type { ChatSettingsGetResponseOutput } from "@/app/api/[locale]/agent/chat/settings/definition";
+import type { MessageListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
+import type { PathGetResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
+import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import type { ThreadListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/definition";
 
 import { ChatInterface } from "./_components/chat-interface";
 
@@ -63,10 +75,31 @@ interface ThreadsPathPageProps {
   }>;
 }
 
-export default async function ThreadsPathPage({
+export interface ThreadsPathPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType | null;
+  creditsToUse: CreditsGetResponseOutput;
+  initialRootFolderId: DefaultFolderId;
+  initialSubFolderId: string | null;
+  initialThreadId: string | null;
+  rootFolderPermissions: RootFolderPermissions;
+  envAvailability: AgentEnvAvailability;
+  leafMessageId: string | null;
+  initialFoldersData: FolderListResponseOutput | null;
+  initialThreadsData: ThreadListResponseOutput | null;
+  initialMessagesData: MessageListResponseOutput | null;
+  initialPathData: PathGetResponseOutput | null;
+  initialSettingsData: ChatSettingsGetResponseOutput | null;
+  initialSkillData: SkillGetResponseOutput | null;
+  initialPublicFeedData: PublicFeedGetResponseOutput | null;
+  initialFolderContentsData: FolderContentsResponseOutput | null;
+  initialSubFolderContentsData: FolderContentsResponseOutput | null;
+}
+
+export async function tanstackLoader({
   params,
   searchParams,
-}: ThreadsPathPageProps): Promise<JSX.Element> {
+}: ThreadsPathPageProps): Promise<ThreadsPathPageData> {
   const { locale, path } = await params;
   const resolvedSearchParams = await searchParams;
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -85,7 +118,33 @@ export default async function ThreadsPathPage({
 
   const user = userResponse.success ? userResponse.data : undefined;
   if (!user) {
-    return <Div>{t("auth.errors.unknownError")}</Div>;
+    return {
+      locale,
+      user: null,
+      creditsToUse: {
+        total: 0,
+        expiring: 0,
+        permanent: 0,
+        earned: 0,
+        free: 0,
+        expiresAt: null,
+      },
+      initialRootFolderId: DefaultFolderId.PRIVATE,
+      initialSubFolderId: null,
+      initialThreadId: null,
+      rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
+      envAvailability: getAgentEnvAvailability(),
+      leafMessageId: null,
+      initialFoldersData: null,
+      initialThreadsData: null,
+      initialMessagesData: null,
+      initialPathData: null,
+      initialSettingsData: null,
+      initialSkillData: null,
+      initialPublicFeedData: null,
+      initialFolderContentsData: null,
+      initialSubFolderContentsData: null,
+    };
   }
 
   if (env.NEXT_PUBLIC_LOCAL_MODE && user.isPublic) {
@@ -158,7 +217,7 @@ export default async function ThreadsPathPage({
 
   // Compute root folder permissions server-side
   // This is stateless and based on user role + folder config
-  let rootFolderPermissions = {
+  let rootFolderPermissions: RootFolderPermissions = {
     canCreateThread: false,
     canCreateFolder: false,
   };
@@ -195,15 +254,15 @@ export default async function ThreadsPathPage({
   // This data is passed as initialData so pages render immediately without a fetch.
   const leafMessageId = resolvedSearchParams.message ?? null;
 
-  let initialFoldersData = null;
-  let initialThreadsData = null;
-  let initialMessagesData = null;
-  let initialPathData = null;
-  let initialSettingsData = null;
-  let initialSkillData = null;
-  let initialPublicFeedData = null;
-  let initialFolderContentsData = null;
-  let initialSubFolderContentsData = null;
+  let initialFoldersData: FolderListResponseOutput | null = null;
+  let initialThreadsData: ThreadListResponseOutput | null = null;
+  let initialMessagesData: MessageListResponseOutput | null = null;
+  let initialPathData: PathGetResponseOutput | null = null;
+  let initialSettingsData: ChatSettingsGetResponseOutput | null = null;
+  let initialSkillData: SkillGetResponseOutput | null = null;
+  let initialPublicFeedData: PublicFeedGetResponseOutput | null = null;
+  let initialFolderContentsData: FolderContentsResponseOutput | null = null;
+  let initialSubFolderContentsData: FolderContentsResponseOutput | null = null;
 
   if (initialRootFolderId !== DefaultFolderId.INCOGNITO && user) {
     const { t: foldersT } = foldersScopedTranslation.scopedT(locale);
@@ -358,6 +417,54 @@ export default async function ThreadsPathPage({
     }
   }
 
+  return {
+    locale,
+    user,
+    creditsToUse,
+    initialRootFolderId,
+    initialSubFolderId,
+    initialThreadId,
+    rootFolderPermissions,
+    envAvailability,
+    leafMessageId,
+    initialFoldersData,
+    initialThreadsData,
+    initialMessagesData,
+    initialPathData,
+    initialSettingsData,
+    initialSkillData,
+    initialPublicFeedData,
+    initialFolderContentsData,
+    initialSubFolderContentsData,
+  };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  creditsToUse,
+  initialRootFolderId,
+  initialSubFolderId,
+  initialThreadId,
+  rootFolderPermissions,
+  envAvailability,
+  leafMessageId,
+  initialFoldersData,
+  initialThreadsData,
+  initialMessagesData,
+  initialPathData,
+  initialSettingsData,
+  initialSkillData,
+  initialPublicFeedData,
+  initialFolderContentsData,
+  initialSubFolderContentsData,
+}: ThreadsPathPageData): JSX.Element {
+  const { t } = userScopedTranslation.scopedT(locale);
+
+  if (!user) {
+    return <Div>{t("auth.errors.unknownError")}</Div>;
+  }
+
   return (
     <EnvAvailabilityProvider availability={envAvailability}>
       <ChatNavigationProvider
@@ -389,4 +496,12 @@ export default async function ThreadsPathPage({
       </ChatNavigationProvider>
     </EnvAvailabilityProvider>
   );
+}
+
+export default async function ThreadsPathPage({
+  params,
+  searchParams,
+}: ThreadsPathPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params, searchParams });
+  return <TanstackPage {...data} />;
 }

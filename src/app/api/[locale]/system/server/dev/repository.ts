@@ -8,6 +8,7 @@
 
 import type { ChildProcess } from "node:child_process";
 import { execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -59,6 +60,28 @@ function portFromUrl(url: string | undefined): number | undefined {
     return parsed.port ? parseInt(parsed.port, 10) : undefined;
   } catch {
     return undefined;
+  }
+}
+
+/**
+ * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
+ * Only patches localhost URLs — production URLs are left untouched.
+ * Child processes inherit process.env so they automatically get the correct URL.
+ */
+function patchPublicUrlPort(port: number): void {
+  const current = process.env["NEXT_PUBLIC_APP_URL"];
+  if (!current) {
+    process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
+    return;
+  }
+  try {
+    const parsed = new URL(current);
+    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+      parsed.port = String(port);
+      process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+    }
+  } catch {
+    // Not a valid URL — leave it as-is
   }
 }
 
@@ -176,7 +199,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     // 2. Force-remove the container (hardcoded container_name in compose
     //    means `docker compose down` may not clean it up properly)
     try {
-      await execAsync(`docker rm -f ${DEV_CONTAINER_NAME} 2>/dev/null || true`);
+      await execAsync(
+        `docker rm -f ${DEV_CONTAINER_NAME} 2>/dev/null || true`,
+        { timeout: 10000 },
+      );
       logger.debug("Removed dev-postgres container");
     } catch {
       logger.debug("No dev-postgres container to remove");
@@ -224,7 +250,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
       try {
         // Remove the Docker volume (this is much cleaner than dealing with file permissions)
-        await execAsync(`docker volume rm ${volumeName} 2>/dev/null || true`);
+        await execAsync(`docker volume rm ${volumeName} 2>/dev/null || true`, {
+          timeout: 10000,
+        });
         logger.debug("Postgres data volume deleted");
       } catch {
         logger.debug("Postgres data volume not found or already deleted");
@@ -308,6 +336,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
     const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
 
+    // Patch NEXT_PUBLIC_APP_URL to reflect the actual port.
+    // This ensures runtime env reads (and all child processes) see the correct URL.
+    patchPublicUrlPort(port);
+
     this.logStartupInfo(port, logger, data);
 
     // Kill any previous dev instance, then write our PID
@@ -325,24 +357,26 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     // Setup database if not skipped
     const dbSetupSuccess = await this.setupDatabase(data, locale, logger);
     if (!dbSetupSuccess) {
-      // Database setup failed critically, start Next.js anyway
+      // Database setup failed critically, start server anyway
       return await this.startNextJsAndWait(
         port,
         logger,
         earlyExitHandler,
         data.profile,
+        data.tanstack,
       );
     }
 
     // Start task runner if not skipped
     void this.startTaskRunnerIfEnabled(data, locale, logger);
 
-    // Start Next.js and keep process alive (passes early handler so it can be replaced)
+    // Start Next.js (or Vite for TanStack) and keep process alive
     return await this.startNextJsAndWait(
       port,
       logger,
       earlyExitHandler,
       data.profile,
+      data.tanstack,
     );
   }
 
@@ -354,9 +388,21 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger: EndpointLogger,
     data: RequestType,
   ): void {
-    logger.vibe(formatStartup("Starting Development Server", "⚡"));
+    logger.vibe(
+      formatStartup(
+        data.tanstack
+          ? "Starting TanStack/Vite Development Server"
+          : "Starting Development Server",
+        "⚡",
+      ),
+    );
     log("");
     log(`  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`);
+    if (data.tanstack) {
+      log(
+        `  ${formatConfig("Mode", "TanStack/Vite")} ${formatHint("(--tanstack)")}`,
+      );
+    }
     log(
       `  ${formatConfig("Debug", logger.isDebugEnabled ? "ON" : "OFF")}  ${formatHint(logger.isDebugEnabled ? "(remove -v or --verbose to disable)" : "(-v or --verbose to enable)")}`,
     );
@@ -638,13 +684,14 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   }
 
   /**
-   * Start Next.js dev server + WebSocket sidecar and wait forever
+   * Start Next.js (or Vite for TanStack) dev server + WebSocket sidecar and wait forever
    */
   private async startNextJsAndWait(
     port: number,
     logger: EndpointLogger,
     earlyExitHandler?: () => void,
     profile = false,
+    tanstack = false,
   ): Promise<never> {
     const { spawn } = await import("node:child_process");
 
@@ -673,7 +720,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     const nextPort = disableProxy ? port : port + NEXT_PORT_OFFSET;
     const wsPort = disableProxy ? port + WS_SIDECAR_OFFSET : port;
 
-    // Kill any stale processes on all used ports
+    // Kill stale processes on all used ports.
+    // TanStack mode: Vite runs on nextPort (internal), proxy on wsPort (public) — same offsets as Next.js.
     this.killProcessOnPort(nextPort, logger);
     this.killProcessOnPort(wsPort, logger);
 
@@ -729,7 +777,11 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     process.on("SIGINT", sigintHandler);
     process.on("SIGTERM", sigintHandler);
 
-    logger.debug(`⚡ Next.js dev server available at http://localhost:${port}`);
+    logger.debug(
+      tanstack
+        ? `⚡ TanStack/Vite dev server available at http://localhost:${port}`
+        : `⚡ Next.js dev server available at http://localhost:${port}`,
+    );
     if (profile) {
       // eslint-disable-next-line i18next/no-literal-string
       process.stdout.write(`
@@ -781,7 +833,6 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
             setTimeout((): void => {
               void (async (): Promise<void> => {
                 const { default: open } = await import("open");
-                const { existsSync } = await import("node:fs");
                 const { resolve } = await import("node:path");
 
                 // 1. CPU profile → open directly (VS Code opens it natively on ctrl+click)
@@ -819,6 +870,56 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       }
     }
 
+    // TanStack Start mode: start Nitro SSR dev server via viteCompiler.
+    // Uses @tanstack/react-start/plugin/vite + nitro plugins.
+    if (tanstack) {
+      const { viteCompiler } =
+        await import("@/app/api/[locale]/system/builder/repository/vite-compiler");
+      const { ViteBuildTypeEnum } =
+        await import("@/app/api/[locale]/system/builder/enum");
+      const { configLoader } =
+        await import("@/app/api/[locale]/system/builder/repository/config-loader");
+      const { scopedTranslation: builderScopedTranslation } =
+        await import("@/app/api/[locale]/system/builder/i18n");
+      const { defaultLocale } = await import("@/i18n/core/config");
+      const { t: builderT } = builderScopedTranslation.scopedT(defaultLocale);
+      const configResult = await configLoader.load(
+        "build.config.ts",
+        undefined,
+        [],
+        logger,
+        builderT,
+      );
+      if (!configResult.success) {
+        logger.error("Failed to load build.config.ts for TanStack Start");
+        process.exit(1);
+      }
+      const tanstackEntry = configResult.data.filesToCompile?.find(
+        (f) => f.type === ViteBuildTypeEnum.TANSTACK_START,
+      );
+      if (!tanstackEntry) {
+        logger.error("No tanstack-start entry found in build.config.ts");
+        process.exit(1);
+      }
+      // TanStack Vite runs on nextPort (internal); WS proxy on wsPort forwards to it.
+      // Pass wsPort as publicPort so Vite's HMR client points to the proxy, not the internal port.
+      const devResult = await viteCompiler.startTanstackDevServer(
+        tanstackEntry,
+        nextPort,
+        logger,
+        disableProxy ? undefined : wsPort,
+      );
+      if (!devResult.success) {
+        logger.error(devResult.message ?? "TanStack Start dev server failed");
+        process.exit(1);
+      }
+      // Keep the process alive — the Vite/Nitro server runs until SIGINT/SIGTERM
+      // oxlint-disable-next-line no-empty-function -- intentional infinite wait; server runs until SIGINT/SIGTERM
+      return new Promise<never>(() => {
+        /* intentional: keep alive until signal */
+      });
+    }
+
     // --- Spawn Next.js with auto-restart on crash ---
     const MAX_RESTARTS = 10;
     const RESTART_BACKOFF_MS = [1000, 2000, 4000, 8000, 15000]; // exponential, capped
@@ -838,26 +939,27 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
             NEXT_CPU_PROF: "1",
           }
         : {};
-      const nextProcess = spawn(
-        "bun",
-        ["run", "next", "dev", "--port", String(nextPort)],
-        {
-          stdio: ["ignore", "pipe", "pipe"],
-          env: {
-            ...process.env,
-            ...profilingEnv,
-            // Cap V8 heap to force GC before memory balloons unboundedly.
-            // 8GB is enough for dev; without this Node grows until OOM.
-            NODE_OPTIONS: [
-              process.env.NODE_OPTIONS,
-              "--max-old-space-size=8192",
-            ]
-              .filter(Boolean)
-              .join(" "),
-          },
-          cwd: process.cwd(),
+
+      const spawnArgs: string[] = [
+        "run",
+        "next",
+        "dev",
+        "--port",
+        String(nextPort),
+      ];
+      const nextProcess = spawn("bun", spawnArgs, {
+        stdio: ["ignore", "pipe", "pipe"],
+        env: {
+          ...process.env,
+          ...profilingEnv,
+          // Cap V8 heap to force GC before memory balloons unboundedly.
+          // 8GB is enough for dev; without this Node grows until OOM.
+          NODE_OPTIONS: [process.env.NODE_OPTIONS, "--max-old-space-size=8192"]
+            .filter(Boolean)
+            .join(" "),
         },
-      );
+        cwd: process.cwd(),
+      });
       this.runningProcesses.set("next", nextProcess);
 
       // Track child PID in PID file so it gets killed on next startup too
@@ -1043,15 +1145,57 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   }
 
   /**
-   * Kill any process occupying the given port and wait until it's free.
+   * Kill a process occupying the given port ONLY if its PID is in our PID file.
+   * This prevents killing processes from other project instances running on the same port.
    */
   private killProcessOnPort(port: number, logger: EndpointLogger): void {
+    // Get PIDs on this port
+    let pidOnPort: number | undefined;
     try {
-      // fuser is more reliable than lsof for finding processes on a port
-      execSync(`fuser -k ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+      const output = execSync(`fuser ${port}/tcp 2>/dev/null`, {
+        encoding: "utf-8",
+      }).trim();
+      const parsed = parseInt(output.split(/\s+/)[0] ?? "", 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        pidOnPort = parsed;
+      }
+    } catch {
+      // No process on port — nothing to do
+      return;
+    }
+
+    if (!pidOnPort) {
+      return;
+    }
+
+    // Only kill if this PID belongs to our project (recorded in our PID file)
+    let ourPids: Set<number> = new Set();
+    if (existsSync(VIBE_DEV_PID_FILE)) {
+      try {
+        ourPids = new Set(
+          readFileSync(VIBE_DEV_PID_FILE, "utf-8")
+            .trim()
+            .split("\n")
+            .map(Number)
+            .filter((p) => p > 0),
+        );
+      } catch {
+        // ignore
+      }
+    }
+
+    if (!ourPids.has(pidOnPort)) {
+      logger.debug(
+        `Port ${port} in use by PID ${pidOnPort} (not ours — leaving it alone)`,
+      );
+      return;
+    }
+
+    try {
+      process.kill(pidOnPort, "SIGTERM");
       logger.info(`Killed stale process on port ${port}`);
     } catch {
-      // No process on port or kill failed — both are fine
+      // Already dead
     }
 
     // Wait until the port is actually released (up to 5 seconds)
@@ -1059,10 +1203,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     while (Date.now() < deadline) {
       try {
         execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
-        // fuser succeeded → port still occupied, keep waiting
         execSync("sleep 0.1");
       } catch {
-        // fuser exited non-zero → port is free
         return;
       }
     }

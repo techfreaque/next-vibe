@@ -36,7 +36,7 @@ import {
 import type { InferJwtPayloadTypeFromRoles } from "../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
-import type { Platform } from "../../shared/types/platform";
+import { Platform } from "../../shared/types/platform";
 import type { WidgetData } from "../../shared/widgets/widget-data";
 import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
 import { createMockUser, getCliUser } from "../auth/cli-user";
@@ -197,8 +197,13 @@ export class RouteDelegationHandler {
           PlatformMarker.CLI_AUTH_BYPASS,
         );
 
-      if (isCliAuthBypass) {
+      if (isCliAuthBypass && options.platform !== Platform.MCP) {
+        // CLI / CLI_PACKAGE with CLI_AUTH_BYPASS: never touch the DB
         cliUser = createMockUser();
+      } else if (isCliAuthBypass && options.platform === Platform.MCP) {
+        // MCP with CLI_AUTH_BYPASS: try DB/session for a real user, fall back to bypass
+        const cliUserResult = await getCliUser(logger, options.locale);
+        cliUser = cliUserResult.success ? cliUserResult.data : createMockUser();
       } else {
         const cliUserResult = await getCliUser(logger, options.locale);
 

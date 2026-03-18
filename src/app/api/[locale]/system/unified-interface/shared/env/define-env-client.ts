@@ -19,6 +19,11 @@ interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   category?: string;
   /** When true, the onboarding flow highlights this field as must-configure. */
   onboardingRequired?: boolean;
+  /**
+   * Called when value is missing/undefined to produce a default.
+   * Result is used for validation but NOT written to .env (client env is bundled at build time).
+   */
+  generate?: () => string;
 }
 
 type Fields = Record<string, FieldDef>;
@@ -64,7 +69,13 @@ export function defineEnvClient<T extends Fields>(
   }>;
 
   const values = Object.fromEntries(
-    Object.entries(fields).map(([key, def]) => [key, def.value]),
+    Object.entries(fields).map(([key, def]) => {
+      const v = def.value;
+      if ((v === undefined || v === "") && def.generate) {
+        return [key, def.generate()];
+      }
+      return [key, v];
+    }),
   );
 
   const envClient = schema.parse(values) as InferEnv<T>;

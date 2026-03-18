@@ -56,6 +56,11 @@ export const translations = {
       title: "Subscription List Failed",
       description: "Failed to list NOWPayments subscriptions: {error}",
     },
+    notConfigured: {
+      title: "NOWPayments Not Configured",
+      description:
+        "NOWPayments is not configured — set NOWPAYMENTS_API_KEY and NOWPAYMENTS_IPN_SECRET in your .env",
+    },
     webhookVerificationFailed: {
       title: "Webhook Verification Failed",
       description: "Failed to verify NOWPayments webhook signature: {error}",

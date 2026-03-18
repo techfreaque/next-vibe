@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
 import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -46,9 +47,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function Newsletter({
+export interface NewsletterPageData {
+  locale: CountryLanguage;
+  authUser: JwtPayloadType;
+  userEmail: string | undefined;
+}
+
+export async function tanstackLoader({
   params,
-}: PageProps): Promise<JSX.Element> {
+}: PageProps): Promise<NewsletterPageData> {
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
   const authUser = await AuthRepository.getAuthMinimalUser(
@@ -72,7 +79,22 @@ export default async function Newsletter({
     }
   }
 
+  return { locale, authUser, userEmail };
+}
+
+export function TanstackPage({
+  locale,
+  authUser,
+  userEmail,
+}: NewsletterPageData): JSX.Element {
   return (
     <NewsletterPage locale={locale} user={authUser} userEmail={userEmail} />
   );
+}
+
+export default async function Newsletter({
+  params,
+}: PageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

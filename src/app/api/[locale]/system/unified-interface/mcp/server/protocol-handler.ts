@@ -7,7 +7,6 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils";
 
-import { getCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -176,7 +175,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       return this.success(request.id ?? null, result);
     } catch (error) {
       const parsedError = parseError(error);
-      this.logger.error("[MCP Protocol] Request handling failed", {
+      this.logger.error("[MCP Protocol] Request handling failed", parsedError, {
         method: request.method,
         error: parsedError.message,
       });
@@ -366,28 +365,14 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 /**
  * Create protocol handler with CLI user
  */
-export async function createMCPProtocolHandler(
+export function createMCPProtocolHandler(
   logger: EndpointLogger,
   locale: CountryLanguage,
+  user: JwtPayloadType,
   registry?: MCPRegistry,
   defRegistry?: IDefinitionsRegistry,
   definitionLdr?: IDefinitionLoader,
-): Promise<MCPProtocolHandler> {
-  // Get CLI user for authentication using consolidated factory
-  const cliUserResult = await getCliUser(logger, locale);
-
-  if (!cliUserResult.success) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
-    throw new Error(`CLI user authentication failed: ${cliUserResult.message}`);
-  }
-
-  const cliUser = cliUserResult.data;
-
-  if (!cliUser.isPublic && !cliUser.id) {
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- MCP server infrastructure requires throwing for invalid CLI user state
-    throw new Error("CLI user ID is required");
-  }
-
+): MCPProtocolHandler {
   // If scoped registries were provided, wire them; otherwise use global singletons (defaults)
   const effectiveRegistry =
     registry ??
@@ -398,7 +383,7 @@ export async function createMCPProtocolHandler(
   return new MCPProtocolHandler(
     logger,
     locale,
-    cliUser,
+    user,
     effectiveRegistry,
     defRegistry,
   );

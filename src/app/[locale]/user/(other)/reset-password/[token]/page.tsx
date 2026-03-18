@@ -6,9 +6,12 @@ import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { scopedTranslation as resetPasswordScopedTranslation } from "@/app/api/[locale]/user/public/reset-password/i18n";
 import { PasswordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
+import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -64,11 +67,17 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; token: string }>;
 }
 
-export default async function ResetPasswordConfirmPage({
+export interface ResetPasswordConfirmPageData {
+  locale: CountryLanguage;
+  token: string;
+  user: JwtPayloadType | undefined;
+  tokenValidationResponse: ResponseType<ResetPasswordValidateGetResponseOutput>;
+}
+
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<ResetPasswordConfirmPageData> {
   const { locale, token } = await params;
-  const { t } = pageT.scopedT(locale);
   const { t: resetPasswordT } = resetPasswordScopedTranslation.scopedT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -100,6 +109,17 @@ export default async function ResetPasswordConfirmPage({
     locale,
   );
 
+  return { locale, token, user, tokenValidationResponse };
+}
+
+export function TanstackPage({
+  locale,
+  token,
+  user,
+  tokenValidationResponse,
+}: ResetPasswordConfirmPageData): JSX.Element {
+  const { t } = pageT.scopedT(locale);
+
   const errorFallback = (
     <Alert variant="destructive" className="mb-8">
       <AlertCircle className="h-4 w-4" />
@@ -126,4 +146,11 @@ export default async function ResetPasswordConfirmPage({
       </Div>
     </ErrorBoundary>
   );
+}
+
+export default async function ResetPasswordConfirmPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

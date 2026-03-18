@@ -150,6 +150,14 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
+      tanstack: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.tanstack.title",
+        description: "post.fields.tanstack.description",
+        schema: z.boolean().default(false),
+      }),
+
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.output.title",
@@ -218,6 +226,7 @@ const { POST } = createEndpoint({
         skipMigrationGeneration: false,
         skipSeeding: false,
         profile: false,
+        tanstack: false,
       },
       quickStart: {
         skipDbSetup: true,
@@ -231,6 +240,7 @@ const { POST } = createEndpoint({
         skipMigrationGeneration: false,
         skipSeeding: false,
         profile: false,
+        tanstack: false,
       },
     },
     responses: {

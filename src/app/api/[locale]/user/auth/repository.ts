@@ -188,19 +188,6 @@ export class AuthRepository {
       );
     }
 
-    // For page context, don't create new leads - return null and let middleware handle it
-    // Pages can't set cookies, so creating a lead here would be wasted
-    if (platform === Platform.NEXT_PAGE) {
-      logger.debug(
-        "Skipping lead creation in page context (middleware will handle)",
-        {
-          platform,
-        },
-      );
-      // Return the invalid leadId temporarily - middleware will fix it on next request
-      return { leadId: existingLeadId || null, shouldUpdateCookie: false };
-    }
-
     // No valid leadId in cookie, create a new one and flag that cookie needs update
     const newLeadId = await AuthRepository.getLeadIdForPublicUser(
       locale,

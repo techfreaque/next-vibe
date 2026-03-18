@@ -2,27 +2,21 @@
 
 import "./globals.css";
 
-import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import Script from "next/script";
 import { Body } from "next-vibe-ui/ui/body";
+import { inter } from "next-vibe-ui/ui/font";
 import { Html } from "next-vibe-ui/ui/html";
+import { Outlet } from "next-vibe-ui/ui/outlet";
+import { Script } from "next-vibe-ui/ui/script";
+import { Scripts } from "next-vibe-ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
 
-import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
 import { RootProviders } from "./layout-shared";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
 
 export const viewport: Viewport = {
   themeColor: "#0EA5E9",
@@ -57,13 +51,34 @@ interface RootLayoutProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function RootLayoutServer({
-  children,
+interface StructuredDataOrganization {
+  "@context": string;
+  "@type": string;
+  name: string;
+  url: string;
+  logo: string;
+  sameAs: string[];
+  contactPoint: {
+    "@type": string;
+    telephone: string;
+    contactType: string;
+    availableLanguage: string[];
+  };
+}
+
+interface RootLayoutData {
+  locale: CountryLanguage;
+  structuredData: StructuredDataOrganization;
+  children?: ReactNode;
+}
+
+export async function tanstackLoader({
   params,
-}: RootLayoutProps): Promise<JSX.Element> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<RootLayoutData> {
   const { locale } = await params;
   const { t } = simpleT(locale);
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": t("app.layout.structuredData.organization.types.organization"),
@@ -91,7 +106,14 @@ export default async function RootLayoutServer({
       ],
     },
   };
+  return { locale, structuredData };
+}
 
+export function TanstackPage({
+  locale,
+  structuredData,
+  children,
+}: RootLayoutData): JSX.Element {
   return (
     <Html lang={locale} suppressHydrationWarning>
       <head>
@@ -100,7 +122,10 @@ export default async function RootLayoutServer({
         <link rel="manifest" href={`/api/${locale}/manifest`} />
       </head>
       <Body className={inter.className}>
-        <RootProviders locale={locale}>{children}</RootProviders>
+        <RootProviders locale={locale}>
+          <Outlet>{children}</Outlet>
+        </RootProviders>
+        <Scripts />
         <Script
           id="structured-data"
           type="application/ld+json"
@@ -108,10 +133,15 @@ export default async function RootLayoutServer({
             __html: JSON.stringify(structuredData),
           }}
         />
-        {env.ENABLE_ANALYTICS && !env.NEXT_PUBLIC_LOCAL_MODE ? (
-          <Analytics />
-        ) : null}
       </Body>
     </Html>
   );
+}
+
+export default async function RootLayoutServer({
+  children,
+  params,
+}: RootLayoutProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data}>{children}</TanstackPage>;
 }

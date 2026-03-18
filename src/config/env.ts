@@ -80,13 +80,16 @@ export const {
     fieldType: "url",
   },
   DATABASE_URL: {
-    schema: createSchema(z.string().url(), z.string().url().optional()),
-    example: "postgres://localhost:5432/postgres",
+    schema: createSchema(
+      z.string().url(),
+      z
+        .string()
+        .url()
+        .default("postgres://postgres:postgres@localhost:5432/postgres"),
+    ),
+    example: "postgres://postgres:postgres@localhost:5432/postgres",
     comment: "Database connection URL",
     sensitive: true,
-    onboardingRequired: true,
-    onboardingStep: 2,
-    onboardingGroup: "database",
   },
   PREVIEW_DB_PORT: {
     schema: z.coerce.number().int().positive().optional().default(5433),
@@ -115,14 +118,7 @@ export const {
               !v.includes("your-secret")),
           "JWT_SECRET_KEY must be at least 64 random characters in production — run: openssl rand -hex 32",
         ),
-      z
-        .string()
-        .min(32)
-        .optional()
-        .default(
-          () =>
-            `auto-${crypto.randomUUID().replace(/-/g, "")}${crypto.randomUUID().replace(/-/g, "")}`,
-        ),
+      z.string().min(32),
     ),
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     comment:
@@ -144,14 +140,7 @@ export const {
             (!v.startsWith("REPLACE_WITH_") && !v.includes("your-cron")),
           "CRON_SECRET must not be a placeholder in production — run: openssl rand -hex 32",
         ),
-      z
-        .string()
-        .min(32)
-        .optional()
-        .default(
-          () =>
-            `auto-${crypto.randomUUID().replace(/-/g, "")}${crypto.randomUUID().replace(/-/g, "")}`,
-        ),
+      z.string().min(32),
     ),
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     comment: "Cron job secret — generate with: openssl rand -hex 32",
@@ -184,21 +173,9 @@ export const {
     comment: "Pulse runner interval in minutes (default: 1)",
     fieldType: "number",
   },
-  ENABLE_ANALYTICS: {
-    schema: createSchema(
-      z.string().transform((v) => v === "true"),
-      z
-        .string()
-        .optional()
-        .default("false")
-        .transform((v) => v === "true"),
-    ),
-    example: "false",
-    fieldType: "boolean",
-  },
   VIBE_ADMIN_USER_EMAIL: {
-    schema: z.email().optional().default("admin@localhost"),
-    example: "admin@example.com",
+    schema: z.email().optional().default("admin@please.change.me"),
+    example: "admin@please.change.me",
     comment:
       "Root admin email. Used for CLI auth, API tool access, and all admin endpoints. Change via the app syncs to DB.",
     commented: true,

@@ -6,9 +6,9 @@ import serveDefinition from "./definition";
 export const { tools } = endpointsHandler({
   endpoint: serveDefinition,
   [Methods.POST]: {
-    handler: async ({ logger, locale }) => {
+    handler: async ({ logger, locale, user }) => {
       const { mcpServeRepository } = await import("./repository");
-      return await mcpServeRepository.startServer(logger, locale);
+      return await mcpServeRepository.startServer(logger, locale, user);
     },
   },
 });

@@ -1,16 +1,38 @@
 import type { JSX } from "react";
 
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { PulseHistoryPageClient } from "./page-client";
 
-export default async function PulseHistoryPage({
-  params,
-}: {
+interface PulseHistoryPageProps {
   params: Promise<{ locale: CountryLanguage }>;
-}): Promise<JSX.Element> {
+}
+
+export interface PulseHistoryPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+}
+
+export async function tanstackLoader({
+  params,
+}: PulseHistoryPageProps): Promise<PulseHistoryPageData> {
   const { locale } = await params;
   const user = await requireAdminUser(locale, `/${locale}/admin/cron/pulse`);
+  return { locale, user };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+}: PulseHistoryPageData): JSX.Element {
   return <PulseHistoryPageClient locale={locale} user={user} />;
+}
+
+export default async function PulseHistoryPage({
+  params,
+}: PulseHistoryPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

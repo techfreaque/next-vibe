@@ -16,7 +16,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { messengerEnv } from "@/app/api/[locale]/messenger/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { MessageStatus, MessageType } from "../../../../messages/enum";
@@ -167,7 +166,9 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
                     recipientName: smtpT(
                       "emailHandling.email.errors.unknown_recipient",
                     ),
-                    senderEmail: messengerEnv.EMAIL_FROM_EMAIL,
+                    senderEmail: smtpT(
+                      "emailHandling.email.errors.unknown_sender",
+                    ),
                     senderName: smtpT(
                       "emailHandling.email.errors.unknown_sender",
                     ),

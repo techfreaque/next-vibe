@@ -41,12 +41,15 @@ function getSmtpAccount1Config(
   const fromEmail = messengerEnv.EMAIL_FROM_EMAIL;
 
   if (!host || !username || !password || !fromEmail) {
-    logger.error("❌ SMTP environment variables not configured for account 1", {
-      host,
-      username,
-      hasPassword: !!password,
-      fromEmail,
-    });
+    logger.debug(
+      "SMTP not configured for account 1 (set EMAIL_* vars to enable)",
+      {
+        host,
+        username,
+        hasPassword: !!password,
+        fromEmail,
+      },
+    );
     return null;
   }
 
@@ -103,8 +106,8 @@ function getSmtpAccount2Config(
   const fromEmail = leadsCampaignsEnv.LEADS_EMAIL_FROM_EMAIL;
 
   if (!host || !username || !password || !fromEmail) {
-    logger.error(
-      "❌ Leads SMTP environment variables not configured for account 2",
+    logger.debug(
+      "Leads SMTP not configured for account 2 (set LEADS_EMAIL_* vars to enable)",
       {
         host,
         username,

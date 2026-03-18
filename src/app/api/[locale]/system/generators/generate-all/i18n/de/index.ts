@@ -39,6 +39,10 @@ export const translations: typeof enTranslations = {
         label: "tRPC aktivieren",
         description: "tRPC-Router generieren (opt-in)",
       },
+      skipTanstack: {
+        label: "TanStack überspringen",
+        description: "TanStack-Routen-Generierung überspringen",
+      },
       success: {
         title: "Erfolg",
       },

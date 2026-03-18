@@ -150,6 +150,11 @@ export const translations: typeof enTranslations = {
       title: "Preis-Erstellung fehlgeschlagen",
       description: "Preis konnte in Stripe nicht erstellt werden",
     },
+    notConfigured: {
+      title: "Stripe nicht konfiguriert",
+      description:
+        "Stripe ist nicht konfiguriert — setze STRIPE_SECRET_KEY in deiner .env",
+    },
   },
 
   success: {

@@ -15,26 +15,26 @@ export const {
 } = defineEnv({
   // Stripe
   STRIPE_SECRET_KEY: {
-    schema: z.string().min(1),
+    schema: z.string().min(1).optional(),
     example: "sk_test_your_stripe_secret_key",
     comment: "Stripe",
     commented: true,
   },
   STRIPE_WEBHOOK_SECRET: {
-    schema: z.string().min(1),
+    schema: z.string().min(1).optional(),
     example: "whsec_your_stripe_webhook_secret",
     commented: true,
   },
 
   // NOWPayments
   NOWPAYMENTS_API_KEY: {
-    schema: z.string().min(1),
+    schema: z.string().min(1).optional(),
     example: "your_nowpayments_api_key",
     comment: "NOWPayments (crypto)",
     commented: true,
   },
   NOWPAYMENTS_IPN_SECRET: {
-    schema: z.string().min(1),
+    schema: z.string().min(1).optional(),
     example: "your_nowpayments_ipn_secret",
     commented: true,
   },

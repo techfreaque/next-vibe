@@ -9,6 +9,7 @@ import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
@@ -24,6 +25,12 @@ interface ReferralPageProps {
   }>;
 }
 
+export interface ReferralPageData {
+  locale: CountryLanguage;
+  isAuthenticated: boolean;
+  user: JwtPayloadType;
+}
+
 export async function generateMetadata({
   params,
 }: ReferralPageProps): Promise<Metadata> {
@@ -36,9 +43,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function ReferralPage({
+export async function tanstackLoader({
   params,
-}: ReferralPageProps): Promise<JSX.Element> {
+}: ReferralPageProps): Promise<ReferralPageData> {
   if (env.NEXT_PUBLIC_LOCAL_MODE) {
     notFound();
   }
@@ -52,11 +59,26 @@ export default async function ReferralPage({
     logger,
   );
   const isAuthenticated = !minimalUser.isPublic && !!minimalUser.id;
+  return { locale, isAuthenticated, user: minimalUser };
+}
+
+export function TanstackPage({
+  locale,
+  isAuthenticated,
+  user,
+}: ReferralPageData): JSX.Element {
   return (
     <ReferralPageClient
       locale={locale}
       isAuthenticated={isAuthenticated}
-      user={minimalUser}
+      user={user}
     />
   );
+}
+
+export default async function ReferralPage({
+  params,
+}: ReferralPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

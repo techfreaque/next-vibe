@@ -8,10 +8,25 @@ interface LeadsEmailsPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function LeadsEmailsPage({
+export interface LeadsEmailsRedirectPageData {
+  locale: CountryLanguage;
+}
+
+export async function tanstackLoader({
   params,
-}: LeadsEmailsPageProps): Promise<React.JSX.Element> {
+}: LeadsEmailsPageProps): Promise<never> {
   const { locale } = await params;
   await requireAdminUser(locale, `/${locale}/admin/leads/emails`);
   redirect(`/${locale}/admin/messenger/campaigns/journeys`);
+}
+
+// oxlint-disable-next-line no-unused-vars
+export function TanstackPage(_props: LeadsEmailsRedirectPageData): never {
+  redirect("/");
+}
+
+export default async function LeadsEmailsPage({
+  params,
+}: LeadsEmailsPageProps): Promise<React.JSX.Element> {
+  return tanstackLoader({ params }) as never;
 }

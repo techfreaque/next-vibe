@@ -14,12 +14,11 @@ interface ChatPageProps {
   }>;
 }
 
-/**
- * Root homepage.
- * - Local mode (vibe start): redirects to chat (threads)
- * - All other modes (dev/prod): redirects to story page
- */
-export default async function HomePage({
+export interface HomePageData {
+  locale: CountryLanguage;
+}
+
+export async function tanstackLoader({
   params,
 }: ChatPageProps): Promise<never> {
   const { locale } = await params;
@@ -61,4 +60,19 @@ export default async function HomePage({
   }
 
   redirect(`/${locale}/story`);
+}
+
+export function TanstackPage(): never {
+  redirect("/");
+}
+
+/**
+ * Root homepage.
+ * - Local mode (vibe start): redirects to chat (threads)
+ * - All other modes (dev/prod): redirects to story page
+ */
+export default async function HomePage({
+  params,
+}: ChatPageProps): Promise<never> {
+  return tanstackLoader({ params });
 }

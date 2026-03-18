@@ -14,6 +14,21 @@ interface AdminUsersPageProps {
   }>;
 }
 
+export interface AdminUsersPageData {
+  locale: CountryLanguage;
+}
+
+export async function tanstackLoader({
+  params,
+}: AdminUsersPageProps): Promise<AdminUsersPageData> {
+  const { locale } = await params;
+  return { locale };
+}
+
+export function TanstackPage({ locale }: AdminUsersPageData): JSX.Element {
+  redirect(`/${locale}/admin/users/stats`);
+}
+
 export default async function AdminUsersPage({
   params,
 }: AdminUsersPageProps): Promise<JSX.Element> {

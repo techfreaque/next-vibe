@@ -570,6 +570,38 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
       );
 
+      // 8b. TanStack Routes Generator
+      if (!data.skipTanstack) {
+        generatorPromises.push(
+          (async (): Promise<string | null> => {
+            try {
+              const { generateTanstackRoutesRepository } =
+                await import("../../unified-interface/tanstack-start/generate/repository");
+
+              const result =
+                await generateTanstackRoutesRepository.generateInternal();
+
+              if (result.success) {
+                generatorsRun++;
+                return "tanstack-routes";
+              }
+              outputLines.push(
+                `❌ TanStack routes generation failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
+            } catch (error) {
+              outputLines.push(
+                `❌ TanStack routes generator failed: ${parseError(error).message}`,
+              );
+              return null;
+            }
+          })(),
+        );
+      } else {
+        outputLines.push("⏭️  TanStack routes generation skipped");
+        generatorsSkipped++;
+      }
+
       // 9. Graph Seeds Index Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
@@ -621,7 +653,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generationCompleted: true,
         output: outputLines.join("\n"),
         generationStats: {
-          totalGenerators: 10,
+          totalGenerators: 11,
           generatorsRun,
           generatorsSkipped,
           outputDirectory:
@@ -1005,6 +1037,7 @@ if (import.meta.main) {
         skipSeeds: false,
         skipTaskIndex: false,
         enableTrpc: false,
+        skipTanstack: false,
         verbose: false,
         outputDir: "src/app/api/[locale]/system/generated",
       },

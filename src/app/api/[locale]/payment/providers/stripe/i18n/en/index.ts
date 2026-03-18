@@ -148,6 +148,11 @@ export const translations = {
       title: "Price Creation Failed",
       description: "Failed to create price in Stripe",
     },
+    notConfigured: {
+      title: "Stripe Not Configured",
+      description:
+        "Stripe is not configured — set STRIPE_SECRET_KEY in your .env",
+    },
   },
 
   success: {

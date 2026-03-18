@@ -23,7 +23,7 @@ import { scopedTranslation as checkoutScopedTranslation } from "../payment/check
 import { SubscriptionCheckoutRepositoryImpl } from "../payment/checkout/repository";
 import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
-import { stripe as getStripe } from "../payment/providers/stripe/repository";
+import { getStripe } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
 import type { JwtPrivatePayloadType } from "../user/auth/types";
 import type {
@@ -191,126 +191,132 @@ export class SubscriptionRepository {
 
         if (needsSync) {
           try {
-            const stripeResponse = await getStripe.subscriptions.retrieve(
-              subscription.providerSubscriptionId,
-            );
+            const stripeClient = getStripe();
+            if (!stripeClient) {
+              logger.warn("Stripe not configured, skipping subscription sync");
+            } else {
+              const stripeResponse = await stripeClient.subscriptions.retrieve(
+                subscription.providerSubscriptionId,
+              );
 
-            const { currentPeriodStart, currentPeriodEnd } =
-              calculateSubscriptionPeriod(stripeResponse);
+              const { currentPeriodStart, currentPeriodEnd } =
+                calculateSubscriptionPeriod(stripeResponse);
 
-            const newStatus = STRIPE_STATUS_MAP[stripeResponse.status];
+              const newStatus = STRIPE_STATUS_MAP[stripeResponse.status];
 
-            // Update if status or period changed
-            const periodChanged =
-              subscription.currentPeriodEnd &&
-              currentPeriodEnd * 1000 !==
-                subscription.currentPeriodEnd.getTime();
+              // Update if status or period changed
+              const periodChanged =
+                subscription.currentPeriodEnd &&
+                currentPeriodEnd * 1000 !==
+                  subscription.currentPeriodEnd.getTime();
 
-            // Check if period advanced forward (renewal happened)
-            const periodAdvanced =
-              periodChanged &&
-              subscription.currentPeriodEnd &&
-              currentPeriodEnd * 1000 > subscription.currentPeriodEnd.getTime();
+              // Check if period advanced forward (renewal happened)
+              const periodAdvanced =
+                periodChanged &&
+                subscription.currentPeriodEnd &&
+                currentPeriodEnd * 1000 >
+                  subscription.currentPeriodEnd.getTime();
 
-            if (newStatus !== subscription.status || periodChanged) {
-              logger.info("Auto-syncing subscription from Stripe", {
-                userId,
-                oldStatus: subscription.status,
-                newStatus,
-                periodChanged,
-                periodAdvanced,
-                oldPeriodEnd: subscription.currentPeriodEnd,
-                newPeriodEnd: new Date(currentPeriodEnd * 1000),
-              });
+              if (newStatus !== subscription.status || periodChanged) {
+                logger.info("Auto-syncing subscription from Stripe", {
+                  userId,
+                  oldStatus: subscription.status,
+                  newStatus,
+                  periodChanged,
+                  periodAdvanced,
+                  oldPeriodEnd: subscription.currentPeriodEnd,
+                  newPeriodEnd: new Date(currentPeriodEnd * 1000),
+                });
 
-              const [updated] = await db
-                .update(subscriptions)
-                .set({
-                  status: newStatus,
-                  currentPeriodStart: new Date(currentPeriodStart * 1000),
-                  currentPeriodEnd: new Date(currentPeriodEnd * 1000),
-                  cancelAtPeriodEnd: stripeResponse.cancel_at_period_end,
-                  cancelAt: stripeResponse.cancel_at
-                    ? new Date(stripeResponse.cancel_at * 1000)
-                    : null,
-                  // Clear grace period fields on successful renewal
-                  paymentFailedAt: null,
-                  gracePeriodEndsAt: null,
-                  updatedAt: new Date(),
-                })
-                .where(eq(subscriptions.id, subscription.id))
-                .returning();
+                const [updated] = await db
+                  .update(subscriptions)
+                  .set({
+                    status: newStatus,
+                    currentPeriodStart: new Date(currentPeriodStart * 1000),
+                    currentPeriodEnd: new Date(currentPeriodEnd * 1000),
+                    cancelAtPeriodEnd: stripeResponse.cancel_at_period_end,
+                    cancelAt: stripeResponse.cancel_at
+                      ? new Date(stripeResponse.cancel_at * 1000)
+                      : null,
+                    // Clear grace period fields on successful renewal
+                    paymentFailedAt: null,
+                    gracePeriodEndsAt: null,
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(subscriptions.id, subscription.id))
+                  .returning();
 
-              if (updated) {
-                subscription = updated;
-              }
+                if (updated) {
+                  subscription = updated;
+                }
 
-              // Grant renewal credits if period advanced (missed webhook recovery)
-              if (periodAdvanced && newStatus === SubscriptionStatus.ACTIVE) {
-                try {
-                  const { CreditRepository } =
-                    await import("../credits/repository");
-                  const { scopedTranslation: creditsScopedTranslation } =
-                    await import("../credits/i18n");
-                  const { productsRepository, ProductIds } =
-                    await import("../products/repository-client");
-                  const { t: creditsT } =
-                    creditsScopedTranslation.scopedT(locale);
+                // Grant renewal credits if period advanced (missed webhook recovery)
+                if (periodAdvanced && newStatus === SubscriptionStatus.ACTIVE) {
+                  try {
+                    const { CreditRepository } =
+                      await import("../credits/repository");
+                    const { scopedTranslation: creditsScopedTranslation } =
+                      await import("../credits/i18n");
+                    const { productsRepository, ProductIds } =
+                      await import("../products/repository-client");
+                    const { t: creditsT } =
+                      creditsScopedTranslation.scopedT(locale);
 
-                  const productId = isSubscriptionPlan(subscription.planId)
-                    ? ProductIds.SUBSCRIPTION
-                    : null;
+                    const productId = isSubscriptionPlan(subscription.planId)
+                      ? ProductIds.SUBSCRIPTION
+                      : null;
 
-                  if (productId) {
-                    const product = productsRepository.getProduct(
-                      productId,
-                      locale,
-                    );
-                    // Credits expire at exact period end — new period credits are pre-granted via invoice.paid
-                    const expiresAt = new Date(currentPeriodEnd * 1000);
+                    if (productId) {
+                      const product = productsRepository.getProduct(
+                        productId,
+                        locale,
+                      );
+                      // Credits expire at exact period end — new period credits are pre-granted via invoice.paid
+                      const expiresAt = new Date(currentPeriodEnd * 1000);
 
-                    // Canonical idempotency key shared across all credit grant paths
-                    // Prevents duplicate grants from invoice handler, subscription.updated, and auto-sync
-                    const sessionId = renewalSessionKey(
-                      subscription.providerSubscriptionId ?? subscription.id,
-                      currentPeriodEnd * 1000,
-                    );
+                      // Canonical idempotency key shared across all credit grant paths
+                      // Prevents duplicate grants from invoice handler, subscription.updated, and auto-sync
+                      const sessionId = renewalSessionKey(
+                        subscription.providerSubscriptionId ?? subscription.id,
+                        currentPeriodEnd * 1000,
+                      );
 
-                    logger.info(
-                      "Auto-granting renewal credits (missed webhook)",
-                      {
+                      logger.info(
+                        "Auto-granting renewal credits (missed webhook)",
+                        {
+                          userId,
+                          credits: product.credits,
+                          expiresAt: expiresAt.toISOString(),
+                          sessionId,
+                        },
+                      );
+
+                      await CreditRepository.addUserCredits(
+                        userId,
+                        product.credits,
+                        "subscription",
+                        logger,
+                        creditsT,
+                        expiresAt,
+                        sessionId,
+                      );
+
+                      logger.info("Successfully auto-granted renewal credits", {
                         userId,
                         credits: product.credits,
-                        expiresAt: expiresAt.toISOString(),
                         sessionId,
-                      },
-                    );
-
-                    await CreditRepository.addUserCredits(
+                      });
+                    }
+                  } catch (creditError) {
+                    logger.error("Failed to auto-grant renewal credits", {
+                      error: parseError(creditError),
                       userId,
-                      product.credits,
-                      "subscription",
-                      logger,
-                      creditsT,
-                      expiresAt,
-                      sessionId,
-                    );
-
-                    logger.info("Successfully auto-granted renewal credits", {
-                      userId,
-                      credits: product.credits,
-                      sessionId,
                     });
+                    // Don't fail the whole sync if credit granting fails
                   }
-                } catch (creditError) {
-                  logger.error("Failed to auto-grant renewal credits", {
-                    error: parseError(creditError),
-                    userId,
-                  });
-                  // Don't fail the whole sync if credit granting fails
                 }
               }
-            }
+            } // end else (stripeClient configured)
           } catch (error) {
             const stripeError = error as { code?: string };
             // If subscription not found in Stripe, mark as canceled
@@ -1452,8 +1458,15 @@ export class SubscriptionRepository {
       }
 
       // Fetch full subscription from Stripe to get all fields (webhook events may not include all fields)
+      const stripe = getStripe();
+      if (!stripe) {
+        logger.warn("Stripe not configured, cannot sync subscription", {
+          subscriptionId,
+        });
+        return;
+      }
       const fullSubscription =
-        await getStripe.subscriptions.retrieve(subscriptionId);
+        await stripe.subscriptions.retrieve(subscriptionId);
 
       const status = STRIPE_STATUS_MAP[fullSubscription.status];
 
@@ -1628,10 +1641,13 @@ export class SubscriptionRepository {
 
       // Try to fetch subscription from Stripe
       let stripeSubscription: Stripe.Subscription | null = null;
+      const stripe = getStripe();
       try {
-        stripeSubscription = await getStripe.subscriptions.retrieve(
-          localSubscription.providerSubscriptionId,
-        );
+        stripeSubscription = stripe
+          ? await stripe.subscriptions.retrieve(
+              localSubscription.providerSubscriptionId,
+            )
+          : null;
       } catch (error) {
         const stripeError = parseError(error);
         if (

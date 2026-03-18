@@ -55,6 +55,10 @@ export const translations = {
         title: "Force Build",
         description: "Continue build even if errors occur",
       },
+      tanstack: {
+        title: "TanStack Build",
+        description: "Build TanStack/Vite app instead of Next.js",
+      },
       skipEndpoints: {
         title: "Skip Endpoints Generation",
         description: "Skip generating endpoint files",

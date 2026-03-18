@@ -143,11 +143,20 @@ export class SystemSettingsRepository {
       const modules = Object.entries(envModules)
         .filter(([name]) => !HIDDEN_MODULES.has(name))
         .map(([name, { env, examples }]) => {
-          const entries = Object.entries(
-            env as Record<string, string | number | boolean | null | undefined>,
-          );
-          const settings = entries.map(([key, rawValue]) => {
-            const exampleDef = findExampleForKey(examples as EnvExample[], key);
+          const envRecord = env as Record<
+            string,
+            string | number | boolean | null | undefined
+          >;
+          // Use examples as the source of all keys so optional fields (undefined in env)
+          // are still visible in settings. Fall back to env entries for keys with no example.
+          const examplesList = examples as EnvExample[];
+          const allKeys = new Set<string>([
+            ...examplesList.map((e) => e.key),
+            ...Object.keys(envRecord),
+          ]);
+          const settings = [...allKeys].map((key) => {
+            const rawValue = envRecord[key];
+            const exampleDef = findExampleForKey(examplesList, key);
             const sensitive = isSensitiveKey(key, exampleDef?.sensitive);
             const isConfigured =
               rawValue !== undefined && rawValue !== null && rawValue !== "";
@@ -367,8 +376,8 @@ export class SystemSettingsRepository {
           ? `${key}="${encryptedValue}"`
           : `${key}=${encryptedValue}`;
 
-        // commented fields are written as commented-out but still in file
-        parts.push(ex?.commented === true ? `# ${valuePart}` : valuePart);
+        // commented fields are written as active lines when explicitly set by user
+        parts.push(valuePart);
 
         return parts.join("\n");
       }

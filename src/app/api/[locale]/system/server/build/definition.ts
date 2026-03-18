@@ -112,6 +112,14 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
+      tanstack: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.tanstack.title",
+        description: "post.fields.tanstack.description",
+        schema: z.boolean().optional().default(false),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -212,35 +220,15 @@ const { POST } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: {
-        package: true,
-        generate: true,
-        generateEndpoints: true,
-        generateSeeds: true,
-        nextBuild: true,
-        migrate: true,
-        seed: true,
-        force: false,
-      },
+      default: {},
       noDb: {
-        package: false,
-        generate: true,
-        generateEndpoints: true,
-        generateSeeds: true,
-        nextBuild: true,
         migrate: false,
         seed: false,
         force: false,
       },
-      packageOnly: {
-        package: true,
-        generate: false,
-        generateEndpoints: false,
-        generateSeeds: false,
-        nextBuild: false,
-        migrate: false,
-        seed: false,
-        force: false,
+
+      tanstackBuild: {
+        tanstack: true,
       },
     },
     responses: {
@@ -259,6 +247,11 @@ const { POST } = createEndpoint({
         success: true,
         output: "✅ Package build completed successfully",
         duration: 15000,
+      },
+      tanstackBuild: {
+        success: true,
+        output: "✅ TanStack/Vite build completed successfully",
+        duration: 10000,
       },
     },
   },

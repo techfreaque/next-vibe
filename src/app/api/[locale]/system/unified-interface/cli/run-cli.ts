@@ -38,6 +38,7 @@ import {
   RouteDelegationHandler,
 } from "./runtime/route-executor";
 import { CliTarget, type CliTargetValue } from "./types/cli-target";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export const binaryStartTime = Date.now();
 
@@ -145,18 +146,7 @@ export function runCli({
   // Scoped definitions registry for packages — lists only the package's endpoints.
   // Uses the scoped alias-map to enumerate canonical paths, then resolves each via getEndpoint.
   const defRegistry: IDefinitionsRegistry | undefined = getEndpoint
-    ? new DefinitionsRegistry(async () => {
-        const { pathToAliasMap: scopedAliasMap } =
-          await import("@/app/api/[locale]/system/generated/alias-map");
-        const canonical = new Set(Object.values(scopedAliasMap));
-        const results = await Promise.all(
-          [...canonical].map((path) => getEndpoint(path)),
-        );
-        return results.filter(
-          (d): d is NonNullable<Awaited<ReturnType<GetEndpointFn>>> =>
-            d !== null,
-        );
-      })
+    ? new DefinitionsRegistry()
     : undefined;
 
   const cliLocale = (process.env["VIBE_CLI_LOCALE"] ??
@@ -421,9 +411,15 @@ export function runCli({
             performanceMonitor.mark("routeStart");
             const { mcpServeRepository } =
               await import("@/app/api/[locale]/system/unified-interface/mcp/serve/repository");
+            const mcpPublicUser: JwtPayloadType = {
+              isPublic: true,
+              leadId: "00000000-0000-0000-0000-000000000000",
+              roles: ["enums.userRole.public"],
+            };
             await mcpServeRepository.startServer(
               logger,
               options.locale,
+              mcpPublicUser,
               undefined,
               defRegistry,
               loader,

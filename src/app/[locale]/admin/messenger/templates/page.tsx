@@ -21,11 +21,25 @@ interface EmailTemplatesPageProps {
   }>;
 }
 
-export default async function EmailTemplatesPage({
+type TemplateMetadata = Awaited<
+  ReturnType<typeof getAllTranslatedTemplateMetadata>
+>[number];
+
+interface TemplatesByCategory {
+  category: string;
+  templates: TemplateMetadata[];
+}
+
+export interface EmailTemplatesPageData {
+  locale: CountryLanguage;
+  allTemplates: TemplateMetadata[];
+  templatesByCategory: TemplatesByCategory[];
+}
+
+export async function tanstackLoader({
   params,
-}: EmailTemplatesPageProps): Promise<React.JSX.Element> {
+}: EmailTemplatesPageProps): Promise<EmailTemplatesPageData> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
   await requireAdminUser(locale, `/${locale}/admin/messenger/templates`);
 
   // Get all templates with translated metadata (using each template's own scopedT)
@@ -38,6 +52,16 @@ export default async function EmailTemplatesPage({
     category,
     templates: allTemplates.filter((tmpl) => tmpl.category === category),
   }));
+
+  return { locale, allTemplates, templatesByCategory };
+}
+
+export function TanstackPage({
+  locale,
+  allTemplates,
+  templatesByCategory,
+}: EmailTemplatesPageData): React.JSX.Element {
+  const { t } = simpleT(locale);
 
   return (
     <Div className="flex flex-col gap-6">
@@ -121,4 +145,11 @@ export default async function EmailTemplatesPage({
       </Card>
     </Div>
   );
+}
+
+export default async function EmailTemplatesPage({
+  params,
+}: EmailTemplatesPageProps): Promise<React.JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

@@ -18,15 +18,17 @@ export const {
 } = defineEnv({
   // Core SMS config
   SMS_PROVIDER: {
-    schema: z.enum([
-      SmsProviders.TWILIO,
-      SmsProviders.AWS,
-      SmsProviders.AWS_SNS,
-      SmsProviders.MESSAGEBIRD,
-      SmsProviders.HTTP,
-      SmsProviders.WHATSAPP,
-      SmsProviders.TELEGRAM,
-    ]),
+    schema: z
+      .enum([
+        SmsProviders.TWILIO,
+        SmsProviders.AWS,
+        SmsProviders.AWS_SNS,
+        SmsProviders.MESSAGEBIRD,
+        SmsProviders.HTTP,
+        SmsProviders.WHATSAPP,
+        SmsProviders.TELEGRAM,
+      ])
+      .optional(),
     example: "twilio",
     comment: "SMS/messaging provider",
     commented: true,
@@ -42,7 +44,7 @@ export const {
     ],
   },
   SMS_FROM_NUMBER: {
-    schema: z.string(),
+    schema: z.string().optional(),
     example: "+1234567890",
     commented: true,
   },

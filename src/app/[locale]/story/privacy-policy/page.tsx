@@ -53,12 +53,24 @@ export async function generateMetadata(
   });
 }
 
-export default async function PrivacyPolicyPage({
+export interface PrivacyPolicyPageData {
+  locale: CountryLanguage;
+  supportEmail: string;
+}
+
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<PrivacyPolicyPageData> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
+  return { locale, supportEmail };
+}
+
+export function TanstackPage({
+  locale,
+  supportEmail,
+}: PrivacyPolicyPageData): JSX.Element {
+  const { t } = simpleT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -417,4 +429,11 @@ export default async function PrivacyPolicyPage({
       </Div>
     </Div>
   );
+}
+
+export default async function PrivacyPolicyPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

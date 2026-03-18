@@ -58,6 +58,11 @@ export const translations = {
         description:
           "Enable profiling: sets NEXT_CPU_PROF=1 (writes .cpuprofile on exit) for the production Next.js server",
       },
+      tanstack: {
+        title: "TanStack",
+        description:
+          "Use TanStack Router/Vite instead of Next.js (runs vite preview)",
+      },
       skipTaskRunner: {
         title: "Skip Task Runner",
         description: "Skip starting the task runner",

@@ -59,6 +59,11 @@ export const translations: typeof enTranslations = {
       description:
         "Nie udało się pobrać listy subskrypcji NOWPayments: {error}",
     },
+    notConfigured: {
+      title: "NOWPayments nie jest skonfigurowany",
+      description:
+        "NOWPayments nie jest skonfigurowany — ustaw NOWPAYMENTS_API_KEY i NOWPAYMENTS_IPN_SECRET w pliku .env",
+    },
     webhookVerificationFailed: {
       title: "Weryfikacja webhooka nie powiodła się",
       description:

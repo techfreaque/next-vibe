@@ -18,6 +18,7 @@ export const translations = {
       react: "React",
       vanilla: "Vanilla JS",
       executable: "Executable (Bun)",
+      spa: "SPA (Vite app build)",
     },
     bunTarget: {
       bun: "Bun Runtime",
@@ -442,6 +443,16 @@ export const translations = {
         title: "Rollup Output Options",
         label: "Rollup Output Options",
         description: "Passthrough rollup output options",
+      },
+      viteTsconfigPath: {
+        title: "tsconfig Path",
+        description: "Path to tsconfig for vite-tsconfig-paths (SPA mode)",
+        placeholder: "tsconfig.tanstack.json",
+      },
+      viteModuleAliases: {
+        label: "Module Aliases",
+        description:
+          "Map import specifiers to resolved file paths (applies to both client and SSR)",
       },
       vitePlugins: {
         title: "Vite Plugins",

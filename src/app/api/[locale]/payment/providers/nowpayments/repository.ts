@@ -154,14 +154,16 @@ interface NOWPaymentsIPNPayload {
 
 export class NOWPaymentsProvider implements PaymentProvider {
   name = "nowpayments";
-  private apiKey: string;
-  private ipnSecret: string;
   private apiUrl: string;
 
   constructor() {
-    this.apiKey = paymentEnv.NOWPAYMENTS_API_KEY;
-    this.ipnSecret = paymentEnv.NOWPAYMENTS_IPN_SECRET;
     this.apiUrl = paymentEnv.NOWPAYMENTS_API_URL;
+  }
+
+  private isConfigured(): boolean {
+    return !!(
+      paymentEnv.NOWPAYMENTS_API_KEY && paymentEnv.NOWPAYMENTS_IPN_SECRET
+    );
   }
 
   /**
@@ -169,7 +171,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
    */
   private getAuthHeaders(): Record<string, string> {
     return {
-      "x-api-key": this.apiKey,
+      "x-api-key": paymentEnv.NOWPAYMENTS_API_KEY ?? "",
     };
   }
 
@@ -186,6 +188,12 @@ export class NOWPaymentsProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<CustomerResult>> {
     const { t } = scopedTranslation.scopedT(locale);
+    if (!this.isConfigured()) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       const [user] = await db
         .select({ id: users.id })
@@ -235,6 +243,12 @@ export class NOWPaymentsProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<CheckoutSessionResult>> {
     const { t } = scopedTranslation.scopedT(locale);
+    if (!this.isConfigured()) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       logger.debug("Creating NOWPayments checkout session", {
         productId: params.productId,
@@ -438,11 +452,20 @@ export class NOWPaymentsProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<WebhookEvent>> {
     const { t } = scopedTranslation.scopedT(locale);
+    if (!this.isConfigured()) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       logger.debug("Verifying NOWPayments webhook signature");
 
       // Calculate HMAC-SHA512 signature
-      const hmac = createHmac("sha512", this.ipnSecret);
+      const hmac = createHmac(
+        "sha512",
+        paymentEnv.NOWPAYMENTS_IPN_SECRET ?? "",
+      );
       hmac.update(body);
       const calculatedSignature = hmac.digest("hex");
 
@@ -565,6 +588,12 @@ export class NOWPaymentsProvider implements PaymentProvider {
     }>
   > {
     const { t } = scopedTranslation.scopedT(locale);
+    if (!this.isConfigured()) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,
@@ -662,6 +691,12 @@ export class NOWPaymentsProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     const { t } = scopedTranslation.scopedT(locale);
+    if (!this.isConfigured()) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,

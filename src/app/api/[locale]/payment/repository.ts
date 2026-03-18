@@ -42,7 +42,7 @@ import type {
   PaymentPortalResponseOutput,
 } from "./portal/definition";
 import { stripeAdminTools } from "./providers/stripe/admin";
-import { stripe as getStripe } from "./providers/stripe/repository";
+import { getStripe } from "./providers/stripe/repository";
 import type { CreditPackCheckoutSession, WebhookData } from "./providers/types";
 import type {
   PaymentRefundRequestOutput,
@@ -124,6 +124,17 @@ export class PaymentRepository {
       const stripeCustomerId = customerResult.data.customerId;
 
       // Create Stripe checkout session
+      const stripe = getStripe();
+      if (!stripe) {
+        return fail({
+          message: t("create.errors.server.title"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          messageParams: {
+            error:
+              "Stripe is not configured — set STRIPE_SECRET_KEY in your .env",
+          },
+        });
+      }
       // Map enum translation keys to Stripe API values
       const paymentMethodTypes = (data.paymentMethodTypes?.map((type) => {
         // Extract last part of translation key (e.g., "card" from "enums.paymentMethodType.card")
@@ -170,7 +181,7 @@ export class PaymentRepository {
         },
       };
 
-      const session = await getStripe.checkout.sessions.create(sessionConfig);
+      const session = await stripe.checkout.sessions.create(sessionConfig);
 
       // Store transaction in database
       let transaction;
@@ -194,7 +205,7 @@ export class PaymentRepository {
           sessionId: session.id,
           error: parseError(dbError),
         });
-        await getStripe.checkout.sessions.expire(session.id).catch(() => {
+        await stripe.checkout.sessions.expire(session.id).catch(() => {
           // Ignore expiration errors
         });
         return fail({

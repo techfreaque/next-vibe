@@ -244,7 +244,9 @@ export interface WebSocketServerHandle {
 export function startWebSocketServer(
   options: WebSocketServerOptions,
 ): WebSocketServerHandle {
-  const { port, logger, hostname = "0.0.0.0" } = options;
+  // Default to "::" which binds both IPv4 and IPv6 on Linux
+  // so Chrome's localhost→[::1] resolution works alongside IPv4 curl/fetch.
+  const { port, logger, hostname = "::" } = options;
   const nextPort = port + NEXT_PORT_OFFSET;
 
   const server = Bun.serve<WsConnectionDataWithProxy>({

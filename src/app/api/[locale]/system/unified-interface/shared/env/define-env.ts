@@ -4,11 +4,119 @@
 
 import "server-only";
 
+import { randomBytes } from "node:crypto";
+import {
+  appendFileSync,
+  existsSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
+import { join } from "node:path";
+
 import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 import { z as zod } from "zod";
 
 import { decryptEnvObject, loadOrCreateKey } from "./env-crypto";
+
+/** Built-in generators for autoGenerate field */
+function runAutoGenerate(type: "hex32" | "hex64"): string {
+  return randomBytes(type === "hex64" ? 32 : 16).toString("hex");
+}
+
+/**
+ * Persist a generated env var to .env so it's stable across restarts.
+ * Appends `KEY=value` if the key is not already present in the file.
+ */
+function persistGeneratedEnvVar(key: string, value: string): void {
+  try {
+    // Find .env by walking up from cwd
+    let dir = process.cwd();
+    let envPath: string | null = null;
+    while (true) {
+      const candidate = join(dir, ".env");
+      if (existsSync(candidate)) {
+        envPath = candidate;
+        break;
+      }
+      const parent = join(dir, "..");
+      if (parent === dir) {
+        break;
+      }
+      dir = parent;
+    }
+    if (!envPath) {
+      return;
+    }
+
+    const contents = readFileSync(envPath, "utf-8");
+    const lines = contents.split("\n");
+    // Replace placeholder line in-place if found
+    const placeholderIdx = lines.findIndex((line) => {
+      const trimmed = line.trimStart();
+      if (!trimmed.startsWith(`${key}=`) && !trimmed.startsWith(`${key} =`)) {
+        return false;
+      }
+      const val = trimmed
+        .split("=")
+        .slice(1)
+        .join("=")
+        .replace(/^["']|["']$/g, "");
+      return isPlaceholder(val);
+    });
+    if (placeholderIdx !== -1) {
+      lines[placeholderIdx] = `${key}="${value}"`;
+      writeFileSync(envPath, lines.join("\n"), "utf-8");
+    } else {
+      // Append if key is entirely absent
+      const alreadySet = lines.some((line) => {
+        const trimmed = line.trimStart();
+        return trimmed.startsWith(`${key}=`) || trimmed.startsWith(`${key} =`);
+      });
+      if (!alreadySet) {
+        const newline =
+          contents.length > 0 && !contents.endsWith("\n") ? "\n" : "";
+        appendFileSync(envPath, `${newline}${key}="${value}"\n`, "utf-8");
+      }
+    }
+  } catch {
+    // Ignore — generation still worked, just won't persist
+  }
+}
+
+/**
+ * Apply generate/autoGenerate for a single field if the value is missing.
+ * Sets process.env and persists to .env.
+ */
+function isPlaceholder(value: string | undefined): boolean {
+  if (value === undefined || value === "") {
+    return true;
+  }
+  return value.startsWith("REPLACE_WITH_") || value.startsWith("your-");
+}
+
+/**
+ * Apply generate/autoGenerate for a single field if the value is missing or a placeholder.
+ * Sets process.env and persists to .env.
+ */
+function applyGenerate(
+  key: string,
+  generate: (() => string) | undefined,
+  autoGenerate: "hex32" | "hex64" | undefined,
+  rawEnv: Record<string, string | undefined>,
+): void {
+  if (!isPlaceholder(rawEnv[key])) {
+    return;
+  }
+  if (!generate && !autoGenerate) {
+    return;
+  }
+
+  const value = generate ? generate() : runAutoGenerate(autoGenerate!);
+  process.env[key] = value;
+  rawEnv[key] = value;
+  persistGeneratedEnvVar(key, value);
+}
 
 /**
  * Lazily decrypted process.env — computed once, reused across all defineEnv calls.
@@ -53,6 +161,12 @@ interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   onboardingGroup?: string;
   /** When set, the settings UI shows a "Generate" button that fills the field with a random value of this type. */
   autoGenerate?: "hex32" | "hex64";
+  /**
+   * Called when the env var is missing/empty to produce a stable default.
+   * The generated value is written to process.env and appended to .env for persistence.
+   * If omitted, `autoGenerate` is used as a built-in generator instead.
+   */
+  generate?: () => string;
 }
 
 type Fields = Record<string, FieldDef>;
@@ -170,9 +284,29 @@ export function defineEnv(
       }
     }
 
+    // Apply generate/autoGenerate for all variant fields before validation
+    const discriminatorValues = Object.keys(unionInput.variants);
+    const rawEnv = getDecryptedEnv();
+    for (const variantFields of Object.values(unionInput.variants)) {
+      for (const [key, def] of Object.entries(variantFields)) {
+        applyGenerate(
+          key,
+          def.generate,
+          def.autoGenerate,
+          rawEnv as Record<string, string | undefined>,
+        );
+      }
+    }
+
+    // Inject default discriminator value if missing so the union can match a variant
+    const envWithDiscriminatorDefault =
+      rawEnv[unionInput.discriminator] === undefined
+        ? { ...rawEnv, [unionInput.discriminator]: discriminatorValues[0] }
+        : rawEnv;
+
     // Validate using discriminated union
     const env = validateEnv(
-      getDecryptedEnv(),
+      envWithDiscriminatorDefault,
       discriminatedUnionSchema,
       envValidationLogger,
       defaultLocale,
@@ -183,10 +317,9 @@ export function defineEnv(
     const mergeableSchemaShape: Record<string, z.ZodTypeAny> = {};
 
     // Handle discriminator field specially - create enum of all variant keys
-    const discriminatorValues = Object.keys(unionInput.variants);
-    mergeableSchemaShape[unionInput.discriminator] = zod.enum(
-      discriminatorValues as [string, ...string[]],
-    );
+    mergeableSchemaShape[unionInput.discriminator] = zod
+      .enum(discriminatorValues as [string, ...string[]])
+      .default(discriminatorValues[0] as string);
 
     // Collect all other fields from all variants
     for (const variantFields of Object.values(unionInput.variants)) {
@@ -228,6 +361,18 @@ export function defineEnv(
 
   // Otherwise treat as simple fields object
   const fields = input as Fields;
+
+  // Apply generate/autoGenerate for missing fields before validation
+  const rawEnvForFields = getDecryptedEnv();
+  for (const [key, def] of Object.entries(fields)) {
+    applyGenerate(
+      key,
+      def.generate,
+      def.autoGenerate,
+      rawEnvForFields as Record<string, string | undefined>,
+    );
+  }
+
   const schemaShape: Record<string, z.ZodTypeAny> = {};
   const examples: EnvExample[] = [];
   for (const [key, def] of Object.entries(fields)) {
@@ -254,7 +399,7 @@ export function defineEnv(
     hints[key] = { example: def.example, comment: def.comment };
   }
   const env = validateEnv(
-    getDecryptedEnv(),
+    rawEnvForFields,
     schema,
     envValidationLogger,
     defaultLocale,

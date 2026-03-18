@@ -146,6 +146,11 @@ export const translations: typeof enTranslations = {
       title: "Tworzenie ceny nie powiodło się",
       description: "Nie udało się utworzyć ceny w Stripe",
     },
+    notConfigured: {
+      title: "Stripe nie jest skonfigurowany",
+      description:
+        "Stripe nie jest skonfigurowany — ustaw STRIPE_SECRET_KEY w pliku .env",
+    },
   },
 
   success: {

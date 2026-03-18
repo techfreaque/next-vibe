@@ -30,7 +30,7 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import { Switch } from "next-vibe-ui/ui/switch";
 import type { JSX } from "react";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
@@ -344,20 +344,29 @@ export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { endpointMutations } = useWidgetContext();
+  const isLoading = endpointMutations?.read?.isLoading ?? value === undefined;
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [pendingRestart, setPendingRestart] = useState(false);
   const [applying, setApplying] = useState(false);
   const [showExport, setShowExport] = useState(false);
-  const [showWizard, setShowWizard] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
+  const [showWizard, setShowWizard] = useState(false);
+
+  // Auto-show wizard when data loads: always if default password, otherwise unless dismissed
+  useEffect(() => {
+    if (!value) {
+      return;
     }
-    return (
-      (value?.needsOnboarding ?? false) &&
-      !localStorage.getItem("vibe-wizard-dismissed")
+    const dismissed =
+      typeof window !== "undefined" &&
+      !!localStorage.getItem("vibe-wizard-dismissed");
+    const hasDefaultPassword = value.onboardingIssues?.some((issue) =>
+      issue.toLowerCase().includes("default"),
     );
-  });
+    if (value.needsOnboarding && (!dismissed || hasDefaultPassword)) {
+      setShowWizard(true);
+    }
+  }, [value]);
 
   const modules = value?.modules ?? [];
   const isWritable = value?.isWritable ?? false;
@@ -494,7 +503,12 @@ export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
       {!showWizard && (
         <>
           {/* Banners */}
-          {!isWritable && (
+          {isLoading && (
+            <Div className="flex items-center gap-2 px-4 py-2 bg-muted/50 border-b text-sm text-muted-foreground animate-pulse">
+              {t("widget.loading")}
+            </Div>
+          )}
+          {!isLoading && !isWritable && (
             <Div className="flex items-center gap-2 px-4 py-2 bg-muted/50 border-b text-sm text-muted-foreground">
               <Lock className="h-3.5 w-3.5 shrink-0" />
               {t("widget.readOnlyBanner")}

@@ -6,6 +6,10 @@ import { envClient } from "@/config/env-client";
 import { languageConfig } from "..";
 import type { Countries, CountryLanguage, Languages } from "./config";
 import { defaultLocaleConfig, translations } from "./config";
+import {
+  navigateTranslationObject,
+  processTranslationValue as sharedProcessTranslationValue,
+} from "./shared-translation-utils";
 import type {
   TParams,
   TranslationElement,
@@ -68,8 +72,6 @@ function navigateTranslationPath(
   isUsingFallback: boolean,
   context?: string,
 ): TranslationElement | string | undefined {
-  // Import shared navigation logic
-  const { navigateTranslationObject } = require("./shared-translation-utils");
   const value = navigateTranslationObject(startValue, keys);
 
   // Handle error logging for missing keys
@@ -160,11 +162,7 @@ export function processTranslationValue<K extends TranslationKey>(
   params?: TParams,
   context?: string,
 ): string {
-  // Import shared processing logic
-  const {
-    processTranslationValue: sharedProcess,
-  } = require("./shared-translation-utils");
-  const result = sharedProcess(value, key, params, context);
+  const result = sharedProcessTranslationValue(value, key, params);
 
   // Log error if value was not a string (only for global translations)
   if (value !== undefined && value !== null && typeof value !== "string") {

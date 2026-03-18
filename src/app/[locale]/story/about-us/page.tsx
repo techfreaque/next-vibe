@@ -82,10 +82,18 @@ function ValueCard({
   );
 }
 
-export default async function AboutUsPage({
+export interface AboutUsPageData {
+  locale: CountryLanguage;
+}
+
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<AboutUsPageData> {
   const { locale } = await params;
+  return { locale };
+}
+
+export function TanstackPage({ locale }: AboutUsPageData): JSX.Element {
   const { t } = simpleT(locale);
 
   // Get values from translations
@@ -301,4 +309,11 @@ export default async function AboutUsPage({
       </Div>
     </Div>
   );
+}
+
+export default async function AboutUsPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

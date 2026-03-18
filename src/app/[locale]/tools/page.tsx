@@ -9,6 +9,7 @@ import type { JSX } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -18,9 +19,14 @@ interface ToolsPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-export default async function ToolsPage({
+export interface ToolsPageData {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+}
+
+export async function tanstackLoader({
   params,
-}: ToolsPageProps): Promise<JSX.Element> {
+}: ToolsPageProps): Promise<ToolsPageData> {
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -30,5 +36,16 @@ export default async function ToolsPage({
     logger,
   );
 
+  return { locale, user };
+}
+
+export function TanstackPage({ locale, user }: ToolsPageData): JSX.Element {
   return <ToolsPageClient locale={locale} user={user} />;
+}
+
+export default async function ToolsPage({
+  params,
+}: ToolsPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

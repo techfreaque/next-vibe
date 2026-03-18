@@ -15,6 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
+import { env } from "@/config/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatActionCommand,
@@ -93,6 +94,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
           encoding: "utf8",
           cwd: process.cwd(),
           stdio: "pipe",
+          env: { ...process.env, DATABASE_URL: env.DATABASE_URL },
         });
         const generateDuration = Date.now() - generateStartTime;
 
@@ -151,7 +153,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       const pushResult = spawnSync("bunx", ["drizzle-kit", "migrate"], {
         encoding: "utf8",
         cwd: process.cwd(),
-        env: { ...process.env },
+        env: { ...process.env, DATABASE_URL: env.DATABASE_URL },
       });
 
       if (pushResult.error) {

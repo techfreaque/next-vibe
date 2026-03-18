@@ -114,6 +114,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               skipSeeds: !data.generateSeeds,
               skipTaskIndex: false,
               enableTrpc: false,
+              skipTanstack: !data.tanstack,
             },
             logger,
             locale,
@@ -188,6 +189,46 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       if (!data.nextBuild) {
         output.push(MESSAGES.SKIP_NEXT_BUILD);
         steps.push({ label: "Next.js", ok: true, skipped: true });
+      } else if (data.tanstack) {
+        // Build TanStack Start (SSR) via vibe builder (uses build.config.ts)
+        output.push("Building TanStack Start (SSR)...");
+        try {
+          const { builderRepository } =
+            await import("../../builder/repository");
+          const { t: builderT } = builderScopedTranslation.scopedT(locale);
+          const tanstackBuildResult = await builderRepository.execute(
+            { configPath: "build.config.ts" },
+            logger,
+            builderT,
+          );
+          if (tanstackBuildResult.success && tanstackBuildResult.data) {
+            output.push(tanstackBuildResult.data.output);
+            output.push("✅ TanStack Start (SSR) build completed successfully");
+            steps.push({ label: "TanStack", ok: true, skipped: false });
+          } else {
+            steps.push({ label: "TanStack", ok: false, skipped: false });
+            errors.push("TanStack Start build failed");
+            if (!data.force) {
+              return fail({
+                message: t("post.errors.server.title"),
+                errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: "TanStack Start build failed" },
+              });
+            }
+          }
+        } catch (buildError) {
+          const parsedError = parseError(buildError);
+          const errorMsg = `TanStack Start build failed: ${parsedError.message}`;
+          steps.push({ label: "TanStack", ok: false, skipped: false });
+          errors.push(errorMsg);
+          if (!data.force) {
+            return fail({
+              message: t("post.errors.server.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: { error: parsedError.message },
+            });
+          }
+        }
       } else {
         // Build Next.js application with proper NODE_ENV
         output.push(MESSAGES.BUILDING_NEXTJS);

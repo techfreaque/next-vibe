@@ -32,10 +32,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function InvestPage(): Promise<JSX.Element> {
+export interface InvestPageData {
+  locale: CountryLanguage;
+  investContent: string;
+}
+
+export async function tanstackLoader({
+  params,
+}: Props): Promise<InvestPageData> {
+  const { locale } = await params;
   const investPath = path.join(process.cwd(), "docs", "INVEST.md");
   const investContent = fs.readFileSync(investPath, "utf-8");
+  return { locale, investContent };
+}
 
+export function TanstackPage({ investContent }: InvestPageData): JSX.Element {
   return (
     <Div className="min-h-screen">
       <Container size="lg" className="py-12">
@@ -45,4 +56,11 @@ export default async function InvestPage(): Promise<JSX.Element> {
       </Container>
     </Div>
   );
+}
+
+export default async function InvestPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

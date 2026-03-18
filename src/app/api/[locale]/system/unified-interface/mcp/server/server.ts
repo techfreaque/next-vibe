@@ -8,6 +8,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
@@ -40,7 +41,11 @@ export class MCPServer {
   /**
    * Start the MCP server
    */
-  async start(logger: EndpointLogger, locale: CountryLanguage): Promise<void> {
+  async start(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+    user: JwtPayloadType,
+  ): Promise<void> {
     if (this.running) {
       logger.warn("[MCP Server] Server already running");
       return;
@@ -66,9 +71,10 @@ export class MCPServer {
       });
 
       // Create protocol handler
-      const protocolHandler = await createMCPProtocolHandler(
+      const protocolHandler = createMCPProtocolHandler(
         logger,
         locale,
+        user,
         this.registry,
         this.defRegistry,
         this.definitionLdr,

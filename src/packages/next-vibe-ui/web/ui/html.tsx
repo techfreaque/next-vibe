@@ -1,10 +1,10 @@
-import type { JSX } from "react";
+import type { JSX, ReactNode } from "react";
 
 import type { StyleType } from "../utils/style-type";
 
 export type HtmlProps = {
-  lang: string;
-  children: JSX.Element | JSX.Element[];
+  lang?: string;
+  children: ReactNode;
   suppressHydrationWarning?: boolean;
 } & StyleType;
 

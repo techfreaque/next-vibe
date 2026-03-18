@@ -15,35 +15,38 @@ export const {
   examples: messengerEnvExamples,
 } = defineEnv({
   EMAIL_FROM_EMAIL: {
-    schema: z.string().email(),
+    schema: z.string().email().optional(),
     example: "noreply@example.com",
     commented: true,
     fieldType: "email",
   },
   EMAIL_HOST: {
-    schema: z.string(),
+    schema: z.string().optional(),
     example: "smtp.example.com",
     commented: true,
   },
   EMAIL_PORT: {
-    schema: z.coerce.number(),
+    schema: z.coerce.number().optional(),
     example: "587",
     commented: true,
     fieldType: "number",
   },
   EMAIL_SECURE: {
-    schema: z.string().transform((v) => v === "true"),
+    schema: z
+      .string()
+      .optional()
+      .transform((v) => v === "true"),
     example: "true",
     commented: true,
     fieldType: "boolean",
   },
   EMAIL_USER: {
-    schema: z.string(),
+    schema: z.string().optional(),
     example: "your_email_username",
     commented: true,
   },
   EMAIL_PASS: {
-    schema: z.string(),
+    schema: z.string().optional(),
     example: "your_email_password",
     commented: true,
   },

@@ -10,7 +10,9 @@ import {
   DEV_SEED_PASSWORD,
   DEV_SEED_USERS,
 } from "@/app/api/[locale]/user/dev-seed-users";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { scopedTranslation as loginScopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
+import type { LoginOptions } from "@/app/api/[locale]/user/public/login/repository";
 import { LoginRepository } from "@/app/api/[locale]/user/public/login/repository";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -25,6 +27,16 @@ import { scopedTranslation as pageT } from "./i18n";
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
   searchParams: Promise<{ callbackUrl?: string }>;
+}
+
+export interface LoginPageData {
+  locale: CountryLanguage;
+  callbackUrl: string | undefined;
+  user: JwtPayloadType | null;
+  loginOptions: LoginOptions | null;
+  errorMessage: string | null;
+  devSeedPassword: string | null;
+  devSeedUsers: typeof DEV_SEED_USERS | null;
 }
 
 /**
@@ -68,13 +80,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-/**
- * Login Page Component
- */
-export default async function LoginPage({
+export async function tanstackLoader({
   params,
   searchParams,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<LoginPageData> {
   const { locale } = await params;
   const { callbackUrl } = await searchParams;
   const { t } = pageT.scopedT(locale);
@@ -111,15 +120,57 @@ export default async function LoginPage({
     loginT,
   );
   if (!loginOptionsResponse.success) {
-    return <Div>{loginOptionsResponse.message}</Div>;
+    return {
+      locale,
+      callbackUrl,
+      user: null,
+      loginOptions: null,
+      errorMessage: loginOptionsResponse.message,
+      devSeedPassword: null,
+      devSeedUsers: null,
+    };
   }
   if (!verifiedUserResponse.success) {
-    return <Div>{t("errors.failedToLoadBrowserIdentity")}</Div>;
+    return {
+      locale,
+      callbackUrl,
+      user: null,
+      loginOptions: loginOptionsResponse.data,
+      errorMessage: t("errors.failedToLoadBrowserIdentity"),
+      devSeedPassword: null,
+      devSeedUsers: null,
+    };
   }
 
   const devSeedPassword =
     env.NODE_ENV === "development" ? DEV_SEED_PASSWORD : null;
   const devSeedUsers = env.NODE_ENV === "development" ? DEV_SEED_USERS : null;
+
+  return {
+    locale,
+    callbackUrl,
+    user: verifiedUserResponse.data,
+    loginOptions: loginOptionsResponse.data,
+    errorMessage: null,
+    devSeedPassword,
+    devSeedUsers,
+  };
+}
+
+export function TanstackPage({
+  locale,
+  callbackUrl,
+  user,
+  loginOptions,
+  errorMessage,
+  devSeedPassword,
+  devSeedUsers,
+}: LoginPageData): JSX.Element {
+  const { t } = pageT.scopedT(locale);
+
+  if (errorMessage ?? !loginOptions ?? !user) {
+    return <Div>{errorMessage ?? t("errors.failedToLoadBrowserIdentity")}</Div>;
+  }
 
   return (
     <>
@@ -133,10 +184,21 @@ export default async function LoginPage({
       <LoginForm
         locale={locale}
         callbackUrl={callbackUrl}
-        user={verifiedUserResponse.data}
+        user={user}
         devSeedPassword={devSeedPassword}
         devSeedUsers={devSeedUsers}
       />
     </>
   );
+}
+
+/**
+ * Login Page Component
+ */
+export default async function LoginPage({
+  params,
+  searchParams,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params, searchParams });
+  return <TanstackPage {...data} />;
 }

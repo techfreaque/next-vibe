@@ -20,6 +20,7 @@ export const translations: typeof enTranslations = {
       react: "React",
       vanilla: "Vanilla JS",
       executable: "Ausführbar (Bun)",
+      spa: "SPA (Vite-App-Build)",
     },
     bunTarget: {
       bun: "Bun-Runtime",
@@ -449,6 +450,16 @@ export const translations: typeof enTranslations = {
         title: "Rollup-Ausgabe-Optionen",
         label: "Rollup-Ausgabe-Optionen",
         description: "Passthrough Rollup-Ausgabe-Optionen",
+      },
+      viteTsconfigPath: {
+        title: "tsconfig-Pfad",
+        description: "Pfad zur tsconfig für vite-tsconfig-paths (SPA-Modus)",
+        placeholder: "tsconfig.tanstack.json",
+      },
+      viteModuleAliases: {
+        label: "Modul-Aliase",
+        description:
+          "Import-Bezeichner auf aufgelöste Dateipfade abbilden (gilt für Client und SSR)",
       },
       vitePlugins: {
         title: "Vite-Plugins",

@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { copyFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 import { config } from "dotenv";
@@ -129,6 +129,20 @@ export function loadEnvironment(): EnvironmentResult {
         envPath = potentialEnvPath;
         projectRoot = root;
         break;
+      }
+    }
+  }
+
+  // Auto-copy .env.example → .env on fresh clone when no .env exists
+  if (!envPath && projectRoot) {
+    const examplePath = join(projectRoot, ".env.example");
+    const targetPath = join(projectRoot, ".env");
+    if (existsSync(examplePath) && !existsSync(targetPath)) {
+      try {
+        copyFileSync(examplePath, targetPath);
+        envPath = targetPath;
+      } catch {
+        // ignore — proceed without .env
       }
     }
   }

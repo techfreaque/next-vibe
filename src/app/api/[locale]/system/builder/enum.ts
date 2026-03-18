@@ -23,6 +23,10 @@ export enum ViteBuildTypeEnum {
   REACT_TAILWIND = "react-tailwind",
   REACT = "react",
   VANILLA = "vanilla",
+  /** Full SPA build: Vite uses root dir + index.html, no lib/IIFE mode */
+  SPA = "spa",
+  /** TanStack Start SSR build: uses @tanstack/react-start/plugin/vite + nitro */
+  TANSTACK_START = "tanstack-start",
 }
 
 /** Bun build types */
@@ -95,6 +99,7 @@ export const { options: BuildTypeOptions } = createEnumOptions(
     REACT: "enums.buildType.react",
     VANILLA: "enums.buildType.vanilla",
     EXECUTABLE: "enums.buildType.executable",
+    SPA: "enums.buildType.spa",
   },
 );
 

@@ -5,6 +5,7 @@ import type { JSX } from "react";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -60,9 +61,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function NewsletterUnsubscribeWithEmail({
+export interface NewsletterUnsubscribeWithEmailPageData {
+  locale: CountryLanguage;
+  decodedEmail: string;
+  authUser: JwtPayloadType;
+}
+
+export async function tanstackLoader({
   params,
-}: PageProps): Promise<JSX.Element> {
+}: PageProps): Promise<NewsletterUnsubscribeWithEmailPageData> {
   const { locale, email } = await params;
 
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -80,6 +87,14 @@ export default async function NewsletterUnsubscribeWithEmail({
     notFound();
   }
 
+  return { locale, decodedEmail, authUser };
+}
+
+export function TanstackPage({
+  locale,
+  decodedEmail,
+  authUser,
+}: NewsletterUnsubscribeWithEmailPageData): JSX.Element {
   return (
     <UnsubscribePage
       locale={locale}
@@ -87,4 +102,11 @@ export default async function NewsletterUnsubscribeWithEmail({
       user={authUser}
     />
   );
+}
+
+export default async function NewsletterUnsubscribeWithEmail({
+  params,
+}: PageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

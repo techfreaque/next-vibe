@@ -58,6 +58,10 @@ export const translations: typeof enTranslations = {
         title: "Wymuś budowanie",
         description: "Kontynuuj budowanie nawet przy błędach",
       },
+      tanstack: {
+        title: "Budowanie TanStack",
+        description: "Buduj aplikację TanStack/Vite zamiast Next.js",
+      },
       skipEndpoints: {
         title: "Pomiń generowanie punktów końcowych",
         description: "Pomiń generowanie plików punktów końcowych",

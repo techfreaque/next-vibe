@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
+  type ResponseType,
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -37,10 +38,19 @@ import type {
 } from "../types";
 import { scopedTranslation } from "./i18n";
 
-// Singleton Stripe instance for direct access (legacy webhook support)
-export const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-  apiVersion: "2026-02-25.clover",
-});
+// Singleton Stripe instance — null when STRIPE_SECRET_KEY is not configured
+const _stripe = paymentEnv.STRIPE_SECRET_KEY
+  ? new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
+      apiVersion: "2026-02-25.clover",
+    })
+  : null;
+
+/** Returns the Stripe client, or null if STRIPE_SECRET_KEY is not configured */
+export function getStripe(): Stripe | null {
+  return _stripe;
+}
+
+export const stripe = _stripe;
 
 export class StripeProvider implements PaymentProvider {
   name = "stripe";
@@ -51,8 +61,15 @@ export class StripeProvider implements PaymentProvider {
     name: string | null,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ) {
+  ): Promise<ResponseType<CustomerResult>> {
     const { t } = scopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       const [user] = await db
         .select({ stripeCustomerId: users.stripeCustomerId })
@@ -71,7 +88,7 @@ export class StripeProvider implements PaymentProvider {
       if (user.stripeCustomerId) {
         // Verify the customer exists in Stripe (handles test->prod migration)
         try {
-          await stripe.customers.retrieve(user.stripeCustomerId);
+          await stripeClient.customers.retrieve(user.stripeCustomerId);
           return success<CustomerResult>({
             customerId: user.stripeCustomerId,
           });
@@ -108,7 +125,7 @@ export class StripeProvider implements PaymentProvider {
       }
 
       // Create new customer (either no customer ID or invalid one was cleared)
-      const customer = await stripe.customers.create({
+      const customer = await stripeClient.customers.create({
         email,
         name: name || undefined,
         metadata: { userId },
@@ -146,7 +163,15 @@ export class StripeProvider implements PaymentProvider {
     logger: EndpointLogger,
     callbackToken: string,
     locale: CountryLanguage,
-  ) {
+  ): Promise<ResponseType<CheckoutSessionResult>> {
+    const { t: tCheckout } = scopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: tCheckout("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       logger.debug("Creating checkout session", {
         productId: params.productId,
@@ -180,7 +205,7 @@ export class StripeProvider implements PaymentProvider {
       const mode = params.interval === "one_time" ? "payment" : "subscription";
 
       // Create checkout session
-      const session = await stripe.checkout.sessions.create({
+      const session = await stripeClient.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ["card"],
         mode: mode,
@@ -293,9 +318,26 @@ export class StripeProvider implements PaymentProvider {
     signature: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ) {
+  ): ReturnType<PaymentProvider["verifyWebhook"]> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: t("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+    if (!paymentEnv.STRIPE_WEBHOOK_SECRET) {
+      logger.error(
+        "Stripe webhook secret is not configured. Please set STRIPE_WEBHOOK_SECRET in your .env file.",
+      );
+      return fail({
+        message: t("errors.webhookVerificationFailed.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
     try {
-      const event = stripe.webhooks.constructEvent(
+      const event = stripeClient.webhooks.constructEvent(
         body,
         signature,
         paymentEnv.STRIPE_WEBHOOK_SECRET,
@@ -434,7 +476,6 @@ export class StripeProvider implements PaymentProvider {
       logger.error("Failed to verify Stripe webhook", {
         error: parseError(error),
       });
-      const { t } = scopedTranslation.scopedT(locale);
       return fail({
         message: t("errors.webhookVerificationFailed.title"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -447,9 +488,24 @@ export class StripeProvider implements PaymentProvider {
     subscriptionId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ) {
+  ): Promise<
+    ResponseType<{
+      userId: string;
+      currentPeriodStart?: number;
+      currentPeriodEnd?: number;
+    }>
+  > {
+    const { t: tSub } = scopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: tSub("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const subscription =
+        await stripeClient.subscriptions.retrieve(subscriptionId);
 
       // Prefer actual period dates from subscription item (most accurate, available in 2025-12-15.clover)
       const item = subscription.items.data[0];
@@ -534,9 +590,17 @@ export class StripeProvider implements PaymentProvider {
     subscriptionId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ) {
+  ): Promise<ResponseType<void>> {
+    const { t: tCancel } = scopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: tCancel("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
-      await stripe.subscriptions.cancel(subscriptionId);
+      await stripeClient.subscriptions.cancel(subscriptionId);
 
       logger.info("Canceled Stripe subscription", { subscriptionId });
 

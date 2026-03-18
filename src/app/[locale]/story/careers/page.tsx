@@ -53,9 +53,14 @@ interface JobPosition {
   applicationDeadline: string;
 }
 
-export default async function CareersPage({
+export interface CareersPageData {
+  locale: CountryLanguage;
+  openPositions: readonly JobPosition[];
+}
+
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<CareersPageData> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   const openPositions: readonly JobPosition[] = [
@@ -107,6 +112,15 @@ export default async function CareersPage({
       ).toLocaleDateString(locale),
     },
   ];
+
+  return { locale, openPositions };
+}
+
+export function TanstackPage({
+  locale,
+  openPositions,
+}: CareersPageData): JSX.Element {
+  const { t } = simpleT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -307,4 +321,11 @@ export default async function CareersPage({
       </Div>
     </Div>
   );
+}
+
+export default async function CareersPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

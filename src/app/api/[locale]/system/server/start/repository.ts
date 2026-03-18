@@ -50,6 +50,28 @@ function portFromUrl(url: string | undefined): number | undefined {
   }
 }
 
+/**
+ * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
+ * Only patches localhost URLs — production URLs are left untouched.
+ * Child processes inherit process.env so they automatically get the correct URL.
+ */
+function patchPublicUrlPort(port: number): void {
+  const current = process.env["NEXT_PUBLIC_APP_URL"];
+  if (!current) {
+    process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
+    return;
+  }
+  try {
+    const parsed = new URL(current);
+    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+      parsed.port = String(port);
+      process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+    }
+  } catch {
+    // Not a valid URL — leave it as-is
+  }
+}
+
 /** Mask credentials in a database URL: postgres://u***:p***@host:5432/db */
 function maskDatabaseUrl(url: string | undefined): string {
   if (!url) {
@@ -109,6 +131,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
     const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
+
+    // Patch NEXT_PUBLIC_APP_URL to reflect the actual port so child processes see the right URL.
+    patchPublicUrlPort(port);
 
     // Mode-based process splitting: "all" (default), "web", "tasks"
     const mode = data.mode ?? "all";
@@ -411,40 +436,74 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       }
 
       output.push("");
-      output.push("⚡ Next.js Production Server");
+      const serverLabel = data.tanstack
+        ? "TanStack/Vite Production Server"
+        : "Next.js Production Server";
+      output.push(`⚡ ${serverLabel}`);
 
       if (runNext) {
-        output.push("   🚀 Starting Next.js production server in parallel...");
-        output.push(`   🌐 Target port: ${port}`);
+        if (data.tanstack) {
+          output.push("   🚀 Starting TanStack/Vite preview server...");
+          output.push(`   🌐 Target port: ${port}`);
 
-        try {
-          // Start Next.js production server as a child process
-          const nextServerResult = await this.startNextServer(
-            port,
-            logger,
-            data.profile,
-          );
+          try {
+            const tanstackResult = await this.startTanstackServer(port, logger);
 
-          if (nextServerResult.success) {
-            output.push("   ✅ Next.js production server started successfully");
-            output.push(`   🌍 Server is live at http://localhost:${port}`);
-            output.push("   🏭 Production mode enabled");
-          } else {
-            errors.push("Failed to start Next.js production server");
-            output.push("   ❌ Failed to start Next.js production server");
-            if (nextServerResult.message) {
-              output.push(`   💡 Reason: ${nextServerResult.message}`);
+            if (tanstackResult.success) {
+              output.push(
+                "   ✅ TanStack/Vite preview server started successfully",
+              );
+              output.push(`   🌍 Server is live at http://localhost:${port}`);
+            } else {
+              errors.push("Failed to start TanStack/Vite preview server");
+              output.push("   ❌ Failed to start TanStack/Vite preview server");
+              if (tanstackResult.message) {
+                output.push(`   💡 Reason: ${tanstackResult.message}`);
+              }
             }
+          } catch (error) {
+            const errorMsg = `Failed to start TanStack server: ${parseError(error).message}`;
+            errors.push(errorMsg);
+            output.push(`   ❌ TanStack server startup failed: ${errorMsg}`);
+            logger.error("TanStack server startup failed", { error: errorMsg });
           }
-        } catch (error) {
-          const errorMsg = `Failed to start Next.js server: ${parseError(error).message}`;
-          errors.push(errorMsg);
-          output.push(`   ❌ Next.js server startup failed: ${errorMsg}`);
-          logger.error("Next.js server startup failed", { error: errorMsg });
+        } else {
+          output.push(
+            "   🚀 Starting Next.js production server in parallel...",
+          );
+          output.push(`   🌐 Target port: ${port}`);
+
+          try {
+            // Start Next.js production server as a child process
+            const nextServerResult = await this.startNextServer(
+              port,
+              logger,
+              data.profile,
+            );
+
+            if (nextServerResult.success) {
+              output.push(
+                "   ✅ Next.js production server started successfully",
+              );
+              output.push(`   🌍 Server is live at http://localhost:${port}`);
+              output.push("   🏭 Production mode enabled");
+            } else {
+              errors.push("Failed to start Next.js production server");
+              output.push("   ❌ Failed to start Next.js production server");
+              if (nextServerResult.message) {
+                output.push(`   💡 Reason: ${nextServerResult.message}`);
+              }
+            }
+          } catch (error) {
+            const errorMsg = `Failed to start Next.js server: ${parseError(error).message}`;
+            errors.push(errorMsg);
+            output.push(`   ❌ Next.js server startup failed: ${errorMsg}`);
+            logger.error("Next.js server startup failed", { error: errorMsg });
+          }
         }
       } else {
         output.push(
-          `   ⏭️ Next.js server skipped (${mode !== "all" ? `--mode=${mode}` : "--next-server=false"})`,
+          `   ⏭️ ${data.tanstack ? "TanStack" : "Next.js"} server skipped (${mode !== "all" ? `--mode=${mode}` : "--next-server=false"})`,
         );
       }
 
@@ -717,6 +776,64 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         }
       }
     }
+  }
+
+  /**
+   * Start TanStack Start production server (.output/server/index.mjs).
+   * Spawns the Nitro server output produced by `vibe build --tanstack`.
+   */
+  private async startTanstackServer(
+    port: number,
+    logger: EndpointLogger,
+  ): Promise<{ success: boolean; message?: string }> {
+    this.killProcessOnPort(port, logger);
+
+    const { existsSync: fsExistsSync } = await import("node:fs");
+    const outputFile = ".output/server/index.mjs";
+    if (!fsExistsSync(outputFile)) {
+      return {
+        success: false,
+        message: `No TanStack Start build found at ${outputFile} — did 'vibe build --tanstack' run?`,
+      };
+    }
+
+    const tanstackProcess = spawn("node", [outputFile], {
+      stdio: "pipe",
+      env: {
+        ...process.env,
+        PORT: String(port),
+        NODE_ENV: "production",
+      },
+    });
+
+    this.runningProcesses.set("tanstack", tanstackProcess);
+
+    tanstackProcess.stdout?.on("data", (data: Buffer) => {
+      process.stdout.write(data);
+    });
+    tanstackProcess.stderr?.on("data", (data: Buffer) => {
+      process.stderr.write(data);
+    });
+
+    tanstackProcess.on("exit", (code) => {
+      logger.info(`TanStack Start server exited with code ${String(code)}`);
+      this.runningProcesses.delete("tanstack");
+    });
+
+    // Give it a moment to start
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 1500);
+    });
+
+    if (tanstackProcess.exitCode !== null) {
+      return {
+        success: false,
+        message: `TanStack Start server exited immediately with code ${String(tanstackProcess.exitCode)}`,
+      };
+    }
+
+    logger.info(`TanStack Start production server started on port ${port}`);
+    return { success: true };
   }
 
   /**

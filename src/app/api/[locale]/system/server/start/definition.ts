@@ -118,6 +118,15 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(false),
       }),
 
+      tanstack: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.tanstack.title",
+        description: "post.fields.tanstack.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+
       // === RESPONSE FIELDS ===
 
       responseMessage: responseField(scopedTranslation, {
@@ -184,6 +193,7 @@ const { POST } = createEndpoint({
         taskRunner: true,
         nextServer: true,
         profile: false,
+        tanstack: false,
       },
       webOnly: {
         mode: "web",
@@ -192,6 +202,7 @@ const { POST } = createEndpoint({
         taskRunner: true,
         nextServer: true,
         profile: false,
+        tanstack: false,
       },
       tasksOnly: {
         mode: "tasks",
@@ -200,6 +211,7 @@ const { POST } = createEndpoint({
         taskRunner: true,
         nextServer: true,
         profile: false,
+        tanstack: false,
       },
       withPort: {
         mode: "all",
@@ -209,6 +221,16 @@ const { POST } = createEndpoint({
         nextServer: true,
         port: 3000,
         profile: false,
+        tanstack: false,
+      },
+      tanstackStart: {
+        mode: "all",
+        seed: true,
+        dbSetup: false,
+        taskRunner: true,
+        nextServer: true,
+        profile: false,
+        tanstack: true,
       },
     },
     responses: {
@@ -222,6 +244,9 @@ const { POST } = createEndpoint({
         responseMessage: "post.fields.output.title",
       },
       withPort: {
+        responseMessage: "post.fields.output.title",
+      },
+      tanstackStart: {
         responseMessage: "post.fields.output.title",
       },
     },

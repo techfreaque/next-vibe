@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "next-vibe/*": ["./src/app/api/[locale]/*"],
+      "next-vibe-ui/*": [
+        "./src/packages/next-vibe-ui/tanstack/*",
+        "./src/packages/next-vibe-ui/web/*"
+      ]
+    }
+  },
+  "include": ["src/app-tanstack/**/*", "src/packages/**/*", "src/app/**/*"]
+}

@@ -39,7 +39,8 @@ import type {
   PaymentRefundResponseOutput,
 } from "../../refund/definition";
 import { scopedTranslation as refundScopedTranslation } from "../../refund/i18n";
-import { stripe } from "./repository";
+import { scopedTranslation as stripeScopedTranslation } from "./i18n";
+import { getStripe } from "./repository";
 
 export interface StripeAdminTools {
   createInvoice(
@@ -82,6 +83,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       }
 
       // Verify the customer exists in Stripe (handles test->prod migration)
+      const stripe = getStripe();
+      if (!stripe) {
+        return null;
+      }
       try {
         await stripe.customers.retrieve(user.stripeCustomerId);
         return user.stripeCustomerId;
@@ -130,7 +135,14 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
   ): Promise<ResponseType<PaymentInvoiceResponseOutput>> {
     const { t: tInvoice } = invoiceScopedTranslation.scopedT(locale);
     const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
-
+    const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: tStripe("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       logger.debug("Creating invoice", {
         userId,
@@ -153,7 +165,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
       }
 
-      const invoice = await stripe.invoices.create({
+      const invoice = await stripeClient.invoices.create({
         customer: stripeCustomerId,
         collection_method: "send_invoice",
         days_until_due: data.dueDate ? 30 : undefined,
@@ -164,7 +176,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         },
       });
 
-      await stripe.invoiceItems.create({
+      await stripeClient.invoiceItems.create({
         customer: stripeCustomerId,
         invoice: invoice.id,
         amount: Math.round(data.amount * 100),
@@ -172,7 +184,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         description: data.description || tInvoice("defaultItem"),
       });
 
-      const finalizedInvoice = await stripe.invoices.finalizeInvoice(
+      const finalizedInvoice = await stripeClient.invoices.finalizeInvoice(
         invoice.id,
         {
           auto_advance: true,
@@ -239,7 +251,14 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
   ): Promise<ResponseType<PaymentPortalResponseOutput>> {
     const { t: tPortal } = portalScopedTranslation.scopedT(locale);
     const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
-
+    const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: tStripe("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       logger.debug("Creating customer portal session", { userId });
 
@@ -258,7 +277,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
       }
 
-      const session = await stripe.billingPortal.sessions.create({
+      const session = await stripeClient.billingPortal.sessions.create({
         customer: stripeCustomerId,
         return_url: data.returnUrl || `${env.NEXT_PUBLIC_APP_URL}/dashboard`,
       });
@@ -320,7 +339,14 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentRefundResponseOutput>> {
     const { t: tRefund } = refundScopedTranslation.scopedT(locale);
-
+    const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
+    const stripeClient = getStripe();
+    if (!stripeClient) {
+      return fail({
+        message: tStripe("errors.notConfigured.title"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     try {
       logger.debug("Creating refund", {
         userId,
@@ -366,7 +392,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
       }
 
-      const refund = await stripe.refunds.create({
+      const refund = await stripeClient.refunds.create({
         payment_intent: paymentIntentId,
         amount: data.amount ? Math.round(data.amount * 100) : undefined,
         reason:

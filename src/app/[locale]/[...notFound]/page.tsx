@@ -11,6 +11,10 @@ interface NotFoundPageProps {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
+export interface NotFoundPageData {
+  locale: CountryLanguage;
+}
+
 /**
  * Generate metadata for the 404 page with translations
  */
@@ -29,6 +33,17 @@ export async function generateMetadata({
   });
 }
 
+export async function tanstackLoader({
+  params,
+}: NotFoundPageProps): Promise<NotFoundPageData> {
+  const { locale } = await params;
+  return { locale };
+}
+
+export function TanstackPage({ locale }: NotFoundPageData): JSX.Element {
+  return <NotFoundBackButton locale={locale} />;
+}
+
 /**
  * Custom 404 Not Found page component for language routes
  * Displayed when a user navigates to a non-existent route within a language
@@ -38,6 +53,6 @@ export async function generateMetadata({
 export default async function NotFound({
   params,
 }: NotFoundPageProps): Promise<JSX.Element> {
-  const { locale } = await params;
-  return <NotFoundBackButton locale={locale} />;
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }

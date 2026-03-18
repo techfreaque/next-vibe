@@ -70,7 +70,11 @@ function DevQuickLogin({
         );
 
         if (response.ok) {
-          window.location.assign(callbackUrl ?? `/${locale}`);
+          const target =
+            devSeedPassword === DEFAULT_PASSWORD_SENTINEL
+              ? `/${locale}/admin/settings`
+              : (callbackUrl ?? `/${locale}`);
+          window.location.assign(target);
         } else {
           setLoadingEmail(null);
         }

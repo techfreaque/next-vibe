@@ -55,12 +55,24 @@ export async function generateMetadata(
   });
 }
 
-export default async function ImprintPage({
+export interface ImprintPageData {
+  locale: CountryLanguage;
+  supportEmail: string;
+}
+
+export async function tanstackLoader({
   params,
-}: Props): Promise<JSX.Element> {
+}: Props): Promise<ImprintPageData> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
+  return { locale, supportEmail };
+}
+
+export function TanstackPage({
+  locale,
+  supportEmail,
+}: ImprintPageData): JSX.Element {
+  const { t } = simpleT(locale);
 
   return (
     <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -143,13 +155,13 @@ export default async function ImprintPage({
                 <Span>{t("config.group.registrationNumber")}</Span>
               </Li>
               {/* <Li className="flex items-start">
- <Span className="mr-2 text-blue-500">•</Span>
- <Span>{t("app.common.company.vatId")}</Span>
- </Li> */}
+<Span className="mr-2 text-blue-500">•</Span>
+<Span>{t("app.common.company.vatId")}</Span>
+</Li> */}
               {/* <Li className="flex items-start">
- <Span className="mr-2 text-blue-500">•</Span>
- <Span>{t("app.common.company.registrationCourt")}</Span>
- </Li> */}
+<Span className="mr-2 text-blue-500">•</Span>
+<Span>{t("app.common.company.registrationCourt")}</Span>
+</Li> */}
             </Ul>
 
             <Div className="my-8 border-t border-gray-200 dark:border-gray-700" />
@@ -266,4 +278,11 @@ export default async function ImprintPage({
       </Div>
     </Div>
   );
+}
+
+export default async function ImprintPage({
+  params,
+}: Props): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data} />;
 }
