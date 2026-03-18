@@ -1,6 +1,6 @@
 /**
  * Individual Cron Task Route Handler
- * Handles GET, PUT, and DELETE for individual cron tasks
+ * Handles GET, PUT, DELETE for individual cron tasks
  */
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";

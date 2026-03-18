@@ -505,7 +505,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         },
       },
     ];
-    return { messages };
+    return { backgroundTasks: [], messages };
   }, [isDisabled, responseData, promptValue, modelValue, skillValue]);
 
   // When a real run completes, invalidate the messages cache so EmbeddedMessagesView refetches.

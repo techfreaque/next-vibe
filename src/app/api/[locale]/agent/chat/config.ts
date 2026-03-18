@@ -61,7 +61,13 @@ export interface ToolExecutionContext {
   pendingToolMessages:
     | ReadonlyMap<
         string,
-        { messageId: string; toolCallData?: { parentId: string | null } }
+        {
+          messageId: string;
+          toolCallData?: {
+            parentId: string | null;
+            toolCall?: { requiresConfirmation?: boolean };
+          };
+        }
       >
     | undefined;
   /**

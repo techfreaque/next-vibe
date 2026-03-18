@@ -323,10 +323,11 @@ const { GET } = createEndpoint({
               content: "get.response.items.item.canPost.content" as const,
               schema: z.boolean().nullable(),
             }),
-            isStreaming: responseField(scopedTranslation, {
+            streamingState: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.isStreaming.content" as const,
-              schema: z.boolean().nullable(),
+              content:
+                "get.response.items.item.streamingState.content" as const,
+              schema: z.enum(["idle", "streaming", "aborting"]).nullable(),
             }),
             // Thread role arrays (nullable for folder items)
             rolesEdit: responseArrayOptionalField(scopedTranslation, {

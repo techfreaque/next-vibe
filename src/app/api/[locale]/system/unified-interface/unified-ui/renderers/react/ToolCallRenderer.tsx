@@ -19,6 +19,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -30,6 +31,7 @@ import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -46,6 +48,8 @@ import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/sh
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import {
   Icon,
   type IconKey,
@@ -60,6 +64,7 @@ import {
   scopedTranslation as reactScopedTranslation,
 } from "../../../react/i18n";
 import { EndpointRenderer } from "./EndpointRenderer";
+import { EndpointsPage } from "./EndpointsPage";
 
 type ToolDecision =
   | { type: "pending" }
@@ -370,6 +375,11 @@ export function ToolCallRenderer({
   const isDeferred = Boolean(toolCall.isDeferred) && !toolCall.isConfirmed;
   // confirmed by user (approve mode): tool was manually approved and executed
   const isConfirmedByUser = Boolean(toolCall.isConfirmed);
+  // denied by user (approve mode): user explicitly declined an approve-mode tool
+  const isDeniedByUser =
+    toolCall.callbackMode === "approve" &&
+    toolCall.isConfirmed === false &&
+    hasError;
   const isLoading =
     !hasResult &&
     !hasError &&
@@ -409,6 +419,28 @@ export function ToolCallRenderer({
     isWaitingForConfirmation,
   );
   const [copied, setCopied] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const cancelMutation = useApiMutation(cronIdEndpoints.DELETE, logger, user);
+
+  const handleCancelTask = useCallback(
+    (e: ButtonMouseEvent): void => {
+      e.stopPropagation();
+      const taskId = toolCall.remoteTaskId;
+      if (!taskId || isCancelling) {
+        return;
+      }
+      setIsCancelling(true);
+      void cancelMutation
+        .mutateAsync({
+          urlPathParams: { id: taskId },
+        })
+        .then(() => undefined)
+        .catch(() => {
+          setIsCancelling(false);
+        });
+    },
+    [cancelMutation, toolCall.remoteTaskId, isCancelling],
+  );
 
   const handleCopyJson = (e: DivMouseEvent): void => {
     e.stopPropagation();
@@ -637,9 +669,18 @@ export function ToolCallRenderer({
                   )}
                 </Div>
               )}
-              {hasError && (
+              {hasError && !isDeniedByUser && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
                   {t("widgets.toolCall.status.error")}
+                </Span>
+              )}
+              {isDeniedByUser && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400">
+                  {t(
+                    isWakeUpBackground
+                      ? "widgets.toolCall.status.deniedWakeUp"
+                      : "widgets.toolCall.status.denied",
+                  )}
                 </Span>
               )}
               {isWaitingForConfirmation && decision?.type === "confirmed" && (
@@ -655,7 +696,11 @@ export function ToolCallRenderer({
               {isWaitingForConfirmation &&
                 (!decision || decision.type === "pending") && (
                   <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-500">
-                    {t("widgets.toolCall.status.waitingForConfirmation")}
+                    {t(
+                      isWakeUpBackground
+                        ? "widgets.toolCall.status.waitingForConfirmationWakeUp"
+                        : "widgets.toolCall.status.waitingForConfirmation",
+                    )}
                   </Span>
                 )}
               {isLoading && (
@@ -668,17 +713,41 @@ export function ToolCallRenderer({
                   {t("widgets.toolCall.status.sentToBackground")}
                 </Span>
               )}
-              {isWakeUpBackground && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400">
-                  {t("widgets.toolCall.status.wakeUpBackground")}
-                </Span>
-              )}
+              {isWakeUpBackground &&
+                !isDeniedByUser &&
+                !isWaitingForConfirmation && (
+                  <>
+                    <Span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                      {t(
+                        isConfirmedByUser
+                          ? "widgets.toolCall.status.confirmedWakeUp"
+                          : "widgets.toolCall.status.wakeUpBackground",
+                      )}
+                    </Span>
+                    {toolCall.remoteTaskId && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-5 px-1.5 text-xs text-muted-foreground hover:text-destructive"
+                        disabled={isCancelling}
+                        onClick={handleCancelTask}
+                      >
+                        {isCancelling ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                      </Button>
+                    )}
+                  </>
+                )}
               {isWaitingForRemote && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500">
                   {t("widgets.toolCall.status.waitingForRemote")}
                 </Span>
               )}
-              {isConfirmedByUser && (
+              {isConfirmedByUser && !isWakeUpBackground && !isDeniedByUser && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
                   {t("widgets.toolCall.status.confirmed")}
                 </Span>
@@ -758,6 +827,16 @@ export function ToolCallRenderer({
                   </Div>
                 </Div>
               )}
+
+            {/* Loading spinner: definition not yet loaded but confirmation needed */}
+            {!isLoading && isWaitingForConfirmation && !definition && (
+              <Div className="p-4 flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <Span className="text-sm">
+                  {t("widgets.toolCall.status.executing")}
+                </Span>
+              </Div>
+            )}
 
             {/* Definition-Driven Rendering - handles waiting, completed, and declined states */}
             {!isLoading &&
@@ -882,7 +961,18 @@ export function ToolCallRenderer({
                 const isPendingCancel = decision?.type === "declined";
                 const hasPendingDecision = isPendingConfirm || isPendingCancel;
 
-                // Use EndpointRenderer for 100% definition-driven rendering
+                // For GET endpoints in confirmation mode: use EndpointsPage so the endpoint
+                // can auto-fetch its data (respecting its own queryOptions defaults).
+                // We render our own Confirm/Cancel buttons — do NOT pass them to EndpointsPage
+                // to avoid triggering an actual API mutation on confirm.
+                const isGetConfirmation =
+                  needsConfirmation && definition.method === "GET";
+
+                // Build confirm handler from current confirmationForm values
+                const handleConfirmFromForm = (): void => {
+                  handleConfirm(confirmationForm.getValues());
+                };
+
                 return (
                   <Div
                     className="p-4 space-y-4"
@@ -906,16 +996,40 @@ export function ToolCallRenderer({
                       </Div>
                     )}
 
-                    {/* Show waiting for confirmation banner (no decision yet) */}
+                    {/* Show waiting for confirmation banner (no decision yet) — includes Confirm/Cancel buttons */}
                     {isWaitingForConfirmation &&
                       !isDeclined &&
                       !hasPendingDecision && (
-                        <Div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-3">
+                        <Div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-3 flex items-center justify-between gap-3 flex-wrap">
                           <Span className="text-amber-600 dark:text-amber-500 text-sm font-medium">
                             {t(
-                              "widgets.toolCall.messages.confirmationRequired",
+                              isWakeUpBackground
+                                ? "widgets.toolCall.messages.confirmationRequiredWakeUp"
+                                : "widgets.toolCall.messages.confirmationRequired",
                             )}
                           </Span>
+                          <Div className="flex gap-2 shrink-0">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="default"
+                              onClick={handleConfirmFromForm}
+                              data-testid="tool-confirm-button"
+                              aria-label={t("widgets.toolCall.actions.confirm")}
+                            >
+                              {t("widgets.toolCall.actions.confirm")}
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={handleCancel}
+                              data-testid="tool-deny-button"
+                              aria-label={t("widgets.toolCall.actions.deny")}
+                            >
+                              {t("widgets.toolCall.actions.deny")}
+                            </Button>
+                          </Div>
                         </Div>
                       )}
 
@@ -927,46 +1041,69 @@ export function ToolCallRenderer({
                         </Span>
                       </Div>
                     )}
-                    <NavigationStackProvider>
-                      <EndpointRenderer
-                        user={user}
-                        endpoint={definition}
+
+                    {/* GET endpoints: use EndpointsPage so auto-fetch works.
+                        Widget submit is also wired to handleConfirmFromForm via onSubmit override.
+                        Real API is NOT called — confirm goes through sendMessage. */}
+                    {isGetConfirmation ? (
+                      <EndpointsPage
+                        endpoint={{ GET: definition }}
                         locale={locale}
-                        data={mergedData}
-                        logger={logger}
-                        disabled={!needsConfirmation || hasPendingDecision}
-                        form={
-                          needsConfirmation || isDeclined
-                            ? confirmationForm
-                            : undefined
-                        }
-                        onSubmit={needsConfirmation ? handleConfirm : undefined}
-                        onCancel={needsConfirmation ? handleCancel : undefined}
-                        submitButton={
-                          needsConfirmation
-                            ? {
-                                text: "widgets.toolCall.actions.confirm" satisfies ReactTranslationKey,
-                                variant:
-                                  decision?.type === "confirmed"
-                                    ? "default"
-                                    : decision?.type === "declined"
-                                      ? "ghost"
-                                      : "default",
-                              }
-                            : undefined
-                        }
-                        cancelButton={
-                          needsConfirmation
-                            ? {
-                                variant:
-                                  decision?.type === "declined"
-                                    ? "destructive"
-                                    : "outline",
-                              }
-                            : undefined
-                        }
+                        user={user}
+                        endpointOptions={{
+                          read: {
+                            urlPathParams: argsObj as never,
+                          },
+                        }}
                       />
-                    </NavigationStackProvider>
+                    ) : (
+                      /* POST/PATCH/PUT/DELETE and completed/declined: EndpointRenderer with
+                         confirmationForm — submit calls handleConfirm (sendMessage), not real API */
+                      <NavigationStackProvider>
+                        <EndpointRenderer
+                          user={user}
+                          endpoint={definition}
+                          locale={locale}
+                          data={mergedData}
+                          logger={logger}
+                          disabled={!needsConfirmation || hasPendingDecision}
+                          form={
+                            needsConfirmation || isDeclined
+                              ? confirmationForm
+                              : undefined
+                          }
+                          onSubmit={
+                            needsConfirmation ? handleConfirm : undefined
+                          }
+                          onCancel={
+                            needsConfirmation ? handleCancel : undefined
+                          }
+                          submitButton={
+                            needsConfirmation
+                              ? {
+                                  text: "widgets.toolCall.actions.confirm" satisfies ReactTranslationKey,
+                                  variant:
+                                    decision?.type === "confirmed"
+                                      ? "default"
+                                      : decision?.type === "declined"
+                                        ? "ghost"
+                                        : "default",
+                                }
+                              : undefined
+                          }
+                          cancelButton={
+                            needsConfirmation
+                              ? {
+                                  variant:
+                                    decision?.type === "declined"
+                                      ? "destructive"
+                                      : "outline",
+                                }
+                              : undefined
+                          }
+                        />
+                      </NavigationStackProvider>
+                    )}
                   </Div>
                 );
               })()}

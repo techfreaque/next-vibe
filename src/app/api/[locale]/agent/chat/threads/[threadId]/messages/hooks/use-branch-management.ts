@@ -81,7 +81,12 @@ function deriveBranchIndices(
     }
 
     const siblings = childrenByParent.get(msg.parentId ?? null) ?? [];
-    if (siblings.length > 1) {
+    // Only record real branches — parallel tool calls share the same sequenceId
+    // and must NOT trigger branch navigation or URL updates.
+    const isRealBranch =
+      siblings.length > 1 &&
+      new Set(siblings.map((s) => s.sequenceId)).size > 1;
+    if (isRealBranch) {
       const idx = siblings.findIndex((s) => s.id === currentId);
       const key = msg.parentId ?? BRANCH_INDEX_KEY;
       if (idx >= 0) {

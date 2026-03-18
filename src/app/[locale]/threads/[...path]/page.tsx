@@ -103,7 +103,6 @@ export async function tanstackLoader({
   const { locale, path } = await params;
   const resolvedSearchParams = await searchParams;
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const { t } = userScopedTranslation.scopedT(locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
   // Get authenticated user
@@ -459,10 +458,10 @@ export function TanstackPage({
   initialFolderContentsData,
   initialSubFolderContentsData,
 }: ThreadsPathPageData): JSX.Element {
-  const { t } = userScopedTranslation.scopedT(locale);
+  const { t: userT } = userScopedTranslation.scopedT(locale);
 
   if (!user) {
-    return <Div>{t("auth.errors.unknownError")}</Div>;
+    return <Div>{userT("auth.errors.unknownError")}</Div>;
   }
 
   return (

@@ -103,6 +103,8 @@ export type ButtonProps = {
   draggable?: boolean;
   onDragStart?: (e: DivDragEvent) => void;
   "data-tour"?: string;
+  "data-testid"?: string;
+  "aria-label"?: string;
 } & StyleType;
 
 export function Button({

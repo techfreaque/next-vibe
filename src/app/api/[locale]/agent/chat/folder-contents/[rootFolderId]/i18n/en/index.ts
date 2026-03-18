@@ -52,7 +52,7 @@ export const translations = {
           archived: { content: "Archived" },
           canEdit: { content: "Can Edit" },
           canPost: { content: "Can Post" },
-          isStreaming: { content: "Is Streaming" },
+          streamingState: { content: "Streaming State" },
           createdAt: { content: "Created At" },
           updatedAt: { content: "Updated At" },
         },

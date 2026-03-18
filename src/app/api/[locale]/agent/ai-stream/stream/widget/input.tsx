@@ -11,8 +11,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
 import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Phone } from "next-vibe-ui/ui/icons/Phone";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Square } from "next-vibe-ui/ui/icons/Square";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
@@ -29,7 +31,13 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-config";
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
+import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
+import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
+import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
+import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
@@ -314,10 +322,70 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const isInputDisabled = isLoading || !canPost;
 
-  // Show stop button when streaming OR when TTS is playing.
+  // Aborting state — user clicked cancel but STREAM_FINISHED hasn't arrived yet
+  const isAborting = useAIStreamStore((s) =>
+    activeThreadId ? s.isAborting(activeThreadId) : false,
+  );
+
+  // Background tasks for this thread (wakeUp tasks still pending/running)
+  const messagesQuery = useApiQuery({
+    endpoint: messagesDefinition.GET,
+    urlPathParams: activeThreadId
+      ? { threadId: activeThreadId }
+      : { threadId: "" },
+    requestData: { rootFolderId: currentRootFolderId },
+    logger,
+    user,
+    options: { enabled: !!activeThreadId },
+  });
+  const backgroundTasks = messagesQuery.data?.backgroundTasks ?? [];
+
+  const deleteTaskMutation = useApiMutation(
+    cronIdEndpoints.DELETE,
+    logger,
+    user,
+  );
+  const handleCancelBackgroundTask = useCallback(
+    (taskId: string) => {
+      void deleteTaskMutation
+        .mutateAsync({ urlPathParams: { id: taskId } })
+        .then(() => {
+          if (!activeThreadId) {
+            return;
+          }
+          apiClient.updateEndpointData(
+            messagesDefinition.GET,
+            logger,
+            (old) => {
+              if (!old?.success) {
+                return old;
+              }
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  backgroundTasks: old.data.backgroundTasks.filter(
+                    (task) => task.id !== taskId,
+                  ),
+                },
+              };
+            },
+            {
+              urlPathParams: { threadId: activeThreadId },
+              requestData: { rootFolderId: currentRootFolderId },
+            },
+          );
+          return undefined;
+        });
+    },
+    [deleteTaskMutation, activeThreadId, currentRootFolderId, logger],
+  );
+
+  // Show stop button when streaming OR when TTS is playing OR when aborting.
   // isStreaming from navigation store is the authoritative signal.
   const isActivelyStreaming = isLoading || isStreaming;
-  const showStopButton = isActivelyStreaming || voiceRuntime.isSpeaking;
+  const showStopButton =
+    isActivelyStreaming || isAborting || voiceRuntime.isSpeaking;
 
   // Voice recording state
   const voice = useVoiceRecording({
@@ -476,6 +544,38 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         </Div>
       )}
 
+      {/* Background tasks banner */}
+      {backgroundTasks.length > 0 && (
+        <Div className="flex flex-col gap-1 mb-2">
+          {backgroundTasks.map(
+            (task: {
+              id: string;
+              displayName: string;
+              toolCallId: string | null;
+            }) => (
+              <Div
+                key={task.id}
+                className="flex items-center justify-between gap-2 px-2 py-1 rounded text-xs bg-violet-500/10 text-violet-600 dark:text-violet-400"
+              >
+                <Div className="flex items-center gap-1.5 min-w-0">
+                  <Loader2 className="h-3 w-3 animate-spin shrink-0" />
+                  <Span className="truncate">{task.displayName}</Span>
+                </Div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-5 w-5 p-0 shrink-0 text-violet-600 dark:text-violet-400 hover:text-destructive"
+                  onClick={() => handleCancelBackgroundTask(task.id)}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </Div>
+            ),
+          )}
+        </Div>
+      )}
+
       {/* Controls */}
       <Div className="flex flex-row items-center gap-1 @sm:gap-1.5 @md:gap-2 flex-nowrap">
         {/* Left: Selector + Tools + File Upload */}
@@ -597,15 +697,22 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
                   <Button
                     type="button"
                     size="icon"
-                    variant="destructive"
-                    onClick={stopGeneration}
+                    variant={isAborting ? "outline" : "destructive"}
+                    onClick={isAborting ? undefined : stopGeneration}
+                    disabled={isAborting}
                     className="h-8 w-8 @sm:h-9 @sm:w-9"
                   >
-                    <Square className="h-3.5 w-3.5 fill-current" />
+                    {isAborting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Square className="h-3.5 w-3.5 fill-current" />
+                    )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {t("app.chat.actions.stopGeneration")}
+                  {isAborting
+                    ? t("app.chat.actions.cancellingGeneration")
+                    : t("app.chat.actions.stopGeneration")}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

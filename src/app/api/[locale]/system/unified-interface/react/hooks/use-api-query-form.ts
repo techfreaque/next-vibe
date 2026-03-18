@@ -597,13 +597,10 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         JSON.stringify(prevQueryParamsRef.current) !==
         JSON.stringify(queryParams);
       if (hasChanged && Object.keys(queryParams).length > 0) {
-        // Only refetch if not already loading and not already populated with fresh cached data.
-        // isCachedData + !isLoadingFresh means we have SSR initialData — skip the explicit refetch
-        // so staleTime is respected instead of being bypassed by an explicit refetch() call.
-        if (
-          !query.isLoading &&
-          !(query.isCachedData && !query.isLoadingFresh)
-        ) {
+        // queryParams changed means a filter/search changed — always refetch.
+        // Don't gate on isCachedData: that check was only meant to prevent
+        // double-fetching on SSR hydration, but it also blocks filter-driven refetches.
+        if (!query.isLoading) {
           void query.refetch();
         }
       }

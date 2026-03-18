@@ -6,7 +6,7 @@
 
 import { translationsKeyMode } from "@/config/debug";
 
-import type { TParams } from "./static-types";
+import type { TParams, TranslationElement } from "./static-types";
 
 /**
  * Nested translation value type supporting deep nesting
@@ -18,7 +18,7 @@ export type NestedValue = string | { [key: string]: NestedValue };
  * This is the core navigation logic shared between global and scoped translations
  */
 export function navigateTranslationObject(
-  startValue: Record<string, NestedValue>,
+  startValue: TranslationElement,
   keys: string[],
 ): NestedValue | undefined {
   let value: NestedValue | undefined = startValue as NestedValue;
@@ -55,7 +55,7 @@ export function navigateTranslationObject(
  * Shared logic for parameter replacement in translation strings
  */
 export function processTranslationValue<K extends string>(
-  value: NestedValue | undefined,
+  value: TranslationElement | NestedValue | undefined,
   key: K,
   params?: TParams,
 ): string {

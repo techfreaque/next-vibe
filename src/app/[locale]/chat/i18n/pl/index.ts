@@ -278,6 +278,7 @@ export const translations: typeof enTranslations = {
     unfiled: "Nieskatalogowane",
     noFoldersAvailable: "Brak dostępnych folderów",
     stopGeneration: "Zatrzymaj generowanie",
+    cancellingGeneration: "Anulowanie...",
     sendMessage: "Wyślij wiadomość",
     shareThread: "Udostępnij wątek",
     manageSharing: "Zarządzaj udostępnianiem",

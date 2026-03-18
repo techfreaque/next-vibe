@@ -27,6 +27,9 @@ import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall, ToolCallResult } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
+import { buildMessagesChannel } from "../../../chat/threads/[threadId]/messages/channel";
+import { createStreamEvent } from "../../../chat/threads/[threadId]/messages/events";
+import { publishWsEvent } from "../../../../system/unified-interface/websocket/emitter";
 import type { AiStreamT } from "../../stream/i18n";
 
 export class ToolConfirmationHandler {
@@ -46,7 +49,13 @@ export class ToolConfirmationHandler {
     user: JwtPayloadType;
     t: AiStreamT;
     streamContext: ToolExecutionContext;
-  }): Promise<ResponseType<{ threadId: string; toolMessageId: string }>> {
+  }): Promise<
+    ResponseType<{
+      threadId: string;
+      toolMessageId: string;
+      wakeUpPending?: boolean;
+    }>
+  > {
     const {
       toolConfirmation,
       messageHistory,
@@ -242,10 +251,18 @@ export class ToolConfirmationHandler {
         });
       }
 
-      // wakeUp confirm: execute-tool returned {taskId, status:'pending'} immediately
-      // (fire-and-forget goroutine running). Skip remote polling — revival delivers result.
-      // Insert deferred confirm with pending status; update task row to point toolMessageId
-      // to the deferred id so handleTaskCompletion backfills the right message on revival.
+      // wakeUp confirm: execute-tool returned {taskId, status:'pending'} immediately.
+      // Two sub-cases depending on whether the wakeUp result arrived before or after confirm:
+      //
+      // Case A — wakeUp completed BEFORE confirm (newer sequence exists from revival AI turn):
+      //   The deferred result is already in a new sequence. Confirm should insert another
+      //   deferred message as the leaf child (handled below in the non-wakeUp deferred path).
+      //
+      // Case B — confirm fires BEFORE wakeUp completes (no newer sequence yet, goroutine running):
+      //   DO NOT touch the tool message — setting isDeferred=true here would race with
+      //   resume-stream's idempotency check and cause it to skip the revival entirely.
+      //   Just update the task row so handleTaskCompletion backfills the right message,
+      //   then return wakeUpPending=true so the confirm stream skips this tool (revival handles it).
       if (
         isWakeUpConfirm &&
         toolResult !== undefined &&
@@ -258,21 +275,8 @@ export class ToolConfirmationHandler {
         const pendingTaskId = (toolResult as Record<string, ToolCallResult>)
           .taskId as string | undefined;
 
-        const pendingToolCall: ToolCall = {
-          ...toolCall,
-          args: finalArgs as ToolCallResult,
-          result: undefined,
-          error: undefined,
-          isConfirmed: true,
-          waitingForConfirmation: false,
-          isDeferred: true,
-          originalToolCallId: toolCall.toolCallId,
-          // Mark as wakeUp pending so the UI shows the right state
-          status: "pending" as const,
-          callbackMode: CallbackMode.WAKE_UP,
-        };
-
         if (!isIncognito) {
+          // Check whether the wakeUp result already landed (newer sequence present).
           const newerSequenceMessage = toolMessage.sequenceId
             ? await db
                 .select({ id: chatMessages.id })
@@ -285,101 +289,87 @@ export class ToolConfirmationHandler {
                   ),
                 )
                 .limit(1)
-            : [{ id: "sentinel" }];
-
-          const toolMessageIdToReturn =
-            newerSequenceMessage.length === 0
-              ? toolConfirmation.messageId
-              : crypto.randomUUID();
+            : [];
 
           if (newerSequenceMessage.length === 0) {
-            // Same sequence — update in-place
+            // Case B: goroutine still running.
+            // Clear waitingForConfirmation so the UI shows the wakeUp state ("Running — result
+            // will wake up AI") instead of the stale "Pending Confirmation" badge.
+            // Do NOT set isDeferred or result — resume-stream owns that when the task completes.
+            const clearedToolCall: ToolCall = {
+              ...toolCall,
+              waitingForConfirmation: false,
+              isConfirmed: true,
+            };
             await db
               .update(chatMessages)
-              .set({ metadata: { toolCall: pendingToolCall } })
+              .set({ metadata: { toolCall: clearedToolCall } })
               .where(eq(chatMessages.id, toolConfirmation.messageId));
-          } else {
-            // Different sequence — insert deferred.
-            // Walk forward from leafMessageId to find the true current branch tip,
-            // so the deferred result is appended to the correct branch even if many
-            // messages were added after the original tool call.
-            const deferredParentId = await walkToLeafMessage(
-              toolMessage.threadId,
-              params.streamContext.leafMessageId ?? null,
-              toolMessage.parentId ?? toolMessage.id,
+            // Re-emit message-created so the client updates the existing bubble's badge
+            // (waitingForConfirmation=false → shows "Running — result will wake up AI").
+            // Do NOT emit tool-result — there is no result yet; resume-stream delivers it later.
+            publishWsEvent(
+              {
+                channel: buildMessagesChannel(toolMessage.threadId),
+                event: "message-created",
+                data: createStreamEvent.messageCreated({
+                  messageId: toolConfirmation.messageId,
+                  threadId: toolMessage.threadId,
+                  role: ChatMessageRole.TOOL,
+                  parentId: toolMessage.parentId ?? null,
+                  content: null,
+                  model: toolMessage.model,
+                  skill: toolMessage.skill,
+                  sequenceId: toolMessage.sequenceId ?? null,
+                  toolCall: clearedToolCall,
+                }).data,
+              },
+              logger,
             );
-            await db.insert(chatMessages).values({
-              id: toolMessageIdToReturn,
-              threadId: toolMessage.threadId,
-              role: "tool" as ChatMessageRole,
-              content: null,
-              parentId: deferredParentId,
-              authorId: toolMessage.authorId,
-              sequenceId: toolMessage.sequenceId ?? crypto.randomUUID(),
-              isAI: true,
-              model: toolMessage.model,
-              skill: toolMessage.skill,
-              metadata: { toolCall: pendingToolCall },
-            });
-          }
 
-          // Update the wakeUp task row to point toolMessageId to the correct message
-          // so handleTaskCompletion backfills the correct message on revival.
-          if (pendingTaskId) {
-            try {
-              await db
-                .update(cronTasks)
-                .set({
-                  wakeUpToolMessageId: toolMessageIdToReturn,
-                  updatedAt: new Date(),
-                })
-                .where(eq(cronTasks.id, pendingTaskId));
-            } catch (updateErr) {
-              logger.warn(
-                "[Tool Confirmation] Failed to update wakeUp task toolMessageId (non-fatal)",
-                {
-                  pendingTaskId,
-                  toolMessageIdToReturn,
-                  error:
-                    updateErr instanceof Error
-                      ? updateErr.message
-                      : String(updateErr),
-                },
-              );
+            if (pendingTaskId) {
+              try {
+                await db
+                  .update(cronTasks)
+                  .set({
+                    wakeUpToolMessageId: toolConfirmation.messageId,
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(cronTasks.id, pendingTaskId));
+              } catch (updateErr) {
+                logger.warn(
+                  "[Tool Confirmation] Failed to update wakeUp task toolMessageId (non-fatal)",
+                  {
+                    pendingTaskId,
+                    toolMessageId: toolConfirmation.messageId,
+                    error:
+                      updateErr instanceof Error
+                        ? updateErr.message
+                        : String(updateErr),
+                  },
+                );
+              }
             }
+
+            logger.info(
+              "[Tool Confirmation] wakeUp confirm (Case B) — goroutine running, resume-stream handles revival",
+              { toolMessageId: toolConfirmation.messageId, pendingTaskId },
+            );
+
+            return {
+              success: true,
+              data: {
+                threadId: toolMessage.threadId,
+                toolMessageId: toolConfirmation.messageId,
+                wakeUpPending: true,
+              },
+            };
           }
-
-          logger.info("[Tool Confirmation] wakeUp confirm — revival pending", {
-            originalMessageId: toolConfirmation.messageId,
-            toolMessageIdToReturn,
-            pendingTaskId,
-            inPlace: newerSequenceMessage.length === 0,
-          });
-
-          return {
-            success: true,
-            data: {
-              threadId: toolMessage.threadId,
-              toolMessageId: toolMessageIdToReturn,
-            },
-          };
-        }
-
-        // Incognito wakeUp: update in-place with pending status
-        if (isIncognito && messageHistory) {
-          const msgIndex = messageHistory.findIndex(
-            (msg) => msg.id === toolConfirmation.messageId,
+          // Case A: wakeUp already completed — fall through to the deferred insertion path below.
+          logger.info(
+            "[Tool Confirmation] wakeUp confirm (Case A) — wakeUp already landed, inserting confirm deferred after revival",
+            { toolMessageId: toolConfirmation.messageId },
           );
-          if (msgIndex >= 0) {
-            messageHistory[msgIndex].metadata = { toolCall: pendingToolCall };
-          }
-          return {
-            success: true,
-            data: {
-              threadId: toolMessage.threadId,
-              toolMessageId: toolConfirmation.messageId,
-            },
-          };
         }
       }
 
@@ -464,20 +454,22 @@ export class ToolConfirmationHandler {
           };
         }
 
-        // Different sequence — insert a deferred message (supersedes original placeholder).
-        // Walk forward from leafMessageId to find the true current branch tip,
-        // so the deferred result is appended to the correct branch even if many
-        // messages were added after the original tool call.
+        // Different sequence — find the true current tip of the thread and append there.
+        // Walk forward from toolMessage.parentId (the assistant that issued the tool calls)
+        // to reach the leaf of whatever chain has grown since (e.g. wakeUp revival messages).
+        // This keeps the thread linear: confirm result is appended after the revival, not
+        // inserted as a parallel sibling that would create a new branch.
         const deferredToolCall: ToolCall = {
           ...confirmedToolCallBase,
           isDeferred: true, // deferred: supersedes original waiting_for_confirmation placeholder
         };
         const confirmedDeferredParentId = await walkToLeafMessage(
           toolMessage.threadId,
-          params.streamContext.leafMessageId ?? null,
+          toolMessage.parentId ?? null,
           toolMessage.parentId ?? toolMessage.id,
         );
         const deferredId = crypto.randomUUID();
+        const confirmedSeqId = toolMessage.sequenceId ?? crypto.randomUUID();
         await db.insert(chatMessages).values({
           id: deferredId,
           threadId: toolMessage.threadId,
@@ -485,12 +477,45 @@ export class ToolConfirmationHandler {
           content: null,
           parentId: confirmedDeferredParentId,
           authorId: toolMessage.authorId,
-          sequenceId: toolMessage.sequenceId ?? crypto.randomUUID(),
+          sequenceId: confirmedSeqId,
           isAI: true,
           model: toolMessage.model,
           skill: toolMessage.skill,
           metadata: { toolCall: deferredToolCall },
         });
+        // Emit WS so the client has this message in cache before any revival stream events.
+        publishWsEvent(
+          {
+            channel: buildMessagesChannel(toolMessage.threadId),
+            event: "message-created",
+            data: createStreamEvent.messageCreated({
+              messageId: deferredId,
+              threadId: toolMessage.threadId,
+              role: ChatMessageRole.TOOL,
+              parentId: confirmedDeferredParentId,
+              content: null,
+              model: toolMessage.model,
+              skill: toolMessage.skill,
+              sequenceId: confirmedSeqId,
+              toolCall: deferredToolCall,
+            }).data,
+          },
+          logger,
+        );
+        publishWsEvent(
+          {
+            channel: buildMessagesChannel(toolMessage.threadId),
+            event: "tool-result",
+            data: createStreamEvent.toolResult({
+              messageId: deferredId,
+              toolName: deferredToolCall.toolName,
+              result: deferredToolCall.result,
+              error: deferredToolCall.error,
+              toolCall: deferredToolCall,
+            }).data,
+          },
+          logger,
+        );
         logger.debug(
           "[Tool Confirmation] Tool executed — deferred confirm message inserted",
           {
@@ -585,18 +610,22 @@ export class ToolConfirmationHandler {
           };
         }
 
-        // Different sequence — insert deferred (supersedes original placeholder).
-        // Walk forward from leafMessageId to find the true current branch tip.
+        // Different sequence — find the true current tip of the thread and append there.
+        // Walk forward from toolMessage.parentId (the assistant that issued the tool calls)
+        // to reach the leaf of whatever chain has grown since (e.g. wakeUp revival messages).
+        // This keeps the thread linear: reject result is appended after the revival, not
+        // inserted as a parallel sibling that would create a new branch.
         const deferredRejected: ToolCall = {
           ...rejectedToolCallBase,
           isDeferred: true,
         };
         const rejectedDeferredParentId = await walkToLeafMessage(
           toolMessage.threadId,
-          params.streamContext.leafMessageId ?? null,
+          toolMessage.parentId ?? null,
           toolMessage.parentId ?? toolMessage.id,
         );
         const deferredId = crypto.randomUUID();
+        const rejectedSeqId = toolMessage.sequenceId ?? crypto.randomUUID();
         await db.insert(chatMessages).values({
           id: deferredId,
           threadId: toolMessage.threadId,
@@ -604,12 +633,45 @@ export class ToolConfirmationHandler {
           content: null,
           parentId: rejectedDeferredParentId,
           authorId: toolMessage.authorId,
-          sequenceId: toolMessage.sequenceId ?? crypto.randomUUID(),
+          sequenceId: rejectedSeqId,
           isAI: true,
           model: toolMessage.model,
           skill: toolMessage.skill,
           metadata: { toolCall: deferredRejected },
         });
+        // Emit WS so the client has this message in cache before any revival stream events.
+        publishWsEvent(
+          {
+            channel: buildMessagesChannel(toolMessage.threadId),
+            event: "message-created",
+            data: createStreamEvent.messageCreated({
+              messageId: deferredId,
+              threadId: toolMessage.threadId,
+              role: ChatMessageRole.TOOL,
+              parentId: rejectedDeferredParentId,
+              content: null,
+              model: toolMessage.model,
+              skill: toolMessage.skill,
+              sequenceId: rejectedSeqId,
+              toolCall: deferredRejected,
+            }).data,
+          },
+          logger,
+        );
+        publishWsEvent(
+          {
+            channel: buildMessagesChannel(toolMessage.threadId),
+            event: "tool-result",
+            data: createStreamEvent.toolResult({
+              messageId: deferredId,
+              toolName: deferredRejected.toolName,
+              result: deferredRejected.result,
+              error: deferredRejected.error,
+              toolCall: deferredRejected,
+            }).data,
+          },
+          logger,
+        );
         logger.debug("[Tool Confirmation] Tool rejected — deferred inserted", {
           originalMessageId: toolConfirmation.messageId,
           deferredId,

@@ -50,7 +50,7 @@ export const translations = {
           archived: { content: "Zarchiwizowany" },
           canEdit: { content: "Może edytować" },
           canPost: { content: "Może pisać" },
-          isStreaming: { content: "Streamuje" },
+          streamingState: { content: "Stan strumieniowania" },
           createdAt: { content: "Utworzono" },
           updatedAt: { content: "Zaktualizowano" },
         },

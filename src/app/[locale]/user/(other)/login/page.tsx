@@ -168,7 +168,7 @@ export function TanstackPage({
 }: LoginPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
 
-  if (errorMessage ?? !loginOptions ?? !user) {
+  if (errorMessage || !loginOptions || !user) {
     return <Div>{errorMessage ?? t("errors.failedToLoadBrowserIdentity")}</Div>;
   }
 

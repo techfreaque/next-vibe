@@ -70,9 +70,17 @@ export async function waitForTask(
     }
 
     if (!task) {
-      return fail({
-        message: t("waitForTask.post.errors.notFound.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
+      // Task not found — it was already completed and cleaned up by revival.
+      // This is not an error: the wakeUp result was already injected into the thread.
+      // Return success so the AI can continue gracefully.
+      logger.info(
+        "[WaitForTask] Task not found — already completed and cleaned up",
+        { taskId },
+      );
+      return success({
+        status: CronTaskStatus.COMPLETED,
+        result: { message: "Task already completed and result injected." },
+        waiting: false,
       });
     }
 

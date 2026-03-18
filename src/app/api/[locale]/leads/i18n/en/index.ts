@@ -60,6 +60,12 @@ export const translations = {
       recipient: "Recipient",
       subject: "Subject",
       email_preview: "Email Preview",
+      stage_of: "of",
+      stages: "stages",
+      journey: "Journey",
+      back: "Back",
+      previous: "Previous",
+      next: "Next",
     },
   },
   auth: {

@@ -99,7 +99,7 @@ function AiStreamChatArea(): JSX.Element {
       return initialMessagesData;
     }
     if (initialPathData?.messages?.length) {
-      return { messages: initialPathData.messages };
+      return { backgroundTasks: [], messages: initialPathData.messages };
     }
     return null;
   }, [threadIdToRender, initialThreadId, initialMessagesData, initialPathData]);

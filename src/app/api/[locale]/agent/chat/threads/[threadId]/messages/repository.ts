@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -28,6 +28,8 @@ import {
   chatThreads,
   type ToolCall,
 } from "../../../db";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { ChatMessageRole, type ChatMessageRoleDB } from "../../../enum";
 import {
   canPostInThread,
@@ -577,13 +579,35 @@ export class MessagesRepository {
         .where(eq(chatMessages.threadId, data.threadId))
         .orderBy(chatMessages.createdAt);
 
+      // Get pending/running background tasks for this thread
+      const rawBackgroundTasks = await db
+        .select({
+          id: cronTasks.id,
+          displayName: cronTasks.displayName,
+          wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+        })
+        .from(cronTasks)
+        .where(
+          and(
+            eq(cronTasks.wakeUpThreadId, data.threadId),
+            sql`${cronTasks.lastExecutionStatus} IN (${CronTaskStatus.PENDING}, ${CronTaskStatus.RUNNING}, ${CronTaskStatus.SCHEDULED})`,
+          ),
+        );
+
+      const backgroundTasks = rawBackgroundTasks.map((task) => ({
+        id: task.id,
+        displayName: task.displayName,
+        toolCallId: task.wakeUpToolMessageId ?? null,
+      }));
+
       logger.debug("Messages retrieved", {
         threadId: data.threadId,
         count: messages.length,
+        backgroundTaskCount: backgroundTasks.length,
       });
 
       // Return messages directly - let type system handle transformations
-      return success({ messages });
+      return success({ messages, backgroundTasks });
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({

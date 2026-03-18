@@ -168,10 +168,11 @@ const { GET } = createEndpoint({
               content: "get.response.items.item.modelNames.content" as const,
               schema: z.array(z.string()),
             }),
-            isStreaming: responseField(scopedTranslation, {
+            streamingState: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "get.response.items.item.isStreaming.content" as const,
-              schema: z.boolean(),
+              content:
+                "get.response.items.item.streamingState.content" as const,
+              schema: z.enum(["idle", "streaming", "aborting"]),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

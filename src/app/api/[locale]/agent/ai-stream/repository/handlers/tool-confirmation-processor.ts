@@ -79,6 +79,21 @@ export class ToolConfirmationProcessor {
         return confirmResult;
       }
 
+      // wakeUpPending=true means the goroutine is still running — resume-stream handles
+      // the deferred insertion and revival. Still include the updated tool message so
+      // the AI can reason about it (sees wakeUp pending state, responds naturally).
+      // The tool message has waitingForConfirmation=false and callbackMode=wakeUp so
+      // message-converter emits the standard wakeUp placeholder result for the AI.
+      if (confirmResult.data.wakeUpPending) {
+        logger.debug(
+          "[Setup] wakeUpPending tool — including in confirm stream so AI can reason",
+          {
+            messageId: confirmResult.data.toolMessageId,
+          },
+        );
+        // Fall through to the standard result-push below — same path as non-wakeUp.
+      }
+
       // toolMessageId is either the original (updated in-place) or a new deferred row.
       const toolMessageId = confirmResult.data.toolMessageId;
       const updatedMessage = await db.query.chatMessages.findFirst({

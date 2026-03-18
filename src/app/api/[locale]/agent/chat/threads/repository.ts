@@ -609,7 +609,7 @@ export class ThreadsRepository {
             canModerate: canModerateFlag,
             canDelete: canDeleteFlag,
             canManagePermissions: canManagePermsFlag,
-            isStreaming: thread.isStreaming,
+            streamingState: thread.streamingState,
             createdAt: thread.createdAt,
             updatedAt: thread.updatedAt,
           };

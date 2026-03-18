@@ -248,37 +248,79 @@ export class AiStreamRepository {
       streamAbortController,
       effectiveCompactTrigger,
       streamContext,
+      skipAiTurn,
     } = setupResult.data;
+
+    // All confirmations were wakeUp-pending — no AI turn needed here.
+    // resume-stream will handle revival when each goroutine completes.
+    if (skipAiTurn) {
+      logger.info(
+        "[AiStream] All confirmations wakeUp-pending — skipping AI turn, revival handles it",
+        { threadId: data.threadId },
+      );
+      return {
+        success: true,
+        data: {
+          success: true,
+          messageId: aiMessageId,
+          responseThreadId: threadResultThreadId,
+        },
+      } satisfies ResponseType<AiStreamPostResponseOutput>;
+    }
 
     // Captured refs so headless path can read lastAiMessageId + content after runStream completes
     let capturedLastAiMessageId: string = aiMessageId;
     let capturedLastAiMessageContent: string | null = null;
-    // Captured wakeUp payload — written by the signal handler, read in finally for deferred insertion + revival
-    let capturedWakeUpPayload: WakeUpPayload | null = null;
+    // Captured wakeUp payloads — queue written by the signal handler, processed in finally for deferred insertion + revival.
+    // Array supports parallel wakeUp tools: each completion pushes its payload; all are processed sequentially.
+    const capturedWakeUpPayloads: WakeUpPayload[] = [];
 
-    // Extracted to a named function so narrowing works correctly outside finally blocks
-    const handleWakeUpRevival = async (
-      payload: WakeUpPayload,
+    // Insert all pending wakeUp deferred messages, then fire ONE revival from the last one.
+    // Batching ensures: if multiple wakeUp tools complete before the stream yields,
+    // all their deferred messages are inserted as a linear chain, and a single AI
+    // turn sees all of them — no duplicate revival responses.
+    const handleWakeUpRevivalBatch = async (
+      payloads: WakeUpPayload[],
     ): Promise<void> => {
+      if (payloads.length === 0) {
+        return;
+      }
       const { insertDeferredWakeUpMessage } =
         await import("./core/deferred-inserter");
-      const wakeUpDeferredId = await insertDeferredWakeUpMessage(
-        threadResultThreadId,
-        payload,
-        logger,
-      );
+
+      let lastDeferredId = "";
+      let lastPayload = payloads[0];
+      // All deferred messages in a batch share one sequenceId so the UI groups
+      // them into a single assistant bubble together with the revival AI response.
+      const batchSequenceId = crypto.randomUUID();
+
+      // Insert all deferred messages sequentially so they form a linear chain
+      // (each walkToLeafMessage finds the previous deferred as the new leaf).
+      for (const payload of payloads) {
+        const { deferredId } = await insertDeferredWakeUpMessage(
+          threadResultThreadId,
+          payload,
+          logger,
+          batchSequenceId,
+        );
+        lastDeferredId = deferredId;
+        lastPayload = payload;
+      }
+
       logger.info("[WakeUp] Firing revival after stream yield", {
         threadId: threadResultThreadId,
-        deferredId: wakeUpDeferredId,
+        deferredCount: payloads.length,
+        lastDeferredId,
       });
       const { runHeadlessAiStream } = await import("./headless");
       await runHeadlessAiStream({
-        favoriteId: payload.favoriteId,
-        model: payload.resolvedModel,
-        skill: payload.resolvedSkill,
+        favoriteId: lastPayload.favoriteId,
+        model: lastPayload.resolvedModel,
+        skill: lastPayload.resolvedSkill,
         prompt: "",
         wakeUpRevival: true,
-        explicitParentMessageId: wakeUpDeferredId,
+        explicitParentMessageId: lastDeferredId,
+        sequenceIdOverride: batchSequenceId,
         threadMode: "append",
         threadId: threadResultThreadId,
         rootFolderId: data.rootFolderId,
@@ -345,7 +387,7 @@ export class AiStreamRepository {
                 toolMessageId: payload.toolMessageId,
               },
             );
-            capturedWakeUpPayload = payload;
+            capturedWakeUpPayloads.push(payload);
             ctx.shouldYieldForWakeUp = true;
           },
         );
@@ -619,9 +661,7 @@ export class AiStreamRepository {
         } finally {
           await clearStreamingState(threadResultThreadId);
           // wakeUp revival: insert deferred (single stream = no race) then revive.
-          if (capturedWakeUpPayload) {
-            await handleWakeUpRevival(capturedWakeUpPayload);
-          }
+          await handleWakeUpRevivalBatch(capturedWakeUpPayloads);
         }
 
         logger.info("[AI Stream] Headless execution complete", {
@@ -685,9 +725,7 @@ export class AiStreamRepository {
             .then(() =>
               // wakeUp revival: if a pub/sub signal arrived mid-stream, insert the deferred
               // message now (stream is done, single-inserter guarantee holds) then fire revival.
-              capturedWakeUpPayload
-                ? handleWakeUpRevival(capturedWakeUpPayload)
-                : Promise.resolve(),
+              handleWakeUpRevivalBatch(capturedWakeUpPayloads),
             )
             .catch((err) => {
               logger.error("[AI Stream] Failed to clear streaming state", {

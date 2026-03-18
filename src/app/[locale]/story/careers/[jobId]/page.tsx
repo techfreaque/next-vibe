@@ -92,7 +92,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export interface JobPostingPageData {
   locale: CountryLanguage;
-  jobId: string;
   job: JobType;
   otherJobs: Array<{ key: string; job: JobType }>;
 }
@@ -290,12 +289,11 @@ export async function tanstackLoader({
     .slice(0, 2)
     .map(([key, j]) => ({ key, job: j }));
 
-  return { locale, jobId, job, otherJobs };
+  return { locale, job, otherJobs };
 }
 
 export function TanstackPage({
   locale,
-  jobId,
   job,
   otherJobs,
 }: JobPostingPageData): JSX.Element {

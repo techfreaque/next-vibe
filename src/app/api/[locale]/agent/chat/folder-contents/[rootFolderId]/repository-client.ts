@@ -99,7 +99,7 @@ export class FolderContentsRepositoryClient {
           archived: null,
           canEdit: null,
           canPost: null,
-          isStreaming: null,
+          streamingState: null,
           rolesEdit: null,
         }));
 
@@ -125,7 +125,7 @@ export class FolderContentsRepositoryClient {
           canModerate: false,
           canDelete: true,
           canManagePermissions: false,
-          isStreaming: false,
+          streamingState: "idle" as const,
           rolesView: thread.rolesView ?? null,
           rolesEdit: thread.rolesEdit ?? null,
           rolesPost: thread.rolesPost ?? null,

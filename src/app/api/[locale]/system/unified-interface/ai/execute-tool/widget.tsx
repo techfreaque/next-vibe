@@ -241,6 +241,9 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
           ...(hasInput ? { urlPathParams: inputData as never } : {}),
           // Never auto-fetch inside execute-tool — user triggers fetch explicitly
           queryOptions: { enabled: false },
+          // Disable auto-submit: prevents the debounced form-watch from calling
+          // query.refetch() (which ignores enabled:false) when form values change
+          formOptions: { autoSubmit: false },
         },
       };
     }

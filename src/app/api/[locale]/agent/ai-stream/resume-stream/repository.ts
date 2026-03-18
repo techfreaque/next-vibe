@@ -86,30 +86,31 @@ export class ResumeStreamRepository {
     } = data;
 
     try {
-      // Read thread state — isStreaming tells us if the live loop is still running.
+      // Read thread state — streamingState tells us if the live loop is still running.
       const [thread] = await db
         .select({
-          isStreaming: chatThreads.isStreaming,
+          streamingState: chatThreads.streamingState,
           rootFolderId: chatThreads.rootFolderId,
         })
         .from(chatThreads)
         .where(eq(chatThreads.id, threadId))
         .limit(1);
 
-      const isLive = thread?.isStreaming === true;
+      const isLive = thread?.streamingState === "streaming";
 
-      // Atomic revival claim: atomically flip isStreaming false→true.
+      // Atomic revival claim: atomically flip streamingState 'idle'→'streaming'.
       // If 0 rows updated, another resume-stream task already claimed this revival slot.
       // This prevents the parallel wakeUp race where two simultaneous completions both
       // try to fire a headless revival on the same thread.
+      // Note: we do NOT claim if streamingState='aborting' — that means user cancelled.
       const claimRevival = async (claimThreadId: string): Promise<boolean> => {
         const claimed = await db
           .update(chatThreads)
-          .set({ isStreaming: true })
+          .set({ streamingState: "streaming" })
           .where(
             and(
               eq(chatThreads.id, claimThreadId),
-              sql`${chatThreads.isStreaming} = false`,
+              sql`${chatThreads.streamingState} = 'idle'`,
             ),
           )
           .returning({ id: chatThreads.id });
@@ -254,6 +255,9 @@ export class ResumeStreamRepository {
               originalToolCallId: toolCall.toolCallId,
               callbackMode: "wakeUp",
               isDeferred: true,
+              // Do NOT propagate isConfirmed — this is an async background result,
+              // not a user-confirmation action. Prevents "Confirmed by you" badge.
+              isConfirmed: false,
             };
 
             // If the thread's live stream is still running, signal it with the full
@@ -277,6 +281,33 @@ export class ResumeStreamRepository {
                 "[ResumeStream] wakeUp — published wake-up signal to live stream (insertion deferred to stream finally)",
                 { threadId: effectiveThreadId, toolMessageId },
               );
+
+              // Cleanup cron tasks — live stream handles insertion + revival, these are no longer needed.
+              const liveWakeUpCleanupIds = [wakeUpTaskId, resumeTaskId].filter(
+                Boolean,
+              ) as string[];
+              if (liveWakeUpCleanupIds.length > 0) {
+                try {
+                  await Promise.all(
+                    liveWakeUpCleanupIds.map((id) =>
+                      db.delete(cronTasks).where(eq(cronTasks.id, id)),
+                    ),
+                  );
+                  logger.info(
+                    "[ResumeStream] Cleaned up cron tasks (live wakeUp signal)",
+                    { deletedIds: liveWakeUpCleanupIds },
+                  );
+                } catch (cleanupErr) {
+                  logger.warn(
+                    "[ResumeStream] Live wakeUp cleanup failed (non-fatal)",
+                    {
+                      liveWakeUpCleanupIds,
+                      error: parseError(cleanupErr).message,
+                    },
+                  );
+                }
+              }
+
               return success({ resumed: false, lastAiMessageId: null });
             }
 
@@ -302,11 +333,11 @@ export class ResumeStreamRepository {
                   setTimeout(resolve, 2_000);
                 });
                 const [currentThread] = await db
-                  .select({ isStreaming: chatThreads.isStreaming })
+                  .select({ streamingState: chatThreads.streamingState })
                   .from(chatThreads)
                   .where(eq(chatThreads.id, effectiveThreadId))
                   .limit(1);
-                if (currentThread?.isStreaming === false) {
+                if (currentThread?.streamingState === "idle") {
                   break;
                 }
               }

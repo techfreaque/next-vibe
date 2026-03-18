@@ -646,6 +646,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const tasks: Task[] = useMemo(() => data?.tasks ?? [], [data?.tasks]);
   const totalTasks = data?.totalTasks ?? 0;
   const countsByStatus = data?.countsByStatus;
+  const countsByHidden = data?.countsByHidden;
 
   // ── Bulk selection state ──────────────────────────────────────────────────
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -837,7 +838,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     [selectedIds, bulkMutation, handleClearSelection, logger],
   );
 
-  // ── Helper: update form fields the same way FormField/Controller widgets do ─
+  // ── Helper: update form fields — auto-submit handles the refetch ─────────
   const patchForm = useCallback(
     (
       patch: Partial<(typeof endpoints.GET)["types"]["RequestOutput"]>,
@@ -1220,19 +1221,19 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         <Div className="w-px bg-border mx-1 self-stretch" />
         <FilterTab
           label={t("widget.filter.visible")}
-          count={0}
+          count={countsByHidden?.visible ?? 0}
           active={activeHiddenFilter === CronTaskHiddenFilter.VISIBLE}
           onClick={() => handleHiddenFilterChange(CronTaskHiddenFilter.VISIBLE)}
         />
         <FilterTab
           label={t("widget.filter.hiddenOnly")}
-          count={0}
+          count={countsByHidden?.hidden ?? 0}
           active={activeHiddenFilter === CronTaskHiddenFilter.HIDDEN}
           onClick={() => handleHiddenFilterChange(CronTaskHiddenFilter.HIDDEN)}
         />
         <FilterTab
           label={t("widget.filter.allTasks")}
-          count={0}
+          count={countsByHidden?.all ?? 0}
           active={activeHiddenFilter === CronTaskHiddenFilter.ALL}
           onClick={() => handleHiddenFilterChange(CronTaskHiddenFilter.ALL)}
         />

@@ -22,6 +22,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   clearStreamingState,
+  setStreamingStateAborting,
   StreamRegistry,
 } from "../repository/core/stream-registry";
 import type {
@@ -94,6 +95,9 @@ export const cancelRepository = {
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
+
+      // Mark as aborting before sending abort signal — gives frontend immediate feedback
+      await setStreamingStateAborting(threadId);
 
       // Cancel the stream via the registry
       const wasActive = StreamRegistry.cancel(threadId);

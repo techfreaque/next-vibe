@@ -190,7 +190,24 @@ export class MessageConverter {
                       toolName: toolCall.toolName,
                     },
                   }
-                : null;
+                : toolCall.callbackMode === "wakeUp"
+                  ? {
+                      type: "json" as const,
+                      value: {
+                        status: "pending",
+                        hint: "Result will be injected into this thread when ready. Do NOT call this tool again.",
+                      },
+                    }
+                  : {
+                      // Fallback: tool call has no result yet (e.g. detach goroutine hasn't
+                      // completed when a parallel wakeUp revival fires). Always emit a placeholder
+                      // so the AI SDK never sees a tool-call without a matching tool-result.
+                      type: "json" as const,
+                      value: {
+                        status: "pending",
+                        hint: "Result not yet available.",
+                      },
+                    };
 
           if (output !== null) {
             return [
@@ -335,7 +352,11 @@ export class MessageConverter {
         // Look ahead to find all TOOL messages in this step.
         // Empty placeholder ASSISTANT messages (no content) between tools do NOT
         // break the group — they are just DB artifacts from sequential tool calls.
-        // A group ends at: a USER message, or an ASSISTANT message with real text content.
+        // Non-empty ASSISTANT messages are also skipped when all tools seen so far
+        // are superseded — this handles the wakeUp case where the AI emits a
+        // "dispatched" response after the pending tool, before the deferred result.
+        // A group ends at: a USER message, or an ASSISTANT with text when we already
+        // have at least one non-superseded tool.
         const toolMessages: ChatMessage[] = [msg];
         let j = i + 1;
         while (j < messages.length) {
@@ -354,8 +375,22 @@ export class MessageConverter {
           ) {
             // Empty placeholder ASSISTANT — skip over it (don't add to toolMessages)
             j++;
+          } else if (
+            next?.role === ChatMessageRole.ASSISTANT &&
+            next.content?.trim() &&
+            toolMessages.every(
+              (t) =>
+                "metadata" in t &&
+                supersededToolCallIds.has(t.metadata!.toolCall!.toolCallId) &&
+                !t.metadata!.toolCall!.isDeferred,
+            )
+          ) {
+            // Non-empty ASSISTANT between a fully-superseded group and a deferred result.
+            // This is the AI's "dispatched" response that preceded the wakeUp result —
+            // skip it so the deferred tool is included in the same group.
+            j++;
           } else {
-            // Real content boundary (USER, or ASSISTANT with text, or SYSTEM, etc.) — stop
+            // Real content boundary — stop
             break;
           }
         }
@@ -468,7 +503,24 @@ export class MessageConverter {
                       toolName: toolCall.toolName,
                     },
                   }
-                : null;
+                : toolCall.callbackMode === "wakeUp"
+                  ? {
+                      type: "json" as const,
+                      value: {
+                        status: "pending",
+                        hint: "Result will be injected into this thread when ready. Do NOT call this tool again.",
+                      },
+                    }
+                  : {
+                      // Fallback: tool call has no result yet (e.g. detach goroutine hasn't
+                      // completed when a parallel wakeUp revival fires). Always emit a placeholder
+                      // so the AI SDK never sees a tool-call without a matching tool-result.
+                      type: "json" as const,
+                      value: {
+                        status: "pending",
+                        hint: "Result not yet available.",
+                      },
+                    };
 
           if (output !== null) {
             toolResultMessages.push({

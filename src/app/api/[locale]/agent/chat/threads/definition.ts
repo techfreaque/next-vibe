@@ -298,11 +298,11 @@ const { GET } = createEndpoint({
                   "Whether the current user can manage permissions for this thread",
                 ),
             }),
-            isStreaming: responseField(scopedTranslation, {
+            streamingState: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
-                "get.response.threads.thread.isStreaming.content" as const,
-              schema: z.boolean(),
+                "get.response.threads.thread.streamingState.content" as const,
+              schema: z.enum(["idle", "streaming", "aborting"]),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

@@ -162,6 +162,11 @@ export interface StreamSetupResult {
   streamAbortController: AbortController;
   /** Rich context for tool executions — rootFolderId, threadId, aiMessageId, etc. */
   streamContext: ToolExecutionContext;
+  /**
+   * When true, all tool confirmations were wakeUp-pending (goroutines still running).
+   * The AI turn should be skipped — resume-stream will handle revival for each task.
+   */
+  skipAiTurn?: boolean;
 }
 
 export async function setupAiStream(params: {
@@ -263,9 +268,6 @@ export async function setupAiStream(params: {
     }
 
     toolConfirmationResults = confirmationResult.data;
-    // Tools have been executed and messages updated with results
-    // Continue with the normal flow to start AI stream
-    // The tool results are now in the message history and AI will process them
   }
 
   if (!userId && !leadId && !isIncognito) {
@@ -1026,7 +1028,7 @@ export async function setupAiStream(params: {
   if (!isIncognito) {
     await db
       .update(chatThreads)
-      .set({ isStreaming: true })
+      .set({ streamingState: "streaming" })
       .where(eq(chatThreads.id, threadResult.threadId));
   }
 
@@ -1051,6 +1053,9 @@ export async function setupAiStream(params: {
       systemPrompt: updatedSystemPrompt,
       trailingSystemMessage,
       toolConfirmationResults,
+      skipAiTurn:
+        (data.toolConfirmations?.length ?? 0) > 0 &&
+        toolConfirmationResults.length === 0,
       voiceMode: data.voiceMode
         ? {
             enabled: data.voiceMode.enabled ?? false,

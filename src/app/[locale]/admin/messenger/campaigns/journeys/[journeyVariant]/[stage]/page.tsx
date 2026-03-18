@@ -72,6 +72,7 @@ export interface EmailPreviewPageData {
   stagesLabel: string;
   subjectLabel: string;
   journeyLabel: string;
+  previewTitle: string;
 }
 
 export async function tanstackLoader({
@@ -158,13 +159,14 @@ export async function tanstackLoader({
     nextStageLabel: nextStage ? scopedT(nextStage) : null,
     companyName: t("config.appName"),
     companyEmail: contactClientRepository.getSupportEmail(locale),
-    backLabel: t("app.admin.common.actions.back"),
-    prevLabel: t("app.admin.common.actions.previous"),
-    nextLabel: t("app.admin.common.actions.next"),
-    stageOfLabel: t("app.admin.leads.leads.admin.emails.stage_of"),
-    stagesLabel: t("app.admin.leads.leads.admin.emails.stages"),
-    subjectLabel: t("app.admin.leads.leads.admin.emails.subject"),
-    journeyLabel: t("app.admin.leads.leads.admin.emails.journey"),
+    previewTitle: scopedT("admin.emails.preview_title"),
+    backLabel: scopedT("admin.emails.back"),
+    prevLabel: scopedT("admin.emails.previous"),
+    nextLabel: scopedT("admin.emails.next"),
+    stageOfLabel: scopedT("admin.emails.stage_of"),
+    stagesLabel: scopedT("admin.emails.stages"),
+    subjectLabel: scopedT("admin.emails.subject"),
+    journeyLabel: scopedT("admin.emails.journey"),
   };
 }
 
@@ -192,6 +194,7 @@ export function TanstackPage({
   stagesLabel,
   subjectLabel,
   journeyLabel,
+  previewTitle,
 }: EmailPreviewPageData): React.JSX.Element {
   return (
     <Div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -212,9 +215,7 @@ export function TanstackPage({
               </Link>
               <Div>
                 <H1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {t("app.admin.leads.leads.admin.emails.preview_title", {
-                    t: stageLabelText,
-                  })}
+                  {previewTitle}
                 </H1>
                 <P className="text-gray-600 dark:text-gray-400">
                   {journeyName} - {stageLabelText}
@@ -340,11 +341,6 @@ export function TanstackPage({
       />
     </Div>
   );
-}
-
-// Helper to avoid "t is not defined" — translations are baked via the loader
-function t(key: string, _vars?: Record<string, unknown>): string {
-  return key;
 }
 
 export default async function EmailPreviewPage({

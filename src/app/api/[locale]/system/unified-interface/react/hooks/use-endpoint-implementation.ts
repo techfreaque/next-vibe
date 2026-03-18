@@ -6,6 +6,7 @@ import type { UseFormReturn } from "react-hook-form";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { EndpointReadOptions } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   DeleteRequest,
@@ -99,11 +100,12 @@ export function useEndpoint<
   const deleteEndpoint = endpoints.DELETE ?? null;
 
   // Merge endpoint-level options with hook options (hook options take precedence)
-  // Extract endpoint read options if it's a GET endpoint
-  const endpointReadOptions =
-    readEndpoint?.options && "queryOptions" in readEndpoint.options
-      ? readEndpoint.options
-      : undefined;
+  // Extract endpoint read options if it's a GET endpoint.
+  // readEndpoint is always endpoints.GET so its options are always EndpointReadOptions.
+  // The union type can't be narrowed structurally here, so we cast safely.
+  const endpointReadOptions = readEndpoint?.options as
+    | EndpointReadOptions<never, never, never>
+    | undefined;
 
   const readQueryEnabled =
     options?.read?.queryOptions?.enabled ??

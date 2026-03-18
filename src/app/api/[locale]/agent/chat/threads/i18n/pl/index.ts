@@ -111,8 +111,8 @@ export const translations: typeof enTranslations = {
           canDelete: {
             content: "Może usuwać",
           },
-          isStreaming: {
-            content: "Streaming",
+          streamingState: {
+            content: "Status strumieniowania",
           },
           canManagePermissions: {
             content: "Może zarządzać uprawnieniami",

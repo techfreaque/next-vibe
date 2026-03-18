@@ -53,13 +53,18 @@ export const translations = {
         executing: "Executing...",
         complete: "Complete",
         sentToBackground: "Sent to background",
-        wakeUpBackground: "Running — result will wake up AI",
+        wakeUpBackground: "Background task — AI will wake up with result",
         waitingForRemote: "Waiting for remote...",
         deferred: "Async result",
         confirmed: "Confirmed by you",
+        confirmedWakeUp: "Confirmed — running in background",
         waitingForConfirmation: "Waiting for confirmation",
+        waitingForConfirmationWakeUp: "Confirm to run in background",
         pendingConfirmation: "Pending Confirmation",
         pendingCancellation: "Pending Cancellation",
+        denied: "Denied",
+        deniedWakeUp: "Denied — won't run in background",
+        notRun: "Not run",
       },
       sections: {
         request: "Request",
@@ -77,10 +82,13 @@ export const translations = {
           "Widget metadata not available. Showing raw result.",
         confirmationRequired:
           "Review and edit parameters, then confirm to execute.",
+        confirmationRequiredWakeUp:
+          "Review and edit parameters, then confirm to run in background — result will wake up AI.",
       },
       actions: {
         confirm: "Confirm",
         cancel: "Cancel",
+        deny: "Deny",
       },
     },
     codeQualityList: {

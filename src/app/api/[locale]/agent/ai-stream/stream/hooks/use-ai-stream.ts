@@ -59,7 +59,7 @@ export function useAIStream(): UseAIStreamReturn {
   // Select only actions (stable across renders) and the minimal state needed
   const storeStartStream = useAIStreamStore((s) => s.startStream);
   const storeStopStream = useAIStreamStore((s) => s.stopStream);
-  const storeSetDraining = useAIStreamStore((s) => s.setDraining);
+  const storeSetAborting = useAIStreamStore((s) => s.setAborting);
   const isStreaming = useAIStreamStore((s) => s.isStreaming);
   const isStreamingThread = useAIStreamStore((s) => s.isStreamingThread);
   const threads = useAIStreamStore((s) => s.threads);
@@ -198,8 +198,8 @@ export function useAIStream(): UseAIStreamReturn {
       // Stop audio immediately
       getAudioQueue().stop();
 
-      // Set drain mode in store — suppresses delta events while server finalizes
-      storeSetDraining(threadId, true);
+      // Set aborting + drain mode — shows spinner on stop button, suppresses deltas
+      storeSetAborting(threadId, true);
 
       // Call server-side cancel endpoint via typesafe mutation
       try {
@@ -231,7 +231,7 @@ export function useAIStream(): UseAIStreamReturn {
       // Server will send STREAM_FINISHED which triggers final cleanup
       // via useMessagesSubscription.
     },
-    [logger, storeSetDraining, storeStopStream, cancelMutation],
+    [logger, storeSetAborting, storeStopStream, cancelMutation],
   );
 
   return {

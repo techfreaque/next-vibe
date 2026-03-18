@@ -106,7 +106,7 @@ export class PublicFeedRepository {
           title: chatThreads.title,
           preview: chatThreads.preview,
           folderId: chatThreads.folderId,
-          isStreaming: chatThreads.isStreaming,
+          streamingState: chatThreads.streamingState,
           createdAt: chatThreads.createdAt,
           updatedAt: chatThreads.updatedAt,
           userId: chatThreads.userId,
@@ -160,7 +160,7 @@ export class PublicFeedRepository {
           downvotes,
           score: upvotes - downvotes,
           modelNames: (row.modelNames as string[] | null) ?? [],
-          isStreaming: row.isStreaming,
+          streamingState: row.streamingState,
           createdAt: row.createdAt,
           updatedAt: row.updatedAt,
         };

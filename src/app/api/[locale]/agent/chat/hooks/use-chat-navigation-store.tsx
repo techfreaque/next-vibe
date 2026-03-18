@@ -69,6 +69,8 @@ export interface ChatNavigationState {
   ) => void;
   /** Mark active thread as streaming; also updates threads endpoint cache */
   startStream: (threadId: string, logger: EndpointLogger) => void;
+  /** Mark active thread as aborting; also updates threads endpoint cache */
+  setAborting: (threadId: string, logger: EndpointLogger) => void;
   /** Mark active thread as not streaming; also updates threads endpoint cache */
   stopStream: (threadId: string, logger: EndpointLogger) => void;
 }
@@ -137,7 +139,36 @@ function createChatNavigationStore(opts?: {
           return success({
             ...old.data,
             threads: old.data.threads.map((t) =>
-              t.id === threadId ? { ...t, isStreaming: true } : t,
+              t.id === threadId
+                ? { ...t, streamingState: "streaming" as const }
+                : t,
+            ),
+          });
+        },
+        {
+          requestData: {
+            rootFolderId: currentRootFolderId,
+            subFolderId: currentSubFolderId,
+          },
+        },
+      );
+    },
+    setAborting: (threadId, logger): void => {
+      set({ isStreaming: false });
+      const { currentRootFolderId, currentSubFolderId } = get();
+      apiClient.updateEndpointData(
+        threadsDefinition.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            threads: old.data.threads.map((t) =>
+              t.id === threadId
+                ? { ...t, streamingState: "aborting" as const }
+                : t,
             ),
           });
         },
@@ -162,7 +193,7 @@ function createChatNavigationStore(opts?: {
           return success({
             ...old.data,
             threads: old.data.threads.map((t) =>
-              t.id === threadId ? { ...t, isStreaming: false } : t,
+              t.id === threadId ? { ...t, streamingState: "idle" as const } : t,
             ),
           });
         },

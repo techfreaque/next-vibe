@@ -2,6 +2,19 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { BRANCH_INDEX_KEY } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-branch-management";
 
 /**
+ * Returns true if the given siblings represent actual user-facing branches
+ * (i.e. they have at least two distinct sequenceIds).
+ *
+ * Parallel tool calls from a single AI step all share the same sequenceId —
+ * they should NOT trigger the branch navigator. Only branches created by
+ * retrying / editing messages (each gets a new sequenceId) are real branches.
+ */
+function isRealBranch(siblings: ChatMessage[]): boolean {
+  const seqs = new Set(siblings.map((s) => s.sequenceId));
+  return seqs.size > 1;
+}
+
+/**
  * Get direct replies for a specific message
  */
 export function getDirectReplies(
@@ -76,14 +89,16 @@ export function buildMessagePath(
     }
     reversePath.reverse();
 
-    // Build branchInfo so the branch navigator renders correctly
+    // Build branchInfo so the branch navigator renders correctly.
+    // Only record real branches — parallel tool calls in a single AI step share
+    // the same sequenceId and must NOT trigger the branch navigator.
     const branchInfo: Record<
       string,
       { siblings: ChatMessage[]; currentIndex: number }
     > = {};
     for (const msg of reversePath) {
       const siblings = childrenMap.get(msg.parentId ?? "") ?? [];
-      if (msg.parentId && siblings.length > 1) {
+      if (msg.parentId && siblings.length > 1 && isRealBranch(siblings)) {
         const idx = siblings.findIndex((s) => s.id === msg.id);
         branchInfo[msg.parentId] = {
           siblings,
@@ -97,7 +112,7 @@ export function buildMessagePath(
       const rootMessages = messages
         .filter((msg) => !msg.parentId || !messageIds.has(msg.parentId))
         .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-      if (rootMessages.length > 1) {
+      if (rootMessages.length > 1 && isRealBranch(rootMessages)) {
         const rootIdx = rootMessages.findIndex((r) => r.id === oldest.id);
         branchInfo[BRANCH_INDEX_KEY] = {
           siblings: rootMessages,
@@ -126,7 +141,7 @@ export function buildMessagePath(
   > = {};
 
   let currentMessage: ChatMessage | undefined;
-  if (rootMessages.length > 1) {
+  if (rootMessages.length > 1 && isRealBranch(rootMessages)) {
     const rootBranchIndex = branchIndices[BRANCH_INDEX_KEY] ?? 0;
     const validRootIndex = Math.min(
       Math.max(0, rootBranchIndex),
@@ -149,7 +164,7 @@ export function buildMessagePath(
       break;
     }
 
-    if (children.length > 1) {
+    if (children.length > 1 && isRealBranch(children)) {
       const branchIndex = branchIndices[currentMessage.id] ?? 0;
       const validIndex = Math.min(
         Math.max(0, branchIndex),
@@ -160,6 +175,9 @@ export function buildMessagePath(
         currentIndex: validIndex,
       };
       currentMessage = children[validIndex];
+    } else if (children.length > 1) {
+      // Same-sequence siblings (parallel tool calls) — pick latest by createdAt
+      currentMessage = children[children.length - 1];
     } else {
       currentMessage = children[0];
     }

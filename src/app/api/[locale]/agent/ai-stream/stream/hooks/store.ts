@@ -41,17 +41,21 @@ interface AIStreamState {
   localStreamThreadIds: Set<string>;
   /** Thread IDs where cancel was requested but STREAM_FINISHED hasn't arrived yet */
   drainingThreads: Set<string>;
+  /** Thread IDs where cancel request was sent (aborting state — shows spinner on stop button) */
+  abortingThreads: Set<string>;
 
   // Derived helpers
   isStreaming: boolean;
   isStreamingThread: (threadId: string) => boolean;
   isLocalStream: (threadId: string) => boolean;
   isDraining: (threadId: string) => boolean;
+  isAborting: (threadId: string) => boolean;
 
   // Stream lifecycle actions
   startStream: (threadId: string, streamId: string) => void;
   stopStream: (threadId?: string) => void;
   setDraining: (threadId: string, value: boolean) => void;
+  setAborting: (threadId: string, value: boolean) => void;
 
   // Thread actions (optimistic thread creation)
   addThread: (thread: StreamingThread) => void;
@@ -68,6 +72,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   threads: {},
   localStreamThreadIds: new Set<string>(),
   drainingThreads: new Set<string>(),
+  abortingThreads: new Set<string>(),
   isStreaming: false,
 
   isStreamingThread: (threadId: string): boolean =>
@@ -79,16 +84,22 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   isDraining: (threadId: string): boolean =>
     get().drainingThreads.has(threadId),
 
+  isAborting: (threadId: string): boolean =>
+    get().abortingThreads.has(threadId),
+
   startStream: (threadId: string, streamId: string): void =>
     set((state) => {
       const newLocal = new Set(state.localStreamThreadIds);
       newLocal.add(threadId);
       const newDraining = new Set(state.drainingThreads);
       newDraining.delete(threadId);
+      const newAborting = new Set(state.abortingThreads);
+      newAborting.delete(threadId);
       return {
         activeStreams: { ...state.activeStreams, [threadId]: { streamId } },
         localStreamThreadIds: newLocal,
         drainingThreads: newDraining,
+        abortingThreads: newAborting,
         isStreaming: true,
       };
     }),
@@ -97,9 +108,11 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
     set((state) => {
       const newLocal = new Set(state.localStreamThreadIds);
       const newDraining = new Set(state.drainingThreads);
+      const newAborting = new Set(state.abortingThreads);
       if (threadId) {
         newLocal.delete(threadId);
         newDraining.delete(threadId);
+        newAborting.delete(threadId);
         const rest = Object.fromEntries(
           Object.entries(state.activeStreams).filter(([k]) => k !== threadId),
         );
@@ -107,6 +120,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
           activeStreams: rest,
           localStreamThreadIds: newLocal,
           drainingThreads: newDraining,
+          abortingThreads: newAborting,
           isStreaming: Object.keys(rest).length > 0,
         };
       }
@@ -114,6 +128,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
         activeStreams: {},
         localStreamThreadIds: new Set<string>(),
         drainingThreads: new Set<string>(),
+        abortingThreads: new Set<string>(),
         isStreaming: false,
       };
     }),
@@ -129,6 +144,21 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       return { drainingThreads: newDraining };
     }),
 
+  setAborting: (threadId: string, value: boolean): void =>
+    set((state) => {
+      const newAborting = new Set(state.abortingThreads);
+      const newDraining = new Set(state.drainingThreads);
+      if (value) {
+        newAborting.add(threadId);
+        // Aborting implies draining — suppress incoming deltas
+        newDraining.add(threadId);
+      } else {
+        newAborting.delete(threadId);
+        newDraining.delete(threadId);
+      }
+      return { abortingThreads: newAborting, drainingThreads: newDraining };
+    }),
+
   addThread: (thread: StreamingThread): void =>
     set((state) => ({
       threads: { ...state.threads, [thread.threadId]: thread },
@@ -140,6 +170,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       threads: {},
       localStreamThreadIds: new Set<string>(),
       drainingThreads: new Set<string>(),
+      abortingThreads: new Set<string>(),
       isStreaming: false,
     }),
 }));

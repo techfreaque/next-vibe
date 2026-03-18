@@ -98,7 +98,7 @@ export class ChatThreadsRepositoryClient {
           canModerate: false,
           canDelete: true,
           canManagePermissions: false,
-          isStreaming: false,
+          streamingState: "idle" as const,
           createdAt: new Date(thread.createdAt),
           updatedAt: new Date(thread.updatedAt),
         })),

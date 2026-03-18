@@ -40,7 +40,7 @@ export const translations = {
           downvotes: { content: "Downvotes" },
           score: { content: "Score" },
           modelNames: { content: "Models Used" },
-          isStreaming: { content: "Is Streaming" },
+          streamingState: { content: "Streaming State" },
           createdAt: { content: "Created At" },
           updatedAt: { content: "Updated At" },
         },

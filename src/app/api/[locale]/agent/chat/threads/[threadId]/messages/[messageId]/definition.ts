@@ -380,6 +380,7 @@ const { DELETE } = createEndpoint({
             return {
               success: true,
               data: {
+                backgroundTasks: oldData.data.backgroundTasks,
                 messages: oldData.data.messages.filter(
                   (msg) => msg.id !== data.pathParams.messageId,
                 ),

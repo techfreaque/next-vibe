@@ -235,8 +235,32 @@ export function useMessagesSubscription(
           );
         },
 
-        // TASK_COMPLETED: endLoop task finished — add deferred result message to cache
+        // TASK_COMPLETED: task finished — remove from backgroundTasks cache + handle deferred message
         [StreamEventType.TASK_COMPLETED]: (e) => {
+          // Remove the completed task from the backgroundTasks list in the messages cache
+          apiClient.updateEndpointData(
+            messagesDefinition.GET,
+            logger,
+            (old) => {
+              if (!old?.success) {
+                return old;
+              }
+              return {
+                ...old,
+                data: {
+                  ...old.data,
+                  backgroundTasks: old.data.backgroundTasks.filter(
+                    (task) => task.id !== e.taskId,
+                  ),
+                },
+              };
+            },
+            {
+              urlPathParams: { threadId },
+              requestData: { rootFolderId },
+            },
+          );
+
           if (!e.deferredMessage) {
             return;
           }

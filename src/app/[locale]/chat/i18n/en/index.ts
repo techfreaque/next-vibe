@@ -274,6 +274,7 @@ export const translations = {
     unfiled: "Unfiled",
     noFoldersAvailable: "No folders available",
     stopGeneration: "Stop generation",
+    cancellingGeneration: "Cancelling...",
     sendMessage: "Send message",
     shareThread: "Share Thread",
     manageSharing: "Manage Sharing",

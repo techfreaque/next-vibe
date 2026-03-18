@@ -278,8 +278,35 @@ const { GET } = createEndpoint({
       paginationInfo: paginationField({
         order: 5,
       }),
+
+      // === PER-STATUS COUNTS (independent of active status filter) ===
+      countsByStatus: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z
+          .object({
+            new: z.number(),
+            pending: z.number(),
+            campaignRunning: z.number(),
+            websiteUser: z.number(),
+            newsletterSubscriber: z.number(),
+            inContact: z.number(),
+            signedUp: z.number(),
+            subscriptionConfirmed: z.number(),
+            unsubscribed: z.number(),
+            bounced: z.number(),
+            invalid: z.number(),
+          })
+          .optional(),
+      }),
     },
   }),
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
@@ -396,6 +423,19 @@ const { GET } = createEndpoint({
           totalCount: 100,
           pageCount: 5,
         },
+        countsByStatus: {
+          new: 10,
+          pending: 5,
+          campaignRunning: 20,
+          websiteUser: 15,
+          newsletterSubscriber: 8,
+          inContact: 3,
+          signedUp: 12,
+          subscriptionConfirmed: 7,
+          unsubscribed: 10,
+          bounced: 5,
+          invalid: 5,
+        },
       },
       filtered: {
         response: {
@@ -404,6 +444,19 @@ const { GET } = createEndpoint({
         paginationInfo: {
           totalCount: 0,
           pageCount: 0,
+        },
+        countsByStatus: {
+          new: 0,
+          pending: 0,
+          campaignRunning: 0,
+          websiteUser: 0,
+          newsletterSubscriber: 0,
+          inContact: 0,
+          signedUp: 0,
+          subscriptionConfirmed: 0,
+          unsubscribed: 0,
+          bounced: 0,
+          invalid: 0,
         },
       },
       customSorting: {

@@ -51,6 +51,7 @@ export class ChatMessagesRepositoryClient {
       });
 
       return success({
+        backgroundTasks: [],
         messages: messages.map((msg) => ({
           id: msg.id,
           threadId: msg.threadId,

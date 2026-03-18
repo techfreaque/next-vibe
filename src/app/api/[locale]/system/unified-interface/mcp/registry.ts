@@ -104,6 +104,7 @@ export class MCPRegistry {
       Platform.MCP,
       user,
       locale,
+      logger,
     );
 
     // MCP native tool listing is opt-in: only expose tools marked MCP_VISIBLE
@@ -177,6 +178,7 @@ export class MCPRegistry {
       Platform.MCP,
       context.user,
       context.locale,
+      logger,
     );
     const toolMeta = allMcpTools.find(
       (tool) =>

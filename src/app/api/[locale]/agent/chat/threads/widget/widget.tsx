@@ -98,7 +98,7 @@ function ThreadRow({
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
-  const isThreadStreaming = thread.isStreaming;
+  const isThreadStreaming = thread.streamingState !== "idle";
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);

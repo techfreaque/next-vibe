@@ -596,112 +596,126 @@ export class RouteExecuteRepository {
           userId: user.id,
         });
 
-        const result = await RouteExecutionExecutor.executeGenericHandler<
-          Record<string, JsonValue>
-        >({
-          toolName,
-          data: input ?? {},
-          user,
-          locale,
-          logger,
-          platform: Platform.MCP,
-          streamContext: {
-            ...streamContext,
-            // Reset per-call fields — detach goroutine is independent of parent stream
-            currentToolMessageId: undefined,
-            callerToolCallId: undefined,
-            pendingToolMessages: undefined,
-            pendingTimeoutMs: undefined,
-            waitingForRemoteResult: undefined,
-            // Do NOT inherit parent abortSignal — detach goroutine must outlive parent stream
-            abortSignal: undefined,
-            escalateToTask: undefined,
-          },
-        });
+        // Fire-and-forget goroutine — returns {taskId, pending} immediately to the AI.
+        // The goroutine handles execution, DB persistence, and task completion notification.
+        void (async (): Promise<void> => {
+          try {
+            const result = await RouteExecutionExecutor.executeGenericHandler<
+              Record<string, JsonValue>
+            >({
+              toolName,
+              data: input ?? {},
+              user,
+              locale,
+              logger,
+              platform: Platform.MCP,
+              streamContext: {
+                ...streamContext,
+                // Reset per-call fields — detach goroutine is independent of parent stream
+                currentToolMessageId: undefined,
+                callerToolCallId: undefined,
+                pendingToolMessages: undefined,
+                pendingTimeoutMs: undefined,
+                waitingForRemoteResult: undefined,
+                // Do NOT inherit parent abortSignal — detach goroutine must outlive parent stream
+                abortSignal: undefined,
+                escalateToTask: undefined,
+              },
+            });
 
-        const completedAt = new Date();
-        const finalStatus = result.success
-          ? CronTaskStatus.COMPLETED
-          : CronTaskStatus.FAILED;
-        const finalResult =
-          result.success && result.data !== undefined ? result.data : null;
+            const completedAt = new Date();
+            const finalStatus = result.success
+              ? CronTaskStatus.COMPLETED
+              : CronTaskStatus.FAILED;
+            const finalResult =
+              result.success && result.data !== undefined ? result.data : null;
 
-        await db.insert(cronTaskExecutions).values({
-          taskId,
-          taskName: toolName,
-          executionId,
-          status: finalStatus,
-          priority: CronTaskPriority.HIGH,
-          startedAt,
-          completedAt,
-          durationMs: completedAt.getTime() - startedAt.getTime(),
-          result: finalResult ?? undefined,
-          triggeredBy: "detach",
-          config: {},
-        });
+            await db.insert(cronTaskExecutions).values({
+              taskId,
+              taskName: toolName,
+              executionId,
+              status: finalStatus,
+              priority: CronTaskPriority.HIGH,
+              startedAt,
+              completedAt,
+              durationMs: completedAt.getTime() - startedAt.getTime(),
+              result: finalResult ?? undefined,
+              triggeredBy: "detach",
+              config: {},
+            });
 
-        // detach: result stays in task history only — never injected into thread.
-        // Keep the task row (disabled + completed) so wait-for-task can find the result
-        // if the AI later decides to block on it. Emit TASK_COMPLETED WS for UI bubble.
-        await db
-          .update(cronTasks)
-          .set({
-            lastExecutionStatus: finalStatus,
-            lastExecutedAt: completedAt,
-            lastExecutionDuration: completedAt.getTime() - startedAt.getTime(),
-            enabled: false,
-            updatedAt: completedAt,
-          })
-          .where(eq(cronTasks.id, taskId));
+            // detach: result stays in task history only — never injected into thread.
+            // Keep the task row (disabled + completed) so wait-for-task can find the result
+            // if the AI later decides to block on it. Emit TASK_COMPLETED WS for UI bubble.
+            await db
+              .update(cronTasks)
+              .set({
+                lastExecutionStatus: finalStatus,
+                lastExecutedAt: completedAt,
+                lastExecutionDuration:
+                  completedAt.getTime() - startedAt.getTime(),
+                enabled: false,
+                updatedAt: completedAt,
+              })
+              .where(eq(cronTasks.id, taskId));
 
-        if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
-          // Re-read the task row to pick up any callbackMode upgrade written by wait-for-task.
-          // If the AI called wait-for-task(taskId) while the task was running, it upgrades
-          // the typed wakeUp* columns on the task row. Re-reading ensures handleTaskCompletion
-          // fires revival instead of a plain WS event.
-          const [latestTask] = await db
-            .select({
-              wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
-              wakeUpThreadId: cronTasks.wakeUpThreadId,
-              wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
-              wakeUpModelId: cronTasks.wakeUpModelId,
-              wakeUpSkillId: cronTasks.wakeUpSkillId,
-              wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
-              wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
-            })
-            .from(cronTasks)
-            .where(eq(cronTasks.id, taskId))
-            .limit(1);
+            if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
+              // Re-read the task row to pick up any callbackMode upgrade written by wait-for-task.
+              // If the AI called wait-for-task(taskId) while the task was running, it upgrades
+              // the typed wakeUp* columns on the task row. Re-reading ensures handleTaskCompletion
+              // fires revival instead of a plain WS event.
+              const [latestTask] = await db
+                .select({
+                  wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
+                  wakeUpThreadId: cronTasks.wakeUpThreadId,
+                  wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+                  wakeUpModelId: cronTasks.wakeUpModelId,
+                  wakeUpSkillId: cronTasks.wakeUpSkillId,
+                  wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
+                  wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+                })
+                .from(cronTasks)
+                .where(eq(cronTasks.id, taskId))
+                .limit(1);
 
-          const upgradedCallbackMode = latestTask?.wakeUpCallbackMode ?? null;
-          const upgradedThreadId =
-            latestTask?.wakeUpThreadId ?? effectiveThreadId;
-          const upgradedToolMessageId =
-            latestTask?.wakeUpToolMessageId ?? effectiveToolMessageId;
+              const upgradedCallbackMode =
+                latestTask?.wakeUpCallbackMode ?? null;
+              const upgradedThreadId =
+                latestTask?.wakeUpThreadId ?? effectiveThreadId;
+              const upgradedToolMessageId =
+                latestTask?.wakeUpToolMessageId ?? effectiveToolMessageId;
 
-          await handleTaskCompletion({
-            toolMessageId: upgradedToolMessageId,
-            threadId: upgradedThreadId,
-            callbackMode:
-              upgradedCallbackMode === CallbackMode.WAKE_UP
-                ? CallbackMode.WAKE_UP
-                : null,
-            status: finalStatus,
-            output:
-              upgradedCallbackMode === CallbackMode.WAKE_UP
-                ? finalResult
-                : null,
-            taskId,
-            modelId: latestTask?.wakeUpModelId ?? null,
-            skillId: latestTask?.wakeUpSkillId ?? null,
-            favoriteId: latestTask?.wakeUpFavoriteId ?? null,
-            leafMessageId: latestTask?.wakeUpLeafMessageId ?? null,
-            userId: user.id,
-            logger,
-            directResumeUser: user,
-            directResumeLocale: locale,
-          });
-        }
+              await handleTaskCompletion({
+                toolMessageId: upgradedToolMessageId,
+                threadId: upgradedThreadId,
+                callbackMode:
+                  upgradedCallbackMode === CallbackMode.WAKE_UP
+                    ? CallbackMode.WAKE_UP
+                    : null,
+                status: finalStatus,
+                output:
+                  upgradedCallbackMode === CallbackMode.WAKE_UP
+                    ? finalResult
+                    : null,
+                taskId,
+                modelId: latestTask?.wakeUpModelId ?? null,
+                skillId: latestTask?.wakeUpSkillId ?? null,
+                favoriteId: latestTask?.wakeUpFavoriteId ?? null,
+                leafMessageId: latestTask?.wakeUpLeafMessageId ?? null,
+                userId: user.id,
+                logger,
+                directResumeUser: user,
+                directResumeLocale: locale,
+              });
+            }
+          } catch (err) {
+            logger.error("[RouteExecute] Detach goroutine failed", {
+              toolName,
+              taskId,
+              error: err instanceof Error ? err.message : String(err),
+            });
+          }
+        })();
 
         return success({
           taskId,
@@ -917,6 +931,20 @@ export class RouteExecuteRepository {
           escalateToTask: undefined,
         },
       });
+
+      // Discard result if stream was cancelled during tool execution.
+      // The abort signal may have fired while the tool was running — any result
+      // returned after cancellation should be ignored to prevent ghost responses.
+      if (streamContext?.abortSignal?.aborted) {
+        logger.info(
+          "[RouteExecute] Stream was cancelled during tool execution — discarding result",
+          { toolName },
+        );
+        return fail({
+          message: t("executeTool.post.errors.validation.title"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
 
       if (!result.success) {
         const endpoint = await getEndpoint(toolName);

@@ -41,7 +41,6 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -326,7 +325,6 @@ export function LeadsListContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.GET>();
-  const onSubmit = useWidgetOnSubmit();
   const navigation = useWidgetNavigation();
 
   const activeStatuses: (typeof LeadStatusFilterValues)[] =
@@ -344,12 +342,27 @@ export function LeadsListContainer({
     [field.value?.response?.leads],
   );
   const paginationInfo = field.value?.paginationInfo;
+  const serverCountsByStatus = field.value?.countsByStatus;
   const isLoading = field.value === null || field.value === undefined;
 
-  // Status breakdown counts from current page (display only)
+  // Status counts — from server (accurate across full DB, not just current page)
   const statusCounts = useMemo((): Partial<
     Record<LeadsTranslationKey, number>
   > => {
+    if (serverCountsByStatus) {
+      return {
+        "enums.leadStatusFilter.new": serverCountsByStatus.new,
+        "enums.leadStatusFilter.pending": serverCountsByStatus.pending,
+        "enums.leadStatusFilter.campaignRunning":
+          serverCountsByStatus.campaignRunning,
+        "enums.leadStatusFilter.subscriptionConfirmed":
+          serverCountsByStatus.subscriptionConfirmed,
+        "enums.leadStatusFilter.unsubscribed":
+          serverCountsByStatus.unsubscribed,
+        "enums.leadStatusFilter.bounced": serverCountsByStatus.bounced,
+      };
+    }
+    // Fallback: count from current page (stale until server data arrives)
     const counts: Partial<Record<LeadsTranslationKey, number>> = {};
     for (const lead of leads) {
       if (lead.status) {
@@ -357,7 +370,7 @@ export function LeadsListContainer({
       }
     }
     return counts;
-  }, [leads]);
+  }, [serverCountsByStatus, leads]);
 
   const handleToggleStatus = useCallback(
     (status: string): void => {
@@ -373,13 +386,16 @@ export function LeadsListContainer({
       const next = current.includes(typed)
         ? current.filter((s) => s !== typed)
         : [...current, typed];
-      form.setValue("statusFilters.status", next);
-      form.setValue("paginationInfo.page", 1);
-      if (onSubmit) {
-        onSubmit();
-      }
+      form.setValue("statusFilters.status", next, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+      form.setValue("paginationInfo.page", 1, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     },
-    [form, onSubmit],
+    [form],
   );
 
   const handleSourceChange = useCallback(
@@ -387,16 +403,22 @@ export function LeadsListContainer({
       const typed =
         value as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter];
       if (value === SOURCE_ALL) {
-        form.setValue("statusFilters.source", []);
+        form.setValue("statusFilters.source", [], {
+          shouldDirty: true,
+          shouldTouch: true,
+        });
       } else {
-        form.setValue("statusFilters.source", [typed]);
+        form.setValue("statusFilters.source", [typed], {
+          shouldDirty: true,
+          shouldTouch: true,
+        });
       }
-      form.setValue("paginationInfo.page", 1);
-      if (onSubmit) {
-        onSubmit();
-      }
+      form.setValue("paginationInfo.page", 1, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     },
-    [form, onSubmit],
+    [form],
   );
 
   const handleSortByChange = useCallback(
@@ -404,13 +426,14 @@ export function LeadsListContainer({
       form.setValue(
         "sortingOptions.sortBy",
         value as (typeof LeadSortField)[keyof typeof LeadSortField],
+        { shouldDirty: true, shouldTouch: true },
       );
-      form.setValue("paginationInfo.page", 1);
-      if (onSubmit) {
-        onSubmit();
-      }
+      form.setValue("paginationInfo.page", 1, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     },
-    [form, onSubmit],
+    [form],
   );
 
   const handleSortOrderChange = useCallback(
@@ -418,13 +441,14 @@ export function LeadsListContainer({
       form.setValue(
         "sortingOptions.sortOrder",
         value as (typeof SortOrder)[keyof typeof SortOrder],
+        { shouldDirty: true, shouldTouch: true },
       );
-      form.setValue("paginationInfo.page", 1);
-      if (onSubmit) {
-        onSubmit();
-      }
+      form.setValue("paginationInfo.page", 1, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     },
-    [form, onSubmit],
+    [form],
   );
 
   const handleView = useCallback(
@@ -558,13 +582,16 @@ export function LeadsListContainer({
 
   const handleSearchChange = useCallback(
     (text: string): void => {
-      form.setValue("statusFilters.search", text);
-      form.setValue("paginationInfo.page", 1);
-      if (onSubmit) {
-        onSubmit();
-      }
+      form.setValue("statusFilters.search", text, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+      form.setValue("paginationInfo.page", 1, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     },
-    [form, onSubmit],
+    [form],
   );
 
   // Pagination
@@ -575,14 +602,12 @@ export function LeadsListContainer({
 
   const handlePageChange = useCallback(
     (newPage: number): void => {
-      form.setValue("paginationInfo.page", newPage);
-      if (onSubmit) {
-        onSubmit();
-      } else {
-        endpointMutations?.read?.refetch?.();
-      }
+      form.setValue("paginationInfo.page", newPage, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
     },
-    [form, onSubmit, endpointMutations],
+    [form],
   );
 
   const activeSource = activeSources[0] ?? SOURCE_ALL;
@@ -700,11 +725,14 @@ export function LeadsListContainer({
               size="sm"
               onClick={() => {
                 if (tab.value === null) {
-                  form.setValue("statusFilters.status", []);
-                  form.setValue("paginationInfo.page", 1);
-                  if (onSubmit) {
-                    onSubmit();
-                  }
+                  form.setValue("statusFilters.status", [], {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
+                  form.setValue("paginationInfo.page", 1, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
                 } else {
                   handleToggleStatus(tab.value);
                 }

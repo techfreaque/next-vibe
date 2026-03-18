@@ -532,7 +532,7 @@ function ThreadRow({
             </DropdownMenu>
           )}
 
-        {item.isStreaming && (
+        {item.streamingState !== null && item.streamingState !== "idle" && (
           /* eslint-disable i18next/no-literal-string */
           <Div className="flex items-center gap-0.5 shrink-0">
             <Div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:0ms]" />

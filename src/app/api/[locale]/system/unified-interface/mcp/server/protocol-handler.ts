@@ -254,6 +254,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     const endpoints = await this.defRegistry.getEndpointsForUser(
       Platform.MCP,
       this.user,
+      this.logger,
     );
 
     // MCP tool discovery is opt-in: only expose endpoints marked MCP_VISIBLE.

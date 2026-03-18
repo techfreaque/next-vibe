@@ -179,7 +179,7 @@ export class FolderContentsRepository {
           archived: null,
           canEdit: null,
           canPost: null,
-          isStreaming: null,
+          streamingState: null,
           rolesEdit: null,
         });
       }
@@ -325,7 +325,7 @@ export class FolderContentsRepository {
           canModerate,
           canDelete,
           canManagePermissions: canManagePerms,
-          isStreaming: thread.isStreaming,
+          streamingState: thread.streamingState,
           rolesView: thread.rolesView ?? null,
           rolesEdit: thread.rolesEdit ?? null,
           rolesPost: thread.rolesPost ?? null,

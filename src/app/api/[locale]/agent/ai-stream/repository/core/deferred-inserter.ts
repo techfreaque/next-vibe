@@ -24,7 +24,8 @@ export async function insertDeferredWakeUpMessage(
   threadId: string,
   payload: WakeUpPayload,
   logger: EndpointLogger,
-): Promise<string> {
+  sharedSequenceId?: string,
+): Promise<{ deferredId: string; deferredSequenceId: string }> {
   const {
     toolMessageId,
     authorId,
@@ -37,7 +38,7 @@ export async function insertDeferredWakeUpMessage(
   } = payload;
 
   const deferredId = crypto.randomUUID();
-  const deferredSequenceId = crypto.randomUUID();
+  const deferredSequenceId = sharedSequenceId ?? crypto.randomUUID();
 
   const deferredStatus =
     wakeUpStatus === "completed" ? ("completed" as const) : ("failed" as const);
@@ -50,6 +51,9 @@ export async function insertDeferredWakeUpMessage(
     originalToolCallId: originalToolCall.toolCallId,
     callbackMode: "wakeUp" as const,
     isDeferred: true,
+    // Do NOT propagate isConfirmed — this is an async background result,
+    // not a user-confirmation action. Prevents "Confirmed by you" badge.
+    isConfirmed: false,
   };
 
   const chainParentId = await walkToLeafMessage(
@@ -113,5 +117,5 @@ export async function insertDeferredWakeUpMessage(
     chainParentId,
   });
 
-  return deferredId;
+  return { deferredId, deferredSequenceId };
 }

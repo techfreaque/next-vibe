@@ -90,8 +90,8 @@ export const translations = {
           archived: {
             content: "Archived",
           },
-          isStreaming: {
-            content: "Streaming",
+          streamingState: {
+            content: "Streaming State",
           },
           createdAt: {
             content: "Created At",

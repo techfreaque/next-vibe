@@ -221,7 +221,7 @@ const { POST } = createEndpoint({
             archived: null,
             canEdit: null,
             canPost: null,
-            isStreaming: null,
+            streamingState: null,
             rolesEdit: null,
           },
           logger,

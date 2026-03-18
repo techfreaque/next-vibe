@@ -80,7 +80,10 @@ export function updateMessages(
       const existing = old?.success ? old.data.messages : [];
       const updated = updater(existing);
       result.push(updated);
-      return success({ messages: updated });
+      return success({
+        backgroundTasks: old?.success ? old.data.backgroundTasks : [],
+        messages: updated,
+      });
     },
     { urlPathParams: { threadId }, requestData: { rootFolderId } },
   );

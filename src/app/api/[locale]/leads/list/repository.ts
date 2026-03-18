@@ -57,6 +57,7 @@ export class LeadsListRepositoryImpl {
             totalCount: paginationData.totalCount,
             pageCount: paginationData.pageCount,
           },
+          countsByStatus: result.data.countsByStatus,
         },
       } satisfies ResponseType<LeadListGetResponseTypeOutput>;
     }

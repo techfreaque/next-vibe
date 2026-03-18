@@ -529,11 +529,167 @@ export class LeadsRepository {
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
+      // Build base conditions without status filter — used for per-status counts
+      // so all tabs show accurate counts simultaneously regardless of active status filter
+      const baseConditions: SQL[] = [];
+      if (campaignStageFilters && campaignStageFilters.length > 0) {
+        const mappedStages = campaignStageFilters
+          .map((filter) => mapCampaignStageFilter(filter))
+          .filter(
+            (stage): stage is typeof EmailCampaignStageValues => stage !== null,
+          );
+        if (mappedStages.length > 0) {
+          baseConditions.push(
+            or(
+              ...mappedStages.map((stage) =>
+                eq(leads.currentCampaignStage, stage),
+              ),
+            )!,
+          );
+        }
+      }
+      if (sourceFilters && sourceFilters.length > 0) {
+        const mappedSources = sourceFilters
+          .map((filter) => mapSourceFilter(filter))
+          .filter(
+            (source): source is typeof LeadSourceValues => source !== null,
+          );
+        if (mappedSources.length > 0) {
+          baseConditions.push(
+            or(...mappedSources.map((source) => eq(leads.source, source)))!,
+          );
+        }
+      }
+      if (countryFilters && countryFilters.length > 0) {
+        const convertedCountries = countryFilters
+          .map((filter) => convertCountryFilter(filter))
+          .filter((country): country is Countries => country !== null);
+        baseConditions.push(
+          or(
+            ...convertedCountries.map((country) => eq(leads.country, country)),
+          )!,
+        );
+      }
+      if (languageFilters && languageFilters.length > 0) {
+        const convertedLanguages = languageFilters
+          .map((filter) => convertLanguageFilter(filter))
+          .filter((language): language is Languages => language !== null);
+        baseConditions.push(
+          or(
+            ...convertedLanguages.map((language) =>
+              eq(leads.language, language),
+            ),
+          )!,
+        );
+      }
+      if (search) {
+        baseConditions.push(
+          or(
+            ilike(leads.email, `%${search}%`),
+            ilike(leads.businessName, `%${search}%`),
+          )!,
+        );
+      }
+      const baseWhereClause =
+        baseConditions.length > 0 ? and(...baseConditions) : undefined;
+
+      const makeStatusCountWhere = (
+        statusVal: (typeof LeadStatus)[keyof typeof LeadStatus],
+      ): ReturnType<typeof eq> | ReturnType<typeof and> =>
+        baseWhereClause
+          ? and(baseWhereClause, eq(leads.status, statusVal))!
+          : eq(leads.status, statusVal);
+
       // Get total count
       const [{ total }] = await db
         .select({ total: count() })
         .from(leads)
         .where(whereClause);
+
+      // Per-status counts — independent of the active status filter
+      const [
+        countNew,
+        countPending,
+        countCampaignRunning,
+        countWebsiteUser,
+        countNewsletterSubscriber,
+        countInContact,
+        countSignedUp,
+        countSubscriptionConfirmed,
+        countUnsubscribed,
+        countBounced,
+        countInvalid,
+      ] = await Promise.all([
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.NEW))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.PENDING))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.CAMPAIGN_RUNNING))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.WEBSITE_USER))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.NEWSLETTER_SUBSCRIBER))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.IN_CONTACT))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.SIGNED_UP))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.SUBSCRIPTION_CONFIRMED))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.UNSUBSCRIBED))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.BOUNCED))
+          .then(([r]) => r?.n ?? 0),
+        db
+          .select({ n: count() })
+          .from(leads)
+          .where(makeStatusCountWhere(LeadStatus.INVALID))
+          .then(([r]) => r?.n ?? 0),
+      ]);
+
+      const countsByStatus = {
+        new: countNew,
+        pending: countPending,
+        campaignRunning: countCampaignRunning,
+        websiteUser: countWebsiteUser,
+        newsletterSubscriber: countNewsletterSubscriber,
+        inContact: countInContact,
+        signedUp: countSignedUp,
+        subscriptionConfirmed: countSubscriptionConfirmed,
+        unsubscribed: countUnsubscribed,
+        bounced: countBounced,
+        invalid: countInvalid,
+      };
 
       // Get leads with sorting
       let orderClause;
@@ -640,6 +796,7 @@ export class LeadsRepository {
           totalCount: total,
           pageCount: totalPages,
         },
+        countsByStatus,
       });
     } catch (error) {
       logger.error("Error listing leads", parseError(error));

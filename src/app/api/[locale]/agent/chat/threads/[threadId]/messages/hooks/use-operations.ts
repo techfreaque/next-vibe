@@ -119,6 +119,7 @@ export function useMessageOperations(
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
+  const navSetAborting = useChatNavigationStore((s) => s.setAborting);
 
   const { mutateAsync: deleteMutateAsync } = useApiMutation(
     messageIdDefinitions.DELETE,
@@ -456,6 +457,7 @@ export function useMessageOperations(
   const stopGeneration = useCallback((): void => {
     logger.debug("Message operations: Stopping generation and TTS playback");
     if (activeThreadId) {
+      navSetAborting(activeThreadId, logger);
       void cancelStream(activeThreadId);
     }
 
@@ -475,7 +477,7 @@ export function useMessageOperations(
           );
         });
     }
-  }, [logger, cancelStream, activeThreadId]);
+  }, [logger, cancelStream, activeThreadId, navSetAborting]);
 
   return useMemo(
     () => ({

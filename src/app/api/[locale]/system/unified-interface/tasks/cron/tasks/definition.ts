@@ -387,6 +387,15 @@ const { GET } = createEndpoint({
           disabled: z.number(),
         }),
       }),
+      countsByHidden: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.totalTasks",
+        schema: z.object({
+          visible: z.number(),
+          hidden: z.number(),
+          all: z.number(),
+        }),
+      }),
     },
   }),
 
@@ -432,6 +441,12 @@ const { GET } = createEndpoint({
     title: "get.success.retrieved.title",
     description: "get.success.retrieved.description",
   },
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
   examples: {
     requests: {
       default: {},
@@ -447,6 +462,11 @@ const { GET } = createEndpoint({
           failed: 0,
           pending: 0,
           disabled: 0,
+        },
+        countsByHidden: {
+          visible: 0,
+          hidden: 0,
+          all: 0,
         },
       },
     },

@@ -6,7 +6,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { JWTPublicPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -21,7 +21,7 @@ interface Props {
 
 export interface ResetPasswordPageData {
   locale: CountryLanguage;
-  user: JwtPayloadType | null;
+  user: JWTPublicPayloadType | null;
   errorMessage: string | null;
 }
 
@@ -98,6 +98,10 @@ export async function tanstackLoader({
         ? t("errors.unknown")
         : verifiedUserResponse.message,
     };
+  }
+
+  if (!user.isPublic) {
+    redirect(`/${locale}/`);
   }
 
   return { locale, user, errorMessage: null };

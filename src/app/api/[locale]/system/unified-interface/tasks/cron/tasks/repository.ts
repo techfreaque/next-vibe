@@ -364,6 +364,61 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         disabled: countDisabled,
       };
 
+      // Counts by hidden visibility — independent of the current hidden filter
+      // so all 3 visibility tabs can show accurate counts simultaneously
+      const baseCountConditions = [];
+      if (!isAdmin) {
+        const userId = !user.isPublic ? user.id : null;
+        if (userId) {
+          baseCountConditions.push(eq(cronTasks.userId, userId));
+        } else {
+          baseCountConditions.push(isNull(cronTasks.id));
+        }
+      }
+      if (data.priority && data.priority.length > 0) {
+        baseCountConditions.push(inArray(cronTasks.priority, data.priority));
+      }
+      if (data.category && data.category.length > 0) {
+        baseCountConditions.push(inArray(cronTasks.category, data.category));
+      }
+      const baseCountWhere =
+        baseCountConditions.length > 0
+          ? and(...baseCountConditions)
+          : undefined;
+
+      const [countHiddenVisible, countHiddenHidden, countHiddenAll] =
+        await Promise.all([
+          db
+            .select({ n: count(cronTasks.id) })
+            .from(cronTasks)
+            .where(
+              baseCountWhere
+                ? and(baseCountWhere, eq(cronTasks.hidden, false))
+                : eq(cronTasks.hidden, false),
+            )
+            .then(([r]) => r?.n ?? 0),
+          db
+            .select({ n: count(cronTasks.id) })
+            .from(cronTasks)
+            .where(
+              baseCountWhere
+                ? and(baseCountWhere, eq(cronTasks.hidden, true))
+                : eq(cronTasks.hidden, true),
+            )
+            .then(([r]) => r?.n ?? 0),
+          db
+            .select({ n: count(cronTasks.id) })
+            .from(cronTasks)
+            .where(baseCountWhere)
+            .then(([r]) => r?.n ?? 0),
+        ]);
+
+      const countsByHidden = {
+        visible: countHiddenVisible,
+        hidden: countHiddenHidden,
+        all: countHiddenAll,
+      };
+
       // Server-side sort
       const sortOrder = (() => {
         switch (data.sort) {
@@ -411,6 +466,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         tasks: formattedTasks,
         totalTasks,
         countsByStatus,
+        countsByHidden,
       };
 
       logger.vibe("🚀 Successfully retrieved cron tasks list");

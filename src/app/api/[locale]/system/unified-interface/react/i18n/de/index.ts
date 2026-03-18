@@ -54,13 +54,18 @@ export const translations: typeof enTranslations = {
         executing: "Wird ausgeführt...",
         complete: "Abgeschlossen",
         sentToBackground: "Im Hintergrund gesendet",
-        wakeUpBackground: "Läuft — Ergebnis weckt KI auf",
+        wakeUpBackground: "Hintergrundaufgabe — KI wird mit Ergebnis geweckt",
         waitingForRemote: "Wartet auf Remote...",
         deferred: "Async-Ergebnis",
         confirmed: "Von Ihnen bestätigt",
+        confirmedWakeUp: "Bestätigt — läuft im Hintergrund",
         waitingForConfirmation: "Wartet auf Bestätigung",
+        waitingForConfirmationWakeUp: "Bestätigen zum Ausführen im Hintergrund",
         pendingConfirmation: "Bestätigung ausstehend",
         pendingCancellation: "Stornierung ausstehend",
+        denied: "Abgelehnt",
+        deniedWakeUp: "Abgelehnt — wird nicht im Hintergrund ausgeführt",
+        notRun: "Nicht ausgeführt",
       },
       sections: {
         request: "Anfrage",
@@ -78,10 +83,13 @@ export const translations: typeof enTranslations = {
           "Widget-Metadaten nicht verfügbar. Zeige Rohdaten.",
         confirmationRequired:
           "Parameter prüfen und bearbeiten, dann bestätigen.",
+        confirmationRequiredWakeUp:
+          "Parameter prüfen und bearbeiten, dann bestätigen — Ergebnis weckt KI auf.",
       },
       actions: {
         confirm: "Bestätigen",
         cancel: "Abbrechen",
+        deny: "Ablehnen",
       },
     },
     codeQualityList: {

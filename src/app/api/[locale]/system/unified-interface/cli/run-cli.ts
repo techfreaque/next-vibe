@@ -26,12 +26,12 @@ import {
 import { createEndpointLogger } from "../shared/logger/endpoint";
 import { Platform } from "../shared/types/platform";
 import { scopedTranslation as cliScopedTranslation } from "./i18n";
+import type { CliRequestData } from "./runtime/cli-request-data";
 import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
   setupGlobalErrorHandlers,
 } from "./runtime/execution-errors";
-import type { CliRequestData } from "./runtime/cli-request-data";
 import { CliInputParser, type ParsedCliData } from "./runtime/parsing";
 import {
   type CliCompatiblePlatform,

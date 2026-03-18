@@ -273,6 +273,27 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
+      backgroundTasks: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          children: {
+            id: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            displayName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            toolCallId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
+          },
+        }),
+      }),
       messages: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: objectField(scopedTranslation, {
@@ -383,6 +404,7 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        backgroundTasks: [],
         messages: [
           {
             id: "660e8400-e29b-41d4-a716-446655440000",

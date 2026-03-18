@@ -46,6 +46,7 @@ function createToolFromEndpoint(
     locale: CountryLanguage;
     logger: EndpointLogger;
     streamContext: ToolExecutionContext;
+    requiresConfirmation: boolean;
   },
 ): CoreTool {
   const { t } = endpoint.scopedTranslation.scopedT(context.locale);
@@ -179,6 +180,24 @@ function createToolFromEndpoint(
         // Route through RouteExecuteRepository which handles both modes.
         // execute-tool always routes through RouteExecuteRepository directly
         // so callerToolCallId (options.toolCallId) is available for deduplication.
+        // If this tool requires confirmation, do NOT fire wakeUp/detach goroutines.
+        // The stream layer sets stepHasToolsAwaitingConfirmation=true and aborts at finish-step.
+        // Confirmation UI shows, user confirms, then tool-confirmation-handler executes.
+        // Return a placeholder so the AI SDK has a result and the stream ends cleanly.
+        if (
+          context.requiresConfirmation &&
+          (callbackMode === CM.WAKE_UP || callbackMode === CM.DETACH)
+        ) {
+          context.logger.info(
+            "[ToolsLoader] tool requires confirmation — blocking wakeUp/detach, returning placeholder",
+            { toolName, callbackMode },
+          );
+          return {
+            status: "waiting_for_confirmation",
+            hint: "Waiting for user confirmation before executing.",
+          };
+        }
+
         if (
           callbackMode === CM.DETACH ||
           callbackMode === CM.WAKE_UP ||
@@ -581,6 +600,7 @@ export async function loadTools(params: {
           locale: params.locale,
           logger: params.logger,
           streamContext: params.streamContext,
+          requiresConfirmation,
         });
 
         toolsMap.set(preferredToolName, createdTool);

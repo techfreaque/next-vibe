@@ -61,6 +61,12 @@ export const translations: typeof enTranslations = {
       recipient: "Odbiorca",
       subject: "Temat",
       email_preview: "Podgląd E-maila",
+      stage_of: "z",
+      stages: "etapów",
+      journey: "Ścieżka",
+      back: "Wróć",
+      previous: "Poprzedni",
+      next: "Następny",
     },
   },
   auth: {

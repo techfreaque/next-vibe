@@ -96,12 +96,21 @@ export const StreamRegistry = {
  * Also updates thread updatedAt and bubbles activity to parent folder.
  * Called from ALL stream exit paths (completion, abort, error, compacting failure).
  */
+export async function setStreamingStateAborting(
+  threadId: string,
+): Promise<void> {
+  await db
+    .update(chatThreads)
+    .set({ streamingState: "aborting" })
+    .where(eq(chatThreads.id, threadId));
+}
+
 export async function clearStreamingState(threadId: string): Promise<void> {
   StreamRegistry.unregister(threadId);
   const now = new Date();
   const [thread] = await db
     .update(chatThreads)
-    .set({ isStreaming: false, updatedAt: now })
+    .set({ streamingState: "idle", updatedAt: now })
     .where(eq(chatThreads.id, threadId))
     .returning({ folderId: chatThreads.folderId });
 
