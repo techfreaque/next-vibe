@@ -98,7 +98,11 @@ function ThreadRow({
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
-  const isThreadStreaming = thread.streamingState !== "idle";
+  const navIsStreaming = useChatNavigationStore((s) => s.isStreaming);
+  // Optimistic: show streaming indicator immediately when the active thread starts
+  // streaming (before the WS STREAMING_STATE_CHANGED event arrives from the server)
+  const isThreadStreaming =
+    thread.streamingState !== "idle" || (isActive && navIsStreaming);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);

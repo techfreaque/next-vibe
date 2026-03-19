@@ -318,6 +318,18 @@ function ThreadRow({
           requestData: { subFolderId: item.folderId ?? null },
         },
       );
+      if (isActive) {
+        setNavigation({
+          activeThreadId: NEW_MESSAGE_ID,
+          currentRootFolderId: item.rootFolderId as DefaultFolderId,
+          currentSubFolderId: null,
+        });
+        window.history.pushState(
+          null,
+          "",
+          `/${locale}/threads/${item.rootFolderId}/${NEW_MESSAGE_ID}`,
+        );
+      }
       if (isIncognito) {
         const { ChatThreadsRepositoryClient } =
           await import("../../threads/repository-client");

@@ -181,8 +181,7 @@ export async function createLeadId(
     return NextResponseClass.next();
   }
 
-  // Redirect to the same URL to ensure the cookie is sent with subsequent requests
-  const response = NextResponseClass.redirect(request.url);
+  const response = NextResponseClass.next();
 
   // Set lead ID cookie
   // IMPORTANT: Lead ID cookie NEVER expires - it persists across all sessions
@@ -196,7 +195,7 @@ export async function createLeadId(
     maxAge: 365 * 24 * 60 * 60 * 10, // 10 years (effectively permanent)
   });
 
-  logger.debug("Lead ID cookie set in middleware with redirect", {
+  logger.debug("Lead ID cookie set in middleware", {
     leadId: result.leadId,
   });
 

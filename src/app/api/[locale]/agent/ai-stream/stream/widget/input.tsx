@@ -217,8 +217,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
 
   // Streaming state from navigation store
   const isStreaming = useChatNavigationStore((s) => s.isStreaming);
-  const startStream = useChatNavigationStore((s) => s.startStream);
-  const stopStream = useChatNavigationStore((s) => s.stopStream);
 
   // leafMessageId from nav store (set by messages widget on branch switch, syncs URL)
   const leafMessageId = useChatNavigationStore((s) => s.leafMessageId);
@@ -266,26 +264,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // Message operations
   const messageOps = useMessageOperations(messageOpsDeps);
 
-  // Wrap sendMessage to notify navigation store when a local stream starts
-  const sendMessageWithStreamNotify = useCallback(
-    async (
-      params: Parameters<typeof messageOps.sendMessage>[0],
-      onNewThread?: Parameters<typeof messageOps.sendMessage>[1],
-    ) => {
-      // Always set isStreaming=true immediately so the stop button shows before
-      // the first WS chunk arrives. For existing threads use the real ID; for
-      // new/null threads use "new" as a placeholder (nav store sets isStreaming
-      // globally, not per-thread, so the placeholder is sufficient).
-      startStream(activeThreadId ?? "new", logger);
-      const result = await messageOps.sendMessage(params, onNewThread);
-      // If stream failed, reset nav store streaming state (STREAM_FINISHED won't arrive)
-      if (!result.success) {
-        stopStream(activeThreadId ?? "new", logger);
-      }
-      return result;
-    },
-    [activeThreadId, startStream, stopStream, logger, messageOps],
-  );
+  // Forward sendMessage — streaming state is managed optimistically in useInputHandlers
+  const sendMessageWithStreamNotify = messageOps.sendMessage;
 
   // Input handlers
   const inputHandlers = useInputHandlers({
