@@ -21,9 +21,7 @@ import type {
   PulseExecuteRequestOutput,
   PulseExecuteResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { PulseExecuteT } from "./i18n";
 
 /**
  * Pulse Execute Repository Implementation
@@ -36,7 +34,7 @@ export class PulseExecuteRepository {
     data: PulseExecuteRequestOutput,
     systemLocale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PulseExecuteT,
   ): Promise<ResponseType<PulseExecuteResponseOutput>> {
     try {
       logger.debug("Executing pulse health check cycle", {

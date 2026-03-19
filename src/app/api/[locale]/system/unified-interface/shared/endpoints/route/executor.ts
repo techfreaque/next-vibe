@@ -28,6 +28,7 @@ import type { CliRequestData } from "../../../cli/runtime/cli-request-data";
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
 import type { JsonValue } from "../../../tasks/unified-runner/types";
 import type { EndpointLogger } from "../../logger/endpoint";
+import type { GenericHandlerBase } from "./handler";
 import type { Platform } from "../../types/platform";
 import { splitArgs } from "../../utils/split-args";
 
@@ -66,15 +67,22 @@ export class RouteExecutionExecutor {
     platform: CliCompatiblePlatform | Platform.AI;
     /** Stream context — rootFolderId, threadId, aiMessageId, etc. */
     streamContext: ToolExecutionContext;
+    /** Pre-loaded route handler — avoids a second dynamic import when caller already loaded it */
+    preloadedHandler?: GenericHandlerBase | null;
   }): Promise<ResponseType<TResult>> {
     const { t } = systemScopedTranslation.scopedT(params.locale);
     try {
-      const handlerResult = await getRouteHandler(params.toolName);
+      const handlerResult =
+        params.preloadedHandler !== undefined
+          ? params.preloadedHandler
+          : await getRouteHandler(params.toolName);
 
       if (!handlerResult) {
         return fail({
-          message: t("unifiedInterface.cli.vibe.errors.routeNotFound"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          message: t("unifiedInterface.cli.vibe.errors.routeNotFound", {
+            toolName: params.toolName,
+          }),
+          errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
         });
       }
 

@@ -24,15 +24,13 @@ import type {
   HaltAllCampaignsPostRequestOutput,
   HaltAllCampaignsPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { CampaignsHaltAllT } from "./i18n";
 
 export class HaltAllCampaignsRepository {
   static async haltAll(
     data: HaltAllCampaignsPostRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CampaignsHaltAllT,
   ): Promise<ResponseType<HaltAllCampaignsPostResponseOutput>> {
     if (data.confirm !== true) {
       return fail({

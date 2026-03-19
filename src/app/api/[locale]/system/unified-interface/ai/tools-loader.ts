@@ -265,6 +265,10 @@ function createToolFromEndpoint(
                   context.streamContext.currentToolMessageId,
                 leafMessageId:
                   perCallLeafMessageId ?? context.streamContext.leafMessageId,
+                // Pass the tool's configured stream timeout so execute-tool/escalateToTask
+                // can use it instead of the hardcoded 90s default.
+                // undefined = not set on definition → callers use default 90_000.
+                callerTimeoutMs: endpoint.streamTimeoutMs,
               }
             : context.streamContext;
 
@@ -631,11 +635,14 @@ export async function loadTools(params: {
         byInstance.set(instanceId, existing);
       }
 
-      const { getCapabilities } =
+      const { RemoteConnectionRepository } =
         await import("@/app/api/[locale]/user/remote-connection/repository");
 
       for (const [instanceId, names] of byInstance) {
-        const capabilities = await getCapabilities(params.user.id, instanceId);
+        const capabilities = await RemoteConnectionRepository.getCapabilities(
+          params.user.id,
+          instanceId,
+        );
         if (!capabilities) {
           params.logger.debug("[Tools Loader] No capabilities for instance", {
             instanceId,

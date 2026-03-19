@@ -21,6 +21,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import {
   getConnectionCredentials,
+  isNodeError,
   openSshClient,
   sftpWriteFile,
 } from "../../client";
@@ -28,54 +29,52 @@ import type {
   FilesWriteRequestOutput,
   FilesWriteResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Allowed base directories for local file writes.
- * See ssh/files/read/repository.ts for rationale.
- */
-function getAllowedBases(): string[] {
-  const override = process.env["SSH_FILES_ALLOWED_BASE"];
-  if (override) {
-    return override
-      .split(":")
-      .map((p) => p.trim())
-      .filter(Boolean);
-  }
-  return [homedir()];
-}
-
-function resolvePath(inputPath: string): string {
-  if (inputPath === "~" || inputPath.startsWith("~/")) {
-    return join(homedir(), inputPath.slice(1));
-  }
-  return resolve(inputPath);
-}
-
-function isValidPath(p: string): boolean {
-  if (!p.startsWith("/") || p.includes("..")) {
-    return false;
-  }
-  const allowedBases = getAllowedBases();
-  return allowedBases.some((base) => p === base || p.startsWith(`${base}/`));
-}
+import type { FilesWriteT } from "./i18n";
 
 export class FilesWriteRepository {
+  /**
+   * Allowed base directories for local file writes.
+   * See ssh/files/read/repository.ts for rationale.
+   */
+  private static getAllowedBases(): string[] {
+    const override = process.env["SSH_FILES_ALLOWED_BASE"];
+    if (override) {
+      return override
+        .split(":")
+        .map((p) => p.trim())
+        .filter(Boolean);
+    }
+    return [homedir()];
+  }
+
+  private static resolvePath(inputPath: string): string {
+    if (inputPath === "~" || inputPath.startsWith("~/")) {
+      return join(homedir(), inputPath.slice(1));
+    }
+    return resolve(inputPath);
+  }
+
+  private static isValidPath(p: string): boolean {
+    if (!p.startsWith("/") || p.includes("..")) {
+      return false;
+    }
+    const allowedBases = FilesWriteRepository.getAllowedBases();
+    return allowedBases.some((base) => p === base || p.startsWith(`${base}/`));
+  }
+
   static async write(
     data: FilesWriteRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: FilesWriteT,
   ): Promise<ResponseType<FilesWriteResponseOutput>> {
     if (data.connectionId) {
       return FilesWriteRepository.writeSftp(data, user, logger, t);
     }
 
-    const filePath = resolvePath(data.path);
+    const filePath = FilesWriteRepository.resolvePath(data.path);
 
-    if (!isValidPath(filePath)) {
+    if (!FilesWriteRepository.isValidPath(filePath)) {
       return fail({
         message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -94,8 +93,7 @@ export class FilesWriteRepository {
       try {
         realFilePath = await realpath(filePath);
       } catch (e) {
-        const err = e as NodeJS.ErrnoException;
-        if (err.code === "ENOENT") {
+        if (isNodeError(e) && e.code === "ENOENT") {
           // File doesn't exist yet — resolve the parent dir instead
           try {
             const parentReal = await realpath(dirname(filePath));
@@ -106,7 +104,7 @@ export class FilesWriteRepository {
               errorType: ErrorResponseTypes.NOT_FOUND,
             });
           }
-        } else if (err.code === "EACCES") {
+        } else if (isNodeError(e) && e.code === "EACCES") {
           return fail({
             message: t("errors.permissionDenied"),
             errorType: ErrorResponseTypes.FORBIDDEN,
@@ -120,7 +118,7 @@ export class FilesWriteRepository {
         }
       }
 
-      if (!isValidPath(realFilePath)) {
+      if (!FilesWriteRepository.isValidPath(realFilePath)) {
         return fail({
           message: t("errors.invalidPath"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -133,14 +131,13 @@ export class FilesWriteRepository {
 
       return success({ ok: true, bytesWritten: buf.length });
     } catch (error) {
-      const err = error as NodeJS.ErrnoException;
-      if (err.code === "ENOENT") {
+      if (isNodeError(error) && error.code === "ENOENT") {
         return fail({
           message: t("errors.parentDirNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      if (err.code === "EACCES") {
+      if (isNodeError(error) && error.code === "EACCES") {
         return fail({
           message: t("errors.permissionDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -158,7 +155,7 @@ export class FilesWriteRepository {
     data: FilesWriteRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: FilesWriteT,
   ): Promise<ResponseType<FilesWriteResponseOutput>> {
     const credsResult = await getConnectionCredentials(
       data.connectionId!,
@@ -192,14 +189,19 @@ export class FilesWriteRepository {
       );
       return success({ ok: true, bytesWritten: result.bytesWritten });
     } catch (error) {
-      const err = error as NodeJS.ErrnoException & { code?: string };
-      if (err.code === "ENOENT" || err.code === "ERR_SFTP_NO_SUCH_FILE") {
+      if (
+        isNodeError(error) &&
+        (error.code === "ENOENT" || error.code === "ERR_SFTP_NO_SUCH_FILE")
+      ) {
         return fail({
           message: t("errors.parentDirNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      if (err.code === "EACCES" || err.code === "ERR_SFTP_PERMISSION_DENIED") {
+      if (
+        isNodeError(error) &&
+        (error.code === "EACCES" || error.code === "ERR_SFTP_PERMISSION_DENIED")
+      ) {
         return fail({
           message: t("errors.permissionDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,

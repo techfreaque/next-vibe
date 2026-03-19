@@ -31,9 +31,7 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { GeneratorsRouteHandlersT } from "./i18n";
 
 // Type definitions
 interface RouteHandlersRequestType {
@@ -50,24 +48,13 @@ interface RouteHandlersResponseType {
 }
 
 /**
- * Route Handlers Generator Repository Interface
- */
-interface RouteHandlersGeneratorRepository {
-  generateRouteHandlers(
-    data: RouteHandlersRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<BaseResponseType<RouteHandlersResponseType>>;
-}
-
-/**
  * Route Handlers Generator Repository Implementation
  */
-class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepository {
-  async generateRouteHandlers(
+export class RouteHandlersGeneratorRepository {
+  static async generateRouteHandlers(
     data: RouteHandlersRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsRouteHandlersT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<RouteHandlersResponseType>> {
     const startTime = Date.now();
@@ -123,10 +110,11 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       }
 
       // Generate content with only valid route files
-      const { content, routeCount } = await this.generateContent(
-        validRouteFiles,
-        logger,
-      );
+      const { content, routeCount } =
+        await RouteHandlersGeneratorRepository.generateContent(
+          validRouteFiles,
+          logger,
+        );
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -168,7 +156,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
    * Extract HTTP methods from definition file (async)
    * We extract from definition instead of route because route files have server-only dependencies
    */
-  private async extractMethodsFromDefinition(
+  private static async extractMethodsFromDefinition(
     routeFile: string,
   ): Promise<string[]> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
@@ -206,7 +194,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
   /**
    * Extract aliases from definition file (async)
    */
-  private async extractAliasesFromDefinition(
+  private static async extractAliasesFromDefinition(
     routeFile: string,
   ): Promise<Array<{ alias: string; method: string }>> {
     const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
@@ -252,7 +240,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
    * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
    * Aliases also include method from their definition
    */
-  private async generateContent(
+  private static async generateContent(
     routeFiles: string[],
     logger: EndpointLogger,
   ): Promise<{ content: string; routeCount: number }> {
@@ -266,7 +254,10 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       const importPath = generateAbsoluteImportPath(routeFile, "route");
 
       // Get methods for this route from definition file
-      const methods = await this.extractMethodsFromDefinition(routeFile);
+      const methods =
+        await RouteHandlersGeneratorRepository.extractMethodsFromDefinition(
+          routeFile,
+        );
 
       if (methods.length === 0) {
         logger.warn(
@@ -289,7 +280,9 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 
       // Extract and add real aliases from definition file (with their method)
       const definitionAliases =
-        await this.extractAliasesFromDefinition(routeFile);
+        await RouteHandlersGeneratorRepository.extractAliasesFromDefinition(
+          routeFile,
+        );
       for (const { alias, method } of definitionAliases) {
         // Only add if not already present (first wins)
         if (!pathMap[alias]) {
@@ -352,7 +345,6 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 import type { GenericHandlerBase } from "../unified-interface/shared/endpoints/route/handler";
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 /**
  * Dynamically import route handler by path
@@ -372,6 +364,3 @@ ${cases.join("\n")}
     return { content, routeCount };
   }
 }
-
-export const routeHandlersGeneratorRepository =
-  new RouteHandlersGeneratorRepositoryImpl();

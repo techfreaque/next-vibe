@@ -37,7 +37,8 @@ import {
   LeadSource,
   LeadStatus,
 } from "../enum";
-import type { scopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
+import type { LeadsT } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type {
   ClickTrackingRequestOutput,
@@ -46,123 +47,8 @@ import type {
   LeadEngagementResponseOutput,
 } from "./engagement/definition";
 
-// Type alias for EngagementTypes enum values
-type EngagementType = (typeof EngagementTypes)[keyof typeof EngagementTypes];
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Client information extracted from request
- */
-interface ClientInfo {
-  userAgent: string;
-  referer: string;
-  ipAddress: string;
-  timestamp: string;
-}
-
-/**
- * Tracking pixel response data
- */
-interface TrackingPixelResult {
-  success: boolean;
+interface AnonymousLeadResult {
   leadId: string;
-  campaignId?: string;
-  engagementRecorded: boolean;
-}
-
-/**
- * Helper to safely extract number from metadata
- */
-const getMetadataNumber = (
-  meta: Record<string, string | number | boolean> | undefined,
-  key: string,
-): number => {
-  if (!meta) {
-    return 0;
-  }
-  const value = meta[key];
-  return typeof value === "number" ? value : 0;
-};
-
-type DeviceTypeValue = (typeof DeviceType)[keyof typeof DeviceType];
-
-/**
- * Parse basic device type, browser and OS from user agent string
- */
-function parseUserAgent(userAgent: string): {
-  deviceType: DeviceTypeValue;
-  browser: string;
-  os: string;
-} {
-  const ua = userAgent.toLowerCase();
-
-  // Device type detection
-  let deviceType: DeviceTypeValue = DeviceType.UNKNOWN;
-  if (
-    ua.includes("bot") ||
-    ua.includes("crawler") ||
-    ua.includes("spider") ||
-    ua.includes("googlebot") ||
-    ua.includes("bingbot") ||
-    ua.includes("slurp") ||
-    ua.includes("duckduckbot") ||
-    ua.includes("baidu") ||
-    ua.includes("yandex")
-  ) {
-    deviceType = DeviceType.BOT;
-  } else if (ua.includes("tablet") || ua.includes("ipad")) {
-    deviceType = DeviceType.TABLET;
-  } else if (
-    ua.includes("mobile") ||
-    ua.includes("android") ||
-    ua.includes("iphone") ||
-    ua.includes("ipod") ||
-    ua.includes("blackberry") ||
-    ua.includes("windows phone")
-  ) {
-    deviceType = DeviceType.MOBILE;
-  } else if (ua.length > 0) {
-    deviceType = DeviceType.DESKTOP;
-  }
-
-  // Browser detection
-  let browser = "Unknown";
-  if (ua.includes("firefox")) {
-    browser = "Firefox";
-  } else if (ua.includes("edg/")) {
-    browser = "Edge";
-  } else if (ua.includes("opr/") || ua.includes("opera")) {
-    browser = "Opera";
-  } else if (ua.includes("chrome") && !ua.includes("chromium")) {
-    browser = "Chrome";
-  } else if (ua.includes("safari") && !ua.includes("chrome")) {
-    browser = "Safari";
-  } else if (ua.includes("msie") || ua.includes("trident/")) {
-    browser = "Internet Explorer";
-  }
-
-  // OS detection
-  let os = "Unknown";
-  if (ua.includes("windows nt")) {
-    os = "Windows";
-  } else if (ua.includes("mac os x") || ua.includes("macos")) {
-    os = "macOS";
-  } else if (ua.includes("android")) {
-    os = "Android";
-  } else if (
-    ua.includes("ios") ||
-    ua.includes("iphone") ||
-    ua.includes("ipad")
-  ) {
-    os = "iOS";
-  } else if (ua.includes("linux")) {
-    os = "Linux";
-  } else if (ua.includes("cros")) {
-    os = "ChromeOS";
-  }
-
-  return { deviceType, browser, os };
 }
 
 /**
@@ -170,9 +56,107 @@ function parseUserAgent(userAgent: string): {
  */
 export class LeadTrackingRepository {
   /**
+   * Helper to safely extract number from metadata
+   */
+  private static getMetadataNumber(
+    meta: Record<string, string | number | boolean> | undefined,
+    key: string,
+  ): number {
+    if (!meta) {
+      return 0;
+    }
+    const value = meta[key];
+    return typeof value === "number" ? value : 0;
+  }
+
+  /**
+   * Parse basic device type, browser and OS from user agent string
+   */
+  private static parseUserAgent(userAgent: string): {
+    deviceType: (typeof DeviceType)[keyof typeof DeviceType];
+    browser: string;
+    os: string;
+  } {
+    const ua = userAgent.toLowerCase();
+
+    // Device type detection
+    let deviceType: (typeof DeviceType)[keyof typeof DeviceType] =
+      DeviceType.UNKNOWN;
+    if (
+      ua.includes("bot") ||
+      ua.includes("crawler") ||
+      ua.includes("spider") ||
+      ua.includes("googlebot") ||
+      ua.includes("bingbot") ||
+      ua.includes("slurp") ||
+      ua.includes("duckduckbot") ||
+      ua.includes("baidu") ||
+      ua.includes("yandex")
+    ) {
+      deviceType = DeviceType.BOT;
+    } else if (ua.includes("tablet") || ua.includes("ipad")) {
+      deviceType = DeviceType.TABLET;
+    } else if (
+      ua.includes("mobile") ||
+      ua.includes("android") ||
+      ua.includes("iphone") ||
+      ua.includes("ipod") ||
+      ua.includes("blackberry") ||
+      ua.includes("windows phone")
+    ) {
+      deviceType = DeviceType.MOBILE;
+    } else if (ua.length > 0) {
+      deviceType = DeviceType.DESKTOP;
+    }
+
+    // Browser detection
+    let browser = "Unknown";
+    if (ua.includes("firefox")) {
+      browser = "Firefox";
+    } else if (ua.includes("edg/")) {
+      browser = "Edge";
+    } else if (ua.includes("opr/") || ua.includes("opera")) {
+      browser = "Opera";
+    } else if (ua.includes("chrome") && !ua.includes("chromium")) {
+      browser = "Chrome";
+    } else if (ua.includes("safari") && !ua.includes("chrome")) {
+      browser = "Safari";
+    } else if (ua.includes("msie") || ua.includes("trident/")) {
+      browser = "Internet Explorer";
+    }
+
+    // OS detection
+    let os = "Unknown";
+    if (ua.includes("windows nt")) {
+      os = "Windows";
+    } else if (ua.includes("mac os x") || ua.includes("macos")) {
+      os = "macOS";
+    } else if (ua.includes("android")) {
+      os = "Android";
+    } else if (
+      ua.includes("ios") ||
+      ua.includes("iphone") ||
+      ua.includes("ipad")
+    ) {
+      os = "iOS";
+    } else if (ua.includes("linux")) {
+      os = "Linux";
+    } else if (ua.includes("cros")) {
+      os = "ChromeOS";
+    }
+
+    return { deviceType, browser, os };
+  }
+
+  /**
    * Extract client information from request
    */
-  static extractClientInfo(request: NextRequest | undefined): ClientInfo {
+  static extractClientInfo(request: NextRequest | undefined): {
+    userAgent: string;
+    referer: string;
+    ipAddress: string;
+    timestamp: string;
+  } {
     if (!request) {
       return {
         userAgent: "cli",
@@ -204,12 +188,19 @@ export class LeadTrackingRepository {
   private static async recordEngagement(
     data: {
       leadId: string;
-      engagementType: EngagementType;
+      engagementType: (typeof EngagementTypes)[keyof typeof EngagementTypes];
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
     },
-    clientInfo: ClientInfo | undefined,
-    t: ModuleT,
+    clientInfo:
+      | {
+          userAgent: string;
+          referer: string;
+          ipAddress: string;
+          timestamp: string;
+        }
+      | undefined,
+    t: LeadsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
@@ -258,7 +249,7 @@ export class LeadTrackingRepository {
       // Note: Not all engagement types trigger status transitions (e.g., LEAD_ATTRIBUTION)
       const actionMap: Partial<
         Record<
-          EngagementType,
+          (typeof EngagementTypes)[keyof typeof EngagementTypes],
           "website_visit" | "email_open" | "email_click" | "form_submit"
         >
       > = {
@@ -311,7 +302,7 @@ export class LeadTrackingRepository {
    */
   private static async updateEmailEngagementRecord(
     campaignId: string,
-    engagementType: EngagementType,
+    engagementType: (typeof EngagementTypes)[keyof typeof EngagementTypes],
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -368,11 +359,16 @@ export class LeadTrackingRepository {
    * Create anonymous lead for website visitors
    */
   private static async createAnonymousLead(
-    clientInfo: ClientInfo,
+    clientInfo: {
+      userAgent: string;
+      referer: string;
+      ipAddress: string;
+      timestamp: string;
+    },
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<{ leadId: string }>> {
+    t: LeadsT,
+  ): Promise<ResponseType<AnonymousLeadResult>> {
     try {
       logger.debug("Creating anonymous lead for tracking", {
         userAgent: clientInfo.userAgent,
@@ -416,7 +412,9 @@ export class LeadTrackingRepository {
       const country = getCountryFromLocale(locale);
       const language = getLanguageFromLocale(locale);
 
-      const parsedDevice = parseUserAgent(clientInfo.userAgent);
+      const parsedDevice = LeadTrackingRepository.parseUserAgent(
+        clientInfo.userAgent,
+      );
 
       const newLead = {
         email: `anonymous-${crypto.randomUUID()}@tracking.local`,
@@ -509,7 +507,7 @@ export class LeadTrackingRepository {
       | "signup"
       | "contact"
       | "newsletter",
-    t: ModuleT,
+    t: LeadsT,
     logger: EndpointLogger,
     metadata?: Record<string, string | number | boolean>,
   ): Promise<
@@ -598,8 +596,10 @@ export class LeadTrackingRepository {
               lastAction: action,
               lastActionAt: new Date().toISOString(),
               statusTransitionCount:
-                getMetadataNumber(filteredMetadata, "statusTransitionCount") +
-                1,
+                LeadTrackingRepository.getMetadataNumber(
+                  filteredMetadata,
+                  "statusTransitionCount",
+                ) + 1,
               lastTransition: [currentStatus, "to", newStatus].join("_"),
             };
 
@@ -687,12 +687,17 @@ export class LeadTrackingRepository {
    */
   static async handleEngagementWithRelationship(
     data: LeadEngagementRequestOutput,
-    clientInfo: ClientInfo,
+    clientInfo: {
+      userAgent: string;
+      referer: string;
+      ipAddress: string;
+      timestamp: string;
+    },
     locale: CountryLanguage,
-    t: ModuleT,
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       // Get leadId from user prop (JWT payload) - always present
       // Fallback to data.leadId for backward compatibility (tracking links)
@@ -907,10 +912,22 @@ export class LeadTrackingRepository {
   static async handleTrackingPixel(
     leadId: string,
     campaignId: string | undefined,
-    clientInfo: ClientInfo,
+    clientInfo: {
+      userAgent: string;
+      referer: string;
+      ipAddress: string;
+      timestamp: string;
+    },
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<TrackingPixelResult>> {
+    t: LeadsT,
+  ): Promise<
+    ResponseType<{
+      success: boolean;
+      leadId: string;
+      campaignId?: string;
+      engagementRecorded: boolean;
+    }>
+  > {
     try {
       let engagementRecorded = false;
 
@@ -966,8 +983,8 @@ export class LeadTrackingRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
   ): Promise<ResponseType<ClickTrackingResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const { id: trackingLeadId, campaignId, url, ref } = data;
       const isLoggedIn = !user.isPublic;
@@ -1016,7 +1033,12 @@ export class LeadTrackingRepository {
         });
       }
 
-      const clientInfo: ClientInfo = {
+      const clientInfo: {
+        userAgent: string;
+        referer: string;
+        ipAddress: string;
+        timestamp: string;
+      } = {
         userAgent: "",
         referer: "",
         ipAddress: "",

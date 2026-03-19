@@ -11,11 +11,9 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatMessageRole } from "../../../chat/enum";
-import type { scopedTranslation as sttScopedTranslation } from "../../../speech-to-text/i18n";
+import type { SpeechToTextT } from "../../../speech-to-text/i18n";
 import { SpeechToTextRepository } from "../../../speech-to-text/repository";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
-
-type SttModuleT = ReturnType<typeof sttScopedTranslation.scopedT>["t"];
 
 export class OperationHandler {
   /**
@@ -27,7 +25,7 @@ export class OperationHandler {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    sttT: SttModuleT;
+    sttT: SpeechToTextT;
   }): Promise<
     ResponseType<{
       threadId: string;

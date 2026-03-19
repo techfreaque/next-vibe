@@ -21,6 +21,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import {
   getConnectionCredentials,
+  isNodeError,
   openSshClient,
   sftpReadFile,
 } from "../../client";
@@ -28,61 +29,58 @@ import type {
   FilesReadRequestOutput,
   FilesReadResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-const DEFAULT_MAX_BYTES = 65536;
-const MAX_ALLOWED_BYTES = 524288;
-
-/**
- * Allowed base directories for local file access.
- * Paths outside these roots are rejected — prevents reading arbitrary system files
- * (e.g. /etc/passwd, /proc/*, private keys) via path traversal or symlink attacks.
- *
- * Defaults to the user's home directory. Override with SSH_FILES_ALLOWED_BASE env var
- * (colon-separated list of absolute paths, e.g. "/home/user:/data").
- */
-function getAllowedBases(): string[] {
-  const override = process.env["SSH_FILES_ALLOWED_BASE"];
-  if (override) {
-    return override
-      .split(":")
-      .map((p) => p.trim())
-      .filter(Boolean);
-  }
-  return [homedir()];
-}
-
-function resolvePath(inputPath: string): string {
-  if (inputPath === "~" || inputPath.startsWith("~/")) {
-    return join(homedir(), inputPath.slice(1));
-  }
-  return resolve(inputPath);
-}
-
-function isValidPath(p: string): boolean {
-  if (!p.startsWith("/") || p.includes("..")) {
-    return false;
-  }
-  const allowedBases = getAllowedBases();
-  return allowedBases.some((base) => p === base || p.startsWith(`${base}/`));
-}
+import type { FilesReadT } from "./i18n";
 
 export class FilesReadRepository {
+  private static readonly DEFAULT_MAX_BYTES = 65536;
+  private static readonly MAX_ALLOWED_BYTES = 524288;
+  /**
+   * Allowed base directories for local file access.
+   * Paths outside these roots are rejected — prevents reading arbitrary system files
+   * (e.g. /etc/passwd, /proc/*, private keys) via path traversal or symlink attacks.
+   *
+   * Defaults to the user's home directory. Override with SSH_FILES_ALLOWED_BASE env var
+   * (colon-separated list of absolute paths, e.g. "/home/user:/data").
+   */
+  private static getAllowedBases(): string[] {
+    const override = process.env["SSH_FILES_ALLOWED_BASE"];
+    if (override) {
+      return override
+        .split(":")
+        .map((p) => p.trim())
+        .filter(Boolean);
+    }
+    return [homedir()];
+  }
+
+  private static resolvePath(inputPath: string): string {
+    if (inputPath === "~" || inputPath.startsWith("~/")) {
+      return join(homedir(), inputPath.slice(1));
+    }
+    return resolve(inputPath);
+  }
+
+  private static isValidPath(p: string): boolean {
+    if (!p.startsWith("/") || p.includes("..")) {
+      return false;
+    }
+    const allowedBases = FilesReadRepository.getAllowedBases();
+    return allowedBases.some((base) => p === base || p.startsWith(`${base}/`));
+  }
+
   static async read(
     data: FilesReadRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: FilesReadT,
   ): Promise<ResponseType<FilesReadResponseOutput>> {
     if (data.connectionId) {
       return FilesReadRepository.readSftp(data, user, logger, t);
     }
 
-    const filePath = resolvePath(data.path);
+    const filePath = FilesReadRepository.resolvePath(data.path);
 
-    if (!isValidPath(filePath)) {
+    if (!FilesReadRepository.isValidPath(filePath)) {
       return fail({
         message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -102,7 +100,7 @@ export class FilesReadRepository {
       });
     }
 
-    if (!isValidPath(realFilePath)) {
+    if (!FilesReadRepository.isValidPath(realFilePath)) {
       return fail({
         message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -110,8 +108,8 @@ export class FilesReadRepository {
     }
 
     const maxBytes = Math.min(
-      data.maxBytes ?? DEFAULT_MAX_BYTES,
-      MAX_ALLOWED_BYTES,
+      data.maxBytes ?? FilesReadRepository.DEFAULT_MAX_BYTES,
+      FilesReadRepository.MAX_ALLOWED_BYTES,
     );
     const offset = data.offset ?? 0;
 
@@ -145,14 +143,13 @@ export class FilesReadRepository {
         await fh.close();
       }
     } catch (error) {
-      const err = error as NodeJS.ErrnoException;
-      if (err.code === "ENOENT") {
+      if (isNodeError(error) && error.code === "ENOENT") {
         return fail({
           message: t("errors.fileNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      if (err.code === "EACCES") {
+      if (isNodeError(error) && error.code === "EACCES") {
         return fail({
           message: t("errors.permissionDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -170,7 +167,7 @@ export class FilesReadRepository {
     data: FilesReadRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: FilesReadT,
   ): Promise<ResponseType<FilesReadResponseOutput>> {
     const credsResult = await getConnectionCredentials(
       data.connectionId!,
@@ -194,8 +191,8 @@ export class FilesReadRepository {
 
     const { client } = clientResult.data;
     const maxBytes = Math.min(
-      data.maxBytes ?? DEFAULT_MAX_BYTES,
-      MAX_ALLOWED_BYTES,
+      data.maxBytes ?? FilesReadRepository.DEFAULT_MAX_BYTES,
+      FilesReadRepository.MAX_ALLOWED_BYTES,
     );
     const offset = data.offset ?? 0;
 
@@ -206,14 +203,19 @@ export class FilesReadRepository {
       const result = await sftpReadFile(client, data.path, offset, maxBytes);
       return success({ ...result, encoding: "utf8" });
     } catch (error) {
-      const err = error as NodeJS.ErrnoException & { code?: string };
-      if (err.code === "ENOENT" || err.code === "ERR_SFTP_FAILURE") {
+      if (
+        isNodeError(error) &&
+        (error.code === "ENOENT" || error.code === "ERR_SFTP_FAILURE")
+      ) {
         return fail({
           message: t("errors.fileNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      if (err.code === "EACCES" || err.code === "ERR_SFTP_PERMISSION_DENIED") {
+      if (
+        isNodeError(error) &&
+        (error.code === "EACCES" || error.code === "ERR_SFTP_PERMISSION_DENIED")
+      ) {
         return fail({
           message: t("errors.permissionDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,

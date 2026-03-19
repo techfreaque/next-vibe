@@ -16,11 +16,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
-
-interface FileRequestParams {
-  threadId: string;
-  filename: string;
-}
+import type { ChatFileUrlVariablesOutput } from "./definition";
 
 interface FileResult {
   buffer: Buffer;
@@ -29,7 +25,7 @@ interface FileResult {
 
 export class ChatFileRepository {
   static async getFile(
-    data: FileRequestParams,
+    data: ChatFileUrlVariablesOutput,
     user: JwtPayloadType | undefined,
     logger: EndpointLogger,
     locale: CountryLanguage,

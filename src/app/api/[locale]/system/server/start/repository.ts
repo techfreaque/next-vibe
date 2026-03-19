@@ -4,14 +4,18 @@
  * Implements task system specification requirements for production environment
  */
 
-/* eslint-disable i18next/no-literal-string */
 // CLI output messages don't need internationalization
 // Process environment access is required for server configuration
 
 import type { ChildProcess } from "node:child_process";
 import { execSync, spawn } from "node:child_process";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -23,6 +27,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
+import type { ServerStartT } from "./i18n";
+import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 import {
   cleanupPidFile,
   killPreviousInstance,
@@ -33,107 +39,95 @@ import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/** Extract port number from a URL string, returns undefined if not parseable */
-function portFromUrl(url: string | undefined): number | undefined {
-  if (!url) {
-    return undefined;
-  }
-  try {
-    const parsed = new URL(url);
-    return parsed.port ? parseInt(parsed.port, 10) : undefined;
-  } catch {
-    return undefined;
-  }
-}
 
 /**
- * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
- * Only patches localhost URLs — production URLs are left untouched.
- * Child processes inherit process.env so they automatically get the correct URL.
+ * Server Start Repository
  */
-function patchPublicUrlPort(port: number): void {
-  const current = process.env["NEXT_PUBLIC_APP_URL"];
-  if (!current) {
-    process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
-    return;
-  }
-  try {
-    const parsed = new URL(current);
-    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
-      parsed.port = String(port);
-      process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+export class ServerStartRepository {
+  private static taskRunnerStarted = false;
+  private static nextServerProcess: ChildProcess | null = null;
+  private static wsServerHandle: WebSocketServerHandle | null = null;
+  private static runningProcesses: Map<string, ChildProcess> = new Map();
+
+  /** Extract port number from a URL string, returns undefined if not parseable */
+  private static portFromUrl(url: string | undefined): number | undefined {
+    if (!url) {
+      return undefined;
     }
-  } catch {
-    // Not a valid URL — leave it as-is
+    try {
+      const parsed = new URL(url);
+      return parsed.port ? parseInt(parsed.port, 10) : undefined;
+    } catch {
+      return undefined;
+    }
   }
-}
 
-/** Mask credentials in a database URL: postgres://u***:p***@host:5432/db */
-function maskDatabaseUrl(url: string | undefined): string {
-  if (!url) {
-    return "(not set)";
+  /**
+   * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
+   * Only patches localhost URLs — production URLs are left untouched.
+   * Child processes inherit process.env so they automatically get the correct URL.
+   */
+  private static patchPublicUrlPort(port: number): void {
+    const current = process.env["NEXT_PUBLIC_APP_URL"];
+    if (!current) {
+      process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
+      return;
+    }
+    try {
+      const parsed = new URL(current);
+      if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+        parsed.port = String(port);
+        process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+      }
+    } catch {
+      // Not a valid URL — leave it as-is
+    }
   }
-  try {
-    const parsed = new URL(url);
-    const maskedUser = parsed.username
-      ? `${parsed.username[0]}${"*".repeat(Math.max(2, parsed.username.length - 1))}`
-      : "";
-    const maskedPass = parsed.password
-      ? `${parsed.password[0]}${"*".repeat(Math.max(2, parsed.password.length - 1))}`
-      : "";
-    const credentials =
-      maskedUser && maskedPass
-        ? `${maskedUser}:${maskedPass}@`
-        : maskedUser
-          ? `${maskedUser}@`
-          : "";
-    return `${parsed.protocol}//${credentials}${parsed.host}${parsed.pathname}${parsed.search}`;
-  } catch {
-    return "(invalid URL)";
+
+  /** Mask credentials in a database URL: postgres://u***:p***@host:5432/db */
+  private static maskDatabaseUrl(url: string | undefined): string {
+    if (!url) {
+      return "(not set)";
+    }
+    try {
+      const parsed = new URL(url);
+      const maskedUser = parsed.username
+        ? `${parsed.username[0]}${"*".repeat(Math.max(2, parsed.username.length - 1))}`
+        : "";
+      const maskedPass = parsed.password
+        ? `${parsed.password[0]}${"*".repeat(Math.max(2, parsed.password.length - 1))}`
+        : "";
+      const credentials =
+        maskedUser && maskedPass
+          ? `${maskedUser}:${maskedPass}@`
+          : maskedUser
+            ? `${maskedUser}@`
+            : "";
+      return `${parsed.protocol}//${credentials}${parsed.host}${parsed.pathname}${parsed.search}`;
+    } catch {
+      return "(invalid URL)";
+    }
   }
-}
 
-/**
- * Server Start Repository Interface
- */
-export interface ServerStartRepository {
-  startServer(
-    data: ServerStartRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<ServerStartResponseOutput>>;
-}
-
-/**
- * Server Start Repository Implementation
- */
-export class ServerStartRepositoryImpl implements ServerStartRepository {
-  private taskRunnerStarted = false;
-  private nextServerProcess: ChildProcess | null = null;
-  private wsServerHandle: WebSocketServerHandle | null = null;
-  private runningProcesses: Map<string, ChildProcess> = new Map();
-
-  async startServer(
+  static async startServer(
     data: ServerStartRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ServerStartResponseOutput>> {
+    const { t } = serverStartScopedTranslation.scopedT(locale);
     const startTime = Date.now();
     const output: string[] = [];
     const errors: string[] = [];
 
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
-    const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
+    const port =
+      data.port ??
+      ServerStartRepository.portFromUrl(env.NEXT_PUBLIC_APP_URL) ??
+      3000;
 
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port so child processes see the right URL.
-    patchPublicUrlPort(port);
+    ServerStartRepository.patchPublicUrlPort(port);
 
     // Mode-based process splitting: "all" (default), "web", "tasks"
     const mode = data.mode ?? "all";
@@ -165,15 +159,15 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         // DATABASE_URL port was already swapped to PREVIEW_DB_PORT by the CLI
         // environment loader (runtime/environment.ts) before any module loaded.
         output.push(
-          `   🔗 Using preview DATABASE_URL: ${maskDatabaseUrl(process.env["DATABASE_URL"])}`,
+          `   🔗 Using preview DATABASE_URL: ${ServerStartRepository.maskDatabaseUrl(process.env["DATABASE_URL"])}`,
         );
 
         try {
           // Dynamic import: must happen AFTER DATABASE_URL is set
-          const { dbUtilsRepository } =
+          const { DbUtilsRepository } =
             await import("../../db/utils/repository");
           const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
-          const dockerCheckResult = await dbUtilsRepository.isDockerAvailable(
+          const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
             dbUtilsT,
             logger,
           );
@@ -183,12 +177,12 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               "   🐘 Starting preview PostgreSQL (docker-compose.preview.yml)...",
             );
 
-            const { dockerOperationsRepository } =
+            const { DockerOperationsRepository } =
               await import("../../db/utils/docker-operations/repository");
             const { t: dockerOpsT } =
               dockerOperationsScopedTranslation.scopedT(locale);
             const dbStartResult =
-              await dockerOperationsRepository.dockerComposeUp(
+              await DockerOperationsRepository.dockerComposeUp(
                 logger,
                 dockerOpsT,
                 "docker-compose.preview.yml",
@@ -210,7 +204,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             }
 
             // Wait for database to be ready
-            await this.waitForDatabaseConnection(logger);
+            await ServerStartRepository.waitForDatabaseConnection(logger);
           } else {
             output.push(
               "   ⚠️ Docker unavailable (continuing without managed DB)",
@@ -279,33 +273,31 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
         try {
           // Import and start the unified task runner
-          const { unifiedTaskRunnerRepository } =
+          const { UnifiedTaskRunnerRepository } =
             await import("../../unified-interface/tasks/unified-runner/repository");
 
           // Set environment to production
-          unifiedTaskRunnerRepository.environment = "production";
+          UnifiedTaskRunnerRepository.environment = "production";
 
           // Start the task runner in the background - manageRunner("start") blocks forever,
           // so we must NOT await it or Next.js will never start.
-          void unifiedTaskRunnerRepository
-            .manageRunner(
-              { action: "start", taskFilter: "cron", dryRun: false },
-              user,
-              locale,
-              logger,
-            )
-            .catch((error) => {
-              logger.error("Task runner exited unexpectedly", {
-                error: parseError(error).message,
-              });
+          void UnifiedTaskRunnerRepository.manageRunner(
+            { action: "start", taskFilter: "cron", dryRun: false },
+            user,
+            locale,
+            logger,
+          ).catch((catchError) => {
+            logger.error("Task runner exited unexpectedly", {
+              error: parseError(catchError).message,
             });
+          });
 
           // Poll until running or timeout (imports + seed can take several seconds)
           const pollStart = Date.now();
           const POLL_TIMEOUT_MS = 10_000;
           const POLL_INTERVAL_MS = 200;
           while (
-            !unifiedTaskRunnerRepository.isRunning &&
+            !UnifiedTaskRunnerRepository.isRunning &&
             Date.now() - pollStart < POLL_TIMEOUT_MS
           ) {
             await new Promise<void>((resolve) => {
@@ -313,9 +305,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             });
           }
 
-          const status = unifiedTaskRunnerRepository.getStatus();
+          const status = UnifiedTaskRunnerRepository.getStatus();
           if (status.running) {
-            this.taskRunnerStarted = true;
+            ServerStartRepository.taskRunnerStarted = true;
             output.push("   ✅ Unified task runner started successfully");
             output.push(
               "   📊 Environment: production | Side tasks: disabled (cron only)",
@@ -366,7 +358,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       }
 
       // Load task registry and verify task runner system
-      if (runTasks && this.taskRunnerStarted) {
+      if (runTasks && ServerStartRepository.taskRunnerStarted) {
         output.push("");
         output.push("📋 Task Registry & Runner System");
 
@@ -393,9 +385,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             );
 
             // Get task runner status
-            const { unifiedTaskRunnerRepository } =
+            const { UnifiedTaskRunnerRepository } =
               await import("../../unified-interface/tasks/unified-runner/repository");
-            const status = unifiedTaskRunnerRepository.getStatus();
+            const status = UnifiedTaskRunnerRepository.getStatus();
 
             logger.debug("Task runner system operational", {
               environment: "production",
@@ -447,7 +439,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           output.push(`   🌐 Target port: ${port}`);
 
           try {
-            const tanstackResult = await this.startTanstackServer(port, logger);
+            const tanstackResult =
+              await ServerStartRepository.startTanstackServer(port, logger, t);
 
             if (tanstackResult.success) {
               output.push(
@@ -475,11 +468,13 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
           try {
             // Start Next.js production server as a child process
-            const nextServerResult = await this.startNextServer(
-              port,
-              logger,
-              data.profile,
-            );
+            const nextServerResult =
+              await ServerStartRepository.startNextServer(
+                port,
+                logger,
+                t,
+                data.profile,
+              );
 
             if (nextServerResult.success) {
               output.push(
@@ -519,13 +514,13 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       output.push("");
 
       const runningServices = [];
-      if (this.taskRunnerStarted) {
+      if (ServerStartRepository.taskRunnerStarted) {
         runningServices.push("unified-task-runner");
       }
-      if (runNext && this.nextServerProcess) {
+      if (runNext && ServerStartRepository.nextServerProcess) {
         runningServices.push(`next-server (HTTP on port ${port})`);
       }
-      if (this.wsServerHandle) {
+      if (ServerStartRepository.wsServerHandle) {
         runningServices.push(`ws-proxy (WebSocket on port ${port} at /ws)`);
       }
 
@@ -583,7 +578,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           `\n🛑 Received ${signal}, shutting down gracefully...\n`,
         );
         cleanupPidFile(VIBE_START_PID_FILE);
-        this.stopAllProcesses();
+        ServerStartRepository.stopAllProcesses();
         process.stdout.write("✅ All processes stopped. Goodbye! 👋\n");
         process.exit(0);
       };
@@ -605,16 +600,19 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           );
 
           // Stop old servers, then start new ones
-          if (this.wsServerHandle) {
-            this.wsServerHandle.stop();
-            this.wsServerHandle = null;
+          if (ServerStartRepository.wsServerHandle) {
+            ServerStartRepository.wsServerHandle.stop();
+            ServerStartRepository.wsServerHandle = null;
           }
-          if (this.nextServerProcess && !this.nextServerProcess.killed) {
-            this.nextServerProcess.kill("SIGTERM");
-            this.nextServerProcess = null;
+          if (
+            ServerStartRepository.nextServerProcess &&
+            !ServerStartRepository.nextServerProcess.killed
+          ) {
+            ServerStartRepository.nextServerProcess.kill("SIGTERM");
+            ServerStartRepository.nextServerProcess = null;
           }
 
-          this.startNextServer(port, logger, data.profile)
+          ServerStartRepository.startNextServer(port, logger, t, data.profile)
             .then((result) => {
               if (result.success) {
                 process.stdout.write("✅ Server restarted successfully\n");
@@ -653,7 +651,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               "\n⏹  Stopping server to collect CPU profile…\n",
             );
             cleanupPidFile(VIBE_START_PID_FILE);
-            this.stopAllProcesses();
+            ServerStartRepository.stopAllProcesses();
 
             setTimeout((): void => {
               void (async (): Promise<void> => {
@@ -733,7 +731,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
   /**
    * Wait for database connection to be ready
    */
-  private async waitForDatabaseConnection(
+  private static async waitForDatabaseConnection(
     logger: EndpointLogger,
   ): Promise<void> {
     const maxAttempts = 60;
@@ -782,19 +780,21 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
    * Start TanStack Start production server (.output/server/index.mjs).
    * Spawns the Nitro server output produced by `vibe build --tanstack`.
    */
-  private async startTanstackServer(
+  private static async startTanstackServer(
     port: number,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; message?: string }> {
-    this.killProcessOnPort(port, logger);
+    t: ServerStartT,
+  ): Promise<ResponseType<void>> {
+    ServerStartRepository.killProcessOnPort(port, logger);
 
     const { existsSync: fsExistsSync } = await import("node:fs");
-    const outputFile = ".output/server/index.mjs";
+    // Use join to prevent Turbopack from statically analyzing this as a module import
+    const outputFile = [".output", "server", "index.mjs"].join("/");
     if (!fsExistsSync(outputFile)) {
-      return {
-        success: false,
-        message: `No TanStack Start build found at ${outputFile} — did 'vibe build --tanstack' run?`,
-      };
+      return fail({
+        message: t("post.errors.tanstackBuildNotFound"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
 
     const tanstackProcess = spawn("node", [outputFile], {
@@ -806,7 +806,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       },
     });
 
-    this.runningProcesses.set("tanstack", tanstackProcess);
+    ServerStartRepository.runningProcesses.set("tanstack", tanstackProcess);
 
     tanstackProcess.stdout?.on("data", (data: Buffer) => {
       process.stdout.write(data);
@@ -817,7 +817,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
     tanstackProcess.on("exit", (code) => {
       logger.info(`TanStack Start server exited with code ${String(code)}`);
-      this.runningProcesses.delete("tanstack");
+      ServerStartRepository.runningProcesses.delete("tanstack");
     });
 
     // Give it a moment to start
@@ -826,23 +826,20 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     });
 
     if (tanstackProcess.exitCode !== null) {
-      return {
-        success: false,
-        message: `TanStack Start server exited immediately with code ${String(tanstackProcess.exitCode)}`,
-      };
+      return fail({
+        message: t("post.errors.tanstackServerExited"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
 
     logger.info(`TanStack Start production server started on port ${port}`);
-    return { success: true };
+    return success(undefined);
   }
 
   /**
-   * Start Next.js production server as a child process
-   */
-  /**
    * Kill any process occupying the given port
    */
-  private killProcessOnPort(port: number, logger: EndpointLogger): void {
+  private static killProcessOnPort(port: number, logger: EndpointLogger): void {
     try {
       // fuser is more reliable than lsof for finding processes on a port
       execSync(`fuser -k ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
@@ -854,11 +851,15 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     }
   }
 
-  private async startNextServer(
+  /**
+   * Start Next.js production server as a child process
+   */
+  private static async startNextServer(
     port: number,
     logger: EndpointLogger,
+    t: ServerStartT,
     profile = false,
-  ): Promise<{ success: boolean; message?: string }> {
+  ): Promise<ResponseType<void>> {
     try {
       // Import WS module to get NEXT_PORT_OFFSET
       const { startWebSocketServer, NEXT_PORT_OFFSET } =
@@ -872,9 +873,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       const wsPort = disableProxy ? port + WS_SIDECAR_OFFSET : port;
 
       // Kill any stale processes on both ports
-      this.killProcessOnPort(nextPort, logger);
+      ServerStartRepository.killProcessOnPort(nextPort, logger);
       if (disableProxy) {
-        this.killProcessOnPort(wsPort, logger);
+        ServerStartRepository.killProcessOnPort(wsPort, logger);
       }
 
       const profilingEnv = profile ? { NEXT_CPU_PROF: "1" } : {};
@@ -899,14 +900,17 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       // --- Start Next.js ---
       const { existsSync: fsExistsSync } = await import("node:fs");
       const distExists = fsExistsSync(".next-prod");
-      logger.info(
+      logger.debug(
         `Next.js dist dir: .next-prod (exists: ${String(distExists)})`,
       );
       if (!distExists) {
         logger.error(
           "No .next-prod build found — did 'vibe build' run during Docker build?",
         );
-        return { success: false, message: "No .next-prod build found" };
+        return fail({
+          message: t("post.errors.nextBuildNotFound"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
       const nextProcess = spawn(
         "bun",
@@ -922,7 +926,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           } as NodeJS.ProcessEnv,
         },
       );
-      this.nextServerProcess = nextProcess;
+      ServerStartRepository.nextServerProcess = nextProcess;
 
       // Pipe Next.js output so crashes are never silent
       const formatNextjs = createNextjsFormatter();
@@ -946,29 +950,32 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
       // --- Start WS server (proxy or sidecar depending on mode) ---
       const wsHandle = startWebSocketServer({ port: wsPort, logger });
-      this.wsServerHandle = wsHandle;
+      ServerStartRepository.wsServerHandle = wsHandle;
 
       // Wait for Next.js to be ready on its port
-      await this.waitForNextServer(
+      await ServerStartRepository.waitForNextServer(
         `http://127.0.0.1:${nextPort}`,
         30000,
         logger,
       );
 
       logger.info(`Next.js production server ready on port ${port}`);
-      return { success: true };
+      return success(undefined);
     } catch (error) {
       logger.error("Failed to start server", {
         error: parseError(error).message,
       });
-      return { success: false, message: parseError(error).message };
+      return fail({
+        message: t("post.errors.startFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
   /**
    * Wait for Next.js to respond on the given URL.
    */
-  private async waitForNextServer(
+  private static async waitForNextServer(
     url: string,
     timeoutMs: number,
     logger: EndpointLogger,
@@ -1003,29 +1010,32 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
   /**
    * Stop all running processes
    */
-  private stopAllProcesses(): void {
+  private static stopAllProcesses(): void {
     // Stop the WS sidecar
-    if (this.wsServerHandle) {
+    if (ServerStartRepository.wsServerHandle) {
       try {
-        this.wsServerHandle.stop();
+        ServerStartRepository.wsServerHandle.stop();
       } catch {
         // Ignore errors when stopping WS server
       }
-      this.wsServerHandle = null;
+      ServerStartRepository.wsServerHandle = null;
     }
 
     // Stop Next.js child process
-    if (this.nextServerProcess && !this.nextServerProcess.killed) {
+    if (
+      ServerStartRepository.nextServerProcess &&
+      !ServerStartRepository.nextServerProcess.killed
+    ) {
       try {
-        this.nextServerProcess.kill("SIGTERM");
+        ServerStartRepository.nextServerProcess.kill("SIGTERM");
       } catch {
         // Ignore
       }
     }
-    this.nextServerProcess = null;
+    ServerStartRepository.nextServerProcess = null;
 
     // Stop any remaining child processes (task runner etc.)
-    for (const [, process] of this.runningProcesses) {
+    for (const [, process] of ServerStartRepository.runningProcesses) {
       try {
         if (process && !process.killed) {
           process.kill("SIGTERM");
@@ -1039,11 +1049,6 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         // Ignore errors when stopping processes
       }
     }
-    this.runningProcesses.clear();
+    ServerStartRepository.runningProcesses.clear();
   }
 }
-
-/**
- * Default repository instance
- */
-export const serverStartRepository = new ServerStartRepositoryImpl();

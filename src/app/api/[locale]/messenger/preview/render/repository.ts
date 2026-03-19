@@ -19,7 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
-import type { scopedTranslation } from "../../i18n";
+import type { EmailsT } from "../../i18n";
 import { getTemplate } from "../../registry/generated";
 import {
   getTemplateSubject,
@@ -27,10 +27,8 @@ import {
 } from "../../registry/template";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 // Type definitions
-export interface PreviewRenderRequestType {
+interface PreviewRenderRequestType {
   templateId: string;
   language: Languages;
   country: Countries;
@@ -44,24 +42,13 @@ interface PreviewRenderResponseType {
 }
 
 /**
- * Email Preview Render Repository Interface
+ * Email Preview Render Repository
  */
-interface EmailPreviewRenderRepository {
-  renderPreview(
+export class EmailPreviewRenderRepository {
+  static async renderPreview(
     data: PreviewRenderRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<BaseResponseType<PreviewRenderResponseType>>;
-}
-
-/**
- * Email Preview Render Repository Implementation
- */
-class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
-  async renderPreview(
-    data: PreviewRenderRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
+    t: EmailsT,
   ): Promise<BaseResponseType<PreviewRenderResponseType>> {
     try {
       logger.debug("Rendering email preview", {
@@ -158,6 +145,3 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
     }
   }
 }
-
-export const emailPreviewRenderRepository =
-  new EmailPreviewRenderRepositoryImpl();

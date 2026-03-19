@@ -8,9 +8,9 @@ export const scopedTranslation = createScopedTranslation({
   pl: () => require("./pl").translations,
 });
 
-export type GeneratorsEndpointsTranslationKey =
+export type GraphSeedsIndexTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
 
-export type GeneratorsEndpointsT = ReturnType<
+export type GraphSeedsIndexT = ReturnType<
   typeof scopedTranslation.scopedT
 >["t"];

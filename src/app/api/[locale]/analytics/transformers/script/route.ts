@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeScript } from "./repository";
+import { ScriptTransformerRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, fn, resolution, lookback } = data;
-      const result = computeScript(source, fn);
+      const result = ScriptTransformerRepository.computeScript(source, fn);
       return success({
         result,
         meta: {

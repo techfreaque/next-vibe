@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { emailStatsRepository } from "./repository";
+import { EmailStatsRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
     handler: ({ data, user, logger, t }) =>
-      emailStatsRepository.getStats(data, user, logger, t),
+      EmailStatsRepository.getStats(data, user, logger, t),
   },
 });

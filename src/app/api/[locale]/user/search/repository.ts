@@ -16,9 +16,7 @@ import type {
   UserSearchGetRequestOutput,
   UserSearchGetResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { UserSearchT } from "./i18n";
 
 /**
  * User Search Repository - Static class pattern
@@ -33,7 +31,7 @@ export class UserSearchRepository {
     data: UserSearchGetRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: UserSearchT,
   ): Promise<ResponseType<UserSearchGetResponseOutput>> {
     const result = await UserRepository.searchUsersWithPagination(
       data.searchCriteria?.search || "",

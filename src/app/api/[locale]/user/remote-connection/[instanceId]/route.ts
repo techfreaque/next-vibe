@@ -9,13 +9,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { getConnectionById } from "./repository";
+import { RemoteConnectionInstanceRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: ({ user, logger, urlPathParams }) =>
-      getConnectionById(user, logger, urlPathParams.instanceId),
+      RemoteConnectionInstanceRepository.getConnectionById(
+        user,
+        logger,
+        urlPathParams.instanceId,
+      ),
   },
 });

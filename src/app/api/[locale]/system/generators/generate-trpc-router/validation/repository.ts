@@ -21,14 +21,12 @@ import type {
   TRPCValidationRequestOutput,
   TRPCValidationResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { TrpcValidationT } from "./i18n";
 
 /**
  * TRPC Validation Options interface
  */
-export interface TRPCValidationOptions {
+interface TRPCValidationOptions {
   apiDir: string;
   fix?: boolean;
   verbose?: boolean;
@@ -38,7 +36,7 @@ export interface TRPCValidationOptions {
 /**
  * TRPC Validation Result interface
  */
-export interface ValidationResult {
+interface ValidationResult {
   success: boolean;
   errors: string[];
   warnings: string[];
@@ -52,7 +50,7 @@ export interface ValidationResult {
 /**
  * Route File Validation interface
  */
-export interface RouteFileValidation {
+interface RouteFileValidation {
   filePath: string;
   hasDefinition: boolean;
   hasEnhancedHandler: boolean;
@@ -63,40 +61,16 @@ export interface RouteFileValidation {
 }
 
 /**
- * TRPC Integration Validation Repository Interface
+ * TRPC Integration Validation Repository
  */
-export interface TRPCValidationRepository {
-  executeValidationOperation(
-    data: TRPCValidationRequestOutput,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<TRPCValidationResponseOutput>>;
-
-  validateTRPCIntegration(
-    options: TRPCValidationOptions,
-    logger: EndpointLogger,
-  ): ValidationResult;
-
-  validateRouteFile(filePath: string, fix: boolean): RouteFileValidation;
-
-  generateValidationReport(result: ValidationResult): string;
-
-  checkRouterExists(apiDir: string): boolean;
-
-  fixRoutes(apiDir: string, logger: EndpointLogger): Promise<ValidationResult>;
-}
-
-/**
- * TRPC Integration Validation Repository Implementation
- */
-export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
+export class TRPCValidationRepository {
   /**
    * Execute TRPC validation operation based on request
    */
-  async executeValidationOperation(
+  static async executeValidationOperation(
     data: TRPCValidationRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: TrpcValidationT,
   ): Promise<ResponseType<TRPCValidationResponseOutput>> {
     try {
       logger.info("Starting TRPC validation operation execution", {
@@ -125,16 +99,24 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
             verbose: options.verbose || false,
             generateReport: options.generateReport || false,
           };
-          result = this.validateTRPCIntegration(validationOptions, logger);
+          result = TRPCValidationRepository.validateTRPCIntegration(
+            validationOptions,
+            logger,
+          );
           break;
         }
 
         case "VALIDATE_ROUTE_FILE": {
           if (!filePath) {
-            // eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
-            throw new Error("File path is required for route file validation");
+            return fail({
+              message: t("errors.executionFailed.title"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              messageParams: {
+                error: "File path is required for route file validation",
+              },
+            });
           }
-          const fileValidation = this.validateRouteFile(
+          const fileValidation = TRPCValidationRepository.validateRouteFile(
             filePath,
             options.fix || false,
           );
@@ -159,19 +141,23 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
             verbose: true,
             generateReport: true,
           };
-          const validationResult = this.validateTRPCIntegration(
-            reportOptions,
-            logger,
-          );
+          const validationResult =
+            TRPCValidationRepository.validateTRPCIntegration(
+              reportOptions,
+              logger,
+            );
           result = {
             ...validationResult,
-            report: this.generateValidationReport(validationResult),
+            report:
+              TRPCValidationRepository.generateValidationReport(
+                validationResult,
+              ),
           };
           break;
         }
 
         case "FIX_ROUTES": {
-          result = await this.fixRoutes(
+          result = await TRPCValidationRepository.fixRoutes(
             options.apiDir || "src/app/api",
             logger,
           );
@@ -179,7 +165,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
         }
 
         case "CHECK_ROUTER_EXISTS": {
-          const routerExists = this.checkRouterExists(
+          const routerExists = TRPCValidationRepository.checkRouterExists(
             options.apiDir || "src/app/api",
           );
           result = {
@@ -196,8 +182,13 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
         }
 
         default: {
-          // eslint-disable-next-line i18next/no-literal-string, oxlint-plugin-restricted/restricted-syntax -- Build-time generator that throws for invalid configuration at startup
-          throw new Error(`Unknown TRPC validation operation: ${operation}`);
+          return fail({
+            message: t("errors.executionFailed.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
+              error: `Unknown TRPC validation operation: ${String(operation)}`,
+            },
+          });
         }
       }
 
@@ -232,7 +223,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Validate TRPC integration across all route files
    */
-  validateTRPCIntegration(
+  static validateTRPCIntegration(
     options: TRPCValidationOptions,
     logger: EndpointLogger,
   ): ValidationResult {
@@ -258,7 +249,8 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
       }
 
       // Find all route files
-      const routeFiles = this.findRouteFiles(resolvedApiDir);
+      const routeFiles =
+        TRPCValidationRepository.findRouteFiles(resolvedApiDir);
 
       if (verbose && logger) {
         logger.info(`Found ${routeFiles.length} route files to validate`);
@@ -266,7 +258,10 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
 
       // Validate each route file
       for (const routeFile of routeFiles) {
-        const validation = this.validateRouteFile(routeFile, fix);
+        const validation = TRPCValidationRepository.validateRouteFile(
+          routeFile,
+          fix,
+        );
         result.routeFiles.push(validation);
 
         // Aggregate errors and warnings
@@ -325,7 +320,10 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Validate a single route file
    */
-  validateRouteFile(filePath: string, fix: boolean): RouteFileValidation {
+  static validateRouteFile(
+    filePath: string,
+    fix: boolean,
+  ): RouteFileValidation {
     const validation: RouteFileValidation = {
       filePath,
       hasDefinition: false,
@@ -424,7 +422,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Generate validation report
    */
-  generateValidationReport(result: ValidationResult): string {
+  static generateValidationReport(result: ValidationResult): string {
     /* eslint-disable i18next/no-literal-string */
     const lines: string[] = [];
 
@@ -482,7 +480,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Check if TRPC router file exists
    */
-  checkRouterExists(apiDir: string): boolean {
+  static checkRouterExists(apiDir: string): boolean {
     /* eslint-disable i18next/no-literal-string */
     try {
       // Use template string to prevent Turbopack from statically tracing paths
@@ -502,9 +500,12 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Fix route files automatically
    */
-  fixRoutes(apiDir: string, logger: EndpointLogger): Promise<ValidationResult> {
+  static fixRoutes(
+    apiDir: string,
+    logger: EndpointLogger,
+  ): Promise<ValidationResult> {
     // First validate to identify issues
-    const validationResult = this.validateTRPCIntegration(
+    const validationResult = TRPCValidationRepository.validateTRPCIntegration(
       {
         apiDir,
         fix: false,
@@ -531,7 +532,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   /**
    * Find all route.ts files in the API directory
    */
-  private findRouteFiles(apiDir: string): string[] {
+  private static findRouteFiles(apiDir: string): string[] {
     const routeFiles: string[] = [];
 
     const scanDirectory = (dir: string): void => {
@@ -565,8 +566,3 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
     return routeFiles;
   }
 }
-
-/**
- * TRPC Integration Validation Repository Instance
- */
-export const trpcValidationRepository = new TRPCValidationRepositoryImpl();

@@ -1,5 +1,4 @@
 /// <reference types="node" />
-/* eslint-disable i18next/no-literal-string */
 
 import { execSync, spawn } from "node:child_process";
 import { readFileSync } from "node:fs";

@@ -21,27 +21,15 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "../../../../../user/auth/types";
 import type { StatusResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Setup Status Repository Interface
- */
-export interface SetupStatusRepository {
-  getStatus(
-    user: JwtPayloadType,
-    t: ModuleT,
-  ): Promise<ResponseType<StatusResponseOutput>>;
-}
+import type { SetupStatusT } from "./i18n";
 
 /**
  * Setup Status Repository Implementation
  */
-class SetupStatusRepositoryImpl implements SetupStatusRepository {
-  async getStatus(
+export class SetupStatusRepository {
+  static async getStatus(
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SetupStatusT,
   ): Promise<ResponseType<StatusResponseOutput>> {
     // Validate user permissions for CLI status check
     if (!user?.id) {
@@ -55,7 +43,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     }
 
     try {
-      const status = await this.checkInstallationStatus();
+      const status = await SetupStatusRepository.checkInstallationStatus();
 
       return success({
         success: true,
@@ -78,7 +66,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     }
   }
 
-  private async checkInstallationStatus(): Promise<{
+  private static async checkInstallationStatus(): Promise<{
     installed: boolean;
     version?: string;
     path?: string;
@@ -89,7 +77,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
         process.platform === "win32".replace("32", "32")
           ? "where".replace("e", "e")
           : "which".replace("h", "h");
-      const output = await this.runCommand(
+      const output = await SetupStatusRepository.runCommand(
         command,
         ["vibe".replace("e", "e")],
         {
@@ -131,7 +119,7 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     }
   }
 
-  private async runCommand(
+  private static async runCommand(
     command: string,
     args: string[],
     options: {
@@ -180,8 +168,3 @@ class SetupStatusRepositoryImpl implements SetupStatusRepository {
     });
   }
 }
-
-/**
- * Default repository instance
- */
-export const setupStatusRepository = new SetupStatusRepositoryImpl();

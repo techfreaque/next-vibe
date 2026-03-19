@@ -19,7 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import { getDefaultToolIds } from "../constants";
+import { getDefaultToolIdsForUser } from "../constants";
 import { chatSettings } from "./db";
 import type {
   ChatSettingsGetResponseOutput,
@@ -27,51 +27,49 @@ import type {
   ChatSettingsUpdateResponseOutput,
   ToolConfigItem,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { SettingsT } from "./i18n";
 import { ChatSettingsRepositoryClient } from "./repository-client";
-
-type SettingsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Returns null if the tool list equals the given defaultIds set (i.e. it IS the default),
- * otherwise returns the normalized list (sorted, only toolId + requiresConfirmation).
- *
- * - For availableTools: defaultIds = full available set (null = all tools allowed)
- * - For pinnedTools: defaultIds = DEFAULT_TOOL_IDS (null = load the standard 9 tools)
- */
-function normalizeToolsOrNull(
-  tools: ToolConfigItem[] | null | undefined,
-  defaultIds: readonly string[] | null,
-): ToolConfigItem[] | null {
-  if (tools === null || tools === undefined) {
-    return null;
-  }
-  const normalized = tools
-    .map(({ toolId, requiresConfirmation }) => ({
-      toolId,
-      requiresConfirmation: requiresConfirmation ?? false,
-    }))
-    .toSorted((a, b) => a.toolId.localeCompare(b.toolId));
-
-  if (defaultIds !== null) {
-    const submittedIds = new Set(normalized.map((t) => t.toolId));
-    const defaultSet = new Set(defaultIds);
-    const sameIds =
-      submittedIds.size === defaultSet.size &&
-      [...submittedIds].every((id) => defaultSet.has(id));
-    const noConfirmations = normalized.every((t) => !t.requiresConfirmation);
-    if (sameIds && noConfirmations) {
-      return null;
-    }
-  }
-
-  return normalized;
-}
 
 /**
  * Chat Settings Repository
  */
 export class ChatSettingsRepository {
+  /**
+   * Returns null if the tool list equals the given defaultIds set (i.e. it IS the default),
+   * otherwise returns the normalized list (sorted, only toolId + requiresConfirmation).
+   *
+   * - For availableTools: defaultIds = full available set (null = all tools allowed)
+   * - For pinnedTools: defaultIds = DEFAULT_TOOL_IDS (null = load the standard 9 tools)
+   */
+  private static normalizeToolsOrNull(
+    tools: ToolConfigItem[] | null | undefined,
+    defaultIds: readonly string[] | null,
+  ): ToolConfigItem[] | null {
+    if (tools === null || tools === undefined) {
+      return null;
+    }
+    const normalized = tools
+      .map(({ toolId, requiresConfirmation }) => ({
+        toolId,
+        requiresConfirmation: requiresConfirmation ?? false,
+      }))
+      .toSorted((a, b) => a.toolId.localeCompare(b.toolId));
+
+    if (defaultIds !== null) {
+      const submittedIds = new Set(normalized.map((t) => t.toolId));
+      const defaultSet = new Set(defaultIds);
+      const sameIds =
+        submittedIds.size === defaultSet.size &&
+        [...submittedIds].every((id) => defaultSet.has(id));
+      const noConfirmations = normalized.every((t) => !t.requiresConfirmation);
+      if (sameIds && noConfirmations) {
+        return null;
+      }
+    }
+
+    return normalized;
+  }
+
   /**
    * Get user's chat settings
    */
@@ -153,12 +151,18 @@ export class ChatSettingsRepository {
       // Normalize tools — null passthrough means "all allowed"
       const availableToolsToStore =
         data.availableTools !== undefined
-          ? normalizeToolsOrNull(data.availableTools, null)
+          ? ChatSettingsRepository.normalizeToolsOrNull(
+              data.availableTools,
+              null,
+            )
           : undefined;
-      // pinnedTools: null = load the DEFAULT_TOOL_IDS set → compare against those
+      // pinnedTools: null = load the role-appropriate DEFAULT_TOOL_IDS set → compare against those
       const pinnedToolsToStore =
         data.pinnedTools !== undefined
-          ? normalizeToolsOrNull(data.pinnedTools, getDefaultToolIds())
+          ? ChatSettingsRepository.normalizeToolsOrNull(
+              data.pinnedTools,
+              getDefaultToolIdsForUser(user),
+            )
           : undefined;
 
       let result: typeof existing;

@@ -19,7 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import type { DefaultFolderId } from "../../config";
+import { isDefaultFolderId } from "../../config";
 import { chatMessages, chatThreads } from "../../db";
 import { ChatMessageRole } from "../../enum";
 import type {
@@ -92,10 +92,8 @@ export class GlobalMessageSearchRepository {
       conditions.push(sql`${chatThreads.rootFolderId} != 'incognito'`);
 
       // Optional filters
-      if (rootFolderId) {
-        conditions.push(
-          eq(chatThreads.rootFolderId, rootFolderId as DefaultFolderId),
-        );
+      if (rootFolderId && isDefaultFolderId(rootFolderId)) {
+        conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
       }
 
       if (role) {

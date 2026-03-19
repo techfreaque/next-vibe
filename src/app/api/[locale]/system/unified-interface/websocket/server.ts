@@ -18,8 +18,6 @@
 
 /// <reference types="bun-types" />
 
-/* eslint-disable i18next/no-literal-string */
-
 import http from "node:http";
 
 import type { ServerWebSocket } from "bun";

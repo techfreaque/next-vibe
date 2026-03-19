@@ -11,14 +11,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeWindowMax } from "./repository";
+import { WindowMaxIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, size, resolution, lookback } = data;
-      const result = computeWindowMax(source, size);
+      const result = WindowMaxIndicatorRepository.computeWindowMax(
+        source,
+        size,
+      );
       return success({
         result,
         meta: {

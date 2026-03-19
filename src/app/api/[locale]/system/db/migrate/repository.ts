@@ -5,7 +5,6 @@
 
 import { spawnSync } from "node:child_process";
 
-import { sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,7 +13,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { db } from "@/app/api/[locale]/system/db";
 import { env } from "@/config/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
@@ -24,63 +22,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 // Import types from the endpoint definition
-import type migrateEndpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type MigrateRequestType = typeof migrateEndpoints.POST.types.RequestOutput;
-type MigrateResponseType = typeof migrateEndpoints.POST.types.ResponseOutput;
+import type { MigrateRequestOutput, MigrateResponseOutput } from "./definition";
+import type { MigrateT } from "./i18n";
 
 /**
- * Database Migration Repository Interface
- * Extended with functionality from migrate-repair.ts, migrate-prod.ts, migrate-sync.ts
- */
-export interface DatabaseMigrationRepository {
-  runMigrations(
-    data: MigrateRequestType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateResponseType>>;
-
-  /**
-   * Repair migration tracking (merged from migrate-repair.ts)
-   */
-  repairMigrations(
-    options: { force?: boolean; dryRun?: boolean; reset?: boolean },
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ repaired: boolean; message: string }>>;
-
-  /**
-   * Run production migrations (merged from migrate-prod.ts)
-   */
-  runProductionMigrations(
-    options: { force?: boolean; backup?: boolean },
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): ResponseType<{ migrated: boolean; message: string }>;
-
-  /**
-   * Sync migrations (merged from migrate-sync.ts)
-   */
-  syncMigrations(
-    options: { force?: boolean; direction?: "up" | "down" },
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): ResponseType<{ synced: boolean; message: string }>;
-}
-
-/**
- * Database Migration Repository Implementation
+ * Database Migration Repository
  * Extended with merged functionality from floating migration files
  */
-export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationRepository {
-  async runMigrations(
-    data: MigrateRequestType,
-    t: ModuleT,
+export class DatabaseMigrationRepository {
+  static async runMigrations(
+    data: MigrateRequestOutput,
+    t: MigrateT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateResponseType>> {
+  ): Promise<ResponseType<MigrateResponseOutput>> {
     const startTime = Date.now();
 
     try {
@@ -216,98 +170,4 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       });
     }
   }
-
-  /**
-   * Repair migration tracking (merged from migrate-repair.ts)
-   */
-  async repairMigrations(
-    options: { force?: boolean; dryRun?: boolean; reset?: boolean },
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ repaired: boolean; message: string }>> {
-    try {
-      let message = t("messages.repairCompleted");
-
-      if (options.dryRun) {
-        message = t("messages.repairDryRun");
-        return success({ repaired: false, message });
-      }
-
-      if (options.reset) {
-        // Reset migration tracking
-        logger.info("Resetting migration tracking");
-        await db.execute(sql`DROP TABLE IF EXISTS __drizzle_migrations`);
-        message = t("messages.trackingReset");
-      }
-
-      // Repair logic would be implemented here
-      return success({ repaired: true, message });
-    } catch (error) {
-      return fail({
-        message: t("post.errors.network.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
-      });
-    }
-  }
-
-  /**
-   * Run production migrations (merged from migrate-prod.ts)
-   */
-  runProductionMigrations(
-    options: { force?: boolean; backup?: boolean },
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): ResponseType<{ migrated: boolean; message: string }> {
-    try {
-      let message = t("messages.productionCompleted");
-
-      if (options.backup) {
-        // Backup logic would be implemented here
-        logger.info("Creating backup before production migration");
-        message += t("messages.productionWithBackup");
-      }
-
-      // Production migration logic would be implemented here
-      return success({ migrated: true, message });
-    } catch (error) {
-      return fail({
-        message: t("post.errors.network.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
-      });
-    }
-  }
-
-  /**
-   * Sync migrations (merged from migrate-sync.ts)
-   */
-  syncMigrations(
-    options: { force?: boolean; direction?: "up" | "down" },
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): ResponseType<{ synced: boolean; message: string }> {
-    try {
-      const direction = options.direction || "up";
-      logger.info("Syncing migrations", { direction });
-      const message = t("messages.syncCompleted", {
-        direction,
-      });
-
-      // Sync logic would be implemented here
-      return success({ synced: true, message });
-    } catch (error) {
-      return fail({
-        message: t("post.errors.network.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
-      });
-    }
-  }
 }
-
-/**
- * Default repository instance
- */
-export const databaseMigrationRepository =
-  new DatabaseMigrationRepositoryImpl();

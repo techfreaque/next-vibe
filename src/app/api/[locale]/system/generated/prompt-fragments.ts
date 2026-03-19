@@ -7,7 +7,6 @@
  */
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 /* eslint-disable simple-import-sort/imports */
 
 /**
@@ -46,77 +45,41 @@ export async function getPromptFragment(
 ): Promise<Record<string, unknown>> {
   switch (id) {
     case "bootstrap":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "extra-instructions":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "favorites":
-      return import("@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "folder-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "formatting":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "guest-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "headless-context":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "identity":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "language":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "memories":
-      return import("@/app/api/[locale]/agent/chat/memories/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/chat/memories/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "message-metadata":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "platform-overview":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "remote-instances":
-      return import("@/app/api/[locale]/user/remote-connection/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/user/remote-connection/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "skill":
-      return import("@/app/api/[locale]/agent/chat/skills/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/chat/skills/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "system-context":
-      return import("@/app/api/[locale]/user/remote-connection/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/user/remote-connection/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "tasks":
-      return import("@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "tool-execution-control":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     case "user-name":
-      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<
-        Record<string, unknown>
-      >;
+      return import("@/app/api/[locale]/agent/ai-stream/system-prompt/prompt") as Promise<Record<string, unknown>>;
     default:
       return {};
   }

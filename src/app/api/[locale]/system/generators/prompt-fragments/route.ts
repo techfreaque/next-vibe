@@ -6,13 +6,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { promptFragmentsGeneratorRepository } from "./repository";
+import { PromptFragmentsGeneratorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) =>
-      promptFragmentsGeneratorRepository.generatePromptFragments(
+      PromptFragmentsGeneratorRepository.generatePromptFragments(
         data,
         logger,
         t,

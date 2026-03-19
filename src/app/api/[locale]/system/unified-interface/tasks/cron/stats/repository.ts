@@ -25,55 +25,41 @@ import type {
   CronStatsGetRequestOutput,
   CronStatsGetResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Cron Stats Repository Interface
- */
-export interface ICronStatsRepository {
-  getStats(
-    data: CronStatsGetRequestOutput,
-    user: JwtPayloadType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronStatsGetResponseOutput>>;
-}
-
-// eslint-disable-next-line i18next/no-literal-string
-function formatUptime(seconds: number): string {
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `${days}d ${hours}h ${minutes}m`;
-}
-
-/**
- * Returns the cutoff Date for a given period string
- */
-function getPeriodCutoff(period: string): Date {
-  const now = new Date();
-  switch (period) {
-    case "hour":
-      return new Date(now.getTime() - 60 * 60 * 1000);
-    case "week":
-      return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    case "month":
-      return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    default: // "day"
-      return new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  }
-}
+import type { CronStatsT } from "./i18n";
 
 /**
  * Cron Stats Repository Implementation
  */
-class CronStatsRepositoryImpl implements ICronStatsRepository {
-  async getStats(
+export class CronStatsRepository {
+  // eslint-disable-next-line i18next/no-literal-string
+  private static formatUptime(seconds: number): string {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${days}d ${hours}h ${minutes}m`;
+  }
+
+  /**
+   * Returns the cutoff Date for a given period string
+   */
+  private static getPeriodCutoff(period: string): Date {
+    const now = new Date();
+    switch (period) {
+      case "hour":
+        return new Date(now.getTime() - 60 * 60 * 1000);
+      case "week":
+        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      case "month":
+        return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      default: // "day"
+        return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    }
+  }
+
+  static async getStats(
     data: CronStatsGetRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: CronStatsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronStatsGetResponseOutput>> {
     try {
@@ -87,7 +73,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       const userId = !user.isPublic ? user.id : null;
 
       const { period = "day", type = "overview", taskId, limit = 100 } = data;
-      const cutoff = getPeriodCutoff(period);
+      const cutoff = CronStatsRepository.getPeriodCutoff(period);
 
       // Build period condition for execution queries
       const periodCondition = gte(cronTaskExecutions.startedAt, cutoff);
@@ -148,7 +134,9 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
       const activeTasks = Number(taskCountRow?.activeTasks ?? 0);
       const systemStatus: CronStatsGetResponseOutput["systemStatus"] =
         totalTasks === 0 || activeTasks === 0 ? "warning" : "healthy";
-      const uptime = formatUptime(Math.floor(process.uptime()));
+      const uptime = CronStatsRepository.formatUptime(
+        Math.floor(process.uptime()),
+      );
       const totalExecutions = Number(execSummary?.totalExecutions ?? 0);
       const successfulExecutions = Number(
         execSummary?.successfulExecutions ?? 0,
@@ -399,14 +387,11 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorDetails.message,
-          period: data.period || "day",
-          type: data.type || "overview",
-          taskId: data.taskId || "unknown",
+          period: data.period ?? "day",
+          type: data.type ?? "overview",
+          taskId: data.taskId ?? "unknown",
         },
       });
     }
   }
 }
-
-// Export singleton instance
-export const cronStatsRepository = new CronStatsRepositoryImpl();

@@ -12,13 +12,15 @@ import "server-only";
 
 import type { TimeSeries } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
-/**
- * @deprecated DataPoint no longer has a meta field. Returns empty array.
- */
-export function computeJsonPath(points: TimeSeries, path: string): TimeSeries {
-  void points;
-  void path;
-  // Superseded: DataPoint has no meta field in the new architecture.
-  // Kept for backwards compatibility with existing graph definitions.
-  return [];
+export class JsonPathTransformerRepository {
+  /**
+   * @deprecated DataPoint no longer has a meta field. Returns empty array.
+   */
+  static computeJsonPath(points: TimeSeries, path: string): TimeSeries {
+    void points;
+    void path;
+    // Superseded: DataPoint has no meta field in the new architecture.
+    // Kept for backwards compatibility with existing graph definitions.
+    return [];
+  }
 }

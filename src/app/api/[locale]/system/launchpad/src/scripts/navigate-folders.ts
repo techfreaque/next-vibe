@@ -1,5 +1,4 @@
 /// <reference types="node" />
-/* eslint-disable i18next/no-literal-string */
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";

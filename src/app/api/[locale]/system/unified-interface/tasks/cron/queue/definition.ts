@@ -357,5 +357,6 @@ export type CronQueueListRequestInput = typeof GET.types.RequestInput;
 export type CronQueueListRequestOutput = typeof GET.types.RequestOutput;
 export type CronQueueListResponseInput = typeof GET.types.ResponseInput;
 export type CronQueueListResponseOutput = typeof GET.types.ResponseOutput;
+export type CronQueueTask = CronQueueListResponseOutput["tasks"][number];
 
 export default endpoints;

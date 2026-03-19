@@ -19,6 +19,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
+  isContentResponse,
   isFileResponse,
   isStreamingResponse,
   success,
@@ -47,16 +48,16 @@ import { getRouteHandler } from "../../../generated/route-handlers";
 import type { CallbackModeValue } from "../../ai/execute-tool/constants";
 import { Platform } from "../../shared/types/platform";
 import { getFullPath } from "../../shared/utils/path";
+import { isCronTaskDue } from "../cron-formatter";
 import { splitTaskArgs } from "../cron/arg-splitter";
 import { cronTasks as cronTasksTable } from "../cron/db";
 import { CronTasksRepository } from "../cron/repository";
-import { isCronTaskDue } from "../cron-formatter";
 import {
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
 import { handleTaskCompletion } from "../task-completion-handler";
-import { pushStatusToRemote } from "../task-sync/repository";
+import { TaskSyncRepository } from "../task-sync/repository";
 import type { JsonValue } from "../unified-runner/types";
 import type {
   NewPulseExecution,
@@ -88,7 +89,7 @@ export class PulseHealthRepository {
         .orderBy(desc(pulseHealth.updatedAt))
         .limit(1);
 
-      return success<PulseHealth | null>((health[0] as PulseHealth) || null);
+      return success<PulseHealth | null>(health[0] ?? null);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
@@ -121,7 +122,7 @@ export class PulseHealthRepository {
         .where(eq(pulseHealth.id, currentHealthResponse.data.id))
         .returning();
 
-      return success<PulseHealth>(updatedHealth as PulseHealth);
+      return success<PulseHealth>(updatedHealth);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
@@ -141,7 +142,7 @@ export class PulseHealthRepository {
         .insert(pulseHealth)
         .values(health)
         .returning();
-      return success<PulseHealth>(newHealth as PulseHealth);
+      return success<PulseHealth>(newHealth);
     } catch (error) {
       logger.error("Failed to create health record", parseError(error));
       const { t } = tasksScopedTranslation.scopedT(locale);
@@ -161,7 +162,7 @@ export class PulseHealthRepository {
         .insert(pulseExecutions)
         .values(execution)
         .returning();
-      return success(newExecution as PulseExecution);
+      return success(newExecution);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
@@ -191,7 +192,7 @@ export class PulseHealthRepository {
         });
       }
 
-      return success(updatedExecution as PulseExecution);
+      return success(updatedExecution);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
@@ -212,7 +213,7 @@ export class PulseHealthRepository {
         .orderBy(desc(pulseExecutions.startedAt))
         .limit(limit);
 
-      return success(executions as PulseExecution[]);
+      return success(executions);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
@@ -233,7 +234,7 @@ export class PulseHealthRepository {
         .where(eq(pulseExecutions.id, id))
         .limit(1);
 
-      return success((execution[0] as PulseExecution) || null);
+      return success(execution[0] ?? null);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
@@ -252,7 +253,7 @@ export class PulseHealthRepository {
         .insert(pulseNotifications)
         .values(notification)
         .returning();
-      return success(newNotification as PulseNotification);
+      return success(newNotification);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
 
@@ -273,7 +274,7 @@ export class PulseHealthRepository {
         .where(eq(pulseNotifications.sent, false))
         .orderBy(pulseNotifications.createdAt);
 
-      return success(notifications as PulseNotification[]);
+      return success(notifications);
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
@@ -459,9 +460,10 @@ export class PulseHealthRepository {
       const pulseId = crypto.randomUUID();
       const now = new Date();
 
-      const { deriveDefaultSelfInstanceId } =
+      const { RemoteConnectionRepository } =
         await import("@/app/api/[locale]/user/remote-connection/repository");
-      const instanceId = deriveDefaultSelfInstanceId();
+      const instanceId =
+        RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 
       const tasksDue: string[] = [];
       const tasksExecuted: string[] = [];
@@ -622,7 +624,7 @@ export class PulseHealthRepository {
         } else {
           // Fire-and-forget: notify remote that task is now RUNNING
           if (dbTask.targetInstance) {
-            void pushStatusToRemote({
+            void TaskSyncRepository.pushStatusToRemote({
               taskId: dbTask.id,
               status: CronTaskStatus.RUNNING,
               summary: "",
@@ -667,13 +669,14 @@ export class PulseHealthRepository {
               }
 
               const attemptStart = Date.now();
+              const taskAbortController = new AbortController();
               let typedResult: ResponseType<
                 Record<string, string | number | boolean>
               >;
 
               try {
                 // Execute with timeout
-                const result = (await Promise.race([
+                const result = await Promise.race([
                   handler({
                     data,
                     urlPathParams,
@@ -695,8 +698,10 @@ export class PulseHealthRepository {
                       favoriteId: undefined,
                       headless: undefined,
                       waitingForRemoteResult: undefined,
-                      abortSignal: undefined,
+                      abortSignal: taskAbortController.signal,
+                      callerCallbackMode: undefined,
                       escalateToTask: undefined,
+                      onEscalatedTaskCancel: undefined,
                     },
                   }),
                   new Promise<never>((...[, reject]) => {
@@ -705,20 +710,18 @@ export class PulseHealthRepository {
                       timeoutMs,
                     );
                   }),
-                ])) as Awaited<ReturnType<typeof handler>>;
+                ]);
 
                 // Normalize non-standard responses
                 typedResult =
-                  isStreamingResponse(result) || isFileResponse(result)
-                    ? (fail({
+                  isStreamingResponse(result) ||
+                  isFileResponse(result) ||
+                  isContentResponse(result)
+                    ? fail({
                         message: tTask("errors.repositoryInternalError"),
                         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                      }) as ResponseType<
-                        Record<string, string | number | boolean>
-                      >)
-                    : (result as ResponseType<
-                        Record<string, string | number | boolean>
-                      >);
+                      })
+                    : result;
               } catch (err) {
                 const isTimeout =
                   err instanceof Error && err.message === "TASK_TIMEOUT";
@@ -727,7 +730,7 @@ export class PulseHealthRepository {
                     ? tTask("errors.repositoryInternalError")
                     : tTask("errors.repositoryInternalError"),
                   errorType: ErrorResponseTypes.INTERNAL_ERROR,
-                }) as ResponseType<Record<string, string | number | boolean>>;
+                });
                 finalStatus = isTimeout
                   ? CronTaskStatus.TIMEOUT
                   : CronTaskStatus.FAILED;
@@ -871,7 +874,7 @@ export class PulseHealthRepository {
 
             // Fire-and-forget: push final status to remote
             if (dbTask.targetInstance) {
-              void pushStatusToRemote({
+              void TaskSyncRepository.pushStatusToRemote({
                 taskId: dbTask.id,
                 status: finalStatus,
                 summary: finalMessage ?? "",
@@ -916,7 +919,7 @@ export class PulseHealthRepository {
 
             // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
             if (dbTask.targetInstance) {
-              void pushStatusToRemote({
+              void TaskSyncRepository.pushStatusToRemote({
                 taskId: dbTask.id,
                 status: CronTaskStatus.FAILED,
                 summary: parseError(unexpectedError).message,

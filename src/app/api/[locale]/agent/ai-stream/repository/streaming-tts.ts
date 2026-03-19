@@ -291,7 +291,7 @@ export class StreamingTTSHandler {
               amount: creditsNeeded,
               feature: "tts",
               type: "tool",
-              partial: deductResult.partialDeduction,
+              partial: deductResult.data.partialDeduction,
             });
             if (this.wsEmit) {
               this.wsEmit(creditEvent);
@@ -299,7 +299,7 @@ export class StreamingTTSHandler {
             this.logger.debug("[Streaming TTS] Credits deducted", {
               skills: cleanText.length,
               credits: creditsNeeded,
-              partial: deductResult.partialDeduction,
+              partial: deductResult.data.partialDeduction,
             });
           } else {
             this.logger.warn("[Streaming TTS] Failed to deduct credits", {

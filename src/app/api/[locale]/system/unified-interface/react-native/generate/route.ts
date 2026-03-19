@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import generateEndpoints from "./definition";
-import { generateExpoIndexesRepository } from "./repository";
+import { GenerateExpoIndexesRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: generateEndpoints,
   [Methods.POST]: {
     handler: ({ user, t }) => {
-      return generateExpoIndexesRepository.generate(user, t);
+      return GenerateExpoIndexesRepository.generate(user, t);
     },
   },
 });

@@ -157,10 +157,10 @@ async function handleLoginResponse(
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + AUTH_TOKEN_COOKIE_MAX_AGE_DAYS);
 
-  const { upsertRemoteConnection } =
+  const { RemoteConnectionRepository } =
     await import("@/app/api/[locale]/user/remote-connection/repository");
 
-  const result = await upsertRemoteConnection({
+  const result = await RemoteConnectionRepository.upsertRemoteConnection({
     userId,
     remoteUrl: host,
     token,

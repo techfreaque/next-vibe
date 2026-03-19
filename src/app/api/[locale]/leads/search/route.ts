@@ -7,14 +7,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { leadSearchRepository } from "./repository";
+import { LeadSearchRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: async ({ data, t, logger, locale }) => {
-      return await leadSearchRepository.searchLeads(data, t, logger, locale);
+      return await LeadSearchRepository.searchLeads(data, t, logger, locale);
     },
   },
 });

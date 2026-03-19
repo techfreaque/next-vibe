@@ -197,6 +197,7 @@ const { GET } = createEndpoint({
     "stream-finished": z.object({
       threadId: z.string(),
       reason: z.enum(["completed", "cancelled", "error", "timeout"]),
+      finalState: z.enum(["idle", "waiting"]),
     }),
   },
 

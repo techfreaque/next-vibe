@@ -18,18 +18,18 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
 
-import type { AiStreamTranslationKey } from "../../stream/i18n";
-import { isStreamAbort, type StreamAbortError } from "../core/constants";
+import type { AiStreamT } from "../../stream/i18n";
+import {
+  AbortReason,
+  isStreamAbort,
+  type StreamAbortError,
+} from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
-import { clearStreamingState } from "../core/stream-registry";
-
-type AiStreamModuleT = (
-  key: AiStreamTranslationKey,
-  params?: TParams,
-) => TranslatedKeyType;
+import {
+  clearStreamingState,
+  setStreamingStateWaiting,
+} from "../core/stream-registry";
 
 /**
  * Flatten a ModelMessage into a plain string the way the model actually sees it.
@@ -156,7 +156,7 @@ export class AbortErrorHandler {
     messages?: ModelMessage[];
     tools?: Record<string, CoreTool>;
     user: JwtPayloadType;
-    t: AiStreamModuleT;
+    t: AiStreamT;
   }): Promise<{ wasHandled: boolean }> {
     const {
       error,
@@ -204,153 +204,178 @@ export class AbortErrorHandler {
     // Save partial content and pending tools to database (non-incognito, non-tool-confirmation, non-loop-stop)
     // Tool confirmation and loop stop both close the controller early in finish-step-handler,
     // so SSE emission would panic. Only client-disconnect warrants partial content save + notification.
-    if (!isIncognito && !isToolConfirmation && !isLoopStop) {
+    // Incognito: skip DB writes but still emit SSE so the frontend cache is updated.
+    if (!isToolConfirmation && !isLoopStop) {
       try {
         let totalCredits = 0;
 
         if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
-          logger.info("[AI Stream] Saving partial content to database", {
-            messageId: ctx.currentAssistantMessageId,
-            contentLength: ctx.currentAssistantContent.length,
-          });
+          if (!isIncognito) {
+            logger.info("[AI Stream] Saving partial content to database", {
+              messageId: ctx.currentAssistantMessageId,
+              contentLength: ctx.currentAssistantContent.length,
+            });
 
-          const fullSystemPrompt =
-            [systemPrompt, trailingSystemMessage]
-              .filter(Boolean)
-              .join("\n\n") || undefined;
+            const fullSystemPrompt =
+              [systemPrompt, trailingSystemMessage]
+                .filter(Boolean)
+                .join("\n\n") || undefined;
 
-          const tokenEstimate = estimateTokensFromContext({
-            systemPrompt: fullSystemPrompt,
-            messages,
-            tools,
-            aiResponse: ctx.currentAssistantContent,
-          });
+            const tokenEstimate = estimateTokensFromContext({
+              systemPrompt: fullSystemPrompt,
+              messages,
+              tools,
+              aiResponse: ctx.currentAssistantContent,
+            });
 
-          const modelInfo = getModelById(model);
-          let modelCreditCost = 0;
-          if (modelInfo) {
-            if (typeof modelInfo.creditCost === "function") {
-              modelCreditCost = modelInfo.creditCost(
-                modelInfo,
-                tokenEstimate.promptTokens,
-                tokenEstimate.completionTokens,
-              );
-            } else if (typeof modelInfo.creditCost === "number") {
-              modelCreditCost = modelInfo.creditCost;
+            const modelInfo = getModelById(model);
+            let modelCreditCost = 0;
+            if (modelInfo) {
+              if (typeof modelInfo.creditCost === "function") {
+                modelCreditCost = modelInfo.creditCost(
+                  modelInfo,
+                  tokenEstimate.promptTokens,
+                  tokenEstimate.completionTokens,
+                );
+              } else if (typeof modelInfo.creditCost === "number") {
+                modelCreditCost = modelInfo.creditCost;
+              }
             }
-          }
 
-          totalCredits += modelCreditCost;
+            totalCredits += modelCreditCost;
 
-          logger.info("[AI Stream] Estimated usage for aborted stream", {
-            messageId: ctx.currentAssistantMessageId,
-            promptTokens: tokenEstimate.promptTokens,
-            completionTokens: tokenEstimate.completionTokens,
-            totalTokens: tokenEstimate.totalTokens,
-            modelCreditCost,
-          });
-
-          // Flush + write final partial content to DB, emit CONTENT_DONE SSE
-          await ctx.dbWriter.emitContentDone({
-            messageId: ctx.currentAssistantMessageId,
-            content: ctx.currentAssistantContent,
-            finishReason: "stop",
-            totalTokens: tokenEstimate.totalTokens,
-            promptTokens: tokenEstimate.promptTokens,
-            completionTokens: tokenEstimate.completionTokens,
-          });
-
-          logger.info("[AI Stream] Saved partial content to database", {
-            messageId: ctx.currentAssistantMessageId,
-            totalTokens: tokenEstimate.totalTokens,
-          });
-
-          // Emit TOKENS_UPDATED for credit accounting
-          ctx.dbWriter.emitTokensUpdated({
-            messageId: ctx.currentAssistantMessageId,
-            promptTokens: tokenEstimate.promptTokens,
-            completionTokens: tokenEstimate.completionTokens,
-            totalTokens: tokenEstimate.totalTokens,
-            cachedInputTokens: 0,
-            cacheWriteTokens: 0,
-            timeToFirstToken: null,
-            finishReason: "stop",
-            creditCost: modelCreditCost,
-          });
-
-          // Deduct model credits and emit CREDITS_DEDUCTED
-          if (userId && modelCreditCost > 0) {
-            await ctx.dbWriter.deductAndEmitCredits({
-              user,
-              amount: modelCreditCost,
-              feature: `model:${model}`,
-              type: "model",
-              model,
+            logger.info("[AI Stream] Estimated usage for aborted stream", {
+              messageId: ctx.currentAssistantMessageId,
+              promptTokens: tokenEstimate.promptTokens,
+              completionTokens: tokenEstimate.completionTokens,
+              totalTokens: tokenEstimate.totalTokens,
+              modelCreditCost,
             });
 
-            logger.info("[AI Stream] Deducted and emitted model credits", {
-              amount: modelCreditCost,
-              model,
-            });
-          }
-        }
-
-        // Save pending tool messages to database
-        if (ctx.pendingToolMessages.size > 0) {
-          logger.info("[AI Stream] Saving pending tool messages to database", {
-            count: ctx.pendingToolMessages.size,
-          });
-
-          for (const [, pendingTool] of ctx.pendingToolMessages) {
-            const { messageId, toolCallData } = pendingTool;
-            const { toolCall, parentId } = toolCallData;
-
-            await db.insert(chatMessages).values({
-              id: messageId,
-              threadId: threadId,
-              role: ChatMessageRole.TOOL,
-              content: null,
-              parentId: parentId,
-              sequenceId: ctx.sequenceId,
-              authorId: userId ?? null,
-              isAI: true,
-              model: model,
-              skill: null,
-              metadata: { toolCall: toolCall },
+            // Flush + write final partial content to DB, emit CONTENT_DONE SSE
+            await ctx.dbWriter.emitContentDone({
+              messageId: ctx.currentAssistantMessageId,
+              content: ctx.currentAssistantContent,
+              finishReason: "stop",
+              totalTokens: tokenEstimate.totalTokens,
+              promptTokens: tokenEstimate.promptTokens,
+              completionTokens: tokenEstimate.completionTokens,
             });
 
-            if (toolCall.creditsUsed && toolCall.creditsUsed > 0) {
-              totalCredits += toolCall.creditsUsed;
+            logger.info("[AI Stream] Saved partial content to database", {
+              messageId: ctx.currentAssistantMessageId,
+              totalTokens: tokenEstimate.totalTokens,
+            });
 
+            // Emit TOKENS_UPDATED for credit accounting
+            ctx.dbWriter.emitTokensUpdated({
+              messageId: ctx.currentAssistantMessageId,
+              promptTokens: tokenEstimate.promptTokens,
+              completionTokens: tokenEstimate.completionTokens,
+              totalTokens: tokenEstimate.totalTokens,
+              cachedInputTokens: 0,
+              cacheWriteTokens: 0,
+              timeToFirstToken: null,
+              finishReason: "stop",
+              creditCost: modelCreditCost,
+            });
+
+            // Deduct model credits and emit CREDITS_DEDUCTED
+            if (userId && modelCreditCost > 0) {
               await ctx.dbWriter.deductAndEmitCredits({
                 user,
-                amount: toolCall.creditsUsed,
-                feature: toolCall.toolName,
-                type: "tool",
+                amount: modelCreditCost,
+                feature: `model:${model}`,
+                type: "model",
                 model,
               });
 
-              logger.info("[AI Stream] Deducted and emitted tool credits", {
-                toolName: toolCall.toolName,
-                amount: toolCall.creditsUsed,
+              logger.info("[AI Stream] Deducted and emitted model credits", {
+                amount: modelCreditCost,
+                model,
               });
             }
+          } else {
+            // Incognito: emit CONTENT_DONE SSE only (no DB write) so frontend cache is updated
+            ctx.dbWriter.emitContentDoneRaw({
+              messageId: ctx.currentAssistantMessageId,
+              content: ctx.currentAssistantContent,
+              totalTokens: null,
+              finishReason: "stop",
+            });
+          }
+        } else {
+          // Stream aborted before any content was generated - emit an empty CONTENT_DONE
+          // using the pre-generated assistant message ID so the frontend can close the slot.
+          ctx.dbWriter.emitContentDoneRaw({
+            messageId: ctx.preGeneratedAssistantMessageId,
+            content: "",
+            totalTokens: null,
+            finishReason: "stop",
+          });
+        }
 
-            logger.info("[AI Stream] Saved pending tool message", {
-              messageId,
-              toolName: toolCall.toolName,
+        if (!isIncognito) {
+          // Save pending tool messages to database
+          if (ctx.pendingToolMessages.size > 0) {
+            logger.info(
+              "[AI Stream] Saving pending tool messages to database",
+              {
+                count: ctx.pendingToolMessages.size,
+              },
+            );
+
+            for (const [, pendingTool] of ctx.pendingToolMessages) {
+              const { messageId, toolCallData } = pendingTool;
+              const { toolCall, parentId } = toolCallData;
+
+              await db.insert(chatMessages).values({
+                id: messageId,
+                threadId: threadId,
+                role: ChatMessageRole.TOOL,
+                content: null,
+                parentId: parentId,
+                sequenceId: ctx.sequenceId,
+                authorId: userId ?? null,
+                isAI: true,
+                model: model,
+                skill: null,
+                metadata: { toolCall: toolCall },
+              });
+
+              if (toolCall.creditsUsed && toolCall.creditsUsed > 0) {
+                totalCredits += toolCall.creditsUsed;
+
+                await ctx.dbWriter.deductAndEmitCredits({
+                  user,
+                  amount: toolCall.creditsUsed,
+                  feature: toolCall.toolName,
+                  type: "tool",
+                  model,
+                });
+
+                logger.info("[AI Stream] Deducted and emitted tool credits", {
+                  toolName: toolCall.toolName,
+                  amount: toolCall.creditsUsed,
+                });
+              }
+
+              logger.info("[AI Stream] Saved pending tool message", {
+                messageId,
+                toolName: toolCall.toolName,
+              });
+            }
+          }
+
+          if (userId && totalCredits > 0) {
+            logger.info("[AI Stream] Total credits for aborted stream", {
+              totalCredits,
             });
           }
         }
 
-        if (userId && totalCredits > 0) {
-          logger.info("[AI Stream] Total credits for aborted stream", {
-            totalCredits,
-          });
-        }
-
-        // Write interruption error message to DB + emit SSE (SSE may not reach client
-        // since the connection is dropped, but the DB write always happens).
+        // Write interruption error message to DB (non-incognito) + emit SSE (always).
+        // emitErrorMessage already skips DB writes for incognito internally.
         // Store the plain translation key as content so the bubble renders it without
         // an error type label or error code — it's an informational stop, not an error.
         await ctx.dbWriter.emitErrorMessage({
@@ -366,7 +391,8 @@ export class AbortErrorHandler {
           userId,
         });
 
-        logger.info("[AI Stream] Saved interruption error message to DB", {
+        logger.info("[AI Stream] Emitted interruption error message", {
+          isIncognito,
           hasPartialContent: !!ctx.currentAssistantMessageId,
           pendingToolsCount: ctx.pendingToolMessages.size,
         });
@@ -379,24 +405,47 @@ export class AbortErrorHandler {
       }
     }
 
-    // For tool confirmation and loop stop, controller is already closed in finish-step-handler.
-    // For client disconnect, emit a fallback stopped event if there was no content yet,
-    // then close the controller.
-    if (!isToolConfirmation && !isLoopStop) {
-      if (!ctx.currentAssistantMessageId || !ctx.currentAssistantContent) {
-        // Stream aborted before any content was generated - emit an empty CONTENT_DONE
-        // using the pre-generated assistant message ID so the frontend can close the slot.
-        ctx.dbWriter.emitContentDoneRaw({
-          messageId: ctx.preGeneratedAssistantMessageId,
-          content: "",
-          totalTokens: null,
-          finishReason: "stop",
-        });
-      }
+    // Clear streaming state in DB + registry.
+    // REMOTE_TOOL_WAIT / STREAM_TIMEOUT: stream died but task is still in flight →
+    // set "waiting" so the UI shows the stop button and blocks new messages.
+    // All other abort reasons → set "idle" (stream is fully done).
+    const isWaitingAbort =
+      streamAbort?.reason === AbortReason.REMOTE_TOOL_WAIT ||
+      streamAbort?.reason === AbortReason.STREAM_TIMEOUT;
+    if (isWaitingAbort) {
+      await setStreamingStateWaiting(threadId);
+      // Emit WS event so live clients update the stop button.
+      // REMOTE_TOOL_WAIT: escalateToTask already fires this early — emitting again is harmless (idempotent on client).
+      // STREAM_TIMEOUT: no prior emission, so this is the first signal.
+      void (async (): Promise<void> => {
+        try {
+          const { publishWsEvent } =
+            await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+          const { buildMessagesChannel } =
+            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel");
+          const { createStreamEvent } =
+            await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events");
+          publishWsEvent(
+            {
+              channel: buildMessagesChannel(threadId),
+              event: "streaming-state-changed",
+              data: createStreamEvent.streamingStateChanged({
+                threadId,
+                state: "waiting",
+              }).data,
+            },
+            logger,
+          );
+        } catch (err) {
+          logger.warn("[AI Stream] Failed to emit waiting state WS event", {
+            threadId,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      })();
+    } else {
+      await clearStreamingState(threadId, logger);
     }
-
-    // Clear streaming state in DB + registry
-    await clearStreamingState(threadId);
 
     ctx.cleanup();
 

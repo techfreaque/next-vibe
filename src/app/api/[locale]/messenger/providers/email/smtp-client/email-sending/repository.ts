@@ -30,7 +30,7 @@ import { scopedTranslation } from "../i18n";
 import type { SmtpSelectionCriteria, SmtpSendResult } from "../repository";
 import { SmtpSendingRepository } from "../sending/repository";
 
-export interface SendEmailParams {
+interface SendEmailParams {
   jsx: JSX.Element;
   subject: string;
   toEmail: string;
@@ -49,35 +49,42 @@ export interface SendEmailParams {
   skipRateLimitCheck?: boolean;
 }
 
-function isLanguage(value: string): value is Languages {
-  return ["en", "de", "pl"].includes(value);
-}
-
-function isCountry(value: string): value is Countries {
-  return ["GLOBAL", "US", "DE", "PL"].includes(value);
-}
-
-function mapLocaleToSelectionCriteria(locale: CountryLanguage): {
-  country: Countries;
-  language: Languages;
-} | null {
-  const parts = locale.split("-");
-  if (parts.length !== 2) {
-    return null;
-  }
-  const [languagePart, countryPart] = parts;
-  if (!isLanguage(languagePart) || !isCountry(countryPart)) {
-    return null;
-  }
-  return { country: countryPart, language: languagePart };
+interface SendEmailResult {
+  result: SmtpSendResult;
 }
 
 export class EmailSendingRepository {
+  private static isLanguage(value: string): value is Languages {
+    return ["en", "de", "pl"].includes(value);
+  }
+
+  private static isCountry(value: string): value is Countries {
+    return ["GLOBAL", "US", "DE", "PL"].includes(value);
+  }
+
+  private static mapLocaleToSelectionCriteria(locale: CountryLanguage): {
+    country: Countries;
+    language: Languages;
+  } | null {
+    const parts = locale.split("-");
+    if (parts.length !== 2) {
+      return null;
+    }
+    const [languagePart, countryPart] = parts;
+    if (
+      !EmailSendingRepository.isLanguage(languagePart) ||
+      !EmailSendingRepository.isCountry(countryPart)
+    ) {
+      return null;
+    }
+    return { country: countryPart, language: languagePart };
+  }
+
   static async sendEmail(
     params: SendEmailParams,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SmtpSendResult }>> {
+  ): Promise<ResponseType<SendEmailResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Email sending initiated", {
@@ -88,7 +95,9 @@ export class EmailSendingRepository {
 
       const rawHtml: string = await render(params.jsx);
 
-      const localeMapping = mapLocaleToSelectionCriteria(params.locale);
+      const localeMapping = EmailSendingRepository.mapLocaleToSelectionCriteria(
+        params.locale,
+      );
       if (!localeMapping) {
         logger.error("Invalid locale format", { locale: params.locale });
         return fail({

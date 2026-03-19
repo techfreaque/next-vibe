@@ -10,11 +10,8 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { AiStreamTranslationKey } from "../../stream/i18n";
-import type { scopedTranslation } from "../../stream/i18n";
+import type { AiStreamT, AiStreamTranslationKey } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
-
-type AiStreamModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class StreamErrorHandler {
   /**
@@ -28,7 +25,7 @@ export class StreamErrorHandler {
     lastSequenceId: string | null;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
-    t: AiStreamModuleT;
+    t: AiStreamT;
   }): Promise<void> {
     const {
       error,

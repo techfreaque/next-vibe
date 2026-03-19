@@ -12,7 +12,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import { EmailCampaignStage } from "../../enum";
 import definitions from "./definition";
-import { emailCampaignsRepository } from "./repository";
+import { EmailCampaignsRepository } from "./repository";
 import { createEmptyEmailCampaignResult } from "./types";
 
 const STAGE_PRIORITIES: Record<string, number> = {
@@ -44,7 +44,7 @@ export const { POST, tools } = endpointsHandler({
       const dryRun = data.dryRun;
 
       // Bootstrap pending leads
-      await emailCampaignsRepository.bootstrapPendingLeads(
+      await EmailCampaignsRepository.bootstrapPendingLeads(
         batchSize,
         t,
         logger,
@@ -63,7 +63,7 @@ export const { POST, tools } = endpointsHandler({
           break;
         }
 
-        const stageResult = await emailCampaignsRepository.processStage(
+        const stageResult = await EmailCampaignsRepository.processStage(
           stage,
           { batchSize: Math.min(batchSize, remainingQuota), dryRun },
           t,

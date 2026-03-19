@@ -14,8 +14,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, locale, logger }) => {
-      const { devRepository } = await import("./repository");
-      return await devRepository.execute(data, locale, logger);
+      const { DevRepository } = await import("./repository");
+      return await DevRepository.execute(data, locale, logger);
     },
   },
 });

@@ -9,11 +9,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { newsletterStatusRepository as repository } from "./repository";
+import { NewsletterStatusRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, t, logger }) => repository.getStatus(data, t, logger),
+    handler: ({ data, t, logger }) =>
+      NewsletterStatusRepository.getStatus(data, t, logger),
   },
 });

@@ -6,6 +6,7 @@
 import { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
+import { CountryLanguageValues } from "@/i18n/core/config";
 
 /**
  * Campaign Starter Configuration Schema
@@ -19,7 +20,10 @@ export const campaignStarterConfigSchema = z.object({
     end: z.coerce.number().min(0).max(23),
   }),
   // Weekly quotas per locale (leads per week)
-  leadsPerWeek: z.record(z.string(), z.coerce.number().min(0)),
+  leadsPerWeek: z.record(
+    z.enum(CountryLanguageValues),
+    z.coerce.number().min(0),
+  ),
 });
 
 export type CampaignStarterConfigType = z.infer<

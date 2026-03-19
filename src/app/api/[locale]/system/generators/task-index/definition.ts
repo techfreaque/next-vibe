@@ -148,3 +148,8 @@ const { POST } = createEndpoint({
 
 const taskIndexGeneratorEndpoints = { POST };
 export default taskIndexGeneratorEndpoints;
+
+export type TaskIndexRequestInput = typeof POST.types.RequestInput;
+export type TaskIndexRequestOutput = typeof POST.types.RequestOutput;
+export type TaskIndexResponseInput = typeof POST.types.ResponseInput;
+export type TaskIndexResponseOutput = typeof POST.types.ResponseOutput;

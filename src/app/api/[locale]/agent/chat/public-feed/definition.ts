@@ -172,7 +172,7 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               content:
                 "get.response.items.item.streamingState.content" as const,
-              schema: z.enum(["idle", "streaming", "aborting"]),
+              schema: z.enum(["idle", "streaming", "aborting", "waiting"]),
             }),
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

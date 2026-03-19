@@ -26,9 +26,7 @@ import { storage } from "next-vibe-ui/lib/storage";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { platform } from "@/config/env-client";
 
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { AuthT } from "./i18n";
 
 // Storage key for auth token
 const AUTH_TOKEN_STORAGE_KEY = "auth_token";
@@ -49,7 +47,7 @@ export interface AuthClientRepository {
   setAuthToken(
     token: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<void>>;
 
   /**
@@ -61,7 +59,7 @@ export interface AuthClientRepository {
    */
   getAuthToken(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<string | undefined>>;
 
   /**
@@ -73,7 +71,7 @@ export interface AuthClientRepository {
    */
   removeAuthToken(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<void>>;
 }
 
@@ -89,7 +87,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
   async setAuthToken(
     token: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<void>> {
     try {
       if (platform.isServer) {
@@ -126,7 +124,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    */
   async getAuthToken(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<string | undefined>> {
     try {
       if (platform.isServer) {
@@ -164,7 +162,7 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    */
   async removeAuthToken(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<void>> {
     try {
       if (platform.isServer) {

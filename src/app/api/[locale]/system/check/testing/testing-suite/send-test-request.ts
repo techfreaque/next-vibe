@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
 // Testing infrastructure - error messages are for test debugging, not end users
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -130,7 +129,9 @@ export async function sendTestRequest<
         leafMessageId: undefined,
         waitingForRemoteResult: undefined,
         favoriteId: undefined,
-        abortSignal: undefined,
+        abortSignal: new AbortController().signal,
+        callerCallbackMode: undefined,
+        onEscalatedTaskCancel: undefined,
         escalateToTask: undefined,
       },
     });

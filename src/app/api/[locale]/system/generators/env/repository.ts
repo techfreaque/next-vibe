@@ -17,10 +17,14 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { scopedTranslation } from "./i18n";
+import {
+  formatCount,
+  formatDuration,
+  formatGenerator,
+  formatWarning,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import type { GeneratorsEnvT } from "./i18n";
 import type { EnvValidationErrorType } from "./validator";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Entry for .env.example generation
@@ -63,12 +67,6 @@ interface EnvValidationError {
   message: string;
   details?: EnvValidationErrorDetails;
 }
-import {
-  formatCount,
-  formatDuration,
-  formatGenerator,
-  formatWarning,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import {
   findFilesRecursively,
@@ -105,11 +103,11 @@ interface EnvGeneratorResponseType {
 /**
  * Env Generator Repository Implementation
  */
-class EnvGeneratorRepositoryImpl {
-  async generateEnv(
+export class EnvGeneratorRepository {
+  static async generateEnv(
     data: EnvGeneratorRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsEnvT,
   ): Promise<BaseResponseType<EnvGeneratorResponseType>> {
     const startTime = Date.now();
 
@@ -257,7 +255,7 @@ class EnvGeneratorRepositoryImpl {
 
       if (!data.dryRun) {
         // Generate server env file
-        const serverContent = this.generateServerEnvContent(
+        const serverContent = EnvGeneratorRepository.generateServerEnvContent(
           validServerModules,
           join(process.cwd(), serverOutputPath),
         );
@@ -268,7 +266,7 @@ class EnvGeneratorRepositoryImpl {
         );
 
         // Generate client env file
-        const clientContent = this.generateClientEnvContent(
+        const clientContent = EnvGeneratorRepository.generateClientEnvContent(
           validClientModules,
           join(process.cwd(), clientOutputPath),
         );
@@ -309,7 +307,7 @@ class EnvGeneratorRepositoryImpl {
           return 0;
         });
         const { content: envExampleContent, keys: envKeys } =
-          await this.generateEnvExampleContent(allModules);
+          await EnvGeneratorRepository.generateEnvExampleContent(allModules);
         await writeGeneratedFile(
           join(process.cwd(), envExamplePath),
           envExampleContent,
@@ -325,10 +323,16 @@ class EnvGeneratorRepositoryImpl {
           "docker-compose.prod.yml",
         );
         if (existsSync(dockerfilePath)) {
-          await this.updateDockerfile(dockerfilePath, envKeys);
+          await EnvGeneratorRepository.updateDockerfile(
+            dockerfilePath,
+            envKeys,
+          );
         }
         if (existsSync(dockerComposePath)) {
-          await this.updateDockerCompose(dockerComposePath, envKeys);
+          await EnvGeneratorRepository.updateDockerCompose(
+            dockerComposePath,
+            envKeys,
+          );
         }
       }
 
@@ -376,7 +380,7 @@ class EnvGeneratorRepositoryImpl {
   /**
    * Generate server env file content
    */
-  private generateServerEnvContent(
+  private static generateServerEnvContent(
     modules: EnvFileInfo[],
     outputFile: string,
   ): string {
@@ -545,7 +549,7 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
   /**
    * Generate client env file content
    */
-  private generateClientEnvContent(
+  private static generateClientEnvContent(
     modules: EnvFileInfo[],
     outputFile: string,
   ): string {
@@ -712,7 +716,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
    * (e.g. NEXT_PUBLIC_* vars are owned by the client module).
    * Returns both the file content and the ordered list of emitted keys.
    */
-  private async generateEnvExampleContent(
+  private static async generateEnvExampleContent(
     modules: EnvFileInfo[],
   ): Promise<{ content: string; keys: string[] }> {
     const lines: string[] = [
@@ -829,7 +833,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
    * Update Dockerfile ARG and ENV blocks with current env keys.
    * Replaces the region between sentinel comments.
    */
-  private async updateDockerfile(
+  private static async updateDockerfile(
     dockerfilePath: string,
     keys: string[],
   ): Promise<void> {
@@ -861,7 +865,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
    * Update docker-compose.prod.yml build args block with current env keys.
    * Replaces the region between sentinel comments.
    */
-  private async updateDockerCompose(
+  private static async updateDockerCompose(
     composePath: string,
     keys: string[],
   ): Promise<void> {
@@ -889,5 +893,3 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     await writeGeneratedFile(composePath, updated, false);
   }
 }
-
-export const envGeneratorRepository = new EnvGeneratorRepositoryImpl();

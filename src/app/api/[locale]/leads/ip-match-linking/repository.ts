@@ -14,25 +14,24 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { scopedTranslation as leadsScopedTranslation } from "../i18n";
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type {
   IpMatchLinkingPostRequestOutput,
   IpMatchLinkingPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-type LeadsModuleT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
+import type { IpMatchLinkingT } from "./i18n";
 
 export class IpMatchLinkingRepository {
   static async run(
     data: IpMatchLinkingPostRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
-    leadsT: LeadsModuleT,
+    t: IpMatchLinkingT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<IpMatchLinkingPostResponseOutput>> {
+    const { t: leadsT } = leadsScopedTranslation.scopedT(locale);
     try {
       const windowDays = data.windowDays ?? 30;
       const dryRun = data.dryRun ?? false;

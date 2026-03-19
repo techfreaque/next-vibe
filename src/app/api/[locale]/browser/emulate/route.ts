@@ -6,7 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import { executeEmulate, filterUndefinedArgs } from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import emulateEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -14,10 +14,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeEmulate(
+      BrowserSharedRepository.executeEmulate(
         {
           toolName: BrowserTool.EMULATE,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             networkConditions: data.networkConditions,
             cpuThrottlingRate: data.cpuThrottlingRate,
             geolocation: data.geolocation,

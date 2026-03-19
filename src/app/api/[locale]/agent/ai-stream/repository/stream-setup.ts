@@ -7,13 +7,12 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { eq } from "drizzle-orm";
-import type { NextRequest } from "next/server";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
+import type { NextRequest } from "next/server";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
@@ -28,28 +27,18 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
 
-import type { AiStreamTranslationKey } from "../stream/i18n";
+import type { SpeechToTextT } from "../../speech-to-text/i18n";
+import type { AiStreamT } from "../stream/i18n";
 
-type AiStreamModuleT = (
-  key: AiStreamTranslationKey,
-  params?: TParams,
-) => TranslatedKeyType;
-
-import type { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
-
-type SttModuleT = ReturnType<typeof sttScopedTranslation.scopedT>["t"];
-
-import { DEFAULT_SKILLS } from "../../chat/skills/config";
-import { customSkills } from "../../chat/skills/db";
-import type { ToolExecutionContext } from "../../chat/config";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import type { ToolExecutionContext } from "../../chat/config";
 import { chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
 import { chatSettings } from "../../chat/settings/db";
+import { DEFAULT_SKILLS } from "../../chat/skills/config";
+import { customSkills } from "../../chat/skills/db";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import {
   DEFAULT_TTS_VOICE,
@@ -57,7 +46,7 @@ import {
 } from "../../text-to-speech/enum";
 import { type AiStreamPostRequestOutput } from "../stream/definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
-import { COMPACT_TRIGGER } from "./core/constants";
+import { AbortReason, COMPACT_TRIGGER, isStreamAbort } from "./core/constants";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
 import { StreamRegistry } from "./core/stream-registry";
@@ -177,8 +166,8 @@ export async function setupAiStream(params: {
   userId: string | undefined;
   leadId: string | undefined;
   ipAddress: string | undefined;
-  aiStreamT: AiStreamModuleT;
-  sttT: SttModuleT;
+  aiStreamT: AiStreamT;
+  sttT: SpeechToTextT;
   maxDuration: number;
   request: NextRequest | undefined;
   extraInstructions: string | undefined;
@@ -227,6 +216,11 @@ export async function setupAiStream(params: {
     toolConfirmationCount: data.toolConfirmations?.length ?? 0,
   });
 
+  // Create abort controller early so signal is available for confirmations and streamContext
+  const streamAbortController = AbortControllerSetup.setupAbortController({
+    maxDuration: params.maxDuration,
+  });
+
   // Handle tool confirmations if present - execute tools and update messages
   let toolConfirmationResults: Array<{
     messageId: string;
@@ -249,6 +243,7 @@ export async function setupAiStream(params: {
         aiMessageId: undefined,
         currentToolMessageId: undefined,
         callerToolCallId: undefined,
+        callerCallbackMode: undefined,
         pendingToolMessages: undefined,
         pendingTimeoutMs: undefined,
         // Pass leafMessageId from request so deferred confirm inserts use the correct branch tip
@@ -258,7 +253,8 @@ export async function setupAiStream(params: {
         favoriteId: params.favoriteIdOverride,
         headless: params.headless,
         waitingForRemoteResult: undefined,
-        abortSignal: undefined,
+        onEscalatedTaskCancel: undefined,
+        abortSignal: streamAbortController.signal,
         escalateToTask: undefined,
       },
     });
@@ -372,39 +368,27 @@ export async function setupAiStream(params: {
     voiceTranscription,
   } = operationResult.data;
 
-  let threadResult;
-  try {
-    threadResult = await ThreadsRepository.ensureThread({
-      threadId: effectiveThreadId,
-      rootFolderId: data.rootFolderId,
-      subFolderId: data.subFolderId,
-      userId,
-      leadId,
-      content: effectiveContent,
-      isIncognito,
-      logger,
-      user,
-      locale,
-    });
-  } catch (error) {
-    logger.error("Failed to ensure thread - RAW ERROR", parseError(error), {
-      errorType: typeof error,
-      errorConstructor:
-        error instanceof Error ? error.constructor.name : "unknown",
-    });
+  const threadResult = await ThreadsRepository.ensureThread({
+    threadId: effectiveThreadId,
+    rootFolderId: data.rootFolderId,
+    subFolderId: data.subFolderId,
+    userId,
+    leadId,
+    content: effectiveContent,
+    isIncognito,
+    logger,
+    user,
+    locale,
+  });
 
-    const errorMessage = parseError(error).message;
-    logger.error("Failed to ensure thread - PARSED", {
-      parsedMessage: errorMessage,
-    });
-
-    if (errorMessage === "PERMISSION_DENIED") {
+  if (!threadResult.success) {
+    logger.error("Failed to ensure thread", { message: threadResult.message });
+    if (threadResult.errorType === ErrorResponseTypes.FORBIDDEN) {
       return fail({
         message: aiStreamT("post.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
-
     return fail({
       message: aiStreamT("post.errors.notFound.title"),
       errorType: ErrorResponseTypes.NOT_FOUND,
@@ -447,7 +431,7 @@ export async function setupAiStream(params: {
       operation: data.operation,
       hasToolConfirmations,
       isIncognito,
-      threadId: threadResult.threadId,
+      threadId: threadResult.data.threadId,
       effectiveRole,
       effectiveContent,
       effectiveParentMessageId,
@@ -754,7 +738,7 @@ export async function setupAiStream(params: {
       headless: params.headless,
       excludeMemories: params.excludeMemories,
       memoryLimit: resolvedToolConfig.memoryLimit,
-      threadId: threadResult.threadId,
+      threadId: threadResult.data.threadId,
       voiceTranscription: voiceTranscription
         ? {
             wasTranscribed: voiceTranscription.wasTranscribed,
@@ -776,7 +760,7 @@ export async function setupAiStream(params: {
   // Build the rich stream context — passed through to all tool executions
   const streamContext: ToolExecutionContext = {
     rootFolderId: data.rootFolderId,
-    threadId: threadResult.threadId,
+    threadId: threadResult.data.threadId,
     aiMessageId,
     skillId: data.skill,
     modelId: data.model,
@@ -785,13 +769,14 @@ export async function setupAiStream(params: {
     favoriteId: params.favoriteIdOverride,
     currentToolMessageId: undefined,
     callerToolCallId: undefined,
+    callerCallbackMode: undefined,
     // pendingToolMessages is wired after StreamContext is created (see index.ts)
     pendingToolMessages: undefined,
     pendingTimeoutMs: undefined,
     leafMessageId: undefined,
     waitingForRemoteResult: undefined,
-    // abortSignal is set after streamAbortController is created (below)
-    abortSignal: undefined,
+    onEscalatedTaskCancel: undefined,
+    abortSignal: streamAbortController.signal,
     // escalateToTask is wired after streamAbortController is created (below)
     escalateToTask: undefined,
   };
@@ -894,21 +879,21 @@ export async function setupAiStream(params: {
     supportsTools: modelConfig?.supportsTools,
   });
 
-  // Create abort controller for this stream (timeout only — no request.signal linkage)
-  const streamAbortController = AbortControllerSetup.setupAbortController({
-    maxDuration: params.maxDuration,
-  });
-
-  // Wire abort signal into streamContext now that the controller exists.
-  // streamContext was built before the controller (it's needed for tool setup),
-  // so we assign the signal here after registration.
-  streamContext.abortSignal = streamAbortController.signal;
+  // streamAbortController was created early (before tool confirmations) so the signal
+  // is already wired into streamContext.abortSignal above.
 
   // Wire escalateToTask closure into streamContext.
   // Captures user, locale, logger, and streamContext by reference so tool authors
   // can call context.streamContext.escalateToTask() from inside execute() to escape
   // the 90s stream timeout for long-running tools (SSH, claude-code, etc.).
-  streamContext.escalateToTask = async (): Promise<{
+  //
+  // The stream aborts via REMOTE_TOOL_WAIT (same as remote queue wait) so the UI
+  // stays in a visible, cancellable waiting state — not a silent STREAM_TIMEOUT.
+  // User cancel fires onEscalatedTaskCancel which marks the task CANCELLED.
+  streamContext.escalateToTask = async (options?: {
+    callbackMode?: string;
+    displayName?: string;
+  }): Promise<{
     taskId: string;
     onComplete: (result: {
       success: boolean;
@@ -916,6 +901,10 @@ export async function setupAiStream(params: {
       message?: string;
     }) => Promise<void>;
   }> => {
+    const { CallbackMode } =
+      await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+
+    const callbackMode = options?.callbackMode ?? CallbackMode.WAKE_UP;
     const escalatedTaskId = `escalated-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     const { db: dbInstance } = await import("@/app/api/[locale]/system/db");
@@ -929,12 +918,13 @@ export async function setupAiStream(params: {
       streamContext.currentToolMessageId ?? streamContext.aiMessageId;
     const taskLeafMessageId = streamContext.leafMessageId;
 
-    // Insert wakeUp task row so handleTaskCompletion can fire revival.
+    // Insert task row with the requested callbackMode so complete-task /
+    // handleTaskCompletion honours wait vs wakeUp vs detach semantics.
     await dbInstance.insert(cronTasksTable).values({
       id: escalatedTaskId,
       shortId: escalatedTaskId,
       routeId: "escalated-tool",
-      displayName: `Escalated: ${escalatedTaskId}`,
+      displayName: options?.displayName ?? `Escalated: ${escalatedTaskId}`,
       category: TaskCategory.SYSTEM,
       schedule: "* * * * *",
       priority: CronTaskPriority.HIGH,
@@ -942,7 +932,7 @@ export async function setupAiStream(params: {
       runOnce: true,
       lastExecutionStatus: CronTaskStatus.RUNNING,
       taskInput: {},
-      wakeUpCallbackMode: "wakeUp",
+      wakeUpCallbackMode: callbackMode,
       wakeUpThreadId: taskThreadId ?? null,
       wakeUpToolMessageId: taskToolMessageId ?? null,
       wakeUpLeafMessageId: taskLeafMessageId ?? null,
@@ -955,24 +945,103 @@ export async function setupAiStream(params: {
       userId: user.id,
     });
 
-    // Signal stream to time out cleanly — tool continues running in goroutine.
-    streamContext.pendingTimeoutMs = 90_000;
+    // Always abort via REMOTE_TOOL_WAIT — stream dies, thread → waiting.
+    // revival (via handleTaskCompletion) delivers the result and resumes the thread.
+    // callbackMode controls what happens ON revival (backfill vs deferred), not how the stream stops.
     streamContext.waitingForRemoteResult = true;
+    // Set timeout from the tool's definition (callerTimeoutMs). 0 = no timer.
+    const escalateTimeoutMs = streamContext.callerTimeoutMs;
+    if (escalateTimeoutMs === undefined) {
+      streamContext.pendingTimeoutMs = 90_000; // default
+    } else if (escalateTimeoutMs > 0) {
+      streamContext.pendingTimeoutMs = escalateTimeoutMs;
+    }
+    // escalateTimeoutMs === 0 → no timer (long-running tool, wait forever)
 
-    logger.info("[StreamSetup] Tool escalated to wakeUp task", {
+    // Mark thread as "waiting" — task is in flight, stream will die soon.
+    // Clients subscribe to STREAMING_STATE_CHANGED and show the stop button.
+    if (taskThreadId) {
+      const { chatThreads: chatThreadsTable } =
+        await import("@/app/api/[locale]/agent/chat/db");
+      const { eq: drizzleEq } = await import("drizzle-orm");
+      try {
+        await dbInstance
+          .update(chatThreadsTable)
+          .set({ streamingState: "waiting" })
+          .where(drizzleEq(chatThreadsTable.id, taskThreadId));
+        const { publishWsEvent: pubWs } =
+          await import("@/app/api/[locale]/system/unified-interface/websocket/emitter");
+        const { buildMessagesChannel: buildChan } =
+          await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel");
+        const { createStreamEvent: cse } =
+          await import("@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events");
+        pubWs(
+          {
+            channel: buildChan(taskThreadId),
+            event: "streaming-state-changed",
+            data: cse.streamingStateChanged({
+              threadId: taskThreadId,
+              state: "waiting",
+            }).data,
+          },
+          logger,
+        );
+      } catch (err) {
+        logger.warn("[StreamSetup] Failed to set thread waiting state", {
+          taskThreadId,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+
+    logger.info("[StreamSetup] Tool escalated to task", {
       taskId: escalatedTaskId,
+      callbackMode,
       taskThreadId,
       taskToolMessageId,
     });
+
+    // Wire cancel propagation: when the user cancels the stream, mark the task
+    // CANCELLED so the dashboard reflects reality and the thread unlocks.
+    streamContext.onEscalatedTaskCancel = async (): Promise<void> => {
+      streamContext.onEscalatedTaskCancel = undefined; // prevent double-fire
+      const { eq: drizzleEq } = await import("drizzle-orm");
+      const { CronTaskStatus: CronStatus } =
+        await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
+      try {
+        await dbInstance
+          .update(cronTasksTable)
+          .set({ lastExecutionStatus: CronStatus.CANCELLED, enabled: false })
+          .where(drizzleEq(cronTasksTable.id, escalatedTaskId));
+        logger.info("[StreamSetup] Escalated task marked CANCELLED", {
+          taskId: escalatedTaskId,
+        });
+        // Clear "waiting" → "idle" so the thread unlocks for new messages.
+        if (taskThreadId) {
+          const { chatThreads: chatThreadsTable } =
+            await import("@/app/api/[locale]/agent/chat/db");
+          await dbInstance
+            .update(chatThreadsTable)
+            .set({ streamingState: "idle" })
+            .where(drizzleEq(chatThreadsTable.id, taskThreadId));
+        }
+      } catch (err) {
+        logger.warn("[StreamSetup] Failed to cancel escalated task", {
+          taskId: escalatedTaskId,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    };
 
     const onComplete = async (result: {
       success: boolean;
       data?: Record<string, JsonValue>;
       message?: string;
     }): Promise<void> => {
+      streamContext.onEscalatedTaskCancel = undefined; // task done, no cancel needed
       const { handleTaskCompletion } =
         await import("@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler");
-      const { CallbackMode } =
+      const { CallbackMode: CM } =
         await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
       const { CronTaskStatus: CronStatus } =
         await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
@@ -984,11 +1053,21 @@ export async function setupAiStream(params: {
       const finalOutput: Record<string, JsonValue> | null =
         result.success && result.data ? result.data : null;
 
+      // Determine effective callbackMode — default to WAKE_UP for backward compat
+      const effectiveMode =
+        callbackMode === CM.WAIT
+          ? CM.WAIT
+          : callbackMode === CM.DETACH
+            ? CM.DETACH
+            : callbackMode === CM.END_LOOP
+              ? CM.END_LOOP
+              : CM.WAKE_UP;
+
       if (taskToolMessageId && taskThreadId && user.id) {
         await handleTaskCompletion({
           toolMessageId: taskToolMessageId,
           threadId: taskThreadId,
-          callbackMode: CallbackMode.WAKE_UP,
+          callbackMode: effectiveMode,
           status: finalStatus,
           output: finalOutput,
           taskId: escalatedTaskId,
@@ -1018,18 +1097,31 @@ export async function setupAiStream(params: {
 
   // Register in stream registry so the cancel endpoint can find and abort it
   StreamRegistry.register(
-    threadResult.threadId,
+    threadResult.data.threadId,
     streamAbortController,
     userId,
     leadId,
   );
+
+  // When the user cancels the stream, propagate cancellation to any escalated task.
+  // The abort signal fires synchronously when StreamRegistry.cancel() is called.
+  streamAbortController.signal.addEventListener("abort", () => {
+    const abortErr = streamAbortController.signal.reason;
+    if (
+      isStreamAbort(abortErr) &&
+      abortErr.reason === AbortReason.USER_CANCELLED &&
+      streamContext.onEscalatedTaskCancel
+    ) {
+      void streamContext.onEscalatedTaskCancel();
+    }
+  });
 
   // Mark thread as streaming in DB (for refresh recovery + cross-tab detection)
   if (!isIncognito) {
     await db
       .update(chatThreads)
       .set({ streamingState: "streaming" })
-      .where(eq(chatThreads.id, threadResult.threadId));
+      .where(eq(chatThreads.id, threadResult.data.threadId));
   }
 
   return {
@@ -1044,8 +1136,8 @@ export async function setupAiStream(params: {
       effectiveParentMessageId,
       effectiveContent,
       effectiveRole,
-      threadId: threadResult.threadId,
-      isNewThread: threadResult.isNew,
+      threadId: threadResult.data.threadId,
+      isNewThread: threadResult.data.isNew,
       userMessageId,
       aiMessageId,
       aiMessageCreatedAt,

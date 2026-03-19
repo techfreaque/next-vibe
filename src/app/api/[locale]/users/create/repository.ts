@@ -25,28 +25,16 @@ import type {
   UserCreateRequestOutput,
   UserCreateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { UsersCreateT } from "./i18n";
 import { sendWelcomeSms } from "./sms";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-export interface UserCreateRepository {
-  createUser(
+export class UserCreateRepository {
+  static async createUser(
     data: UserCreateRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<UserCreateResponseOutput>>;
-}
-
-export class UserCreateRepositoryImpl implements UserCreateRepository {
-  async createUser(
-    data: UserCreateRequestOutput,
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ModuleT,
+    t: UsersCreateT,
   ): Promise<ResponseType<UserCreateResponseOutput>> {
     try {
       logger.debug("Creating user", {
@@ -166,5 +154,3 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
     }
   }
 }
-
-export const userCreateRepository = new UserCreateRepositoryImpl();

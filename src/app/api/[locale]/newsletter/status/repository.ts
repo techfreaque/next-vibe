@@ -23,22 +23,12 @@ import type {
   StatusGetRequestOutput,
   StatusGetResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { NewsletterStatusT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-export interface NewsletterStatusRepository {
-  getStatus(
+export class NewsletterStatusRepository {
+  static async getStatus(
     data: StatusGetRequestOutput,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<StatusGetResponseOutput>>;
-}
-
-export class NewsletterStatusRepositoryImpl implements NewsletterStatusRepository {
-  async getStatus(
-    data: StatusGetRequestOutput,
-    t: ModuleT,
+    t: NewsletterStatusT,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatusGetResponseOutput>> {
     try {
@@ -95,5 +85,3 @@ export class NewsletterStatusRepositoryImpl implements NewsletterStatusRepositor
     }
   }
 }
-
-export const newsletterStatusRepository = new NewsletterStatusRepositoryImpl();

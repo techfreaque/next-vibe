@@ -29,16 +29,14 @@ import type {
   ConnectionTestRequestOutput,
   ConnectionTestResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { ConnectionsTestT } from "./i18n";
 
 export class ConnectionTestRepository {
   static async test(
     data: ConnectionTestRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: ConnectionsTestT,
   ): Promise<ResponseType<ConnectionTestResponseOutput>> {
     // Verify connection belongs to user
     const [row] = await db

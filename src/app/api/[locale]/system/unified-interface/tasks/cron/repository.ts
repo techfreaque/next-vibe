@@ -27,7 +27,8 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
-import type { scopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
+import type { TasksT } from "../i18n";
 import type { JsonValue } from "../unified-runner/types";
 import type {
   CronTaskExecution,
@@ -35,152 +36,151 @@ import type {
   NewCronTask,
   NewCronTaskExecution,
 } from "./db";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 import { cronTaskExecutions, cronTasks } from "./db";
+import type {
+  CronTaskDeleteResponseOutput,
+  CronTaskGetResponseOutput,
+  CronTaskPutResponseOutput,
+} from "./[id]/definition";
 import type { CronTaskResponseType as CronTaskResponse } from "./tasks/definition";
-
-export type { CronTaskResponse };
-
-/**
- * Translate task displayName and description using the endpoint's scoped translation.
- * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
- * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
- */
-export async function translateTaskFields(
-  task: CronTaskResponse,
-  locale: CountryLanguage,
-): Promise<CronTaskResponse> {
-  const endpoint = await getEndpoint(task.routeId);
-  if (!endpoint) {
-    return task;
-  }
-
-  const { t } = endpoint.scopedTranslation.scopedT(locale);
-  const translatedName = t(task.displayName as Parameters<typeof t>[0]);
-  const translatedDesc = task.description
-    ? t(task.description as Parameters<typeof t>[0])
-    : null;
-
-  return {
-    ...task,
-    displayName:
-      translatedName !== task.displayName ? translatedName : task.displayName,
-    description:
-      translatedDesc && translatedDesc !== task.description
-        ? translatedDesc
-        : task.description,
-  };
-}
-
-/**
- * Fetch the last execution's error/result summary for a batch of tasks.
- * Returns a Map<taskId, errorOrSummary>.
- */
-export async function fetchLastExecutionSummaries(
-  taskIds: string[],
-): Promise<Map<string, string | null>> {
-  if (taskIds.length === 0) {
-    return new Map();
-  }
-
-  // Get the latest execution per task using a lateral-style query
-  const rows = await db
-    .select({
-      taskId: cronTaskExecutions.taskId,
-      status: cronTaskExecutions.status,
-      error: cronTaskExecutions.error,
-      result: cronTaskExecutions.result,
-    })
-    .from(cronTaskExecutions)
-    .where(inArray(cronTaskExecutions.taskId, taskIds))
-    .orderBy(desc(cronTaskExecutions.startedAt))
-    .limit(taskIds.length * 2); // grab a few extras to ensure coverage
-
-  const map = new Map<string, string | null>();
-  for (const row of rows) {
-    if (map.has(row.taskId)) {
-      continue;
-    } // first = latest
-    if (row.status === CronTaskStatus.FAILED && row.error?.message) {
-      map.set(row.taskId, row.error.message);
-    } else if (row.result) {
-      const entries = Object.entries(row.result);
-      if (entries.length > 0) {
-        const snippet = entries
-          .slice(0, 4)
-          .map(([k, v]) => `${k}:${String(v)}`)
-          .join(", ");
-        map.set(
-          row.taskId,
-          snippet.length > 120 ? `${snippet.slice(0, 117)}...` : snippet,
-        );
-      } else {
-        map.set(row.taskId, null);
-      }
-    } else {
-      map.set(row.taskId, null);
-    }
-  }
-  return map;
-}
-
-export function serializeTask(
-  task: CronTaskRow,
-  logger: EndpointLogger,
-): CronTaskResponse {
-  return {
-    id: task.id,
-    shortId: task.shortId,
-    routeId: task.routeId,
-    displayName: task.displayName,
-    description: task.description ?? null,
-    version: task.version,
-    category: (TaskCategoryDB as readonly string[]).includes(task.category)
-      ? task.category
-      : TaskCategory.SYSTEM,
-    schedule: task.schedule,
-    timezone: task.timezone ?? null,
-    enabled: task.enabled,
-    hidden: task.hidden,
-    priority: task.priority,
-    timeout: task.timeout ?? null,
-    retries: task.retries ?? null,
-    retryDelay: task.retryDelay ?? null,
-    taskInput: task.taskInput,
-    runOnce: task.runOnce,
-    outputMode: task.outputMode,
-    notificationTargets: task.notificationTargets,
-    lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
-    lastExecutionStatus: task.lastExecutionStatus ?? null,
-    lastExecutionError: null, // populated by caller from execution history
-    lastExecutionDuration: task.lastExecutionDuration ?? null,
-    nextExecutionAt: task.enabled
-      ? (calculateNextExecutionTime(
-          task.schedule,
-          task.timezone ?? "UTC",
-          logger,
-        )?.toISOString() ?? null)
-      : null,
-    executionCount: task.executionCount,
-    successCount: task.successCount,
-    errorCount: task.errorCount,
-    averageExecutionTime: task.averageExecutionTime ?? null,
-    consecutiveFailures: task.consecutiveFailures,
-    targetInstance: task.targetInstance ?? null,
-    tags: task.tags,
-    userId: task.userId ?? null,
-    createdAt: task.createdAt.toISOString(),
-    updatedAt: task.updatedAt.toISOString(),
-  };
-}
 
 /**
  * Implementation of Cron Tasks Repository
  */
 export class CronTasksRepository {
+  /**
+   * Translate task displayName and description using the endpoint's scoped translation.
+   * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
+   * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
+   */
+  static async translateTaskFields(
+    task: CronTaskResponse,
+    locale: CountryLanguage,
+  ): Promise<CronTaskResponse> {
+    const endpoint = await getEndpoint(task.routeId);
+    if (!endpoint) {
+      return task;
+    }
+
+    const { t } = endpoint.scopedTranslation.scopedT(locale);
+    const translatedName = t(task.displayName);
+    const translatedDesc = task.description ? t(task.description) : null;
+
+    return {
+      ...task,
+      displayName:
+        translatedName !== task.displayName ? translatedName : task.displayName,
+      description:
+        translatedDesc && translatedDesc !== task.description
+          ? translatedDesc
+          : task.description,
+    };
+  }
+
+  /**
+   * Fetch the last execution's error/result summary for a batch of tasks.
+   * Returns a Map<taskId, errorOrSummary>.
+   */
+  static async fetchLastExecutionSummaries(
+    taskIds: string[],
+  ): Promise<Map<string, string | null>> {
+    if (taskIds.length === 0) {
+      return new Map();
+    }
+
+    // Get the latest execution per task using a lateral-style query
+    const rows = await db
+      .select({
+        taskId: cronTaskExecutions.taskId,
+        status: cronTaskExecutions.status,
+        error: cronTaskExecutions.error,
+        result: cronTaskExecutions.result,
+      })
+      .from(cronTaskExecutions)
+      .where(inArray(cronTaskExecutions.taskId, taskIds))
+      .orderBy(desc(cronTaskExecutions.startedAt))
+      .limit(taskIds.length * 2); // grab a few extras to ensure coverage
+
+    const map = new Map<string, string | null>();
+    for (const row of rows) {
+      if (map.has(row.taskId)) {
+        continue;
+      } // first = latest
+      if (row.status === CronTaskStatus.FAILED && row.error?.message) {
+        map.set(row.taskId, row.error.message);
+      } else if (row.result) {
+        const entries = Object.entries(row.result);
+        if (entries.length > 0) {
+          const snippet = entries
+            .slice(0, 4)
+            .map(([k, v]) => `${k}:${String(v)}`)
+            .join(", ");
+          map.set(
+            row.taskId,
+            snippet.length > 120 ? `${snippet.slice(0, 117)}...` : snippet,
+          );
+        } else {
+          map.set(row.taskId, null);
+        }
+      } else {
+        map.set(row.taskId, null);
+      }
+    }
+    return map;
+  }
+
+  static serializeTask(
+    task: CronTaskRow,
+    logger: EndpointLogger,
+  ): CronTaskResponse {
+    return {
+      id: task.id,
+      shortId: task.shortId,
+      routeId: task.routeId,
+      displayName: task.displayName,
+      description: task.description ?? null,
+      version: task.version,
+      category: TaskCategoryDB.includes(task.category)
+        ? task.category
+        : TaskCategory.SYSTEM,
+      schedule: task.schedule,
+      timezone: task.timezone ?? null,
+      enabled: task.enabled,
+      hidden: task.hidden,
+      priority: task.priority,
+      timeout: task.timeout ?? null,
+      retries: task.retries ?? null,
+      retryDelay: task.retryDelay ?? null,
+      taskInput: task.taskInput,
+      runOnce: task.runOnce,
+      outputMode: task.outputMode,
+      notificationTargets: task.notificationTargets,
+      lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
+      lastExecutionStatus: task.lastExecutionStatus ?? null,
+      lastExecutionError: null, // populated by caller from execution history
+      lastExecutionDuration: task.lastExecutionDuration ?? null,
+      nextExecutionAt: task.enabled
+        ? (calculateNextExecutionTime(
+            task.schedule,
+            task.timezone ?? "UTC",
+            logger,
+          )?.toISOString() ?? null)
+        : null,
+      executionCount: task.executionCount,
+      successCount: task.successCount,
+      errorCount: task.errorCount,
+      averageExecutionTime: task.averageExecutionTime ?? null,
+      consecutiveFailures: task.consecutiveFailures,
+      targetInstance: task.targetInstance ?? null,
+      tags: task.tags,
+      userId: task.userId ?? null,
+      createdAt: task.createdAt.toISOString(),
+      updatedAt: task.updatedAt.toISOString(),
+    };
+  }
+
   static async getAllTasks(
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow[]>> {
     try {
@@ -190,7 +190,7 @@ export class CronTasksRepository {
         .from(cronTasks)
         .orderBy(desc(cronTasks.createdAt));
       logger.info(`Successfully fetched ${tasks.length} cron tasks`);
-      return success(tasks as CronTaskRow[]);
+      return success(tasks);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron tasks", {
@@ -208,9 +208,9 @@ export class CronTasksRepository {
     id: string,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    t: ModuleT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ task: CronTaskResponse }>> {
+  ): Promise<ResponseType<CronTaskGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const isAdmin =
         !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -240,11 +240,13 @@ export class CronTasksRepository {
         });
       }
 
-      const serialized = serializeTask(task, logger);
-      const summaries = await fetchLastExecutionSummaries([task.id]);
+      const serialized = CronTasksRepository.serializeTask(task, logger);
+      const summaries = await CronTasksRepository.fetchLastExecutionSummaries([
+        task.id,
+      ]);
       serialized.lastExecutionError = summaries.get(task.id) ?? null;
       return success({
-        task: await translateTaskFields(serialized, locale),
+        task: await CronTasksRepository.translateTaskFields(serialized, locale),
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -263,7 +265,7 @@ export class CronTasksRepository {
   /** Find a system task (userId IS NULL) by its routeId */
   static async getSystemTaskByRouteId(
     routeId: string,
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow | null>> {
     try {
@@ -274,7 +276,7 @@ export class CronTasksRepository {
           sql`${cronTasks.routeId} = ${routeId} AND ${cronTasks.userId} IS NULL`,
         )
         .limit(1);
-      const result: CronTaskRow | null = (task[0] as CronTaskRow) || null;
+      const result: CronTaskRow | null = task[0] ?? null;
       return success<CronTaskRow | null>(result);
     } catch (error) {
       const parsedError = parseError(error);
@@ -292,7 +294,7 @@ export class CronTasksRepository {
 
   /** Get all system tasks (userId IS NULL) — for startup sync */
   static async getAllSystemTasks(
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow[]>> {
     try {
@@ -300,7 +302,7 @@ export class CronTasksRepository {
         .select()
         .from(cronTasks)
         .where(isNull(cronTasks.userId));
-      return success(tasks as CronTaskRow[]);
+      return success(tasks);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch system tasks", {
@@ -316,7 +318,7 @@ export class CronTasksRepository {
 
   static async createTask(
     task: NewCronTask,
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow>> {
     try {
@@ -326,7 +328,7 @@ export class CronTasksRepository {
         id: newTask.id,
         routeId: newTask.routeId,
       });
-      return success(newTask as CronTaskRow);
+      return success(newTask);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create cron task", {
@@ -346,9 +348,9 @@ export class CronTasksRepository {
     updates: Partial<CronTaskRow>,
     user: JwtPayloadType | null,
     locale: CountryLanguage,
-    t: ModuleT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ task: CronTaskResponse; success: boolean }>> {
+  ): Promise<ResponseType<CronTaskPutResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       // null user = internal system call (e.g. task runner) — skip ownership check.
       // For non-null users, ownership is enforced atomically inside the UPDATE WHERE
@@ -363,6 +365,14 @@ export class CronTasksRepository {
         `Updating task "${id}" (${Object.keys(updates).join(", ")})`,
       );
 
+      // Only admins can set targetInstance — it controls cross-instance task routing
+      if ("targetInstance" in updates && !isAdmin) {
+        return fail({
+          message: t("errors.repositoryUpdateTaskForbidden"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       // Resolve shortId → canonical id so the WHERE clause uses the primary key.
       const [resolved] = await db
         .select({ id: cronTasks.id })
@@ -376,12 +386,9 @@ export class CronTasksRepository {
       // - admin users: match only on id (can edit any task)
       // - regular users: match on id AND userId (own tasks only)
       const whereClause =
-        user === null || isAdmin
+        user === null || isAdmin || userId === null
           ? eq(cronTasks.id, canonicalId)
-          : and(
-              eq(cronTasks.id, canonicalId),
-              eq(cronTasks.userId, userId as string),
-            );
+          : and(eq(cronTasks.id, canonicalId), eq(cronTasks.userId, userId));
 
       const [task] = await db
         .update(cronTasks)
@@ -411,11 +418,13 @@ export class CronTasksRepository {
         });
       }
 
-      const serialized = serializeTask(task, logger);
-      const summaries = await fetchLastExecutionSummaries([task.id]);
+      const serialized = CronTasksRepository.serializeTask(task, logger);
+      const summaries = await CronTasksRepository.fetchLastExecutionSummaries([
+        task.id,
+      ]);
       serialized.lastExecutionError = summaries.get(task.id) ?? null;
       return success({
-        task: await translateTaskFields(serialized, locale),
+        task: await CronTasksRepository.translateTaskFields(serialized, locale),
         success: true,
       });
     } catch (error) {
@@ -435,9 +444,10 @@ export class CronTasksRepository {
   static async deleteTask(
     id: string,
     user: JwtPayloadType,
-    t: ModuleT,
+    locale: CountryLanguage,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: string }>> {
+  ): Promise<ResponseType<CronTaskDeleteResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const isAdmin =
         !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -487,7 +497,7 @@ export class CronTasksRepository {
 
   static async createExecution(
     execution: NewCronTaskExecution,
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution>> {
     try {
@@ -496,7 +506,7 @@ export class CronTasksRepository {
         .insert(cronTaskExecutions)
         .values(execution)
         .returning();
-      return success(newExecution as CronTaskExecution);
+      return success(newExecution);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to create cron execution", {
@@ -514,7 +524,7 @@ export class CronTasksRepository {
   static async updateExecution(
     id: string,
     updates: Partial<CronTaskExecution>,
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution>> {
     try {
@@ -534,7 +544,7 @@ export class CronTasksRepository {
         });
       }
 
-      return success(updatedExecution as CronTaskExecution);
+      return success(updatedExecution);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to update cron execution", {
@@ -552,7 +562,7 @@ export class CronTasksRepository {
   static async getExecutionsByTaskId(
     taskId: string,
     limit = 50,
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution[]>> {
     try {
@@ -564,7 +574,7 @@ export class CronTasksRepository {
         .orderBy(desc(cronTaskExecutions.startedAt))
         .limit(limit);
 
-      return success(executions as CronTaskExecution[]);
+      return success(executions);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron executions by task ID", {
@@ -582,7 +592,7 @@ export class CronTasksRepository {
 
   static async getRecentExecutions(
     limit = 100,
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution[]>> {
     try {
@@ -593,7 +603,7 @@ export class CronTasksRepository {
         .orderBy(desc(cronTaskExecutions.startedAt))
         .limit(limit);
 
-      return success(executions as CronTaskExecution[]);
+      return success(executions);
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch recent cron executions", {
@@ -609,7 +619,7 @@ export class CronTasksRepository {
   }
 
   static async getTaskStatistics(
-    t: ModuleT,
+    t: TasksT,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -648,191 +658,191 @@ export class CronTasksRepository {
       });
     }
   }
-}
 
-/**
- * Truncate a string to maxLen, adding "..." if truncated.
- */
-function truncate(str: string, maxLen: number): string {
-  if (str.length <= maxLen) {
-    return str;
+  /**
+   * Truncate a string to maxLen, adding "..." if truncated.
+   */
+  private static truncate(str: string, maxLen: number): string {
+    if (str.length <= maxLen) {
+      return str;
+    }
+    return `${str.slice(0, maxLen - 3)}...`;
   }
-  return `${str.slice(0, maxLen - 3)}...`;
-}
 
-/**
- * Summarise a task result JSONB value into a short human-readable string.
- */
-function summariseResult(
-  result: Record<string, JsonValue> | null,
-): string | null {
-  if (!result) {
-    return null;
+  /**
+   * Summarise a task result JSONB value into a short human-readable string.
+   */
+  private static summariseResult(
+    result: Record<string, JsonValue> | null,
+  ): string | null {
+    if (!result) {
+      return null;
+    }
+    const entries = Object.entries(result);
+    if (entries.length === 0) {
+      return null;
+    }
+    // Compact key:value pairs
+    const snippet = entries
+      .slice(0, 4)
+      .map(([k, v]) => `${k}:${String(v)}`)
+      .join(", ");
+    return CronTasksRepository.truncate(snippet, 80);
   }
-  const entries = Object.entries(result);
-  if (entries.length === 0) {
-    return null;
-  }
-  // Compact key:value pairs
-  const snippet = entries
-    .slice(0, 4)
-    .map(([k, v]) => `${k}:${String(v)}`)
-    .join(", ");
-  return truncate(snippet, 80);
-}
 
-/**
- * Generate a concise tasks summary for injection into the AI system prompt.
- * Returns an empty string if the user has no tasks.
- *
- * Loads task definitions + recent execution history for enriched formatting.
- */
-/**
- * Load raw task summary items for system prompt injection.
- * Returns typed data — formatting is handled by formatTasksSummary() in tasks-formatter.ts.
- */
-export async function loadTaskItems(params: {
-  userId: string;
-  logger: EndpointLogger;
-}): Promise<TaskSummaryItem[]> {
-  const { userId, logger } = params;
+  /**
+   * Load raw task summary items for system prompt injection.
+   * Returns typed data — formatting is handled by formatTasksSummary() in tasks-formatter.ts.
+   */
+  static async loadTaskItems(params: {
+    userId: string;
+    logger: EndpointLogger;
+  }): Promise<TaskSummaryItem[]> {
+    const { userId, logger } = params;
 
-  try {
-    // Query 1: Task definitions with enriched fields
-    const { getLocalInstanceId } =
-      await import("@/app/api/[locale]/user/remote-connection/repository");
-    const instanceId = await getLocalInstanceId(userId);
+    try {
+      // Query 1: Task definitions with enriched fields
+      const { RemoteConnectionRepository } =
+        await import("@/app/api/[locale]/user/remote-connection/repository");
+      const instanceId =
+        await RemoteConnectionRepository.getLocalInstanceId(userId);
 
-    const tasks = await db
-      .select({
-        id: cronTasks.id,
-        shortId: cronTasks.shortId,
-        displayName: cronTasks.displayName,
-        schedule: cronTasks.schedule,
-        enabled: cronTasks.enabled,
-        lastExecutionStatus: cronTasks.lastExecutionStatus,
-        lastExecutedAt: cronTasks.lastExecutedAt,
-        lastExecutionDuration: cronTasks.lastExecutionDuration,
-        errorCount: cronTasks.errorCount,
-        routeId: cronTasks.routeId,
-        description: cronTasks.description,
-        priority: cronTasks.priority,
-        consecutiveFailures: cronTasks.consecutiveFailures,
-      })
-      .from(cronTasks)
-      .where(
-        and(
-          // Never show hidden tasks to AI
-          eq(cronTasks.hidden, false),
-          // Include user's own tasks + tasks targeting this instance (e.g. delegated from prod)
-          instanceId
-            ? or(
-                eq(cronTasks.userId, userId),
-                eq(cronTasks.targetInstance, instanceId),
-              )
-            : eq(cronTasks.userId, userId),
-        ),
-      )
-      .orderBy(desc(cronTasks.updatedAt))
-      .limit(50);
+      const tasks = await db
+        .select({
+          id: cronTasks.id,
+          shortId: cronTasks.shortId,
+          displayName: cronTasks.displayName,
+          schedule: cronTasks.schedule,
+          enabled: cronTasks.enabled,
+          lastExecutionStatus: cronTasks.lastExecutionStatus,
+          lastExecutedAt: cronTasks.lastExecutedAt,
+          lastExecutionDuration: cronTasks.lastExecutionDuration,
+          errorCount: cronTasks.errorCount,
+          routeId: cronTasks.routeId,
+          description: cronTasks.description,
+          priority: cronTasks.priority,
+          consecutiveFailures: cronTasks.consecutiveFailures,
+        })
+        .from(cronTasks)
+        .where(
+          and(
+            // Never show hidden tasks to AI
+            eq(cronTasks.hidden, false),
+            // Include user's own tasks + tasks targeting this instance (e.g. delegated from prod)
+            instanceId
+              ? or(
+                  eq(cronTasks.userId, userId),
+                  eq(cronTasks.targetInstance, instanceId),
+                )
+              : eq(cronTasks.userId, userId),
+          ),
+        )
+        .orderBy(desc(cronTasks.updatedAt))
+        .limit(50);
 
-    if (tasks.length === 0) {
+      if (tasks.length === 0) {
+        return [];
+      }
+
+      // Query 2: Recent executions for all discovered tasks (last 3 per task)
+      const taskIds = tasks.map((t) => t.id);
+      const recentExecs =
+        taskIds.length > 0
+          ? await db
+              .select({
+                taskId: cronTaskExecutions.taskId,
+                status: cronTaskExecutions.status,
+                completedAt: cronTaskExecutions.completedAt,
+                durationMs: cronTaskExecutions.durationMs,
+                result: cronTaskExecutions.result,
+                error: cronTaskExecutions.error,
+              })
+              .from(cronTaskExecutions)
+              .where(inArray(cronTaskExecutions.taskId, taskIds))
+              .orderBy(desc(cronTaskExecutions.startedAt))
+              .limit(taskIds.length * 3)
+          : [];
+
+      // Group executions by taskId (max 3 per task)
+      const execsByTask = new Map<string, typeof recentExecs>();
+      for (const exec of recentExecs) {
+        const existing = execsByTask.get(exec.taskId) ?? [];
+        if (existing.length < 3) {
+          existing.push(exec);
+          execsByTask.set(exec.taskId, existing);
+        }
+      }
+
+      // Shape into TaskSummaryItem[] with enriched fields
+      const summaryItems = tasks.map((t) => {
+        const taskExecs = execsByTask.get(t.id) ?? [];
+
+        // Find last successful result for summary
+        const lastSuccess = taskExecs.find(
+          (e) => e.status === CronTaskStatus.COMPLETED,
+        );
+        const lastResultSummary = lastSuccess
+          ? CronTasksRepository.summariseResult(lastSuccess.result ?? null)
+          : null;
+
+        // Map recent executions
+        const recentExecutions: RecentExecution[] = taskExecs.map((e) => ({
+          status: e.status,
+          completedAt: e.completedAt?.toISOString() ?? null,
+          durationMs: e.durationMs,
+          resultSnippet: e.result
+            ? CronTasksRepository.summariseResult(e.result)
+            : null,
+          errorSnippet: e.error?.message
+            ? CronTasksRepository.truncate(e.error.message, 60)
+            : null,
+        }));
+
+        return {
+          id: t.id,
+          shortId: t.shortId,
+          displayName: t.displayName,
+          description: t.description,
+          schedule: t.schedule,
+          enabled: t.enabled,
+          lastExecutionStatus: t.lastExecutionStatus,
+          lastExecutedAt: t.lastExecutedAt,
+          lastExecutionDuration: t.lastExecutionDuration,
+          errorCount: t.errorCount,
+          routeId: t.routeId,
+          priority: t.priority,
+          consecutiveFailures: t.consecutiveFailures,
+          lastResultSummary,
+          recentExecutions:
+            recentExecutions.length > 0 ? recentExecutions : null,
+        };
+      });
+
+      logger.debug("Loaded task items for system prompt", {
+        userId,
+        taskCount: tasks.length,
+        execsLoaded: recentExecs.length,
+      });
+
+      return summaryItems;
+    } catch (error) {
+      logger.error("Failed to load task items", {
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return [];
     }
-
-    // Query 2: Recent executions for all discovered tasks (last 3 per task)
-    const taskIds = tasks.map((t) => t.id);
-    const recentExecs =
-      taskIds.length > 0
-        ? await db
-            .select({
-              taskId: cronTaskExecutions.taskId,
-              status: cronTaskExecutions.status,
-              completedAt: cronTaskExecutions.completedAt,
-              durationMs: cronTaskExecutions.durationMs,
-              result: cronTaskExecutions.result,
-              error: cronTaskExecutions.error,
-            })
-            .from(cronTaskExecutions)
-            .where(inArray(cronTaskExecutions.taskId, taskIds))
-            .orderBy(desc(cronTaskExecutions.startedAt))
-            .limit(taskIds.length * 3)
-        : [];
-
-    // Group executions by taskId (max 3 per task)
-    const execsByTask = new Map<string, typeof recentExecs>();
-    for (const exec of recentExecs) {
-      const existing = execsByTask.get(exec.taskId) ?? [];
-      if (existing.length < 3) {
-        existing.push(exec);
-        execsByTask.set(exec.taskId, existing);
-      }
-    }
-
-    // Shape into TaskSummaryItem[] with enriched fields
-    const summaryItems = tasks.map((t) => {
-      const taskExecs = execsByTask.get(t.id) ?? [];
-
-      // Find last successful result for summary
-      const lastSuccess = taskExecs.find(
-        (e) => e.status === CronTaskStatus.COMPLETED,
-      );
-      const lastResultSummary = lastSuccess
-        ? summariseResult(lastSuccess.result ?? null)
-        : null;
-
-      // Map recent executions
-      const recentExecutions: RecentExecution[] = taskExecs.map((e) => ({
-        status: e.status,
-        completedAt: e.completedAt?.toISOString() ?? null,
-        durationMs: e.durationMs,
-        resultSnippet: e.result ? summariseResult(e.result) : null,
-        errorSnippet: e.error?.message ? truncate(e.error.message, 60) : null,
-      }));
-
-      return {
-        id: t.id,
-        shortId: t.shortId,
-        displayName: t.displayName,
-        description: t.description,
-        schedule: t.schedule,
-        enabled: t.enabled,
-        lastExecutionStatus: t.lastExecutionStatus,
-        lastExecutedAt: t.lastExecutedAt,
-        lastExecutionDuration: t.lastExecutionDuration,
-        errorCount: t.errorCount,
-        routeId: t.routeId,
-        priority: t.priority,
-        consecutiveFailures: t.consecutiveFailures,
-        lastResultSummary,
-        recentExecutions: recentExecutions.length > 0 ? recentExecutions : null,
-      };
-    });
-
-    logger.debug("Loaded task items for system prompt", {
-      userId,
-      taskCount: tasks.length,
-      execsLoaded: recentExecs.length,
-    });
-
-    return summaryItems;
-  } catch (error) {
-    logger.error("Failed to load task items", {
-      userId,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return [];
   }
-}
 
-/**
- * Generate a concise tasks summary string for injection into the AI system prompt.
- * @deprecated Prefer loadTaskItems() + formatTasksSummary() — keeps data and formatting separate.
- */
-export async function generateTasksSummary(params: {
-  userId: string;
-  logger: EndpointLogger;
-}): Promise<string> {
-  const items = await loadTaskItems(params);
-  return formatTasksSummary(items);
+  /**
+   * Generate a concise tasks summary string for injection into the AI system prompt.
+   * @deprecated Prefer loadTaskItems() + formatTasksSummary() — keeps data and formatting separate.
+   */
+  static async generateTasksSummary(params: {
+    userId: string;
+    logger: EndpointLogger;
+  }): Promise<string> {
+    const items = await CronTasksRepository.loadTaskItems(params);
+    return formatTasksSummary(items);
+  }
 }

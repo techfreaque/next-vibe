@@ -20,10 +20,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";
-import { SubscriptionCheckoutRepositoryImpl } from "../payment/checkout/repository";
+import { SubscriptionCheckoutRepository } from "../payment/checkout/repository";
 import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
-import { getStripe } from "../payment/providers/stripe/repository";
+import { StripeProvider } from "../payment/providers/stripe/repository";
 import type { WebhookData } from "../payment/providers/types";
 import type { JwtPrivatePayloadType } from "../user/auth/types";
 import type {
@@ -49,112 +49,118 @@ import type {
   SubscriptionUpdatePutResponseOutput,
 } from "./update/definition";
 
-/**
- * Map Stripe subscription status to our subscription status.
- * Exhaustive over Stripe.Subscription.Status — adding a new Stripe status will
- * cause a compile error, forcing us to handle it explicitly.
- */
-const STRIPE_STATUS_MAP: Record<
-  Stripe.Subscription.Status,
-  typeof SubscriptionStatusValue
-> = {
-  active: SubscriptionStatus.ACTIVE,
-  trialing: SubscriptionStatus.TRIALING,
-  canceled: SubscriptionStatus.CANCELED,
-  incomplete_expired: SubscriptionStatus.INCOMPLETE_EXPIRED,
-  past_due: SubscriptionStatus.PAST_DUE,
-  unpaid: SubscriptionStatus.UNPAID,
-  paused: SubscriptionStatus.PAUSED,
-  incomplete: SubscriptionStatus.INCOMPLETE,
-};
-
-/**
- * Check if a plan ID matches the subscription plan.
- * Handles both legacy prefixed values ('app.api.subscription.enums.plan.subscription')
- * and current short values ('enums.plan.subscription') stored in the DB.
- */
-function isSubscriptionPlan(planId: string): boolean {
-  return (
-    planId === SubscriptionPlan.SUBSCRIPTION ||
-    planId.endsWith(`.${SubscriptionPlan.SUBSCRIPTION}`)
-  );
-}
-
-/**
- * Generate canonical idempotency key for subscription credit grants.
- * Shared across all credit grant paths (invoice handler, subscription.updated, auto-sync)
- * to prevent duplicate grants from different webhook/sync triggers.
- */
-function renewalSessionKey(
-  providerSubscriptionId: string,
-  periodEndMs: number,
-): string {
-  return `renewal_${providerSubscriptionId}_${periodEndMs}`;
-}
-
-/**
- * Calculate current period dates from Stripe subscription
- * Stripe API 2025-12-15.clover removed current_period_start/end from response
- */
-function calculateSubscriptionPeriod(subscription: Stripe.Subscription): {
-  currentPeriodStart: number;
-  currentPeriodEnd: number;
-} {
-  // Prefer actual period dates from subscription item (most accurate)
-  const item = subscription.items.data[0];
-  if (item?.current_period_start && item?.current_period_end) {
-    return {
-      currentPeriodStart: item.current_period_start,
-      currentPeriodEnd: item.current_period_end,
-    };
-  }
-
-  // Fallback: Calculate current period from billing_cycle_anchor + interval
-  const anchor =
-    subscription.billing_cycle_anchor ||
-    subscription.start_date ||
-    subscription.created;
-  const billingInterval = item?.plan.interval || "month";
-  const intervalCount = item?.plan.interval_count || 1;
-
-  const now = Math.floor(Date.now() / 1000);
-  let periodStart = anchor;
-  let periodEnd = anchor;
-
-  // Advance period-by-period until we find the one containing "now"
-  for (let i = 0; i < 120; i++) {
-    const d = new Date(periodEnd * 1000);
-    if (billingInterval === "month") {
-      d.setMonth(d.getMonth() + intervalCount);
-    } else if (billingInterval === "year") {
-      d.setFullYear(d.getFullYear() + intervalCount);
-    } else if (billingInterval === "week") {
-      d.setDate(d.getDate() + 7 * intervalCount);
-    } else if (billingInterval === "day") {
-      d.setDate(d.getDate() + intervalCount);
-    } else {
-      d.setMonth(d.getMonth() + 1);
-    }
-    const nextEnd = Math.floor(d.getTime() / 1000);
-
-    if (nextEnd > now) {
-      periodStart = periodEnd;
-      periodEnd = nextEnd;
-      break;
-    }
-    periodEnd = nextEnd;
-  }
-
-  return {
-    currentPeriodStart: periodStart,
-    currentPeriodEnd: periodEnd,
-  };
+interface SyncSubscriptionResult {
+  message: string;
+  changes: string[];
 }
 
 /**
  * Subscription Repository - Static class pattern
  */
 export class SubscriptionRepository {
+  /**
+   * Map Stripe subscription status to our subscription status.
+   * Exhaustive over Stripe.Subscription.Status — adding a new Stripe status will
+   * cause a compile error, forcing us to handle it explicitly.
+   */
+  private static readonly STRIPE_STATUS_MAP: Record<
+    Stripe.Subscription.Status,
+    typeof SubscriptionStatusValue
+  > = {
+    active: SubscriptionStatus.ACTIVE,
+    trialing: SubscriptionStatus.TRIALING,
+    canceled: SubscriptionStatus.CANCELED,
+    incomplete_expired: SubscriptionStatus.INCOMPLETE_EXPIRED,
+    past_due: SubscriptionStatus.PAST_DUE,
+    unpaid: SubscriptionStatus.UNPAID,
+    paused: SubscriptionStatus.PAUSED,
+    incomplete: SubscriptionStatus.INCOMPLETE,
+  };
+
+  /**
+   * Check if a plan ID matches the subscription plan.
+   * Handles both legacy prefixed values ('app.api.subscription.enums.plan.subscription')
+   * and current short values ('enums.plan.subscription') stored in the DB.
+   */
+  private static isSubscriptionPlan(planId: string): boolean {
+    return (
+      planId === SubscriptionPlan.SUBSCRIPTION ||
+      planId.endsWith(`.${SubscriptionPlan.SUBSCRIPTION}`)
+    );
+  }
+
+  /**
+   * Generate canonical idempotency key for subscription credit grants.
+   * Shared across all credit grant paths (invoice handler, subscription.updated, auto-sync)
+   * to prevent duplicate grants from different webhook/sync triggers.
+   */
+  private static renewalSessionKey(
+    providerSubscriptionId: string,
+    periodEndMs: number,
+  ): string {
+    return `renewal_${providerSubscriptionId}_${periodEndMs}`;
+  }
+
+  /**
+   * Calculate current period dates from Stripe subscription
+   * Stripe API 2025-12-15.clover removed current_period_start/end from response
+   */
+  private static calculateSubscriptionPeriod(
+    subscription: Stripe.Subscription,
+  ): {
+    currentPeriodStart: number;
+    currentPeriodEnd: number;
+  } {
+    // Prefer actual period dates from subscription item (most accurate)
+    const item = subscription.items.data[0];
+    if (item?.current_period_start && item?.current_period_end) {
+      return {
+        currentPeriodStart: item.current_period_start,
+        currentPeriodEnd: item.current_period_end,
+      };
+    }
+
+    // Fallback: Calculate current period from billing_cycle_anchor + interval
+    const anchor =
+      subscription.billing_cycle_anchor ||
+      subscription.start_date ||
+      subscription.created;
+    const billingInterval = item?.plan.interval || "month";
+    const intervalCount = item?.plan.interval_count || 1;
+
+    const now = Math.floor(Date.now() / 1000);
+    let periodStart = anchor;
+    let periodEnd = anchor;
+
+    // Advance period-by-period until we find the one containing "now"
+    for (let i = 0; i < 120; i++) {
+      const d = new Date(periodEnd * 1000);
+      if (billingInterval === "month") {
+        d.setMonth(d.getMonth() + intervalCount);
+      } else if (billingInterval === "year") {
+        d.setFullYear(d.getFullYear() + intervalCount);
+      } else if (billingInterval === "week") {
+        d.setDate(d.getDate() + 7 * intervalCount);
+      } else if (billingInterval === "day") {
+        d.setDate(d.getDate() + intervalCount);
+      } else {
+        d.setMonth(d.getMonth() + 1);
+      }
+      const nextEnd = Math.floor(d.getTime() / 1000);
+
+      if (nextEnd > now) {
+        periodStart = periodEnd;
+        periodEnd = nextEnd;
+        break;
+      }
+      periodEnd = nextEnd;
+    }
+
+    return {
+      currentPeriodStart: periodStart,
+      currentPeriodEnd: periodEnd,
+    };
+  }
   static async getSubscription(
     userId: string,
     logger: EndpointLogger,
@@ -191,7 +197,7 @@ export class SubscriptionRepository {
 
         if (needsSync) {
           try {
-            const stripeClient = getStripe();
+            const stripeClient = StripeProvider.getStripe();
             if (!stripeClient) {
               logger.warn("Stripe not configured, skipping subscription sync");
             } else {
@@ -200,9 +206,12 @@ export class SubscriptionRepository {
               );
 
               const { currentPeriodStart, currentPeriodEnd } =
-                calculateSubscriptionPeriod(stripeResponse);
+                SubscriptionRepository.calculateSubscriptionPeriod(
+                  stripeResponse,
+                );
 
-              const newStatus = STRIPE_STATUS_MAP[stripeResponse.status];
+              const newStatus =
+                SubscriptionRepository.STRIPE_STATUS_MAP[stripeResponse.status];
 
               // Update if status or period changed
               const periodChanged =
@@ -262,7 +271,9 @@ export class SubscriptionRepository {
                     const { t: creditsT } =
                       creditsScopedTranslation.scopedT(locale);
 
-                    const productId = isSubscriptionPlan(subscription.planId)
+                    const productId = SubscriptionRepository.isSubscriptionPlan(
+                      subscription.planId,
+                    )
                       ? ProductIds.SUBSCRIPTION
                       : null;
 
@@ -276,10 +287,12 @@ export class SubscriptionRepository {
 
                       // Canonical idempotency key shared across all credit grant paths
                       // Prevents duplicate grants from invoice handler, subscription.updated, and auto-sync
-                      const sessionId = renewalSessionKey(
-                        subscription.providerSubscriptionId ?? subscription.id,
-                        currentPeriodEnd * 1000,
-                      );
+                      const sessionId =
+                        SubscriptionRepository.renewalSessionKey(
+                          subscription.providerSubscriptionId ??
+                            subscription.id,
+                          currentPeriodEnd * 1000,
+                        );
 
                       logger.info(
                         "Auto-granting renewal credits (missed webhook)",
@@ -366,7 +379,7 @@ export class SubscriptionRepository {
           try {
             const { creditPacks } = await import("../credits/db");
             const periodEndMs = subscription.currentPeriodEnd.getTime();
-            const expectedSessionId = renewalSessionKey(
+            const expectedSessionId = SubscriptionRepository.renewalSessionKey(
               subscription.providerSubscriptionId,
               periodEndMs,
             );
@@ -388,7 +401,9 @@ export class SubscriptionRepository {
                 await import("../products/repository-client");
               const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
-              const productId = isSubscriptionPlan(subscription.planId)
+              const productId = SubscriptionRepository.isSubscriptionPlan(
+                subscription.planId,
+              )
                 ? ProductIds.SUBSCRIPTION
                 : null;
 
@@ -482,8 +497,7 @@ export class SubscriptionRepository {
 
     // Create checkout session via checkout repository
     const { t: checkoutT } = checkoutScopedTranslation.scopedT(locale);
-    const checkoutRepo = new SubscriptionCheckoutRepositoryImpl();
-    return await checkoutRepo.createCheckoutSession(
+    return await SubscriptionCheckoutRepository.createCheckoutSession(
       {
         planId: data.plan,
         billingInterval: data.billingInterval,
@@ -800,7 +814,7 @@ export class SubscriptionRepository {
         // recognises that credits were already granted on the initial checkout.
         // providerSubscriptionId is set for both Stripe and NOWPayments paths.
         const checkoutSessionId = providerSubscriptionId
-          ? renewalSessionKey(
+          ? SubscriptionRepository.renewalSessionKey(
               providerSubscriptionId,
               (currentPeriodEnd ?? new Date()).getTime(),
             )
@@ -858,7 +872,7 @@ export class SubscriptionRepository {
   /**
    * Handle invoice.created webhook — pre-grant credits before payment confirmation.
    * This ensures users have credits immediately when a new billing period starts.
-   * Idempotency: uses renewalSessionKey() so duplicate webhooks or later invoice.paid
+   * Idempotency: uses SubscriptionRepository.renewalSessionKey() so duplicate webhooks or later invoice.paid
    * events won't double-grant.
    */
   static async handleInvoiceCreated(
@@ -962,7 +976,9 @@ export class SubscriptionRepository {
       }
       const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
 
-      const productId = isSubscriptionPlan(subscription.planId)
+      const productId = SubscriptionRepository.isSubscriptionPlan(
+        subscription.planId,
+      )
         ? ProductIds.SUBSCRIPTION
         : null;
 
@@ -990,7 +1006,7 @@ export class SubscriptionRepository {
       const expiresAt = periodEnd;
 
       // Canonical idempotency key — shared with invoice.paid and subscription.updated
-      const renewalSessionId = renewalSessionKey(
+      const renewalSessionId = SubscriptionRepository.renewalSessionKey(
         subscriptionId,
         periodEnd.getTime(),
       );
@@ -1161,7 +1177,9 @@ export class SubscriptionRepository {
         const { t: creditsT } =
           creditsScopedTranslation.scopedT(userLocaleForInvoice);
 
-        const productId = isSubscriptionPlan(subscription.planId)
+        const productId = SubscriptionRepository.isSubscriptionPlan(
+          subscription.planId,
+        )
           ? ProductIds.SUBSCRIPTION
           : null;
 
@@ -1189,7 +1207,7 @@ export class SubscriptionRepository {
           const expiresAt = periodEnd;
 
           // Canonical idempotency key shared across all credit grant paths
-          const renewalSessionId = renewalSessionKey(
+          const renewalSessionId = SubscriptionRepository.renewalSessionKey(
             subscriptionId,
             periodEnd.getTime(),
           );
@@ -1458,7 +1476,7 @@ export class SubscriptionRepository {
       }
 
       // Fetch full subscription from Stripe to get all fields (webhook events may not include all fields)
-      const stripe = getStripe();
+      const stripe = StripeProvider.getStripe();
       if (!stripe) {
         logger.warn("Stripe not configured, cannot sync subscription", {
           subscriptionId,
@@ -1468,11 +1486,12 @@ export class SubscriptionRepository {
       const fullSubscription =
         await stripe.subscriptions.retrieve(subscriptionId);
 
-      const status = STRIPE_STATUS_MAP[fullSubscription.status];
+      const status =
+        SubscriptionRepository.STRIPE_STATUS_MAP[fullSubscription.status];
 
       // Check if period changed (renewal detected)
       const { currentPeriodStart, currentPeriodEnd } =
-        calculateSubscriptionPeriod(fullSubscription);
+        SubscriptionRepository.calculateSubscriptionPeriod(fullSubscription);
 
       const oldPeriodEnd = subscription.currentPeriodEnd;
       const newPeriodEnd = new Date(currentPeriodEnd * 1000);
@@ -1531,7 +1550,9 @@ export class SubscriptionRepository {
         const { t: creditsT } =
           creditsScopedTranslation.scopedT(userLocaleForUpdate);
 
-        const productId = isSubscriptionPlan(subscription.planId)
+        const productId = SubscriptionRepository.isSubscriptionPlan(
+          subscription.planId,
+        )
           ? ProductIds.SUBSCRIPTION
           : null;
 
@@ -1542,7 +1563,7 @@ export class SubscriptionRepository {
           );
 
           // Canonical idempotency key shared across all credit grant paths
-          const renewalSessionId = renewalSessionKey(
+          const renewalSessionId = SubscriptionRepository.renewalSessionKey(
             fullSubscription.id,
             newPeriodEnd.getTime(),
           );
@@ -1608,7 +1629,7 @@ export class SubscriptionRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ message: string; changes: string[] }>> {
+  ): Promise<ResponseType<SyncSubscriptionResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const changes: string[] = [];
@@ -1641,7 +1662,7 @@ export class SubscriptionRepository {
 
       // Try to fetch subscription from Stripe
       let stripeSubscription: Stripe.Subscription | null = null;
-      const stripe = getStripe();
+      const stripe = StripeProvider.getStripe();
       try {
         stripeSubscription = stripe
           ? await stripe.subscriptions.retrieve(
@@ -1691,9 +1712,12 @@ export class SubscriptionRepository {
       // Sync status if subscription exists in Stripe
       if (stripeSubscription) {
         const { currentPeriodStart, currentPeriodEnd } =
-          calculateSubscriptionPeriod(stripeSubscription);
+          SubscriptionRepository.calculateSubscriptionPeriod(
+            stripeSubscription,
+          );
 
-        const newStatus = STRIPE_STATUS_MAP[stripeSubscription.status];
+        const newStatus =
+          SubscriptionRepository.STRIPE_STATUS_MAP[stripeSubscription.status];
 
         // Always update period + status if anything changed (not just status)
         const periodChanged =
@@ -1738,7 +1762,7 @@ export class SubscriptionRepository {
 
           if (productId) {
             const product = productsRepository.getProduct(productId, locale);
-            const renewalSessionId = renewalSessionKey(
+            const renewalSessionId = SubscriptionRepository.renewalSessionKey(
               localSubscription.providerSubscriptionId,
               newPeriodEndMs,
             );
@@ -1932,7 +1956,11 @@ export class SubscriptionRepository {
         },
       };
 
-      await this.handleSubscriptionCheckout(webhookData, logger, locale);
+      await SubscriptionRepository.handleSubscriptionCheckout(
+        webhookData,
+        logger,
+        locale,
+      );
 
       logger.info("NOWPayments success redirect processed", {
         npId,

@@ -9,7 +9,7 @@ import path from "node:path";
 import { v4 as uuidv4 } from "uuid";
 
 import { agentEnv } from "../../env";
-import type { FileMetadata, StorageAdapter } from "./types";
+import type { FileMetadata, StorageAdapter } from "./index";
 
 export class LocalStorageAdapter implements StorageAdapter {
   async uploadFile(

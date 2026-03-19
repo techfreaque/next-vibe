@@ -6,10 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import {
-  executeEvaluateScript,
-  filterUndefinedArgs,
-} from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import evaluateScriptEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -17,10 +14,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeEvaluateScript(
+      BrowserSharedRepository.executeEvaluateScript(
         {
           toolName: BrowserTool.EVALUATE_SCRIPT,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             function: data.function,
             args: data.args ?? undefined,
           }),

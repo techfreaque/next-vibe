@@ -17,23 +17,21 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { env } from "@/config/env";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-type CheckScopedKey = (typeof scopedTranslation)["ScopedTranslationKey"];
+import type { CheckVibeCheckT, CheckVibeCheckTranslationKey } from "./i18n";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { ensureConfigReady } from "../config/repository";
+import { ConfigRepositoryImpl } from "../config/repository";
 import type { CheckConfig } from "../config/types";
 import type { LintResponseOutput } from "../lint/definition";
-import { lintRepository } from "../lint/repository";
+import { LintRepository } from "../lint/repository";
 import type { OxlintResponseOutput } from "../oxlint/definition";
-import { oxlintRepository } from "../oxlint/repository";
+import { scopedTranslation as oxlintScopedTranslation } from "../oxlint/i18n";
+import { OxlintRepository } from "../oxlint/repository";
 import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
 import type { TypecheckResponseOutput } from "../typecheck/definition";
 import { scopedTranslation as typecheckScopedTranslation } from "../typecheck/i18n";
-import { typecheckRepository } from "../typecheck/repository";
+import { TypecheckRepository } from "../typecheck/repository";
 import type {
   VibeCheckRequestOutput,
   VibeCheckResponseOutput,
@@ -62,9 +60,9 @@ interface CheckIssue {
 export class VibeCheckRepository {
   private static getPerformanceKey(
     type: CheckType,
-    t: ModuleT,
-  ): ReturnType<ModuleT> {
-    const keyMap: Record<CheckType, CheckScopedKey> = {
+    t: CheckVibeCheckT,
+  ): ReturnType<CheckVibeCheckT> {
+    const keyMap: Record<CheckType, CheckVibeCheckTranslationKey> = {
       oxlint: "performance.oxlint",
       eslint: "performance.eslint",
       typecheck: "performance.typecheck",
@@ -79,10 +77,13 @@ export class VibeCheckRepository {
     config: CheckConfig,
     logger: EndpointLogger,
     platform: Platform,
+    locale: CountryLanguage,
     extensive: boolean,
+    signal: AbortSignal,
   ): Promise<CheckResult> {
     const startTime = Date.now();
-    const result = await oxlintRepository.execute(
+    const { t: oxlintT } = oxlintScopedTranslation.scopedT(locale);
+    const result = await OxlintRepository.execute(
       {
         path: paths.length === 1 ? paths[0] : paths,
         fix,
@@ -95,6 +96,9 @@ export class VibeCheckRepository {
       },
       logger,
       platform,
+      oxlintT,
+      signal,
+      locale,
       config,
     );
     logger.info(
@@ -114,10 +118,12 @@ export class VibeCheckRepository {
     config: CheckConfig,
     logger: EndpointLogger,
     platform: Platform,
+    locale: CountryLanguage,
     extensive: boolean,
+    signal: AbortSignal,
   ): Promise<CheckResult> {
     const startTime = Date.now();
-    const result = await lintRepository.execute(
+    const result = await LintRepository.execute(
       {
         path,
         fix,
@@ -132,6 +138,8 @@ export class VibeCheckRepository {
       logger,
       platform,
       config,
+      signal,
+      locale,
     );
     logger.info(
       `✓ ESLint check completed with ${result.success ? result.data.items?.length : 0} issues`,
@@ -151,10 +159,11 @@ export class VibeCheckRepository {
     platform: Platform,
     locale: CountryLanguage,
     extensive: boolean,
+    signal: AbortSignal,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const { t: typecheckT } = typecheckScopedTranslation.scopedT(locale);
-    const result = await typecheckRepository.execute(
+    const result = await TypecheckRepository.execute(
       {
         path,
         timeout,
@@ -170,6 +179,7 @@ export class VibeCheckRepository {
       typecheckT,
       locale,
       config,
+      signal,
     );
 
     logger.info(
@@ -218,12 +228,19 @@ export class VibeCheckRepository {
     data: VibeCheckRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    t: ModuleT,
+    t: CheckVibeCheckT,
     locale: CountryLanguage,
+    signal: AbortSignal,
   ): Promise<ResponseType<VibeCheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     try {
-      const configResult = await ensureConfigReady(logger, false);
+      logger.debug("[VIBE-CHECK] ensureConfigReady start");
+      const configResult = await ConfigRepositoryImpl.ensureConfigReady(
+        logger,
+        locale,
+        false,
+      );
+      logger.debug("[VIBE-CHECK] ensureConfigReady done");
 
       if (!configResult.ready) {
         return success(
@@ -310,7 +327,9 @@ export class VibeCheckRepository {
             configResult.config,
             logger,
             platform,
+            locale,
             isExtensive,
+            signal,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
@@ -340,7 +359,9 @@ export class VibeCheckRepository {
             configResult.config,
             logger,
             platform,
+            locale,
             isExtensive,
+            signal,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
@@ -373,6 +394,7 @@ export class VibeCheckRepository {
             platform,
             locale,
             isExtensive,
+            signal,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
@@ -438,7 +460,7 @@ export class VibeCheckRepository {
   private static processCheckResults(
     checkResults: PromiseSettledResult<CheckResult>[],
     performanceTimings: Partial<Record<TranslationKey, number>>,
-    t: ModuleT,
+    t: CheckVibeCheckT,
   ): { allIssues: CheckIssue[]; hasErrors: boolean } {
     const allIssues: CheckIssue[] = [];
     let hasErrors = false;

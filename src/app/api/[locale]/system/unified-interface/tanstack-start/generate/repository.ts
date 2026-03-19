@@ -43,9 +43,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
+import type { TanstackT } from "../i18n";
 import type { GenerateResponseOutput } from "./definition";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface GenerationResult {
   created: string[];
@@ -53,40 +52,35 @@ interface GenerationResult {
   errors: Array<{ file: string; error: string }>;
 }
 
-export interface GenerateTanstackRoutesRepository {
-  generate(
-    user: JwtPayloadType,
-    t: ModuleT,
-  ): Promise<ResponseType<GenerateResponseOutput>>;
-  generateInternal(): Promise<ResponseType<GenerateResponseOutput>>;
-}
-
-class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepository {
-  private readonly PROJECT_ROOT: string;
+export class GenerateTanstackRoutesRepository {
+  private static readonly PROJECT_ROOT: string = process.cwd();
   /** UI source dir: page.tsx + layout.tsx */
-  private readonly UI_DIR: string;
+  private static readonly UI_DIR: string = join(
+    GenerateTanstackRoutesRepository.PROJECT_ROOT,
+    "src/app/[locale]",
+  );
   /** API source dir: route.ts */
-  private readonly API_DIR: string;
-  private readonly ROUTES_DIR: string;
-  private readonly WRAPPER_IMPORT: string;
+  private static readonly API_DIR: string = join(
+    GenerateTanstackRoutesRepository.PROJECT_ROOT,
+    "src/app/api/[locale]",
+  );
+  private static readonly ROUTES_DIR: string = join(
+    GenerateTanstackRoutesRepository.PROJECT_ROOT,
+    "src/app-tanstack/routes",
+  );
+  private static readonly WRAPPER_IMPORT: string =
+    "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
-  constructor() {
-    this.PROJECT_ROOT = process.cwd();
-    this.UI_DIR = join(this.PROJECT_ROOT, "src/app/[locale]");
-    this.API_DIR = join(this.PROJECT_ROOT, "src/app/api/[locale]");
-    this.ROUTES_DIR = join(this.PROJECT_ROOT, "src/app-tanstack/routes");
-    this.WRAPPER_IMPORT =
-      "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
-  }
-
-  async generateInternal(): Promise<ResponseType<GenerateResponseOutput>> {
+  static async generateInternal(): Promise<
+    ResponseType<GenerateResponseOutput>
+  > {
     const { t } = scopedTranslation.scopedT(defaultLocale);
-    return this.runGeneration(t);
+    return GenerateTanstackRoutesRepository.runGeneration(t);
   }
 
-  async generate(
+  static async generate(
     user: JwtPayloadType,
-    t: ModuleT,
+    t: TanstackT,
   ): Promise<ResponseType<GenerateResponseOutput>> {
     if (!user?.id) {
       return fail({
@@ -97,14 +91,14 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
         },
       });
     }
-    return this.runGeneration(t);
+    return GenerateTanstackRoutesRepository.runGeneration(t);
   }
 
-  private async runGeneration(
-    t: ModuleT,
+  private static async runGeneration(
+    t: TanstackT,
   ): Promise<ResponseType<GenerateResponseOutput>> {
     try {
-      if (!existsSync(this.UI_DIR)) {
+      if (!existsSync(GenerateTanstackRoutesRepository.UI_DIR)) {
         return fail({
           message: t("generate.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -114,7 +108,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
         });
       }
 
-      const result = this.generateRoutes();
+      const result = GenerateTanstackRoutesRepository.generateRoutes();
 
       const message = t("generate.post.success.description", {
         created: result.created.length,
@@ -142,23 +136,37 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
   // Core generation
   // ---------------------------------------------------------------------------
 
-  private generateRoutes(): GenerationResult {
+  private static generateRoutes(): GenerationResult {
     const result: GenerationResult = { created: [], skipped: [], errors: [] };
 
     // Ensure routes dir exists
-    if (!existsSync(this.ROUTES_DIR)) {
-      mkdirSync(this.ROUTES_DIR, { recursive: true });
+    if (!existsSync(GenerateTanstackRoutesRepository.ROUTES_DIR)) {
+      mkdirSync(GenerateTanstackRoutesRepository.ROUTES_DIR, {
+        recursive: true,
+      });
     }
 
     // Clean up previously generated files (those with AUTO-GENERATED header)
-    this.cleanupGeneratedFiles(this.ROUTES_DIR, result);
+    GenerateTanstackRoutesRepository.cleanupGeneratedFiles(
+      GenerateTanstackRoutesRepository.ROUTES_DIR,
+      result,
+    );
 
     // Scan UI source files (page.tsx + layout.tsx)
-    const allLayouts = this.findFiles(this.UI_DIR, "layout.tsx");
-    const allPages = this.findFiles(this.UI_DIR, "page.tsx");
+    const allLayouts = GenerateTanstackRoutesRepository.findFiles(
+      GenerateTanstackRoutesRepository.UI_DIR,
+      "layout.tsx",
+    );
+    const allPages = GenerateTanstackRoutesRepository.findFiles(
+      GenerateTanstackRoutesRepository.UI_DIR,
+      "page.tsx",
+    );
     // Scan API source files (route.ts) — from api dir
-    const allApiRoutes = existsSync(this.API_DIR)
-      ? this.findFiles(this.API_DIR, "route.ts")
+    const allApiRoutes = existsSync(GenerateTanstackRoutesRepository.API_DIR)
+      ? GenerateTanstackRoutesRepository.findFiles(
+          GenerateTanstackRoutesRepository.API_DIR,
+          "route.ts",
+        )
       : [];
 
     // Generate layout files
@@ -169,13 +177,17 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
         result.skipped.push(relPath);
         continue;
       }
-      const srcFile = join(this.UI_DIR, relPath);
-      if (this.hasCustomDirective(srcFile)) {
+      const srcFile = join(GenerateTanstackRoutesRepository.UI_DIR, relPath);
+      if (GenerateTanstackRoutesRepository.hasCustomDirective(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
       try {
-        const outFile = this.emitLayoutFile(dir, srcFile, this.UI_DIR);
+        const outFile = GenerateTanstackRoutesRepository.emitLayoutFile(
+          dir,
+          srcFile,
+          GenerateTanstackRoutesRepository.UI_DIR,
+        );
         if (outFile) {
           result.created.push(outFile);
         }
@@ -187,13 +199,17 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     // Generate page files
     for (const relPath of allPages) {
       const dir = dirname(relPath);
-      const srcFile = join(this.UI_DIR, relPath);
-      if (this.hasCustomDirective(srcFile)) {
+      const srcFile = join(GenerateTanstackRoutesRepository.UI_DIR, relPath);
+      if (GenerateTanstackRoutesRepository.hasCustomDirective(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
       try {
-        const outFile = this.emitPageFile(dir, srcFile, this.UI_DIR);
+        const outFile = GenerateTanstackRoutesRepository.emitPageFile(
+          dir,
+          srcFile,
+          GenerateTanstackRoutesRepository.UI_DIR,
+        );
         if (outFile) {
           result.created.push(outFile);
         }
@@ -205,17 +221,21 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     // Generate API route files
     for (const relPath of allApiRoutes) {
       const dir = dirname(relPath);
-      const srcFile = join(this.API_DIR, relPath);
-      if (this.hasCustomDirective(srcFile)) {
+      const srcFile = join(GenerateTanstackRoutesRepository.API_DIR, relPath);
+      if (GenerateTanstackRoutesRepository.hasCustomDirective(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
-      if (!this.hasHttpExports(srcFile)) {
+      if (!GenerateTanstackRoutesRepository.hasHttpExports(srcFile)) {
         result.skipped.push(relPath);
         continue;
       }
       try {
-        const outFile = this.emitApiFile(dir, srcFile, this.API_DIR);
+        const outFile = GenerateTanstackRoutesRepository.emitApiFile(
+          dir,
+          srcFile,
+          GenerateTanstackRoutesRepository.API_DIR,
+        );
         if (outFile) {
           result.created.push(outFile);
         }
@@ -225,7 +245,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     }
 
     // Emit a root index route that redirects / → /<defaultLocale>/
-    this.emitRootRedirect(defaultLocale, result);
+    GenerateTanstackRoutesRepository.emitRootRedirect(defaultLocale, result);
 
     return result;
   }
@@ -237,8 +257,14 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
   /**
    * Emit a root index route that redirects / → /<defaultLocale>/
    */
-  private emitRootRedirect(locale: string, result: GenerationResult): void {
-    const outPath = join(this.ROUTES_DIR, "index.tsx");
+  private static emitRootRedirect(
+    locale: string,
+    result: GenerationResult,
+  ): void {
+    const outPath = join(
+      GenerateTanstackRoutesRepository.ROUTES_DIR,
+      "index.tsx",
+    );
     const content = [
       `// AUTO-GENERATED — redirects / to the default locale.`,
       `import { createFileRoute, redirect } from "@tanstack/react-router";`,
@@ -251,7 +277,10 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     ].join("\n");
     writeFileSync(outPath, content, "utf-8");
     result.created.push(
-      relative(this.PROJECT_ROOT, outPath).replace(/\\/g, "/"),
+      relative(GenerateTanstackRoutesRepository.PROJECT_ROOT, outPath).replace(
+        /\\/g,
+        "/",
+      ),
     );
   }
 
@@ -267,24 +296,26 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
    *   and TanstackPage itself has no server imports at module scope.
    * - Otherwise: simple Outlet wrapper that imports the default export directly.
    */
-  private emitLayoutFile(
+  private static emitLayoutFile(
     dir: string,
     srcFile: string,
     sourceDir: string,
   ): string | null {
-    const { flatName, routePath, importPath } = this.buildPaths(
-      dir,
-      sourceDir,
-      "layout",
+    const { flatName, routePath, importPath } =
+      GenerateTanstackRoutesRepository.buildPaths(dir, sourceDir, "layout");
+    const outPath = join(
+      GenerateTanstackRoutesRepository.ROUTES_DIR,
+      `${flatName}.tsx`,
     );
-    const outPath = join(this.ROUTES_DIR, `${flatName}.tsx`);
-    const srcRelative = relative(this.PROJECT_ROOT, srcFile).replace(
-      /\\/g,
-      "/",
-    );
+    const srcRelative = relative(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      srcFile,
+    ).replace(/\\/g, "/");
 
-    const hasTanstackLoader = this.hasTanstackLoaderExport(srcFile);
-    const isClientComponent = this.hasUseClientDirective(srcFile);
+    const hasTanstackLoader =
+      GenerateTanstackRoutesRepository.hasTanstackLoaderExport(srcFile);
+    const isClientComponent =
+      GenerateTanstackRoutesRepository.hasUseClientDirective(srcFile);
 
     let content: string;
     if (hasTanstackLoader) {
@@ -293,7 +324,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
         `import { lazy } from "react";`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
         `import { createServerFn } from "@tanstack/react-start";`,
-        `import { toNextParams } from "${this.WRAPPER_IMPORT}";`,
+        `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
         ``,
         `const TanstackLayout = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
         ``,
@@ -337,35 +368,38 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     }
 
     writeFileSync(outPath, content, "utf-8");
-    return relative(this.PROJECT_ROOT, outPath).replace(/\\/g, "/");
+    return relative(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      outPath,
+    ).replace(/\\/g, "/");
   }
 
   /**
    * Emit a TanStack Start page route file.
    * page.tsx at dir → routes/path.index.tsx (createFileRoute '/path/')
    */
-  private emitPageFile(
+  private static emitPageFile(
     dir: string,
     srcFile: string,
     sourceDir: string,
   ): string | null {
-    const { flatName, routePath, importPath } = this.buildPaths(
-      dir,
-      sourceDir,
-      "page",
+    const { flatName, routePath, importPath } =
+      GenerateTanstackRoutesRepository.buildPaths(dir, sourceDir, "page");
+    const outPath = join(
+      GenerateTanstackRoutesRepository.ROUTES_DIR,
+      `${flatName}.tsx`,
     );
-    const outPath = join(this.ROUTES_DIR, `${flatName}.tsx`);
-    const srcRelative = relative(this.PROJECT_ROOT, srcFile).replace(
-      /\\/g,
-      "/",
-    );
+    const srcRelative = relative(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      srcFile,
+    ).replace(/\\/g, "/");
 
     const content = [
       `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
       `import { lazy } from "react";`,
       `import { createFileRoute } from "@tanstack/react-router";`,
       `import { createServerFn } from "@tanstack/react-start";`,
-      `import { toNextParams } from "${this.WRAPPER_IMPORT}";`,
+      `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
       ``,
       `const TanstackPage = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
       ``,
@@ -384,33 +418,36 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     ].join("\n");
 
     writeFileSync(outPath, content, "utf-8");
-    return relative(this.PROJECT_ROOT, outPath).replace(/\\/g, "/");
+    return relative(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      outPath,
+    ).replace(/\\/g, "/");
   }
 
   /**
    * Emit a TanStack Start API route file.
    * route.ts at dir → routes/api.path.ts (createFileRoute '/api/path')
    */
-  private emitApiFile(
+  private static emitApiFile(
     dir: string,
     srcFile: string,
     sourceDir: string,
   ): string | null {
-    const { flatName, routePath, importPath } = this.buildPaths(
-      dir,
-      sourceDir,
-      "api",
+    const { flatName, routePath, importPath } =
+      GenerateTanstackRoutesRepository.buildPaths(dir, sourceDir, "api");
+    const outPath = join(
+      GenerateTanstackRoutesRepository.ROUTES_DIR,
+      `${flatName}.ts`,
     );
-    const outPath = join(this.ROUTES_DIR, `${flatName}.ts`);
-    const srcRelative = relative(this.PROJECT_ROOT, srcFile).replace(
-      /\\/g,
-      "/",
-    );
+    const srcRelative = relative(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      srcFile,
+    ).replace(/\\/g, "/");
 
     const content = [
       `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
       `import { createFileRoute } from "@tanstack/react-router";`,
-      `import { wrapNextApiRoute } from "${this.WRAPPER_IMPORT}";`,
+      `import { wrapNextApiRoute } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
       ``,
       `export const Route = createFileRoute("${routePath}")({`,
       `  server: { handlers: wrapNextApiRoute(() => import("${importPath}")) },`,
@@ -419,7 +456,10 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     ].join("\n");
 
     writeFileSync(outPath, content, "utf-8");
-    return relative(this.PROJECT_ROOT, outPath).replace(/\\/g, "/");
+    return relative(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      outPath,
+    ).replace(/\\/g, "/");
   }
 
   // ---------------------------------------------------------------------------
@@ -433,7 +473,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
    * @param sourceDir - Absolute path to the source root (UI_DIR or API_DIR)
    * @param kind      - "page" | "layout" | "api"
    */
-  private buildPaths(
+  private static buildPaths(
     dir: string,
     sourceDir: string,
     kind: "page" | "layout" | "api",
@@ -446,7 +486,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
       .flatMap((s) =>
         s.includes(".") && !s.startsWith("[") ? s.split(".") : [s],
       )
-      .map((s) => this.convertSegment(s))
+      .map((s) => GenerateTanstackRoutesRepository.convertSegment(s))
       .filter((s): s is string => s !== null);
 
     const urlSegments = tsSegments.join("/");
@@ -490,7 +530,10 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     }
 
     // Import path: @/ maps to src/, so strip the leading "src/" from the relative path
-    const srcDirFromRoot = relative(this.PROJECT_ROOT, sourceDir)
+    const srcDirFromRoot = relative(
+      GenerateTanstackRoutesRepository.PROJECT_ROOT,
+      sourceDir,
+    )
       .replace(/\\/g, "/")
       .replace(/^src\//, "");
     const importPath =
@@ -509,7 +552,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
    * appears if a segment literally named "[locale]" exists deeper in the tree
    * (shouldn't happen, but handled gracefully via the dynamic segment rule).
    */
-  private convertSegment(segment: string): string | null {
+  private static convertSegment(segment: string): string | null {
     // Strip route groups like (group)
     if (segment.startsWith("(") && segment.endsWith(")")) {
       return null;
@@ -533,7 +576,10 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
    * Remove auto-generated route files (identified by "// AUTO-GENERATED" header).
    * Preserves __root.tsx and manually written files.
    */
-  private cleanupGeneratedFiles(dir: string, result: GenerationResult): void {
+  private static cleanupGeneratedFiles(
+    dir: string,
+    result: GenerationResult,
+  ): void {
     let names: string[];
     try {
       names = readdirSync(dir, { encoding: "utf-8" });
@@ -549,7 +595,10 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
         continue;
       }
       if (isDir) {
-        this.cleanupGeneratedFiles(fullPath, result);
+        GenerateTanstackRoutesRepository.cleanupGeneratedFiles(
+          fullPath,
+          result,
+        );
         continue;
       }
       // Skip non-TS/TSX files and the root file
@@ -575,7 +624,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
   // Utilities
   // ---------------------------------------------------------------------------
 
-  private hasCustomDirective(filePath: string): boolean {
+  private static hasCustomDirective(filePath: string): boolean {
     if (!existsSync(filePath)) {
       return false;
     }
@@ -593,7 +642,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     }
   }
 
-  private hasUseClientDirective(filePath: string): boolean {
+  private static hasUseClientDirective(filePath: string): boolean {
     if (!existsSync(filePath)) {
       return false;
     }
@@ -611,7 +660,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     }
   }
 
-  private hasTanstackLoaderExport(filePath: string): boolean {
+  private static hasTanstackLoaderExport(filePath: string): boolean {
     if (!existsSync(filePath)) {
       return false;
     }
@@ -623,7 +672,7 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     }
   }
 
-  private hasHttpExports(filePath: string): boolean {
+  private static hasHttpExports(filePath: string): boolean {
     if (!existsSync(filePath)) {
       return false;
     }
@@ -639,12 +688,9 @@ class GenerateTanstackRoutesRepositoryImpl implements GenerateTanstackRoutesRepo
     }
   }
 
-  private findFiles(dir: string, pattern: string): string[] {
+  private static findFiles(dir: string, pattern: string): string[] {
     return findFilesByName(dir, pattern)
       .map((r) => relative(dir, r.fullPath))
       .filter((p) => !p.includes("/i18n/"));
   }
 }
-
-export const generateTanstackRoutesRepository =
-  new GenerateTanstackRoutesRepositoryImpl();

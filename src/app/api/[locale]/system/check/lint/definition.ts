@@ -22,8 +22,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { scopedTranslation } from "./i18n";
-import { CheckResultWidget } from "./widget";
+
+const CheckResultWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.CheckResultWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

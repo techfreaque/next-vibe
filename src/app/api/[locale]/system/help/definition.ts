@@ -25,11 +25,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { cliRequestDataSchema } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import { Platform } from "../unified-interface/shared/types/platform";
 import { TOOL_HELP_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { HelpToolsWidget } from "./widget";
-import { Platform } from "../unified-interface/shared/types/platform";
+
+const HelpToolsWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.HelpToolsWidget })),
+);
 
 // Serializable tool metadata returned in response
 const aiToolMetadataSchema = z.object({
@@ -360,3 +364,4 @@ export type HelpGetRequestOutput = typeof GET.types.RequestOutput;
 export type HelpGetResponseInput = typeof GET.types.ResponseInput;
 export type HelpGetResponseOutput = typeof GET.types.ResponseOutput;
 export type HelpToolMetadataSerialized = HelpGetResponseOutput["tools"][0];
+export type HelpToolParameters = HelpToolMetadataSerialized["parameters"];

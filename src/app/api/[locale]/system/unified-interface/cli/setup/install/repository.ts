@@ -22,34 +22,21 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "../../../../../user/auth/types";
 import type { InstallRequestOutput, InstallResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Setup Install Repository Interface
- */
-export interface SetupInstallRepository {
-  installCli(
-    data: InstallRequestOutput,
-    user: JwtPayloadType,
-    t: ModuleT,
-  ): Promise<ResponseType<InstallResponseOutput>>;
-}
+import type { SetupInstallT } from "./i18n";
 
 /**
  * Setup Install Repository Implementation
  */
-class SetupInstallRepositoryImpl implements SetupInstallRepository {
+export class SetupInstallRepository {
   // eslint-disable-next-line i18next/no-literal-string
-  private readonly NPM_UNLINK_ARGS = ["unlink", "-g"] as const;
-  private readonly NPM_LINK_ARGS = ["link"] as const;
-  private readonly NPM_LINK_FORCE_ARGS = ["link", "--force"] as const;
+  private static readonly NPM_UNLINK_ARGS = ["unlink", "-g"] as const;
+  private static readonly NPM_LINK_ARGS = ["link"] as const;
+  private static readonly NPM_LINK_FORCE_ARGS = ["link", "--force"] as const;
 
   /**
    * Get the appropriate binary directory for the current platform
    */
-  private getBinaryDirectory(): string {
+  private static getBinaryDirectory(): string {
     const platform = os.platform();
     const homeDir = os.homedir();
 
@@ -80,7 +67,7 @@ class SetupInstallRepositoryImpl implements SetupInstallRepository {
   /**
    * Get the binary filename for the current platform
    */
-  private getBinaryFilename(): string {
+  private static getBinaryFilename(): string {
     return os.platform() === "win32" ? "vibe.cmd" : "vibe";
   }
 
@@ -95,7 +82,7 @@ class SetupInstallRepositoryImpl implements SetupInstallRepository {
    * then executes that file with Bun. This allows a single global "vibe"
    * binary to work with multiple projects on the same machine.
    */
-  private createBinaryContent(vibeRelativePath: string): string {
+  private static createBinaryContent(vibeRelativePath: string): string {
     const platform = os.platform();
 
     if (platform === "win32") {
@@ -161,9 +148,9 @@ exit 1
   /**
    * Check if bun is available
    */
-  private async checkBunAvailable(): Promise<boolean> {
+  private static async checkBunAvailable(): Promise<boolean> {
     try {
-      await this.runCommand("bun", ["--version"], {
+      await SetupInstallRepository.runCommand("bun", ["--version"], {
         verbose: false,
         ignoreErrors: true,
       });
@@ -172,10 +159,10 @@ exit 1
       return false;
     }
   }
-  async installCli(
+  static async installCli(
     data: InstallRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SetupInstallT,
   ): Promise<ResponseType<InstallResponseOutput>> {
     // Validate user permissions for CLI installation
     if (!user?.id) {
@@ -190,7 +177,7 @@ exit 1
 
     try {
       // Check if already installed
-      const status = await this.checkInstallationStatus();
+      const status = await SetupInstallRepository.checkInstallationStatus();
 
       if (status.installed && !data.force) {
         return success({
@@ -205,7 +192,7 @@ exit 1
       }
 
       // Check if Bun is available
-      const bunAvailable = await this.checkBunAvailable();
+      const bunAvailable = await SetupInstallRepository.checkBunAvailable();
       if (!bunAvailable) {
         return fail({
           message: t("post.errors.server.title"),
@@ -251,8 +238,8 @@ exit 1
       }
 
       // Get binary installation paths
-      const binDir = this.getBinaryDirectory();
-      const binaryFilename = this.getBinaryFilename();
+      const binDir = SetupInstallRepository.getBinaryDirectory();
+      const binaryFilename = SetupInstallRepository.getBinaryFilename();
       const targetPath = path.join(binDir, binaryFilename);
 
       // Remove existing binary if force is enabled
@@ -285,7 +272,8 @@ exit 1
       }
 
       // Create binary content with the RELATIVE path so it can be found from any project
-      const binaryContent = this.createBinaryContent(vibeRelativePath);
+      const binaryContent =
+        SetupInstallRepository.createBinaryContent(vibeRelativePath);
 
       // Write binary file
       writeFileSync(targetPath, binaryContent, { mode: 0o755 });
@@ -337,7 +325,7 @@ exit 1
     }
   }
 
-  private async checkInstallationStatus(): Promise<{
+  private static async checkInstallationStatus(): Promise<{
     installed: boolean;
     version?: string;
     path?: string;
@@ -387,7 +375,7 @@ exit 1
     }
   }
 
-  private async runCommand(
+  private static async runCommand(
     command: string,
     args: string[],
     options: {
@@ -439,8 +427,3 @@ exit 1
     });
   }
 }
-
-/**
- * Default repository instance
- */
-export const setupInstallRepository = new SetupInstallRepositoryImpl();

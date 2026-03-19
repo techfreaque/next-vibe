@@ -1,7 +1,6 @@
 import { translations as clientRoutesIndexTranslations } from "../../client-routes-index/i18n/pl";
 import { translations as emailTemplatesTranslations } from "../../email-templates/i18n/pl";
 import { translations as endpointTranslations } from "../../endpoint/i18n/pl";
-import { translations as endpointsTranslations } from "../../endpoints/i18n/pl";
 import { translations as envTranslations } from "../../env/i18n/pl";
 import { translations as generateAllTranslations } from "../../generate-all/i18n/pl";
 import { translations as generateTrpcRouterTranslations } from "../../generate-trpc-router/i18n/pl";
@@ -15,7 +14,6 @@ export const translations: typeof enTranslations = {
   clientRoutesIndex: clientRoutesIndexTranslations,
   emailTemplates: emailTemplatesTranslations,
   endpoint: endpointTranslations,
-  endpoints: endpointsTranslations,
   env: envTranslations,
   generateAll: generateAllTranslations,
   generateTrpcRouter: generateTrpcRouterTranslations,

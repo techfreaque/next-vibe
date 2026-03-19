@@ -53,6 +53,9 @@ export class ConfigValidator implements IConfigValidator {
     // Validate file paths for filesToCompile
     if (config.filesToCompile) {
       for (const file of config.filesToCompile) {
+        if (file.disabled) {
+          continue;
+        }
         const inputPath = resolve(ROOT_DIR, file.input);
         if (!existsSync(inputPath)) {
           errors.push(

@@ -27,7 +27,7 @@ import type { ProductsTranslationKey } from "./i18n";
  * Credit Value Definition
  * 1 credit = €0.01 = $0.01 = 0.24 PLN
  */
-const CREDIT_VALUE_USD = 0.01;
+export const CREDIT_VALUE_USD = 0.01;
 
 /**
  * Standard markup percentage applied to all external API costs

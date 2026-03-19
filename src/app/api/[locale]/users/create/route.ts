@@ -19,7 +19,7 @@ import {
 } from "@/app/api/[locale]/user/public/signup/email";
 
 import definitions from "./definition";
-import { userCreateRepository } from "./repository";
+import { UserCreateRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
@@ -62,7 +62,7 @@ export const { POST, tools } = endpointsHandler({
       },
     ],
     handler: async ({ data, user, locale, logger, t }) => {
-      return await userCreateRepository.createUser(
+      return await UserCreateRepository.createUser(
         data,
         user,
         locale,

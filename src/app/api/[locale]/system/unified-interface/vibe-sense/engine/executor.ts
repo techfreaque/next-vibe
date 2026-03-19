@@ -7,28 +7,28 @@
 
 import "server-only";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { defaultLocale } from "@/i18n/core/config";
 
+import { GraphResolution } from "../enum";
+import type { GraphNodeConfig } from "../graph/schema";
 import type { GraphEdge } from "../graph/types";
 import {
   DataPointSchema,
   type DataPoint,
-  type TimeRange,
   type Resolution,
   type SignalEvent,
+  type TimeRange,
 } from "../shared/fields";
-import { GraphResolution } from "../enum";
 import { needsScaleUp, scaleUpSeries, trimSeries } from "../shared/range";
-import { writeDatapoints, readDatapoints } from "../store/datapoints";
+import { readDatapoints, writeDatapoints } from "../store/datapoints";
 import { writeSignals } from "../store/signals";
-import type { GraphNodeConfig } from "../graph/schema";
 
 // ─── System Constants ─────────────────────────────────────────────────────────
 
@@ -38,6 +38,8 @@ const VIBE_SENSE_SYSTEM_USER: JwtPayloadType = {
   isPublic: false,
   roles: [UserPermissionRole.ADMIN],
 };
+
+const VIBE_SENSE_ABORT_CONTROLLER = new AbortController();
 
 const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   rootFolderId: DefaultFolderId.CRON,
@@ -53,7 +55,9 @@ const VIBE_SENSE_STREAM_CONTEXT: ToolExecutionContext = {
   leafMessageId: undefined,
   waitingForRemoteResult: undefined,
   favoriteId: undefined,
-  abortSignal: undefined,
+  abortSignal: VIBE_SENSE_ABORT_CONTROLLER.signal,
+  callerCallbackMode: undefined,
+  onEscalatedTaskCancel: undefined,
   escalateToTask: undefined,
 };
 

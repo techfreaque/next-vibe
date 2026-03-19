@@ -10,6 +10,7 @@ import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { createAndSendUserMessage } from "./shared";
 import type { StartStreamFn } from "./shared";
@@ -21,6 +22,7 @@ export interface BranchMessageDeps {
   currentSubFolderId: string | null;
   /** Active thread ID — needed to look up message in apiClient cache */
   activeThreadId: string | null;
+  user: JwtPayloadType;
   settings: {
     selectedModel: ModelId;
     selectedSkill: string;

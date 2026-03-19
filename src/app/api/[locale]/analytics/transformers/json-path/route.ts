@@ -11,14 +11,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeJsonPath } from "./repository";
+import { JsonPathTransformerRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, path, resolution, lookback } = data;
-      const result = computeJsonPath(source, path);
+      const result = JsonPathTransformerRepository.computeJsonPath(
+        source,
+        path,
+      );
       return success({
         result,
         meta: {

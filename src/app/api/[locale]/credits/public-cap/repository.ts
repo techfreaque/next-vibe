@@ -19,26 +19,24 @@ import type {
   PublicCapPostResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/** Default daily cap if env var is not set */
-const DEFAULT_CAP = 500;
+import type { PublicCapT } from "./i18n";
 
 /** YYYY-MM-DD string for today in server local time */
-function todayString(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
 export class PublicCapRepository {
+  /** Default daily cap if env var is not set */
+  private static readonly DEFAULT_CAP = 500;
+  private static todayString(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
   /**
    * Get or create the single config row, resetting spendToday if a new day has started.
    * Lazy midnight reset: happens on the first read/write after midnight.
    */
   private static async getOrCreateRow(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PublicCapT,
   ): Promise<ResponseType<typeof publicFreeTierDailyCap.$inferSelect>> {
     try {
       const [row] = await db.select().from(publicFreeTierDailyCap).limit(1);
@@ -47,7 +45,7 @@ export class PublicCapRepository {
         // First ever call — seed the row
         const [created] = await db
           .insert(publicFreeTierDailyCap)
-          .values({ capAmount: DEFAULT_CAP, spendToday: 0 })
+          .values({ capAmount: PublicCapRepository.DEFAULT_CAP, spendToday: 0 })
           .returning();
         if (!created) {
           return fail({
@@ -60,7 +58,7 @@ export class PublicCapRepository {
 
       // Lazy midnight reset: if lastResetAt date differs from today, zero spendToday
       const resetDate = row.lastResetAt.toISOString().slice(0, 10);
-      if (resetDate !== todayString()) {
+      if (resetDate !== PublicCapRepository.todayString()) {
         const [reset] = await db
           .update(publicFreeTierDailyCap)
           .set({
@@ -94,7 +92,7 @@ export class PublicCapRepository {
    */
   static async getStatus(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PublicCapT,
   ): Promise<ResponseType<PublicCapGetResponseOutput>> {
     const rowResult = await this.getOrCreateRow(logger, t);
     if (!rowResult.success) {
@@ -124,7 +122,7 @@ export class PublicCapRepository {
   static async updateCap(
     capAmount: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PublicCapT,
   ): Promise<ResponseType<PublicCapPostResponseOutput>> {
     try {
       const rowResult = await this.getOrCreateRow(logger, t);
@@ -163,15 +161,16 @@ export class PublicCapRepository {
 
       if (!row) {
         // Seed row if missing (shouldn't happen but be safe)
-        await db
-          .insert(publicFreeTierDailyCap)
-          .values({ capAmount: DEFAULT_CAP, spendToday: amount });
+        await db.insert(publicFreeTierDailyCap).values({
+          capAmount: PublicCapRepository.DEFAULT_CAP,
+          spendToday: amount,
+        });
         return;
       }
 
       // Lazy midnight reset
       const resetDate = row.lastResetAt.toISOString().slice(0, 10);
-      if (resetDate !== todayString()) {
+      if (resetDate !== PublicCapRepository.todayString()) {
         await db
           .update(publicFreeTierDailyCap)
           .set({
@@ -216,7 +215,7 @@ export class PublicCapRepository {
 
       // Lazy midnight reset
       const resetDate = row.lastResetAt.toISOString().slice(0, 10);
-      if (resetDate !== todayString()) {
+      if (resetDate !== PublicCapRepository.todayString()) {
         // New day — reset and allow
         await db
           .update(publicFreeTierDailyCap)

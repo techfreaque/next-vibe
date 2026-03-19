@@ -15,35 +15,22 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { db } from "../index";
 import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { SqlT } from "./i18n";
 
 /**
- * Execute SQL query Repository Interface
+ * Execute SQL query Repository
  */
-export interface SqlRepositoryInterface {
-  execute(
+export class SqlRepository {
+  static async execute(
     data: SqlRequestOutput,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SqlResponseOutput>>;
-}
-
-/**
- * Execute SQL query Repository Implementation
- */
-export class SqlRepositoryImpl implements SqlRepositoryInterface {
-  async execute(
-    data: SqlRequestOutput,
-    t: ModuleT,
+    t: SqlT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SqlResponseOutput>> {
     let output = "";
 
     try {
       // Get query from either direct input or file
-      const query = await this.resolveQuery(data, logger);
+      const query = await SqlRepository.resolveQuery(data, logger);
 
       if (!query) {
         return fail({
@@ -54,14 +41,14 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
 
       // Validate SQL query for safety
       logger.info("Executing SQL query");
-      const queryType = this.getQueryType(query);
+      const queryType = SqlRepository.getQueryType(query);
 
       if (data.dryRun) {
-        output = this.formatDryRunOutput(query, queryType);
+        output = SqlRepository.formatDryRunOutput(query, queryType);
       } else {
         // Execute actual SQL query
-        const queryResult = await this.executeQuery(query, data.limit);
-        output = this.formatSuccessOutput(queryResult, queryType);
+        const queryResult = await SqlRepository.executeQuery(query, data.limit);
+        output = SqlRepository.formatSuccessOutput(queryResult, queryType);
 
         const response: SqlResponseOutput = {
           success: true,
@@ -94,7 +81,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
     }
   }
 
-  private getQueryType(query: string): string {
+  private static getQueryType(query: string): string {
     const normalizedQuery = query.trim().toLowerCase();
     if (normalizedQuery.startsWith("select")) {
       return "SELECT";
@@ -120,7 +107,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
     return "UNKNOWN";
   }
 
-  private async executeQuery(
+  private static async executeQuery(
     query: string,
     limit = 100,
   ): Promise<{
@@ -131,7 +118,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
     // Add LIMIT for SELECT queries if not already present
     let finalQuery = query;
     if (
-      this.getQueryType(query) === "SELECT" &&
+      SqlRepository.getQueryType(query) === "SELECT" &&
       !query.toLowerCase().includes("limit")
     ) {
       finalQuery = `${query} LIMIT ${limit}`;
@@ -147,7 +134,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
     };
   }
 
-  private async resolveQuery(
+  private static async resolveQuery(
     data: SqlRequestOutput,
     logger: EndpointLogger,
   ): Promise<string | null> {
@@ -174,7 +161,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
     return null;
   }
 
-  private formatDryRunOutput(query: string, queryType: string): string {
+  private static formatDryRunOutput(query: string, queryType: string): string {
     const lines: string[] = [];
     lines.push("Dry Run Mode - No Changes Made");
     lines.push("");
@@ -185,7 +172,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
     return lines.join("\n");
   }
 
-  private formatSuccessOutput(
+  private static formatSuccessOutput(
     queryResult: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       results: Record<string, any>[];
@@ -213,8 +200,3 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
     return lines.join("\n");
   }
 }
-
-/**
- * Default repository instance
- */
-export const sqlRepository = new SqlRepositoryImpl();

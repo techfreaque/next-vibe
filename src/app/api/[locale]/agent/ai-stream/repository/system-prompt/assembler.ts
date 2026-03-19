@@ -9,8 +9,6 @@
  * This file only assembles — no hardcoded prompt content here.
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 export const CONTINUE_CONVERSATION_PROMPT =
   "Respond to the previous AI message naturally, as if you were a user engaging with it. Provide your thoughts, feedback, or follow-up based on what was said. Do not ask questions or try to drive the conversation - simply respond to what the AI said.";
 

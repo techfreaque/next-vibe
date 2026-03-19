@@ -33,9 +33,8 @@ import type {
   FolderListResponseOutput,
   FolderListUrlVariablesOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type FoldersT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { FolderByIdT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Chat Folders Repository - Static class pattern
@@ -47,7 +46,7 @@ export class ChatFoldersRepository {
   static async getFolders(
     data: FolderListUrlVariablesOutput,
     user: JwtPayloadType,
-    t: FoldersT,
+    t: FolderByIdT,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<FolderListResponseOutput>> {
@@ -222,11 +221,11 @@ export class ChatFoldersRepository {
   static async createFolder(
     data: FolderCreateRequestOutput,
     user: JwtPayloadType,
-    t: FoldersT,
-    logger: EndpointLogger,
     locale: CountryLanguage,
+    logger: EndpointLogger,
     rootFolderId: DefaultFolderId,
   ): Promise<ResponseType<FolderCreateResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Creating folder", {
         rootFolderId,

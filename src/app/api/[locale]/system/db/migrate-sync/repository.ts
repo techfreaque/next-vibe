@@ -18,52 +18,27 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type migrateSyncEndpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type {
+  MigrateSyncRequestOutput,
+  MigrateSyncResponseOutput,
+} from "./definition";
+import type { MigrateSyncT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-// Constants to avoid literal strings
-const SQL_FILE_EXTENSION = ".sql";
-const BACKUP_FOLDER_NAME = ".backup";
-const TRACKING_COMMENT = `-- Migration tracking only - original backed up
+/**
+ * Database Migration Sync Repository
+ */
+export class DatabaseMigrateSyncRepository {
+  private static readonly SQL_FILE_EXTENSION = ".sql";
+  private static readonly BACKUP_FOLDER_NAME = ".backup";
+  private static readonly TRACKING_COMMENT = `-- Migration tracking only - original backed up
 -- This allows Drizzle to establish proper tracking without executing DDL
 SELECT 1; -- No-op for tracking
 `;
-
-type MigrateSyncRequestType =
-  typeof migrateSyncEndpoints.POST.types.RequestOutput;
-type MigrateSyncResponseType =
-  typeof migrateSyncEndpoints.POST.types.ResponseOutput;
-
-/**
- * Migration file interface
- */
-interface MigrationFile {
-  filename: string;
-  content: string;
-}
-
-/**
- * Database Migration Sync Repository Interface
- */
-export interface DatabaseMigrateSyncRepository {
-  syncMigrations(
-    data: MigrateSyncRequestType,
-    t: ModuleT,
+  static async syncMigrations(
+    data: MigrateSyncRequestOutput,
+    t: MigrateSyncT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateSyncResponseType>>;
-}
-
-/**
- * Database Migration Sync Repository Implementation
- */
-export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRepository {
-  async syncMigrations(
-    data: MigrateSyncRequestType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateSyncResponseType>> {
+  ): Promise<ResponseType<MigrateSyncResponseOutput>> {
     try {
       logger.info("Starting migration sync process", { options: data });
 
@@ -77,7 +52,8 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
         logger.info("DRY RUN MODE - No changes will be made");
 
         // Count migration files for dry run
-        const migrationFiles = this.getMigrationFiles();
+        const migrationFiles =
+          DatabaseMigrateSyncRepository.getMigrationFiles();
         const output = t("messages.dryRunComplete");
 
         return success({
@@ -93,23 +69,29 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
 
       // Step 1: Clear existing migration tracking to start fresh
       logger.info("Clearing existing migration tracking");
-      await this.clearMigrationTracking(logger);
+      await DatabaseMigrateSyncRepository.clearMigrationTracking(logger);
       trackingCleared = true;
 
       // Step 2: Create temporary migration files that only track without executing
       logger.info("Creating tracking-only migration files");
-      const migrationFiles = this.getMigrationFiles();
-      await this.createTrackingMigrations(migrationFiles, logger);
+      const migrationFiles = DatabaseMigrateSyncRepository.getMigrationFiles();
+      await DatabaseMigrateSyncRepository.createTrackingMigrations(
+        migrationFiles,
+        logger,
+      );
       trackingFilesCreated = true;
 
       // Step 3: Run Drizzle migration to establish proper tracking
       logger.info("Running Drizzle migration for tracking");
-      await this.runTrackingMigration(logger);
+      await DatabaseMigrateSyncRepository.runTrackingMigration(logger);
       drizzleMigrationRun = true;
 
       // Step 4: Restore original migration files
       logger.info("Restoring original migration files");
-      await this.restoreOriginalMigrations(migrationFiles, logger);
+      await DatabaseMigrateSyncRepository.restoreOriginalMigrations(
+        migrationFiles,
+        logger,
+      );
       originalFilesRestored = true;
 
       const output = t("messages.success");
@@ -139,7 +121,9 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
   /**
    * Clear existing migration tracking
    */
-  private async clearMigrationTracking(logger: EndpointLogger): Promise<void> {
+  private static async clearMigrationTracking(
+    logger: EndpointLogger,
+  ): Promise<void> {
     try {
       // Drop and recreate the migration table to start fresh
       await db.execute(
@@ -157,7 +141,7 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
   /**
    * Get list of migration files
    */
-  private getMigrationFiles(): MigrationFile[] {
+  private static getMigrationFiles(): { filename: string; content: string }[] {
     const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 
     if (!existsSync(migrationsFolder)) {
@@ -165,7 +149,9 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
     }
 
     return readdirSync(migrationsFolder)
-      .filter((file) => file.endsWith(SQL_FILE_EXTENSION))
+      .filter((file) =>
+        file.endsWith(DatabaseMigrateSyncRepository.SQL_FILE_EXTENSION),
+      )
       .toSorted()
       .map((filename) => ({
         filename,
@@ -176,8 +162,8 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
   /**
    * Create tracking-only migration files (empty SQL that just establishes tracking)
    */
-  private async createTrackingMigrations(
-    migrationFiles: MigrationFile[],
+  private static async createTrackingMigrations(
+    migrationFiles: { filename: string; content: string }[],
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -185,7 +171,10 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
       const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 
       // Backup original files
-      const backupFolder = path.join(migrationsFolder, BACKUP_FOLDER_NAME);
+      const backupFolder = path.join(
+        migrationsFolder,
+        DatabaseMigrateSyncRepository.BACKUP_FOLDER_NAME,
+      );
       await fs.mkdir(backupFolder, { recursive: true });
 
       for (const { filename, content } of migrationFiles) {
@@ -193,7 +182,7 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
         await fs.writeFile(path.join(backupFolder, filename), content, "utf-8");
 
         // Create tracking-only version (empty SQL with just a comment)
-        const trackingContent = TRACKING_COMMENT;
+        const trackingContent = DatabaseMigrateSyncRepository.TRACKING_COMMENT;
 
         await fs.writeFile(
           path.join(migrationsFolder, filename),
@@ -216,7 +205,9 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
   /**
    * Run Drizzle migration with tracking-only files
    */
-  private async runTrackingMigration(logger: EndpointLogger): Promise<void> {
+  private static async runTrackingMigration(
+    logger: EndpointLogger,
+  ): Promise<void> {
     try {
       // This will establish proper Drizzle tracking without executing DDL
       await drizzleMigrate(db, { migrationsFolder: "drizzle" });
@@ -232,14 +223,17 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
   /**
    * Restore original migration files
    */
-  private async restoreOriginalMigrations(
-    migrationFiles: MigrationFile[],
+  private static async restoreOriginalMigrations(
+    migrationFiles: { filename: string; content: string }[],
     logger: EndpointLogger,
   ): Promise<void> {
     try {
       const fs = await import("node:fs/promises");
       const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-      const backupFolder = path.join(migrationsFolder, BACKUP_FOLDER_NAME);
+      const backupFolder = path.join(
+        migrationsFolder,
+        DatabaseMigrateSyncRepository.BACKUP_FOLDER_NAME,
+      );
 
       for (const { filename } of migrationFiles) {
         // Restore original from backup
@@ -264,9 +258,3 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
     }
   }
 }
-
-/**
- * Export repository instance
- */
-export const databaseMigrateSyncRepository =
-  new DatabaseMigrateSyncRepositoryImpl();

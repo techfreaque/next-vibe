@@ -3,7 +3,11 @@
  * Implements CreditRepository static interface for React Native
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  type ResponseType,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -15,15 +19,18 @@ import type { CreditPackCheckoutSession } from "../payment/providers/types";
 import creditsDefinitions, {
   type CreditsGetResponseOutput,
 } from "./definition";
-import type { CreditTypeIdentifierValue } from "./enum";
 import type {
   CreditIdentifier,
   CreditPool,
   CreditRepositoryType,
   CreditTransactionOutput,
-  ModuleT,
 } from "./repository";
-
+import type {
+  CreditsHistoryGetRequestOutput,
+  CreditsHistoryGetResponseOutput,
+} from "./history/definition";
+import type { CreditTypeIdentifierValue } from "./enum";
+import type { CreditsT } from "./i18n";
 /**
  * Native Credit Repository - Static class pattern
  */
@@ -34,7 +41,7 @@ export class CreditRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on native, but required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
     const response = await nativeEndpoint(
       creditsDefinitions.GET,
@@ -43,14 +50,13 @@ export class CreditRepository {
       locale,
     );
     if (response.success) {
-      return { success: true, data: response.data, message: response.message };
+      return success(response.data);
     }
-    return {
-      success: false,
-      errorType: response.errorType,
+    return fail({
       message: response.message,
+      errorType: response.errorType,
       messageParams: response.messageParams,
-    };
+    });
   }
 
   static async getBalance(
@@ -59,7 +65,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
@@ -93,7 +99,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
@@ -107,7 +113,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
@@ -119,11 +125,11 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _ipAddress: string,
     // oxlint-disable-next-line no-unused-vars
-    _locale: string,
+    _locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<ResponseType<{ leadId: string; credits: number }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getOrCreateLeadByIp is not implemented on native");
@@ -139,7 +145,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _expiresAt?: Date,
     // oxlint-disable-next-line no-unused-vars
@@ -161,7 +167,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<
@@ -178,7 +184,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<ResponseType<number>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("expireCredits is not implemented on native");
@@ -190,7 +196,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleCreditPackPurchase is not implemented on native");
@@ -204,7 +210,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<
     ResponseType<{
       userId?: string;
@@ -228,10 +234,10 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
-  ): Promise<{ success: boolean; messageId?: string }> {
+  ): Promise<ResponseType<{ messageId?: string; partialDeduction?: boolean }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductCreditsForFeature is not implemented on native");
   }
@@ -244,7 +250,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<ResponseType<void>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("mergePendingLeadWallets is not implemented on native");
@@ -258,7 +264,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<boolean> {
@@ -290,7 +296,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<ResponseType<CreditPool>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getUserPool is not implemented on native");
@@ -302,7 +308,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
@@ -316,7 +322,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
@@ -334,7 +340,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
   ): Promise<
@@ -349,26 +355,16 @@ export class CreditRepository {
 
   static async getTransactionHistory(
     // oxlint-disable-next-line no-unused-vars
-    _data: { paginationInfo: { page: number; limit: number } },
+    _data: CreditsHistoryGetRequestOutput,
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
-  ): Promise<
-    ResponseType<{
-      transactions: CreditTransactionOutput[];
-      paginationInfo: {
-        page: number;
-        limit: number;
-        totalCount: number;
-        pageCount: number;
-      };
-    }>
-  > {
+  ): Promise<ResponseType<CreditsHistoryGetResponseOutput>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getTransactionHistory is not implemented on native");
   }
@@ -408,7 +404,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _sourceUserEmail?: string,
   ): Promise<ResponseType<{ packId: string; transactionId: string }>> {
@@ -422,7 +418,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<
     ResponseType<{ total: number; available: number; locked: number }>
   > {
@@ -442,7 +438,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<ResponseType<void>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductEarnedCredits is not implemented on native");
@@ -458,7 +454,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -497,12 +493,8 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
-  ): Promise<{
-    success: boolean;
-    messageId?: string;
-    partialDeduction?: boolean;
-  }> {
+    _t: CreditsT,
+  ): Promise<ResponseType<{ messageId?: string; partialDeduction?: boolean }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductCreditsForTTS is not implemented on native");
   }
@@ -515,14 +507,10 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
-  ): Promise<{
-    success: boolean;
-    messageId?: string;
-    partialDeduction?: boolean;
-  }> {
+  ): Promise<ResponseType<{ messageId?: string; partialDeduction?: boolean }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductCreditsForSTT is not implemented on native");
   }
@@ -537,14 +525,10 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
-    _t: ModuleT,
+    _t: CreditsT,
     // oxlint-disable-next-line no-unused-vars
     _locale: CountryLanguage,
-  ): Promise<{
-    success: boolean;
-    messageId?: string;
-    partialDeduction?: boolean;
-  }> {
+  ): Promise<ResponseType<{ messageId?: string; partialDeduction?: boolean }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deductCreditsForModelUsage is not implemented on native");
   }

@@ -15,8 +15,8 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     handler: async ({ data, locale, logger, t }) => {
       // Lazy import to avoid creating connections during route discovery
-      const { healthCheckRepository } = await import("./repository");
-      return await healthCheckRepository.checkHealth(data, logger, t, locale);
+      const { HealthCheckRepository } = await import("./repository");
+      return await HealthCheckRepository.checkHealth(data, logger, t, locale);
     },
   },
 });

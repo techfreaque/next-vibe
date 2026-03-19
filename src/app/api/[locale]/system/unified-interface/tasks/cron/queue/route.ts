@@ -7,13 +7,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { endpoints } from "./definition";
-import { cronQueueRepository } from "./repository";
+import { CronQueueRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     handler: async ({ data, user, locale, t, logger }) => {
-      return await cronQueueRepository.getQueue(data, user, locale, t, logger);
+      return await CronQueueRepository.getQueue(data, user, locale, t, logger);
     },
   },
 });

@@ -18,18 +18,15 @@ import type {
   LinuxUserDeleteRequestOutput,
   LinuxUserDeleteResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-const execAsync = promisify(exec);
+import type { UsersUsernameT } from "./i18n";
 
 export class LinuxUserDeleteRepository {
+  private static readonly execAsync = promisify(exec);
   static async delete(
     data: LinuxUserDeleteRequestOutput,
     logger: EndpointLogger,
     username: string,
-    t: ModuleT,
+    t: UsersUsernameT,
   ): Promise<ResponseType<LinuxUserDeleteResponseOutput>> {
     const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
     if (!isLocalMode) {
@@ -49,7 +46,9 @@ export class LinuxUserDeleteRepository {
     }
 
     try {
-      const { stdout: uidStr } = await execAsync(`id -u ${username}`);
+      const { stdout: uidStr } = await LinuxUserDeleteRepository.execAsync(
+        `id -u ${username}`,
+      );
       const uid = parseInt(uidStr.trim(), 10);
       if (uid < 1000) {
         return fail({
@@ -67,7 +66,9 @@ export class LinuxUserDeleteRepository {
     const removeHome = data.removeHome ? "--remove" : "";
     try {
       logger.info(`Deleting Linux user: ${username}`);
-      await execAsync(`userdel ${removeHome} ${username}`);
+      await LinuxUserDeleteRepository.execAsync(
+        `userdel ${removeHome} ${username}`,
+      );
       return success({ ok: true });
     } catch (error) {
       logger.error("Failed to delete Linux user", parseError(error));

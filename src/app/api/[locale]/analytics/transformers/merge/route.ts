@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeMerge } from "./repository";
+import { MergeTransformerRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { a, b, resolution, lookback } = data;
-      const result = computeMerge(a, b);
+      const result = MergeTransformerRepository.computeMerge(a, b);
       return success({
         result,
         meta: {

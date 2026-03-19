@@ -23,46 +23,44 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { CronTaskStatus } from "../../enum";
 import type { JsonValue } from "../../unified-runner/types";
 import { cronTaskExecutions, cronTasks } from "../db";
-import { serializeTask, translateTaskFields } from "../repository";
+import { CronTasksRepository } from "../repository";
 import type {
   CronDashboardRequestOutput,
   CronDashboardResponseOutput,
 } from "./definition";
 import type { CronDashboardT } from "./i18n";
 
-/* eslint-disable i18next/no-literal-string */
-
-/**
- * Truncate a string, appending "..." if over maxLen.
- */
-function truncate(str: string, maxLen: number): string {
-  if (str.length <= maxLen) {
-    return str;
-  }
-  return `${str.slice(0, maxLen - 3)}...`;
-}
-
-/**
- * Summarise a task result JSONB value into a short readable string.
- */
-function summariseResult(
-  result: Record<string, JsonValue> | null,
-): string | null {
-  if (!result) {
-    return null;
-  }
-  const entries = Object.entries(result);
-  if (entries.length === 0) {
-    return null;
-  }
-  const snippet = entries
-    .slice(0, 4)
-    .map(([k, v]) => `${k}:${String(v)}`)
-    .join(", ");
-  return truncate(snippet, 80);
-}
-
 export class CronDashboardRepository {
+  /**
+   * Truncate a string, appending "..." if over maxLen.
+   */
+  private static truncate(str: string, maxLen: number): string {
+    if (str.length <= maxLen) {
+      return str;
+    }
+    return `${str.slice(0, maxLen - 3)}...`;
+  }
+
+  /**
+   * Summarise a task result JSONB value into a short readable string.
+   */
+  private static summariseResult(
+    result: Record<string, JsonValue> | null,
+  ): string | null {
+    if (!result) {
+      return null;
+    }
+    const entries = Object.entries(result);
+    if (entries.length === 0) {
+      return null;
+    }
+    const snippet = entries
+      .slice(0, 4)
+      .map(([k, v]) => `${k}:${String(v)}`)
+      .join(", ");
+    return CronDashboardRepository.truncate(snippet, 80);
+  }
+
   static async getDashboard(
     data: CronDashboardRequestOutput,
     user: JwtPayloadType,
@@ -153,21 +151,28 @@ export class CronDashboardRepository {
             (e) => e.status === CronTaskStatus.COMPLETED,
           );
           const lastResultSummary = lastSuccess
-            ? summariseResult(lastSuccess.result ?? null)
+            ? CronDashboardRepository.summariseResult(
+                lastSuccess.result ?? null,
+              )
             : null;
 
           const recentExecutions = taskExecs.map((e) => ({
             status: e.status,
             completedAt: e.completedAt?.toISOString() ?? null,
             durationMs: e.durationMs,
-            resultSnippet: e.result ? summariseResult(e.result) : null,
+            resultSnippet: e.result
+              ? CronDashboardRepository.summariseResult(e.result)
+              : null,
             errorSnippet: e.error?.message
-              ? truncate(e.error.message, 60)
+              ? CronDashboardRepository.truncate(e.error.message, 60)
               : null,
           }));
 
-          const serialized = serializeTask(task, logger);
-          const base = await translateTaskFields(serialized, locale);
+          const serialized = CronTasksRepository.serializeTask(task, logger);
+          const base = await CronTasksRepository.translateTaskFields(
+            serialized,
+            locale,
+          );
 
           return {
             ...base,
@@ -196,7 +201,7 @@ export class CronDashboardRepository {
             priority: ft.priority,
             consecutiveFailures: ft.consecutiveFailures,
             lastError: lastFailed?.error?.message
-              ? truncate(lastFailed.error.message, 120)
+              ? CronDashboardRepository.truncate(lastFailed.error.message, 120)
               : null,
             lastFailedAt: lastFailed?.startedAt?.toISOString() ?? null,
           };

@@ -1,13 +1,16 @@
 /**
  * Complete Task API Definition
- * MCP tool for Claude Code to mark a cron task as completed/failed/cancelled.
- * Supports custom output payloads for structured result reporting.
- * MCP-visible only on local/prod instances (NODE_ENV=production).
+ * MCP tool called by tools (e.g. claude-code interactive) when their async work is done.
+ * Accepts the exact response payload of the originating tool — same shape as if the tool
+ * had returned synchronously. The framework uses this as the wakeUpResult so the deferred
+ * TOOL message in the thread renders with the correct response fields.
+ *
+ * Only taskId + response are required. Status is always "completed".
+ * MCP-visible on all instances so Claude Code in a terminal can call back.
  */
 
 import { z } from "zod";
 
-import { envClient } from "@/config/env-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   objectField,
@@ -22,10 +25,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
+import { envClient } from "@/config/env-client";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -55,27 +58,11 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().min(1),
       }),
-      status: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        columns: 6,
-        schema: z.enum([
-          CronTaskStatus.COMPLETED,
-          CronTaskStatus.FAILED,
-          CronTaskStatus.CANCELLED,
-        ]),
-      }),
-      summary: requestField(scopedTranslation, {
+      response: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        schema: z.string().min(1),
-      }),
-      output: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
-        columns: 12,
-        schema: taskInputSchema.optional(),
+        schema: taskInputSchema,
       }),
 
       // Response
@@ -141,16 +128,17 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        taskId: "db-health",
-        status: CronTaskStatus.COMPLETED,
-        summary: "Implemented the requested feature and all tests pass.",
-        output: { errorsFound: 0, testsRun: 12, testsPassed: 12 },
+        taskId: "escalated-1234567890-abc123",
+        response: {
+          output: "Ran echo hello — output: hello",
+          durationMs: 1200,
+        },
       },
     },
     responses: {
       default: {
         completed: true,
-        pushedToRemote: true,
+        pushedToRemote: false,
         updatedAt: new Date("2026-02-26T21:00:00Z").toISOString(),
       },
     },

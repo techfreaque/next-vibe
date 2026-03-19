@@ -4,8 +4,6 @@
  * IMPORTANT: No database imports or server-only code allowed
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import { CronTaskStatus } from "../enum";
 import { CRON_DELETE_ALIAS, CRON_UPDATE_ALIAS } from "./[id]/constants";
 import { CRON_DASHBOARD_ALIAS } from "./dashboard/constants";

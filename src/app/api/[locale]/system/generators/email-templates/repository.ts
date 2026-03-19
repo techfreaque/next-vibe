@@ -27,10 +27,8 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
+import type { GeneratorsEmailTemplatesT } from "./i18n";
 import type { TemplateCachedMetadata } from "@/app/api/[locale]/messenger/registry/template";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions
 interface EmailTemplateRequestType {
@@ -54,24 +52,13 @@ interface TemplateInfo {
 }
 
 /**
- * Email Template Generator Repository Interface
- */
-interface EmailTemplateGeneratorRepository {
-  generateEmailTemplates(
-    data: EmailTemplateRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<BaseResponseType<EmailTemplateResponseType>>;
-}
-
-/**
  * Email Template Generator Repository Implementation
  */
-class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepository {
-  async generateEmailTemplates(
+export class EmailTemplateGeneratorRepository {
+  static async generateEmailTemplates(
     data: EmailTemplateRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsEmailTemplatesT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<EmailTemplateResponseType>> {
     const startTime = Date.now();
@@ -114,15 +101,20 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
       }
 
       // Load templates and extract metadata
-      const templates = await this.loadTemplates(templateFiles, logger);
+      const templates = await EmailTemplateGeneratorRepository.loadTemplates(
+        templateFiles,
+        logger,
+      );
 
       logger.debug(`Loaded ${templates.length} valid templates`);
 
       // Generate server-side content (full templates with adapters)
-      const serverContent = this.generateServerContent(templates);
+      const serverContent =
+        EmailTemplateGeneratorRepository.generateServerContent(templates);
 
       // Generate client-safe content (components only, no server-only imports)
-      const clientContent = this.generateClientContent(templates);
+      const clientContent =
+        EmailTemplateGeneratorRepository.generateClientContent(templates);
 
       // Calculate client output file path
       const clientOutputFile = outputFile.replace(/\.ts$/, ".client.ts");
@@ -168,7 +160,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
   /**
    * Load templates and extract metadata
    */
-  private async loadTemplates(
+  private static async loadTemplates(
     templateFiles: string[],
     logger: EndpointLogger,
   ): Promise<TemplateInfo[]> {
@@ -222,7 +214,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
   /**
    * Generate server-side registry content with lazy imports and metadata cache
    */
-  private generateServerContent(templates: TemplateInfo[]): string {
+  private static generateServerContent(templates: TemplateInfo[]): string {
     // Sort templates by import path for consistent import order
     const templatesByPath = templates.toSorted((a, b) =>
       a.importPath.localeCompare(b.importPath),
@@ -530,7 +522,7 @@ export async function getAllTranslatedTemplateMetadata(
    * Generate client-safe registry content without server-only imports
    * Only includes template components and metadata for preview purposes
    */
-  private generateClientContent(templates: TemplateInfo[]): string {
+  private static generateClientContent(templates: TemplateInfo[]): string {
     // Sort templates by ID for consistent output
     const templatesById = templates.toSorted((a, b) =>
       a.id.localeCompare(b.id),
@@ -650,6 +642,3 @@ export function getTemplatesByCategory(
 `;
   }
 }
-
-export const emailTemplateGeneratorRepository =
-  new EmailTemplateGeneratorRepositoryImpl();

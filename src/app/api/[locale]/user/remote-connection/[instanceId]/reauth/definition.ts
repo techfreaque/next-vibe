@@ -150,6 +150,8 @@ const { POST } = createEndpoint({
 
 export type RemoteConnectionReauthPostRequestInput =
   typeof POST.types.RequestInput;
+export type RemoteConnectionReauthPostResponseOutput =
+  typeof POST.types.ResponseOutput;
 
 const definitions = { POST };
 export default definitions;

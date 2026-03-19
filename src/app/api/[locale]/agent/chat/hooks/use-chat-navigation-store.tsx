@@ -26,6 +26,7 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { DefaultFolderId, isDefaultFolderId } from "../config";
+import folderContentsDefinition from "../folder-contents/[rootFolderId]/definition";
 import threadsDefinition from "../threads/definition";
 
 /**
@@ -73,9 +74,70 @@ export interface ChatNavigationState {
   setAborting: (threadId: string, logger: EndpointLogger) => void;
   /** Mark active thread as not streaming; also updates threads endpoint cache */
   stopStream: (threadId: string, logger: EndpointLogger) => void;
+  /** Mark active thread as waiting (stream dead, task in flight); updates threads endpoint cache */
+  setWaiting: (threadId: string, logger: EndpointLogger) => void;
 }
 
 type ChatNavigationStore = StoreApi<ChatNavigationState>;
+
+/**
+ * Patches both the threads cache and folder-contents cache for a given thread's
+ * streamingState. Must patch both because the sidebar uses folder-contents while
+ * some views use threads.
+ */
+function patchThreadStreamingState(
+  threadId: string,
+  state: "idle" | "streaming" | "aborting" | "waiting",
+  currentRootFolderId: DefaultFolderId,
+  currentSubFolderId: string | null,
+  logger: EndpointLogger,
+): void {
+  // Patch threads endpoint cache (used by some views)
+  apiClient.updateEndpointData(
+    threadsDefinition.GET,
+    logger,
+    (old) => {
+      if (!old?.success) {
+        return old;
+      }
+      return success({
+        ...old.data,
+        threads: old.data.threads.map((t) =>
+          t.id === threadId ? { ...t, streamingState: state } : t,
+        ),
+      });
+    },
+    {
+      requestData: {
+        rootFolderId: currentRootFolderId,
+        subFolderId: currentSubFolderId,
+      },
+    },
+  );
+
+  // Patch folder-contents endpoint cache (used by sidebar)
+  apiClient.updateEndpointData(
+    folderContentsDefinition.GET,
+    logger,
+    (old) => {
+      if (!old?.success) {
+        return old;
+      }
+      return success({
+        ...old.data,
+        items: old.data.items.map((item) =>
+          item.type === "thread" && item.id === threadId
+            ? { ...item, streamingState: state }
+            : item,
+        ),
+      });
+    },
+    {
+      urlPathParams: { rootFolderId: currentRootFolderId },
+      requestData: { subFolderId: currentSubFolderId },
+    },
+  );
+}
 
 /**
  * Factory: creates a new store instance.
@@ -129,80 +191,45 @@ function createChatNavigationStore(opts?: {
     startStream: (threadId, logger): void => {
       set({ isStreaming: true });
       const { currentRootFolderId, currentSubFolderId } = get();
-      apiClient.updateEndpointData(
-        threadsDefinition.GET,
+      patchThreadStreamingState(
+        threadId,
+        "streaming",
+        currentRootFolderId,
+        currentSubFolderId,
         logger,
-        (old) => {
-          if (!old?.success) {
-            return old;
-          }
-          return success({
-            ...old.data,
-            threads: old.data.threads.map((t) =>
-              t.id === threadId
-                ? { ...t, streamingState: "streaming" as const }
-                : t,
-            ),
-          });
-        },
-        {
-          requestData: {
-            rootFolderId: currentRootFolderId,
-            subFolderId: currentSubFolderId,
-          },
-        },
       );
     },
     setAborting: (threadId, logger): void => {
       set({ isStreaming: false });
       const { currentRootFolderId, currentSubFolderId } = get();
-      apiClient.updateEndpointData(
-        threadsDefinition.GET,
+      patchThreadStreamingState(
+        threadId,
+        "aborting",
+        currentRootFolderId,
+        currentSubFolderId,
         logger,
-        (old) => {
-          if (!old?.success) {
-            return old;
-          }
-          return success({
-            ...old.data,
-            threads: old.data.threads.map((t) =>
-              t.id === threadId
-                ? { ...t, streamingState: "aborting" as const }
-                : t,
-            ),
-          });
-        },
-        {
-          requestData: {
-            rootFolderId: currentRootFolderId,
-            subFolderId: currentSubFolderId,
-          },
-        },
       );
     },
     stopStream: (threadId, logger): void => {
       set({ isStreaming: false });
       const { currentRootFolderId, currentSubFolderId } = get();
-      apiClient.updateEndpointData(
-        threadsDefinition.GET,
+      patchThreadStreamingState(
+        threadId,
+        "idle",
+        currentRootFolderId,
+        currentSubFolderId,
         logger,
-        (old) => {
-          if (!old?.success) {
-            return old;
-          }
-          return success({
-            ...old.data,
-            threads: old.data.threads.map((t) =>
-              t.id === threadId ? { ...t, streamingState: "idle" as const } : t,
-            ),
-          });
-        },
-        {
-          requestData: {
-            rootFolderId: currentRootFolderId,
-            subFolderId: currentSubFolderId,
-          },
-        },
+      );
+    },
+    setWaiting: (threadId, logger): void => {
+      set({ isStreaming: false });
+      const { currentRootFolderId, currentSubFolderId } = get();
+      patchThreadStreamingState(
+        threadId,
+        "waiting",
+        currentRootFolderId,
+        currentSubFolderId,
+        logger,
       );
     },
   }));

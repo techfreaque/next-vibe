@@ -11,7 +11,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { WAIT_FOR_TASK_ALIAS } from "../../../../system/unified-interface/tasks/wait-for-task/constants";
 import type { ToolExecutionContext } from "../../../chat/config";
-import { getDefaultToolIds } from "../../../chat/constants";
+import { getDefaultToolIdsForUser } from "../../../chat/constants";
 import type { ToolCall } from "../../../chat/db";
 
 /**
@@ -111,7 +111,7 @@ export class ToolsSetupHandler {
     // of the user's saved tool list (it may predate the tool being added to defaults).
     const visibleToolIdsFromClient = params.pinnedTools
       ? params.pinnedTools.map((t) => getFullPath(t.toolId) ?? t.toolId)
-      : [...getDefaultToolIds()]; // agent mode = default tool set
+      : [...getDefaultToolIdsForUser(params.user)]; // agent mode = role-appropriate default tool set
 
     // Inject pinned remote tools (from availableTools) into visible set.
     // Remote tools use "instanceId__toolName" format and are only in availableTools

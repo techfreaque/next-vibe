@@ -8,11 +8,16 @@ import { relative, resolve as resolvePath } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
-import { success } from "../../../shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
-import { ensureConfigReady } from "../config/repository";
+import { ConfigRepositoryImpl } from "../config/repository";
 import { sortIssuesByLocation } from "../config/shared";
 import type { CheckConfig } from "../config/types";
 import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
@@ -21,30 +26,20 @@ import type {
   OxlintRequestOutput,
   OxlintResponseOutput,
 } from "./definition";
+import type { CheckOxlintT } from "./i18n";
 
 /**
- * Run Oxlint Repository Interface
+ * Run Oxlint Repository
  */
-export interface OxlintRepositoryInterface {
-  execute(
+export class OxlintRepository {
+  static async execute(
     data: OxlintRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    providedConfig?: CheckConfig,
-  ): Promise<ApiResponseType<OxlintResponseOutput>>;
-}
-
-/**
- * Run Oxlint Repository Implementation
- */
-export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
-  private config: CheckConfig | null = null;
-
-  async execute(
-    data: OxlintRequestOutput,
-    logger: EndpointLogger,
-    platform: Platform,
-    providedConfig?: CheckConfig,
+    t: CheckOxlintT,
+    signal: AbortSignal,
+    locale: CountryLanguage,
+    providedConfig: CheckConfig | undefined,
   ): Promise<ApiResponseType<OxlintResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     try {
@@ -57,7 +52,11 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       if (providedConfig) {
         config = providedConfig;
       } else {
-        const configResult = await ensureConfigReady(logger, false);
+        const configResult = await ConfigRepositoryImpl.ensureConfigReady(
+          logger,
+          locale,
+          false,
+        );
         if (!configResult.ready) {
           return success({
             items: [
@@ -86,9 +85,6 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         }
         config = configResult.config;
       }
-
-      // Store config for use in methods
-      this.config = config;
 
       // Apply mcpLimit when platform is MCP
       const defaults = config.vibeCheck || {};
@@ -120,8 +116,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       }
 
       // Ensure cache directory exists
-      const cacheDir = this.config.oxlint.enabled
-        ? this.config.oxlint.cachePath
+      const cacheDir = config.oxlint.enabled
+        ? config.oxlint.cachePath
         : "./.tmp";
       await fs.mkdir(cacheDir, { recursive: true });
 
@@ -138,16 +134,25 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
 
       // Run oxlint on paths (folders and/or files)
       // Oxlint will handle file discovery based on ignore patterns in config
-      const result = await this.runOxlint(
+      const runResult = await OxlintRepository.runOxlint(
         targetPaths,
         effectiveData.fix,
         effectiveData.timeout,
         logger,
+        config,
+        t,
         activeIgnorePatterns,
+        signal,
       );
 
+      if (!runResult.success) {
+        return runResult;
+      }
+
+      const result = runResult.data;
+
       // Build response with pagination
-      const response = this.buildResponse(
+      const response = OxlintRepository.buildResponse(
         effectiveData.skipSorting
           ? result.issues
           : sortIssuesByLocation(result.issues),
@@ -195,21 +200,26 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Run oxlint on paths (files and/or folders)
    */
-  private async runOxlint(
+  private static async runOxlint(
     paths: string[],
     fix: boolean,
     timeout: number,
     logger: EndpointLogger,
+    config: CheckConfig,
+    t: CheckOxlintT,
     extraIgnorePatterns?: string[],
-  ): Promise<{ issues: OxlintIssue[] }> {
+    signal?: AbortSignal,
+  ): Promise<ApiResponseType<{ issues: OxlintIssue[] }>> {
     logger.debug(`[OXLINT] Running on ${paths.length} path(s)`);
 
     // Build oxlint command arguments
-    if (!this.config?.oxlint.enabled) {
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-      throw new Error("Oxlint config not available");
+    if (!config.oxlint.enabled) {
+      return fail({
+        message: t("errors.oxlintDisabled"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
-    const oxlintConfigPath = resolvePath(this.config.oxlint.configPath);
+    const oxlintConfigPath = resolvePath(config.oxlint.configPath);
 
     // Check if config exists, if not use default settings
     const configExists = existsSync(oxlintConfigPath);
@@ -249,13 +259,18 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     /* eslint-enable i18next/no-literal-string */
 
     // If fix is requested, run oxlint --fix and oxfmt in parallel
-    if (fix && this.config?.prettier.enabled) {
+    if (fix && config.prettier.enabled) {
       const fixArgs = [...baseArgs, "--fix"];
 
       // Run both oxlint --fix and oxfmt in parallel
       const [oxlintResult, oxfmtResult] = await Promise.allSettled([
-        this.runOxlintCommand(fixArgs, timeout, logger),
-        this.runOxfmt(paths, logger, this.config.prettier.configPath),
+        OxlintRepository.runOxlintCommand(fixArgs, timeout, logger, signal),
+        OxlintRepository.runOxfmt(
+          paths,
+          logger,
+          config.prettier.configPath,
+          config.prettier.ignoreFilePath,
+        ),
       ]);
 
       // Handle oxlint result
@@ -266,31 +281,48 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
             `[OXLINT] Oxfmt formatting failed: ${String(oxfmtResult.reason)}`,
           );
         }
-        return oxlintResult.value;
+        return success(oxlintResult.value);
       } else {
         // eslint-disable-next-line i18next/no-literal-string
         logger.error(`[OXLINT] Fix failed: ${String(oxlintResult.reason)}`);
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-        throw oxlintResult.reason;
+        return fail({
+          message: t("errors.oxlintFailed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: parseError(oxlintResult.reason).message },
+        });
       }
     }
 
     // Just run normal check
-    return await this.runOxlintCommand(baseArgs, timeout, logger);
+    return success(
+      await OxlintRepository.runOxlintCommand(
+        baseArgs,
+        timeout,
+        logger,
+        signal,
+      ),
+    );
   }
 
   /**
    * Run oxfmt on paths (files and/or folders) for formatting
    */
-  private async runOxfmt(
+  private static async runOxfmt(
     paths: string[],
     logger: EndpointLogger,
     configPath: string,
+    ignoreFilePath?: string,
   ): Promise<void> {
     if (paths.length === 0) {
       return;
     }
-    const command = ["oxfmt", "--config", configPath, ...paths];
+    /* eslint-disable i18next/no-literal-string */
+    const ignoreArgs =
+      ignoreFilePath && existsSync(`${process.cwd()}/${ignoreFilePath}`)
+        ? ["--ignore-path", `${process.cwd()}/${ignoreFilePath}`]
+        : [];
+    /* eslint-enable i18next/no-literal-string */
+    const command = ["oxfmt", "--config", configPath, ...ignoreArgs, ...paths];
 
     logger.debug(`[OXLINT] Executing Oxfmt command: bunx ${command.join(" ")}`);
 
@@ -331,7 +363,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Build file statistics from issues
    */
-  private buildFileStats(
+  private static buildFileStats(
     issues: OxlintIssue[],
   ): Map<string, { errors: number; warnings: number; total: number }> {
     const fileStats = new Map<
@@ -361,7 +393,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Format file statistics for response
    */
-  private formatFileStats(
+  private static formatFileStats(
     fileStats: Map<string, { errors: number; warnings: number; total: number }>,
   ): Array<{
     file: string;
@@ -382,7 +414,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Build response with pagination and statistics
    */
-  private buildResponse(
+  private static buildResponse(
     allIssues: OxlintIssue[],
     data: OxlintRequestOutput,
     skipFiles = false,
@@ -407,8 +439,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         | undefined;
 
       if (!skipFiles) {
-        const fileStats = this.buildFileStats(allIssues);
-        files = this.formatFileStats(fileStats);
+        const fileStats = OxlintRepository.buildFileStats(allIssues);
+        files = OxlintRepository.formatFileStats(fileStats);
       }
 
       return {
@@ -448,8 +480,8 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       | undefined;
 
     if (!skipFiles) {
-      const fileStats = this.buildFileStats(filteredIssues);
-      files = this.formatFileStats(fileStats);
+      const fileStats = OxlintRepository.buildFileStats(filteredIssues);
+      files = OxlintRepository.formatFileStats(fileStats);
     }
 
     return {
@@ -462,10 +494,11 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Run oxlint command and return results
    */
-  private async runOxlintCommand(
+  private static async runOxlintCommand(
     args: string[],
     timeout: number,
     logger: EndpointLogger,
+    signal?: AbortSignal,
   ): Promise<{
     issues: OxlintIssue[];
   }> {
@@ -475,10 +508,15 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     // Use spawn for execution
     const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
+      if (signal?.aborted) {
+        reject(new Error("Aborted"));
+        return;
+      }
       const child = spawn("bunx", args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,
+        signal,
       });
 
       let output = "";
@@ -525,7 +563,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     });
 
     // Parse oxlint output
-    const result = await this.parseOxlintOutput(stdout, logger);
+    const result = await OxlintRepository.parseOxlintOutput(stdout, logger);
 
     // eslint-disable-next-line i18next/no-literal-string
     logger.debug(`[OXLINT] Completed with ${result.issues.length} issues`);
@@ -536,7 +574,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
   /**
    * Parse oxlint JSON output
    */
-  private async parseOxlintOutput(
+  private static async parseOxlintOutput(
     stdout: string,
     logger: EndpointLogger,
   ): Promise<{
@@ -642,8 +680,3 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     return { issues };
   }
 }
-
-/**
- * Default repository instance
- */
-export const oxlintRepository = new OxlintRepositoryImpl();

@@ -11,7 +11,7 @@ export const translations: typeof enTranslations = {
         title: "Uruchom Claude Code",
         dynamicTitle: "Claude Code: {{prompt}}",
         description:
-          "Uruchamia sesję Claude Code na Hermesie (lokalnej maszynie deweloperskiej). PREFERUJ headless:false (domyślnie) — otwiera pełną sesję Claude Code, w której Max może aktywnie uczestniczyć. headless:true tylko dla w pełni zautomatyzowanych zadań wsadowych bez udziału człowieka (np. cron-joby). W trybie interaktywnym sesja jest strumieniowana na żywo do terminala; w trybie wsadowym uruchamia `claude -p` i zwraca wynik po zakończeniu. Zawsze uruchamia z --dangerously-skip-permissions.",
+          "Uruchamia zadanie Claude Code. Tryb wsadowy (DOMYŚLNY): działa bezgłowo i zwraca wynik. Tryb interaktywny: otwiera sesję terminala na żywo — wynik jest dostarczany automatycznie gdy sesja się kończy.",
         fields: {
           prompt: {
             label: "Prompt",
@@ -21,49 +21,51 @@ export const translations: typeof enTranslations = {
           model: {
             label: "Model",
             description:
-              "Model Claude do użycia w tej sesji. Domyślnie Sonnet.",
+              "Model Claude do użycia w tej sesji. Domyślnie Sonnet (zalecany). Opus do złożonych zadań, Haiku do szybkich/tanich.",
             options: {
-              sonnet: "Sonnet 4.6",
-              opus: "Opus 4.6",
-              haiku: "Haiku 4.5",
+              sonnet: "Sonnet 4.6 (zalecany)",
+              opus: "Opus 4.6 (najlepsze rozumowanie)",
+              haiku: "Haiku 4.5 (najszybszy)",
             },
           },
           maxBudgetUsd: {
             label: "Maks. budżet (USD)",
             description:
-              "Maksymalny limit wydatków w USD. Zapobiega niekontrolowanym kosztom użycia narzędzi. Pomiń dla braku limitu.",
+              "Maksymalny limit wydatków w USD. Zapobiega niekontrolowanym kosztom. Pomiń dla braku limitu.",
           },
           availableTools: {
             label: "Dozwolone narzędzia",
             description:
-              "Rozdzielona przecinkami lista dozwolonych narzędzi (np. Read,Edit,Bash). Pomiń dla wszystkich domyślnych narzędzi.",
-          },
-          interactiveMode: {
-            label: "Tryb interaktywny",
-            description:
-              "PREFERUJ true (domyślnie). Tryb interaktywny otwiera pełną sesję Claude Code — Max widzi wyniki na żywo i może uczestniczyć. Ustaw false tylko dla w pełni zautomatyzowanych zadań wsadowych (cron-joby, pipeline'y) bez interakcji człowieka.",
-          },
-          timeoutSeconds: {
-            label: "Timeout (sekundy)",
-            description:
-              "Maksymalny czas wykonania w sekundach. Domyślnie: 600 (10 minut).",
-          },
-          output: {
-            label: "Wyjście",
-            description: "Połączony stdout procesu Claude Code.",
-          },
-          exitCode: {
-            label: "Kod wyjścia",
-            description: "Kod wyjścia procesu. 0 = sukces, niezerowy = błąd.",
+              "Rozdzielona przecinkami lista dozwolonych narzędzi (np. Read,Edit,Bash). Pomiń dla wszystkich domyślnych.",
           },
           taskTitle: {
             label: "Tytuł zadania",
             description:
-              "Krótki tytuł do archiwizacji tego zadania (np. 'Napraw błąd logowania'). Generowany automatycznie z promptu, jeśli pominięty.",
+              "Krótki tytuł do archiwizacji zadania. Generowany automatycznie z promptu, jeśli pominięty.",
+          },
+          interactiveMode: {
+            label: "Tryb interaktywny",
+            description:
+              "false (DOMYŚLNY): działa bezgłowo i zwraca cały wynik po zakończeniu. true: otwiera okno terminala dla sesji na żywo — wynik jest dostarczany automatycznie gdy sesja się kończy.",
+          },
+          output: {
+            label: "Wyjście",
+            description:
+              "Połączony stdout procesu Claude Code. Pusty gdy zadanie zostało eskalowane do tła.",
           },
           durationMs: {
             label: "Czas trwania (ms)",
             description: "Łączny czas działania procesu.",
+          },
+          taskId: {
+            label: "ID zadania",
+            description:
+              "W trybie interaktywnym: ID zadania śledzącego używanego przez Claude Code po zakończeniu sesji. Wynik jest dostarczany automatycznie. W trybie wsadowym: nieobecny (wynik zwracany inline).",
+          },
+          hint: {
+            label: "Wskazówka",
+            description:
+              "Wskazówka dla AI dotycząca sposobu dostarczenia wyniku.",
           },
         },
         errors: {
@@ -80,6 +82,11 @@ export const translations: typeof enTranslations = {
             title: "Wykonanie nie powiodło się",
             description:
               "Proces Claude Code nie mógł zostać uruchomiony lub uległ awarii",
+          },
+          internalExitCode: {
+            title: "Wykonanie nie powiodło się (exit {{exitCode}})",
+            description:
+              "Proces Claude Code zakończył się z niezerowym kodem wyjścia",
           },
           forbidden: {
             title: "Zabronione",
@@ -110,7 +117,19 @@ export const translations: typeof enTranslations = {
         success: {
           title: "Claude Code zakończony",
           description:
-            "Proces Claude Code zakończony — sprawdź exitCode dla sukcesu/błędu i output dla wyników",
+            "Proces Claude Code zakończony pomyślnie. Jeśli wyjście jest puste, wynik zostanie dostarczony przez injektowanie wątku.",
+        },
+        widget: {
+          runningBatch: "Claude działa...",
+          runningInteractive: "Uruchamianie interaktywnej sesji terminala...",
+          escalated:
+            "Działa w tle — wynik zostanie injektowany po zakończeniu.",
+          taskIdLabel: "ID zadania",
+          outputLabel: "Wyjście",
+          interactiveSessionLaunched:
+            "Interaktywna sesja uruchomiona w terminalu.",
+          copyOutput: "Kopiuj",
+          copied: "Skopiowano!",
         },
       },
     },

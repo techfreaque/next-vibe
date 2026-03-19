@@ -25,7 +25,7 @@ import {
 } from "../../../products/repository-client";
 import type { PaymentInterval } from "../types";
 import { scopedTranslation } from "./i18n";
-import { getStripe } from "./repository";
+import { StripeProvider } from "./repository";
 
 export interface StripePriceResult {
   priceId: string;
@@ -52,7 +52,7 @@ export class StripePriceManager {
     logger: EndpointLogger,
   ): Promise<ResponseType<StripePriceResult>> {
     const { t: tStripe } = scopedTranslation.scopedT(locale);
-    const stripe = getStripe();
+    const stripe = StripeProvider.getStripe();
     if (!stripe) {
       return fail({
         message: tStripe("errors.notConfigured.title"),

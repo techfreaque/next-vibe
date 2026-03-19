@@ -13,42 +13,29 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-// Import types from the endpoint definition
-import type endpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type RequestType = typeof endpoints.POST.types.RequestOutput;
-type SchemaVerifyResponseType = typeof endpoints.POST.types.ResponseOutput;
+import type {
+  SchemaVerifyRequestOutput,
+  SchemaVerifyResponseOutput,
+} from "./definition";
+import type { SchemaVerifyT } from "./i18n";
 
 /**
- * Verify database schema Repository Interface
+ * Verify database schema Repository
  */
-export interface SchemaVerifyRepositoryInterface {
-  execute(
-    data: RequestType,
-    t: ModuleT,
+export class SchemaVerifyRepository {
+  static async execute(
+    data: SchemaVerifyRequestOutput,
+    t: SchemaVerifyT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SchemaVerifyResponseType>>;
-}
-
-/**
- * Verify database schema Repository Implementation
- */
-export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterface {
-  async execute(
-    data: RequestType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SchemaVerifyResponseType>> {
+  ): Promise<ResponseType<SchemaVerifyResponseOutput>> {
     const outputs: string[] = [];
     const issues: string[] = [];
     const fixedIssues: string[] = [];
 
     try {
       // Check database schema integrity
-      const validationResult = await this.performSchemaValidation(t);
+      const validationResult =
+        await SchemaVerifyRepository.performSchemaValidation(t);
       const schemaValid = validationResult.valid;
 
       if (!data.silent) {
@@ -78,7 +65,7 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
         issues.push(...validationResult.issues);
 
         if (data.fixIssues) {
-          const fixed = await this.fixSchemaIssues();
+          const fixed = await SchemaVerifyRepository.fixSchemaIssues();
           fixedIssues.push(...fixed);
           outputs.push(
             t("fixed", {
@@ -101,7 +88,7 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
         );
       }
 
-      const response: SchemaVerifyResponseType = {
+      const response: SchemaVerifyResponseOutput = {
         success: true,
         valid: finalValid,
         output: data.silent ? "" : outputs.join("\n"),
@@ -120,7 +107,7 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
     }
   }
 
-  private async performSchemaValidation(t: ModuleT): Promise<{
+  private static async performSchemaValidation(t: SchemaVerifyT): Promise<{
     valid: boolean;
     tablesChecked: number;
     columnsChecked: number;
@@ -156,7 +143,7 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
     }
   }
 
-  private async fixSchemaIssues(): Promise<string[]> {
+  private static async fixSchemaIssues(): Promise<string[]> {
     try {
       // Simulate fixing schema issues
       // In real implementation, apply migrations, fix constraints, etc.
@@ -169,8 +156,3 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const schemaVerifyRepository = new SchemaVerifyRepositoryImpl();

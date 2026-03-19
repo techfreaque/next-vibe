@@ -9,14 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import statusEndpoints from "./definition";
-import { setupStatusRepository } from "./repository";
+import { SetupStatusRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: statusEndpoints,
   [Methods.POST]: {
     handler: ({ user, logger, t }) => {
       logger.debug("Setup status check started");
-      return setupStatusRepository.getStatus(user, t);
+      return SetupStatusRepository.getStatus(user, t);
     },
   },
 });

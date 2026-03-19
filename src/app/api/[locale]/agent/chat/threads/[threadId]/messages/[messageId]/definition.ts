@@ -362,6 +362,7 @@ const { DELETE } = createEndpoint({
   icon: "message-circle",
   category: "app.endpointCategories.chatMessages",
   tags: ["tags.messages" as const],
+  requiresConfirmation: true,
 
   options: {
     mutationOptions: {

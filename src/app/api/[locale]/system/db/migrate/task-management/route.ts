@@ -8,12 +8,16 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { migrationTaskManagementRepository as repository } from "./repository";
+import { MigrationTaskManagementRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, t, logger }) =>
-      repository.executeMigrationTaskOperation(data, t, logger),
+      MigrationTaskManagementRepository.executeMigrationTaskOperation(
+        data,
+        t,
+        logger,
+      ),
   },
 });

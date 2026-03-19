@@ -12,16 +12,15 @@ import "server-only";
 
 import type { TimeSeries } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
-/**
- * @deprecated DataPoint no longer has a meta field. Returns empty array.
- */
-export function computeFieldPick(
-  points: TimeSeries,
-  field: string,
-): TimeSeries {
-  void points;
-  void field;
-  // Superseded: DataPoint has no meta field in the new architecture.
-  // Kept for backwards compatibility with existing graph definitions.
-  return [];
+export class FieldPickTransformerRepository {
+  /**
+   * @deprecated DataPoint no longer has a meta field. Returns empty array.
+   */
+  static computeFieldPick(points: TimeSeries, field: string): TimeSeries {
+    void points;
+    void field;
+    // Superseded: DataPoint has no meta field in the new architecture.
+    // Kept for backwards compatibility with existing graph definitions.
+    return [];
+  }
 }

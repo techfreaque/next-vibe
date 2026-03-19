@@ -9,7 +9,7 @@ export const translations = {
         title: "Run Claude Code",
         dynamicTitle: "Claude Code: {{prompt}}",
         description:
-          "Launch a Claude Code session on Hermes (the local dev machine). DEFAULT: interactiveMode:false — runs `claude -p` (non-interactive print mode), collects all output, and returns it programmatically when done. Use this default for ALL automated tasks, cron jobs, pipelines, and AI tool calls. Only set interactiveMode:true for live back-and-forth sessions where Max is actively watching the terminal — output will NOT be returned in this mode. Always runs with --dangerously-skip-permissions so no confirmation prompts interrupt the flow.",
+          "Run a Claude Code task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session — result is delivered back automatically when the session ends.",
         fields: {
           prompt: {
             label: "Prompt",
@@ -19,11 +19,11 @@ export const translations = {
           model: {
             label: "Model",
             description:
-              "Claude model to use for this session. Defaults to Sonnet.",
+              "Claude model to use for this session. Defaults to Sonnet (recommended for most tasks). Use Opus for complex reasoning, Haiku for fast/cheap tasks.",
             options: {
-              sonnet: "Sonnet 4.6",
-              opus: "Opus 4.6",
-              haiku: "Haiku 4.5",
+              sonnet: "Sonnet 4.6 (recommended)",
+              opus: "Opus 4.6 (best reasoning)",
+              haiku: "Haiku 4.5 (fastest)",
             },
           },
           maxBudgetUsd: {
@@ -44,25 +44,26 @@ export const translations = {
           interactiveMode: {
             label: "Interactive Mode",
             description:
-              "Use interactiveMode:true only when you want a live back-and-forth session with the user watching. Use interactiveMode:false (default) for automated batch tasks where output must be returned programmatically (cron jobs, pipelines, tool calls).",
-          },
-          timeoutSeconds: {
-            label: "Timeout (seconds)",
-            description:
-              "Maximum execution time in seconds. Defaults to 1800 (30 minutes). Increase for very long-running tasks.",
+              "false (DEFAULT): runs headlessly and returns all output when done. true: opens a terminal window for a live session — result is delivered back automatically when the session ends.",
           },
           output: {
             label: "Output",
-            description: "Combined stdout from the Claude Code process.",
-          },
-          exitCode: {
-            label: "Exit Code",
             description:
-              "Process exit code. 0 = success, non-zero = error or partial failure.",
+              "Combined stdout from the Claude Code process. Empty when task was escalated to background execution (result injected via wakeUp).",
           },
           durationMs: {
             label: "Duration (ms)",
             description: "Total wall-clock time the process ran.",
+          },
+          taskId: {
+            label: "Task ID",
+            description:
+              "For interactive mode: the tracking task ID that Claude Code will call complete-task with when the session ends. The result is delivered back automatically. For batch mode: not present (result returned inline).",
+          },
+          hint: {
+            label: "Hint",
+            description:
+              "Guidance for the AI on how the result will be delivered.",
           },
         },
         errors: {
@@ -78,6 +79,10 @@ export const translations = {
             title: "Execution Failed",
             description:
               "Claude Code process failed to start or crashed unexpectedly",
+          },
+          internalExitCode: {
+            title: "Execution Failed (exit {{exitCode}})",
+            description: "Claude Code process exited with a non-zero exit code",
           },
           forbidden: {
             title: "Forbidden",
@@ -107,7 +112,19 @@ export const translations = {
         success: {
           title: "Claude Code Completed",
           description:
-            "Claude Code process finished — check exitCode for success/failure and output for results",
+            "Claude Code process finished successfully. If output is empty, result will arrive via thread injection.",
+        },
+        widget: {
+          runningBatch: "Claude is running...",
+          runningInteractive: "Launching interactive terminal session...",
+          escalated:
+            "Running in background — result will be injected when complete.",
+          taskIdLabel: "Task ID",
+          outputLabel: "Output",
+          interactiveSessionLaunched:
+            "Interactive session launched in terminal.",
+          copyOutput: "Copy",
+          copied: "Copied!",
         },
       },
     },

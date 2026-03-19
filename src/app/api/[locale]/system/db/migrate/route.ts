@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import migrateEndpoints from "./definition";
-import { databaseMigrationRepository } from "./repository";
+import { DatabaseMigrationRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: migrateEndpoints,
   [Methods.POST]: {
     handler: ({ data, t, logger }) => {
-      return databaseMigrationRepository.runMigrations(data, t, logger);
+      return DatabaseMigrationRepository.runMigrations(data, t, logger);
     },
   },
 });

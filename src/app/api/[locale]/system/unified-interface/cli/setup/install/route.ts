@@ -9,7 +9,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import installEndpoints from "./definition";
-import { setupInstallRepository } from "./repository";
+import { SetupInstallRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: installEndpoints,
@@ -19,7 +19,7 @@ export const { POST, tools } = endpointsHandler({
         force: data.force,
         verbose: data.verbose,
       });
-      return setupInstallRepository.installCli(data, user, t);
+      return SetupInstallRepository.installCli(data, user, t);
     },
   },
 });

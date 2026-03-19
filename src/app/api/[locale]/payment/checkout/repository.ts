@@ -28,36 +28,21 @@ import type {
   CheckoutRequestOutput,
   CheckoutResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { PaymentCheckoutT } from "./i18n";
 
 /**
- * Subscription Checkout Repository Interface
+ * Subscription Checkout Repository
  */
-export interface SubscriptionCheckoutRepository {
-  createCheckoutSession(
-    data: CheckoutRequestOutput,
-    user: JwtPrivatePayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<CheckoutResponseOutput>>;
-}
-
-/**
- * Subscription Checkout Repository Implementation
- */
-export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutRepository {
+export class SubscriptionCheckoutRepository {
   /**
    * Create a subscription checkout session
    */
-  async createCheckoutSession(
+  static async createCheckoutSession(
     data: CheckoutRequestOutput,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PaymentCheckoutT,
   ): Promise<ResponseType<CheckoutResponseOutput>> {
     logger.debug("Function called - before try block", {
       userId: user?.id,
@@ -213,9 +198,3 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
     }
   }
 }
-
-/**
- * Subscription Checkout Repository Instance
- */
-export const subscriptionCheckoutRepository =
-  new SubscriptionCheckoutRepositoryImpl();

@@ -34,6 +34,10 @@ export const translations: typeof enTranslations = {
       migrationFailed: "Migration fehlgeschlagen: {{error}}",
       seedingFailed: "Seeding fehlgeschlagen: {{error}}",
       restartFailed: "Server-Neustart fehlgeschlagen: {{error}}",
+      noPidFile: "Keine .vibe-pid-Datei gefunden — läuft vibe start gerade?",
+      invalidPid: "Ungültige PID in .vibe-pid: {{pid}}",
+      processNotRunning: "Prozess {{pid}} läuft nicht",
+      signalFailed: "SIGUSR1 konnte nicht gesendet werden: {{error}}",
     },
     errors: {
       validation: {

@@ -7,3 +7,8 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
 });
+
+export type RebuildTranslationKey =
+  (typeof scopedTranslation)["ScopedTranslationKey"];
+
+export type RebuildT = ReturnType<typeof scopedTranslation.scopedT>["t"];

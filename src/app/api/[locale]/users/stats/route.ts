@@ -9,7 +9,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { usersStatsRepository } from "./repository";
+import { UsersStatsRepository } from "./repository";
 
 /**
  * Export handlers using endpointsHandler
@@ -19,7 +19,7 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
     handler: async ({ data, logger, locale }) => {
-      return await usersStatsRepository.getUserStats(data, logger, locale);
+      return await UsersStatsRepository.getUserStats(data, logger, locale);
     },
   },
 });

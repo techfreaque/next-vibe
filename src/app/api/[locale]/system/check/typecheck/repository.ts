@@ -25,7 +25,7 @@ import {
 } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
-import { ensureConfigReady } from "../config/repository";
+import { ConfigRepositoryImpl } from "../config/repository";
 import type { CheckConfig } from "../config/types";
 import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
 import type {
@@ -33,7 +33,7 @@ import type {
   TypecheckRequestOutput,
   TypecheckResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { CheckTypecheckT } from "./i18n";
 import {
   createTypecheckConfig,
   getDisplayPath,
@@ -43,40 +43,26 @@ import {
   type TypecheckConfig,
 } from "./utils";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-// ============================================================
-// Constants
-// ============================================================
-
-/** Wildcard include patterns to remove (we specify explicit files instead) */
-const WILDCARD_INCLUDE_PATTERNS: readonly string[] = ["**/*.ts", "**/*.tsx"];
-
-// ============================================================
-// TypeScript Configuration Schema
-// ============================================================
-
-// TypeScript configuration Zod schema for runtime validation
-const TsConfigSchema = z.object({
-  compilerOptions: z
-    .object({
-      rootDir: z.string().optional(),
-      paths: z.record(z.string(), z.array(z.string())).optional(),
-      baseUrl: z.string().optional(),
-      typeRoots: z.array(z.string()).optional(),
-    })
-    .passthrough()
-    .optional(),
-  include: z.array(z.string()).optional(),
-  exclude: z.array(z.string()).optional(),
-});
-
-// TypeScript configuration type inferred from Zod schema
-type TsConfig = z.infer<typeof TsConfigSchema>;
-
 // ============================================================
 // Internal Types
 // ============================================================
+
+interface TsConfig {
+  compilerOptions?: {
+    rootDir?: string;
+    paths?: Record<string, string[]>;
+    baseUrl?: string;
+    typeRoots?: string[];
+    [key: string]:
+      | string
+      | string[]
+      | Record<string, string[]>
+      | boolean
+      | undefined;
+  };
+  include?: string[];
+  exclude?: string[];
+}
 
 /** Parsed issue from typecheck output */
 interface ParsedIssue {
@@ -88,16 +74,32 @@ interface ParsedIssue {
   message: string;
 }
 
-// ============================================================
-// Repository Interface
-// ============================================================
-
-const execAsync = promisify(exec);
-
 /**
- * Run TypeScript type checking Repository Implementation
+ * Run TypeScript type checking Repository
  */
-export class TypecheckRepositoryImpl {
+export class TypecheckRepository {
+  /** Wildcard include patterns to remove (we specify explicit files instead) */
+  private static readonly WILDCARD_INCLUDE_PATTERNS: readonly string[] = [
+    "**/*.ts",
+    "**/*.tsx",
+  ];
+
+  /** TypeScript configuration Zod schema for runtime validation */
+  private static readonly TsConfigSchema = z.object({
+    compilerOptions: z
+      .object({
+        rootDir: z.string().optional(),
+        paths: z.record(z.string(), z.array(z.string())).optional(),
+        baseUrl: z.string().optional(),
+        typeRoots: z.array(z.string()).optional(),
+      })
+      .passthrough()
+      .optional(),
+    include: z.array(z.string()).optional(),
+    exclude: z.array(z.string()).optional(),
+  });
+
+  private static readonly execAsync = promisify(exec);
   // --------------------------------------------------------
   // Static Private Helpers - Command Configuration
   // --------------------------------------------------------
@@ -171,11 +173,11 @@ export class TypecheckRepositoryImpl {
   ): ParsedIssue | null {
     // Try patterns in order based on which tool is being used
     const primaryPattern = useTsgo
-      ? TypecheckRepositoryImpl.getTsgoErrorPattern()
-      : TypecheckRepositoryImpl.getTscErrorPattern();
+      ? TypecheckRepository.getTsgoErrorPattern()
+      : TypecheckRepository.getTscErrorPattern();
     const fallbackPattern = useTsgo
-      ? TypecheckRepositoryImpl.getTscErrorPattern()
-      : TypecheckRepositoryImpl.getTsgoErrorPattern();
+      ? TypecheckRepository.getTscErrorPattern()
+      : TypecheckRepository.getTsgoErrorPattern();
 
     let match = line.match(primaryPattern);
     if (!match) {
@@ -211,11 +213,11 @@ export class TypecheckRepositoryImpl {
     const errors: ParsedIssue[] = [];
     const warnings: ParsedIssue[] = [];
 
-    const cleanOutput = TypecheckRepositoryImpl.stripAnsiCodes(output);
+    const cleanOutput = TypecheckRepository.stripAnsiCodes(output);
     const lines = cleanOutput.split("\n");
 
     for (const line of lines) {
-      const issue = TypecheckRepositoryImpl.parseOutputLine(line, useTsgo);
+      const issue = TypecheckRepository.parseOutputLine(line, useTsgo);
 
       if (issue) {
         // Apply filtering based on target path and disableFilter setting
@@ -292,9 +294,7 @@ export class TypecheckRepositoryImpl {
    * Adjust file paths to be relative to temp config location.
    */
   private static adjustFilePaths(files: string[], prefix: string): string[] {
-    return files.map((file) =>
-      TypecheckRepositoryImpl.adjustPath(file, prefix),
-    );
+    return files.map((file) => TypecheckRepository.adjustPath(file, prefix));
   }
 
   /**
@@ -311,7 +311,7 @@ export class TypecheckRepositoryImpl {
 
     for (const [key, pathArray] of Object.entries(paths)) {
       adjustedPaths[key] = pathArray.map((path) =>
-        TypecheckRepositoryImpl.adjustPath(path, prefix),
+        TypecheckRepository.adjustPath(path, prefix),
       );
     }
 
@@ -330,7 +330,7 @@ export class TypecheckRepositoryImpl {
     }
 
     return typeRoots.map((root) =>
-      TypecheckRepositoryImpl.adjustPath(root, prefix),
+      TypecheckRepository.adjustPath(root, prefix),
     );
   }
 
@@ -342,7 +342,7 @@ export class TypecheckRepositoryImpl {
     prefix: string,
   ): string[] {
     return patterns.map((pattern) =>
-      TypecheckRepositoryImpl.adjustPath(pattern, prefix),
+      TypecheckRepository.adjustPath(pattern, prefix),
     );
   }
 
@@ -369,7 +369,7 @@ export class TypecheckRepositoryImpl {
     }
 
     return excludes.map((excludePattern) =>
-      TypecheckRepositoryImpl.adjustPath(excludePattern, prefix),
+      TypecheckRepository.adjustPath(excludePattern, prefix),
     );
   }
 
@@ -383,64 +383,58 @@ export class TypecheckRepositoryImpl {
     tempConfigPath: string,
     cachePath: string,
     locale: CountryLanguage,
+    t: CheckTypecheckT,
     extraExcludePatterns?: string[],
-  ): void {
+  ): ApiResponseType<void> {
     // Calculate the relative prefix based on cache directory depth
-    const prefix = TypecheckRepositoryImpl.getRelativePrefix(cachePath);
+    const prefix = TypecheckRepository.getRelativePrefix(cachePath);
 
     // Read and validate the main tsconfig.json
-    let mainTsConfig: TsConfig;
-    try {
-      const tsConfigContent = readFileSync("tsconfig.json", "utf8");
-      const parsedJsonResult = parseJsonWithComments(tsConfigContent, locale);
-      if (!parsedJsonResult.success) {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors
-        throw new Error("Failed to parse tsconfig.json");
-      }
-      mainTsConfig = TsConfigSchema.parse(parsedJsonResult.data);
-    } catch (error) {
-      /* eslint-disable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors */
-      throw new Error(
-        `Failed to read or parse tsconfig.json: ${error instanceof Error ? error.message : String(error)}`,
-        { cause: error },
-      );
-      /* eslint-enable oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string */
+    const tsConfigContent = readFileSync("tsconfig.json", "utf8");
+    const parsedJsonResult = parseJsonWithComments(tsConfigContent, locale);
+    if (!parsedJsonResult.success) {
+      return fail({
+        message: t("errors.parseTsconfig.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
+    const mainTsConfig = TypecheckRepository.TsConfigSchema.parse(
+      parsedJsonResult.data,
+    ) as TsConfig;
 
     // Filter out wildcard patterns and adjust paths for temp config location
     const generalFilesToInclude = (mainTsConfig.include || []).filter(
       (includePattern) =>
-        WILDCARD_INCLUDE_PATTERNS.includes(includePattern)
+        TypecheckRepository.WILDCARD_INCLUDE_PATTERNS.includes(includePattern)
           ? undefined
           : includePattern,
     );
-    const adjustedGeneralIncludes =
-      TypecheckRepositoryImpl.adjustIncludePatterns(
-        generalFilesToInclude,
-        prefix,
-      );
+    const adjustedGeneralIncludes = TypecheckRepository.adjustIncludePatterns(
+      generalFilesToInclude,
+      prefix,
+    );
 
     // Adjust paths for temp config location
-    const adjustedFiles = TypecheckRepositoryImpl.adjustFilePaths(
+    const adjustedFiles = TypecheckRepository.adjustFilePaths(
       filesToCheck,
       prefix,
     );
-    const adjustedPaths = TypecheckRepositoryImpl.adjustPathMappings(
+    const adjustedPaths = TypecheckRepository.adjustPathMappings(
       mainTsConfig.compilerOptions?.paths,
       prefix,
     );
     const adjustedExcludes = [
-      ...TypecheckRepositoryImpl.adjustExcludePatterns(
+      ...TypecheckRepository.adjustExcludePatterns(
         mainTsConfig.exclude,
         prefix,
       ),
       // Extra excludes from non-extensive mode — passed as-is (relative to project root,
       // adjusted with prefix so they resolve correctly from the temp config location)
       ...(extraExcludePatterns ?? []).map((p) =>
-        TypecheckRepositoryImpl.adjustPath(p, prefix),
+        TypecheckRepository.adjustPath(p, prefix),
       ),
     ];
-    const adjustedTypeRoots = TypecheckRepositoryImpl.adjustTypeRoots(
+    const adjustedTypeRoots = TypecheckRepository.adjustTypeRoots(
       mainTsConfig.compilerOptions?.typeRoots,
       prefix,
     );
@@ -471,6 +465,7 @@ export class TypecheckRepositoryImpl {
     };
 
     writeFileSync(tempConfigPath, JSON.stringify(tempTsConfig, null, 2));
+    return success(undefined);
   }
 
   // --------------------------------------------------------
@@ -480,13 +475,14 @@ export class TypecheckRepositoryImpl {
   /**
    * Execute TypeScript type checking.
    */
-  async execute(
+  static async execute(
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    t: ModuleT,
+    t: CheckTypecheckT,
     locale: CountryLanguage,
-    providedConfig?: CheckConfig,
+    providedConfig: CheckConfig | undefined,
+    signal: AbortSignal,
   ): Promise<ApiResponseType<TypecheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     const startTime = Date.now();
@@ -499,7 +495,11 @@ export class TypecheckRepositoryImpl {
       if (providedConfig) {
         checkConfig = providedConfig;
       } else {
-        const configResult = await ensureConfigReady(logger, false);
+        const configResult = await ConfigRepositoryImpl.ensureConfigReady(
+          logger,
+          locale,
+          false,
+        );
 
         if (!configResult.ready) {
           return success({
@@ -556,7 +556,7 @@ export class TypecheckRepositoryImpl {
       const useTsgo = typecheckConfig.useTsgo ?? false;
 
       // Get the appropriate base command
-      const baseCommand = TypecheckRepositoryImpl.getBaseCommand(useTsgo);
+      const baseCommand = TypecheckRepository.getBaseCommand(useTsgo);
 
       logger.debug(
         `[TYPESCRIPT] Using ${useTsgo ? "tsgo" : "tsc"} for type checking`,
@@ -566,16 +566,21 @@ export class TypecheckRepositoryImpl {
       config = createTypecheckConfig(data.path, typecheckConfig.cachePath);
 
       // Build the command based on path type
-      const command = this.buildCommand(
+      const buildResult = TypecheckRepository.buildCommand(
         baseCommand,
         config,
         typecheckConfig.cachePath,
         logger,
         locale,
+        t,
         activeIgnorePatterns,
       );
 
-      if (!command) {
+      if (!buildResult.success) {
+        return buildResult;
+      }
+
+      if (!buildResult.data) {
         return fail({
           message: t("errors.noTsFiles.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -585,31 +590,35 @@ export class TypecheckRepositoryImpl {
         });
       }
 
+      const command = buildResult.data;
+
       logger.debug(`[TYPESCRIPT] Executing command: ${command}`);
 
       // Execute the typecheck command
-      const execResult = await this.executeCommand(
+      const execResult = await TypecheckRepository.executeCommand(
         command,
         data.timeout,
         logger,
+        t,
+        signal,
       );
 
-      if (!execResult.success && !execResult.output) {
+      if (!execResult.success) {
         return fail({
           message: t("errors.internal.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: execResult.error || "Unknown error",
+            error: execResult.message || "Unknown error",
           },
         });
       }
 
-      output = execResult.output;
+      output = execResult.data.output;
 
       // Parse the output into structured issues
       // For multiple paths use targetPaths array for filtering, otherwise single targetPath
       const filterTarget = config.targetPaths ?? config.targetPath;
-      const { errors, warnings } = TypecheckRepositoryImpl.parseTypecheckOutput(
+      const { errors, warnings } = TypecheckRepository.parseTypecheckOutput(
         output,
         useTsgo,
         filterTarget,
@@ -632,9 +641,11 @@ export class TypecheckRepositoryImpl {
             return lineA - lineB;
           });
 
-      return success(this.buildResponse(issues, effectiveData, isMCP));
+      return success(
+        TypecheckRepository.buildResponse(issues, effectiveData, isMCP),
+      );
     } catch (error) {
-      return this.handleError(
+      return TypecheckRepository.handleError(
         error as Error,
         output,
         config,
@@ -705,7 +716,7 @@ export class TypecheckRepositoryImpl {
   /**
    * Build response with pagination and statistics
    */
-  private buildResponse(
+  private static buildResponse(
     allIssues: TypecheckIssue[],
     data: TypecheckRequestOutput,
     skipFiles = false,
@@ -730,8 +741,8 @@ export class TypecheckRepositoryImpl {
         | undefined;
 
       if (!skipFiles) {
-        const fileStats = TypecheckRepositoryImpl.buildFileStats(allIssues);
-        files = TypecheckRepositoryImpl.formatFileStats(fileStats);
+        const fileStats = TypecheckRepository.buildFileStats(allIssues);
+        files = TypecheckRepository.formatFileStats(fileStats);
       }
 
       return {
@@ -771,8 +782,8 @@ export class TypecheckRepositoryImpl {
       | undefined;
 
     if (!skipFiles) {
-      const fileStats = TypecheckRepositoryImpl.buildFileStats(filteredIssues);
-      files = TypecheckRepositoryImpl.formatFileStats(fileStats);
+      const fileStats = TypecheckRepository.buildFileStats(filteredIssues);
+      files = TypecheckRepository.formatFileStats(fileStats);
     }
 
     return {
@@ -785,14 +796,15 @@ export class TypecheckRepositoryImpl {
   /**
    * Build the typecheck command based on path type.
    */
-  private buildCommand(
+  private static buildCommand(
     baseCommand: string,
     config: TypecheckConfig,
     cachePath: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    t: CheckTypecheckT,
     extraIgnorePatterns?: string[],
-  ): string | null {
+  ): ApiResponseType<string | null> {
     if (config.pathType === PathType.NO_PATH) {
       // No specific path provided, check entire project.
       // When extra ignore patterns are present we need a temp config to carry the excludes —
@@ -813,91 +825,116 @@ export class TypecheckRepositoryImpl {
         );
         // Empty filesToCheck — original tsconfig includes already cover the full project.
         // The temp config just carries the extra excludes on top of those.
-        TypecheckRepositoryImpl.createTempTsConfig(
+        const createResult = TypecheckRepository.createTempTsConfig(
           [],
           tempConfigFile,
           cachePath,
           locale,
+          t,
           extraIgnorePatterns,
         );
-        return TypecheckRepositoryImpl.buildTypecheckCommand(
-          baseCommand,
-          tempBuildInfoFile,
-          tempConfigFile,
+        if (!createResult.success) {
+          return createResult;
+        }
+        return success(
+          TypecheckRepository.buildTypecheckCommand(
+            baseCommand,
+            tempBuildInfoFile,
+            tempConfigFile,
+          ),
         );
       }
 
       logger.debug("[TYPESCRIPT] Running check on entire project");
-      return TypecheckRepositoryImpl.buildTypecheckCommand(
-        baseCommand,
-        config.buildInfoFile,
-        "tsconfig.json",
+      return success(
+        TypecheckRepository.buildTypecheckCommand(
+          baseCommand,
+          config.buildInfoFile,
+          "tsconfig.json",
+        ),
       );
     }
 
     if (!config.tempConfigFile) {
-      return null;
+      return success(null);
     }
 
+    let createResult: ApiResponseType<void>;
     if (config.pathType === PathType.SINGLE_FILE) {
       // Single file - create temporary tsconfig for this file
-      TypecheckRepositoryImpl.createTempTsConfig(
+      createResult = TypecheckRepository.createTempTsConfig(
         [config.targetPath!],
         config.tempConfigFile,
         cachePath,
         locale,
+        t,
         extraIgnorePatterns,
       );
     } else if (config.pathType === PathType.MULTIPLE_PATHS) {
       // Multiple paths - combine all into one tsconfig
       const includes = resolvePathsToIncludes(config.targetPaths ?? []);
-      TypecheckRepositoryImpl.createTempTsConfig(
+      createResult = TypecheckRepository.createTempTsConfig(
         includes,
         config.tempConfigFile,
         cachePath,
         locale,
+        t,
         extraIgnorePatterns,
       );
     } else {
       // Folder - create temporary tsconfig with folder glob pattern
       const folderPath = config.targetPath || ".";
-
-      TypecheckRepositoryImpl.createTempTsConfig(
+      createResult = TypecheckRepository.createTempTsConfig(
         [`${folderPath}/**/*`],
         config.tempConfigFile,
         cachePath,
         locale,
+        t,
         extraIgnorePatterns,
       );
     }
 
-    return TypecheckRepositoryImpl.buildTypecheckCommand(
-      baseCommand,
-      config.buildInfoFile,
-      config.tempConfigFile,
+    if (!createResult.success) {
+      return createResult;
+    }
+
+    return success(
+      TypecheckRepository.buildTypecheckCommand(
+        baseCommand,
+        config.buildInfoFile,
+        config.tempConfigFile,
+      ),
     );
   }
 
   /**
    * Execute the typecheck command.
    */
-  private async executeCommand(
+  private static async executeCommand(
     command: string,
     timeout: number | undefined,
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; output: string; error?: string }> {
+    t: CheckTypecheckT,
+    signal?: AbortSignal,
+  ): Promise<ApiResponseType<{ output: string }>> {
     try {
-      const result = await execAsync(command, {
+      if (signal?.aborted) {
+        return fail({
+          message: t("errors.aborted.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+      const result = await TypecheckRepository.execAsync(command, {
         cwd: process.cwd(),
         timeout: (timeout ?? 900) * 1000,
         maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+        signal,
       });
 
       logger.debug("[TYPESCRIPT] Command executed successfully");
-      return {
-        success: true,
+      return success({
         output: [result.stdout, result.stderr].filter(Boolean).join("\n"),
-      };
+      });
     } catch (execError) {
       // TSC exit codes 1 and 2 mean TypeScript errors were found
       const hasTypeErrors =
@@ -911,10 +948,9 @@ export class TypecheckRepositoryImpl {
           typeof execError.stdout === "string" ? execError.stdout : "";
         const stderr =
           typeof execError.stderr === "string" ? execError.stderr : "";
-        return {
-          success: false,
+        return success({
           output: [stdout, stderr].filter(Boolean).join("\n"),
-        };
+        });
       }
 
       // Other errors are unexpected
@@ -923,18 +959,18 @@ export class TypecheckRepositoryImpl {
       logger.error(
         `[TYPESCRIPT] Unexpected error executing command: ${parsedError.message}`,
       );
-      return {
-        success: false,
-        output: "",
-        error: parsedError.message,
-      };
+      return fail({
+        message: t("errors.internal.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsedError.message },
+      });
     }
   }
 
   /**
    * Handle errors during execution.
    */
-  private handleError(
+  private static handleError(
     error: Error,
     output: string,
     config: TypecheckConfig | undefined,
@@ -942,7 +978,7 @@ export class TypecheckRepositoryImpl {
     startTime: number,
     logger: EndpointLogger,
     skipFiles = false,
-    t: ModuleT,
+    t: CheckTypecheckT,
   ): ApiResponseType<TypecheckResponseOutput> {
     const duration = Date.now() - startTime;
     const parsedError = parseError(error);
@@ -979,7 +1015,7 @@ export class TypecheckRepositoryImpl {
       output += error.stdout;
 
       // Parse TypeScript errors from stdout
-      const { errors } = TypecheckRepositoryImpl.parseTypecheckOutput(
+      const { errors } = TypecheckRepository.parseTypecheckOutput(
         error.stdout,
         false, // Try both patterns
         targetPath,
@@ -1005,7 +1041,9 @@ export class TypecheckRepositoryImpl {
     const errorCode =
       hasCode && typeof error.code === "number" ? error.code : 0;
     if (errorCode === 2 || issues.length > 0) {
-      return success(this.buildResponse(issues, data, skipFiles));
+      return success(
+        TypecheckRepository.buildResponse(issues, data, skipFiles),
+      );
     }
 
     return fail({
@@ -1019,8 +1057,3 @@ export class TypecheckRepositoryImpl {
     });
   }
 }
-
-// ============================================================
-// Default Repository Instance
-// ============================================================
-export const typecheckRepository = new TypecheckRepositoryImpl();

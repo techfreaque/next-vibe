@@ -13,7 +13,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
 
 import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../enum";
 
@@ -126,14 +125,15 @@ export const selectPulseNotificationSchema =
 
 /**
  * Type exports for pulse health
+ *
+ * Use $inferSelect / $inferInsert so that db.select().from(table) and
+ * .insert().returning() unify to the same types without casts.
  */
-export type PulseHealth = z.infer<typeof selectPulseHealthSchema>;
-export type NewPulseHealth = z.infer<typeof insertPulseHealthSchema>;
+export type PulseHealth = typeof pulseHealth.$inferSelect;
+export type NewPulseHealth = typeof pulseHealth.$inferInsert;
 
-export type PulseExecution = z.infer<typeof selectPulseExecutionSchema>;
-export type NewPulseExecution = z.infer<typeof insertPulseExecutionSchema>;
+export type PulseExecution = typeof pulseExecutions.$inferSelect;
+export type NewPulseExecution = typeof pulseExecutions.$inferInsert;
 
-export type PulseNotification = z.infer<typeof selectPulseNotificationSchema>;
-export type NewPulseNotification = z.infer<
-  typeof insertPulseNotificationSchema
->;
+export type PulseNotification = typeof pulseNotifications.$inferSelect;
+export type NewPulseNotification = typeof pulseNotifications.$inferInsert;

@@ -3,7 +3,6 @@
  * Handles task index generation functionality
  */
 
-/* eslint-disable i18next/no-literal-string */
 // CLI output messages don't need internationalization
 
 import "server-only";
@@ -32,35 +31,19 @@ import {
   getRelativeImportPath,
   writeGeneratedFile,
 } from "../shared/utils";
-import type endpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type {
+  TaskIndexRequestOutput,
+  TaskIndexResponseOutput,
+} from "./definition";
+import type { GeneratorsTaskIndexT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type RequestType = typeof endpoints.POST.types.RequestOutput;
-type TaskIndexResponseType = typeof endpoints.POST.types.ResponseOutput;
-
-/**
- * Task Index Generator Repository Interface
- */
-interface TaskIndexGeneratorRepository {
-  generateTaskIndex(
-    data: RequestType,
+export class TaskIndexGeneratorRepository {
+  static async generateTaskIndex(
+    data: TaskIndexRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<BaseResponseType<TaskIndexResponseType>>;
-}
-
-/**
- * Task Index Generator Repository Implementation
- */
-class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
-  async generateTaskIndex(
-    data: RequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsTaskIndexT,
     liveIndex?: LiveIndex,
-  ): Promise<BaseResponseType<TaskIndexResponseType>> {
+  ): Promise<BaseResponseType<TaskIndexResponseOutput>> {
     const startTime = Date.now();
 
     try {
@@ -91,23 +74,25 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       );
 
       // Validate files
-      const validationResult = await this.validateTaskFiles(
-        taskFiles,
-        taskRunnerFiles,
-        logger,
-      );
+      const validationResult =
+        await TaskIndexGeneratorRepository.validateTaskFiles(
+          taskFiles,
+          taskRunnerFiles,
+          logger,
+          t,
+        );
       if (!validationResult.success) {
         return fail({
           message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
-            error: validationResult.error || "Validation failed",
+            error: validationResult.message || "Validation failed",
           },
         });
       }
 
       // Generate content
-      const content = this.generateContent(
+      const content = TaskIndexGeneratorRepository.generateContent(
         taskFiles,
         taskRunnerFiles,
         outputFile,
@@ -152,11 +137,12 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
   /**
    * Validate discovered task files
    */
-  private async validateTaskFiles(
+  private static async validateTaskFiles(
     taskFiles: string[],
     taskRunnerFiles: string[],
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; error?: string }> {
+    t: GeneratorsTaskIndexT,
+  ): Promise<BaseResponseType<Record<string, never>>> {
     try {
       // Validate task.ts files
       for (const file of taskFiles) {
@@ -167,10 +153,13 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
             !content.includes("export const tasks") &&
             !content.includes("export { tasks }")
           ) {
-            return {
-              success: false,
-              error: `Task file ${file} must export 'tasks' array`,
-            };
+            return fail({
+              message: t("post.errors.validation.title"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              messageParams: {
+                error: `Task file ${file} must export 'tasks' array`,
+              },
+            });
           }
 
           const hasLegacyExports =
@@ -183,10 +172,13 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
             );
           }
         } catch (error) {
-          return {
-            success: false,
-            error: `Failed to validate task file ${file}: ${parseError(error).message}`,
-          };
+          return fail({
+            message: t("post.errors.internal.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
+              error: `Failed to validate task file ${file}: ${parseError(error).message}`,
+            },
+          });
         }
       }
 
@@ -199,32 +191,41 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
             !content.includes("export const taskRunners") &&
             !content.includes("export { taskRunners }")
           ) {
-            return {
-              success: false,
-              error: `Task runner file ${file} must export 'taskRunners' array`,
-            };
+            return fail({
+              message: t("post.errors.validation.title"),
+              errorType: ErrorResponseTypes.VALIDATION_ERROR,
+              messageParams: {
+                error: `Task runner file ${file} must export 'taskRunners' array`,
+              },
+            });
           }
         } catch (error) {
-          return {
-            success: false,
-            error: `Failed to validate task runner file ${file}: ${parseError(error).message}`,
-          };
+          return fail({
+            message: t("post.errors.internal.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            messageParams: {
+              error: `Failed to validate task runner file ${file}: ${parseError(error).message}`,
+            },
+          });
         }
       }
 
-      return { success: true };
+      return success({});
     } catch (error) {
-      return {
-        success: false,
-        error: `Task file validation failed: ${parseError(error).message}`,
-      };
+      return fail({
+        message: t("post.errors.internal.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          error: `Task file validation failed: ${parseError(error).message}`,
+        },
+      });
     }
   }
 
   /**
    * Generate task index content
    */
-  private generateContent(
+  private static generateContent(
     taskFiles: string[],
     taskRunnerFiles: string[],
     outputFile: string,
@@ -321,6 +322,3 @@ export default allTasks;
 `;
   }
 }
-
-export const taskIndexGeneratorRepository =
-  new TaskIndexGeneratorRepositoryImpl();

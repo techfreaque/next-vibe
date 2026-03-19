@@ -2,12 +2,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { envKeysGeneratorRepository } from "./repository";
+import { EnvKeysGeneratorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) =>
-      envKeysGeneratorRepository.generateEnvKeys(data, logger, t),
+      EnvKeysGeneratorRepository.generateEnvKeys(data, logger, t),
   },
 });

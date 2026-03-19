@@ -21,78 +21,41 @@ import type {
   DockerOperationRequestOutput,
   DockerOperationResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { DockerOperationsT } from "./i18n";
 
 /**
- * Docker command constants
+ * Docker Operations Repository
  */
-const DOCKER_CMD_FLAG_FILE = "-f";
-const DOCKER_CMD_FLAG_DETACH = "-d";
+export class DockerOperationsRepository {
+  private static readonly DOCKER_CMD_FLAG_FILE = "-f";
+  private static readonly DOCKER_CMD_FLAG_DETACH = "-d";
+  private static readonly HIDDEN_DOCKER_LOG_PATTERNS = [
+    // Match raw Docker output: Container {name} {action}
+    /^\s*Container\s+[\w-]+\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started|Running)\s*$/,
+    // Match raw Docker output: Network {any}_default {action}
+    /^\s*Network\s+[a-zA-Z0-9_-]+_default\s+(Removing|Removed|Creating|Created)\s*$/,
+    // Match raw Docker output: Volume {any} {action}
+    /^\s*Volume\s+[a-zA-Z0-9_-]+\s+(Removing|Removed|Creating|Created)\s*$/,
+    // Container name already in use — not a real error, container is already running
+    /already in use by container/,
+    /You have to remove \(or rename\) that container/,
+    /Error response from daemon: Conflict/,
+  ];
+  /**
+   * Check if a log line should be hidden
+   */
+  private static shouldHideLogLine(line: string): boolean {
+    return DockerOperationsRepository.HIDDEN_DOCKER_LOG_PATTERNS.some(
+      (pattern) => pattern.test(line.trim()),
+    );
+  }
 
-/**
- * Docker log patterns to hide in development mode
- */
-const HIDDEN_DOCKER_LOG_PATTERNS = [
-  // Match raw Docker output: Container {name} {action}
-  /^\s*Container\s+[\w-]+\s+(Stopping|Stopped|Removing|Removed|Creating|Created|Starting|Started|Running)\s*$/,
-  // Match raw Docker output: Network {any}_default {action}
-  /^\s*Network\s+[a-zA-Z0-9_-]+_default\s+(Removing|Removed|Creating|Created)\s*$/,
-  // Match raw Docker output: Volume {any} {action}
-  /^\s*Volume\s+[a-zA-Z0-9_-]+\s+(Removing|Removed|Creating|Created)\s*$/,
-  // Container name already in use — not a real error, container is already running
-  /already in use by container/,
-  /You have to remove \(or rename\) that container/,
-  /Error response from daemon: Conflict/,
-];
-
-/**
- * Check if a log line should be hidden
- */
-function shouldHideLogLine(line: string): boolean {
-  return HIDDEN_DOCKER_LOG_PATTERNS.some((pattern) =>
-    pattern.test(line.trim()),
-  );
-}
-
-/**
- * Docker Operations Repository Interface
- */
-export interface DockerOperationsRepository {
-  executeCommand(
-    data: DockerOperationRequestOutput,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<DockerOperationResponseOutput>>;
-
-  dockerComposeUp(
-    logger: EndpointLogger,
-    t: ModuleT,
-    composeFile?: string,
-    timeout?: number,
-    projectName?: string,
-  ): Promise<ResponseType<boolean>>;
-
-  dockerComposeDown(
-    logger: EndpointLogger,
-    t: ModuleT,
-    composeFile?: string,
-    timeout?: number,
-    projectName?: string,
-  ): Promise<ResponseType<boolean>>;
-}
-
-/**
- * Docker Operations Repository Implementation
- */
-export class DockerOperationsRepositoryImpl implements DockerOperationsRepository {
   /**
    * Execute a Docker command with timeout and log filtering
    */
-  async executeCommand(
+  static async executeCommand(
     data: DockerOperationRequestOutput,
-    t: ModuleT,
+    t: DockerOperationsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<DockerOperationResponseOutput>> {
     try {
@@ -107,13 +70,14 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         description,
       } = options;
 
-      const result = await this.executeDockerCommandInternal(command, {
-        timeout,
-        hideStandardLogs,
-        description,
-        t,
-        logger,
-      });
+      const result =
+        await DockerOperationsRepository.executeDockerCommandInternal(command, {
+          timeout,
+          hideStandardLogs,
+          description,
+          t,
+          logger,
+        });
 
       logger.info("🗄️  Docker command execution completed", {
         success: result.success,
@@ -139,9 +103,9 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
   /**
    * Execute Docker Compose down with timeout and log filtering
    */
-  async dockerComposeDown(
+  static async dockerComposeDown(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: DockerOperationsT,
     composeFile = "docker-compose-dev.yml",
     timeout = 30000,
     projectName?: string,
@@ -155,17 +119,18 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         commandParts.push("--project-name");
         commandParts.push(projectName);
       }
-      commandParts.push(DOCKER_CMD_FLAG_FILE);
+      commandParts.push(DockerOperationsRepository.DOCKER_CMD_FLAG_FILE);
       commandParts.push(composeFile);
       commandParts.push("down");
       const command = commandParts.join(" ");
-      const result = await this.executeDockerCommandInternal(command, {
-        timeout,
-        hideStandardLogs: true,
-        description: "Stopping Docker containers...",
-        t,
-        logger,
-      });
+      const result =
+        await DockerOperationsRepository.executeDockerCommandInternal(command, {
+          timeout,
+          hideStandardLogs: true,
+          description: "Stopping Docker containers...",
+          t,
+          logger,
+        });
 
       const duration = Date.now() - startTime;
       logger.info(
@@ -188,9 +153,9 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
   /**
    * Execute Docker Compose up with timeout and log filtering
    */
-  async dockerComposeUp(
+  static async dockerComposeUp(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: DockerOperationsT,
     composeFile = "docker-compose-dev.yml",
     timeout = 60000,
     projectName?: string,
@@ -204,18 +169,19 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         commandParts.push("--project-name");
         commandParts.push(projectName);
       }
-      commandParts.push(DOCKER_CMD_FLAG_FILE);
+      commandParts.push(DockerOperationsRepository.DOCKER_CMD_FLAG_FILE);
       commandParts.push(composeFile);
       commandParts.push("up");
-      commandParts.push(DOCKER_CMD_FLAG_DETACH);
+      commandParts.push(DockerOperationsRepository.DOCKER_CMD_FLAG_DETACH);
       const command = commandParts.join(" ");
-      const result = await this.executeDockerCommandInternal(command, {
-        timeout,
-        hideStandardLogs: true,
-        description: "Starting Docker containers...",
-        t,
-        logger,
-      });
+      const result =
+        await DockerOperationsRepository.executeDockerCommandInternal(command, {
+          timeout,
+          hideStandardLogs: true,
+          description: "Starting Docker containers...",
+          t,
+          logger,
+        });
 
       const duration = Date.now() - startTime;
       logger.debug(
@@ -238,13 +204,13 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
   /**
    * Internal method to execute Docker command with proper logging
    */
-  private async executeDockerCommandInternal(
+  private static async executeDockerCommandInternal(
     command: string,
     options: {
       timeout?: number;
       hideStandardLogs?: boolean;
       description?: string;
-      t: ModuleT;
+      t: DockerOperationsT;
       logger: EndpointLogger;
     },
   ): Promise<{ success: boolean; output: string; error?: string }> {
@@ -295,7 +261,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         const lines = data.toString().split("\n");
         for (const line of lines) {
           if (line.trim()) {
-            if (hideStandardLogs && shouldHideLogLine(line)) {
+            if (
+              hideStandardLogs &&
+              DockerOperationsRepository.shouldHideLogLine(line)
+            ) {
               // Hide this log line but still capture it in output
               output += line;
               output += "\n";
@@ -314,7 +283,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         const lines = data.toString().split("\n");
         for (const line of lines) {
           if (line.trim()) {
-            if (hideStandardLogs && shouldHideLogLine(line)) {
+            if (
+              hideStandardLogs &&
+              DockerOperationsRepository.shouldHideLogLine(line)
+            ) {
               // Hide this error line but still capture it
               error += line;
               error += "\n";
@@ -397,8 +369,3 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
     });
   }
 }
-
-/**
- * Docker Operations Repository Instance
- */
-export const dockerOperationsRepository = new DockerOperationsRepositoryImpl();

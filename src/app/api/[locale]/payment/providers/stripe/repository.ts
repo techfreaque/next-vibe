@@ -38,21 +38,17 @@ import type {
 } from "../types";
 import { scopedTranslation } from "./i18n";
 
-// Singleton Stripe instance — null when STRIPE_SECRET_KEY is not configured
-const _stripe = paymentEnv.STRIPE_SECRET_KEY
-  ? new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-      apiVersion: "2026-02-25.clover",
-    })
-  : null;
-
-/** Returns the Stripe client, or null if STRIPE_SECRET_KEY is not configured */
-export function getStripe(): Stripe | null {
-  return _stripe;
-}
-
-export const stripe = _stripe;
-
 export class StripeProvider implements PaymentProvider {
+  private static readonly _stripe = paymentEnv.STRIPE_SECRET_KEY
+    ? new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
+        apiVersion: "2026-02-25.clover",
+      })
+    : null;
+
+  /** Returns the Stripe client, or null if STRIPE_SECRET_KEY is not configured */
+  static getStripe(): Stripe | null {
+    return StripeProvider._stripe;
+  }
   name = "stripe";
 
   async ensureCustomer(
@@ -63,7 +59,7 @@ export class StripeProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<CustomerResult>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: t("errors.notConfigured.title"),
@@ -165,7 +161,7 @@ export class StripeProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<CheckoutSessionResult>> {
     const { t: tCheckout } = scopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: tCheckout("errors.notConfigured.title"),
@@ -320,7 +316,7 @@ export class StripeProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): ReturnType<PaymentProvider["verifyWebhook"]> {
     const { t } = scopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: t("errors.notConfigured.title"),
@@ -496,7 +492,7 @@ export class StripeProvider implements PaymentProvider {
     }>
   > {
     const { t: tSub } = scopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: tSub("errors.notConfigured.title"),
@@ -592,7 +588,7 @@ export class StripeProvider implements PaymentProvider {
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     const { t: tCancel } = scopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: tCancel("errors.notConfigured.title"),

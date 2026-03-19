@@ -21,9 +21,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserRoleValue } from "../user-roles/enum";
 import { scopedTranslation } from "./i18n";
-import type { AuthRepositoryType, InferUserType } from "./repository";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { AuthT } from "./i18n";
+import type { AuthRepositoryType } from "./repository";
+import type { InferUserType } from "./types";
 
 const AUTH_TOKEN_STORAGE_KEY = "@auth/token";
 const AUTH_EXPIRES_AT_STORAGE_KEY = "@auth/expiresAt";
@@ -85,7 +85,7 @@ export class AuthRepository {
     token: string,
     rememberMe: boolean,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<void>> {
     try {
       const expirationDays = rememberMe ? 30 : 7;
@@ -112,7 +112,7 @@ export class AuthRepository {
 
   static async clearAuthCookies(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AuthT,
   ): Promise<ResponseType<void>> {
     try {
       await storage.removeItem(AUTH_TOKEN_STORAGE_KEY);

@@ -15,7 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { createDefaultCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -39,7 +38,7 @@ export class UserRolesRepository {
    * @returns User roles or error response
    */
   static async findByUserId(
-    userId: DbId,
+    userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<UserRole[]>> {
@@ -100,10 +99,10 @@ export class UserRolesRepository {
    * @returns Map of userId -> roles for efficient lookups
    */
   static async findByUserIds(
-    userIds: DbId[],
+    userIds: string[],
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<Map<DbId, UserRole[]>>> {
+  ): Promise<ResponseType<Map<string, UserRole[]>>> {
     try {
       logger.debug("Batch finding user roles for multiple users", {
         count: userIds.length,
@@ -120,7 +119,7 @@ export class UserRolesRepository {
 
       // If all users were CLI default users, return empty map
       if (validUserIds.length === 0) {
-        const emptyMap = new Map<DbId, UserRole[]>();
+        const emptyMap = new Map<string, UserRole[]>();
         userIds.forEach((id) => emptyMap.set(id, []));
         return success(emptyMap);
       }
@@ -132,7 +131,7 @@ export class UserRolesRepository {
         .where(inArray(userRoles.userId, validUserIds));
 
       // Group roles by userId for efficient lookup
-      const rolesMap = new Map<DbId, UserRole[]>();
+      const rolesMap = new Map<string, UserRole[]>();
 
       // Initialize map with empty arrays for all requested users
       userIds.forEach((id) => rolesMap.set(id, []));
@@ -173,7 +172,7 @@ export class UserRolesRepository {
    * @returns User role or error response
    */
   static async findByUserIdAndRole(
-    userId: DbId,
+    userId: string,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -297,7 +296,7 @@ export class UserRolesRepository {
    * @returns Success or error response
    */
   static async removeRole(
-    userId: DbId,
+    userId: string,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -334,7 +333,7 @@ export class UserRolesRepository {
    * @returns Success or error response
    */
   static async hasRole(
-    userId: DbId,
+    userId: string,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -365,7 +364,7 @@ export class UserRolesRepository {
    * @returns Success or error response
    */
   static async deleteByUserId(
-    userId: DbId,
+    userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
@@ -392,7 +391,7 @@ export class UserRolesRepository {
    * @returns Array of role strings or error response
    */
   static async getUserRoles(
-    userId: DbId,
+    userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {

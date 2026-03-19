@@ -7,6 +7,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -18,18 +19,16 @@ import type {
   LeadListGetRequestTypeOutput,
   LeadListGetResponseTypeOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-type LeadsModuleT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
+import type { LeadsT } from "../i18n";
+import type { LeadsListT } from "./i18n";
 
 /**
  * Repository implementation for leads list operations
  */
-export class LeadsListRepositoryImpl {
-  async listLeads(
+export class LeadsListRepository {
+  static async listLeads(
     data: LeadListGetRequestTypeOutput,
-    t: ModuleT,
+    t: LeadsListT,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<LeadListGetResponseTypeOutput>> {
@@ -37,7 +36,7 @@ export class LeadsListRepositoryImpl {
     logger.debug("Request data", data);
 
     // Pass data directly - it matches the structure expected by LeadsRepository
-    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
+    const leadsT: LeadsT = leadsScopedTranslation.scopedT(locale).t;
     const result = await LeadsRepository.listLeads(data, logger, leadsT);
 
     if (result.success && result.data) {
@@ -47,19 +46,16 @@ export class LeadsListRepositoryImpl {
       logger.vibe(`🎯 Successfully listed ${responseData.leads.length} leads`);
 
       // The definition expects response and paginationInfo separately
-      return {
-        success: true as const,
-        data: {
-          response: {
-            leads: responseData.leads,
-          },
-          paginationInfo: {
-            totalCount: paginationData.totalCount,
-            pageCount: paginationData.pageCount,
-          },
-          countsByStatus: result.data.countsByStatus,
+      return success({
+        response: {
+          leads: responseData.leads,
         },
-      } satisfies ResponseType<LeadListGetResponseTypeOutput>;
+        paginationInfo: {
+          totalCount: paginationData.totalCount,
+          pageCount: paginationData.pageCount,
+        },
+        countsByStatus: result.data.countsByStatus,
+      });
     }
     logger.error("Failed to list leads", { message: result.message });
     return fail({
@@ -68,8 +64,3 @@ export class LeadsListRepositoryImpl {
     });
   }
 }
-
-/**
- * Export repository instance
- */
-export const leadsListRepository = new LeadsListRepositoryImpl();

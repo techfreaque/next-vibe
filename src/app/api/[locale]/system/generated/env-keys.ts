@@ -6,7 +6,6 @@
  */
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 /**
  * Serializable metadata for a single env key.
@@ -948,3 +947,4 @@ export const ENV_KEYS = [
 ] as const satisfies readonly EnvKeyMeta[];
 
 export type EnvKeyName = (typeof ENV_KEYS)[number]["key"];
+

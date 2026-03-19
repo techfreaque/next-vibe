@@ -40,6 +40,10 @@ export const translations = {
       migrationFailed: "Migration failed: {{error}}",
       seedingFailed: "Seeding failed: {{error}}",
       restartFailed: "Server restart failed: {{error}}",
+      noPidFile: "No .vibe-pid file found — is vibe start running?",
+      invalidPid: "Invalid PID in .vibe-pid: {{pid}}",
+      processNotRunning: "Process {{pid}} is not running",
+      signalFailed: "Failed to send SIGUSR1: {{error}}",
     },
     errors: {
       validation: {

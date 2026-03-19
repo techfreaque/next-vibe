@@ -496,6 +496,7 @@ export const translations: typeof enTranslations = {
   errors: {
     toolExecutionError:
       "Ein Werkzeug konnte nicht korrekt ausgeführt werden. Bitte versuchen Sie es erneut.",
+    toolExecutionErrorDetail: "Tool-Fehler: {{error}}",
     toolExecutionFailed:
       "Werkzeug-Ausführung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     toolDisabledByUser:

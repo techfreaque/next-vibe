@@ -125,6 +125,7 @@ export const translations: typeof enTranslations = {
       "check.config.ts muss 'default' oder 'config' exportieren",
     oxlintFailed: "Oxlint fehlgeschlagen",
     prettierFailed: "Prettier fehlgeschlagen mit Exit-Code",
+    oxlintDisabled: "Oxlint ist in check.config.ts deaktiviert",
   },
   success: {
     title: "Erfolg",

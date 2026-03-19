@@ -154,6 +154,14 @@ export const translations = {
       title: "Invalid Command",
       message: "The TypeScript check command is invalid or missing",
     },
+    aborted: {
+      title: "Operation Aborted",
+      description: "The type check operation was aborted",
+    },
+    parseTsconfig: {
+      title: "Failed to Parse tsconfig.json",
+      description: "The tsconfig.json file could not be parsed",
+    },
   },
 
   // Success messages

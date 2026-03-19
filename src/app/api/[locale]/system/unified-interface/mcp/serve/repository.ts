@@ -18,12 +18,12 @@ import type { MCPRegistry } from "../registry";
 import { MCPServer } from "../server/server";
 import type { MCPServeResponseInput } from "./definition";
 
-class MCPServeRepository {
+export class MCPServeRepository {
   /**
    * Start MCP server
    * Note: This function never returns as the MCP server takes over the process
    */
-  async startServer(
+  static async startServer(
     logger: EndpointLogger,
     locale: CountryLanguage,
     user: JwtPayloadType,
@@ -48,5 +48,3 @@ class MCPServeRepository {
     });
   }
 }
-
-export const mcpServeRepository = new MCPServeRepository();

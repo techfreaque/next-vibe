@@ -3,7 +3,6 @@
  * Handles run tests operations
  */
 
-/* eslint-disable i18next/no-literal-string */
 // CLI output messages don't need internationalization
 
 import type { ResponseType as ApiResponseType } from "next-vibe/shared/types/response.schema";
@@ -17,29 +16,16 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { TestRequestOutput, TestResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { TestingTestT } from "./i18n";
 
 /**
- * Run tests Repository Interface
+ * Run tests Repository
  */
-interface TestRepositoryInterface {
-  execute(
+export class TestRepository {
+  static async execute(
     data: TestRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ApiResponseType<TestResponseOutput>>;
-}
-
-/**
- * Run tests Repository Implementation
- */
-class TestRepositoryImpl implements TestRepositoryInterface {
-  async execute(
-    data: TestRequestOutput,
-    logger: EndpointLogger,
-    t: ModuleT,
+    t: TestingTestT,
   ): Promise<ApiResponseType<TestResponseOutput>> {
     logger.info("system.check.testing.test.execute.start");
     const startTime = Date.now();
@@ -115,8 +101,3 @@ class TestRepositoryImpl implements TestRepositoryInterface {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const testRepository = new TestRepositoryImpl();

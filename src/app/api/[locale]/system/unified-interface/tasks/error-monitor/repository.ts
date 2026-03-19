@@ -34,122 +34,111 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { errorLogs } from "./db";
 import type { ErrorMonitorPostResponseOutput } from "./definition";
 
-/** 3 hours in milliseconds */
-const SCAN_WINDOW_MS = 3 * 60 * 60 * 1000;
-
-/** Max rows to fetch from each source */
-const MAX_ROWS = 5000;
-
-/** Max patterns to return */
-const MAX_PATTERNS = 20;
-
-/** Max thread IDs per pattern */
-const MAX_THREAD_IDS = 10;
-
-interface PatternAccumulator {
-  count: number;
-  threadIds: Set<string>;
-  model: string | null;
-  tool: string | null;
-  firstSeen: Date;
-  lastSeen: Date;
-}
-
-interface ErrorPattern {
-  type: string;
-  count: number;
-  threadIds: string[];
-  model: string | null;
-  tool: string | null;
-  firstSeen: string;
-  lastSeen: string;
-}
-
-/**
- * Classify a chat error message into a pattern key.
- * Privacy-safe: only uses role, errorType, errorCode, model, and metadata.toolCall.toolName.
- */
-function classifyChatError(msg: {
-  role: string;
-  errorType: string | null;
-  errorCode: string | null;
-  model: string | null;
-  metadata: MessageMetadata | null;
-}): { type: string; tool: string | null; model: string | null } {
-  const metadata = msg.metadata;
-
-  // 1. Tool failure: metadata has toolCall with error
-  if (metadata?.toolCall?.error) {
-    const toolName = metadata.toolCall.toolName ?? "unknown";
-    return { type: `tool_failure:${toolName}`, tool: toolName, model: null };
-  }
-
-  // 2. HTTP error code
-  if (msg.errorCode) {
-    return {
-      type: `api_error_${msg.errorCode}`,
-      tool: null,
-      model: msg.model,
-    };
-  }
-
-  // 3. Model error (error role + model set)
-  if (msg.role === ChatMessageRole.ERROR && msg.model) {
-    return { type: `model_error:${msg.model}`, tool: null, model: msg.model };
-  }
-
-  // 4. Typed error
-  if (msg.errorType) {
-    return { type: `error:${msg.errorType}`, tool: null, model: msg.model };
-  }
-
-  // 5. Generic error role
-  if (msg.role === ChatMessageRole.ERROR) {
-    return { type: "unknown_error", tool: null, model: msg.model };
-  }
-
-  return { type: "unknown_error", tool: null, model: null };
-}
-
-/** Add an error to the pattern accumulator */
-function addToPatternMap(
-  patternMap: Map<string, PatternAccumulator>,
-  type: string,
-  threadId: string | null,
-  model: string | null,
-  tool: string | null,
-  date: Date,
-): void {
-  const existing = patternMap.get(type);
-  if (existing) {
-    existing.count++;
-    if (threadId) {
-      existing.threadIds.add(threadId);
-    }
-    if (date < existing.firstSeen) {
-      existing.firstSeen = date;
-    }
-    if (date > existing.lastSeen) {
-      existing.lastSeen = date;
-    }
-  } else {
-    patternMap.set(type, {
-      count: 1,
-      threadIds: new Set(threadId ? [threadId] : []),
-      model,
-      tool,
-      firstSeen: date,
-      lastSeen: date,
-    });
-  }
-}
-
 export class ErrorMonitorRepository {
+  /** 3 hours in milliseconds */
+  private static readonly SCAN_WINDOW_MS = 3 * 60 * 60 * 1000;
+  /** Max rows to fetch from each source */
+  private static readonly MAX_ROWS = 5000;
+  /** Max patterns to return */
+  private static readonly MAX_PATTERNS = 20;
+  /** Max thread IDs per pattern */
+  private static readonly MAX_THREAD_IDS = 10;
+
+  /**
+   * Classify a chat error message into a pattern key.
+   * Privacy-safe: only uses role, errorType, errorCode, model, and metadata.toolCall.toolName.
+   */
+  private static classifyChatError(msg: {
+    role: string;
+    errorType: string | null;
+    errorCode: string | null;
+    model: string | null;
+    metadata: MessageMetadata | null;
+  }): { type: string; tool: string | null; model: string | null } {
+    const metadata = msg.metadata;
+
+    // 1. Tool failure: metadata has toolCall with error
+    if (metadata?.toolCall?.error) {
+      const toolName = metadata.toolCall.toolName ?? "unknown";
+      return { type: `tool_failure:${toolName}`, tool: toolName, model: null };
+    }
+
+    // 2. HTTP error code
+    if (msg.errorCode) {
+      return {
+        type: `api_error_${msg.errorCode}`,
+        tool: null,
+        model: msg.model,
+      };
+    }
+
+    // 3. Model error (error role + model set)
+    if (msg.role === ChatMessageRole.ERROR && msg.model) {
+      return { type: `model_error:${msg.model}`, tool: null, model: msg.model };
+    }
+
+    // 4. Typed error
+    if (msg.errorType) {
+      return { type: `error:${msg.errorType}`, tool: null, model: msg.model };
+    }
+
+    // 5. Generic error role
+    if (msg.role === ChatMessageRole.ERROR) {
+      return { type: "unknown_error", tool: null, model: msg.model };
+    }
+
+    return { type: "unknown_error", tool: null, model: null };
+  }
+
+  /** Add an error to the pattern accumulator */
+  private static addToPatternMap(
+    patternMap: Map<
+      string,
+      {
+        count: number;
+        threadIds: Set<string>;
+        model: string | null;
+        tool: string | null;
+        firstSeen: Date;
+        lastSeen: Date;
+      }
+    >,
+    type: string,
+    threadId: string | null,
+    model: string | null,
+    tool: string | null,
+    date: Date,
+  ): void {
+    const existing = patternMap.get(type);
+    if (existing) {
+      existing.count++;
+      if (threadId) {
+        existing.threadIds.add(threadId);
+      }
+      if (date < existing.firstSeen) {
+        existing.firstSeen = date;
+      }
+      if (date > existing.lastSeen) {
+        existing.lastSeen = date;
+      }
+    } else {
+      patternMap.set(type, {
+        count: 1,
+        threadIds: new Set(threadId ? [threadId] : []),
+        model,
+        tool,
+        firstSeen: date,
+        lastSeen: date,
+      });
+    }
+  }
   static async scanForPatterns(
     logger: EndpointLogger,
   ): Promise<ResponseType<ErrorMonitorPostResponseOutput>> {
     const scanTo = new Date();
-    const scanFrom = new Date(scanTo.getTime() - SCAN_WINDOW_MS);
+    const scanFrom = new Date(
+      scanTo.getTime() - ErrorMonitorRepository.SCAN_WINDOW_MS,
+    );
 
     logger.debug(
       `Scanning for errors from ${scanFrom.toISOString()} to ${scanTo.toISOString()}`,
@@ -186,10 +175,20 @@ export class ErrorMonitorRepository {
           ),
         ),
       )
-      .limit(MAX_ROWS);
+      .limit(ErrorMonitorRepository.MAX_ROWS);
 
     // ── 3. Aggregate into patterns ───────────────────────────────────
-    const patternMap = new Map<string, PatternAccumulator>();
+    const patternMap = new Map<
+      string,
+      {
+        count: number;
+        threadIds: Set<string>;
+        model: string | null;
+        tool: string | null;
+        firstSeen: Date;
+        lastSeen: Date;
+      }
+    >();
 
     // Process backend errors — one row per fingerprint (dedup on write)
     const backendPatterns = await db
@@ -207,7 +206,7 @@ export class ErrorMonitorRepository {
         ),
       )
       .orderBy(desc(errorLogs.occurrences))
-      .limit(MAX_PATTERNS);
+      .limit(ErrorMonitorRepository.MAX_PATTERNS);
 
     for (const bp of backendPatterns) {
       const type = bp.errorType
@@ -234,7 +233,7 @@ export class ErrorMonitorRepository {
 
     // Process chat errors from chat_messages
     for (const msg of chatErrors) {
-      const classification = classifyChatError({
+      const classification = ErrorMonitorRepository.classifyChatError({
         role: msg.role,
         errorType: msg.errorType,
         errorCode: msg.errorCode,
@@ -242,7 +241,7 @@ export class ErrorMonitorRepository {
         metadata: msg.metadata as MessageMetadata | null,
       });
 
-      addToPatternMap(
+      ErrorMonitorRepository.addToPatternMap(
         patternMap,
         classification.type,
         msg.threadId,
@@ -253,18 +252,23 @@ export class ErrorMonitorRepository {
     }
 
     // ── 4. Convert to output (truncated) ─────────────────────────────
-    const patterns: ErrorPattern[] = [...patternMap.entries()]
+    const patterns: ErrorMonitorPostResponseOutput["patterns"] = [
+      ...patternMap.entries(),
+    ]
       .map(([type, data]) => ({
         type,
         count: data.count,
-        threadIds: [...data.threadIds].slice(0, MAX_THREAD_IDS),
+        threadIds: [...data.threadIds].slice(
+          0,
+          ErrorMonitorRepository.MAX_THREAD_IDS,
+        ),
         model: data.model,
         tool: data.tool,
         firstSeen: data.firstSeen.toISOString(),
         lastSeen: data.lastSeen.toISOString(),
       }))
       .toSorted((a, b) => b.count - a.count)
-      .slice(0, MAX_PATTERNS);
+      .slice(0, ErrorMonitorRepository.MAX_PATTERNS);
 
     const errorsFound = backendErrorCount + chatErrors.length;
 

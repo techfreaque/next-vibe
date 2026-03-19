@@ -1,29 +1,31 @@
 "use client";
 
 import type { Route } from "next";
-import Link from "next/link";
-import { cn } from "next-vibe/shared/utils/utils";
 import type { IconComponent } from "next-vibe-ui/lib/helper";
 import { Div } from "next-vibe-ui/ui/div";
 import { History } from "next-vibe-ui/ui/icons/History";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { cn } from "next-vibe/shared/utils/utils";
+import Link from "next/link";
 import type { JSX } from "react";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface SubscriptionTabsNavProps {
   locale: CountryLanguage;
   activeTab: string;
-  isAdmin: boolean;
+  user: JwtPayloadType;
 }
 
 export function SubscriptionTabsNav({
   locale,
   activeTab,
-  isAdmin,
+  user,
 }: SubscriptionTabsNavProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -43,9 +45,10 @@ export function SubscriptionTabsNav({
       value: "buy",
       href: `/${locale}/subscription/buy`,
       icon: ShoppingCart,
-      label: isAdmin
-        ? t("app.subscription.subscription.tabs.adminBuy")
-        : t("app.subscription.subscription.tabs.buy"),
+      label:
+        !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN)
+          ? t("app.subscription.subscription.tabs.adminBuy")
+          : t("app.subscription.subscription.tabs.buy"),
     },
     {
       value: "history",
@@ -53,12 +56,16 @@ export function SubscriptionTabsNav({
       icon: History,
       label: t("app.subscription.subscription.tabs.history"),
     },
-    {
-      value: "remote",
-      href: `/${locale}/subscription/remote` satisfies Route,
-      icon: Link2,
-      label: t("app.subscription.subscription.tabs.remote"),
-    },
+    ...(user.isPublic
+      ? []
+      : [
+          {
+            value: "remote",
+            href: `/${locale}/subscription/remote` satisfies Route,
+            icon: Link2,
+            label: t("app.subscription.subscription.tabs.remote"),
+          },
+        ]),
   ];
 
   return (

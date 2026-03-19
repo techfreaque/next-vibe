@@ -19,10 +19,11 @@ export interface RemoteSession {
 export async function getRemoteSession(
   userId: string,
 ): Promise<RemoteSession | null> {
-  const { getRemoteConnectionRecord } =
+  const { RemoteConnectionRepository } =
     await import("@/app/api/[locale]/user/remote-connection/repository");
 
-  const record = await getRemoteConnectionRecord(userId);
+  const record =
+    await RemoteConnectionRepository.getRemoteConnectionRecord(userId);
   if (!record) {
     return null;
   }

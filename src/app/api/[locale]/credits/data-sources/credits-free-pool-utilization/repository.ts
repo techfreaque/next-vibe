@@ -17,12 +17,13 @@ import { db } from "@/app/api/[locale]/system/db";
 import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
-import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { TimeRange } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type {
+  DataPoint,
+  Resolution,
+  TimeRange,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { FREE_CREDIT_POOL } from "../../constants";
 import { creditWallets } from "../../db";
-
-const FREE_CREDIT_POOL = 20;
 
 export class QueryCreditsFreePoolUtilizationRepository {
   static async queryCreditsFreePoolUtilization(data: {

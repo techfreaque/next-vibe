@@ -21,33 +21,24 @@ import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { CreditRepository } from "../../credits/repository";
 import {
+  CREDIT_VALUE_USD,
+  STANDARD_MARKUP_PERCENTAGE,
   STT_COST_PER_SECOND,
   STT_MINIMUM_BALANCE,
 } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
 import type { SpeechToTextPostResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Server-side provider configuration
- * Hardcoded to use OpenAI Whisper via Eden AI
- */
-const STT_PROVIDER = "openai";
-const STT_MODEL = "whisper-1";
-const STT_PROVIDER_KEY = STT_PROVIDER; // Eden AI expects "openai" for Whisper
-
-/**
- * Maximum polling attempts for async transcription
- */
-const MAX_POLLING_ATTEMPTS = 30;
-const POLLING_INTERVAL_MS = 1000;
+import type { SpeechToTextT } from "./i18n";
 
 /**
  * Speech-to-Text Repository
  */
 export class SpeechToTextRepository {
+  /** Server-side provider configuration — hardcoded to use OpenAI Whisper via Eden AI */
+  private static readonly STT_PROVIDER = "openai"; // Eden AI expects "openai" for Whisper
+  private static readonly STT_MODEL = "whisper-1";
+  private static readonly MAX_POLLING_ATTEMPTS = 30;
+  private static readonly POLLING_INTERVAL_MS = 1000;
   /**
    * Transcribe audio to text
    */
@@ -56,14 +47,14 @@ export class SpeechToTextRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SpeechToTextT,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     // Server-side language configuration - ignore client input
     const language = getLanguageFromLocale(locale);
 
     logger.info("Starting audio transcription", {
-      provider: STT_PROVIDER,
-      model: STT_MODEL,
+      provider: this.STT_PROVIDER,
+      model: this.STT_MODEL,
       language,
       fileSize: file.size,
       fileName: file.name,
@@ -118,12 +109,12 @@ export class SpeechToTextRepository {
       const formData = new FormData();
       const blob = new Blob([buffer], { type: file.type });
       formData.append("file", blob, file.name);
-      formData.append("providers", STT_PROVIDER_KEY); // Use provider/model format
+      formData.append("providers", this.STT_PROVIDER); // Use provider/model format
       formData.append("language", language);
 
       logger.debug("Sending request to Eden AI", {
-        provider: STT_PROVIDER,
-        model: STT_MODEL,
+        provider: this.STT_PROVIDER,
+        model: this.STT_MODEL,
         language,
         fileType: file.type,
         fileSize: file.size,
@@ -147,7 +138,7 @@ export class SpeechToTextRepository {
         logger.error("Eden AI API error", {
           status: response.status,
           error: errorText,
-          provider: STT_PROVIDER,
+          provider: this.STT_PROVIDER,
           language,
         });
         return fail({
@@ -185,7 +176,7 @@ export class SpeechToTextRepository {
       // Poll for results
       const pollResult = await SpeechToTextRepository.pollForResults(
         publicId,
-        STT_PROVIDER_KEY, // Use provider/model format to match Eden AI response
+        this.STT_PROVIDER, // Use provider/model format to match Eden AI response
         logger,
         t,
       );
@@ -194,14 +185,43 @@ export class SpeechToTextRepository {
         return pollResult;
       }
 
-      // Calculate credits based on audio duration
+      // Calculate credits based on actual cost from Eden AI when available,
+      // falling back to duration-based calculation.
+      // Eden AI returns cost in USD — convert to credits using CREDIT_VALUE_USD with our markup.
       const audioDurationSeconds = pollResult.data.duration;
-      const creditsNeeded = audioDurationSeconds * STT_COST_PER_SECOND;
+      const edenAiCostUsd = pollResult.data.edenAiCostUsd;
+
+      let creditsNeeded: number;
+      if (
+        edenAiCostUsd !== null &&
+        edenAiCostUsd !== undefined &&
+        edenAiCostUsd > 0
+      ) {
+        // Use Eden AI's actual cost with our standard markup applied
+        creditsNeeded =
+          (edenAiCostUsd * (1 + STANDARD_MARKUP_PERCENTAGE)) / CREDIT_VALUE_USD;
+        logger.debug("STT: Using Eden AI cost for credit calculation", {
+          edenAiCostUsd,
+          creditsNeeded,
+        });
+      } else if (audioDurationSeconds > 0) {
+        creditsNeeded = audioDurationSeconds * STT_COST_PER_SECOND;
+      } else {
+        // Eden AI returned neither cost nor duration — charge minimum (1 second)
+        logger.error(
+          "STT: Eden AI did not return cost or audio_duration — charging 1-second minimum",
+          {
+            pollResult: JSON.stringify(pollResult.data),
+            provider: this.STT_PROVIDER,
+          },
+        );
+        creditsNeeded = STT_COST_PER_SECOND;
+      }
 
       logger.info("Transcription successful", {
         textLength: pollResult.data.text.length,
-        provider: STT_PROVIDER,
-        model: STT_MODEL,
+        provider: this.STT_PROVIDER,
+        model: this.STT_MODEL,
         audioDurationSeconds,
         creditsNeeded,
         costPerSecond: STT_COST_PER_SECOND,
@@ -227,7 +247,7 @@ export class SpeechToTextRepository {
         });
       }
 
-      if (deductResult.partialDeduction) {
+      if (deductResult.data.partialDeduction) {
         logger.info(
           "STT: Partial credit deduction (insufficient funds, deducted to 0)",
           {
@@ -242,7 +262,7 @@ export class SpeechToTextRepository {
         response: {
           success: true,
           text: pollResult.data.text,
-          provider: STT_PROVIDER,
+          provider: this.STT_PROVIDER,
           confidence: pollResult.data.confidence,
         },
       });
@@ -250,8 +270,8 @@ export class SpeechToTextRepository {
       const errorMessage = parseError(error).message;
       logger.error("Failed to transcribe audio", {
         error: errorMessage,
-        provider: STT_PROVIDER,
-        model: STT_MODEL,
+        provider: this.STT_PROVIDER,
+        model: this.STT_MODEL,
       });
 
       return fail({
@@ -271,19 +291,20 @@ export class SpeechToTextRepository {
     publicId: string,
     provider: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SpeechToTextT,
   ): Promise<
     ResponseType<{
       text: string;
       confidence: number | undefined;
       duration: number;
+      edenAiCostUsd: number | undefined;
     }>
   > {
     let attempts = 0;
 
-    while (attempts < MAX_POLLING_ATTEMPTS) {
+    while (attempts < this.MAX_POLLING_ATTEMPTS) {
       await new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), POLLING_INTERVAL_MS);
+        setTimeout(() => resolve(), this.POLLING_INTERVAL_MS);
       });
 
       try {
@@ -386,12 +407,14 @@ export class SpeechToTextRepository {
           const transcription = providerResult?.text || "";
           const confidence = providerResult?.confidence;
           const duration = providerResult?.audio_duration || 0;
+          const edenAiCostUsd = providerResult?.cost;
 
           logger.info("Transcription completed", {
             textLength: transcription.length,
             attempts,
             confidence,
             duration,
+            edenAiCostUsd,
             hasText: !!providerResult?.text,
             providerResultStructure: JSON.stringify(providerResult),
           });
@@ -407,6 +430,7 @@ export class SpeechToTextRepository {
             text: transcription,
             confidence,
             duration,
+            edenAiCostUsd,
           });
         } else if (resultData.status === "failed") {
           logger.error("Transcription failed", { publicId, provider });

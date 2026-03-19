@@ -11,7 +11,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { DbId } from "@/app/api/[locale]/system/db/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -21,9 +20,7 @@ import type {
   AvatarDeleteResponseOutput,
   AvatarPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { MeAvatarT } from "./i18n";
 
 /**
  * Avatar Repository - Static class pattern
@@ -38,11 +35,11 @@ export class AvatarRepository {
    * @returns ResponseType with avatar URL
    */
   static async uploadAvatar(
-    userId: DbId,
+    userId: string,
     file: File,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MeAvatarT,
   ): Promise<ResponseType<AvatarPostResponseOutput>> {
     try {
       logger.debug("Uploading user avatar", {
@@ -155,10 +152,10 @@ export class AvatarRepository {
    * @returns ResponseType with boolean result
    */
   static async deleteAvatar(
-    userId: DbId,
+    userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MeAvatarT,
   ): Promise<ResponseType<AvatarDeleteResponseOutput>> {
     try {
       logger.debug("Deleting user avatar", { userId });

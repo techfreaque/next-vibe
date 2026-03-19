@@ -8,13 +8,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { endpoints } from "./definition";
-import { cronTasksListRepository } from "./repository";
+import { CronTasksListRepository } from "./repository";
 
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     handler: async ({ data, user, locale, t, logger }) => {
-      return await cronTasksListRepository.getTasks(
+      return await CronTasksListRepository.getTasks(
         data,
         user,
         locale,
@@ -25,7 +25,7 @@ export const { GET, POST, tools } = endpointsHandler({
   },
   [Methods.POST]: {
     handler: async ({ data, user, locale, t, logger }) => {
-      return await cronTasksListRepository.createTask(
+      return await CronTasksListRepository.createTask(
         data,
         user,
         locale,

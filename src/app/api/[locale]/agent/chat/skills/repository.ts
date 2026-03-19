@@ -47,6 +47,7 @@ import type {
   SkillListItem,
   SkillListRequestOutput,
   SkillListResponseOutput,
+  SkillListSections,
 } from "./definition";
 import {
   type SkillCategoryValue,
@@ -60,44 +61,44 @@ import type { SkillsT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import { SkillsRepositoryClient } from "./repository-client";
 
-/** Default model selection used when none is provided */
-const DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
-  selectionType: ModelSelectionType.MANUAL,
-  manualModelId: defaultModel,
-};
-
-/**
- * Filter default skills based on user roles and current instance.
- * - userRole: only show skills the user's role can access (defaults to [CUSTOMER, ADMIN])
- */
-function filterDefaultSkills(user: JwtPayloadType): Skill[] {
-  const userRoles = user.roles;
-
-  return DEFAULT_SKILLS.filter((char) => {
-    // Check user role access
-    const allowedRoles = char.userRole ?? [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ];
-    const hasRole = userRoles.some((role) =>
-      (allowedRoles as string[]).includes(role),
-    );
-    if (!hasRole) {
-      return false;
-    }
-
-    // If no instance filter, show on all instances
-    // If no instanceId in DB, show all skills (dev/disconnected mode)
-    return true;
-  });
-}
-
 /**
  * Skills Repository - Static class pattern
  * All methods return ResponseType for consistent error handling
  */
 export class SkillsRepository {
+  /** Default model selection used when none is provided */
+  private static readonly DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: defaultModel,
+  };
+
+  /**
+   * Filter default skills based on user roles and current instance.
+   * - userRole: only show skills the user's role can access (defaults to [CUSTOMER, ADMIN])
+   */
+  private static filterDefaultSkills(user: JwtPayloadType): Skill[] {
+    const userRoles = user.roles;
+
+    return DEFAULT_SKILLS.filter((char) => {
+      // Check user role access
+      const allowedRoles = char.userRole ?? [
+        UserPermissionRole.PUBLIC,
+        UserPermissionRole.CUSTOMER,
+        UserPermissionRole.ADMIN,
+      ];
+      const hasRole = userRoles.some((role) =>
+        allowedRoles.some((r) => r === role),
+      );
+      if (!hasRole) {
+        return false;
+      }
+
+      // If no instance filter, show on all instances
+      // If no instanceId in DB, show all skills (dev/disconnected mode)
+      return true;
+    });
+  }
+
   /**
    * Get all skills for a user (default + custom)
    * Handles both authenticated and public users
@@ -180,7 +181,7 @@ export class SkillsRepository {
         });
 
         // Map default skills to card display fields (filtered by role + instance)
-        const filteredDefaults = filterDefaultSkills(user);
+        const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
         const defaultSkillsCards = filteredDefaults.map((char) => {
           return SkillsRepository.mapSkillToListItem(
             char.id,
@@ -237,7 +238,7 @@ export class SkillsRepository {
 
       // For public/lead users, return only default skills as card display fields (filtered)
       logger.debug("Getting default skills for public user");
-      const filteredDefaults = filterDefaultSkills(user);
+      const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
       let defaultSkillsCards = filteredDefaults.map((char) => {
         return SkillsRepository.mapSkillToListItem(
           char.id,
@@ -304,7 +305,7 @@ export class SkillsRepository {
    */
   private static buildResponse(
     allMatchedSkills: SkillListItem[],
-    allSections: SkillListResponseOutput["sections"],
+    allSections: SkillListSections,
     isCompact: boolean,
     currentPage: number,
     pageSize: number | undefined,
@@ -348,7 +349,7 @@ export class SkillsRepository {
   private static groupSkillsIntoSections(
     skills: SkillListItem[],
     t: SkillsT,
-  ): SkillListResponseOutput["sections"] {
+  ): SkillListSections {
     // Group skills by category
     const groupedByCategory = new Map<
       typeof SkillCategoryValue,
@@ -588,7 +589,8 @@ export class SkillsRepository {
           systemPrompt: data.systemPrompt,
           category: data.category,
           voice: data.voice,
-          modelSelection: data.modelSelection ?? DEFAULT_MODEL_SELECTION,
+          modelSelection:
+            data.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
           ownershipType: data.isPublic
             ? SkillOwnershipType.PUBLIC
             : SkillOwnershipType.USER,
@@ -652,7 +654,8 @@ export class SkillsRepository {
             systemPrompt: data.systemPrompt,
             category: data.category,
             voice: data.voice,
-            modelSelection: data.modelSelection ?? DEFAULT_MODEL_SELECTION,
+            modelSelection:
+              data.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
             ownershipType: data.isPublic
               ? SkillOwnershipType.PUBLIC
               : SkillOwnershipType.USER,

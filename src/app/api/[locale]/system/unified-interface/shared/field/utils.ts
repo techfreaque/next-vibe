@@ -764,10 +764,19 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       }
     }
 
-    // If no children matched the usage, return z.never()
-    // This handles cases like container fields with only widget children
-    // These UI-only containers shouldn't be in validation schemas
+    // If no children matched the usage, check if the container itself has matching usage
+    // A container with request usage but only urlPathParams/response children is valid (e.g. DELETE endpoints)
     if (Object.keys(shape).length === 0) {
+      // If the container itself has request data usage, return empty object (valid empty form)
+      if (
+        targetUsage === FieldUsage.RequestData &&
+        typedField.usage &&
+        "request" in typedField.usage &&
+        (typedField.usage.request === "data" ||
+          typedField.usage.request === "data&urlPathParams")
+      ) {
+        return z.object({}) as InferSchemaFromField<F, Usage>;
+      }
       return z.never() as InferSchemaFromField<F, Usage>;
     }
 

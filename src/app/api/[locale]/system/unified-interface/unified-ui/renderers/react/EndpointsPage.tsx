@@ -1051,7 +1051,23 @@ function StackEntryLayer({
                 ...entry.params.urlPathParams,
                 ...entry.params.data,
               },
-              mutationOptions: extractMutationOptions(entry.endpoint),
+              mutationOptions: {
+                ...extractMutationOptions(entry.endpoint),
+                onSuccess: async (ctx) => {
+                  const base = extractMutationOptions(entry.endpoint);
+                  if (base?.onSuccess) {
+                    await base.onSuccess(ctx);
+                  }
+                  if (
+                    entry.popNavigationOnSuccess &&
+                    entry.popNavigationOnSuccess > 0
+                  ) {
+                    for (let i = 0; i < entry.popNavigationOnSuccess; i++) {
+                      navigationOverride?.pop?.();
+                    }
+                  }
+                },
+              },
             },
           }}
           debug={debug}

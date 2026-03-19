@@ -22,20 +22,18 @@ import type { Platform } from "@/app/api/[locale]/system/unified-interface/share
 import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { configRepository } from "../repository";
+import { ConfigRepositoryImpl } from "../repository";
 import type {
   ConfigCreateRequestOutput,
   ConfigCreateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { ConfigCreateT } from "./i18n";
 
 export class ConfigCreateRepository {
   static async execute(
     data: ConfigCreateRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ConfigCreateT,
     platform: Platform,
     locale: CountryLanguage,
   ): Promise<ResponseType<ConfigCreateResponseOutput>> {
@@ -123,19 +121,21 @@ export class ConfigCreateRepository {
       }
 
       // Create check.config.ts with user-selected options
-      const configResult =
-        await configRepository.createDefaultCheckConfig(logger);
+      const configResult = await ConfigRepositoryImpl.createDefaultCheckConfig(
+        logger,
+        locale,
+      );
 
       if (!configResult.success) {
         return fail({
           message: t("errors.configCreation"),
-          messageParams: { error: configResult.error || "Unknown error" },
+          messageParams: { error: configResult.message || "Unknown error" },
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
       // Modify the created config to reflect user choices
-      const createdConfigPath = configResult.configPath;
+      const createdConfigPath = configResult.data.configPath;
       const { readFileSync, writeFileSync } = await import("node:fs");
       let configContent = readFileSync(createdConfigPath, "utf-8");
 
@@ -198,39 +198,44 @@ export class ConfigCreateRepository {
 
       // Create MCP config if requested
       if (data.createMcpConfig) {
-        const mcpResult = await configRepository.createDefaultMcpConfig(
+        const mcpResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
           logger,
           ".mcp.json",
+          locale,
         );
         if (mcpResult.success) {
-          mcpConfigPath = mcpResult.mcpConfigPath;
+          mcpConfigPath = mcpResult.data.mcpConfigPath;
         } else {
           logger.warn(t("warnings.mcpConfigFailed"), {
-            error: mcpResult.error,
+            error: mcpResult.message,
           });
         }
 
-        const mcpCursorResult = await configRepository.createDefaultMcpConfig(
-          logger,
-          ".cursor/mcp.json",
-        );
+        const mcpCursorResult =
+          await ConfigRepositoryImpl.createDefaultMcpConfig(
+            logger,
+            ".cursor/mcp.json",
+            locale,
+          );
         if (mcpCursorResult.success) {
-          mcpConfigPath = mcpCursorResult.mcpConfigPath;
+          mcpConfigPath = mcpCursorResult.data.mcpConfigPath;
         } else {
           logger.warn(t("warnings.mcpConfigFailed"), {
-            error: mcpCursorResult.error,
+            error: mcpCursorResult.message,
           });
         }
 
-        const mcpVscodeResult = await configRepository.createDefaultMcpConfig(
-          logger,
-          ".vscode/mcp.json",
-        );
+        const mcpVscodeResult =
+          await ConfigRepositoryImpl.createDefaultMcpConfig(
+            logger,
+            ".vscode/mcp.json",
+            locale,
+          );
         if (mcpVscodeResult.success) {
-          mcpConfigPath = mcpVscodeResult.mcpConfigPath;
+          mcpConfigPath = mcpVscodeResult.data.mcpConfigPath;
         } else {
           logger.warn(t("warnings.mcpConfigFailed"), {
-            error: mcpVscodeResult.error,
+            error: mcpVscodeResult.message,
           });
         }
       }
@@ -238,20 +243,24 @@ export class ConfigCreateRepository {
       // Update VSCode settings if requested
       if (data.updateVscodeSettings) {
         // Load the created config to get settings
-        const configReadResult =
-          await configRepository.ensureConfigReady(logger);
+        const configReadResult = await ConfigRepositoryImpl.ensureConfigReady(
+          logger,
+          locale,
+          false,
+        );
         if (configReadResult.ready) {
-          const vscodeResult = await configRepository.generateVSCodeSettings(
-            logger,
-            configReadResult.config,
-            locale,
-          );
+          const vscodeResult =
+            await ConfigRepositoryImpl.generateVSCodeSettings(
+              logger,
+              configReadResult.config,
+              locale,
+            );
 
           if (vscodeResult.success) {
-            vscodeSettingsPath = vscodeResult.settingsPath;
+            vscodeSettingsPath = vscodeResult.data.settingsPath;
           } else {
             logger.warn(t("warnings.vscodeFailed"), {
-              error: vscodeResult.error,
+              error: vscodeResult.message,
             });
           }
         }
@@ -284,7 +293,7 @@ export class ConfigCreateRepository {
       }
 
       // Build success message
-      const messages: string[] = [`✓ Created ${configResult.configPath}`];
+      const messages: string[] = [`✓ Created ${configResult.data.configPath}`];
 
       if (mcpConfigPath) {
         messages.push(`✓ Created ${mcpConfigPath}`);

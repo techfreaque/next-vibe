@@ -7,3 +7,8 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
 });
+
+export type IpMatchLinkingTranslationKey =
+  (typeof scopedTranslation)["ScopedTranslationKey"];
+
+export type IpMatchLinkingT = ReturnType<typeof scopedTranslation.scopedT>["t"];

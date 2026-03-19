@@ -510,6 +510,7 @@ export const translations = {
   },
   errors: {
     toolExecutionError: "A tool failed to execute properly. Please try again.",
+    toolExecutionErrorDetail: "Tool error: {{error}}",
     toolExecutionFailed: "Tool execution failed. Please try again.",
     toolDisabledByUser:
       "This tool has been disabled by the user. Do not attempt to call it again.",

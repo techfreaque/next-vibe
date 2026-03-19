@@ -23,15 +23,13 @@ import { messengerAccounts } from "../accounts/db";
 import { MessengerAccountStatus } from "../accounts/enum";
 import { getProviderByMessengerAccountId } from "../providers/registry";
 import type { CampaignType } from "../accounts/enum";
-import type { scopedTranslation as sendScopedTranslation } from "../send/i18n";
+import type { EmailSendT } from "../send/i18n";
 import { MessageChannel } from "../accounts/enum";
-
-type SendModuleT = ReturnType<typeof sendScopedTranslation.scopedT>["t"];
 
 /**
  * SMS Send Request Type
  */
-export interface SmsSendProps {
+interface SmsSendProps {
   to: string;
   message: string;
   campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
@@ -42,7 +40,7 @@ export interface SmsSendProps {
 /**
  * SMS Send Response Type
  */
-export interface SmsSendResponse {
+interface SmsSendResponse {
   result: {
     success: boolean;
     messageId: string;
@@ -53,27 +51,15 @@ export interface SmsSendResponse {
 }
 
 /**
- * SMS Service Repository Interface
- */
-export interface SmsServiceRepository {
-  sendSms(
-    data: SmsSendProps,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-    t: SendModuleT,
-  ): Promise<ResponseType<SmsSendResponse>>;
-}
-
-/**
- * SMS Service Repository Implementation
+ * SMS Service Repository
  * Finds the default active SMS account and sends through the provider registry.
  */
-export class SmsServiceRepositoryImpl implements SmsServiceRepository {
-  async sendSms(
+export class SmsServiceRepository {
+  static async sendSms(
     data: SmsSendProps,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: SendModuleT,
+    t: EmailSendT,
   ): Promise<ResponseType<SmsSendResponse>> {
     try {
       logger.debug("SMS service: Sending SMS notification", {
@@ -156,8 +142,3 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
     }
   }
 }
-
-/**
- * SMS Service Repository Singleton Instance
- */
-export const smsServiceRepository = new SmsServiceRepositoryImpl();

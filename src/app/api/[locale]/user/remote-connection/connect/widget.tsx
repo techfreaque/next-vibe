@@ -25,7 +25,6 @@ import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import { useMemo } from "react";
 
 import {
   useWidgetLocale,
@@ -53,7 +52,6 @@ export function RemoteConnectWidget({
   const locale = useWidgetLocale();
   const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
-  const emptyField = useMemo(() => ({}), []);
 
   const backButton = <NavigateButtonWidget field={field.children.backButton} />;
 
@@ -151,7 +149,7 @@ export function RemoteConnectWidget({
             </Div>
           </Div>
 
-          <FormAlertWidget field={emptyField} />
+          <FormAlertWidget field={field.children.formAlert} />
 
           <SubmitButtonWidget field={field.children.submitButton} />
         </CardContent>

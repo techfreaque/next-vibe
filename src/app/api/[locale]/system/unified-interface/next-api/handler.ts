@@ -7,9 +7,9 @@
 // Side-effect: registers global error sink so all logger.error() calls persist to error_logs
 import "../shared/logger/error-persist";
 
+import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
@@ -178,7 +178,9 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           leafMessageId: undefined,
           waitingForRemoteResult: undefined,
           favoriteId: undefined,
-          abortSignal: undefined,
+          abortSignal: request.signal,
+          callerCallbackMode: undefined,
+          onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
         },
       });

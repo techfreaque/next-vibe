@@ -50,289 +50,295 @@ import type {
 } from "./definition";
 import { scopedTranslation, type ThreadsT } from "./i18n";
 
-function generateThreadTitle(content: string): string {
-  const maxLength = 50;
-  const minLastSpace = 20;
-  const ellipsis = "...";
-  const truncated = content.slice(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(" ");
-  return lastSpace > minLastSpace
-    ? `${truncated.slice(0, lastSpace)}${ellipsis}`
-    : truncated;
-}
-
-/**
- * Verify existing thread and check permissions
- * Returns thread ID if valid, error response otherwise
- */
-async function verifyExistingThread(params: {
+interface EnsureThreadResult {
   threadId: string;
-  isIncognito: boolean;
-  userId: string | undefined;
-  user: JwtPayloadType;
-  logger: EndpointLogger;
-  locale: CountryLanguage;
-}): Promise<ResponseType<string>> {
-  const { threadId, isIncognito, userId, user, logger, locale } = params;
-  const { t } = scopedTranslation.scopedT(locale);
-
-  if (!isIncognito && userId) {
-    const [existing] = await db
-      .select()
-      .from(chatThreads)
-      .where(eq(chatThreads.id, threadId))
-      .limit(1);
-
-    if (!existing?.id) {
-      logger.error("Thread not found", { threadId, userId });
-      return fail({
-        message: t("get.errors.notFound.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
-    }
-
-    let folder: ChatFolder | null = null;
-    if (existing.folderId) {
-      const [folderResult] = await db
-        .select()
-        .from(chatFolders)
-        .where(eq(chatFolders.id, existing.folderId))
-        .limit(1);
-      folder = folderResult || null;
-    }
-
-    const hasPermission = await canPostInThread(
-      user,
-      existing,
-      folder,
-      logger,
-      locale,
-    );
-
-    if (!hasPermission) {
-      logger.error("User does not have permission to post in thread", {
-        threadId,
-        userId,
-        threadUserId: existing.userId,
-        rootFolderId: existing.rootFolderId,
-      });
-      return fail({
-        message: t("get.errors.forbidden.title"),
-        errorType: ErrorResponseTypes.FORBIDDEN,
-      });
-    }
-
-    logger.debug("Permission check passed for existing thread", {
-      threadId,
-      userId,
-      threadUserId: existing.userId,
-      rootFolderId: existing.rootFolderId,
-    });
-  }
-
-  return success(threadId);
-}
-
-async function ensureThread({
-  threadId,
-  rootFolderId,
-  subFolderId,
-  userId,
-  content,
-  isIncognito,
-  logger,
-  user,
-  leadId,
-  locale,
-}: {
-  threadId: string;
-  rootFolderId: DefaultFolderId;
-  subFolderId: string | null | undefined;
-  userId?: string;
-  leadId?: string;
-  content: string;
-  isIncognito: boolean;
-  logger: EndpointLogger;
-  user: JwtPayloadType;
-  locale: CountryLanguage;
-}): Promise<{ threadId: string; isNew: boolean }> {
-  logger.debug("ensureThread called", {
-    threadId,
-    rootFolderId,
-    subFolderId,
-    userId,
-    leadId,
-    isIncognito,
-  });
-
-  if (isIncognito) {
-    logger.debug("Thread ID provided for incognito", { threadId });
-    return { threadId, isNew: true };
-  }
-
-  const [existing] = await db
-    .select()
-    .from(chatThreads)
-    .where(eq(chatThreads.id, threadId))
-    .limit(1);
-
-  if (existing?.id) {
-    const verifyResult = await verifyExistingThread({
-      threadId,
-      isIncognito,
-      userId,
-      user,
-      logger,
-      locale,
-    });
-
-    if (!verifyResult.success) {
-      const errorMessage = verifyResult.message || "UNKNOWN_ERROR";
-      return await Promise.reject(new Error(errorMessage));
-    }
-
-    return { threadId: verifyResult.data, isNew: false };
-  }
-
-  const title = generateThreadTitle(content);
-  let folder: ChatFolder | null = null;
-
-  if (subFolderId) {
-    const [folderResult] = await db
-      .select()
-      .from(chatFolders)
-      .where(eq(chatFolders.id, subFolderId))
-      .limit(1);
-
-    if (!folderResult) {
-      logger.error("Folder not found", { subFolderId });
-      return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
-    }
-
-    folder = folderResult;
-    logger.debug("Found folder for permission check", {
-      folderId: folder.id,
-      folderName: folder.name,
-      rootFolderId: folder.rootFolderId,
-      parentId: folder.parentId,
-    });
-  } else if (!subFolderId) {
-    const { getDefaultFolderConfig } = await import("../config");
-    const { hasRolePermission } = await import("../permissions/permissions");
-
-    const rootConfig = getDefaultFolderConfig(rootFolderId);
-    if (!rootConfig) {
-      logger.error("Root folder config not found", { rootFolderId });
-      return await Promise.reject(new Error("FOLDER_NOT_FOUND"));
-    }
-
-    if (rootFolderId === DefaultFolderId.PUBLIC) {
-      const hasPermission = await hasRolePermission(
-        user,
-        rootConfig.rolesCreateThread,
-        logger,
-        locale,
-      );
-
-      if (!hasPermission) {
-        logger.error(
-          "User does not have permission to create threads in root folder",
-          {
-            userId,
-            leadId,
-            isPublic: user.isPublic,
-            rootFolderId,
-            requiredRoles: rootConfig.rolesCreateThread,
-          },
-        );
-        return await Promise.reject(new Error("PERMISSION_DENIED"));
-      }
-
-      logger.info("User has permission to create thread in root folder", {
-        userId,
-        leadId,
-        isPublic: user.isPublic,
-        rootFolderId,
-      });
-    }
-  }
-
-  if (folder) {
-    logger.debug("About to check permissions", {
-      hasFolder: !!folder,
-      folderId: folder?.id,
-      folderName: folder?.name,
-      folderParentId: folder?.parentId,
-      userId,
-      leadId,
-      rootFolderId,
-      subFolderId,
-    });
-    const hasPermission = await canCreateThreadInFolder(
-      user,
-      folder,
-      logger,
-      locale,
-    );
-
-    logger.debug("Permission check result", {
-      hasPermission,
-      userId,
-      leadId,
-      rootFolderId,
-      subFolderId,
-    });
-
-    if (!hasPermission) {
-      logger.error("User does not have permission to create thread", {
-        userId,
-        leadId,
-        rootFolderId,
-        subFolderId,
-      });
-      return await Promise.reject(new Error("PERMISSION_DENIED"));
-    }
-  }
-
-  await db.insert(chatThreads).values({
-    id: threadId,
-    userId: userId ?? null,
-    leadId: leadId ?? null,
-    title,
-    rootFolderId,
-    folderId: subFolderId ?? null,
-  });
-
-  logger.debug("Created new thread", {
-    threadId,
-    title,
-    userId,
-    leadId,
-  });
-
-  return { threadId, isNew: true };
+  isNew: boolean;
 }
 
 /**
  * Threads Repository - Static class pattern
  */
 export class ThreadsRepository {
+  private static generateThreadTitle(content: string): string {
+    const maxLength = 50;
+    const minLastSpace = 20;
+    const ellipsis = "...";
+    const truncated = content.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(" ");
+    return lastSpace > minLastSpace
+      ? `${truncated.slice(0, lastSpace)}${ellipsis}`
+      : truncated;
+  }
+
   /**
-   * Generate thread title from first message
-   * Truncates content to max 50 characters at word boundary
+   * Verify existing thread and check permissions
+   * Returns thread ID if valid, error response otherwise
    */
-  static generateThreadTitle(content: string): string {
-    return generateThreadTitle(content);
+  private static async verifyExistingThread(params: {
+    threadId: string;
+    isIncognito: boolean;
+    userId: string | undefined;
+    user: JwtPayloadType;
+    logger: EndpointLogger;
+    locale: CountryLanguage;
+  }): Promise<ResponseType<string>> {
+    const { threadId, isIncognito, userId, user, logger, locale } = params;
+    const { t } = scopedTranslation.scopedT(locale);
+
+    if (!isIncognito && userId) {
+      const [existing] = await db
+        .select()
+        .from(chatThreads)
+        .where(eq(chatThreads.id, threadId))
+        .limit(1);
+
+      if (!existing?.id) {
+        logger.error("Thread not found", { threadId, userId });
+        return fail({
+          message: t("get.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      let folder: ChatFolder | null = null;
+      if (existing.folderId) {
+        const [folderResult] = await db
+          .select()
+          .from(chatFolders)
+          .where(eq(chatFolders.id, existing.folderId))
+          .limit(1);
+        folder = folderResult || null;
+      }
+
+      const hasPermission = await canPostInThread(
+        user,
+        existing,
+        folder,
+        logger,
+        locale,
+      );
+
+      if (!hasPermission) {
+        logger.error("User does not have permission to post in thread", {
+          threadId,
+          userId,
+          threadUserId: existing.userId,
+          rootFolderId: existing.rootFolderId,
+        });
+        return fail({
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
+      logger.debug("Permission check passed for existing thread", {
+        threadId,
+        userId,
+        threadUserId: existing.userId,
+        rootFolderId: existing.rootFolderId,
+      });
+    }
+
+    return success(threadId);
   }
 
   /**
    * Ensure thread exists or create new one with permission checks
    * Used by AI streaming to get or create a thread before posting messages
    */
-  static async ensureThread(
-    params: Parameters<typeof ensureThread>[0],
-  ): Promise<{ threadId: string; isNew: boolean }> {
-    return ensureThread(params);
+  static async ensureThread({
+    threadId,
+    rootFolderId,
+    subFolderId,
+    userId,
+    content,
+    isIncognito,
+    logger,
+    user,
+    leadId,
+    locale,
+  }: {
+    threadId: string;
+    rootFolderId: DefaultFolderId;
+    subFolderId: string | null | undefined;
+    userId?: string;
+    leadId?: string;
+    content: string;
+    isIncognito: boolean;
+    logger: EndpointLogger;
+    user: JwtPayloadType;
+    locale: CountryLanguage;
+  }): Promise<ResponseType<EnsureThreadResult>> {
+    logger.debug("ensureThread called", {
+      threadId,
+      rootFolderId,
+      subFolderId,
+      userId,
+      leadId,
+      isIncognito,
+    });
+
+    if (isIncognito) {
+      logger.debug("Thread ID provided for incognito", { threadId });
+      return success({ threadId, isNew: true });
+    }
+
+    const [existing] = await db
+      .select()
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+
+    if (existing?.id) {
+      const verifyResult = await ThreadsRepository.verifyExistingThread({
+        threadId,
+        isIncognito,
+        userId,
+        user,
+        logger,
+        locale,
+      });
+
+      if (!verifyResult.success) {
+        return verifyResult;
+      }
+
+      return success({ threadId: verifyResult.data, isNew: false });
+    }
+
+    const title = ThreadsRepository.generateThreadTitle(content);
+    let folder: ChatFolder | null = null;
+
+    if (subFolderId) {
+      const [folderResult] = await db
+        .select()
+        .from(chatFolders)
+        .where(eq(chatFolders.id, subFolderId))
+        .limit(1);
+
+      if (!folderResult) {
+        logger.error("Folder not found", { subFolderId });
+        const { t } = scopedTranslation.scopedT(locale);
+        return fail({
+          message: t("get.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      folder = folderResult;
+      logger.debug("Found folder for permission check", {
+        folderId: folder.id,
+        folderName: folder.name,
+        rootFolderId: folder.rootFolderId,
+        parentId: folder.parentId,
+      });
+    } else if (!subFolderId) {
+      const { getDefaultFolderConfig } = await import("../config");
+      const { hasRolePermission } = await import("../permissions/permissions");
+
+      const rootConfig = getDefaultFolderConfig(rootFolderId);
+      if (!rootConfig) {
+        logger.error("Root folder config not found", { rootFolderId });
+        const { t } = scopedTranslation.scopedT(locale);
+        return fail({
+          message: t("get.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      if (rootFolderId === DefaultFolderId.PUBLIC) {
+        const hasPermission = await hasRolePermission(
+          user,
+          rootConfig.rolesCreateThread,
+          logger,
+          locale,
+        );
+
+        if (!hasPermission) {
+          logger.error(
+            "User does not have permission to create threads in root folder",
+            {
+              userId,
+              leadId,
+              isPublic: user.isPublic,
+              rootFolderId,
+              requiredRoles: rootConfig.rolesCreateThread,
+            },
+          );
+          const { t } = scopedTranslation.scopedT(locale);
+          return fail({
+            message: t("get.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+
+        logger.info("User has permission to create thread in root folder", {
+          userId,
+          leadId,
+          isPublic: user.isPublic,
+          rootFolderId,
+        });
+      }
+    }
+
+    if (folder) {
+      logger.debug("About to check permissions", {
+        hasFolder: !!folder,
+        folderId: folder?.id,
+        folderName: folder?.name,
+        folderParentId: folder?.parentId,
+        userId,
+        leadId,
+        rootFolderId,
+        subFolderId,
+      });
+      const hasPermission = await canCreateThreadInFolder(
+        user,
+        folder,
+        logger,
+        locale,
+      );
+
+      logger.debug("Permission check result", {
+        hasPermission,
+        userId,
+        leadId,
+        rootFolderId,
+        subFolderId,
+      });
+
+      if (!hasPermission) {
+        logger.error("User does not have permission to create thread", {
+          userId,
+          leadId,
+          rootFolderId,
+          subFolderId,
+        });
+        const { t } = scopedTranslation.scopedT(locale);
+        return fail({
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+    }
+
+    await db.insert(chatThreads).values({
+      id: threadId,
+      userId: userId ?? null,
+      leadId: leadId ?? null,
+      title,
+      rootFolderId,
+      folderId: subFolderId ?? null,
+    });
+
+    logger.debug("Created new thread", {
+      threadId,
+      title,
+      userId,
+      leadId,
+    });
+
+    return success({ threadId, isNew: true });
   }
 
   /** 24h cache for total conversations count */
@@ -405,12 +411,15 @@ export class ThreadsRepository {
       // If no rootFolderId specified, show threads from all folders (filtered by permissions later)
       const conditions = [];
 
+      // Track whether the query guarantees all results are owned by the current user.
+      // When true, we skip the per-thread canViewThread loop (owner always has view).
+      let allThreadsOwnedByUser = false;
+
       if (rootFolderId === DefaultFolderId.PUBLIC) {
         // PUBLIC folder: Show all threads in public folder (from all users)
         conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC));
       } else if (rootFolderId === DefaultFolderId.SHARED) {
         // SHARED folder: Show user's own threads
-        // Permission filtering happens later via canViewThread
         conditions.push(eq(chatThreads.rootFolderId, DefaultFolderId.SHARED));
         // For public users, filter by leadId; for authenticated users, filter by userId
         if (user.isPublic) {
@@ -418,6 +427,7 @@ export class ThreadsRepository {
         } else {
           conditions.push(eq(chatThreads.userId, userIdentifier));
         }
+        allThreadsOwnedByUser = true;
       } else if (rootFolderId) {
         // Specific folder: Show only user's own threads in that folder
         // For public users, filter by leadId; for authenticated users, filter by userId
@@ -427,6 +437,7 @@ export class ThreadsRepository {
           conditions.push(eq(chatThreads.userId, userIdentifier));
         }
         conditions.push(eq(chatThreads.rootFolderId, rootFolderId));
+        allThreadsOwnedByUser = true;
       } else {
         // No rootFolderId specified: Show threads from all folders
         // For public users, show threads from public folder
@@ -536,25 +547,31 @@ export class ThreadsRepository {
         }
       }
 
-      // Filter threads based on user permissions
-      const visibleThreads = [];
-      for (const thread of dbThreads) {
-        // Get folder if thread has one
-        const folder = thread.folderId
-          ? allFolders[thread.folderId] || null
-          : null;
+      // Filter threads based on user permissions.
+      // Skip per-thread canViewThread when the DB query already guarantees ownership —
+      // the owner always has view access, so checking each thread individually is wasteful.
+      let visibleThreads;
+      if (allThreadsOwnedByUser) {
+        visibleThreads = dbThreads;
+      } else {
+        visibleThreads = [];
+        for (const thread of dbThreads) {
+          const folder = thread.folderId
+            ? allFolders[thread.folderId] || null
+            : null;
 
-        const canView = await canViewThread(
-          user,
-          thread,
-          folder,
-          logger,
-          locale,
-          allFolders,
-        );
+          const canView = await canViewThread(
+            user,
+            thread,
+            folder,
+            logger,
+            locale,
+            allFolders,
+          );
 
-        if (canView) {
-          visibleThreads.push(thread);
+          if (canView) {
+            visibleThreads.push(thread);
+          }
         }
       }
 

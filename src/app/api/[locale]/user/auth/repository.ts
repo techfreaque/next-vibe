@@ -51,58 +51,52 @@ import {
 import { UserRolesRepository } from "../user-roles/repository";
 import { scopedTranslation } from "./i18n";
 import type {
+  InferUserType,
   JwtPayloadType,
   JwtPrivatePayloadType,
-  JWTPublicPayloadType,
 } from "./types";
-
-export type InferUserType<TRoles extends readonly UserRoleValue[]> =
-  Exclude<TRoles[number], "PUBLIC"> extends never
-    ? JWTPublicPayloadType
-    : Extract<TRoles[number], "PUBLIC"> extends never
-      ? JwtPrivatePayloadType
-      : JwtPayloadType;
-
-/**
- * Helper to create public user payload
- */
-function createPublicUser<TRoles extends readonly UserRoleValue[]>(
-  leadId: string,
-): InferUserType<TRoles> {
-  return {
-    isPublic: true,
-    leadId,
-    roles: [UserPermissionRole.PUBLIC],
-  } as InferUserType<TRoles>;
-}
-
-/**
- * Helper to create private user payload
- * Note: This is a helper for creating payload structure - roles should be fetched from DB
- */
-function createPrivateUser<TRoles extends readonly UserRoleValue[]>(
-  userId: string,
-  leadId: string,
-  roles: (typeof UserPermissionRole)[keyof typeof UserPermissionRole][],
-): InferUserType<TRoles> {
-  return {
-    isPublic: false,
-    id: userId,
-    leadId,
-    roles,
-  } as InferUserType<TRoles>;
-}
-
-/**
- * Module-level secret key for JWT operations
- */
-const SECRET_KEY: Uint8Array = new TextEncoder().encode(env.JWT_SECRET_KEY);
 
 /**
  * Contains all authentication business logic consolidated from handlers and core
  * Platform-agnostic - delegates to platform handlers for storage
  */
 export class AuthRepository {
+  /**
+   * Module-level secret key for JWT operations
+   */
+  private static readonly SECRET_KEY: Uint8Array = new TextEncoder().encode(
+    env.JWT_SECRET_KEY,
+  );
+
+  /**
+   * Helper to create public user payload
+   */
+  private static createPublicUser<TRoles extends readonly UserRoleValue[]>(
+    leadId: string,
+  ): InferUserType<TRoles> {
+    return {
+      isPublic: true,
+      leadId,
+      roles: [UserPermissionRole.PUBLIC],
+    } as InferUserType<TRoles>;
+  }
+
+  /**
+   * Helper to create private user payload
+   * Note: This is a helper for creating payload structure - roles should be fetched from DB
+   */
+  private static createPrivateUser<TRoles extends readonly UserRoleValue[]>(
+    userId: string,
+    leadId: string,
+    roles: (typeof UserPermissionRole)[keyof typeof UserPermissionRole][],
+  ): InferUserType<TRoles> {
+    return {
+      isPublic: false,
+      id: userId,
+      leadId,
+      roles,
+    } as InferUserType<TRoles>;
+  }
   /**
    * Update lead ID cookie (for API routes only, not pages)
    * This is called when a new lead is created for a public user
@@ -542,7 +536,7 @@ export class AuthRepository {
         logger,
         locale,
       );
-      return createPrivateUser(
+      return AuthRepository.createPrivateUser(
         userId,
         leadId,
         filterUserPermissionRoles(userRoles),
@@ -564,7 +558,7 @@ export class AuthRepository {
           requiredRoles: [...permissionRoles] as string[],
         },
       );
-      return createPublicUser<TRoles>(leadId);
+      return AuthRepository.createPublicUser<TRoles>(leadId);
     }
 
     // Get user roles from database
@@ -577,7 +571,7 @@ export class AuthRepository {
 
     // Customer role is allowed for any authenticated user
     if (permissionRoles.includes(UserPermissionRole.CUSTOMER)) {
-      return createPrivateUser(
+      return AuthRepository.createPrivateUser(
         userId,
         leadId,
         filterUserPermissionRoles(userRoles),
@@ -600,7 +594,7 @@ export class AuthRepository {
         });
         // If CUSTOMER role is in permission roles, return authenticated user
         if (permissionRoles.includes(UserPermissionRole.CUSTOMER)) {
-          return createPrivateUser(
+          return AuthRepository.createPrivateUser(
             userId,
             leadId,
             filterUserPermissionRoles(userRoles),
@@ -609,7 +603,7 @@ export class AuthRepository {
         // If PUBLIC role is in permission roles (mixed with other roles), return authenticated user
         // (authenticated users can access PUBLIC endpoints when mixed with other roles)
         if (permissionRoles.includes(UserPermissionRole.PUBLIC)) {
-          return createPrivateUser(
+          return AuthRepository.createPrivateUser(
             userId,
             leadId,
             filterUserPermissionRoles(userRoles),
@@ -622,7 +616,7 @@ export class AuthRepository {
           leadId,
           requiredRoles: permissionRoles.join(", "),
         });
-        return createPublicUser<TRoles>(leadId);
+        return AuthRepository.createPublicUser<TRoles>(leadId);
       }
 
       // Check for required roles
@@ -631,7 +625,7 @@ export class AuthRepository {
       );
 
       if (hasRequiredRole) {
-        return createPrivateUser(
+        return AuthRepository.createPrivateUser(
           userId,
           leadId,
           filterUserPermissionRoles(userRoles),
@@ -646,7 +640,7 @@ export class AuthRepository {
         // User is authenticated but doesn't have the specific role
         // However, since PUBLIC is allowed (mixed with other roles), we can return the authenticated user
         // as they have at least CUSTOMER role (all authenticated users have CUSTOMER)
-        return createPrivateUser(
+        return AuthRepository.createPrivateUser(
           userId,
           leadId,
           filterUserPermissionRoles(userRoles),
@@ -661,7 +655,7 @@ export class AuthRepository {
         requiredRoles: permissionRoles.join(", "),
         userRoles: userRolesResponse.data.map((r) => r.role).join(", "),
       });
-      return createPublicUser<TRoles>(leadId);
+      return AuthRepository.createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error("Error checking user authentication", {
         translationKey: "debug.errorCheckingUserAuth",
@@ -678,14 +672,14 @@ export class AuthRepository {
           logger,
           locale,
         );
-        return createPrivateUser(
+        return AuthRepository.createPrivateUser(
           userId,
           leadId,
           filterUserPermissionRoles(errorUserRoles),
         ) as InferUserType<TRoles>;
       }
       // Otherwise, return public user (will be rejected by endpoint handler)
-      return createPublicUser<TRoles>(leadId);
+      return AuthRepository.createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -705,7 +699,7 @@ export class AuthRepository {
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime(`${AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS}s`)
-        .sign(SECRET_KEY);
+        .sign(AuthRepository.SECRET_KEY);
 
       return success(token);
     } catch (error) {
@@ -732,7 +726,7 @@ export class AuthRepository {
       // Verify the token
       const { payload } = await jwtVerify<JwtPrivatePayloadType>(
         token,
-        SECRET_KEY,
+        AuthRepository.SECRET_KEY,
       );
 
       // Validate the payload structure
@@ -835,7 +829,7 @@ export class AuthRepository {
             logger,
           );
         }
-        return success(createPublicUser(leadId || ""));
+        return success(AuthRepository.createPublicUser(leadId || ""));
       }
 
       // Verify token
@@ -864,7 +858,7 @@ export class AuthRepository {
             logger,
           );
         }
-        return success(createPublicUser(leadId || ""));
+        return success(AuthRepository.createPublicUser(leadId || ""));
       }
 
       if (
@@ -897,7 +891,7 @@ export class AuthRepository {
               logger,
             );
           }
-          return success(createPublicUser(leadId || ""));
+          return success(AuthRepository.createPublicUser(leadId || ""));
         }
       }
 
@@ -942,7 +936,7 @@ export class AuthRepository {
           logger,
         );
       }
-      return success(createPublicUser(leadId || ""));
+      return success(AuthRepository.createPublicUser(leadId || ""));
     }
   }
 
@@ -1043,7 +1037,7 @@ export class AuthRepository {
             logger,
           );
         }
-        return createPublicUser<TRoles>(leadId);
+        return AuthRepository.createPublicUser<TRoles>(leadId);
       }
 
       const jwtPayload = authResult.data;
@@ -1094,7 +1088,7 @@ export class AuthRepository {
           logger,
         );
       }
-      return createPublicUser<TRoles>(leadId);
+      return AuthRepository.createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -1130,7 +1124,7 @@ export class AuthRepository {
           hasId: !!jwtPayload.id,
         });
         // Use leadId from payload (always present)
-        return createPublicUser<TRoles>(jwtPayload.leadId);
+        return AuthRepository.createPublicUser<TRoles>(jwtPayload.leadId);
       }
 
       // Use leadId from payload (always present)
@@ -1140,7 +1134,7 @@ export class AuthRepository {
       const userId = jwtPayload.id;
       if (!userId) {
         // This should never happen due to check above, but satisfies TypeScript
-        return createPublicUser<TRoles>(leadId);
+        return AuthRepository.createPublicUser<TRoles>(leadId);
       }
 
       // Use internal method to check authentication with roles
@@ -1166,7 +1160,7 @@ export class AuthRepository {
           logger.warn("Using leadId from JWT payload as fallback", {
             leadId: jwtPayload.leadId,
           });
-          return createPublicUser<TRoles>(jwtPayload.leadId);
+          return AuthRepository.createPublicUser<TRoles>(jwtPayload.leadId);
         }
         logger.error(
           "Failed to create public lead and no payload leadId available",
@@ -1178,7 +1172,7 @@ export class AuthRepository {
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
-      return createPublicUser<TRoles>(leadId);
+      return AuthRepository.createPublicUser<TRoles>(leadId);
     }
   }
 
@@ -1560,7 +1554,7 @@ export class AuthRepository {
   }
 }
 
-// Pick + keyof excludes private members automatically
+// Type for native repository type checking
 export type AuthRepositoryType = Pick<
   typeof AuthRepository,
   keyof typeof AuthRepository

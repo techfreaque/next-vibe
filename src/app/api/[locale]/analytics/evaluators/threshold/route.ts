@@ -11,14 +11,18 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeThreshold } from "./repository";
+import { ThresholdEvaluatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, op, value } = data;
-      const signals = computeThreshold(source, op, value);
+      const signals = ThresholdEvaluatorRepository.computeThreshold(
+        source,
+        op,
+        value,
+      );
       return success({ signals });
     },
   },

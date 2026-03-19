@@ -20,10 +20,8 @@ import { parseError } from "next-vibe/shared/utils";
 import { findFilesByName } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { scopedTranslation } from "../i18n";
+import type { ReactNativeT } from "../i18n";
 import type { GenerateResponseOutput } from "./definition";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface GenerationResult {
   created: string[];
@@ -32,33 +30,22 @@ interface GenerationResult {
 }
 
 /**
- * Generate Expo Indexes Repository Interface
+ * Generate Expo Indexes Repository
  */
-export interface GenerateExpoIndexesRepository {
-  generate(
+export class GenerateExpoIndexesRepository {
+  private static readonly PROJECT_ROOT: string = process.cwd();
+  private static readonly SOURCE_DIR: string = join(
+    GenerateExpoIndexesRepository.PROJECT_ROOT,
+    "src/app/[locale]",
+  );
+  private static readonly TARGET_DIR: string = join(
+    GenerateExpoIndexesRepository.PROJECT_ROOT,
+    "src/app-native/[locale]",
+  );
+
+  static async generate(
     user: JwtPayloadType,
-    t: ModuleT,
-  ): Promise<ResponseType<GenerateResponseOutput>>;
-}
-
-/**
- * Generate Expo Indexes Repository Implementation
- */
-class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository {
-  private readonly PROJECT_ROOT: string;
-  private readonly SOURCE_DIR: string;
-  private readonly TARGET_DIR: string;
-
-  constructor() {
-    // Calculate paths relative to project root
-    this.PROJECT_ROOT = process.cwd();
-    this.SOURCE_DIR = join(this.PROJECT_ROOT, "src/app/[locale]");
-    this.TARGET_DIR = join(this.PROJECT_ROOT, "src/app-native/[locale]");
-  }
-
-  async generate(
-    user: JwtPayloadType,
-    t: ModuleT,
+    t: ReactNativeT,
   ): Promise<ResponseType<GenerateResponseOutput>> {
     // Validate user permissions
     if (!user?.id) {
@@ -73,7 +60,7 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
 
     try {
       // Check if source directory exists
-      if (!existsSync(this.SOURCE_DIR)) {
+      if (!existsSync(GenerateExpoIndexesRepository.SOURCE_DIR)) {
         return fail({
           message: t("generate.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -84,10 +71,12 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
       }
 
       // Ensure target directory exists
-      this.ensureDir(this.TARGET_DIR);
+      GenerateExpoIndexesRepository.ensureDir(
+        GenerateExpoIndexesRepository.TARGET_DIR,
+      );
 
       // Generate indexes
-      const result = this.generateIndexes();
+      const result = GenerateExpoIndexesRepository.generateIndexes();
 
       // Prepare success message
       const message = t("generate.post.success.description", {
@@ -119,7 +108,7 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
    * Check if a file has the "use custom" directive at the top
    * The directive must be on its own line, not part of other text
    */
-  private hasCustomIndexDirective(filePath: string): boolean {
+  private static hasCustomIndexDirective(filePath: string): boolean {
     if (!existsSync(filePath)) {
       return false;
     }
@@ -141,7 +130,7 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
   /**
    * Generate the content for a page index.tsx file
    */
-  private generatePageIndex(
+  private static generatePageIndex(
     relativePath: string,
     componentType: "page" | "layout",
   ): string {
@@ -204,7 +193,7 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
   /**
    * Ensure directory exists, creating it if necessary
    */
-  private ensureDir(dirPath: string): void {
+  private static ensureDir(dirPath: string): void {
     if (!existsSync(dirPath)) {
       mkdirSync(dirPath, { recursive: true });
     }
@@ -213,7 +202,11 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
   /**
    * Recursively find all files matching a pattern
    */
-  private findFiles(dir: string, pattern: string, basePath = ""): string[] {
+  private static findFiles(
+    dir: string,
+    pattern: string,
+    basePath = "",
+  ): string[] {
     // Use consolidated directory scanner
     const results = findFilesByName(dir, pattern);
 
@@ -232,7 +225,7 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
   /**
    * Generate index files for all pages and layouts
    */
-  private generateIndexes(): GenerationResult {
+  private static generateIndexes(): GenerationResult {
     const result: GenerationResult = {
       created: [],
       skipped: [],
@@ -240,26 +233,36 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
     };
 
     // Find all page.tsx and layout.tsx files
-    const pageFiles = this.findFiles(this.SOURCE_DIR, "page.tsx");
-    const layoutFiles = this.findFiles(this.SOURCE_DIR, "layout.tsx");
+    const pageFiles = GenerateExpoIndexesRepository.findFiles(
+      GenerateExpoIndexesRepository.SOURCE_DIR,
+      "page.tsx",
+    );
+    const layoutFiles = GenerateExpoIndexesRepository.findFiles(
+      GenerateExpoIndexesRepository.SOURCE_DIR,
+      "layout.tsx",
+    );
 
     // Process pages
     for (const pageFile of pageFiles) {
       const relativePath = dirname(pageFile);
-      const targetPath = join(this.TARGET_DIR, relativePath, "index.tsx");
+      const targetPath = join(
+        GenerateExpoIndexesRepository.TARGET_DIR,
+        relativePath,
+        "index.tsx",
+      );
 
       try {
         // Check for custom-index directive
-        if (this.hasCustomIndexDirective(targetPath)) {
+        if (GenerateExpoIndexesRepository.hasCustomIndexDirective(targetPath)) {
           result.skipped.push(relativePath);
           continue;
         }
 
         // Ensure directory exists
-        this.ensureDir(dirname(targetPath));
+        GenerateExpoIndexesRepository.ensureDir(dirname(targetPath));
 
         // Generate content
-        const content = this.generatePageIndex(
+        const content = GenerateExpoIndexesRepository.generatePageIndex(
           relativePath === "." ? "" : relativePath,
           "page",
         );
@@ -278,23 +281,27 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
     for (const layoutFile of layoutFiles) {
       const relativePath = dirname(layoutFile);
       const layoutTargetPath = join(
-        this.TARGET_DIR,
+        GenerateExpoIndexesRepository.TARGET_DIR,
         relativePath,
         "_layout.tsx",
       );
 
       try {
         // Check for custom directive in _layout.tsx file
-        if (this.hasCustomIndexDirective(layoutTargetPath)) {
+        if (
+          GenerateExpoIndexesRepository.hasCustomIndexDirective(
+            layoutTargetPath,
+          )
+        ) {
           result.skipped.push(relativePath);
           continue;
         }
 
         // Ensure directory exists
-        this.ensureDir(dirname(layoutTargetPath));
+        GenerateExpoIndexesRepository.ensureDir(dirname(layoutTargetPath));
 
         // Generate content for layout
-        const content = this.generatePageIndex(
+        const content = GenerateExpoIndexesRepository.generatePageIndex(
           relativePath === "." ? "" : relativePath,
           "layout",
         );
@@ -312,9 +319,3 @@ export default createLayoutWrapperWithImport(() => import("${importPath}"));
     return result;
   }
 }
-
-/**
- * Default repository instance
- */
-export const generateExpoIndexesRepository =
-  new GenerateExpoIndexesRepositoryImpl();

@@ -16,9 +16,12 @@ export async function loadTasksData(
   }
 
   try {
-    const { loadTaskItems } =
+    const { CronTasksRepository } =
       await import("@/app/api/[locale]/system/unified-interface/tasks/cron/repository");
-    const tasks: TaskSummaryItem[] = await loadTaskItems({ userId, logger });
+    const tasks: TaskSummaryItem[] = await CronTasksRepository.loadTaskItems({
+      userId,
+      logger,
+    });
     return { tasks };
   } catch (error) {
     logger.error("Failed to load tasks for system prompt", {

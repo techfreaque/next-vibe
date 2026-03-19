@@ -12,7 +12,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { v4 as uuidv4 } from "uuid";
 
-import type { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
+import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import {
   calculateCreditCost,
   getModelById,
@@ -21,11 +21,9 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-type AiStreamModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
-import { reparentUserMessage } from "../../../chat/threads/[threadId]/messages/repository";
+import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import type { StreamContext } from "../core/stream-context";
 import { MessageConverter } from "./message-converter";
 
@@ -84,7 +82,7 @@ export class CompactingHandler {
     timezone: string;
     rootFolderId: DefaultFolderId;
     compactingMessageCreatedAt: Date;
-    t: AiStreamModuleT;
+    t: AiStreamT;
   }): Promise<
     | {
         success: true;
@@ -172,7 +170,7 @@ export class CompactingHandler {
     //   effectiveParentMessage → compacting → user → AI
     const { currentUserMessage } = params;
     if (currentUserMessage && !params.isIncognito) {
-      await reparentUserMessage({
+      await MessagesRepository.reparentUserMessage({
         messageId: currentUserMessage.id,
         newParentId: compactingMessageId,
         logger,

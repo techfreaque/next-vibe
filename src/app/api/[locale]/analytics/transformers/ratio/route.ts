@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeRatio } from "./repository";
+import { RatioTransformerRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { a, b, resolution, lookback } = data;
-      const result = computeRatio(a, b);
+      const result = RatioTransformerRepository.computeRatio(a, b);
       return success({
         result,
         meta: {

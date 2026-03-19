@@ -18,11 +18,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { defaultLocale } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../config";
-import type { scopedTranslation as idScopedTranslation } from "./[id]/i18n";
+import type { MemoriesListResponseOutput } from "./definition";
+import type { MemoryAddResponseOutput } from "./create/definition";
+import type { MemoryUpdateResponseOutput } from "./[id]/definition";
+import type { MemoryByIdT } from "./[id]/i18n";
 import { memories, type Memory } from "./db";
 import { formatMemorySummary } from "./formatter";
-
-type MemoriesT = ReturnType<typeof idScopedTranslation.scopedT>["t"];
 
 export class MemoriesRepository {
   private static readonly LIMITS = {
@@ -91,7 +92,7 @@ export class MemoriesRepository {
     userId: string;
     logger: EndpointLogger;
     rootFolderId: DefaultFolderId;
-  }): Promise<ResponseType<{ memories: Memory[] }>> {
+  }): Promise<ResponseType<MemoriesListResponseOutput>> {
     const { userId, logger, rootFolderId } = params;
 
     const result = await MemoriesRepository.getMemoriesList({
@@ -105,7 +106,29 @@ export class MemoriesRepository {
       count: result.length,
     });
 
-    return success({ memories: result });
+    return success({
+      memories: result.map(
+        ({
+          memoryNumber: id,
+          content,
+          tags,
+          priority,
+          isPublic,
+          isArchived,
+          isShared,
+          createdAt,
+        }) => ({
+          id,
+          content,
+          tags: tags ?? [],
+          priority,
+          isPublic,
+          isArchived,
+          isShared,
+          createdAt,
+        }),
+      ),
+    });
   }
 
   /**
@@ -120,7 +143,7 @@ export class MemoriesRepository {
     isPublic: boolean;
     isShared: boolean;
     logger: EndpointLogger;
-  }): Promise<ResponseType<{ id: number }>> {
+  }): Promise<ResponseType<MemoryAddResponseOutput>> {
     const {
       content,
       tags = [],
@@ -202,8 +225,8 @@ export class MemoriesRepository {
     isShared?: boolean;
     userId: string;
     logger: EndpointLogger;
-    t: MemoriesT;
-  }): Promise<ResponseType<{ success: true }>> {
+    t: MemoryByIdT;
+  }): Promise<ResponseType<MemoryUpdateResponseOutput>> {
     const {
       memoryNumber,
       content,
@@ -308,7 +331,7 @@ export class MemoriesRepository {
     memoryNumber: number;
     userId: string;
     logger: EndpointLogger;
-    t: MemoriesT;
+    t: MemoryByIdT;
   }): Promise<
     ResponseType<{
       content: string;

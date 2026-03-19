@@ -19,10 +19,8 @@ import { LeadSortField, SortOrder } from "../enum";
 import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type { LeadSearchGetResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-type LeadsModuleT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
+import type { LeadsT } from "../i18n";
+import type { LeadsSearchT } from "./i18n";
 
 /**
  * Search request interface - matches definition with defaults
@@ -34,23 +32,18 @@ interface SearchRequestType {
 }
 
 /**
- * Search response interface - derived from definition
- */
-type SearchResponseType = LeadSearchGetResponseOutput;
-
-/**
  * Lead Search Repository Implementation
  */
-class LeadSearchRepositoryImpl {
+export class LeadSearchRepository {
   /**
    * Search leads using the main leads repository
    */
-  async searchLeads(
+  static async searchLeads(
     data: SearchRequestType,
-    t: ModuleT,
+    t: LeadsSearchT,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<SearchResponseType>> {
+  ): Promise<ResponseType<LeadSearchGetResponseOutput>> {
     logger.debug("Searching leads", {
       searchTerm: data.search,
       limit: data.limit,
@@ -61,7 +54,7 @@ class LeadSearchRepositoryImpl {
     const offset = data.offset ?? 0;
     const limit = data.limit ?? 10;
 
-    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
+    const leadsT: LeadsT = leadsScopedTranslation.scopedT(locale).t;
 
     // Use the existing listLeads method with search filter
     const searchResult = await LeadsRepository.listLeads(
@@ -140,8 +133,3 @@ class LeadSearchRepositoryImpl {
     });
   }
 }
-
-/**
- * Default repository instance
- */
-export const leadSearchRepository = new LeadSearchRepositoryImpl();

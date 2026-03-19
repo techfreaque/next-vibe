@@ -30,9 +30,7 @@ import type {
   MePostRequestOutput,
   MePostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { MeT } from "./i18n";
 
 /**
  * User Profile Repository - Static class pattern
@@ -50,7 +48,7 @@ export class UserProfileRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MeT,
   ): Promise<ResponseType<MeGetResponseOutput>> {
     try {
       // Handle public users - return JWT payload only
@@ -122,7 +120,7 @@ export class UserProfileRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MeT,
   ): Promise<ResponseType<MePostResponseOutput>> {
     try {
       // Public users: sync lead locale only
@@ -301,7 +299,7 @@ export class UserProfileRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MeT,
   ): Promise<ResponseType<MeDeleteResponseOutput>> {
     try {
       if (!user.id) {

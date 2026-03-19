@@ -42,84 +42,78 @@ import type {
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface ConfigParams {
-  data: VibeFrameConfigRequestOutput;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-}
-
-// ─── Exchange Token ───────────────────────────────────────────────────────────
-
-const EXCHANGE_TOKEN_TTL_MS = 30_000; // 30 seconds
-
-/**
- * Mint a short-lived single-use exchange token.
- * leadId is nullable: if absent, middleware creates a new lead on redemption.
- * Only called when at least one of leadId / authToken is provided.
- */
-async function mintExchangeToken(
-  leadId: string | undefined,
-  authToken: string | undefined,
-): Promise<string> {
-  const token = randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + EXCHANGE_TOKEN_TTL_MS);
-
-  await db.insert(frameExchangeTokens).values({
-    leadId: leadId ?? null,
-    token,
-    authToken: authToken ?? null,
-    expiresAt,
-  });
-
-  return token;
-}
-
-// ─── URL Builder ─────────────────────────────────────────────────────────────
-
-function buildFrameUrl(
-  locale: CountryLanguage,
-  endpointId: string,
-  frameId: string,
-  exchangeToken: string | undefined,
-  integration: IntegrationRequest,
-): string {
-  const base = envClient.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
-  // endpoint "contact_POST" → path "contact/POST"
-  // endpoint "agent_search_kagi_POST" → path "agent/search/kagi/POST"
-  const endpointPath = endpointId.replace(/_/g, "/");
-  const url = new URL(`${base}/${locale}/frame/${endpointPath}`);
-
-  url.searchParams.set("frameId", frameId);
-  if (exchangeToken) {
-    url.searchParams.set("et", exchangeToken);
-  }
-
-  if (integration.theme && integration.theme !== "system") {
-    url.searchParams.set("theme", integration.theme);
-  }
-  if (integration.urlPathParams) {
-    url.searchParams.set(
-      "urlPathParams",
-      JSON.stringify(integration.urlPathParams),
-    );
-  }
-  if (integration.data) {
-    url.searchParams.set("data", JSON.stringify(integration.data));
-  }
-
-  return url.toString();
-}
-
 // ─── Repository ──────────────────────────────────────────────────────────────
 
-export const VibeFrameConfigRepository = {
-  async config({
+export class VibeFrameConfigRepository {
+  private static readonly EXCHANGE_TOKEN_TTL_MS = 30_000; // 30 seconds
+
+  /**
+   * Mint a short-lived single-use exchange token.
+   * leadId is nullable: if absent, middleware creates a new lead on redemption.
+   * Only called when at least one of leadId / authToken is provided.
+   */
+  private static async mintExchangeToken(
+    leadId: string | undefined,
+    authToken: string | undefined,
+  ): Promise<string> {
+    const token = randomBytes(32).toString("hex");
+    const expiresAt = new Date(
+      Date.now() + VibeFrameConfigRepository.EXCHANGE_TOKEN_TTL_MS,
+    );
+
+    await db.insert(frameExchangeTokens).values({
+      leadId: leadId ?? null,
+      token,
+      authToken: authToken ?? null,
+      expiresAt,
+    });
+
+    return token;
+  }
+
+  private static buildFrameUrl(
+    locale: CountryLanguage,
+    endpointId: string,
+    frameId: string,
+    exchangeToken: string | undefined,
+    integration: IntegrationRequest,
+  ): string {
+    const base = envClient.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+    // endpoint "contact_POST" → path "contact/POST"
+    // endpoint "agent_search_kagi_POST" → path "agent/search/kagi/POST"
+    const endpointPath = endpointId.replace(/_/g, "/");
+    const url = new URL(`${base}/${locale}/frame/${endpointPath}`);
+
+    url.searchParams.set("frameId", frameId);
+    if (exchangeToken) {
+      url.searchParams.set("et", exchangeToken);
+    }
+
+    if (integration.theme && integration.theme !== "system") {
+      url.searchParams.set("theme", integration.theme);
+    }
+    if (integration.urlPathParams) {
+      url.searchParams.set(
+        "urlPathParams",
+        JSON.stringify(integration.urlPathParams),
+      );
+    }
+    if (integration.data) {
+      url.searchParams.set("data", JSON.stringify(integration.data));
+    }
+
+    return url.toString();
+  }
+
+  static async config({
     data,
     locale,
     logger,
-  }: ConfigParams): Promise<ResponseType<VibeFrameConfigResponseOutput>> {
+  }: {
+    data: VibeFrameConfigRequestOutput;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+  }): Promise<ResponseType<VibeFrameConfigResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
@@ -149,10 +143,13 @@ export const VibeFrameConfigRepository = {
         try {
           let exchangeToken: string | undefined;
           if (needsToken) {
-            exchangeToken = await mintExchangeToken(leadId, authToken);
+            exchangeToken = await VibeFrameConfigRepository.mintExchangeToken(
+              leadId,
+              authToken,
+            );
           }
 
-          const widgetUrl = buildFrameUrl(
+          const widgetUrl = VibeFrameConfigRepository.buildFrameUrl(
             locale,
             endpointId,
             frameId,
@@ -181,5 +178,5 @@ export const VibeFrameConfigRepository = {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  },
-};
+  }
+}

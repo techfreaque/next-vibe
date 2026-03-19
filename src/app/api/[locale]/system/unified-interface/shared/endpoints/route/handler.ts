@@ -11,7 +11,6 @@ import type { z } from "zod";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
@@ -23,7 +22,6 @@ import {
   isStreamingResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
-import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -362,6 +360,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     if (providedUser) {
       user = providedUser as InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
     } else {
+      const { AuthRepository } =
+        await import("@/app/api/[locale]/user/auth/repository");
       const authUser = await AuthRepository.getAuthMinimalUser(
         endpoint.allowedRoles,
         { platform, locale, request },
@@ -430,6 +430,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     // 4. Check and deduct credits if endpoint has credit cost
     if (endpoint.credits && endpoint.credits > 0) {
+      const { CreditRepository } =
+        await import("@/app/api/[locale]/credits/repository");
       const hasSufficient = await CreditRepository.hasSufficientCredits(
         user.id
           ? { userId: user.id, leadId: user.leadId }
@@ -525,9 +527,9 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     if (email?.afterHandlerEmails) {
-      const { emailHandlingRepository } =
+      const { EmailHandlingRepository } =
         await import("@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/repository");
-      await emailHandlingRepository.handleEmails<
+      await EmailHandlingRepository.handleEmails<
         T["types"]["RequestOutput"],
         T["types"]["ResponseOutput"],
         T["types"]["UrlVariablesOutput"],

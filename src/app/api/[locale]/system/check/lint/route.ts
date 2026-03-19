@@ -9,13 +9,20 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { lintRepository } from "./repository";
+import { LintRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, platform }) => {
-      return await lintRepository.execute(data, logger, platform);
+    handler: async ({ data, logger, platform, locale, streamContext }) => {
+      return await LintRepository.execute(
+        data,
+        logger,
+        platform,
+        undefined,
+        streamContext.abortSignal,
+        locale,
+      );
     },
   },
 });

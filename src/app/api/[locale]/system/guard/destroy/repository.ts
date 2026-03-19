@@ -16,51 +16,40 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type guardDestroyEndpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type GuardDestroyRequestType =
-  typeof guardDestroyEndpoints.POST.types.RequestOutput;
-type GuardDestroyResponseType =
-  typeof guardDestroyEndpoints.POST.types.ResponseOutput;
+import type {
+  GuardDestroyRequestOutput,
+  GuardDestroyResponseOutput,
+} from "./definition";
+import type { GuardDestroyT } from "./i18n";
 
 /**
- * Guard Destroy Repository Interface
+ * Guard Destroy Repository
  */
-export interface GuardDestroyRepository {
-  destroyGuard(
-    data: GuardDestroyRequestType,
+export class GuardDestroyRepository {
+  static destroyGuard(
+    data: GuardDestroyRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<GuardDestroyResponseType>;
-}
-
-/**
- * Guard Destroy Repository Implementation
- */
-export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
-  destroyGuard(
-    data: GuardDestroyRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<GuardDestroyResponseType> {
+    t: GuardDestroyT,
+  ): ResponseType<GuardDestroyResponseOutput> {
     try {
       logger.info("Destroying guard environment");
       logger.debug("Guard destroy request data", { data });
 
       // Handle dry run
       if (data.dryRun) {
-        return this.handleDryRun(logger);
+        return GuardDestroyRepository.handleDryRun(logger);
       }
 
       if (data.guardId) {
-        return this.destroyByGuardId(data.guardId, logger);
+        return GuardDestroyRepository.destroyByGuardId(data.guardId, logger);
       }
 
       if (data.projectPath) {
-        return this.destroyByProject(data.projectPath, logger, t);
+        return GuardDestroyRepository.destroyByProject(
+          data.projectPath,
+          logger,
+          t,
+        );
       }
 
       // Default to current project if no parameters specified
@@ -68,7 +57,11 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       logger.info(
         `No parameters specified, defaulting to current project: ${currentProjectPath}`,
       );
-      return this.destroyByProject(currentProjectPath, logger, t);
+      return GuardDestroyRepository.destroyByProject(
+        currentProjectPath,
+        logger,
+        t,
+      );
     } catch (error) {
       logger.error("Guard destruction failed", parseError(error));
       const parsedError =
@@ -82,12 +75,12 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     }
   }
 
-  private handleDryRun(
+  private static handleDryRun(
     logger: EndpointLogger,
-  ): ResponseType<GuardDestroyResponseType> {
+  ): ResponseType<GuardDestroyResponseOutput> {
     logger.info("Executing dry run for guard destruction");
 
-    const response: GuardDestroyResponseType = {
+    const response: GuardDestroyResponseOutput = {
       success: true,
       output: "🔍 Would destroy guard environments (dry run)", // eslint-disable-line i18next/no-literal-string
       destroyedGuards: [],
@@ -97,10 +90,10 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     return success(response);
   }
 
-  private destroyByGuardId(
+  private static destroyByGuardId(
     guardId: string,
     logger: EndpointLogger,
-  ): ResponseType<GuardDestroyResponseType> {
+  ): ResponseType<GuardDestroyResponseOutput> {
     logger.debug(`Destroying guard: ${guardId}`);
 
     // Mock implementation - in real system would destroy actual guard
@@ -113,7 +106,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       userRemoved: true,
     };
 
-    const response: GuardDestroyResponseType = {
+    const response: GuardDestroyResponseOutput = {
       success: true,
       output: `🗑️ Guard '${guardId}' destroyed successfully`, // eslint-disable-line i18next/no-literal-string
       destroyedGuards: [mockGuard],
@@ -123,11 +116,11 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     return success(response);
   }
 
-  private destroyByProject(
+  private static destroyByProject(
     projectPath: string,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<GuardDestroyResponseType> {
+    t: GuardDestroyT,
+  ): ResponseType<GuardDestroyResponseOutput> {
     logger.debug(`Destroying guard for project: ${projectPath}`);
 
     const projectName = path.basename(projectPath);
@@ -155,7 +148,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       userRemoved: true,
     };
 
-    const response: GuardDestroyResponseType = {
+    const response: GuardDestroyResponseOutput = {
       success: true,
       output: `🗑️ Guard destroyed successfully for project '${projectName}'`, // eslint-disable-line i18next/no-literal-string
       destroyedGuards: [mockGuard],
@@ -165,9 +158,9 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     return success(response);
   }
 
-  private destroyAllGuards(
+  private static destroyAllGuards(
     logger: EndpointLogger,
-  ): ResponseType<GuardDestroyResponseType> {
+  ): ResponseType<GuardDestroyResponseOutput> {
     logger.debug("Destroying all guards");
 
     // Mock implementation - in real system would find and destroy all guards
@@ -182,7 +175,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       },
     ];
 
-    const response: GuardDestroyResponseType = {
+    const response: GuardDestroyResponseOutput = {
       success: true,
       output: `🗑️ Destroyed ${mockGuards.length} guard environment${mockGuards.length === 1 ? "" : "s"}`, // eslint-disable-line i18next/no-literal-string
       destroyedGuards: mockGuards,
@@ -192,5 +185,3 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
     return success(response);
   }
 }
-
-export const guardDestroyRepository = new GuardDestroyRepositoryImpl();

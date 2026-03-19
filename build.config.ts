@@ -146,6 +146,7 @@ const config: BuildConfig = {
     // `input` = srcDirectory for tanstackStart plugin (src/app-tanstack).
     // `output` = .output (Nitro outputs .output/server/index.mjs).
     {
+      disabled: true,
       input: "src/app-tanstack",
       output: ".output",
       type: ViteBuildTypeEnum.TANSTACK_START,

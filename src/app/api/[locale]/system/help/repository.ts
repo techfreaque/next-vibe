@@ -24,25 +24,33 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import {
+  PlatformMarker,
   UserPermissionRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { generateSchemaForUsage } from "../unified-interface/shared/field/utils";
 import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "../unified-interface/shared/types/enums";
 import { Platform } from "../unified-interface/shared/types/platform";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 
-import type { HelpGetRequestOutput, HelpGetResponseOutput } from "./definition";
+import type {
+  HelpGetRequestOutput,
+  HelpGetResponseOutput,
+  HelpToolMetadataSerialized,
+  HelpToolParameters,
+} from "./definition";
 import { scopedTranslation } from "./i18n";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
-type ToolItem = HelpGetResponseOutput["tools"][number];
+interface HelpInteractiveResult {
+  started: boolean;
+}
 
 interface EndpointMeta {
   toolName: string;
@@ -63,285 +71,279 @@ interface EndpointMeta {
   };
 }
 
-/** Map user-facing platform filter to internal Platform enum */
-type PlatformFilterValue = "cli" | "mcp" | "ai" | "web" | "all";
+export class HelpRepository {
+  // ─── Platform/role filtering on static meta ────────────────────────────────
 
-function mapFilterToPlatform(filter: PlatformFilterValue): Platform | "all" {
-  switch (filter) {
-    case "cli":
-      return Platform.CLI;
-    case "mcp":
-      return Platform.MCP;
-    case "ai":
-      return Platform.AI;
-    case "web":
-      return Platform.TRPC;
-    case "all":
-      return "all";
-  }
-}
+  private static readonly COMPACT_DEFAULT_PAGE_SIZE = 25;
+  private static readonly HUMAN_DEFAULT_PAGE_SIZE = 500;
+  /** If a filtered result set is ≤ this many tools, auto-upgrade to full detail (params + examples) */
+  private static readonly COMPACT_FULL_DETAIL_THRESHOLD = 5;
 
-// ─── Platform/role filtering on static meta ──────────────────────────────────
+  private static mapFilterToPlatform(
+    filter: Platform | "all",
+  ): Platform | "all" {
+    switch (filter) {
+      case "all":
+        return "all";
+      default:
+        return filter;
+    }
+  }
 
-const ROLE_CLI_OFF = "enums.userRole.cliOff";
-const ROLE_WEB_OFF = "enums.userRole.webOff";
-const ROLE_AI_TOOL_OFF = "enums.userRole.aiToolOff";
-const ROLE_MCP_OFF = "enums.userRole.mcpOff";
-const ROLE_MCP_VISIBLE = "enums.userRole.mcpVisible";
-const ROLE_PRODUCTION_OFF = "enums.userRole.productionOff";
-const ROLE_CLI_AUTH_BYPASS = "enums.userRole.cliAuthBypass";
-const ROLE_SKILL_OFF = "enums.userRole.skillOff";
-const ROLE_PUBLIC = "enums.userRole.public";
-
-function checkPlatformAccess(roles: string[], platform: Platform): boolean {
-  if (
-    envClient.NODE_ENV === "production" &&
-    !envClient.NEXT_PUBLIC_LOCAL_MODE &&
-    roles.includes(ROLE_PRODUCTION_OFF)
-  ) {
-    return false;
-  }
-  switch (platform) {
-    case Platform.CLI:
-      return !roles.includes(ROLE_CLI_OFF);
-    case Platform.MCP:
-      return !roles.includes(ROLE_MCP_OFF) && !roles.includes(ROLE_CLI_OFF);
-    case Platform.AI:
-    case Platform.CRON:
-      return !roles.includes(ROLE_AI_TOOL_OFF) && !roles.includes(ROLE_WEB_OFF);
-    case Platform.REMOTE_SKILL:
-      return !roles.includes(ROLE_SKILL_OFF);
-    case Platform.CLI_PACKAGE:
-      return (
-        !roles.includes(ROLE_CLI_OFF) && roles.includes(ROLE_CLI_AUTH_BYPASS)
-      );
-    case Platform.NEXT_PAGE:
-    case Platform.NEXT_API:
-    case Platform.TRPC:
-    case Platform.ELECTRON:
-    case Platform.FRAME:
-      return !roles.includes(ROLE_WEB_OFF);
-    default:
-      return true;
-  }
-}
-
-function checkUserAccess(
-  roles: string[],
-  userRoles: string[],
-  isPublic: boolean,
-): boolean {
-  const permRoles = roles.filter(
-    (r) =>
-      !r.endsWith("Off") &&
-      !r.endsWith("Bypass") &&
-      r !== ROLE_MCP_VISIBLE &&
-      r !== ROLE_SKILL_OFF,
-  );
-  if (permRoles.length === 0) {
-    return false;
-  }
-  if (permRoles.includes(ROLE_PUBLIC)) {
-    return true;
-  }
-  if (isPublic) {
-    return false;
-  }
-  return permRoles.some((r) => userRoles.includes(r));
-}
-
-function filterMetaForUser(
-  meta: EndpointMeta[],
-  platform: Platform,
-  userRoles: string[],
-  isPublic: boolean,
-): EndpointMeta[] {
-  return meta.filter((m) => {
-    const platformOk = checkPlatformAccess(m.allowedRoles, platform);
-    if (!platformOk) {
+  private static checkPlatformAccess(
+    roles: string[],
+    platform: Platform,
+  ): boolean {
+    if (
+      envClient.NODE_ENV === "production" &&
+      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
+      roles.includes(PlatformMarker.PRODUCTION_OFF)
+    ) {
       return false;
     }
-    return checkUserAccess(m.allowedRoles, userRoles, isPublic);
-  });
-}
-
-// ─── Platform badge helpers (admin only) ─────────────────────────────────────
-
-function getMetaPlatforms(roles: string[]): Platform[] {
-  return (Object.values(Platform) as Platform[]).filter((p) =>
-    checkPlatformAccess(roles, p),
-  );
-}
-
-// ─── Constants ──────────────────────────────────────────────────────────────
-
-const COMPACT_DEFAULT_PAGE_SIZE = 25;
-const HUMAN_DEFAULT_PAGE_SIZE = 500;
-/** If a filtered result set is ≤ this many tools, auto-upgrade to full detail (params + examples) */
-const COMPACT_FULL_DETAIL_THRESHOLD = 5;
-
-// ─── Tool serialization helpers ──────────────────────────────────────────────
-
-function isCompactPlatform(platform: Platform): boolean {
-  return (
-    platform === Platform.AI ||
-    platform === Platform.MCP ||
-    platform === Platform.CRON
-  );
-}
-
-function getParameterSchema(
-  endpoint: CreateApiEndpointAny,
-  locale: CountryLanguage,
-): ToolItem["parameters"] | null {
-  if (!endpoint.fields) {
-    return null;
+    switch (platform) {
+      case Platform.CLI:
+        return !roles.includes(PlatformMarker.CLI_OFF);
+      case Platform.MCP:
+        return (
+          !roles.includes(PlatformMarker.MCP_OFF) &&
+          !roles.includes(PlatformMarker.CLI_OFF)
+        );
+      case Platform.AI:
+      case Platform.CRON:
+        return (
+          !roles.includes(PlatformMarker.AI_TOOL_OFF) &&
+          !roles.includes(PlatformMarker.WEB_OFF)
+        );
+      case Platform.REMOTE_SKILL:
+        return !roles.includes(PlatformMarker.SKILL_OFF);
+      case Platform.CLI_PACKAGE:
+        return (
+          !roles.includes(PlatformMarker.CLI_OFF) &&
+          roles.includes(PlatformMarker.CLI_AUTH_BYPASS)
+        );
+      case Platform.NEXT_PAGE:
+      case Platform.NEXT_API:
+      case Platform.TRPC:
+      case Platform.ELECTRON:
+      case Platform.FRAME:
+        return !roles.includes(PlatformMarker.WEB_OFF);
+      default:
+        return true;
+    }
   }
-  try {
-    const requestDataSchema = generateSchemaForUsage(
-      endpoint.fields,
-      FieldUsage.RequestData,
-    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
-    const urlPathParamsSchema = generateSchemaForUsage(
-      endpoint.fields,
-      FieldUsage.RequestUrlParams,
-    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
-    const combinedShape: Record<string, z.ZodTypeAny> = {};
-    if (requestDataSchema instanceof z.ZodObject) {
-      Object.assign(combinedShape, requestDataSchema.shape);
+
+  private static checkUserAccess(
+    roles: string[],
+    userRoles: string[],
+    isPublic: boolean,
+  ): boolean {
+    const permRoles = roles.filter(
+      (r) =>
+        !r.endsWith("Off") &&
+        !r.endsWith("Bypass") &&
+        r !== PlatformMarker.MCP_VISIBLE &&
+        r !== PlatformMarker.SKILL_OFF,
+    );
+    if (permRoles.length === 0) {
+      return false;
     }
-    if (urlPathParamsSchema instanceof z.ZodObject) {
-      Object.assign(combinedShape, urlPathParamsSchema.shape);
+    if (permRoles.includes(UserPermissionRole.PUBLIC)) {
+      return true;
     }
-    if (Object.keys(combinedShape).length === 0) {
+    if (isPublic) {
+      return false;
+    }
+    return permRoles.some((r) => userRoles.includes(r));
+  }
+
+  private static filterMetaForUser(
+    meta: EndpointMeta[],
+    platform: Platform,
+    userRoles: string[],
+    isPublic: boolean,
+  ): EndpointMeta[] {
+    return meta.filter((m) => {
+      const platformOk = HelpRepository.checkPlatformAccess(
+        m.allowedRoles,
+        platform,
+      );
+      if (!platformOk) {
+        return false;
+      }
+      return HelpRepository.checkUserAccess(
+        m.allowedRoles,
+        userRoles,
+        isPublic,
+      );
+    });
+  }
+
+  private static getMetaPlatforms(roles: string[]): Platform[] {
+    return (Object.values(Platform) as Platform[]).filter((p) =>
+      HelpRepository.checkPlatformAccess(roles, p),
+    );
+  }
+
+  private static isCompactPlatform(platform: Platform): boolean {
+    return (
+      platform === Platform.AI ||
+      platform === Platform.MCP ||
+      platform === Platform.CRON
+    );
+  }
+
+  private static getParameterSchema(
+    endpoint: CreateApiEndpointAny,
+    locale: CountryLanguage,
+  ): HelpToolParameters | null {
+    if (!endpoint.fields) {
       return null;
     }
-    const schema = zodSchemaToJsonSchema(z.object(combinedShape));
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const topLevelFields: Record<string, any> = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const fieldsObj = endpoint.fields as any;
-    if (fieldsObj && typeof fieldsObj === "object" && "children" in fieldsObj) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const children = (fieldsObj as any).children;
-      if (children && typeof children === "object") {
-        Object.assign(topLevelFields, children);
+    try {
+      const requestDataSchema = generateSchemaForUsage(
+        endpoint.fields,
+        FieldUsage.RequestData,
+      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+      const urlPathParamsSchema = generateSchemaForUsage(
+        endpoint.fields,
+        FieldUsage.RequestUrlParams,
+      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+      const combinedShape: Record<string, z.ZodTypeAny> = {};
+      if (requestDataSchema instanceof z.ZodObject) {
+        Object.assign(combinedShape, requestDataSchema.shape);
       }
-    }
-    enrichJsonSchemaFromFields(schema, topLevelFields);
+      if (urlPathParamsSchema instanceof z.ZodObject) {
+        Object.assign(combinedShape, urlPathParamsSchema.shape);
+      }
+      if (Object.keys(combinedShape).length === 0) {
+        return null;
+      }
+      const schema = zodSchemaToJsonSchema(z.object(combinedShape));
 
-    if (
-      locale &&
-      schema &&
-      typeof schema === "object" &&
-      "properties" in schema
-    ) {
-      const props = (
-        schema as {
-          properties: Record<
-            string,
-            Record<string, string | number | boolean | null | string[]>
-          >;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const topLevelFields: Record<string, any> = {};
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fieldsObj = endpoint.fields as any;
+      if (
+        fieldsObj &&
+        typeof fieldsObj === "object" &&
+        "children" in fieldsObj
+      ) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const children = (fieldsObj as any).children;
+        if (children && typeof children === "object") {
+          Object.assign(topLevelFields, children);
         }
-      ).properties;
-      const { t } = endpoint.scopedTranslation.scopedT(locale);
-      for (const [key, prop] of Object.entries(props)) {
-        if (prop && typeof prop === "object" && !prop.description) {
-          const field = topLevelFields[key];
-          if (
-            field &&
-            typeof field === "object" &&
-            "description" in field &&
-            typeof field.description === "string"
-          ) {
-            try {
-              prop.description = t(field.description);
-            } catch {
-              /* missing translation — skip */
+      }
+      enrichJsonSchemaFromFields(schema, topLevelFields);
+
+      if (
+        locale &&
+        schema &&
+        typeof schema === "object" &&
+        "properties" in schema
+      ) {
+        const props = (
+          schema as {
+            properties: Record<
+              string,
+              Record<string, string | number | boolean | null | string[]>
+            >;
+          }
+        ).properties;
+        const { t } = endpoint.scopedTranslation.scopedT(locale);
+        for (const [key, prop] of Object.entries(props)) {
+          if (prop && typeof prop === "object" && !prop.description) {
+            const field = topLevelFields[key];
+            if (
+              field &&
+              typeof field === "object" &&
+              "description" in field &&
+              typeof field.description === "string"
+            ) {
+              try {
+                prop.description = t(field.description);
+              } catch {
+                /* missing translation — skip */
+              }
             }
           }
         }
       }
-    }
 
-    if (schema && "~standard" in schema) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { "~standard": _std, ...clean } = schema as Record<
-        string,
-        ToolItem["parameters"]
-      >;
-      return clean as ToolItem["parameters"];
+      if (schema && "~standard" in schema) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { "~standard": _std, ...clean } = schema;
+        return clean;
+      }
+      return schema;
+    } catch {
+      return null;
     }
-    return schema;
-  } catch {
-    return null;
   }
-}
 
-function serializeMeta(
-  tool: EndpointMeta,
-  parameters?: ToolItem["parameters"],
-  includeExamples = false,
-  platforms?: Platform[],
-): ToolItem {
-  return {
-    name: tool.toolName,
-    title: tool.title,
-    id: tool.toolName,
-    tags: tool.tags,
-    method: tool.method,
-    description: tool.description,
-    category: tool.category,
-    aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
-    requiresConfirmation: tool.requiresConfirmation,
-    credits: tool.credits,
-    platforms,
-    parameters,
-    examples: includeExamples ? tool.examples : undefined,
-  };
-}
+  private static serializeMeta(
+    tool: EndpointMeta,
+    parameters?: HelpToolParameters,
+    includeExamples = false,
+    platforms?: Platform[],
+  ): HelpToolMetadataSerialized {
+    return {
+      name: tool.toolName,
+      title: tool.title,
+      id: tool.toolName,
+      tags: tool.tags,
+      method: tool.method,
+      description: tool.description,
+      category: tool.category,
+      aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
+      requiresConfirmation: tool.requiresConfirmation,
+      credits: tool.credits,
+      platforms,
+      parameters,
+      examples: includeExamples ? tool.examples : undefined,
+    };
+  }
 
-function serializeMetaMinimal(
-  tool: EndpointMeta,
-  platforms?: Platform[],
-): ToolItem {
-  return {
-    name: tool.toolName,
-    title: tool.title,
-    id: tool.toolName,
-    tags: tool.tags,
-    description: tool.description,
-    category: tool.category,
-    aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
-    credits: tool.credits,
-    platforms,
-  };
-}
+  private static serializeMetaMinimal(
+    tool: EndpointMeta,
+    platforms?: Platform[],
+  ): HelpToolMetadataSerialized {
+    return {
+      name: tool.toolName,
+      title: tool.title,
+      id: tool.toolName,
+      tags: tool.tags,
+      description: tool.description,
+      category: tool.category,
+      aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
+      credits: tool.credits,
+      platforms,
+    };
+  }
 
-function buildMetaSearchIndex(tool: EndpointMeta): string {
-  return [
-    tool.title,
-    tool.description,
-    tool.category,
-    ...tool.tags,
-    tool.toolName,
-    ...tool.aliases,
-  ]
-    .join(" ")
-    .toLowerCase();
-}
+  private static buildMetaSearchIndex(tool: EndpointMeta): string {
+    return [
+      tool.title,
+      tool.description,
+      tool.category,
+      ...tool.tags,
+      tool.toolName,
+      ...tool.aliases,
+    ]
+      .join(" ")
+      .toLowerCase();
+  }
 
-/** Lazy-load the full endpoint definition for parameter schema (detail view only) */
-async function loadEndpointForMeta(
-  tool: EndpointMeta,
-): Promise<CreateApiEndpointAny | null> {
-  const { getEndpoint } =
-    await import("@/app/api/[locale]/system/generated/endpoint");
-  return getEndpoint(tool.toolName);
-}
-
-export class HelpRepository {
+  /** Lazy-load the full endpoint definition for parameter schema (detail view only) */
+  private static async loadEndpointForMeta(
+    tool: EndpointMeta,
+  ): Promise<CreateApiEndpointAny | null> {
+    const { getEndpoint } =
+      await import("@/app/api/[locale]/system/generated/endpoint");
+    return getEndpoint(tool.toolName);
+  }
   /**
    * Start interactive CLI session — Ink-based route navigator.
    */
@@ -349,7 +351,7 @@ export class HelpRepository {
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
     locale: CountryLanguage,
     platform: CliCompatiblePlatform,
-  ): Promise<ResponseType<{ started: boolean }>> {
+  ): Promise<ResponseType<HelpInteractiveResult>> {
     if (!user) {
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
@@ -369,15 +371,18 @@ export class HelpRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const { getCapabilities, getCapabilitiesAnyUser } =
+    const { RemoteConnectionRepository } =
       await import("@/app/api/[locale]/user/remote-connection/repository");
 
     // Try user-scoped lookup first, fall back to any-user lookup for CLI/system users
     // whose userId doesn't own the connection.
     const capabilities = user.isPublic
-      ? await getCapabilitiesAnyUser(instanceId)
-      : ((await getCapabilities(user.id, instanceId)) ??
-        (await getCapabilitiesAnyUser(instanceId)));
+      ? await RemoteConnectionRepository.getCapabilitiesAnyUser(instanceId)
+      : ((await RemoteConnectionRepository.getCapabilities(
+          user.id,
+          instanceId,
+        )) ??
+        (await RemoteConnectionRepository.getCapabilitiesAnyUser(instanceId)));
 
     if (!capabilities) {
       return success({
@@ -388,7 +393,7 @@ export class HelpRepository {
       });
     }
 
-    const allTools: ToolItem[] = capabilities.map((cap) => {
+    const allTools: HelpToolMetadataSerialized[] = capabilities.map((cap) => {
       const prefixedId = `${instanceId}__${cap.toolName}`;
       return {
         name: prefixedId,
@@ -441,10 +446,12 @@ export class HelpRepository {
       );
     }
 
-    const isCompact = isCompactPlatform(platform);
+    const isCompact = HelpRepository.isCompactPlatform(platform);
     const effectivePageSize =
       data.pageSize ??
-      (isCompact ? COMPACT_DEFAULT_PAGE_SIZE : HUMAN_DEFAULT_PAGE_SIZE);
+      (isCompact
+        ? HelpRepository.COMPACT_DEFAULT_PAGE_SIZE
+        : HelpRepository.HUMAN_DEFAULT_PAGE_SIZE);
     const currentPage = data.page ?? 1;
 
     const isAdmin =
@@ -469,7 +476,7 @@ export class HelpRepository {
     const platformFilter = isAdmin ? data.platform : undefined;
 
     if (platformFilter) {
-      const mapped = mapFilterToPlatform(platformFilter as PlatformFilterValue);
+      const mapped = HelpRepository.mapFilterToPlatform(platformFilter);
       discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
     } else if (!isAdmin && platform === Platform.NEXT_API) {
       // Non-admin users on the web tools page see AI-relevant tools
@@ -478,10 +485,12 @@ export class HelpRepository {
       discoveryPlatform = Platform.CLI;
     }
 
-    const userRoles = user.isPublic ? [ROLE_PUBLIC] : [...user.roles];
+    const userRoles = user.isPublic
+      ? [UserPermissionRole.PUBLIC]
+      : [...user.roles];
 
     // Filter meta by platform + user roles
-    const filteredByPlatform = filterMetaForUser(
+    const filteredByPlatform = HelpRepository.filterMetaForUser(
       allMeta,
       discoveryPlatform,
       userRoles,
@@ -493,21 +502,23 @@ export class HelpRepository {
       if (!isAdmin) {
         return undefined;
       }
-      return getMetaPlatforms(tool.allowedRoles);
+      return HelpRepository.getMetaPlatforms(tool.allowedRoles);
     };
 
     // When admin filters by a specific platform, additionally filter
     let platformFilteredMeta = filteredByPlatform;
     if (platformFilter) {
       platformFilteredMeta = filteredByPlatform.filter((m) =>
-        getMetaPlatforms(m.allowedRoles).includes(platformFilter),
+        HelpRepository.getMetaPlatforms(m.allowedRoles).includes(
+          platformFilter,
+        ),
       );
     }
 
     // includeProdOnly: exclude PRODUCTION_OFF tools
     if (isAdmin && data.includeProdOnly) {
       platformFilteredMeta = platformFilteredMeta.filter(
-        (m) => !m.allowedRoles.includes(ROLE_PRODUCTION_OFF),
+        (m) => !m.allowedRoles.includes(PlatformMarker.PRODUCTION_OFF),
       );
     }
 
@@ -540,7 +551,7 @@ export class HelpRepository {
       );
       if (!matchedTool) {
         return success({
-          tools: [] satisfies ToolItem[],
+          tools: [] satisfies HelpToolMetadataSerialized[],
           totalCount,
           matchedCount: 0,
           categories,
@@ -548,14 +559,14 @@ export class HelpRepository {
           ...adminMeta,
         });
       }
-      const endpoint = await loadEndpointForMeta(matchedTool);
+      const endpoint = await HelpRepository.loadEndpointForMeta(matchedTool);
       const parameters = endpoint
-        ? (getParameterSchema(endpoint, locale) ?? undefined)
+        ? (HelpRepository.getParameterSchema(endpoint, locale) ?? undefined)
         : undefined;
       const callAs = matchedTool.toolName;
       return success({
         tools: [
-          serializeMeta(
+          HelpRepository.serializeMeta(
             matchedTool,
             parameters,
             true,
@@ -575,7 +586,7 @@ export class HelpRepository {
     // Build search index once
     const searchIndexMap = new Map<string, string>();
     for (const m of platformFilteredMeta) {
-      searchIndexMap.set(m.toolName, buildMetaSearchIndex(m));
+      searchIndexMap.set(m.toolName, HelpRepository.buildMetaSearchIndex(m));
     }
 
     // Auto-upgrade to detail mode on exact name/alias match
@@ -586,14 +597,14 @@ export class HelpRepository {
           m.aliases.some((a) => a.toLowerCase() === query),
       );
       if (exactMatch) {
-        const endpoint = await loadEndpointForMeta(exactMatch);
+        const endpoint = await HelpRepository.loadEndpointForMeta(exactMatch);
         const parameters = endpoint
-          ? (getParameterSchema(endpoint, locale) ?? undefined)
+          ? (HelpRepository.getParameterSchema(endpoint, locale) ?? undefined)
           : undefined;
         const callAs = exactMatch.toolName;
         return success({
           tools: [
-            serializeMeta(
+            HelpRepository.serializeMeta(
               exactMatch,
               parameters,
               true,
@@ -646,14 +657,20 @@ export class HelpRepository {
     const pageSlice = filtered.slice(offset, offset + effectivePageSize);
 
     if (isCompact) {
-      if (matchedCount <= COMPACT_FULL_DETAIL_THRESHOLD) {
-        const tools: ToolItem[] = await Promise.all(
+      if (matchedCount <= HelpRepository.COMPACT_FULL_DETAIL_THRESHOLD) {
+        const tools: HelpToolMetadataSerialized[] = await Promise.all(
           pageSlice.map(async (m) => {
-            const endpoint = await loadEndpointForMeta(m);
+            const endpoint = await HelpRepository.loadEndpointForMeta(m);
             const parameters = endpoint
-              ? (getParameterSchema(endpoint, locale) ?? undefined)
+              ? (HelpRepository.getParameterSchema(endpoint, locale) ??
+                undefined)
               : undefined;
-            return serializeMeta(m, parameters, true, getToolPlatforms(m));
+            return HelpRepository.serializeMeta(
+              m,
+              parameters,
+              true,
+              getToolPlatforms(m),
+            );
           }),
         );
         return success({
@@ -673,7 +690,7 @@ export class HelpRepository {
           : "";
       return success({
         tools: pageSlice.map((m) =>
-          serializeMetaMinimal(m, getToolPlatforms(m)),
+          HelpRepository.serializeMetaMinimal(m, getToolPlatforms(m)),
         ),
         totalCount,
         matchedCount,
@@ -688,7 +705,7 @@ export class HelpRepository {
 
     return success({
       tools: pageSlice.map((m) =>
-        serializeMeta(m, undefined, false, getToolPlatforms(m)),
+        HelpRepository.serializeMeta(m, undefined, false, getToolPlatforms(m)),
       ),
       totalCount,
       matchedCount,

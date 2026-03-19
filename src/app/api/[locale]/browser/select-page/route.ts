@@ -6,7 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import { executeSelectPage, filterUndefinedArgs } from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import selectPageEndpoints, {
   type SelectPageResponseOutput,
 } from "./definition";
@@ -16,10 +16,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeSelectPage<SelectPageResponseOutput>(
+      BrowserSharedRepository.executeSelectPage<SelectPageResponseOutput>(
         {
           toolName: BrowserTool.SELECT_PAGE,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             pageId: data.pageId,
             bringToFront: data.bringToFront,
           }),

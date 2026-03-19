@@ -1,5 +1,4 @@
 /// <reference types="node" />
-/* eslint-disable i18next/no-literal-string */
 import { execSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";

@@ -23,16 +23,14 @@ import type {
   MessengerSendRequestOutput,
   MessengerSendResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { EmailSendT } from "./i18n";
 
 export class MessengerSendRepository {
   static async send(
     data: MessengerSendRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: EmailSendT,
     locale: CountryLanguage,
   ): Promise<ResponseType<MessengerSendResponseOutput>> {
     try {

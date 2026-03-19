@@ -7,10 +7,16 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 
 import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { buildMessagesChannel } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel";
+import { createStreamEvent } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events";
 import { db } from "@/app/api/[locale]/system/db";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 
 import { AbortReason, StreamAbortError } from "./constants";
 
@@ -105,12 +111,81 @@ export async function setStreamingStateAborting(
     .where(eq(chatThreads.id, threadId));
 }
 
-export async function clearStreamingState(threadId: string): Promise<void> {
+export async function clearStreamingState(
+  threadId: string,
+  logger: EndpointLogger,
+): Promise<"idle" | "waiting"> {
+  StreamRegistry.unregister(threadId);
+  const now = new Date();
+
+  // Check for active tasks tied to this thread — if any are still running,
+  // set "waiting" instead of "idle" so the stop button stays visible.
+  const [activeTask] = await db
+    .select({ id: cronTasks.id })
+    .from(cronTasks)
+    .where(
+      and(
+        eq(cronTasks.wakeUpThreadId, threadId),
+        eq(cronTasks.lastExecutionStatus, CronTaskStatus.RUNNING),
+      ),
+    )
+    .limit(1);
+
+  const nextState = activeTask ? "waiting" : "idle";
+
+  const [thread] = await db
+    .update(chatThreads)
+    .set({ streamingState: nextState, updatedAt: now })
+    .where(
+      and(
+        eq(chatThreads.id, threadId),
+        ne(chatThreads.streamingState, "waiting"),
+      ),
+    )
+    .returning({ folderId: chatThreads.folderId });
+
+  // Bubble last-activity to parent folder so it sorts correctly in sidebar
+  if (thread?.folderId) {
+    await db
+      .update(chatFolders)
+      .set({ updatedAt: now })
+      .where(eq(chatFolders.id, thread.folderId));
+  }
+
+  // When a task is in flight, emit STREAMING_STATE_CHANGED: waiting so clients
+  // show the stop button. Emit regardless of whether the DB update matched —
+  // escalateToTask may have already set DB to "waiting" (skipping the update),
+  // but the frontend still needs this event to show the stop button.
+  if (nextState === "waiting") {
+    publishWsEvent(
+      {
+        channel: buildMessagesChannel(threadId),
+        event: "streaming-state-changed",
+        data: createStreamEvent.streamingStateChanged({
+          threadId,
+          state: "waiting",
+        }).data,
+      },
+      logger,
+    );
+  }
+
+  return nextState;
+}
+
+/**
+ * Set streaming state to "waiting": unregister from in-memory map + set streamingState="waiting" in DB.
+ * Used when the stream aborts but a task is still in flight (REMOTE_TOOL_WAIT, STREAM_TIMEOUT).
+ * Revival (via handleTaskCompletion) will set the state back to idle/streaming when the task completes.
+ */
+export async function setStreamingStateWaiting(
+  threadId: string,
+): Promise<void> {
   StreamRegistry.unregister(threadId);
   const now = new Date();
   const [thread] = await db
     .update(chatThreads)
-    .set({ streamingState: "idle", updatedAt: now })
+    .set({ streamingState: "waiting", updatedAt: now })
     .where(eq(chatThreads.id, threadId))
     .returning({ folderId: chatThreads.folderId });
 

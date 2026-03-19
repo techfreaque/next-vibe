@@ -43,7 +43,7 @@ export const translations = {
       interactive: "Enter interactive mode",
     },
     errors: {
-      routeNotFound: "Route not found",
+      routeNotFound: "Tool not found: {{toolName}}",
       executionFailed: "Execution failed",
       unknownError: "Unknown error occurred",
       publicPayloadNotSupported: "Public payload not supported",

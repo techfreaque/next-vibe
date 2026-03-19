@@ -8,11 +8,12 @@ import { dirname, relative } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import { success } from "../../../shared/types/response.schema";
 import { parseError } from "../../../shared/utils/parse-error";
-import { ensureConfigReady } from "../config/repository";
+import { ConfigRepositoryImpl } from "../config/repository";
 import { sortIssuesByLocation } from "../config/shared";
 import type { CheckConfig } from "../config/types";
 import { calculateFilteredSummary, filterIssues } from "../shared/filter-utils";
@@ -23,26 +24,16 @@ import type {
 } from "./definition";
 
 /**
- * Run ESLint Repository Interface
+ * Run ESLint Repository
  */
-export interface LintRepositoryInterface {
-  execute(
+export class LintRepository {
+  static async execute(
     data: LintRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
-    providedConfig?: CheckConfig,
-  ): Promise<ApiResponseType<LintResponseOutput>>;
-}
-
-/**
- * Run ESLint Repository Implementation
- */
-export class LintRepositoryImpl implements LintRepositoryInterface {
-  async execute(
-    data: LintRequestOutput,
-    logger: EndpointLogger,
-    platform: Platform,
-    providedConfig?: CheckConfig,
+    providedConfig: CheckConfig | undefined,
+    signal: AbortSignal,
+    locale: CountryLanguage,
   ): Promise<ApiResponseType<LintResponseOutput>> {
     const isMCP = platform === Platform.MCP;
     try {
@@ -51,7 +42,11 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       if (providedConfig) {
         checkConfig = providedConfig;
       } else {
-        const configResult = await ensureConfigReady(logger, false);
+        const configResult = await ConfigRepositoryImpl.ensureConfigReady(
+          logger,
+          locale,
+          false,
+        );
 
         if (!configResult.ready) {
           return success({
@@ -137,12 +132,13 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         `[ESLINT] Starting execution (path: ${pathDisplay}, fix: ${effectiveData.fix})`,
       );
 
-      const result = await this.executeEslint(
+      const result = await LintRepository.executeEslint(
         effectiveData,
         enabledConfig,
         logger,
         isMCP,
         activeIgnorePatterns,
+        signal,
       );
 
       logger.debug(
@@ -186,7 +182,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
    * Run ESLint once with all target paths (files and/or directories).
    * ESLint handles directory traversal natively — no manual file discovery needed.
    */
-  private async executeEslint(
+  private static async executeEslint(
     data: LintRequestOutput,
     checkConfig: {
       eslint: { enabled: true; configPath: string; cachePath: string };
@@ -194,6 +190,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     logger: EndpointLogger,
     skipFiles = false,
     extraIgnorePatterns?: string[],
+    signal?: AbortSignal,
   ): Promise<LintResponseOutput> {
     const cacheDir = checkConfig.eslint.cachePath;
     await fs.mkdir(dirname(cacheDir), { recursive: true });
@@ -238,10 +235,15 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
 
     const { spawn } = await import("node:child_process");
     const stdout = await new Promise<string>((resolve, reject) => {
+      if (signal?.aborted) {
+        reject(new Error("Aborted"));
+        return;
+      }
       const child = spawn("bunx", args, {
         cwd: process.cwd(),
         stdio: ["ignore", "pipe", "pipe"],
         shell: false,
+        signal,
       });
 
       let output = "";
@@ -280,19 +282,23 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       });
     });
 
-    const result = await this.parseEslintOutput(stdout, data.fix, logger);
+    const result = await LintRepository.parseEslintOutput(
+      stdout,
+      data.fix,
+      logger,
+    );
 
     const sortedIssues = data.skipSorting
       ? result.issues
       : sortIssuesByLocation(result.issues);
 
-    return this.buildResponse(sortedIssues, data, skipFiles);
+    return LintRepository.buildResponse(sortedIssues, data, skipFiles);
   }
 
   /**
    * Build file statistics from issues
    */
-  private buildFileStats(
+  private static buildFileStats(
     issues: LintIssue[],
   ): Map<string, { errors: number; warnings: number; total: number }> {
     const fileStats = new Map<
@@ -322,7 +328,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   /**
    * Format file statistics for response
    */
-  private formatFileStats(
+  private static formatFileStats(
     fileStats: Map<string, { errors: number; warnings: number; total: number }>,
   ): Array<{
     file: string;
@@ -343,7 +349,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   /**
    * Build response with pagination and statistics
    */
-  private buildResponse(
+  private static buildResponse(
     allIssues: LintIssue[],
     data: LintRequestOutput,
     skipFiles = false,
@@ -367,8 +373,8 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         | undefined;
 
       if (!skipFiles) {
-        const fileStats = this.buildFileStats(allIssues);
-        files = this.formatFileStats(fileStats);
+        const fileStats = LintRepository.buildFileStats(allIssues);
+        files = LintRepository.formatFileStats(fileStats);
       }
 
       return { items: undefined, files, ...summary };
@@ -402,8 +408,8 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       | undefined;
 
     if (!skipFiles) {
-      const fileStats = this.buildFileStats(filteredIssues);
-      files = this.formatFileStats(fileStats);
+      const fileStats = LintRepository.buildFileStats(filteredIssues);
+      files = LintRepository.formatFileStats(fileStats);
     }
 
     return {
@@ -416,7 +422,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
   /**
    * Parse ESLint JSON output
    */
-  private async parseEslintOutput(
+  private static async parseEslintOutput(
     stdout: string,
     shouldFix: boolean,
     logger: EndpointLogger,
@@ -499,8 +505,3 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     return { issues, hasFixableIssues };
   }
 }
-
-/**
- * Default repository instance
- */
-export const lintRepository = new LintRepositoryImpl();

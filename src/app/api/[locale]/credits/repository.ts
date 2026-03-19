@@ -75,6 +75,7 @@ import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
 import { withTransaction } from "../system/db/utils/repository-helpers";
+import { FREE_CREDIT_POOL } from "./constants";
 import {
   creditPacks,
   creditTransactions,
@@ -94,44 +95,46 @@ import type {
   CreditsHistoryGetRequestOutput,
   CreditsHistoryGetResponseOutput,
 } from "./history/definition";
-import type { scopedTranslation } from "./i18n";
+import type { CreditsT } from "./i18n";
 import { PublicCapRepository } from "./public-cap/repository";
 
-export type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+export interface CreditIdentifier {
+  userId?: string;
+  leadId?: string;
+}
 
-/**
- * Pool of wallets that share free credits
- */
 export interface CreditPool {
   userWallet: CreditWallet | null;
   leadWallets: CreditWallet[];
   poolId: string;
-  poolType: "USER_POOL" | "LEAD_POOL";
+  poolType: string;
 }
 
-/**
- * Credit Identifier - identifies who owns credits
- */
-export interface CreditIdentifier {
-  leadId?: string;
-  userId?: string;
-}
-
-/**
- * Credit Transaction Interface
- */
 export interface CreditTransactionOutput {
   id: string;
   amount: number;
   balanceAfter: number;
   type: string;
+  modelId?: string | null;
   messageId: string | null;
   createdAt: Date;
 }
 
-/**
- * Credit Repository Interface
- */
+interface GetOrCreateLeadByIpResult {
+  leadId: string;
+  credits: number;
+}
+interface DeductCreditsResult {
+  partial?: boolean;
+}
+interface DeductForModelResult {
+  messageId?: string;
+  partialDeduction?: boolean;
+}
+interface AddReferralBonusResult {
+  packId: string;
+  transactionId: string;
+}
 
 /**
  * Credit Repository Implementation
@@ -152,7 +155,7 @@ export class CreditRepository {
   static async getUserPool(
     userId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<ResponseType<CreditPool>> {
     try {
       // Get user wallet
@@ -203,7 +206,7 @@ export class CreditRepository {
   private static async getUserPoolReadOnly(
     userId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<ResponseType<CreditPool>> {
     try {
       const [userWallet] = await db
@@ -257,7 +260,7 @@ export class CreditRepository {
   static async getLeadPoolOnly(
     leadId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
     try {
@@ -306,7 +309,7 @@ export class CreditRepository {
   static async getLeadPool(
     leadId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
     try {
@@ -828,12 +831,11 @@ export class CreditRepository {
     }
 
     // Enforce pool limit: max 20 free credits can be spent per period
-    const maxFreeCreditsPerPool = 20;
     const freeCreditsAvailable = Math.max(
       0,
       Math.min(
         totalFreeInWallets,
-        maxFreeCreditsPerPool - freeCreditsSpentThisPeriod,
+        FREE_CREDIT_POOL - freeCreditsSpentThisPeriod,
       ),
     );
 
@@ -856,7 +858,7 @@ export class CreditRepository {
   private static async getOrCreateUserWallet(
     userId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<ResponseType<CreditWallet>> {
     const [existingWallet] = await db
       .select()
@@ -984,7 +986,7 @@ export class CreditRepository {
   private static async getOrCreateLeadWallet(
     leadId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditWallet>> {
     const [existingWallet] = await db
@@ -1018,7 +1020,6 @@ export class CreditRepository {
     // Grant free credits only if the lead's pool doesn't already have them
     const now = new Date();
     const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    const maxFreeCreditsPerPool = 20;
 
     // Check if connected leads already have free credits in this period
     const connectedLeadIds = await CreditRepository.findConnectedLeads(leadId);
@@ -1034,11 +1035,11 @@ export class CreditRepository {
       0,
     );
     const initialCredits =
-      poolFreeCredits >= maxFreeCreditsPerPool
+      poolFreeCredits >= FREE_CREDIT_POOL
         ? 0
         : Math.min(
             CreditRepository.getInitialFreeCredits(locale),
-            maxFreeCreditsPerPool - poolFreeCredits,
+            FREE_CREDIT_POOL - poolFreeCredits,
           );
 
     try {
@@ -1294,7 +1295,7 @@ export class CreditRepository {
   static async getBalance(
     identifier: CreditIdentifier,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
@@ -1368,7 +1369,7 @@ export class CreditRepository {
   static async getLeadBalance(
     leadId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
     try {
@@ -1412,7 +1413,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
     try {
       // Side effects first: ensure wallets exist + monthly reset
@@ -1476,8 +1477,8 @@ export class CreditRepository {
     ipAddress: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<{ leadId: string; credits: number }>> {
+    t: CreditsT,
+  ): Promise<ResponseType<GetOrCreateLeadByIpResult>> {
     try {
       // Check if lead exists for this IP
       const [existingLead] = await db
@@ -1577,7 +1578,7 @@ export class CreditRepository {
     amount: number,
     type: "subscription" | "permanent" | "bonus",
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     // Input validation
@@ -1734,7 +1735,7 @@ export class CreditRepository {
     amount: number,
     type: "subscription" | "permanent" | "free",
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     expiresAt?: Date,
     sessionId?: string,
   ): Promise<ResponseType<void>> {
@@ -1854,10 +1855,10 @@ export class CreditRepository {
     feature: string | undefined,
     messageId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
     allowPartial = false, //  allow deducting less than requested
-  ): Promise<ResponseType<void>> {
+  ): Promise<ResponseType<DeductCreditsResult>> {
     // Round amount to 6 decimal places to avoid floating point precision artifacts
     const roundedAmount = Math.round(amount * 1_000_000) / 1_000_000;
 
@@ -2007,7 +2008,6 @@ export class CreditRepository {
             0,
           );
 
-          const maxFreeCreditsPerPool = 20;
           // Re-fetch lead wallets inside transaction with FOR UPDATE to prevent
           // concurrent over-spending of free credits across the pool
           const freshLeadWallets = await tx
@@ -2028,7 +2028,7 @@ export class CreditRepository {
           // even though wallets still show freeCreditsRemaining > 0.
           const freeCreditsAvailableInPool = Math.min(
             actualFreeRemaining,
-            Math.max(0, maxFreeCreditsPerPool - freeCreditsSpentThisPeriod),
+            Math.max(0, FREE_CREDIT_POOL - freeCreditsSpentThisPeriod),
           );
 
           logger.debug("Pool free credit limit check", {
@@ -2354,8 +2354,8 @@ export class CreditRepository {
               poolId: pool.poolId,
               feature,
             });
-            // Return success - we deducted what was available
-            return { success: true as const };
+            // Return partial flag so callers can propagate it
+            return success({ partial: true });
           } else {
             // For tools/endpoints: insufficient credits, rollback without creating record
             const availableCredits = [
@@ -2373,20 +2373,18 @@ export class CreditRepository {
               poolId: pool.poolId,
               feature,
             });
-            return {
-              success: false as const,
-            };
+            return fail({
+              message: t("errors.insufficientCredits"),
+              errorType: ErrorResponseTypes.BAD_REQUEST,
+            });
           }
         }
 
-        return { success: true as const };
+        return success({ partial: false });
       });
 
       if (!result.success) {
-        return fail({
-          message: t("errors.insufficientCredits"),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-        });
+        return result;
       }
 
       logger.debug("Credits deducted from pool", {
@@ -2394,6 +2392,7 @@ export class CreditRepository {
         poolType: pool.poolType,
         amount,
         walletCount: walletsForDeduction.length,
+        partial: result.data.partial,
       });
 
       // Increment global public cap counter for free-tier pools (non-fatal, fire-and-forget)
@@ -2401,7 +2400,7 @@ export class CreditRepository {
         void PublicCapRepository.incrementSpend(amount, logger);
       }
 
-      return success();
+      return success({ partial: result.data.partial });
     } catch (error) {
       logger.error("Failed to deduct credits", parseError(error), {
         ...identifier,
@@ -2428,7 +2427,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -2597,7 +2596,7 @@ export class CreditRepository {
     data: CreditsHistoryGetRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditsHistoryGetResponseOutput>> {
     const { page, limit } = data.paginationInfo;
@@ -2661,7 +2660,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
@@ -2841,7 +2840,7 @@ export class CreditRepository {
    */
   static async expireCredits(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<ResponseType<number>> {
     try {
       const expiredPacks = await db
@@ -2939,7 +2938,7 @@ export class CreditRepository {
     userId: string,
     leadId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<
     ResponseType<{
       userId?: string;
@@ -2995,20 +2994,16 @@ export class CreditRepository {
     cost: number,
     feature: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
-  ): Promise<{
-    success: boolean;
-    messageId?: string;
-    partialDeduction?: boolean;
-  }> {
+  ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
         feature,
         cost,
       });
-      return { success: true };
+      return success({});
     }
 
     try {
@@ -3026,7 +3021,10 @@ export class CreditRepository {
         identifier = { leadId: user.leadId };
       } else {
         logger.error("No identifier for credit deduction", { feature, cost });
-        return { success: false };
+        return fail({
+          message: t("errors.getCreditIdentifierFailed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       const result = await CreditRepository.deductCredits(
@@ -3045,7 +3043,10 @@ export class CreditRepository {
           ...identifier,
           cost,
         });
-        return { success: false };
+        return fail({
+          message: t("errors.deductionFailed"),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
       }
 
       logger.debug(`Credits deducted for ${feature}`, {
@@ -3054,13 +3055,16 @@ export class CreditRepository {
         messageId: creditMessageId,
       });
 
-      return { success: true, messageId: creditMessageId };
+      return success({ messageId: creditMessageId });
     } catch (error) {
       logger.error(`Error deducting credits for ${feature}`, {
         error: error instanceof Error ? error.message : String(error),
         cost,
       });
-      return { success: false };
+      return fail({
+        message: t("errors.deductionFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -3073,15 +3077,11 @@ export class CreditRepository {
     logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
-    t: ModuleT,
-  ): Promise<{
-    success: boolean;
-    messageId?: string;
-    partialDeduction?: boolean;
-  }> {
+    t: CreditsT,
+  ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping TTS credit deduction - zero cost", { cost });
-      return { success: true };
+      return success({});
     }
 
     try {
@@ -3096,7 +3096,10 @@ export class CreditRepository {
         identifier = { leadId: user.leadId };
       } else {
         logger.error("No identifier for TTS credit deduction", { cost });
-        return { success: false };
+        return fail({
+          message: t("errors.getCreditIdentifierFailed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
       const result = await CreditRepository.deductCredits(
         identifier,
@@ -3115,25 +3118,29 @@ export class CreditRepository {
           ...identifier,
           cost,
         });
-        return { success: false };
+        return fail({
+          message: t("errors.deductionFailed"),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
       }
 
+      const partialDeduction = result.data?.partial ?? false;
       logger.debug("TTS credits deducted", {
         ...identifier,
         cost,
         messageId: creditMessageId,
+        partialDeduction,
       });
 
-      return {
-        success: true,
-        messageId: creditMessageId,
-        partialDeduction: false,
-      };
+      return success({ messageId: creditMessageId, partialDeduction });
     } catch (error) {
       logger.error("Failed to deduct TTS credits", parseError(error), {
         cost,
       });
-      return { success: false };
+      return fail({
+        message: t("errors.deductionFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -3144,17 +3151,13 @@ export class CreditRepository {
     user: JwtPayloadType,
     cost: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
-  ): Promise<{
-    success: boolean;
-    messageId?: string;
-    partialDeduction?: boolean;
-  }> {
+  ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping STT credit deduction - zero cost", { cost });
-      return { success: true };
+      return success({});
     }
 
     try {
@@ -3169,7 +3172,10 @@ export class CreditRepository {
         identifier = { leadId: user.leadId };
       } else {
         logger.error("No identifier for STT credit deduction", { cost });
-        return { success: false };
+        return fail({
+          message: t("errors.getCreditIdentifierFailed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
       const result = await CreditRepository.deductCredits(
         identifier,
@@ -3188,25 +3194,29 @@ export class CreditRepository {
           ...identifier,
           cost,
         });
-        return { success: false };
+        return fail({
+          message: t("errors.deductionFailed"),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
       }
 
+      const partialDeduction = result.data?.partial ?? false;
       logger.debug("STT credits deducted", {
         ...identifier,
         cost,
         messageId: creditMessageId,
+        partialDeduction,
       });
 
-      return {
-        success: true,
-        messageId: creditMessageId,
-        partialDeduction: false,
-      };
+      return success({ messageId: creditMessageId, partialDeduction });
     } catch (error) {
       logger.error("Failed to deduct STT credits", parseError(error), {
         cost,
       });
-      return { success: false };
+      return fail({
+        message: t("errors.deductionFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -3220,20 +3230,16 @@ export class CreditRepository {
     cost: number,
     model: ModelId,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
-  ): Promise<{
-    success: boolean;
-    messageId?: string;
-    partialDeduction?: boolean;
-  }> {
+  ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
         model,
         cost,
       });
-      return { success: true };
+      return success({});
     }
 
     try {
@@ -3248,7 +3254,10 @@ export class CreditRepository {
         identifier = { leadId: user.leadId };
       } else {
         logger.error("No identifier for credit deduction", { model, cost });
-        return { success: false };
+        return fail({
+          message: t("errors.getCreditIdentifierFailed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       // Call internal deduct method with allowPartial=true for model usage
@@ -3264,23 +3273,28 @@ export class CreditRepository {
         true, // Allow partial deduction for model usage
       );
 
-      // For model usage, treat partial deduction as success
-      // The transaction will have committed whatever was available
       if (!result.success) {
+        logger.warn(`Model usage: Credit deduction failed`, {
+          ...identifier,
+          requestedCost: cost,
+          model,
+        });
+        return fail({
+          message: t("errors.deductionFailed"),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
+      }
+
+      const partialDeduction = result.data?.partial ?? false;
+      if (partialDeduction) {
         logger.warn(
-          `Model usage: Insufficient credits, deducted what was available`,
+          `Model usage: Partial credit deduction (insufficient funds, deducted to 0)`,
           {
             ...identifier,
             requestedCost: cost,
             model,
           },
         );
-        // Return success with partial flag - we eat the cost difference
-        return {
-          success: true,
-          messageId: creditMessageId,
-          partialDeduction: true,
-        };
       }
 
       logger.debug(`Credits deducted for model usage`, {
@@ -3288,16 +3302,20 @@ export class CreditRepository {
         cost,
         model,
         messageId: creditMessageId,
+        partialDeduction,
       });
 
-      return { success: true, messageId: creditMessageId };
+      return success({ messageId: creditMessageId, partialDeduction });
     } catch (error) {
       logger.error(`Error deducting credits for model`, {
         error: error instanceof Error ? error.message : String(error),
         cost,
         model,
       });
-      return { success: false };
+      return fail({
+        message: t("errors.deductionFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 
@@ -3308,7 +3326,7 @@ export class CreditRepository {
   static async handleCreditPackPurchase(
     session: CreditPackCheckoutSession,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<void> {
     try {
       const userId = session.metadata?.userId;
@@ -3457,7 +3475,7 @@ export class CreditRepository {
     userId: string,
     leadIds: string[],
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Linking lead wallets to user during signup/login", {
@@ -3506,7 +3524,7 @@ export class CreditRepository {
     identifier: CreditIdentifier,
     required: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
   ): Promise<boolean> {
@@ -3546,9 +3564,9 @@ export class CreditRepository {
     commissionPercent: number,
     originalAmountCents: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     sourceUserEmail?: string,
-  ): Promise<ResponseType<{ packId: string; transactionId: string }>> {
+  ): Promise<ResponseType<AddReferralBonusResult>> {
     try {
       // Get or create user wallet
       const walletResult = await CreditRepository.getOrCreateUserWallet(
@@ -3641,7 +3659,7 @@ export class CreditRepository {
   static async getEarnedCreditsBalance(
     userId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<
     ResponseType<{
       total: number;
@@ -3718,7 +3736,7 @@ export class CreditRepository {
     payoutRequestId: string,
     currency: "BTC" | "USDC" | "CREDITS",
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<ResponseType<void>> {
     try {
       const walletResult = await CreditRepository.getOrCreateUserWallet(
@@ -3742,7 +3760,10 @@ export class CreditRepository {
           .limit(1);
 
         if (!lockedWallet) {
-          return { error: "wallet_not_found" } as const;
+          return fail({
+            message: t("errors.deductEarnedCreditsFailed"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
         }
 
         // Get earned packs ordered by creation (FIFO), locked to prevent concurrent reads
@@ -3783,7 +3804,10 @@ export class CreditRepository {
         }
 
         if (remaining > 0) {
-          return { error: "insufficient_earned_credits" } as const;
+          return fail({
+            message: t("errors.deductEarnedCreditsFailed"),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
         }
 
         // Update wallet balance atomically with floor
@@ -3815,20 +3839,11 @@ export class CreditRepository {
           },
         });
 
-        return { error: null } as const;
+        return success();
       });
 
-      if (txResult.error === "wallet_not_found") {
-        return fail({
-          message: t("errors.deductEarnedCreditsFailed"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-      if (txResult.error === "insufficient_earned_credits") {
-        return fail({
-          message: t("errors.deductEarnedCreditsFailed"),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-        });
+      if (!txResult.success) {
+        return txResult;
       }
 
       logger.info("Earned credits deducted for payout", {
@@ -3860,7 +3875,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];

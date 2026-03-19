@@ -13,8 +13,14 @@
  */
 
 import { Box, Text, useInput } from "ink";
-import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  type JSX,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { Path } from "react-hook-form";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";

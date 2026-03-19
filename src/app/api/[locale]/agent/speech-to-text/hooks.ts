@@ -158,8 +158,8 @@ export function useEdenAISpeech({
               textLength: transcribedText.length,
             });
 
-            // Optimistically update credit balance in UI
-            const creditCost = speechToTextDefinitions.POST.credits ?? 0;
+            // Optimistically update credit balance in UI using actual cost from server
+            const creditCost = responseData.creditCost ?? 0;
             if (creditCost > 0) {
               deductCredits(creditCost, "stt");
             }

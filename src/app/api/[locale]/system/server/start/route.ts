@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import startEndpoints from "./definition";
-import { serverStartRepository } from "./repository";
+import { ServerStartRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: startEndpoints,
   [Methods.POST]: {
     handler: ({ data, user, locale, logger }) => {
-      return serverStartRepository.startServer(data, user, locale, logger);
+      return ServerStartRepository.startServer(data, user, locale, logger);
     },
   },
 });

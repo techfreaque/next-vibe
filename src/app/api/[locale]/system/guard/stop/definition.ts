@@ -306,3 +306,8 @@ const { POST } = createEndpoint({
 
 const endpoints = { POST };
 export default endpoints;
+
+export type GuardStopRequestInput = typeof POST.types.RequestInput;
+export type GuardStopRequestOutput = typeof POST.types.RequestOutput;
+export type GuardStopResponseInput = typeof POST.types.ResponseInput;
+export type GuardStopResponseOutput = typeof POST.types.ResponseOutput;

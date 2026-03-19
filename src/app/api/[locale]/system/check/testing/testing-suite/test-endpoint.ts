@@ -1,4 +1,3 @@
-/* eslint-disable i18next/no-literal-string */
 // Testing infrastructure - test descriptions are for developers, not end users
 
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";

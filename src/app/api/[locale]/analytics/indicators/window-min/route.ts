@@ -11,14 +11,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeWindowMin } from "./repository";
+import { WindowMinIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, size, resolution, lookback } = data;
-      const result = computeWindowMin(source, size);
+      const result = WindowMinIndicatorRepository.computeWindowMin(
+        source,
+        size,
+      );
       return success({
         result,
         meta: {

@@ -7,3 +7,5 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
 });
+
+export type InboxMoveT = ReturnType<typeof scopedTranslation.scopedT>["t"];

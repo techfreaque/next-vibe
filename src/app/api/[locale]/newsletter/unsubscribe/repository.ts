@@ -27,9 +27,7 @@ import type {
   UnsubscribePostRequestOutput,
   UnsubscribePostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { NewsletterUnsubscribeT } from "./i18n";
 
 export class NewsletterUnsubscribeRepository {
   static async unsubscribe(
@@ -37,7 +35,7 @@ export class NewsletterUnsubscribeRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: NewsletterUnsubscribeT,
   ): Promise<ResponseType<UnsubscribePostResponseOutput>> {
     try {
       logger.debug("Starting newsletter unsubscription", {

@@ -25,7 +25,7 @@ import { LeadSource, LeadStatus } from "../enum";
 
 /**
  */
-export interface ClientInfo {
+interface ClientInfo {
   userAgent?: string;
   ipAddress?: string;
   referer?: string;

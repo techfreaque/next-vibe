@@ -23,20 +23,18 @@ import type {
   HealthCheckRequestOutput,
   HealthCheckResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { ServerHealthT } from "./i18n";
 
 /**
- * Health Check Repository Implementation
+ * Health Check Repository
  */
-export class HealthCheckRepositoryImpl {
-  private startTime = Date.now();
+export class HealthCheckRepository {
+  private static startTime = Date.now();
 
-  async checkHealth(
+  static async checkHealth(
     data: HealthCheckRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ServerHealthT,
     locale: CountryLanguage,
   ): Promise<ResponseType<HealthCheckResponseOutput>> {
     const checkStart = performance.now();
@@ -59,13 +57,16 @@ export class HealthCheckRepositoryImpl {
       const envInfo = getCurrentEnvironmentInfo();
 
       // Basic health check
-      const basicCheck = await this.performBasicCheck();
+      const basicCheck = await HealthCheckRepository.performBasicCheck();
       checks.push(basicCheck);
 
       // Database health check
       let databaseStatus;
       if (data.includeDatabase) {
-        const dbCheck = await this.performDatabaseCheck(logger, locale);
+        const dbCheck = await HealthCheckRepository.performDatabaseCheck(
+          logger,
+          locale,
+        );
         checks.push(dbCheck);
         databaseStatus = {
           status:
@@ -82,7 +83,7 @@ export class HealthCheckRepositoryImpl {
       // Task runner health check
       let tasksStatus;
       if (data.includeTasks) {
-        const taskCheck = await this.performTaskCheck();
+        const taskCheck = await HealthCheckRepository.performTaskCheck();
         checks.push(taskCheck);
         tasksStatus = {
           runnerStatus:
@@ -102,22 +103,23 @@ export class HealthCheckRepositoryImpl {
       // System health check
       let systemStatus;
       if (data.includeSystem) {
-        const sysCheck = await this.performSystemCheck();
+        const sysCheck = await HealthCheckRepository.performSystemCheck();
         checks.push(sysCheck);
         systemStatus = {
-          memory: this.getMemoryInfo(),
-          cpu: this.getCpuInfo(),
-          disk: this.getDiskInfo(),
+          memory: HealthCheckRepository.getMemoryInfo(),
+          cpu: HealthCheckRepository.getCpuInfo(),
+          disk: HealthCheckRepository.getDiskInfo(),
         };
       }
 
       // Determine overall status
-      const overallStatus = this.determineOverallStatus(checks);
+      const overallStatus =
+        HealthCheckRepository.determineOverallStatus(checks);
 
       const response: HealthCheckResponseOutput = {
         status: overallStatus,
         timestamp: new Date().toISOString(),
-        uptime: Date.now() - this.startTime,
+        uptime: Date.now() - HealthCheckRepository.startTime,
         environment: {
           name: envInfo.environment,
           nodeEnv: envInfo.nodeEnv,
@@ -167,7 +169,7 @@ export class HealthCheckRepositoryImpl {
   /**
    * Perform basic health check
    */
-  private performBasicCheck(): Promise<{
+  private static performBasicCheck(): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -209,7 +211,7 @@ export class HealthCheckRepositoryImpl {
   /**
    * Perform database health check
    */
-  private async performDatabaseCheck(
+  private static async performDatabaseCheck(
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<{
@@ -222,11 +224,11 @@ export class HealthCheckRepositoryImpl {
 
     try {
       // Import database utilities
-      const { dbUtilsRepository } = await import("../../db/utils/repository");
+      const { DbUtilsRepository } = await import("../../db/utils/repository");
 
       // Test database connection
       const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
-      const connectionResult = await dbUtilsRepository.testConnection(
+      const connectionResult = await DbUtilsRepository.testConnection(
         dbUtilsT,
         logger,
       );
@@ -258,7 +260,7 @@ export class HealthCheckRepositoryImpl {
   /**
    * Perform task runner health check
    */
-  private performTaskCheck(): Promise<{
+  private static performTaskCheck(): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -299,7 +301,7 @@ export class HealthCheckRepositoryImpl {
   /**
    * Perform system health check
    */
-  private performSystemCheck(): Promise<{
+  private static performSystemCheck(): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -308,7 +310,7 @@ export class HealthCheckRepositoryImpl {
     const start = performance.now();
 
     try {
-      const memoryInfo = this.getMemoryInfo();
+      const memoryInfo = HealthCheckRepository.getMemoryInfo();
 
       if (memoryInfo.percentage > 90) {
         return Promise.resolve({
@@ -338,7 +340,11 @@ export class HealthCheckRepositoryImpl {
   /**
    * Get memory information
    */
-  private getMemoryInfo(): { used: number; total: number; percentage: number } {
+  private static getMemoryInfo(): {
+    used: number;
+    total: number;
+    percentage: number;
+  } {
     const memoryUsage = process.memoryUsage();
     return {
       used: memoryUsage.heapUsed,
@@ -350,7 +356,7 @@ export class HealthCheckRepositoryImpl {
   /**
    * Get CPU information
    */
-  private getCpuInfo(): { usage: number; loadAverage: number[] } {
+  private static getCpuInfo(): { usage: number; loadAverage: number[] } {
     const loadAverageValues =
       process.platform === "win32" ? [0, 0, 0] : loadavg();
     return {
@@ -362,7 +368,7 @@ export class HealthCheckRepositoryImpl {
   /**
    * Get disk information
    */
-  private getDiskInfo(): {
+  private static getDiskInfo(): {
     available: number;
     total: number;
     percentage: number;
@@ -383,7 +389,7 @@ export class HealthCheckRepositoryImpl {
   /**
    * Determine overall status from individual checks
    */
-  private determineOverallStatus(
+  private static determineOverallStatus(
     checks: Array<{ status: "pass" | "fail" | "warn" }>,
   ): "healthy" | "warning" | "critical" | "unknown" {
     const hasFailures = checks.some((check) => check.status === "fail");
@@ -399,8 +405,3 @@ export class HealthCheckRepositoryImpl {
     return "unknown";
   }
 }
-
-/**
- * Default repository instance
- */
-export const healthCheckRepository = new HealthCheckRepositoryImpl();

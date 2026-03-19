@@ -4,7 +4,6 @@
  */
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 import type { EnvironmentSeeds } from "@/app/api/[locale]/system/db/seed/seed-manager";
 

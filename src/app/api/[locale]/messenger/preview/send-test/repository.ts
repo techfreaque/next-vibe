@@ -19,14 +19,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
-import type { scopedTranslation } from "../../i18n";
+import type { EmailsT } from "../../i18n";
 import { getTemplate } from "../../registry/generated";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 // Type definitions
-export interface SendTestRequestType {
+interface SendTestRequestType {
   templateId: string;
   recipientEmail: string;
   language: Languages;
@@ -40,24 +38,13 @@ interface SendTestResponseType {
 }
 
 /**
- * Email Preview Send Test Repository Interface
+ * Email Preview Send Test Repository
  */
-interface EmailPreviewSendTestRepository {
-  sendTest(
+export class EmailPreviewSendTestRepository {
+  static async sendTest(
     data: SendTestRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<BaseResponseType<SendTestResponseType>>;
-}
-
-/**
- * Email Preview Send Test Repository Implementation
- */
-class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestRepository {
-  async sendTest(
-    data: SendTestRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
+    t: EmailsT,
   ): Promise<BaseResponseType<SendTestResponseType>> {
     try {
       logger.debug("Sending test email", {
@@ -179,6 +166,3 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
     }
   }
 }
-
-export const emailPreviewSendTestRepository =
-  new EmailPreviewSendTestRepositoryImpl();

@@ -8,13 +8,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { dockerOperationsRepository as repository } from "./repository";
+import { DockerOperationsRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, t, logger }) => {
-      return repository.executeCommand(data, t, logger);
+      return DockerOperationsRepository.executeCommand(data, t, logger);
     },
   },
 });

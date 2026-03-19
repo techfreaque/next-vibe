@@ -3,8 +3,6 @@
  * Ensures only one instance of each type runs at a time and enables rebuild signaling via SIGUSR1
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import { execSync } from "node:child_process";
 import {
   existsSync,

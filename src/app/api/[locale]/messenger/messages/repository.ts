@@ -39,14 +39,18 @@ import type {
 } from "./list/definition";
 import { scopedTranslation } from "./list/i18n";
 
+interface CreateEmailResult {
+  id: string;
+}
+
 /**
  * Emails Repository Implementation
  */
-class EmailsRepositoryImpl {
+export class EmailsRepository {
   /**
    * Get paginated list of emails with filtering and sorting
    */
-  async getEmails(
+  static async getEmails(
     data: EmailsListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -263,7 +267,7 @@ class EmailsRepositoryImpl {
   /**
    * Get email by ID
    */
-  async getEmailById(
+  static async getEmailById(
     urlPathParams: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
@@ -328,11 +332,11 @@ class EmailsRepositoryImpl {
   /**
    * Create a new email record
    */
-  async create(
+  static async create(
     data: NewEmail,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ id: string }>> {
+  ): Promise<ResponseType<CreateEmailResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const [result] = await db
@@ -358,8 +362,3 @@ class EmailsRepositoryImpl {
     }
   }
 }
-
-export const emailsRepository = new EmailsRepositoryImpl();
-
-// Export as emailRepository for backwards compatibility with seeds
-export const emailRepository = emailsRepository;

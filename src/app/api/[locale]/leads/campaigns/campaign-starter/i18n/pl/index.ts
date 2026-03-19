@@ -75,5 +75,6 @@ export const translations: typeof enTranslations = {
       description:
         "Wystąpił błąd podczas przetwarzania żądania startera kampanii",
     },
+    invalidTransition: "Nieprawidłowe przejście statusu dla startu kampanii",
   },
 };

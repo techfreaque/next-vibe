@@ -40,6 +40,8 @@ export enum StreamEventType {
   STREAM_FINISHED = "stream-finished",
   // Async remote task completed — client should re-trigger AI stream to continue
   TASK_COMPLETED = "task-completed",
+  // Thread streaming state changed (e.g. stream ended but task is still in flight → "waiting")
+  STREAMING_STATE_CHANGED = "streaming-state-changed",
 }
 
 /**
@@ -254,6 +256,8 @@ export interface StreamFinishedEventData {
   threadId: string;
   /** How the stream ended: "completed" | "cancelled" | "error" | "timeout" */
   reason: "completed" | "cancelled" | "error" | "timeout";
+  /** Final thread streaming state — "waiting" means a task is still in flight */
+  finalState: "idle" | "waiting";
 }
 
 /**
@@ -278,6 +282,16 @@ export interface TaskCompletedEventData {
     sequenceId: string | null;
     toolCall: ToolCall;
   };
+}
+
+/**
+ * Streaming state changed event data
+ * Emitted when the thread's streamingState changes server-side (e.g. → "waiting" when
+ * escalateToTask fires and the stream is about to die but the task is still running).
+ */
+export interface StreamingStateChangedEventData {
+  threadId: string;
+  state: "idle" | "streaming" | "aborting" | "waiting";
 }
 
 /**
@@ -311,6 +325,8 @@ export interface StreamEventDataMap {
   [StreamEventType.STREAM_FINISHED]: StreamFinishedEventData;
   // Async task completion — triggers AI stream resume
   [StreamEventType.TASK_COMPLETED]: TaskCompletedEventData;
+  // Thread streaming state changed
+  [StreamEventType.STREAMING_STATE_CHANGED]: StreamingStateChangedEventData;
 }
 
 /**
@@ -454,6 +470,13 @@ export const createStreamEvent = {
     data: TaskCompletedEventData,
   ): StreamEvent<StreamEventType.TASK_COMPLETED> => ({
     type: StreamEventType.TASK_COMPLETED,
+    data,
+  }),
+
+  streamingStateChanged: (
+    data: StreamingStateChangedEventData,
+  ): StreamEvent<StreamEventType.STREAMING_STATE_CHANGED> => ({
+    type: StreamEventType.STREAMING_STATE_CHANGED,
     data,
   }),
 };

@@ -38,11 +38,11 @@ export async function loadRemoteInstancesData(
   }
 
   try {
-    const { getAllActiveConnections, getLocalInstanceId } =
+    const { RemoteConnectionRepository } =
       await import("@/app/api/[locale]/user/remote-connection/repository");
     const [connections, localId] = await Promise.all([
-      getAllActiveConnections(userId),
-      getLocalInstanceId(userId),
+      RemoteConnectionRepository.getAllActiveConnections(userId),
+      RemoteConnectionRepository.getLocalInstanceId(userId),
     ]);
 
     if (connections.length === 0) {

@@ -1,10 +1,28 @@
 /**
  * Claude Code Repository
- * Two modes controlled by the `headless` flag:
- * - headless:false (default): opens a NEW terminal window with `claude` so the
- *   human can interact without log collision from the Next.js dev server.
- * - headless:true: spawns `claude -p` in the same process and pipes output back.
- * Both modes require a prompt.
+ *
+ * Two modes controlled by `interactiveMode`:
+ *
+ * BATCH MODE (interactiveMode:false, DEFAULT)
+ *   Runs `claude -p` synchronously and returns output directly.
+ *   execute-tool's outer layer handles all callbackModes transparently —
+ *   no special handling needed here.
+ *
+ * INTERACTIVE MODE (interactiveMode:true)
+ *   Opens a terminal window. The session can run for hours or days.
+ *
+ *   When called from a streaming context (streamContext.escalateToTask present):
+ *   escalateToTask() creates the tracking task, sets waitingForRemoteResult so
+ *   the stream aborts via REMOTE_TOOL_WAIT (stays visible + cancellable), and
+ *   handles revival when CC calls complete-task. The callbackMode is taken from
+ *   streamContext.callerCallbackMode so wait/wakeUp/detach/endLoop all work.
+ *
+ *   When called from a goroutine (cronTaskId present, no escalateToTask):
+ *   Manual task creation with revival columns copied from parent task row.
+ *
+ *   When called from CLI/cron (no context): spawn detached, no revival.
+ *
+ *   Cleanup: complete-task deletes the tracking task row after revival.
  */
 
 import "server-only";
@@ -12,6 +30,7 @@ import "server-only";
 import { execSync, spawn } from "node:child_process";
 import { once } from "node:events";
 
+import { eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -22,33 +41,19 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import {
   CronTaskPriority,
+  CronTaskStatus,
   TaskCategory,
+  TaskOutputMode,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-// Ain't got time for that
-const YOLO_MODE = true;
-
-/**
- * Check if a command exists on the system.
- */
-function commandExists(cmd: string): boolean {
-  try {
-    execSync(`command -v ${cmd}`, { stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
-  }
-}
+import type { ClaudeCodeT } from "./i18n";
 
 interface TerminalEmulator {
   bin: string;
@@ -56,268 +61,161 @@ interface TerminalEmulator {
   buildArgs: (claudeArgs: string[], cwd: string) => string[];
 }
 
-/**
- * Build a shell command string that cd's into cwd and runs claude with args.
- */
-function buildShellCommand(claudeArgs: string[], cwd: string): string {
-  const escaped = claudeArgs.map((a) => `'${a.replace(/'/g, "'\\''")}'`);
-  return `cd '${cwd.replace(/'/g, "'\\''")}' && claude ${escaped.join(" ")}`;
-}
+export class ClaudeCodeRepository {
+  // Ain't got time for that
+  private static readonly YOLO_MODE = true;
 
-/**
- * Detect the best available terminal emulator.
- * Checks $TERMINAL env var first, then probes common emulators.
- */
-function detectTerminal(logger: EndpointLogger): TerminalEmulator | undefined {
-  const isMac = process.platform === "darwin";
+  /**
+   * Check if a command exists on the system.
+   */
+  private static commandExists(cmd: string): boolean {
+    try {
+      execSync(`command -v ${cmd}`, { stdio: "ignore" });
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
-  // macOS: use open -a Terminal (or iTerm if available)
-  if (isMac) {
-    // Prefer iTerm2, fall back to Terminal.app
-    const macApp = commandExists("osascript") ? "osascript" : undefined;
-    if (macApp) {
+  /**
+   * Build a shell command string that cd's into cwd and runs claude with args.
+   */
+  private static buildShellCommand(claudeArgs: string[], cwd: string): string {
+    const escaped = claudeArgs.map((a) => `'${a.replace(/'/g, "'\\''")}'`);
+    return `cd '${cwd.replace(/'/g, "'\\''")}' && claude ${escaped.join(" ")}`;
+  }
+
+  /**
+   * Detect the best available terminal emulator.
+   * Checks $TERMINAL env var first, then probes common emulators.
+   */
+  private static detectTerminal(
+    logger: EndpointLogger,
+  ): TerminalEmulator | undefined {
+    const isMac = process.platform === "darwin";
+
+    // macOS: use open -a Terminal (or iTerm if available)
+    if (isMac) {
+      const macApp = ClaudeCodeRepository.commandExists("osascript")
+        ? "osascript"
+        : undefined;
+      if (macApp) {
+        return {
+          bin: "osascript",
+          buildArgs: (claudeArgs, cwd) => {
+            const shellCmd = ClaudeCodeRepository.buildShellCommand(
+              claudeArgs,
+              cwd,
+            );
+            return [
+              "-e",
+              `tell application "Terminal" to do script "${shellCmd.replace(/"/g, '\\"')}"`,
+            ];
+          },
+        };
+      }
+      return undefined;
+    }
+
+    // Linux / other Unix: try emulators in priority order
+
+    // 1. $TERMINAL env var (user's explicit preference)
+    const envTerminal = process.env["TERMINAL"];
+    if (envTerminal && ClaudeCodeRepository.commandExists(envTerminal)) {
+      logger.info("Using $TERMINAL", { terminal: envTerminal });
       return {
-        bin: "osascript",
-        buildArgs: (claudeArgs, cwd) => {
-          const shellCmd = buildShellCommand(claudeArgs, cwd);
-          // AppleScript to open Terminal.app with a command
-          return [
-            "-e",
-            `tell application "Terminal" to do script "${shellCmd.replace(/"/g, '\\"')}"`,
-          ];
-        },
+        bin: envTerminal,
+        buildArgs: (claudeArgs, cwd) => [
+          "-e",
+          ClaudeCodeRepository.buildShellCommand(claudeArgs, cwd),
+        ],
       };
     }
+
+    // 2. Common terminal emulators with their specific exec flags
+    const candidates: Array<{
+      bin: string;
+      execFlag: string[];
+    }> = [
+      { bin: "x-terminal-emulator", execFlag: ["-e"] },
+      { bin: "kitty", execFlag: ["--"] },
+      { bin: "alacritty", execFlag: ["-e"] },
+      { bin: "wezterm", execFlag: ["start", "--"] },
+      { bin: "gnome-terminal", execFlag: ["--"] },
+      { bin: "konsole", execFlag: ["-e"] },
+      { bin: "xfce4-terminal", execFlag: ["-e"] },
+      { bin: "mate-terminal", execFlag: ["-e"] },
+      { bin: "xterm", execFlag: ["-e"] },
+    ];
+
+    for (const candidate of candidates) {
+      if (ClaudeCodeRepository.commandExists(candidate.bin)) {
+        logger.info("Detected terminal emulator", { terminal: candidate.bin });
+        return {
+          bin: candidate.bin,
+          buildArgs: (claudeArgs, cwd) => {
+            const shellCmd = ClaudeCodeRepository.buildShellCommand(
+              claudeArgs,
+              cwd,
+            );
+            return [...candidate.execFlag, "sh", "-c", shellCmd];
+          },
+        };
+      }
+    }
+
     return undefined;
   }
 
-  // Linux / other Unix: try emulators in priority order
-
-  // 1. $TERMINAL env var (user's explicit preference)
-  const envTerminal = process.env["TERMINAL"];
-  if (envTerminal && commandExists(envTerminal)) {
-    logger.info("Using $TERMINAL", { terminal: envTerminal });
-    return {
-      bin: envTerminal,
-      buildArgs: (claudeArgs, cwd) => [
-        "-e",
-        buildShellCommand(claudeArgs, cwd),
-      ],
-    };
-  }
-
-  // 2. Common terminal emulators with their specific exec flags
-  const candidates: Array<{
-    bin: string;
-    execFlag: string[];
-  }> = [
-    // Debian/Ubuntu system default
-    { bin: "x-terminal-emulator", execFlag: ["-e"] },
-    // Popular modern terminals
-    { bin: "kitty", execFlag: ["--"] },
-    { bin: "alacritty", execFlag: ["-e"] },
-    { bin: "wezterm", execFlag: ["start", "--"] },
-    // Desktop environment defaults
-    { bin: "gnome-terminal", execFlag: ["--"] },
-    { bin: "konsole", execFlag: ["-e"] },
-    { bin: "xfce4-terminal", execFlag: ["-e"] },
-    { bin: "mate-terminal", execFlag: ["-e"] },
-    // Fallback
-    { bin: "xterm", execFlag: ["-e"] },
-  ];
-
-  for (const candidate of candidates) {
-    if (commandExists(candidate.bin)) {
-      logger.info("Detected terminal emulator", { terminal: candidate.bin });
-      return {
-        bin: candidate.bin,
-        buildArgs: (claudeArgs, cwd) => {
-          const shellCmd = buildShellCommand(claudeArgs, cwd);
-          // Most terminals accept: terminal -e sh -c "command"
-          return [...candidate.execFlag, "sh", "-c", shellCmd];
-        },
-      };
-    }
-  }
-
-  return undefined;
-}
-
-/**
- * Spawn claude in a separate terminal window for interactive mode.
- * Returns immediately once the terminal is launched — we don't wait for
- * the claude session to finish since it's in its own window.
- */
-function spawnInTerminal(
-  terminal: TerminalEmulator,
-  claudeArgs: string[],
-  cwd: string,
-  logger: EndpointLogger,
-): void {
-  const termArgs = terminal.buildArgs(claudeArgs, cwd);
-  logger.info("Spawning terminal", {
-    bin: terminal.bin,
-    args: termArgs,
-  });
-
-  spawn(terminal.bin, termArgs, {
-    cwd,
-    env: process.env,
-    stdio: "ignore",
-    detached: true,
-  }).unref();
-}
-
-export async function runClaudeCode(
-  data: RunRequestOutput,
-  logger: EndpointLogger,
-  t: ModuleT,
-  cronTaskId?: string,
-  streamContext?: ToolExecutionContext,
-): Promise<ResponseType<RunResponseOutput>> {
-  const timeoutMs = (data.timeoutSeconds ?? 600) * 1000;
-  const start = Date.now();
-  const isInteractive = data.interactiveMode ?? false;
-  const cwd = process.cwd();
-
-  // Batch mode with long timeout: escalate to wakeUp task so the stream doesn't time out.
-  // Interactive mode opens a terminal — returns immediately, no escalation needed.
-  // Escalate if timeoutMs exceeds stream timeout threshold (89s).
-  if (!isInteractive && timeoutMs > 89_000 && streamContext?.escalateToTask) {
-    const { taskId, onComplete } = await streamContext.escalateToTask();
-    logger.info("[ClaudeCode] Escalated batch run to wakeUp task", {
-      taskId,
-      timeoutMs,
-      prompt: data.prompt.slice(0, 100),
+  /**
+   * Spawn claude in a separate terminal window for interactive mode.
+   * Returns immediately once the terminal is launched.
+   */
+  private static spawnInTerminal(
+    terminal: TerminalEmulator,
+    claudeArgs: string[],
+    cwd: string,
+    logger: EndpointLogger,
+  ): void {
+    const termArgs = terminal.buildArgs(claudeArgs, cwd);
+    logger.info("Spawning terminal", {
+      bin: terminal.bin,
+      args: termArgs,
     });
 
-    void (async (): Promise<void> => {
-      const result = await runClaudeCode(data, logger, t, cronTaskId);
-      await onComplete({
-        success: result.success,
-        data: result.success
-          ? (result.data as Record<string, JsonValue>)
-          : undefined,
-        message: result.success ? undefined : result.message,
-      });
-    })();
-
-    return success({
-      output: `[Task escalated — result will be injected when complete. taskId=${taskId}]`,
-      exitCode: 0,
-      durationMs: 0,
-    });
+    spawn(terminal.bin, termArgs, {
+      cwd,
+      env: { ...process.env, CLAUDECODE: undefined },
+      stdio: "ignore",
+      detached: true,
+    }).unref();
   }
 
-  // ── Auto-create a cron task for tracking when none was provided ──
-  let effectiveTaskId = cronTaskId;
-  if (!effectiveTaskId && isInteractive) {
-    const taskId = `cc-${Date.now()}`;
-    const title =
-      data.taskTitle || data.prompt.slice(0, 80).replace(/\n/g, " ");
-    try {
-      const { deriveDefaultSelfInstanceId } =
-        await import("@/app/api/[locale]/user/remote-connection/repository");
-      const instanceId = deriveDefaultSelfInstanceId();
-      await db.insert(cronTasks).values({
-        id: taskId,
-        shortId: taskId,
-        routeId: "claude-code",
-        displayName: title,
-        description: data.prompt.slice(0, 500),
-        category: TaskCategory.DEVELOPMENT,
-        schedule: "manual",
-        enabled: false,
-        priority: CronTaskPriority.LOW,
-        runOnce: true,
-        targetInstance: instanceId,
-        tags: ["claude-code", "interactive"],
-      });
-      effectiveTaskId = taskId;
-      logger.info("Auto-created tracking task for interactive session", {
-        taskId,
-        title,
-      });
-    } catch (err) {
-      // Non-fatal — continue without tracking
-      logger.warn("Failed to auto-create tracking task", parseError(err));
-    }
-  }
-
-  // Build claude CLI args
-  const args: string[] = isInteractive
-    ? [data.prompt]
-    : ["-p", data.prompt, "--output-format", "text"];
-  if (YOLO_MODE) {
-    args.push("--dangerously-skip-permissions");
-  }
-  if (data.model) {
-    args.push("--model", data.model);
-  }
-  // if (data.maxBudgetUsd !== undefined && data.maxBudgetUsd !== null) {
-  //   args.push("--max-budget-usd", String(data.maxBudgetUsd));
-  // }
-  // For interactive mode, append task context to the prompt itself
-  // (--system-prompt gets mangled by shell escaping through terminal emulators)
-  if (effectiveTaskId && isInteractive) {
-    args[0] = `${args[0]}\n\n[TASK CONTEXT] cronTaskId=${effectiveTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${effectiveTaskId}", status="status.completed"|"status.failed", and a brief summary of what was done.`;
-  }
-  // if (data.availableTools) {
-  //   args.push("--availableTools", data.availableTools);
-  // }
-
-  logger.info("Running Claude Code CLI", {
-    mode: isInteractive ? "interactive" : "batch",
-    prompt: data.prompt.slice(0, 200),
-    model: data.model,
-    timeoutMs,
-    taskId: effectiveTaskId,
-  });
-
-  // ── Interactive mode: open in a separate terminal window ──
-  if (isInteractive) {
-    const terminal = detectTerminal(logger);
-
-    if (terminal) {
-      try {
-        spawnInTerminal(terminal, args, cwd, logger);
-      } catch (err) {
-        logger.error("Failed to spawn terminal", parseError(err));
-        return fail({
-          message: t("claudeCode.run.post.errors.internal.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
-      const durationMs = Date.now() - start;
-      logger.info("Claude Code interactive session launched in terminal", {
-        terminal: terminal.bin,
-        durationMs,
-        taskLifecycleManagedExternally: !!effectiveTaskId,
-      });
-
-      return {
-        success: true as const,
-        data: {
-          output: `Opened interactive Claude Code session in ${terminal.bin}`,
-          exitCode: 0,
-          durationMs,
-        },
-        // When launched with a cron task ID, the session manages its own lifecycle
-        // via the complete-task MCP tool — tell the runner not to auto-complete.
-        ...(effectiveTaskId && {
-          taskLifecycleManagedExternally: true as const,
-        }),
-      };
-    }
-
-    // Fallback: no terminal emulator found — use inherited stdio
-    logger.warn("No terminal emulator found, falling back to inherited stdio");
+  /**
+   * Core batch execution: spawns `claude -p` and collects output.
+   */
+  private static async runClaudeCodeBatch(
+    args: string[],
+    cwd: string,
+    timeoutMs: number,
+    logger: EndpointLogger,
+    t: ClaudeCodeT,
+  ): Promise<ResponseType<RunResponseOutput>> {
+    const start = Date.now();
+    const stdoutChunks: Buffer[] = [];
+    const stderrChunks: Buffer[] = [];
 
     const child = spawn("claude", args, {
       cwd,
       env: process.env,
-      stdio: "inherit",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    child.stdout?.on("data", (chunk: Buffer) => {
+      stdoutChunks.push(chunk);
+    });
+    child.stderr?.on("data", (chunk: Buffer) => {
+      stderrChunks.push(chunk);
     });
 
     const timer = setTimeout(() => {
@@ -339,66 +237,287 @@ export async function runClaudeCode(
     const durationMs = Date.now() - start;
     const exitCode = child.exitCode ?? 1;
 
-    logger.info("Claude Code interactive session finished (inherited stdio)", {
+    const stdout = Buffer.concat(stdoutChunks).toString("utf8");
+    const stderr = Buffer.concat(stderrChunks).toString("utf8");
+
+    logger.debug("Claude Code batch finished", {
       exitCode,
       durationMs,
+      stdoutLength: stdout.length,
+      stderrLength: stderr.length,
     });
-    return success({ output: "", exitCode, durationMs });
-  }
 
-  // ── Batch mode: pipe output back ──
-  const stdoutChunks: Buffer[] = [];
-  const stderrChunks: Buffer[] = [];
+    if (exitCode !== 0) {
+      const errOutput = stderr
+        ? `${stdout}\n\n--- stderr ---\n${stderr}`
+        : stdout;
+      logger.warn("Claude Code exited with non-zero code", {
+        exitCode,
+        errOutput: errOutput.slice(0, 200),
+      });
+      return fail({
+        message: t("claudeCode.run.post.errors.internalExitCode.title"),
+        messageParams: { exitCode: String(exitCode) },
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
 
-  const child = spawn("claude", args, {
-    cwd,
-    env: process.env,
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+    const output = stderr ? `${stdout}\n\n--- stderr ---\n${stderr}` : stdout;
 
-  child.stdout?.on("data", (chunk: Buffer) => {
-    stdoutChunks.push(chunk);
-    process.stdout.write(chunk);
-  });
-  child.stderr?.on("data", (chunk: Buffer) => {
-    stderrChunks.push(chunk);
-    process.stderr.write(chunk);
-  });
-
-  const timer = setTimeout(() => {
-    child.kill("SIGTERM");
-  }, timeoutMs);
-
-  try {
-    await once(child, "close");
-  } catch (err) {
-    clearTimeout(timer);
-    logger.error("Claude Code CLI failed to spawn", parseError(err));
-    return fail({
-      message: t("claudeCode.run.post.errors.internal.title"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    return success({
+      output: output || "",
+      durationMs,
     });
   }
 
-  clearTimeout(timer);
-  const durationMs = Date.now() - start;
-  const exitCode = child.exitCode ?? 1;
+  static async runClaudeCode(
+    data: RunRequestOutput,
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: ClaudeCodeT,
+    cronTaskId: string | undefined,
+    streamContext: ToolExecutionContext | undefined,
+  ): Promise<ResponseType<RunResponseOutput>> {
+    const timeoutMs = 30 * 60 * 1000; // 30 minutes hard cap
+    const start = Date.now();
+    const isInteractive = data.interactiveMode ?? false;
+    const cwd = process.cwd();
 
-  const stdout = Buffer.concat(stdoutChunks).toString("utf8");
-  const stderr = Buffer.concat(stderrChunks).toString("utf8");
+    // Build claude CLI args
+    const args: string[] = isInteractive
+      ? [data.prompt]
+      : ["-p", data.prompt, "--output-format", "text"];
+    if (ClaudeCodeRepository.YOLO_MODE) {
+      args.push("--dangerously-skip-permissions");
+    }
+    if (data.model) {
+      args.push("--model", data.model);
+    }
 
-  logger.info("Claude Code batch finished", {
-    exitCode,
-    durationMs,
-    stdoutLength: stdout.length,
-    stderrLength: stderr.length,
-  });
+    logger.debug("Running Claude Code CLI", {
+      mode: isInteractive ? "interactive" : "batch",
+      prompt: data.prompt.slice(0, 200),
+      model: data.model,
+      timeoutMs,
+      taskId: cronTaskId,
+    });
 
-  const output = stderr ? `${stdout}\n\n--- stderr ---\n${stderr}` : stdout;
+    // ── Interactive mode ────────────────────────────────────────────────────────
+    if (isInteractive) {
+      const title =
+        data.taskTitle || data.prompt.slice(0, 80).replace(/\n/g, " ");
 
-  return success({
-    output: output || "No output",
-    exitCode,
-    durationMs,
-  });
+      // ── Path 1: streaming context with escalateToTask (the normal AI-call path) ──
+      // escalateToTask creates the tracking task, aborts the stream via REMOTE_TOOL_WAIT
+      // (stays visible + cancellable), and handles revival when CC calls complete-task.
+      if (streamContext?.escalateToTask) {
+        const callbackMode =
+          streamContext.callerCallbackMode ?? CallbackMode.WAKE_UP;
+        const { taskId: trackingTaskId } = await streamContext.escalateToTask({
+          callbackMode,
+          displayName: title,
+        });
+
+        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} — pass the complete result in the response object so the AI that launched you can see it.`;
+
+        const terminal = ClaudeCodeRepository.detectTerminal(logger);
+        if (terminal) {
+          try {
+            ClaudeCodeRepository.spawnInTerminal(terminal, args, cwd, logger);
+          } catch (err) {
+            logger.error("Failed to spawn terminal", parseError(err));
+            return fail({
+              message: t("claudeCode.run.post.errors.internal.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
+          logger.info("Interactive: launched in terminal via escalateToTask", {
+            terminal: terminal.bin,
+            trackingTaskId,
+            callbackMode,
+          });
+        } else {
+          // No terminal — spawn detached background process
+          logger.warn(
+            "No terminal found, spawning detached via escalateToTask",
+          );
+          spawn("claude", args, {
+            cwd,
+            env: { ...process.env, CLAUDECODE: undefined },
+            stdio: "ignore",
+            detached: true,
+          }).unref();
+          logger.info("Interactive: launched detached via escalateToTask", {
+            trackingTaskId,
+            callbackMode,
+          });
+        }
+
+        const durationMs = Date.now() - start;
+        return success({
+          output: `Interactive Claude Code session launched. Task ID: ${trackingTaskId}.`,
+          durationMs,
+          taskId: trackingTaskId,
+          hint: "Interactive session launched. Result will be delivered when Claude Code calls complete-task.",
+        });
+      }
+
+      // ── Path 2: goroutine context (cronTaskId present, no escalateToTask) ──
+      // Copy revival columns from parent task row so complete-task can revive correctly.
+      if (cronTaskId) {
+        const trackingTaskId = `cc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+        let revivalColumns: {
+          wakeUpCallbackMode?: string;
+          wakeUpThreadId?: string | null;
+          wakeUpToolMessageId?: string | null;
+          wakeUpLeafMessageId?: string | null;
+          wakeUpModelId?: string | null;
+          wakeUpSkillId?: string | null;
+          wakeUpFavoriteId?: string | null;
+        } = {};
+
+        try {
+          const parentTask = await db
+            .select({
+              wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
+              wakeUpThreadId: cronTasks.wakeUpThreadId,
+              wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+              wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+              wakeUpModelId: cronTasks.wakeUpModelId,
+              wakeUpSkillId: cronTasks.wakeUpSkillId,
+              wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
+            })
+            .from(cronTasks)
+            .where(eq(cronTasks.id, cronTaskId))
+            .limit(1)
+            .then((rows) => rows[0] ?? null);
+
+          if (parentTask) {
+            revivalColumns = {
+              wakeUpCallbackMode: parentTask.wakeUpCallbackMode ?? undefined,
+              wakeUpThreadId: parentTask.wakeUpThreadId,
+              wakeUpToolMessageId: parentTask.wakeUpToolMessageId,
+              wakeUpLeafMessageId: parentTask.wakeUpLeafMessageId,
+              wakeUpModelId: parentTask.wakeUpModelId,
+              wakeUpSkillId: parentTask.wakeUpSkillId,
+              wakeUpFavoriteId: parentTask.wakeUpFavoriteId,
+            };
+          }
+
+          const { RemoteConnectionRepository } =
+            await import("@/app/api/[locale]/user/remote-connection/repository");
+          const instanceId =
+            RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+
+          await db.insert(cronTasks).values({
+            id: trackingTaskId,
+            shortId: trackingTaskId,
+            routeId: "claude-code",
+            displayName: title,
+            description: data.prompt.slice(0, 500),
+            category: TaskCategory.DEVELOPMENT,
+            schedule: "manual",
+            enabled: false,
+            priority: CronTaskPriority.LOW,
+            runOnce: true,
+            lastExecutionStatus: CronTaskStatus.RUNNING,
+            outputMode: TaskOutputMode.STORE_ONLY,
+            notificationTargets: [],
+            targetInstance: instanceId,
+            tags: ["claude-code", "interactive"],
+            userId: user.id,
+            ...revivalColumns,
+          });
+
+          logger.info("Interactive (goroutine): created tracking task", {
+            trackingTaskId,
+            wakeUpCallbackMode: revivalColumns.wakeUpCallbackMode,
+          });
+        } catch (err) {
+          logger.warn(
+            "Failed to create goroutine tracking task",
+            parseError(err),
+          );
+        }
+
+        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} — pass the complete result in the response object so the AI that launched you can see it.`;
+
+        const terminal = ClaudeCodeRepository.detectTerminal(logger);
+        if (terminal) {
+          try {
+            ClaudeCodeRepository.spawnInTerminal(terminal, args, cwd, logger);
+          } catch (err) {
+            logger.error(
+              "Failed to spawn terminal (goroutine)",
+              parseError(err),
+            );
+            return fail({
+              message: t("claudeCode.run.post.errors.internal.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            });
+          }
+        } else {
+          spawn("claude", args, {
+            cwd,
+            env: { ...process.env, CLAUDECODE: undefined },
+            stdio: "ignore",
+            detached: true,
+          }).unref();
+        }
+
+        const durationMs = Date.now() - start;
+        logger.info("Interactive (goroutine): session launched", {
+          trackingTaskId,
+          durationMs,
+        });
+
+        return success({
+          output: `Interactive Claude Code session launched. Task ID: ${trackingTaskId}.`,
+          durationMs,
+          taskId: trackingTaskId,
+          hint: "Interactive session launched. Result will be delivered when Claude Code calls complete-task.",
+        });
+      }
+
+      // ── Path 3: CLI/cron — no revival context, just spawn and return ──
+      logger.info("Interactive (CLI/cron): spawning detached, no revival");
+      const terminal = ClaudeCodeRepository.detectTerminal(logger);
+      if (terminal) {
+        try {
+          ClaudeCodeRepository.spawnInTerminal(terminal, args, cwd, logger);
+        } catch (err) {
+          logger.error("Failed to spawn terminal (CLI)", parseError(err));
+          return fail({
+            message: t("claudeCode.run.post.errors.internal.title"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          });
+        }
+      } else {
+        spawn("claude", args, {
+          cwd,
+          env: process.env,
+          stdio: "ignore",
+          detached: true,
+        }).unref();
+      }
+
+      const durationMs = Date.now() - start;
+      return success({
+        output: "Interactive Claude Code session launched.",
+        durationMs,
+      });
+    }
+
+    // ── Batch mode ──────────────────────────────────────────────────────────────
+    // Run synchronously and return the result. execute-tool handles all callback
+    // modes (wakeUp, detach, wait, endLoop) at the outer layer.
+    return ClaudeCodeRepository.runClaudeCodeBatch(
+      args,
+      cwd,
+      timeoutMs,
+      logger,
+      t,
+    );
+  }
 }

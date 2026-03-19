@@ -203,6 +203,26 @@ Available parameters from the endpoint handler:
 
 ## Common Violations
 
+### Importing i18n / Scoped Translations in Routes
+
+Routes must **never** import scoped translations. The handler already provides `t` automatically — it is scoped to the endpoint's own `scopedTranslation`. Just destructure `t` from the handler params and pass it to the repository.
+
+```typescript
+// ❌ WRONG - Route importing its own i18n just to get t
+import { scopedTranslation as importScopedTranslation } from "@/app/api/[locale]/leads/import/i18n";
+
+handler: async ({ user, urlPathParams, logger, locale }) => {
+  const { t } = importScopedTranslation.scopedT(locale);
+  return await ImportRepository.stopJob(user.id, urlPathParams.jobId, logger, t);
+},
+
+// ✅ CORRECT - t is already provided by the handler, no import needed
+handler: ({ user, urlPathParams, logger, t }) =>
+  ImportRepository.stopJob(user.id, urlPathParams.jobId, logger, t),
+```
+
+The `t` in handler params is already scoped to the endpoint's `scopedTranslation`. No import needed.
+
 ### Business Logic in Routes
 
 ```typescript

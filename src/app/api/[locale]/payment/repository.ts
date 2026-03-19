@@ -33,6 +33,7 @@ import type {
 } from "./definition";
 import { CheckoutMode, PaymentProvider, PaymentStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
+import type { PaymentT } from "./i18n";
 import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
@@ -42,20 +43,18 @@ import type {
   PaymentPortalResponseOutput,
 } from "./portal/definition";
 import { stripeAdminTools } from "./providers/stripe/admin";
-import { getStripe } from "./providers/stripe/repository";
+import { StripeProvider } from "./providers/stripe/repository";
 import type { CreditPackCheckoutSession, WebhookData } from "./providers/types";
 import type {
   PaymentRefundRequestOutput,
   PaymentRefundResponseOutput,
 } from "./refund/definition";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 export class PaymentRepository {
   static async createPaymentSession(
     data: PaymentPostRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: PaymentT,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<PaymentPostResponseOutput>> {
@@ -124,7 +123,7 @@ export class PaymentRepository {
       const stripeCustomerId = customerResult.data.customerId;
 
       // Create Stripe checkout session
-      const stripe = getStripe();
+      const stripe = StripeProvider.getStripe();
       if (!stripe) {
         return fail({
           message: t("create.errors.server.title"),
@@ -248,7 +247,7 @@ export class PaymentRepository {
   static async getPaymentInfo(
     data: PaymentGetRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: PaymentT,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentGetResponseOutput>> {
     try {
@@ -326,9 +325,9 @@ export class PaymentRepository {
     userId: string,
     data: PaymentPortalRequestOutput,
     locale: CountryLanguage,
-    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentPortalResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     // Get user's subscription to determine provider
     const subscription = await db
       .select()

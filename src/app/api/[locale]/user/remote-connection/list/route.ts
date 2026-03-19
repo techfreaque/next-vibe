@@ -8,12 +8,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { listRemoteConnections } from "./repository";
+import { RemoteConnectionListRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger }) => listRemoteConnections(user, logger),
+    handler: ({ user, logger }) =>
+      RemoteConnectionListRepository.listRemoteConnections(user, logger),
   },
 });

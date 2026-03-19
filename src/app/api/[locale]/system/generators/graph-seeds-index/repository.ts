@@ -3,13 +3,16 @@
  * Scans for graph-seeds.ts files and generates a unified index.
  */
 
-/* eslint-disable i18next/no-literal-string */
-// Generator output — no i18n needed
-
 import "server-only";
 
 import { readFile } from "node:fs/promises";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -18,6 +21,10 @@ import {
   formatDuration,
   formatGenerator,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import type { GraphSeedsIndexT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -39,13 +46,15 @@ interface GenerateResult {
   duration: number;
 }
 
-class GraphSeedsIndexGeneratorRepositoryImpl {
-  async generateGraphSeedsIndex(
+export class GraphSeedsIndexGeneratorRepository {
+  static async generateGraphSeedsIndex(
     data: GenerateOptions,
     logger: EndpointLogger,
+    locale: CountryLanguage,
     liveIndex?: LiveIndex,
   ): Promise<GenerateResult> {
     const startTime = Date.now();
+    const { t } = scopedTranslation.scopedT(locale);
 
     try {
       logger.debug(`Starting graph seeds index generation: ${data.outputFile}`);
@@ -66,17 +75,21 @@ class GraphSeedsIndexGeneratorRepositoryImpl {
       logger.debug(`Found ${seedFiles.length} graph-seeds.ts files`);
 
       // Validate files
-      const validationResult = await this.validateFiles(seedFiles);
+      const validationResult =
+        await GraphSeedsIndexGeneratorRepository.validateFiles(seedFiles, t);
       if (!validationResult.success) {
         return {
           success: false,
-          message: validationResult.error ?? "Validation failed",
+          message: validationResult.message ?? t("errors.validation.title"),
           filesFound: 0,
           duration: Date.now() - startTime,
         };
       }
 
-      const content = this.generateContent(seedFiles, data.outputFile);
+      const content = GraphSeedsIndexGeneratorRepository.generateContent(
+        seedFiles,
+        data.outputFile,
+      );
 
       await writeGeneratedFile(data.outputFile, content, data.dryRun);
 
@@ -109,9 +122,10 @@ class GraphSeedsIndexGeneratorRepositoryImpl {
     }
   }
 
-  private async validateFiles(
+  private static async validateFiles(
     files: string[],
-  ): Promise<{ success: boolean; error?: string }> {
+    t: GraphSeedsIndexT,
+  ): Promise<ResponseType<Record<string, never>>> {
     for (const file of files) {
       try {
         const content = await readFile(file, "utf-8");
@@ -120,23 +134,34 @@ class GraphSeedsIndexGeneratorRepositoryImpl {
           !content.includes("export const graphSeeds") &&
           !content.includes("export { graphSeeds }")
         ) {
-          return {
-            success: false,
-            error: `Graph seeds file ${file} must export 'graphSeeds' array`,
-          };
+          return fail({
+            message: t("errors.validation.title"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            messageParams: {
+              file,
+              error: `Graph seeds file ${file} must export 'graphSeeds' array`,
+            },
+          });
         }
       } catch (error) {
-        return {
-          success: false,
-          error: `Failed to validate graph seeds file ${file}: ${parseError(error).message}`,
-        };
+        return fail({
+          message: t("errors.internal.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: {
+            file,
+            error: `Failed to validate graph seeds file ${file}: ${parseError(error).message}`,
+          },
+        });
       }
     }
 
-    return { success: true };
+    return success({});
   }
 
-  private generateContent(seedFiles: string[], outputFile: string): string {
+  private static generateContent(
+    seedFiles: string[],
+    outputFile: string,
+  ): string {
     const imports: string[] = [];
     const spreadEntries: string[] = [];
 
@@ -179,6 +204,3 @@ ${spreadEntries.join("\n")}
 `;
   }
 }
-
-export const graphSeedsIndexGeneratorRepository =
-  new GraphSeedsIndexGeneratorRepositoryImpl();

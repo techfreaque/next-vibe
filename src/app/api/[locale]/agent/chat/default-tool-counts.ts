@@ -103,10 +103,14 @@ function ensureComputed(): void {
 
 /**
  * Get the default active tool count for this user's role.
- * Returns a single number — the count of DEFAULT_TOOL_IDS (core 8).
+ * Returns a single number — the count of the role-appropriate DEFAULT_TOOL_IDS.
  */
-export function getDefaultActiveToolCount(): number {
-  return getDefaultToolIds().length;
+export function getDefaultActiveToolCount(user: JwtPayloadType): number {
+  if (user.isPublic) {
+    return getDefaultToolIds(false, false).length;
+  }
+  const isAdmin = user.roles.includes(UserRole.ADMIN);
+  return getDefaultToolIds(isAdmin, !isAdmin).length;
 }
 
 /**

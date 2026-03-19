@@ -9,7 +9,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import uninstallEndpoints from "./definition";
-import { setupUninstallRepository } from "./repository";
+import { SetupUninstallRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: uninstallEndpoints,
@@ -18,7 +18,7 @@ export const { POST, tools } = endpointsHandler({
       logger.info("Setup uninstall operation started", {
         verbose: data.verbose,
       });
-      return setupUninstallRepository.uninstallCli(data, user, t);
+      return SetupUninstallRepository.uninstallCli(data, user, t);
     },
   },
 });

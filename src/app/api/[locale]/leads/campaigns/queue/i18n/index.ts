@@ -11,3 +11,5 @@ export const scopedTranslation = createScopedTranslation({
 export type CampaignQueueTranslationKey = Parameters<
   ReturnType<typeof scopedTranslation.scopedT>["t"]
 >[0];
+
+export type CampaignQueueT = ReturnType<typeof scopedTranslation.scopedT>["t"];

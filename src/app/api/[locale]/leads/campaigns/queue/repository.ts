@@ -27,15 +27,13 @@ import type {
   CampaignQueueGetRequestOutput,
   CampaignQueueGetResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { CampaignQueueT } from "./i18n";
 
 export class CampaignQueueRepository {
   static async getQueue(
     data: CampaignQueueGetRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CampaignQueueT,
   ): Promise<ResponseType<CampaignQueueGetResponseOutput>> {
     try {
       const page = data.page ?? 1;

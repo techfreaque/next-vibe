@@ -34,9 +34,7 @@ import type {
   MessagePatchResponseOutput,
   MessagePatchUrlVariablesOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type MessageByIdT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { MessageByIdT } from "./i18n";
 
 /**
  * Message Repository Implementation

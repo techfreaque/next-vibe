@@ -26,14 +26,12 @@ import type {
   ErrorLogsResponseOutput,
 } from "./definition";
 import { ErrorLogStatusFilter } from "./enum";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { ErrorLogsT } from "./i18n";
 
 export class ErrorLogsRepository {
   static async getLogs(
     data: ErrorLogsRequestOutput,
-    t: ModuleT,
+    t: ErrorLogsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ErrorLogsResponseOutput>> {
     try {
@@ -131,7 +129,7 @@ export class ErrorLogsRepository {
 
   static async updateStatus(
     data: ErrorLogsPatchRequestOutput,
-    t: ModuleT,
+    t: ErrorLogsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ErrorLogsPatchResponseOutput>> {
     try {

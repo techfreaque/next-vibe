@@ -10,12 +10,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { trpcValidationRepository as repository } from "./repository";
+import { TRPCValidationRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data, logger, t }) =>
-      repository.executeValidationOperation(data, logger, t),
+      TRPCValidationRepository.executeValidationOperation(data, logger, t),
   },
 });

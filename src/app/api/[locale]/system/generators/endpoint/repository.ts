@@ -32,9 +32,7 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { GeneratorsEndpointT } from "./i18n";
 
 // Type definitions
 interface EndpointRequestType {
@@ -53,11 +51,11 @@ interface EndpointResponseType {
 /**
  * Endpoint Generator Repository Implementation
  */
-class EndpointGeneratorRepositoryImpl {
-  async generateEndpoint(
+export class EndpointGeneratorRepository {
+  static async generateEndpoint(
     data: EndpointRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsEndpointT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<EndpointResponseType>> {
     const startTime = Date.now();
@@ -102,7 +100,10 @@ class EndpointGeneratorRepositoryImpl {
 
       // Generate both files
       const { endpointContent, aliasMapContent, endpointCount } =
-        await this.generateContent(validDefinitionFiles, logger);
+        await EndpointGeneratorRepository.generateContent(
+          validDefinitionFiles,
+          logger,
+        );
 
       // Derive alias-map path from outputFile (same dir)
       const aliasMapFile = outputFile.replace(
@@ -152,7 +153,7 @@ class EndpointGeneratorRepositoryImpl {
    * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
    * Aliases also include method from their definition
    */
-  private async generateContent(
+  private static async generateContent(
     definitionFiles: string[],
     logger: EndpointLogger,
   ): Promise<{
@@ -403,7 +404,6 @@ class EndpointGeneratorRepositoryImpl {
     const aliasMapContent = `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 /**
  * Map of aliases to their canonical full paths.
@@ -418,7 +418,6 @@ ${aliasMapEntries}
     const endpointContent = `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
@@ -441,6 +440,3 @@ ${cases.join("\n")}
     return { endpointContent, aliasMapContent, endpointCount };
   }
 }
-
-export const endpointGeneratorRepository =
-  new EndpointGeneratorRepositoryImpl();

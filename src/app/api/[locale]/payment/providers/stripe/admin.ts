@@ -40,7 +40,7 @@ import type {
 } from "../../refund/definition";
 import { scopedTranslation as refundScopedTranslation } from "../../refund/i18n";
 import { scopedTranslation as stripeScopedTranslation } from "./i18n";
-import { getStripe } from "./repository";
+import { StripeProvider } from "./repository";
 
 export interface StripeAdminTools {
   createInvoice(
@@ -83,7 +83,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       }
 
       // Verify the customer exists in Stripe (handles test->prod migration)
-      const stripe = getStripe();
+      const stripe = StripeProvider.getStripe();
       if (!stripe) {
         return null;
       }
@@ -136,7 +136,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     const { t: tInvoice } = invoiceScopedTranslation.scopedT(locale);
     const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
     const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: tStripe("errors.notConfigured.title"),
@@ -252,7 +252,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     const { t: tPortal } = portalScopedTranslation.scopedT(locale);
     const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
     const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: tStripe("errors.notConfigured.title"),
@@ -340,7 +340,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
   ): Promise<ResponseType<PaymentRefundResponseOutput>> {
     const { t: tRefund } = refundScopedTranslation.scopedT(locale);
     const { t: tStripe } = stripeScopedTranslation.scopedT(locale);
-    const stripeClient = getStripe();
+    const stripeClient = StripeProvider.getStripe();
     if (!stripeClient) {
       return fail({
         message: tStripe("errors.notConfigured.title"),

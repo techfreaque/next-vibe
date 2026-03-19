@@ -47,7 +47,6 @@ const { DELETE } = createEndpoint({
         label: "delete.instanceId.label" as const,
         description: "delete.instanceId.description" as const,
         schema: z.string().min(1).max(32),
-        hidden: true,
       }),
       submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
@@ -171,6 +170,9 @@ const { DELETE } = createEndpoint({
     },
   },
 });
+
+export type RemoteConnectionDisconnectDeleteResponseOutput =
+  typeof DELETE.types.ResponseOutput;
 
 const definitions = { DELETE };
 export default definitions;

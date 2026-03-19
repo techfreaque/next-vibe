@@ -22,15 +22,13 @@ import type {
   RunConfigRequestOutput,
   RunConfigResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { VibeSenseRunConfigT } from "./i18n";
 
 export class RunConfigRepository {
   static async execute(
     data: RunConfigRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: VibeSenseRunConfigT,
   ): Promise<ResponseType<RunConfigResponseOutput>> {
     try {
       const parsed = graphConfigSchema.safeParse(data.config);

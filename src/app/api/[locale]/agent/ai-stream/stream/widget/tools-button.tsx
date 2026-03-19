@@ -17,6 +17,7 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -72,11 +73,13 @@ export function ToolsButton({
 
   const enabledTools = enabledToolsProp ?? computedEnabledTools;
   const openToolsModal = useToolsModalStore((state) => state.open);
-  // null = default: DEFAULT_TOOL_IDS are pinned (active)
+  // null = default: role-appropriate DEFAULT_TOOL_IDS are pinned (active)
   // customized: count tools with active=true
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const isCustomer = !user.isPublic && !isAdmin;
   const activeToolCount = enabledTools
     ? enabledTools.filter((tool) => tool.pinned).length
-    : getDefaultToolIds().length;
+    : getDefaultToolIds(isAdmin, isCustomer).length;
   const { t } = simpleT(locale);
 
   return (

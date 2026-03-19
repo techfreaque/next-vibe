@@ -27,9 +27,9 @@ import {
 } from "../shared/endpoints/definitions/registry";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
-import { formatValidationErrorDetails } from "../shared/utils/format-validation-error";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
+import { formatValidationErrorDetails } from "../shared/utils/format-validation-error";
 import { scopedTranslation as mcpScopedTranslation } from "./i18n";
 import type {
   MCPExecutionContext,
@@ -196,6 +196,36 @@ export class MCPRegistry {
     }
 
     // Execute tool using shared generic handler
+    const executeArgs: Parameters<
+      typeof RouteExecutionExecutor.executeGenericHandler
+    >[0] = {
+      toolName: context.toolName,
+      data: context.data,
+      user: context.user,
+      locale: context.locale,
+      logger,
+      platform: Platform.MCP,
+      streamContext: {
+        rootFolderId: DefaultFolderId.CRON,
+        threadId: undefined,
+        aiMessageId: undefined,
+        skillId: undefined,
+        modelId: undefined,
+        headless: undefined,
+        currentToolMessageId: undefined,
+        callerToolCallId: undefined,
+        pendingToolMessages: undefined,
+        pendingTimeoutMs: undefined,
+        leafMessageId: undefined,
+        waitingForRemoteResult: undefined,
+        favoriteId: undefined,
+        abortSignal: context.signal,
+        callerCallbackMode: undefined,
+        onEscalatedTaskCancel: undefined,
+        escalateToTask: undefined,
+      },
+    };
+
     try {
       logger.debug("[MCP Registry] Executing tool", {
         toolName: context.toolName,
@@ -205,31 +235,24 @@ export class MCPRegistry {
         dataKeys: Object.keys(context.data),
       });
 
-      const result = await RouteExecutionExecutor.executeGenericHandler({
-        toolName: context.toolName,
-        data: context.data,
-        user: context.user,
-        locale: context.locale,
-        logger,
-        platform: Platform.MCP,
-        streamContext: {
-          rootFolderId: DefaultFolderId.CRON,
-          threadId: undefined,
-          aiMessageId: undefined,
-          skillId: undefined,
-          modelId: undefined,
-          headless: undefined,
-          currentToolMessageId: undefined,
-          callerToolCallId: undefined,
-          pendingToolMessages: undefined,
-          pendingTimeoutMs: undefined,
-          leafMessageId: undefined,
-          waitingForRemoteResult: undefined,
-          favoriteId: undefined,
-          abortSignal: undefined,
-          escalateToTask: undefined,
-        },
-      });
+      let result =
+        await RouteExecutionExecutor.executeGenericHandler(executeArgs);
+
+      // Bun TDZ race: dynamic imports can throw "Cannot access 'X' before initialization"
+      // on first load. Retry once after 10ms to let the module settle.
+      if (
+        !result.success &&
+        result.messageParams &&
+        "error" in result.messageParams &&
+        typeof result.messageParams["error"] === "string" &&
+        result.messageParams["error"].includes("before initialization")
+      ) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        result =
+          await RouteExecutionExecutor.executeGenericHandler(executeArgs);
+      }
 
       logger.debug("[MCP Registry] Tool execution complete", {
         toolName: context.toolName,
@@ -247,13 +270,30 @@ export class MCPRegistry {
           "error" in result.messageParams &&
           "errorCount" in result.messageParams);
       if (needsEndpoint) {
-        const endpointResult = await this.definitionLdr.load({
+        let endpointResult = await this.definitionLdr.load({
           identifier: context.toolName,
           platform: Platform.MCP,
           user: context.user,
           logger,
           locale: context.locale,
         });
+        // Bun TDZ race: dynamic imports can throw "Cannot access 'X' before initialization"
+        // on first load. Retry once after 10ms to let the module settle.
+        if (
+          !endpointResult.success &&
+          endpointResult.message?.includes("before initialization")
+        ) {
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 10);
+          });
+          endpointResult = await this.definitionLdr.load({
+            identifier: context.toolName,
+            platform: Platform.MCP,
+            user: context.user,
+            logger,
+            locale: context.locale,
+          });
+        }
         if (endpointResult.success) {
           endpoint = endpointResult.data;
         }
@@ -269,6 +309,44 @@ export class MCPRegistry {
       );
     } catch (error) {
       const parsedError = parseError(error);
+
+      // Bun TDZ race: retry once after 10ms if the module wasn't initialized yet.
+      if (parsedError.message.includes("before initialization")) {
+        logger.warn("[MCP Registry] TDZ race detected, retrying after 10ms", {
+          toolName: context.toolName,
+          error: parsedError.message,
+        });
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 10);
+        });
+        try {
+          const retryResult =
+            await RouteExecutionExecutor.executeGenericHandler(executeArgs);
+          return this.convertToMCPResult(
+            retryResult,
+            context.toolName,
+            context.locale,
+            logger,
+            null,
+            context.user,
+          );
+        } catch (retryError) {
+          const retryParsed = parseError(retryError);
+          logger.error("[MCP Registry] Retry also failed", {
+            toolName: context.toolName,
+            error: retryParsed.message,
+          });
+          return this.fail({
+            error: t("registry.toolExecutionFailed"),
+            code: MCPErrorCode.TOOL_EXECUTION_FAILED,
+            details: {
+              toolName: context.toolName,
+              exceptionMessage: retryParsed.message,
+            },
+          });
+        }
+      }
+
       logger.error("[MCP Registry] Tool execution failed with exception", {
         toolName: context.toolName,
         error: parsedError.message,

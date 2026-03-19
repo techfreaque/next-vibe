@@ -19,10 +19,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { chatFavorites } from "../db";
-import type { FavoritesReorderRequestOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ReorderT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type {
+  FavoritesReorderRequestOutput,
+  FavoritesReorderResponseOutput,
+} from "./definition";
+import type { FavoritesReorderT } from "./i18n";
 
 /**
  * Favorites Reorder Repository
@@ -35,8 +36,8 @@ export class FavoritesReorderRepository {
     requestData: FavoritesReorderRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-    t: ReorderT,
-  ): Promise<ResponseType<{ success: boolean }>> {
+    t: FavoritesReorderT,
+  ): Promise<ResponseType<FavoritesReorderResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {

@@ -50,6 +50,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
 
+import folderContentsDefinition from "../../../../folder-contents/[rootFolderId]/definition";
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
 import messagesDefinition from "../definition";
@@ -643,6 +644,30 @@ export function ChatMessages({
   // Streaming state from navigation store
   const startStream = useChatNavigationStore((s) => s.startStream);
   const stopStream = useChatNavigationStore((s) => s.stopStream);
+  const setWaiting = useChatNavigationStore((s) => s.setWaiting);
+
+  // Read initial streamingState from the folder-contents cache for page load recovery.
+  // If the thread is in "waiting" state (task in flight, stream dead), restore stop button.
+  const initialStreamingState = useMemo(() => {
+    if (!activeThreadId) {
+      return undefined;
+    }
+    const cached = apiClient.getEndpointData(
+      folderContentsDefinition.GET,
+      logger,
+      {
+        urlPathParams: { rootFolderId: currentRootFolderId },
+        requestData: { subFolderId: currentSubFolderId ?? null },
+      },
+    );
+    if (!cached?.success) {
+      return undefined;
+    }
+    const item = cached.data.items.find(
+      (i) => i.type === "thread" && i.id === activeThreadId,
+    );
+    return item?.streamingState ?? undefined;
+  }, [activeThreadId, currentRootFolderId, currentSubFolderId, logger]);
 
   // Always-on WS subscription for all stream events on this thread
   useMessagesSubscription(
@@ -661,6 +686,10 @@ export function ChatMessages({
       onStreamFinished: activeThreadId
         ? (): void => stopStream(activeThreadId, logger)
         : undefined,
+      onStreamingStateWaiting: activeThreadId
+        ? (): void => setWaiting(activeThreadId, logger)
+        : undefined,
+      initialStreamingState,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
     },
   );

@@ -6,16 +6,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { scopedTranslation } from "./i18n";
 import { CampaignQueueRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, logger, locale }) => {
-      const { t } = scopedTranslation.scopedT(locale);
-      return CampaignQueueRepository.getQueue(data, logger, t);
-    },
+    handler: ({ data, logger, t }) =>
+      CampaignQueueRepository.getQueue(data, logger, t),
   },
 });

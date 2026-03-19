@@ -25,9 +25,7 @@ import type {
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type FavoritesCreateT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { FavoriteCreateT } from "./i18n";
 
 /**
  * Favorites Create Repository
@@ -40,7 +38,7 @@ export class FavoritesCreateRepository {
     data: FavoriteCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: FavoritesCreateT,
+    t: FavoriteCreateT,
     locale: CountryLanguage,
   ): Promise<ResponseType<FavoriteCreateResponseOutput>> {
     const userId = user.id;

@@ -109,6 +109,7 @@ const { GET } = createEndpoint({
 
 export type ChatFileRequestOutput = typeof GET.types.RequestOutput;
 export type ChatFileResponseOutput = typeof GET.types.ResponseOutput;
+export type ChatFileUrlVariablesOutput = typeof GET.types.UrlVariablesOutput;
 
 const definitions = { GET };
 

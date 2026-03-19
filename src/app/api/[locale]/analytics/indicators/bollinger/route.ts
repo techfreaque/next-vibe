@@ -11,14 +11,15 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeBollinger } from "./repository";
+import { BollingerIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, period, stdDev, resolution, lookback } = data;
-      const { upper, middle, lower } = computeBollinger(source, period, stdDev);
+      const { upper, middle, lower } =
+        BollingerIndicatorRepository.computeBollinger(source, period, stdDev);
       return success({
         upper,
         middle,

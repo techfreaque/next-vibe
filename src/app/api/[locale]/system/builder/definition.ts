@@ -249,6 +249,16 @@ const { POST } = createEndpoint({
               icon: "file",
               usage: { request: "data" },
               children: {
+                disabled: requestField(scopedTranslation, {
+                  type: WidgetType.FORM_FIELD,
+                  fieldType: FieldDataType.BOOLEAN,
+                  label: "post.fields.disabled.title",
+                  description: "post.fields.disabled.description",
+                  optional: true,
+                  colSpan: 2,
+                  schema: z.boolean().optional(),
+                }),
+
                 input: requestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,

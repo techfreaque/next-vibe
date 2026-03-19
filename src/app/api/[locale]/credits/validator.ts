@@ -10,7 +10,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ModelId } from "../agent/models/models";
-import { CreditRepository, type ModuleT } from "./repository";
+import type { CreditsT } from "./i18n";
+import { CreditRepository } from "./repository";
 
 /**
  * Validation Result Interface
@@ -31,7 +32,7 @@ export interface CreditValidatorInterface {
     modelId: string,
     modelCost: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>>;
 
@@ -40,7 +41,7 @@ export interface CreditValidatorInterface {
     modelId: string,
     modelCost: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>>;
 
@@ -50,7 +51,7 @@ export interface CreditValidatorInterface {
     modelCost: number,
     locale: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<
     ResponseType<{
       leadId: string;
@@ -68,7 +69,7 @@ class CreditValidator implements CreditValidatorInterface {
     modelId: ModelId,
     modelCost: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
@@ -121,7 +122,7 @@ class CreditValidator implements CreditValidatorInterface {
     modelId: ModelId,
     modelCost: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
@@ -174,7 +175,7 @@ class CreditValidator implements CreditValidatorInterface {
     modelCost: number,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsT,
   ): Promise<
     ResponseType<{
       leadId: string;

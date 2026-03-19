@@ -7,3 +7,10 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
 });
+
+export type BounceProcessorTranslationKey =
+  (typeof scopedTranslation)["ScopedTranslationKey"];
+
+export type BounceProcessorT = ReturnType<
+  typeof scopedTranslation.scopedT
+>["t"];

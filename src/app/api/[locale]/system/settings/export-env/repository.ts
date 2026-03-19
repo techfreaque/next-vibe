@@ -30,38 +30,42 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { ExportEnvResponseOutput } from "./definition";
 import type { ExportEnvT } from "./i18n";
 
-const SENSITIVE_PATTERNS = [
-  "_KEY",
-  "_SECRET",
-  "_PASS",
-  "_TOKEN",
-  "_SID",
-  "_CREDENTIAL",
-  "PASSWORD",
-  "JWT_SECRET",
-  "CRON_SECRET",
-  "ACCESS_KEY",
-  "AUTH_TOKEN",
-  "DATABASE_URL",
-];
-
-function isSensitiveKey(key: string, explicitSensitive?: boolean): boolean {
-  if (explicitSensitive !== undefined) {
-    return explicitSensitive;
-  }
-  const upper = key.toUpperCase();
-  return SENSITIVE_PATTERNS.some((p) => upper.includes(p));
-}
-
-function getEnvFilePath(): string {
-  return join(process.cwd(), ".env");
-}
-
-function formatDate(): string {
-  return new Date().toISOString().slice(0, 16).replace("T", " ");
-}
-
 export class ExportEnvRepository {
+  private static readonly SENSITIVE_PATTERNS = [
+    "_KEY",
+    "_SECRET",
+    "_PASS",
+    "_TOKEN",
+    "_SID",
+    "_CREDENTIAL",
+    "PASSWORD",
+    "JWT_SECRET",
+    "CRON_SECRET",
+    "ACCESS_KEY",
+    "AUTH_TOKEN",
+    "DATABASE_URL",
+  ];
+
+  private static isSensitiveKey(
+    key: string,
+    explicitSensitive?: boolean,
+  ): boolean {
+    if (explicitSensitive !== undefined) {
+      return explicitSensitive;
+    }
+    const upper = key.toUpperCase();
+    return ExportEnvRepository.SENSITIVE_PATTERNS.some((p) =>
+      upper.includes(p),
+    );
+  }
+
+  private static getEnvFilePath(): string {
+    return join(process.cwd(), ".env");
+  }
+
+  private static formatDate(): string {
+    return new Date().toISOString().slice(0, 16).replace("T", " ");
+  }
   static async exportProdEnv(
     logger: EndpointLogger,
     t: ExportEnvT,
@@ -73,7 +77,7 @@ export class ExportEnvRepository {
         await import("@/app/api/[locale]/system/generated/env");
 
       // Read raw .env to get encrypted values (need to decrypt them for prod)
-      const envPath = getEnvFilePath();
+      const envPath = ExportEnvRepository.getEnvFilePath();
       const rawEnvFile = existsSync(envPath)
         ? await readFile(envPath, "utf-8")
         : "";
@@ -98,7 +102,7 @@ export class ExportEnvRepository {
       const checklistItems: string[] = [];
 
       const lines: string[] = [];
-      const now = formatDate();
+      const now = ExportEnvRepository.formatDate();
 
       lines.push(
         "# ============================================================",
@@ -169,7 +173,10 @@ export class ExportEnvRepository {
           const exampleDef = (examples as EnvExample[]).find(
             (e) => e.key === key,
           );
-          const sensitive = isSensitiveKey(key, exampleDef?.sensitive);
+          const sensitive = ExportEnvRepository.isSensitiveKey(
+            key,
+            exampleDef?.sensitive,
+          );
 
           if (exampleDef?.comment) {
             lines.push(`# ${exampleDef.comment}`);

@@ -6,7 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import { executeClick, filterUndefinedArgs } from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import clickEndpoints, { type ClickResponseOutput } from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -14,10 +14,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeClick<ClickResponseOutput>(
+      BrowserSharedRepository.executeClick<ClickResponseOutput>(
         {
           toolName: BrowserTool.CLICK,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,
             dblClick: data.dblClick,
           }),

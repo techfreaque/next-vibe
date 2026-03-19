@@ -13,45 +13,35 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type guardStopEndpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type GuardStopRequestType = typeof guardStopEndpoints.POST.types.RequestOutput;
-type GuardStopResponseType =
-  typeof guardStopEndpoints.POST.types.ResponseOutput;
+import type {
+  GuardStopRequestOutput,
+  GuardStopResponseOutput,
+} from "./definition";
+import type { GuardStopT } from "./i18n";
 
 /**
- * Guard Stop Repository Interface
+ * Guard Stop Repository
  */
-export interface GuardStopRepository {
-  stopGuard(
-    data: GuardStopRequestType,
+export class GuardStopRepository {
+  static stopGuard(
+    data: GuardStopRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<GuardStopResponseType>;
-}
-
-/**
- * Guard Stop Repository Implementation
- */
-export class GuardStopRepositoryImpl implements GuardStopRepository {
-  stopGuard(
-    data: GuardStopRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<GuardStopResponseType> {
+    t: GuardStopT,
+  ): ResponseType<GuardStopResponseOutput> {
     try {
       logger.info("Stopping guard environment");
       logger.debug("Guard stop request data", { data });
 
       if (data.guardId) {
-        return this.stopByGuardId(data.guardId, data.force || false, logger);
+        return GuardStopRepository.stopByGuardId(
+          data.guardId,
+          data.force || false,
+          logger,
+        );
       }
 
       if (data.projectPath) {
-        return this.stopByProject(
+        return GuardStopRepository.stopByProject(
           data.projectPath,
           data.force || false,
           logger,
@@ -59,7 +49,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       }
 
       if (data.stopAll) {
-        return this.stopAllGuards(data.force || false, logger);
+        return GuardStopRepository.stopAllGuards(data.force || false, logger);
       }
 
       return fail({
@@ -82,11 +72,11 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     }
   }
 
-  private stopByGuardId(
+  private static stopByGuardId(
     guardId: string,
     force: boolean,
     logger: EndpointLogger,
-  ): ResponseType<GuardStopResponseType> {
+  ): ResponseType<GuardStopResponseOutput> {
     logger.debug(`Stopping guard: ${guardId} (force: ${force})`);
 
     // Mock implementation - in real system would stop actual guard process
@@ -101,7 +91,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     };
 
     const forceText = force ? " force" : "";
-    const response: GuardStopResponseType = {
+    const response: GuardStopResponseOutput = {
       success: true,
       output: `⏹️ Guard '${guardId}'${forceText} stopped successfully`, // eslint-disable-line i18next/no-literal-string
       stoppedGuards: [mockGuard],
@@ -111,11 +101,11 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     return success(response);
   }
 
-  private stopByProject(
+  private static stopByProject(
     projectPath: string,
     force: boolean,
     logger: EndpointLogger,
-  ): ResponseType<GuardStopResponseType> {
+  ): ResponseType<GuardStopResponseOutput> {
     logger.debug(
       `Stopping guard for project: ${projectPath} (force: ${force})`,
     );
@@ -138,7 +128,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     };
 
     const forceText = force ? " force" : "";
-    const response: GuardStopResponseType = {
+    const response: GuardStopResponseOutput = {
       success: true,
       output: `⏹️ Guard${forceText} stopped successfully for project '${projectName}'`, // eslint-disable-line i18next/no-literal-string
       stoppedGuards: [mockGuard],
@@ -148,10 +138,10 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     return success(response);
   }
 
-  private stopAllGuards(
+  private static stopAllGuards(
     force: boolean,
     logger: EndpointLogger,
-  ): ResponseType<GuardStopResponseType> {
+  ): ResponseType<GuardStopResponseOutput> {
     logger.debug(`Stopping all guards (force: ${force})`);
 
     // Mock implementation - in real system would find and stop all guards
@@ -168,7 +158,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     ];
 
     const forceText = force ? " force" : "";
-    const response: GuardStopResponseType = {
+    const response: GuardStopResponseOutput = {
       success: true,
       output: `⏹️${forceText} Stopped ${mockGuards.length} guard environment${mockGuards.length === 1 ? "" : "s"}`, // eslint-disable-line i18next/no-literal-string
       stoppedGuards: mockGuards,
@@ -178,5 +168,3 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
     return success(response);
   }
 }
-
-export const guardStopRepository = new GuardStopRepositoryImpl();

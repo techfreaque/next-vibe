@@ -5,7 +5,6 @@
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
-import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -28,11 +27,18 @@ import type { UserRoleValue } from "./user-roles/enum";
  * Native User Repository - Static class pattern
  */
 export class UserRepository {
+  private static activeUserCountCache: {
+    count: number;
+    timestamp: number;
+  } | null = null;
+  // eslint-disable-next-line @typescript-eslint/class-literal-property-style
+  private static readonly CACHE_DURATION_MS = 0;
+
   static async getUserById<
     T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
   >(
     // oxlint-disable-next-line no-unused-vars
-    _userId: DbId,
+    _userId: string,
     // oxlint-disable-next-line no-unused-vars
     _detailLevel: T = UserDetailLevel.STANDARD as T,
     // oxlint-disable-next-line no-unused-vars
@@ -94,7 +100,7 @@ export class UserRepository {
 
   static async exists(
     // oxlint-disable-next-line no-unused-vars
-    _userId: DbId,
+    _userId: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars
@@ -120,7 +126,7 @@ export class UserRepository {
     // oxlint-disable-next-line no-unused-vars
     _email: string,
     // oxlint-disable-next-line no-unused-vars
-    _excludeUserId: DbId,
+    _excludeUserId: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars

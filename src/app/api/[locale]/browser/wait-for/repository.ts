@@ -16,7 +16,7 @@ import type {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { BrowserT } from "../i18n";
 import type { MCPContentBlock } from "../shared/repository";
-import { executeWaitFor, filterUndefinedArgs } from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import { BrowserTool } from "../enum";
 import type { WaitForRequestOutput, WaitForResponseOutput } from "./definition";
 
@@ -26,10 +26,10 @@ export class WaitForRepository {
     t: BrowserT,
     logger: EndpointLogger,
   ): Promise<ResponseType<WaitForResponseOutput> | ContentResponse> {
-    const result = await executeWaitFor(
+    const result = await BrowserSharedRepository.executeWaitFor(
       {
         toolName: BrowserTool.WAIT_FOR,
-        args: filterUndefinedArgs({
+        args: BrowserSharedRepository.filterUndefinedArgs({
           text: data.text,
           timeout: data.timeout,
         }),

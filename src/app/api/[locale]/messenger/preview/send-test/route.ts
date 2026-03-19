@@ -6,13 +6,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definition from "./definition";
-import { emailPreviewSendTestRepository } from "./repository";
+import { EmailPreviewSendTestRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, logger, t }) =>
-      emailPreviewSendTestRepository.sendTest(data, logger, t),
+      EmailPreviewSendTestRepository.sendTest(data, logger, t),
   },
 });

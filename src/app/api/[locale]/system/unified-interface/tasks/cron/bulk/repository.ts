@@ -27,16 +27,14 @@ import type {
   CronBulkRequestOutput,
   CronBulkResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { CronBulkT } from "./i18n";
 
 export class CronBulkRepository {
   static async executeBulkAction(
     data: CronBulkRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: CronBulkT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronBulkResponseOutput>> {
     const isAdmin =

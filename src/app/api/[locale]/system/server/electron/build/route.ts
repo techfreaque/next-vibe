@@ -8,13 +8,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import electronBuildDefinition from "./definition";
-import { electronBuildRepository } from "./repository";
+import { ElectronBuildRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: electronBuildDefinition,
   [Methods.POST]: {
     handler: ({ data, logger, t }) => {
-      return electronBuildRepository(data, logger, t);
+      return ElectronBuildRepository.electronBuildRepository(data, logger, t);
     },
   },
 });

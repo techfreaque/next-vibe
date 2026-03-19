@@ -8,16 +8,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { scopedTranslation } from "./i18n";
 import { HaltAllCampaignsRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger, locale }) => {
-      const { t } = scopedTranslation.scopedT(locale);
-      return HaltAllCampaignsRepository.haltAll(data, logger, t);
-    },
+    handler: ({ data, logger, t }) =>
+      HaltAllCampaignsRepository.haltAll(data, logger, t),
   },
 });

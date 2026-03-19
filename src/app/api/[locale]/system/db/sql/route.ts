@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import sqlEndpoints from "./definition";
-import { sqlRepository } from "./repository";
+import { SqlRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: sqlEndpoints,
   [Methods.POST]: {
     handler: ({ data, t, logger }) => {
-      return sqlRepository.execute(data, t, logger);
+      return SqlRepository.execute(data, t, logger);
     },
   },
 });

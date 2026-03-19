@@ -11,14 +11,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeFieldPick } from "./repository";
+import { FieldPickTransformerRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, field, resolution, lookback } = data;
-      const result = computeFieldPick(source, field);
+      const result = FieldPickTransformerRepository.computeFieldPick(
+        source,
+        field,
+      );
       return success({
         result,
         meta: {

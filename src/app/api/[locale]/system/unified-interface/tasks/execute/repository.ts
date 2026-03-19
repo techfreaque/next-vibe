@@ -32,7 +32,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { scopedTranslation as tasksScopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
 import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
-import { pushStatusToRemote } from "@/app/api/[locale]/system/unified-interface/tasks/task-sync/repository";
+import { TaskSyncRepository } from "@/app/api/[locale]/system/unified-interface/tasks/task-sync/repository";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
@@ -49,9 +49,7 @@ import type {
   TaskExecuteRequestOutput,
   TaskExecuteResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { TaskExecuteT } from "./i18n";
 
 export class TaskExecuteRepository {
   /**
@@ -65,7 +63,7 @@ export class TaskExecuteRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: TaskExecuteT,
   ): Promise<ResponseType<TaskExecuteResponseOutput>> {
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
@@ -195,15 +193,15 @@ export class TaskExecuteRepository {
     const maxRetries = task.retries ?? 0;
     const retryDelayMs = task.retryDelay ?? 30000;
 
-    const { getLocalInstanceId, deriveDefaultSelfInstanceId } =
+    const { RemoteConnectionRepository } =
       await import("@/app/api/[locale]/user/remote-connection/repository");
     const instanceId = user.id
-      ? await getLocalInstanceId(user.id)
-      : deriveDefaultSelfInstanceId();
+      ? await RemoteConnectionRepository.getLocalInstanceId(user.id)
+      : RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 
     // Fire-and-forget: notify remote RUNNING
     if (task.targetInstance) {
-      void pushStatusToRemote({
+      void TaskSyncRepository.pushStatusToRemote({
         taskId: task.id,
         status: CronTaskStatus.RUNNING,
         summary: "",
@@ -245,6 +243,7 @@ export class TaskExecuteRepository {
       }
 
       const attemptStart = Date.now();
+      const taskAbortController = new AbortController();
 
       let typedResult: ResponseType<Record<string, string | number | boolean>>;
       try {
@@ -270,7 +269,9 @@ export class TaskExecuteRepository {
               modelId: undefined,
               headless: undefined,
               waitingForRemoteResult: undefined,
-              abortSignal: undefined,
+              abortSignal: taskAbortController.signal,
+              callerCallbackMode: undefined,
+              onEscalatedTaskCancel: undefined,
               escalateToTask: undefined,
             },
           }),
@@ -415,7 +416,7 @@ export class TaskExecuteRepository {
 
     // Fire-and-forget: push final status to remote
     if (task.targetInstance) {
-      void pushStatusToRemote({
+      void TaskSyncRepository.pushStatusToRemote({
         taskId: task.id,
         status: finalStatus,
         summary: finalMessage ?? "",

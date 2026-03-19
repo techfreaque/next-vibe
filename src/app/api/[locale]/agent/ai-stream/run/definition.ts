@@ -48,6 +48,7 @@ const { POST } = createEndpoint({
   aliases: [AI_RUN_ALIAS, "run-ai", "agent-run"],
   allowedRoles: [
     UserRole.ADMIN,
+    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,

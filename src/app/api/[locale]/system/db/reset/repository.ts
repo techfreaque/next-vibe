@@ -15,35 +15,19 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { db } from "../index";
-import type { scopedTranslation } from "./i18n";
+import type { ResetT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-// Import types from the endpoint definition
-import type resetEndpoints from "./definition";
-
-type ResetRequestType = typeof resetEndpoints.POST.types.RequestOutput;
-type ResetResponseType = typeof resetEndpoints.POST.types.ResponseOutput;
+import type { DbResetRequestOutput, DbResetResponseOutput } from "./definition";
 
 /**
- * Database Reset Repository Interface
+ * Database Reset Repository
  */
-export interface DatabaseResetRepository {
-  resetDatabase(
-    data: ResetRequestType,
-    t: ModuleT,
+export class DatabaseResetRepository {
+  static async resetDatabase(
+    data: DbResetRequestOutput,
+    t: ResetT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<ResetResponseType>>;
-}
-
-/**
- * Database Reset Repository Implementation
- */
-export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
-  async resetDatabase(
-    data: ResetRequestType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ResetResponseType>> {
+  ): Promise<ResponseType<DbResetResponseOutput>> {
     const startTime = Date.now();
     const operations: Array<{
       type: "truncate" | "migrate" | "seed";
@@ -59,7 +43,10 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
 
     try {
       // Truncate operation
-      const truncateResult = await this.truncateTables(data.force, t);
+      const truncateResult = await DatabaseResetRepository.truncateTables(
+        data.force,
+        t,
+      );
       tablesAffected = truncateResult.count;
 
       if (!data.force && !data.dryRun) {
@@ -92,7 +79,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
 
       // Migration operation
       if (!data.skipMigrations && !data.dryRun && data.force) {
-        const migrationResult = await this.runMigrations(t);
+        const migrationResult = await DatabaseResetRepository.runMigrations(t);
         migrationsRun = migrationResult.count;
         operations.push({
           type: "migrate",
@@ -125,7 +112,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
 
       // Seed operation
       if (!data.skipSeeds && !data.dryRun && data.force) {
-        const seedResult = await this.runSeeds(t);
+        const seedResult = await DatabaseResetRepository.runSeeds(t);
         seedsRun = seedResult.count;
         operations.push({
           type: "seed",
@@ -158,7 +145,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
 
       const duration = Date.now() - startTime;
 
-      const response: ResetResponseType = {
+      const response: DbResetResponseOutput = {
         success: true,
         operations,
         tablesAffected,
@@ -188,9 +175,9 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Truncate all tables (safe reset)
    */
-  private async truncateTables(
+  private static async truncateTables(
     force: boolean,
-    t: ModuleT,
+    t: ResetT,
   ): Promise<{ output: string; count: number }> {
     try {
       if (!force) {
@@ -202,8 +189,8 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
 
       // Get all table names
       const tables = await db.execute<{ tablename: string }>(sql`
-        SELECT tablename 
-        FROM pg_tables 
+        SELECT tablename
+        FROM pg_tables
         WHERE schemaname = 'public'
         AND tablename NOT LIKE '__drizzle%'
       `);
@@ -243,9 +230,9 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Drop and recreate database schema
    */
-  private async dropAndRecreate(
+  private static async dropAndRecreate(
     force: boolean,
-    t: ModuleT,
+    t: ResetT,
   ): Promise<{ output: string; count: number }> {
     try {
       if (!force) {
@@ -257,8 +244,8 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
 
       // Get all tables before dropping
       const tables = await db.execute<{ tablename: string }>(sql`
-        SELECT tablename 
-        FROM pg_tables 
+        SELECT tablename
+        FROM pg_tables
         WHERE schemaname = 'public'
       `);
 
@@ -287,13 +274,16 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Initialize database (full setup)
    */
-  private async initializeDatabase(
+  private static async initializeDatabase(
     force: boolean,
-    t: ModuleT,
+    t: ResetT,
   ): Promise<{ output: string; count: number }> {
     try {
       // This combines drop and recreate with full setup
-      const dropResult = await this.dropAndRecreate(force, t);
+      const dropResult = await DatabaseResetRepository.dropAndRecreate(
+        force,
+        t,
+      );
 
       return {
         output: t("messages.databaseInitialized", {
@@ -314,8 +304,8 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Run database migrations
    */
-  private runMigrations(
-    t: ModuleT,
+  private static runMigrations(
+    t: ResetT,
   ): Promise<{ output: string; count: number }> {
     // This would integrate with the migration repository
     // For now, returning realistic placeholder
@@ -330,7 +320,9 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Run database seeds
    */
-  private runSeeds(t: ModuleT): Promise<{ output: string; count: number }> {
+  private static runSeeds(
+    t: ResetT,
+  ): Promise<{ output: string; count: number }> {
     // This would integrate with the seed system
     // For now, returning realistic placeholder
     return Promise.resolve({
@@ -341,8 +333,3 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
     });
   }
 }
-
-/**
- * Default repository instance
- */
-export const databaseResetRepository = new DatabaseResetRepositoryImpl();

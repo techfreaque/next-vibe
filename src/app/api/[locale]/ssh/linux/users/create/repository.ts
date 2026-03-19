@@ -28,35 +28,33 @@ import type {
   LinuxUserCreateRequestOutput,
   LinuxUserCreateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-const execAsync = promisify(exec);
-
-/** Map LoginShell enum values to actual shell paths */
-const SHELL_PATHS: Record<string, string> = {
-  [LoginShell.BASH]: "/bin/bash",
-  [LoginShell.ZSH]: "/usr/bin/zsh",
-  [LoginShell.SH]: "/bin/sh",
-  [LoginShell.FISH]: "/usr/bin/fish",
-  [LoginShell.DASH]: "/bin/dash",
-  [LoginShell.NOLOGIN]: "/usr/sbin/nologin",
-};
-
-function resolveShell(loginShell: string | undefined): string {
-  if (!loginShell) {
-    return "/bin/bash";
-  }
-  return SHELL_PATHS[loginShell] ?? loginShell;
-}
+import type { UsersCreateT } from "./i18n";
 
 export class LinuxUserCreateRepository {
+  private static readonly execAsync = promisify(exec);
+
+  /** Map LoginShell enum values to actual shell paths */
+  private static readonly SHELL_PATHS: Record<string, string> = {
+    [LoginShell.BASH]: "/bin/bash",
+    [LoginShell.ZSH]: "/usr/bin/zsh",
+    [LoginShell.SH]: "/bin/sh",
+    [LoginShell.FISH]: "/usr/bin/fish",
+    [LoginShell.DASH]: "/bin/dash",
+    [LoginShell.NOLOGIN]: "/usr/sbin/nologin",
+  };
+
+  private static resolveShell(loginShell: string | undefined): string {
+    if (!loginShell) {
+      return "/bin/bash";
+    }
+    return LinuxUserCreateRepository.SHELL_PATHS[loginShell] ?? loginShell;
+  }
+
   static async create(
     data: LinuxUserCreateRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: UsersCreateT,
   ): Promise<ResponseType<LinuxUserCreateResponseOutput>> {
     if (data.connectionId) {
       return LinuxUserCreateRepository.createSsh(data, user, logger, t);
@@ -78,7 +76,7 @@ export class LinuxUserCreateRepository {
       });
     }
 
-    const shell = resolveShell(data.loginShell);
+    const shell = LinuxUserCreateRepository.resolveShell(data.loginShell);
     const homeDir = data.homeDir ?? `/home/${username}`;
     const groups = data.groups ?? [];
     if (data.sudoAccess) {
@@ -95,7 +93,7 @@ export class LinuxUserCreateRepository {
     try {
       logger.info(`Creating Linux user: ${username}`);
       if (!needsSudo) {
-        await execAsync(useraddCmd);
+        await LinuxUserCreateRepository.execAsync(useraddCmd);
       } else if (sudoPassword) {
         await new Promise<void>((resolve, reject) => {
           const args = useraddCmd.split(" ").filter(Boolean);
@@ -117,11 +115,11 @@ export class LinuxUserCreateRepository {
           });
         });
       } else {
-        await execAsync(`sudo ${useraddCmd}`);
+        await LinuxUserCreateRepository.execAsync(`sudo ${useraddCmd}`);
       }
 
       // Get uid/gid
-      const { stdout: idOut } = await execAsync(
+      const { stdout: idOut } = await LinuxUserCreateRepository.execAsync(
         `id -u ${username} && id -g ${username}`,
       );
       const [uidStr, gidStr] = idOut.trim().split("\n");
@@ -183,7 +181,7 @@ export class LinuxUserCreateRepository {
     data: LinuxUserCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: UsersCreateT,
   ): Promise<ResponseType<LinuxUserCreateResponseOutput>> {
     const credsResult = await getConnectionCredentials(
       data.connectionId!,
@@ -216,7 +214,7 @@ export class LinuxUserCreateRepository {
       });
     }
 
-    const shell = resolveShell(data.loginShell);
+    const shell = LinuxUserCreateRepository.resolveShell(data.loginShell);
     const homeDir = data.homeDir ?? `/home/${username}`;
     const groups = [...(data.groups ?? [])];
     if (data.sudoAccess) {

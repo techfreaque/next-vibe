@@ -11,8 +11,6 @@
  * - AI stream tools (future): reads token from user's configured remote login
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,

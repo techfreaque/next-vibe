@@ -3,7 +3,6 @@
  * Orchestrates all generator operations in parallel
  */
 
-/* eslint-disable i18next/no-literal-string */
 // CLI output messages don't need internationalization
 
 import "server-only";
@@ -23,32 +22,21 @@ import {
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import type { DirtyFlags, LiveIndex } from "../shared/live-index";
-import type endpoints from "./definition";
+import type {
+  GenerateAllRequestOutput,
+  GenerateAllResponseOutput,
+} from "./definition";
 import { scopedTranslation } from "./i18n";
-
-type RequestType = typeof endpoints.POST.types.RequestOutput;
-type GenerateAllResponseType = typeof endpoints.POST.types.ResponseOutput;
-
-/**
- * Generate All Repository Interface
- */
-interface GenerateAllRepository {
-  generateAll(
-    data: RequestType,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<BaseResponseType<GenerateAllResponseType>>;
-}
 
 /**
  * Generate All Repository Implementation
  */
-class GenerateAllRepositoryImpl implements GenerateAllRepository {
-  async generateAll(
-    data: RequestType,
+export class GenerateAllRepository {
+  static async generateAll(
+    data: GenerateAllRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<BaseResponseType<GenerateAllResponseType>> {
+  ): Promise<BaseResponseType<GenerateAllResponseOutput>> {
     const outputLines: string[] = [];
     let generatorsRun = 0;
     let generatorsSkipped = 0;
@@ -63,14 +51,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { endpointsMetaGeneratorRepository } =
+              const { EndpointsMetaGeneratorRepository } =
                 await import("../endpoints-meta/repository");
 
               const { scopedTranslation: endpointsMetaI18n } =
                 await import("../endpoints-meta/i18n");
               const { t: subT } = endpointsMetaI18n.scopedT(locale);
               const result =
-                await endpointsMetaGeneratorRepository.generateEndpointsMeta(
+                await EndpointsMetaGeneratorRepository.generateEndpointsMeta(
                   {
                     outputDir:
                       "src/app/api/[locale]/system/generated/endpoints-meta",
@@ -103,13 +91,13 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { endpointGeneratorRepository } =
+              const { EndpointGeneratorRepository } =
                 await import("../endpoint/repository");
 
               const { scopedTranslation: endpointI18n } =
                 await import("../endpoint/i18n");
               const { t: subT } = endpointI18n.scopedT(locale);
-              const result = await endpointGeneratorRepository.generateEndpoint(
+              const result = await EndpointGeneratorRepository.generateEndpoint(
                 {
                   outputFile:
                     "src/app/api/[locale]/system/generated/endpoint.ts",
@@ -142,14 +130,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { routeHandlersGeneratorRepository } =
+              const { RouteHandlersGeneratorRepository } =
                 await import("../route-handlers/repository");
 
               const { scopedTranslation: routeHandlersI18n } =
                 await import("../route-handlers/i18n");
               const { t: subT } = routeHandlersI18n.scopedT(locale);
               const result =
-                await routeHandlersGeneratorRepository.generateRouteHandlers(
+                await RouteHandlersGeneratorRepository.generateRouteHandlers(
                   {
                     outputFile:
                       "src/app/api/[locale]/system/generated/route-handlers.ts",
@@ -222,13 +210,13 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { seedsGeneratorRepository } =
+              const { SeedsGeneratorRepository } =
                 await import("../seeds/repository");
 
               const { scopedTranslation: seedsI18n } =
                 await import("../seeds/i18n");
               const { t: subT } = seedsI18n.scopedT(locale);
-              const result = await seedsGeneratorRepository.generateSeeds(
+              const result = await SeedsGeneratorRepository.generateSeeds(
                 {
                   outputDir: "src/app/api/[locale]/system/generated",
                   includeTestData: true,
@@ -264,14 +252,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { taskIndexGeneratorRepository } =
+              const { TaskIndexGeneratorRepository } =
                 await import("../task-index/repository");
 
               const { scopedTranslation: taskIndexI18n } =
                 await import("../task-index/i18n");
               const { t: subT } = taskIndexI18n.scopedT(locale);
               const result =
-                await taskIndexGeneratorRepository.generateTaskIndex(
+                await TaskIndexGeneratorRepository.generateTaskIndex(
                   {
                     outputFile:
                       "src/app/api/[locale]/system/generated/tasks-index.ts",
@@ -306,14 +294,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            const { skillsIndexGeneratorRepository } =
+            const { SkillsIndexGeneratorRepository } =
               await import("../skills-index/repository");
 
             const { scopedTranslation: skillsIndexI18n } =
               await import("../skills-index/i18n");
             const { t: subT } = skillsIndexI18n.scopedT(locale);
             const result =
-              await skillsIndexGeneratorRepository.generateSkillsIndex(
+              await SkillsIndexGeneratorRepository.generateSkillsIndex(
                 {
                   outputFile:
                     "src/app/api/[locale]/system/generated/skills-index.ts",
@@ -344,14 +332,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            const { promptFragmentsGeneratorRepository } =
+            const { PromptFragmentsGeneratorRepository } =
               await import("../prompt-fragments/repository");
 
             const { scopedTranslation: promptFragmentsI18n } =
               await import("../prompt-fragments/i18n");
             const { t: subT } = promptFragmentsI18n.scopedT(locale);
             const result =
-              await promptFragmentsGeneratorRepository.generatePromptFragments(
+              await PromptFragmentsGeneratorRepository.generatePromptFragments(
                 {
                   outputFile:
                     "src/app/api/[locale]/system/generated/prompt-fragments.ts",
@@ -383,11 +371,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { generateTrpcRouterRepository } =
+              const { GenerateTrpcRouterRepository } =
                 await import("../generate-trpc-router/repository");
 
               const result =
-                await generateTrpcRouterRepository.generateTrpcRouter(
+                await GenerateTrpcRouterRepository.generateTrpcRouter(
                   {
                     apiDir: "src/app/api",
                     outputFile:
@@ -424,14 +412,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            const { emailTemplateGeneratorRepository } =
+            const { EmailTemplateGeneratorRepository } =
               await import("../email-templates/repository");
 
             const { scopedTranslation: emailTemplatesI18n } =
               await import("../email-templates/i18n");
             const { t: subT } = emailTemplatesI18n.scopedT(locale);
             const result =
-              await emailTemplateGeneratorRepository.generateEmailTemplates(
+              await EmailTemplateGeneratorRepository.generateEmailTemplates(
                 {
                   outputFile:
                     "src/app/api/[locale]/messenger/registry/generated.ts",
@@ -463,14 +451,14 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { remoteCapabilitiesGeneratorRepository } =
+              const { RemoteCapabilitiesGeneratorRepository } =
                 await import("../remote-capabilities/repository");
               const { scopedTranslation: remoteCapI18n } =
                 await import("../remote-capabilities/i18n");
               const { t: subT } = remoteCapI18n.scopedT(locale);
 
               const result =
-                await remoteCapabilitiesGeneratorRepository.generateRemoteCapabilities(
+                await RemoteCapabilitiesGeneratorRepository.generateRemoteCapabilities(
                   {
                     outputDir:
                       "src/app/api/[locale]/system/generated/remote-capabilities",
@@ -502,12 +490,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            const { envGeneratorRepository } =
+            const { EnvGeneratorRepository } =
               await import("../env/repository");
 
             const { scopedTranslation: envI18n } = await import("../env/i18n");
             const { t: subT } = envI18n.scopedT(locale);
-            const result = await envGeneratorRepository.generateEnv(
+            const result = await EnvGeneratorRepository.generateEnv(
               {
                 outputDir: "src/app/api/[locale]/system/generated",
                 verbose: false,
@@ -538,13 +526,13 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            const { envKeysGeneratorRepository } =
+            const { EnvKeysGeneratorRepository } =
               await import("../env-keys/repository");
 
             const { scopedTranslation: envKeysI18n } =
               await import("../env-keys/i18n");
             const { t: subT } = envKeysI18n.scopedT(locale);
-            const result = await envKeysGeneratorRepository.generateEnvKeys(
+            const result = await EnvKeysGeneratorRepository.generateEnvKeys(
               {
                 outputFile: "src/app/api/[locale]/system/generated/env-keys.ts",
                 dryRun: false,
@@ -575,11 +563,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { generateTanstackRoutesRepository } =
+              const { GenerateTanstackRoutesRepository } =
                 await import("../../unified-interface/tanstack-start/generate/repository");
 
               const result =
-                await generateTanstackRoutesRepository.generateInternal();
+                await GenerateTanstackRoutesRepository.generateInternal();
 
               if (result.success) {
                 generatorsRun++;
@@ -606,17 +594,18 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
-            const { graphSeedsIndexGeneratorRepository } =
+            const { GraphSeedsIndexGeneratorRepository } =
               await import("../graph-seeds-index/repository");
 
             const result =
-              await graphSeedsIndexGeneratorRepository.generateGraphSeedsIndex(
+              await GraphSeedsIndexGeneratorRepository.generateGraphSeedsIndex(
                 {
                   outputFile:
                     "src/app/api/[locale]/system/generated/graph-seeds-index.ts",
                   dryRun: false,
                 },
                 logger,
+                locale,
               );
 
             if (result.success) {
@@ -678,7 +667,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
    * Run only the generators whose dirty flags are set, using the live index.
    * Used by the dev watcher for surgical, efficient regeneration.
    */
-  async generateDirty(
+  static async generateDirty(
     dirty: DirtyFlags,
     liveIndex: LiveIndex,
     logger: EndpointLogger,
@@ -693,12 +682,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { endpointsMetaGeneratorRepository } =
+            const { EndpointsMetaGeneratorRepository } =
               await import("../endpoints-meta/repository");
             const { scopedTranslation: i18n } =
               await import("../endpoints-meta/i18n");
             const { t } = i18n.scopedT(locale);
-            await endpointsMetaGeneratorRepository.generateEndpointsMeta(
+            await EndpointsMetaGeneratorRepository.generateEndpointsMeta(
               {
                 outputDir:
                   "src/app/api/[locale]/system/generated/endpoints-meta",
@@ -718,12 +707,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
         (async (): Promise<void> => {
           try {
-            const { endpointGeneratorRepository } =
+            const { EndpointGeneratorRepository } =
               await import("../endpoint/repository");
             const { scopedTranslation: i18n } =
               await import("../endpoint/i18n");
             const { t } = i18n.scopedT(locale);
-            await endpointGeneratorRepository.generateEndpoint(
+            await EndpointGeneratorRepository.generateEndpoint(
               {
                 outputFile: "src/app/api/[locale]/system/generated/endpoint.ts",
                 dryRun: false,
@@ -742,12 +731,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
         (async (): Promise<void> => {
           try {
-            const { routeHandlersGeneratorRepository } =
+            const { RouteHandlersGeneratorRepository } =
               await import("../route-handlers/repository");
             const { scopedTranslation: i18n } =
               await import("../route-handlers/i18n");
             const { t } = i18n.scopedT(locale);
-            await routeHandlersGeneratorRepository.generateRouteHandlers(
+            await RouteHandlersGeneratorRepository.generateRouteHandlers(
               {
                 outputFile:
                   "src/app/api/[locale]/system/generated/route-handlers.ts",
@@ -767,12 +756,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
         (async (): Promise<void> => {
           try {
-            const { remoteCapabilitiesGeneratorRepository } =
+            const { RemoteCapabilitiesGeneratorRepository } =
               await import("../remote-capabilities/repository");
             const { scopedTranslation: remoteCapI18n } =
               await import("../remote-capabilities/i18n");
             const { t } = remoteCapI18n.scopedT(locale);
-            await remoteCapabilitiesGeneratorRepository.generateRemoteCapabilities(
+            await RemoteCapabilitiesGeneratorRepository.generateRemoteCapabilities(
               {
                 outputDir:
                   "src/app/api/[locale]/system/generated/remote-capabilities",
@@ -835,12 +824,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { taskIndexGeneratorRepository } =
+            const { TaskIndexGeneratorRepository } =
               await import("../task-index/repository");
             const { scopedTranslation: i18n } =
               await import("../task-index/i18n");
             const { t } = i18n.scopedT(locale);
-            await taskIndexGeneratorRepository.generateTaskIndex(
+            await TaskIndexGeneratorRepository.generateTaskIndex(
               {
                 outputFile:
                   "src/app/api/[locale]/system/generated/tasks-index.ts",
@@ -867,12 +856,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { emailTemplateGeneratorRepository } =
+            const { EmailTemplateGeneratorRepository } =
               await import("../email-templates/repository");
             const { scopedTranslation: i18n } =
               await import("../email-templates/i18n");
             const { t } = i18n.scopedT(locale);
-            await emailTemplateGeneratorRepository.generateEmailTemplates(
+            await EmailTemplateGeneratorRepository.generateEmailTemplates(
               {
                 outputFile:
                   "src/app/api/[locale]/messenger/registry/generated.ts",
@@ -899,15 +888,16 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { graphSeedsIndexGeneratorRepository } =
+            const { GraphSeedsIndexGeneratorRepository } =
               await import("../graph-seeds-index/repository");
-            await graphSeedsIndexGeneratorRepository.generateGraphSeedsIndex(
+            await GraphSeedsIndexGeneratorRepository.generateGraphSeedsIndex(
               {
                 outputFile:
                   "src/app/api/[locale]/system/generated/graph-seeds-index.ts",
                 dryRun: false,
               },
               logger,
+              locale,
               liveIndex,
             );
             ran.push("graph-seeds-index");
@@ -927,12 +917,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { skillsIndexGeneratorRepository } =
+            const { SkillsIndexGeneratorRepository } =
               await import("../skills-index/repository");
             const { scopedTranslation: i18n } =
               await import("../skills-index/i18n");
             const { t } = i18n.scopedT(locale);
-            await skillsIndexGeneratorRepository.generateSkillsIndex(
+            await SkillsIndexGeneratorRepository.generateSkillsIndex(
               {
                 outputFile:
                   "src/app/api/[locale]/system/generated/skills-index.ts",
@@ -959,12 +949,12 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { promptFragmentsGeneratorRepository } =
+            const { PromptFragmentsGeneratorRepository } =
               await import("../prompt-fragments/repository");
             const { scopedTranslation: i18n } =
               await import("../prompt-fragments/i18n");
             const { t } = i18n.scopedT(locale);
-            await promptFragmentsGeneratorRepository.generatePromptFragments(
+            await PromptFragmentsGeneratorRepository.generatePromptFragments(
               {
                 outputFile:
                   "src/app/api/[locale]/system/generated/prompt-fragments.ts",
@@ -993,11 +983,11 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { seedsGeneratorRepository } =
+            const { SeedsGeneratorRepository } =
               await import("../seeds/repository");
             const { scopedTranslation: i18n } = await import("../seeds/i18n");
             const { t } = i18n.scopedT(locale);
-            await seedsGeneratorRepository.generateSeeds(
+            await SeedsGeneratorRepository.generateSeeds(
               {
                 outputDir: "src/app/api/[locale]/system/generated",
                 includeTestData: true,
@@ -1026,24 +1016,21 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
   }
 }
 
-export const generateAllRepository = new GenerateAllRepositoryImpl();
-
 if (import.meta.main) {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  void generateAllRepository
-    .generateAll(
-      {
-        skipEndpoints: false,
-        skipSeeds: false,
-        skipTaskIndex: false,
-        enableTrpc: false,
-        skipTanstack: false,
-        verbose: false,
-        outputDir: "src/app/api/[locale]/system/generated",
-      },
-      logger,
-      defaultLocale,
-    )
+  void GenerateAllRepository.generateAll(
+    {
+      skipEndpoints: false,
+      skipSeeds: false,
+      skipTaskIndex: false,
+      enableTrpc: false,
+      skipTanstack: false,
+      verbose: false,
+      outputDir: "src/app/api/[locale]/system/generated",
+    },
+    logger,
+    defaultLocale,
+  )
     .then((result) => {
       if (!result.success) {
         // oxlint-disable-next-line no-console

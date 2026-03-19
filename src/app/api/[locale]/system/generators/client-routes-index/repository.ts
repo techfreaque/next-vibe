@@ -28,9 +28,7 @@ import {
   findFilesRecursively,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { GeneratorsClientRoutesIndexT } from "./i18n";
 
 // Type definitions
 interface ClientRoutesRequestType {
@@ -49,11 +47,11 @@ interface ClientRoutesResponseType {
 /**
  * Client Routes Index Generator Repository
  */
-class ClientRoutesIndexGeneratorRepositoryImpl {
-  async generateClientRoutesIndex(
+export class ClientRoutesIndexGeneratorRepository {
+  static async generateClientRoutesIndex(
     data: ClientRoutesRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsClientRoutesIndexT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<ClientRoutesResponseType>> {
     const startTime = Date.now();
@@ -80,17 +78,18 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
       if (clientRouteFiles.length === 0) {
         return success({
           success: true,
-          message: "No client routes found",
+          message: t("post.errors.notFound.title"),
           routesFound: 0,
           duration: Date.now() - startTime,
         });
       }
 
       // Generate switch cases following route-handlers pattern
-      const { content, routeCount } = await this.generateContent(
-        clientRouteFiles,
-        logger,
-      );
+      const { content, routeCount } =
+        await ClientRoutesIndexGeneratorRepository.generateContent(
+          clientRouteFiles,
+          logger,
+        );
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -127,7 +126,7 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
   /**
    * Extract HTTP methods from route-client file by reading the file exports
    */
-  private async extractMethodsFromClientRoute(
+  private static async extractMethodsFromClientRoute(
     routeFile: string,
   ): Promise<string[]> {
     try {
@@ -148,7 +147,7 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
   /**
    * Generate client route handlers content with dynamic imports following route-handlers pattern
    */
-  private async generateContent(
+  private static async generateContent(
     clientRouteFiles: string[],
     logger: EndpointLogger,
   ): Promise<{ content: string; routeCount: number }> {
@@ -163,7 +162,10 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
       const importPath = `@/app/api/[locale]/${pathStr}/route-client`;
 
       // Get methods for this client route
-      const methods = await this.extractMethodsFromClientRoute(routeFile);
+      const methods =
+        await ClientRoutesIndexGeneratorRepository.extractMethodsFromClientRoute(
+          routeFile,
+        );
 
       if (methods.length === 0) {
         logger.warn(`No methods found in client route: ${routeFile}`);
@@ -212,7 +214,6 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
  */
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
@@ -231,6 +232,3 @@ ${cases.join("\n")}
     return { content, routeCount };
   }
 }
-
-export const ClientRoutesIndexGeneratorRepository =
-  new ClientRoutesIndexGeneratorRepositoryImpl();

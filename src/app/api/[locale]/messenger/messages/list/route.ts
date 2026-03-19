@@ -6,7 +6,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { emailsRepository } from "../repository";
+import { EmailsRepository } from "../repository";
 import definitions from "./definition";
 
 export const { GET, tools } = endpointsHandler({
@@ -14,6 +14,6 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: ({ data, user, logger, locale }) =>
-      emailsRepository.getEmails(data, user, logger, locale),
+      EmailsRepository.getEmails(data, user, logger, locale),
   },
 });

@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { sessionCleanupRepository } from "./repository";
+import { SessionCleanupRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, logger, locale }) =>
-      sessionCleanupRepository.executeSessionCleanup(data, logger, locale),
+      SessionCleanupRepository.executeSessionCleanup(data, logger, locale),
   },
 });

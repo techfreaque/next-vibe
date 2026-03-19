@@ -9,8 +9,8 @@ import {
   isNull,
   lte,
   or,
-  type SQL,
   sql,
+  type SQL,
 } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -31,61 +31,46 @@ import { ActivityType, UserAssociation } from "../../../leads/enum";
 import { EngagementLevel } from "../../../leads/tracking/engagement/enum";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../db";
-import type { scopedTranslation } from "./i18n";
+import type { StatsT } from "./i18n";
 
 import {
+  mapMessageStatusFilter,
+  mapMessageTypeFilter,
   MessageStatus,
   MessageStatusFilter,
   MessageTypeFilter,
   RetryRange,
-  mapMessageStatusFilter,
-  mapMessageTypeFilter,
 } from "../enum";
-import { DateRangePreset, getDateRangeFromPreset, TimePeriod } from "./enum";
 import type {
   EmailStatsGetRequestTypeOutput,
   EmailStatsGetResponseTypeOutput,
+  EmailStatsGroupedStats,
+  EmailStatsByStatus,
+  EmailStatsByType,
+  EmailStatsByProvider,
+  EmailStatsByTemplate,
+  EmailStatsByEngagement,
+  EmailStatsByRetryCount,
+  EmailStatsByUserAssociation,
+  EmailStatsRecentActivity,
+  EmailStatsTopPerformingTemplate,
+  EmailStatsTopPerformingProvider,
+  EmailStatsHistoricalData,
 } from "./definition";
-
-type StatsModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-// Extract types from definition schema for DRY principle
-type EmailStatsResponseType = EmailStatsGetResponseTypeOutput;
-type GroupedStatsType = EmailStatsResponseType["groupedStats"];
-type ByStatusType = GroupedStatsType["byStatus"][number];
-type ByTypeType = GroupedStatsType["byType"][number];
-type ByProviderType = GroupedStatsType["byProvider"][number];
-type ByTemplateType = GroupedStatsType["byTemplate"][number];
-type ByEngagementType = GroupedStatsType["byEngagement"][number];
-type ByRetryCountType = GroupedStatsType["byRetryCount"][number];
-type ByUserAssociationType = GroupedStatsType["byUserAssociation"][number];
-type RecentActivityType = EmailStatsResponseType["recentActivity"][number];
-type TopPerformingTemplateType =
-  EmailStatsResponseType["topPerformingTemplates"][number];
-type TopPerformingProviderType =
-  EmailStatsResponseType["topPerformingProviders"][number];
-type HistoricalDataType = EmailStatsResponseType["historicalData"];
-
-interface EmailStatsRepository {
-  getStats(
-    data: EmailStatsGetRequestTypeOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-    t: StatsModuleT,
-  ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>>;
-}
+import { DateRangePreset, getDateRangeFromPreset, TimePeriod } from "./enum";
 
 /**
- * Email Stats Repository Implementation
+ * Email Stats Repository
  */
-class EmailStatsRepositoryImpl implements EmailStatsRepository {
+export class EmailStatsRepository {
   /**
    * Get comprehensive email statistics
    */
-  async getStats(
+  static async getStats(
     data: EmailStatsGetRequestTypeOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: StatsModuleT,
+    t: StatsT,
   ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>> {
     logger.debug("Getting email stats", {
       userId: user.isPublic ? "public" : user.id,
@@ -153,12 +138,12 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
 
       // Generate comprehensive email statistics
       const results = await Promise.all([
-        this.generateCurrentPeriodStats(whereClause),
-        this.generateHistoricalData(timePeriod, whereClause, t),
-        this.generateGroupedStats(whereClause, t),
-        this.generateRecentActivity(whereClause),
-        this.generateTopPerformingTemplates(whereClause),
-        this.generateTopPerformingProviders(whereClause),
+        EmailStatsRepository.generateCurrentPeriodStats(whereClause),
+        EmailStatsRepository.generateHistoricalData(timePeriod, whereClause, t),
+        EmailStatsRepository.generateGroupedStats(whereClause, t),
+        EmailStatsRepository.generateRecentActivity(whereClause),
+        EmailStatsRepository.generateTopPerformingTemplates(whereClause),
+        EmailStatsRepository.generateTopPerformingProviders(whereClause),
       ]);
 
       const [
@@ -170,7 +155,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         topPerformingProviders,
       ] = results;
 
-      const statsResponse: EmailStatsResponseType = {
+      const statsResponse: EmailStatsGetResponseTypeOutput = {
         ...currentPeriodStats,
         historicalData,
         groupedStats,
@@ -205,7 +190,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate current period statistics
    */
-  private async generateCurrentPeriodStats(
+  private static async generateCurrentPeriodStats(
     whereClause: SQL | undefined,
   ): Promise<{
     totalEmails: number;
@@ -377,7 +362,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Helper function to transform historical results to chart data
    */
-  private transformToHistoricalData(
+  private static transformToHistoricalData(
     results: Array<{ period: string; [key: string]: number | string }>,
     field: string,
   ): HistoricalDataPointType[] {
@@ -391,7 +376,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Get PostgreSQL date truncation period string for time period
    */
-  private getPostgresTimePeriod(
+  private static getPostgresTimePeriod(
     period: (typeof TimePeriod)[keyof typeof TimePeriod],
   ): string {
     switch (period) {
@@ -415,12 +400,13 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate historical data for charts
    */
-  private async generateHistoricalData(
+  private static async generateHistoricalData(
     timePeriodParam: (typeof TimePeriod)[keyof typeof TimePeriod],
     whereClause: SQL | undefined,
-    t: StatsModuleT,
-  ): Promise<HistoricalDataType> {
-    const timePeriod = this.getPostgresTimePeriod(timePeriodParam);
+    t: StatsT,
+  ): Promise<EmailStatsHistoricalData> {
+    const timePeriod =
+      EmailStatsRepository.getPostgresTimePeriod(timePeriodParam);
 
     // Get historical data for all metrics
     const historicalResults = await db
@@ -448,7 +434,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       series: [
         {
           name: t("get.response.metrics.totalEmails"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "totalEmails",
           ),
@@ -457,13 +443,16 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.sentEmails"),
-          data: this.transformToHistoricalData(historicalResults, "sentEmails"),
+          data: EmailStatsRepository.transformToHistoricalData(
+            historicalResults,
+            "sentEmails",
+          ),
           color: "#10b981",
           type: SharedChartType.LINE,
         },
         {
           name: t("get.response.metrics.deliveredEmails"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "deliveredEmails",
           ),
@@ -472,7 +461,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.openedEmails"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "openedEmails",
           ),
@@ -481,7 +470,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.clickedEmails"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "clickedEmails",
           ),
@@ -490,7 +479,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.bouncedEmails"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "bouncedEmails",
           ),
@@ -499,7 +488,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.failedEmails"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "failedEmails",
           ),
@@ -579,7 +568,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.emails_with_errors"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "emailsWithErrors",
           ),
@@ -588,7 +577,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.average_retry_count"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "averageRetryCount",
           ),
@@ -597,7 +586,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.average_processing_time"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "averageProcessingTime",
           ),
@@ -606,7 +595,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         },
         {
           name: t("get.response.metrics.average_delivery_time"),
-          data: this.transformToHistoricalData(
+          data: EmailStatsRepository.transformToHistoricalData(
             historicalResults,
             "averageDeliveryTime",
           ),
@@ -620,10 +609,10 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate grouped statistics
    */
-  private async generateGroupedStats(
+  private static async generateGroupedStats(
     whereClause: SQL | undefined,
-    t: StatsModuleT,
-  ): Promise<GroupedStatsType> {
+    t: StatsT,
+  ): Promise<EmailStatsGroupedStats> {
     // Get total count for percentage calculations
     const [{ totalEmails }] = await db
       .select({ totalEmails: count() })
@@ -640,7 +629,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .where(whereClause)
       .groupBy(emails.status);
 
-    const byStatus: ByStatusType[] = statusStats.map((item) => ({
+    const byStatus: EmailStatsByStatus[] = statusStats.map((item) => ({
       status: item.status,
       count: item.count,
       percentage: totalEmails > 0 ? item.count / totalEmails : 0,
@@ -662,7 +651,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .where(whereClause)
       .groupBy(emails.type);
 
-    const byType: ByTypeType[] = typeStats.map((item) => ({
+    const byType: EmailStatsByType[] = typeStats.map((item) => ({
       type: item.type,
       count: item.count,
       percentage: totalEmails > 0 ? item.count / totalEmails : 0,
@@ -688,7 +677,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .where(whereClause)
       .groupBy(emails.accountId);
 
-    const byProvider: ByProviderType[] = providerStats.map((item) => ({
+    const byProvider: EmailStatsByProvider[] = providerStats.map((item) => ({
       provider: item.provider || "unknown",
       count: item.count,
       percentage: totalEmails > 0 ? item.count / totalEmails : 0,
@@ -719,7 +708,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       .where(whereClause)
       .groupBy(emails.templateName);
 
-    const byTemplate: ByTemplateType[] = templateStats
+    const byTemplate: EmailStatsByTemplate[] = templateStats
       .filter((item) => item.templateName)
       .map((item) => ({
         template: item.templateName!,
@@ -764,10 +753,12 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       },
     ];
 
-    const byEngagement: ByEngagementType[] = engagementData.map((item) => ({
-      engagement: item.level,
-      count: item.count,
-    }));
+    const byEngagement: EmailStatsByEngagement[] = engagementData.map(
+      (item) => ({
+        engagement: item.level,
+        count: item.count,
+      }),
+    );
 
     // Get retry count data based on actual retry counts
     const noRetriesCount = await db
@@ -795,10 +786,12 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       },
     ];
 
-    const byRetryCount: ByRetryCountType[] = retryData.map((item, index) => ({
-      retryCount: index,
-      count: item.count,
-    }));
+    const byRetryCount: EmailStatsByRetryCount[] = retryData.map(
+      (item, index) => ({
+        retryCount: index,
+        count: item.count,
+      }),
+    );
 
     // Get user association stats
     const userAssociationStats = {
@@ -853,12 +846,11 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       },
     ];
 
-    const byUserAssociation: ByUserAssociationType[] = associationData.map(
-      (item) => ({
+    const byUserAssociation: EmailStatsByUserAssociation[] =
+      associationData.map((item) => ({
         association: item.type,
         count: item.count,
-      }),
-    );
+      }));
 
     return {
       byStatus,
@@ -874,9 +866,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate recent activity data
    */
-  private async generateRecentActivity(
+  private static async generateRecentActivity(
     whereClause: SQL | undefined,
-  ): Promise<RecentActivityType[]> {
+  ): Promise<EmailStatsRecentActivity[]> {
     const recentEmails = await db
       .select({
         id: emails.id,
@@ -910,9 +902,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate top performing templates
    */
-  private async generateTopPerformingTemplates(
+  private static async generateTopPerformingTemplates(
     whereClause: SQL | undefined,
-  ): Promise<TopPerformingTemplateType[]> {
+  ): Promise<EmailStatsTopPerformingTemplate[]> {
     const templateStats = await db
       .select({
         templateName: emails.templateName,
@@ -953,9 +945,9 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   /**
    * Generate top performing providers
    */
-  private async generateTopPerformingProviders(
+  private static async generateTopPerformingProviders(
     whereClause: SQL | undefined,
-  ): Promise<TopPerformingProviderType[]> {
+  ): Promise<EmailStatsTopPerformingProvider[]> {
     const providerStats = await db
       .select({
         provider: emails.accountId,
@@ -988,8 +980,3 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     }));
   }
 }
-
-/**
- * Export singleton instance
- */
-export const emailStatsRepository = new EmailStatsRepositoryImpl();

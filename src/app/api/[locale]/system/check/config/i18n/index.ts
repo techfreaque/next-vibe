@@ -8,7 +8,7 @@ export const scopedTranslation = createScopedTranslation({
   pl: () => require("./pl").translations,
 });
 
-export type ImportTranslationKey =
+export type CheckConfigTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
 
-export type ImportT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+export type CheckConfigT = ReturnType<typeof scopedTranslation.scopedT>["t"];

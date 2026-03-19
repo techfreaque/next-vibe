@@ -9,6 +9,7 @@ import { z } from "zod";
 import {
   UserPermissionRole,
   UserRoleDB,
+  type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 /**
@@ -48,3 +49,10 @@ export type JWTPublicPayloadType = z.infer<typeof publicJwtPayloadSchema> & {
 export type JwtPrivatePayloadType = z.infer<typeof privateJwtPayloadSchema>;
 
 export type JwtPayloadType = JWTPublicPayloadType | JwtPrivatePayloadType;
+
+export type InferUserType<TRoles extends readonly UserRoleValue[]> =
+  Exclude<TRoles[number], "PUBLIC"> extends never
+    ? JWTPublicPayloadType
+    : Extract<TRoles[number], "PUBLIC"> extends never
+      ? JwtPrivatePayloadType
+      : JwtPayloadType;

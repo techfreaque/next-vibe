@@ -162,7 +162,7 @@ export class BuildExecutor {
       if (buildConfig.filesToCompile?.length) {
         const stepStart = Date.now();
         const compileResult = await this.compileFiles(
-          buildConfig.filesToCompile,
+          buildConfig.filesToCompile.filter((f) => !f.disabled),
           output,
           filesBuilt,
           logger,

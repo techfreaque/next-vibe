@@ -9,9 +9,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { NowpaymentsCliT } from "./i18n";
 
 import type { RequestSchema, ResponseSchema } from "./definition";
 
@@ -24,11 +22,11 @@ interface NgrokApiResponse {
   tunnels: NgrokTunnel[];
 }
 
-export interface CliNowpaymentsRepository {
+interface CliNowpaymentsRepository {
   execute(
     params: RequestSchema,
     locale: string,
-    t: ModuleT,
+    t: NowpaymentsCliT,
   ): Promise<ResponseType<ResponseSchema>>;
 }
 
@@ -36,7 +34,7 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
   async execute(
     params: RequestSchema,
     locale: string,
-    t: ModuleT,
+    t: NowpaymentsCliT,
   ): Promise<ResponseType<ResponseSchema>> {
     const { operation, port = 3000 } = params;
 
@@ -121,7 +119,7 @@ Or use package managers:
   private async executeNgrokTunnelBlocking(
     port: number,
     locale: string,
-    t: ModuleT,
+    t: NowpaymentsCliT,
   ): Promise<ResponseType<ResponseSchema>> {
     process.stdout.write(`\n🚀 Starting ngrok tunnel on port ${port}...\n\n`);
 

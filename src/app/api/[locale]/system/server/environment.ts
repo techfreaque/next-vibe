@@ -3,7 +3,6 @@
  * Provides centralized environment detection and configuration for the server system
  */
 
-/* eslint-disable i18next/no-literal-string */
 import "server-only";
 
 import { Environment } from "next-vibe/shared/utils/env-util";

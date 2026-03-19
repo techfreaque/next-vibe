@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import dbUtilsHealthEndpoint from "./definition";
-import { dbUtilsRepository } from "./repository";
+import { DbUtilsRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: dbUtilsHealthEndpoint,
   [Methods.GET]: {
     handler: async ({ data, t, logger }) => {
-      return await dbUtilsRepository.checkHealth(data, t, logger);
+      return await DbUtilsRepository.checkHealth(data, t, logger);
     },
   },
 });

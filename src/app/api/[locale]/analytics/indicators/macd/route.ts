@@ -11,7 +11,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeMacd } from "./repository";
+import { MacdIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
@@ -25,7 +25,7 @@ export const { POST, tools } = endpointsHandler({
         resolution,
         lookback,
       } = data;
-      const { macd, signal, histogram } = computeMacd(
+      const { macd, signal, histogram } = MacdIndicatorRepository.computeMacd(
         source,
         fastPeriod,
         slowPeriod,

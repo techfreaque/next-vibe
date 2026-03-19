@@ -3,7 +3,12 @@
  * Implements SubscriptionRepository static interface for React Native
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+  type ResponseType,
+} from "next-vibe/shared/types/response.schema";
 
 import type { WebhookData } from "@/app/api/[locale]/payment/providers/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
@@ -28,6 +33,31 @@ import type {
  * Native Subscription Repository - Static class pattern
  */
 export class SubscriptionRepository {
+  private static readonly STRIPE_STATUS_MAP = {};
+
+  // oxlint-disable-next-line no-unused-vars
+  private static isSubscriptionPlan(_planId: string): boolean {
+    return false;
+  }
+
+  private static renewalSessionKey(
+    // oxlint-disable-next-line no-unused-vars
+    _providerSubscriptionId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _periodEndMs: number,
+  ): string {
+    return "";
+  }
+
+  private static calculateSubscriptionPeriod(
+    // oxlint-disable-next-line no-unused-vars
+    _subscription: never,
+  ): {
+    currentPeriodStart: number;
+    currentPeriodEnd: number;
+  } {
+    return { currentPeriodStart: 0, currentPeriodEnd: 0 };
+  }
   static async getSubscription(
     // oxlint-disable-next-line no-unused-vars
     _userId: string,
@@ -42,19 +72,14 @@ export class SubscriptionRepository {
     );
 
     if (response.success) {
-      return {
-        success: true,
-        data: response.data,
-        message: response.message,
-      };
+      return success(response.data);
     }
 
-    return {
-      success: false,
-      errorType: response.errorType,
+    return fail({
       message: response.message,
+      errorType: response.errorType ?? ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: response.messageParams,
-    };
+    });
   }
 
   static async createSubscription(

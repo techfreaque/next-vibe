@@ -16,16 +16,20 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewSession, Session } from "./db";
 import { sessions } from "./db";
+
+interface CurrentSessionResult {
+  userId: string;
+  expiresAt: Date;
+  token: string;
+}
 import { SessionErrorReason } from "./enum";
 import { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { SessionT } from "./i18n";
 
 /**
  * Session repository implementation
@@ -38,7 +42,7 @@ export class SessionRepository {
    */
   static async findByToken(
     token: string,
-    t: ModuleT,
+    t: SessionT,
   ): Promise<ResponseType<Session>> {
     try {
       // First, try to find the session in the database
@@ -77,7 +81,7 @@ export class SessionRepository {
    * Delete expired sessions
    * @returns Success or error response
    */
-  static async deleteExpired(t: ModuleT): Promise<ResponseType<void>> {
+  static async deleteExpired(t: SessionT): Promise<ResponseType<void>> {
     try {
       // Note: Logger not available for internal cleanup methods
 
@@ -113,7 +117,7 @@ export class SessionRepository {
   static async extendSession(
     token: string,
     newExpiresAt: Date,
-    t: ModuleT,
+    t: SessionT,
   ): Promise<ResponseType<void>> {
     try {
       // Note: Logger not available for internal session methods
@@ -194,8 +198,8 @@ export class SessionRepository {
    * @returns Success or error response
    */
   static async deleteById(
-    sessionId: DbId,
-    t: ModuleT,
+    sessionId: string,
+    t: SessionT,
   ): Promise<ResponseType<void>> {
     try {
       await db.delete(sessions).where(eq(sessions.id, sessionId));
@@ -218,8 +222,8 @@ export class SessionRepository {
    * @returns Success or error response
    */
   static async deleteByUserId(
-    userId: DbId,
-    t: ModuleT,
+    userId: string,
+    t: SessionT,
   ): Promise<ResponseType<void>> {
     try {
       // Note: Logger not available for internal session methods
@@ -246,8 +250,8 @@ export class SessionRepository {
    * @returns Session data if valid, error if not
    */
   static async getCurrentSession(
-    t: ModuleT,
-  ): Promise<ResponseType<{ userId: string; expiresAt: Date; token: string }>> {
+    t: SessionT,
+  ): Promise<ResponseType<CurrentSessionResult>> {
     try {
       // Get the current session token from cookies
       const cookiesStore = await cookies();

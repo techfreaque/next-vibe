@@ -24,7 +24,7 @@ import {
   SourcemapModeEnum,
 } from "@/app/api/[locale]/system/builder/enum";
 import type { BuildConfig } from "@/app/api/[locale]/system/builder/repository";
-import { packageEndpointGeneratorRepository } from "@/app/api/[locale]/system/generators/package-endpoints/repository";
+import { PackageEndpointGeneratorRepository } from "@/app/api/[locale]/system/generators/package-endpoints/repository";
 
 import manifest from "./package";
 
@@ -56,7 +56,7 @@ const config: BuildConfig = {
   hooks: {
     preBuild: async ({ logger }) => {
       logger.info("Generating scoped endpoint registry for @next-vibe/checker");
-      const result = await packageEndpointGeneratorRepository.generate({
+      const result = await PackageEndpointGeneratorRepository.generate({
         manifest,
         outputDir: GENERATED_DIR,
       });

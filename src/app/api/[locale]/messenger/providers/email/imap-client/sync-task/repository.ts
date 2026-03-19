@@ -16,7 +16,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "../i18n";
-import { imapSyncRepository } from "../sync-service/repository";
+import { ImapSyncRepository } from "../sync-service/repository";
 
 interface TaskConfig {
   maxAccountsPerRun: number;
@@ -40,12 +40,16 @@ interface TaskResult {
   };
 }
 
-export class ImapSyncTaskRepositoryImpl {
-  async executeImapSync(
+interface ExecuteImapSyncResult {
+  result: TaskResult;
+}
+
+export class ImapSyncTaskRepository {
+  static async executeImapSync(
     config: TaskConfig,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: TaskResult }>> {
+  ): Promise<ResponseType<ExecuteImapSyncResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     logger.info("tasks.imap_sync.start", {
       maxAccountsPerRun: config.maxAccountsPerRun ?? 0,
@@ -55,7 +59,7 @@ export class ImapSyncTaskRepositoryImpl {
     });
 
     try {
-      const syncResult = await imapSyncRepository.syncAllAccounts(
+      const syncResult = await ImapSyncRepository.syncAllAccounts(
         logger,
         locale,
       );
@@ -108,7 +112,7 @@ export class ImapSyncTaskRepositoryImpl {
     }
   }
 
-  validateImapSync(
+  static validateImapSync(
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): ResponseType<{ isValid: boolean }> {
@@ -127,5 +131,3 @@ export class ImapSyncTaskRepositoryImpl {
     }
   }
 }
-
-export const imapSyncTaskRepository = new ImapSyncTaskRepositoryImpl();

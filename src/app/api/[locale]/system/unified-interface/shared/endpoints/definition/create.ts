@@ -258,6 +258,13 @@ export interface ApiEndpoint<
    * Defaults to false (no confirmation required)
    */
   readonly requiresConfirmation?: boolean;
+  /**
+   * Stream timeout in milliseconds when this tool is called by AI and escalates
+   * to a background task (via escalateToTask or remote queue).
+   * Default: 90_000 (90s — covers a full cron pulse cycle).
+   * Set to 0 for no timeout (long-running tools like claude-code, shell).
+   */
+  readonly streamTimeoutMs?: number;
   /** Icon identifier */
   readonly icon: IconKey;
 

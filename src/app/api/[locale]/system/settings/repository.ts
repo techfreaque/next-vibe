@@ -31,78 +31,82 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { SystemSettingsGetResponseOutput } from "./definition";
 import type { SystemSettingsT } from "./i18n";
 
-/** Sentinel password that triggers onboarding */
-const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
-
-/** Patterns for detecting sensitive env keys by name */
-const SENSITIVE_PATTERNS = [
-  "_KEY",
-  "_SECRET",
-  "_PASS",
-  "_TOKEN",
-  "_SID",
-  "_CREDENTIAL",
-  "PASSWORD",
-  "JWT_SECRET",
-  "CRON_SECRET",
-  "ACCESS_KEY",
-  "AUTH_TOKEN",
-  "DATABASE_URL",
-];
-
-function isSensitiveKey(key: string, explicitSensitive?: boolean): boolean {
-  if (explicitSensitive !== undefined) {
-    return explicitSensitive;
-  }
-  const upper = key.toUpperCase();
-  return SENSITIVE_PATTERNS.some((p) => upper.includes(p));
-}
-
-function stringifyValue(
-  value: string | number | boolean | null | undefined,
-): string {
-  if (value === undefined || value === null) {
-    return "";
-  }
-  return String(value);
-}
-
-function getEnvFilePath(): string {
-  return join(process.cwd(), ".env");
-}
-
-async function checkWritable(): Promise<boolean> {
-  // Docker detection
-  if (process.env["VIBE_IS_DOCKER"] === "true") {
-    return false;
-  }
-
-  const envPath = getEnvFilePath();
-  if (!existsSync(envPath)) {
-    return false;
-  }
-
-  try {
-    await access(envPath, constants.W_OK);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function isDevMode(): boolean {
-  const devPidPath = join(process.cwd(), ".tmp", ".vibe-dev.pid");
-  return existsSync(devPidPath);
-}
-
-function findExampleForKey(
-  examples: EnvExample[],
-  key: string,
-): EnvExample | undefined {
-  return examples.find((e) => e.key === key);
-}
-
 export class SystemSettingsRepository {
+  /** Sentinel password that triggers onboarding */
+  private static readonly DEFAULT_PASSWORD_SENTINEL = "change-me-now";
+
+  /** Patterns for detecting sensitive env keys by name */
+  private static readonly SENSITIVE_PATTERNS = [
+    "_KEY",
+    "_SECRET",
+    "_PASS",
+    "_TOKEN",
+    "_SID",
+    "_CREDENTIAL",
+    "PASSWORD",
+    "JWT_SECRET",
+    "CRON_SECRET",
+    "ACCESS_KEY",
+    "AUTH_TOKEN",
+    "DATABASE_URL",
+  ];
+
+  private static isSensitiveKey(
+    key: string,
+    explicitSensitive?: boolean,
+  ): boolean {
+    if (explicitSensitive !== undefined) {
+      return explicitSensitive;
+    }
+    const upper = key.toUpperCase();
+    return SystemSettingsRepository.SENSITIVE_PATTERNS.some((p) =>
+      upper.includes(p),
+    );
+  }
+
+  private static stringifyValue(
+    value: string | number | boolean | null | undefined,
+  ): string {
+    if (value === undefined || value === null) {
+      return "";
+    }
+    return String(value);
+  }
+
+  private static getEnvFilePath(): string {
+    return join(process.cwd(), ".env");
+  }
+
+  private static async checkWritable(): Promise<boolean> {
+    // Docker detection
+    if (process.env["VIBE_IS_DOCKER"] === "true") {
+      return false;
+    }
+
+    const envPath = SystemSettingsRepository.getEnvFilePath();
+    if (!existsSync(envPath)) {
+      return false;
+    }
+
+    try {
+      await access(envPath, constants.W_OK);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private static isDevMode(): boolean {
+    const devPidPath = join(process.cwd(), ".tmp", ".vibe-dev.pid");
+    return existsSync(devPidPath);
+  }
+
+  private static findExampleForKey(
+    examples: EnvExample[],
+    key: string,
+  ): EnvExample | undefined {
+    return examples.find((e) => e.key === key);
+  }
   /**
    * GET — Read all env modules with metadata
    */
@@ -122,7 +126,7 @@ export class SystemSettingsRepository {
       const HIDDEN_MODULES = new Set(["serverSystem"]);
 
       // Read raw .env to check which values are stored encrypted
-      const envPath = getEnvFilePath();
+      const envPath = SystemSettingsRepository.getEnvFilePath();
       const rawEnvFile = existsSync(envPath)
         ? await readFile(envPath, "utf-8")
         : "";
@@ -156,12 +160,20 @@ export class SystemSettingsRepository {
           ]);
           const settings = [...allKeys].map((key) => {
             const rawValue = envRecord[key];
-            const exampleDef = findExampleForKey(examplesList, key);
-            const sensitive = isSensitiveKey(key, exampleDef?.sensitive);
+            const exampleDef = SystemSettingsRepository.findExampleForKey(
+              examplesList,
+              key,
+            );
+            const sensitive = SystemSettingsRepository.isSensitiveKey(
+              key,
+              exampleDef?.sensitive,
+            );
             const isConfigured =
               rawValue !== undefined && rawValue !== null && rawValue !== "";
             const value =
-              sensitive && isConfigured ? "****" : stringifyValue(rawValue);
+              sensitive && isConfigured
+                ? "****"
+                : SystemSettingsRepository.stringifyValue(rawValue);
 
             return {
               key,
@@ -208,7 +220,8 @@ export class SystemSettingsRepository {
           | Record<string, string | number | boolean | null | undefined>
           | undefined;
         if (
-          rawEnv?.["VIBE_ADMIN_USER_PASSWORD"] === DEFAULT_PASSWORD_SENTINEL
+          rawEnv?.["VIBE_ADMIN_USER_PASSWORD"] ===
+          SystemSettingsRepository.DEFAULT_PASSWORD_SENTINEL
         ) {
           onboardingIssues.push(t("errors.defaultPasswordDetected"));
         }
@@ -242,8 +255,8 @@ export class SystemSettingsRepository {
         (a, b) => a.step - b.step,
       );
 
-      const writable = await checkWritable();
-      const devMode = isDevMode();
+      const writable = await SystemSettingsRepository.checkWritable();
+      const devMode = SystemSettingsRepository.isDevMode();
 
       return success({
         modules,
@@ -272,7 +285,7 @@ export class SystemSettingsRepository {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<ResponseType<any>> {
     try {
-      const writable = await checkWritable();
+      const writable = await SystemSettingsRepository.checkWritable();
       if (!writable) {
         return fail({
           message: t("errors.readOnly"),
@@ -280,7 +293,7 @@ export class SystemSettingsRepository {
         });
       }
 
-      const envPath = getEnvFilePath();
+      const envPath = SystemSettingsRepository.getEnvFilePath();
       logger.debug(`Writing settings to ${envPath}`);
 
       // Load env modules to get metadata (comments, defaults, commented flag)
@@ -313,75 +326,6 @@ export class SystemSettingsRepository {
       const settingsToWrite = data.settings;
       const keysToUpdate = new Set(Object.keys(settingsToWrite));
 
-      /**
-       * Get the Zod default value for a key if one exists.
-       * Returns undefined if no default is defined.
-       */
-      function getZodDefault(key: string): string | undefined {
-        const fieldSchema = schemaMap.get(key);
-        if (!fieldSchema) {
-          return undefined;
-        }
-        // Unwrap ZodOptional/ZodDefault layers to find the inner default
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let schema: any = fieldSchema;
-        while (schema) {
-          if (schema._def?.defaultValue !== undefined) {
-            const defaultVal = schema._def.defaultValue();
-            return defaultVal !== undefined ? String(defaultVal) : undefined;
-          }
-          // Unwrap ZodOptional, ZodNullable, ZodTransform inner types
-          if (schema._def?.innerType) {
-            schema = schema._def.innerType;
-          } else if (schema._def?.schema) {
-            schema = schema._def.schema;
-          } else {
-            break;
-          }
-        }
-        return undefined;
-      }
-
-      /**
-       * Check if a value equals the schema default — skip writing if so.
-       * This keeps .env clean and lets defaults evolve without stale overrides.
-       */
-      function isDefaultValue(key: string, value: string): boolean {
-        const defaultVal = getZodDefault(key);
-        return defaultVal !== undefined && defaultVal === value;
-      }
-
-      /**
-       * Format a key=value line with comment block above it (like .env.example).
-       * Respects the `commented` flag (commented out but present in file).
-       */
-      function formatEnvLine(key: string, rawValue: string): string {
-        const ex = exampleMap.get(key);
-        const parts: string[] = [];
-
-        if (ex?.comment) {
-          parts.push(`# ${ex.comment}`);
-        }
-
-        const sensitive = isSensitiveKey(key, ex?.sensitive);
-        const encryptedValue = sensitive
-          ? encryptEnvValue(rawValue, cryptoKey)
-          : rawValue;
-        const needsQuotes =
-          isEncryptedValue(encryptedValue) ||
-          encryptedValue.includes(" ") ||
-          encryptedValue.includes("#") ||
-          encryptedValue.includes("=");
-        const valuePart = needsQuotes
-          ? `${key}="${encryptedValue}"`
-          : `${key}=${encryptedValue}`;
-
-        // commented fields are written as active lines when explicitly set by user
-        parts.push(valuePart);
-
-        return parts.join("\n");
-      }
-
       // Rebuild the file line by line.
       // For keys we're updating: strip the old comment block above them and write
       // fresh comment+value via formatEnvLine. For everything else: keep as-is.
@@ -405,11 +349,20 @@ export class SystemSettingsRepository {
           if (key && keysToUpdate.has(key)) {
             keysToUpdate.delete(key);
             const rawValue = settingsToWrite[key] ?? "";
-            if (isDefaultValue(key, rawValue)) {
+            if (
+              SystemSettingsRepository.isDefaultValue(key, rawValue, schemaMap)
+            ) {
               skippedKeys.push(key);
             } else {
               updatedKeys.push(key);
-              outputLines.push(formatEnvLine(key, rawValue));
+              outputLines.push(
+                SystemSettingsRepository.formatEnvLine(
+                  key,
+                  rawValue,
+                  exampleMap,
+                  cryptoKey,
+                ),
+              );
             }
           } else {
             outputLines.push(line);
@@ -434,7 +387,7 @@ export class SystemSettingsRepository {
           const nextKey = nextKeyMatch ? nextKeyMatch[1] : null;
 
           if (nextKey && keysToUpdate.has(nextKey)) {
-            // Skip this comment line — formatEnvLine will write a fresh comment block
+            // Skip this comment line — formatEnvLine() will write a fresh comment block
             i++;
             continue;
           }
@@ -455,11 +408,20 @@ export class SystemSettingsRepository {
         if (keysToUpdate.has(key)) {
           keysToUpdate.delete(key);
           const rawValue = settingsToWrite[key] ?? "";
-          if (isDefaultValue(key, rawValue)) {
+          if (
+            SystemSettingsRepository.isDefaultValue(key, rawValue, schemaMap)
+          ) {
             skippedKeys.push(key);
           } else {
             updatedKeys.push(key);
-            outputLines.push(formatEnvLine(key, rawValue));
+            outputLines.push(
+              SystemSettingsRepository.formatEnvLine(
+                key,
+                rawValue,
+                exampleMap,
+                cryptoKey,
+              ),
+            );
           }
         } else {
           outputLines.push(line);
@@ -472,7 +434,7 @@ export class SystemSettingsRepository {
         const rawValue = settingsToWrite[key] ?? "";
 
         // Skip if value equals the schema default
-        if (isDefaultValue(key, rawValue)) {
+        if (SystemSettingsRepository.isDefaultValue(key, rawValue, schemaMap)) {
           skippedKeys.push(key);
           continue;
         }
@@ -485,7 +447,14 @@ export class SystemSettingsRepository {
         ) {
           outputLines.push("");
         }
-        outputLines.push(formatEnvLine(key, rawValue));
+        outputLines.push(
+          SystemSettingsRepository.formatEnvLine(
+            key,
+            rawValue,
+            exampleMap,
+            cryptoKey,
+          ),
+        );
       }
 
       // Write back
@@ -512,5 +481,89 @@ export class SystemSettingsRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * Get the Zod default value for a key if one exists.
+   * Returns undefined if no default is defined.
+   */
+  private static getZodDefault(
+    key: string,
+    schemaMap: Map<string, ZodTypeAny>,
+  ): string | undefined {
+    const fieldSchema = schemaMap.get(key);
+    if (!fieldSchema) {
+      return undefined;
+    }
+    // Unwrap ZodOptional/ZodDefault layers to find the inner default
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let schema: any = fieldSchema;
+    while (schema) {
+      if (schema._def?.defaultValue !== undefined) {
+        const defaultVal = schema._def.defaultValue();
+        return defaultVal !== undefined ? String(defaultVal) : undefined;
+      }
+      // Unwrap ZodOptional, ZodNullable, ZodTransform inner types
+      if (schema._def?.innerType) {
+        schema = schema._def.innerType;
+      } else if (schema._def?.schema) {
+        schema = schema._def.schema;
+      } else {
+        break;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Check if a value equals the schema default — skip writing if so.
+   * This keeps .env clean and lets defaults evolve without stale overrides.
+   */
+  private static isDefaultValue(
+    key: string,
+    value: string,
+    schemaMap: Map<string, ZodTypeAny>,
+  ): boolean {
+    const defaultVal = SystemSettingsRepository.getZodDefault(key, schemaMap);
+    return defaultVal !== undefined && defaultVal === value;
+  }
+
+  /**
+   * Format a key=value line with comment block above it (like .env.example).
+   * Respects the `commented` flag (commented out but present in file).
+   */
+  private static formatEnvLine(
+    key: string,
+    rawValue: string,
+    exampleMap: Map<string, EnvExample>,
+    cryptoKey: Buffer,
+  ): string {
+    const ex = exampleMap.get(key);
+    const parts: string[] = [];
+
+    if (ex?.comment) {
+      parts.push(`# ${ex.comment}`);
+    }
+
+    const sensitive = SystemSettingsRepository.isSensitiveKey(
+      key,
+      ex?.sensitive,
+    );
+    const encryptedValue = sensitive
+      ? encryptEnvValue(rawValue, cryptoKey)
+      : rawValue;
+    const needsQuotes =
+      isEncryptedValue(encryptedValue) ||
+      encryptedValue.includes(" ") ||
+      encryptedValue.includes("#") ||
+      encryptedValue.includes("=");
+    const valuePart = needsQuotes
+      ? `${key}="${encryptedValue}"`
+      : `${key}=${encryptedValue}`;
+
+    // commented fields are written as active lines when explicitly set by user
+    parts.push(valuePart);
+
+    return parts.join("\n");
   }
 }

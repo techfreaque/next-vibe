@@ -18,40 +18,42 @@ import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { remoteConnections } from "../db";
 import type { RemoteConnectionByIdGetResponseOutput } from "./definition";
 
-export async function getConnectionById(
-  user: JwtPrivatePayloadType,
-  logger: EndpointLogger,
-  instanceId: string,
-): Promise<ResponseType<RemoteConnectionByIdGetResponseOutput>> {
-  const [row] = await db
-    .select()
-    .from(remoteConnections)
-    .where(
-      and(
-        eq(remoteConnections.userId, user.id),
-        eq(remoteConnections.instanceId, instanceId),
-      ),
-    );
+export class RemoteConnectionInstanceRepository {
+  static async getConnectionById(
+    user: JwtPrivatePayloadType,
+    logger: EndpointLogger,
+    instanceId: string,
+  ): Promise<ResponseType<RemoteConnectionByIdGetResponseOutput>> {
+    const [row] = await db
+      .select()
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.userId, user.id),
+          eq(remoteConnections.instanceId, instanceId),
+        ),
+      );
 
-  if (!row || !row.isActive) {
-    logger.debug("No active remote connection for user+instance", {
-      userId: user.id,
-      instanceId,
-    });
+    if (!row || !row.isActive) {
+      logger.debug("No active remote connection for user+instance", {
+        userId: user.id,
+        instanceId,
+      });
+      return success({
+        isConnected: false,
+        friendlyName: null,
+        remoteUrl: null,
+        isActive: null,
+        lastSyncedAt: null,
+      });
+    }
+
     return success({
-      isConnected: false,
-      friendlyName: null,
-      remoteUrl: null,
-      isActive: null,
-      lastSyncedAt: null,
+      isConnected: true,
+      friendlyName: row.friendlyName,
+      remoteUrl: row.remoteUrl,
+      isActive: row.isActive,
+      lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,
     });
   }
-
-  return success({
-    isConnected: true,
-    friendlyName: row.friendlyName,
-    remoteUrl: row.remoteUrl,
-    isActive: row.isActive,
-    lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,
-  });
 }

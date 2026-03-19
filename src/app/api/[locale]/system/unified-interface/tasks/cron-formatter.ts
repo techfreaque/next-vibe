@@ -505,6 +505,9 @@ export function isCronTaskDue(
   schedule: string,
   currentDate?: Date,
 ): boolean {
+  if (schedule === "manual") {
+    return false;
+  }
   try {
     const interval = cronParser.parse(schedule, {
       tz: "UTC",

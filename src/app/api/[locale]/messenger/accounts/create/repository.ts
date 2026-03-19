@@ -22,16 +22,14 @@ import type {
   MessengerAccountCreatePOSTRequestOutput,
   MessengerAccountCreatePOSTResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { MessengerAccountCreateT } from "./i18n";
 
 export class MessengerAccountCreateRepository {
   static async createAccount(
     data: MessengerAccountCreatePOSTRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MessengerAccountCreateT,
   ): Promise<ResponseType<MessengerAccountCreatePOSTResponseOutput>> {
     try {
       logger.info("Creating messenger account", {

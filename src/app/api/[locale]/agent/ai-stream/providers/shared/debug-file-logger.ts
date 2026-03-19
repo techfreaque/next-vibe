@@ -9,8 +9,6 @@ import { join } from "node:path";
 
 import { enableDebugLogger } from "@/config/debug";
 
-/* eslint-disable i18next/no-literal-string */
-
 const DEBUG_DIR = "/home/max/projects/next-vibe/.tmp/ai-debug-runs";
 let requestSeq = 0;
 

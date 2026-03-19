@@ -14,7 +14,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { scopedTranslation as importScopedTranslation } from "@/app/api/[locale]/import/i18n";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -22,7 +21,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { csvImportJobs } from "../db";
 import { CsvImportJobStatus } from "../enum";
 import { scopedTranslation } from "../i18n";
-import { leadsImportRepository } from "../repository";
+import { LeadsImportRepository } from "../repository";
 import type {
   ImportProcessPostRequestOutput,
   ImportProcessPostResponseOutput,
@@ -36,7 +35,6 @@ export class LeadsImportProcessRepository {
   ): Promise<ResponseType<ImportProcessPostResponseOutput>> {
     const { maxJobsPerRun, maxRetriesPerJob, dryRun } = data;
     const { t } = scopedTranslation.scopedT(locale);
-    const { t: importT } = importScopedTranslation.scopedT(locale);
 
     let jobsProcessed = 0;
     let totalRowsProcessed = 0;
@@ -55,18 +53,15 @@ export class LeadsImportProcessRepository {
         )
         .limit(maxJobsPerRun);
 
-      const { importRepository } =
-        await import("@/app/api/[locale]/import/repository");
-
       for (const job of pendingJobs) {
         try {
           jobsProcessed++;
 
-          const batchResult = await importRepository.processBatch(
+          const batchResult = await LeadsImportRepository.processBatch(
             job.id,
-            leadsImportRepository,
+            LeadsImportRepository,
             logger,
-            importT,
+            t,
           );
 
           if (batchResult.success) {

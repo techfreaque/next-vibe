@@ -35,13 +35,12 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
+  FolderContentsItem,
   FolderContentsRequestOutput,
   FolderContentsResponseOutput,
   FolderContentsUrlVariablesOutput,
 } from "./definition";
 import type { FolderContentsT } from "./i18n";
-
-type FolderItem = FolderContentsResponseOutput["items"][number];
 
 export class FolderContentsRepository {
   static async getFolderContents(
@@ -121,7 +120,7 @@ export class FolderContentsRepository {
       }
 
       // Filter and map folders
-      const folderItems: FolderItem[] = [];
+      const folderItems: FolderContentsItem[] = [];
       for (const folder of dbFolders) {
         if (!(await canViewFolder(user, folder, logger, locale))) {
           continue;
@@ -249,7 +248,7 @@ export class FolderContentsRepository {
         }
       }
 
-      const threadItems: FolderItem[] = [];
+      const threadItems: FolderContentsItem[] = [];
       for (const thread of dbThreads) {
         const folder = thread.folderId
           ? (threadFolderMap[thread.folderId] ?? null)

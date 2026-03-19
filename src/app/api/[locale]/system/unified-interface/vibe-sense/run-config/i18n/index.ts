@@ -7,3 +7,7 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
 });
+
+export type VibeSenseRunConfigT = ReturnType<
+  typeof scopedTranslation.scopedT
+>["t"];

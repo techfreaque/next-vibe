@@ -3,7 +3,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import signupEndpoints from "./definition";
 import { renderAdminSignupNotification, renderRegisterMail } from "./email";
-import { signupRepository } from "./repository";
+import { SignupRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: signupEndpoints,
@@ -19,7 +19,7 @@ export const { POST, tools } = endpointsHandler({
       },
     ],
     handler: async ({ data, user, locale, logger, request, platform, t }) => {
-      return await signupRepository.registerUser(
+      return await SignupRepository.registerUser(
         data,
         user,
         locale,

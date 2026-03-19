@@ -29,7 +29,7 @@ import { MessengerAccountStatus } from "../../../../accounts/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { MessageChannel } from "../../../../accounts/enum";
-import { imapConnectionRepository } from "../connection/repository";
+import { ImapConnectionRepository } from "../connection/repository";
 import type { ImapAccountShape, ImapFolder, NewImapFolder } from "../db";
 import { imapFolders, toImapShape } from "../db";
 import { ImapSyncStatus } from "../enum";
@@ -53,54 +53,28 @@ interface SyncResult {
   };
 }
 
-/**
- * IMAP Flag Constants
- */
-const IMAP_FLAGS = {
-  SEEN: "\\Seen",
-  FLAGGED: "\\Flagged",
-  DELETED: "\\Deleted",
-  DRAFT: "\\Draft",
-  ANSWERED: "\\Answered",
-} as const;
-
-/**
- * IMAP Sync Repository Interface
- */
-export interface ImapSyncRepository {
-  syncAllAccounts(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>>;
-
-  syncAccount(
-    account: ImapAccountShape,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>>;
-
-  syncAccountFolders(
-    account: ImapAccountShape,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>>;
-
-  syncFolderMessages(
-    account: ImapAccountShape,
-    folder: ImapFolder,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>>;
+interface ImapSyncResult {
+  result: SyncResult;
 }
 
 /**
- * IMAP Sync Repository Implementation
+ * IMAP Sync Repository
  */
-export class ImapSyncRepositoryImpl implements ImapSyncRepository {
-  async syncAllAccounts(
+export class ImapSyncRepository {
+  /**
+   * IMAP Flag Constants
+   */
+  private static readonly IMAP_FLAGS = {
+    SEEN: "\\Seen",
+    FLAGGED: "\\Flagged",
+    DELETED: "\\Deleted",
+    DRAFT: "\\Draft",
+    ANSWERED: "\\Answered",
+  } as const;
+  static async syncAllAccounts(
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>> {
+  ): Promise<ResponseType<ImapSyncResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let accountsProcessed = 0;
@@ -139,7 +113,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           logger.debug(`Syncing account: ${account.email}`);
 
           // Sync account
-          const accountResult = await this.syncAccount(account, logger, locale);
+          const accountResult = await ImapSyncRepository.syncAccount(
+            account,
+            logger,
+            locale,
+          );
 
           if (accountResult.success) {
             foldersProcessed +=
@@ -254,11 +232,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
     }
   }
 
-  async syncAccount(
+  static async syncAccount(
     account: ImapAccountShape,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>> {
+  ): Promise<ResponseType<ImapSyncResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let foldersProcessed = 0;
@@ -274,7 +252,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
     try {
       logger.debug(`Starting sync for account: ${account.email}`);
 
-      const connectionResult = await imapConnectionRepository.testConnection(
+      const connectionResult = await ImapConnectionRepository.testConnection(
         { account },
         logger,
         t,
@@ -287,7 +265,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
         });
       }
 
-      const folderResult = await this.syncAccountFolders(
+      const folderResult = await ImapSyncRepository.syncAccountFolders(
         account,
         logger,
         locale,
@@ -313,7 +291,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
       for (const folder of folders) {
         try {
-          const messageResult = await this.syncFolderMessages(
+          const messageResult = await ImapSyncRepository.syncFolderMessages(
             account,
             folder,
             logger,
@@ -386,11 +364,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
     }
   }
 
-  async syncAccountFolders(
+  static async syncAccountFolders(
     account: ImapAccountShape,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>> {
+  ): Promise<ResponseType<ImapSyncResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let foldersProcessed = 0;
@@ -401,7 +379,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
     try {
       logger.debug(`Syncing folders for account: ${account.email}`);
 
-      const remoteFoldersResult = await imapConnectionRepository.listFolders(
+      const remoteFoldersResult = await ImapConnectionRepository.listFolders(
         { account },
         logger,
         t,
@@ -531,12 +509,12 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
     }
   }
 
-  async syncFolderMessages(
+  static async syncFolderMessages(
     account: ImapAccountShape,
     folder: ImapFolder,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ result: SyncResult }>> {
+  ): Promise<ResponseType<ImapSyncResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let messagesProcessed = 0;
@@ -549,7 +527,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
 
       // Get messages from IMAP server
       const remoteMessagesResponse =
-        await imapConnectionRepository.listMessages(
+        await ImapConnectionRepository.listMessages(
           {
             account,
             folderPath: folder.path,
@@ -590,11 +568,21 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
               .update(emails)
               .set({
                 subject: remoteMessage.subject,
-                isRead: remoteMessage.flags.includes(IMAP_FLAGS.SEEN),
-                isFlagged: remoteMessage.flags.includes(IMAP_FLAGS.FLAGGED),
-                isDeleted: remoteMessage.flags.includes(IMAP_FLAGS.DELETED),
-                isDraft: remoteMessage.flags.includes(IMAP_FLAGS.DRAFT),
-                isAnswered: remoteMessage.flags.includes(IMAP_FLAGS.ANSWERED),
+                isRead: remoteMessage.flags.includes(
+                  ImapSyncRepository.IMAP_FLAGS.SEEN,
+                ),
+                isFlagged: remoteMessage.flags.includes(
+                  ImapSyncRepository.IMAP_FLAGS.FLAGGED,
+                ),
+                isDeleted: remoteMessage.flags.includes(
+                  ImapSyncRepository.IMAP_FLAGS.DELETED,
+                ),
+                isDraft: remoteMessage.flags.includes(
+                  ImapSyncRepository.IMAP_FLAGS.DRAFT,
+                ),
+                isAnswered: remoteMessage.flags.includes(
+                  ImapSyncRepository.IMAP_FLAGS.ANSWERED,
+                ),
                 messageSize: remoteMessage.size,
                 hasAttachments: remoteMessage.hasAttachments,
                 attachmentCount: remoteMessage.attachmentCount,
@@ -625,11 +613,21 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
               bodyText: remoteMessage.bodyText,
               bodyHtml: remoteMessage.bodyHtml,
               headers: remoteMessage.headers,
-              isRead: remoteMessage.flags.includes(IMAP_FLAGS.SEEN),
-              isFlagged: remoteMessage.flags.includes(IMAP_FLAGS.FLAGGED),
-              isDeleted: remoteMessage.flags.includes(IMAP_FLAGS.DELETED),
-              isDraft: remoteMessage.flags.includes(IMAP_FLAGS.DRAFT),
-              isAnswered: remoteMessage.flags.includes(IMAP_FLAGS.ANSWERED),
+              isRead: remoteMessage.flags.includes(
+                ImapSyncRepository.IMAP_FLAGS.SEEN,
+              ),
+              isFlagged: remoteMessage.flags.includes(
+                ImapSyncRepository.IMAP_FLAGS.FLAGGED,
+              ),
+              isDeleted: remoteMessage.flags.includes(
+                ImapSyncRepository.IMAP_FLAGS.DELETED,
+              ),
+              isDraft: remoteMessage.flags.includes(
+                ImapSyncRepository.IMAP_FLAGS.DRAFT,
+              ),
+              isAnswered: remoteMessage.flags.includes(
+                ImapSyncRepository.IMAP_FLAGS.ANSWERED,
+              ),
               messageSize: remoteMessage.size,
               hasAttachments: remoteMessage.hasAttachments,
               attachmentCount: remoteMessage.attachmentCount,
@@ -694,6 +692,3 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
     }
   }
 }
-
-// Export singleton instance
-export const imapSyncRepository = new ImapSyncRepositoryImpl();

@@ -13,7 +13,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import { agentEnv } from "../../env";
-import type { FileMetadata, StorageAdapter } from "./types";
+import type { FileMetadata, StorageAdapter } from "./index";
 
 export class S3StorageAdapter implements StorageAdapter {
   private client!: S3Client;

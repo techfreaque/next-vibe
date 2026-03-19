@@ -6,8 +6,8 @@
 
 "use client";
 
+import { createElement, useRef } from "react";
 import type { ReactElement, ReactNode } from "react";
-import { useRef } from "react";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
@@ -62,9 +62,9 @@ export function InkWidgetContextProvider<
   }
   const store = storeRef.current;
 
-  return (
-    <InkWidgetContextStoreContext.Provider value={store}>
-      {children}
-    </InkWidgetContextStoreContext.Provider>
+  return createElement(
+    InkWidgetContextStoreContext.Provider,
+    { value: store },
+    children,
   );
 }

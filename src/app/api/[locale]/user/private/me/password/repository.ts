@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { hashPassword, verifyPassword } from "next-vibe/shared/utils/password";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { DbId } from "@/app/api/[locale]/system/db/types";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -28,9 +28,7 @@ import type {
   PasswordPostRequestOutput,
   PasswordPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { MePasswordT } from "./i18n";
 
 /**
  * Password Update Repository - Static class pattern
@@ -44,7 +42,7 @@ export class PasswordUpdateRepository {
     passwords: PasswordPostRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MePasswordT,
   ): Promise<ResponseType<PasswordPostResponseOutput>> {
     const userId = user.id;
 
@@ -200,10 +198,10 @@ export class PasswordUpdateRepository {
    * Set a user's password (for initial setup and password reset)
    */
   static async setPassword(
-    userId: DbId,
+    userId: string,
     newPassword: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MePasswordT,
   ): Promise<ResponseType<null>> {
     try {
       logger.debug("Setting password", { userId });

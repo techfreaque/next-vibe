@@ -157,6 +157,14 @@ export const translations: typeof enTranslations = {
       message:
         "Polecenie sprawdzania TypeScript jest nieprawidłowe lub brakuje",
     },
+    aborted: {
+      title: "Operacja przerwana",
+      description: "Operacja sprawdzania typów została przerwana",
+    },
+    parseTsconfig: {
+      title: "Nie udało się przetworzyć tsconfig.json",
+      description: "Plik tsconfig.json nie mógł zostać przetworzony",
+    },
   },
 
   // Success messages

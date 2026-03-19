@@ -24,29 +24,16 @@ import type {
   UninstallRequestOutput,
   UninstallResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Setup Uninstall Repository Interface
- */
-export interface SetupUninstallRepository {
-  uninstallCli(
-    data: UninstallRequestOutput,
-    user: JwtPayloadType,
-    t: ModuleT,
-  ): Promise<ResponseType<UninstallResponseOutput>>;
-}
+import type { SetupUninstallT } from "./i18n";
 
 /**
  * Setup Uninstall Repository Implementation
  */
-class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
-  async uninstallCli(
+export class SetupUninstallRepository {
+  static async uninstallCli(
     data: UninstallRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SetupUninstallT,
   ): Promise<ResponseType<UninstallResponseOutput>> {
     // Validate user permissions for CLI uninstallation
     if (!user?.id) {
@@ -61,7 +48,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
 
     try {
       // Check current status
-      const status = await this.checkInstallationStatus();
+      const status = await SetupUninstallRepository.checkInstallationStatus();
 
       if (!status.installed) {
         return success({
@@ -73,13 +60,18 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
 
       // Uninstall using npm unlink
       // eslint-disable-next-line i18next/no-literal-string
-      const output = await this.runCommand("npm", ["unlink", "-g"], {
-        cwd: process.cwd(),
-        verbose: data.verbose,
-      });
+      const output = await SetupUninstallRepository.runCommand(
+        "npm",
+        ["unlink", "-g"],
+        {
+          cwd: process.cwd(),
+          verbose: data.verbose,
+        },
+      );
 
       // Verify uninstallation
-      const newStatus = await this.checkInstallationStatus();
+      const newStatus =
+        await SetupUninstallRepository.checkInstallationStatus();
 
       return success({
         success: !newStatus.installed,
@@ -101,7 +93,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
     }
   }
 
-  private async checkInstallationStatus(): Promise<{
+  private static async checkInstallationStatus(): Promise<{
     installed: boolean;
     version?: string;
     path?: string;
@@ -109,10 +101,14 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
     try {
       // Try to run 'which vibe' or 'where vibe' to find the installation
       const command = process.platform === "win32" ? "where" : "which";
-      const output = await this.runCommand(command, ["vibe"], {
-        verbose: false,
-        ignoreErrors: true,
-      });
+      const output = await SetupUninstallRepository.runCommand(
+        command,
+        ["vibe"],
+        {
+          verbose: false,
+          ignoreErrors: true,
+        },
+      );
 
       if (output) {
         // Get version
@@ -144,7 +140,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
     }
   }
 
-  private async runCommand(
+  private static async runCommand(
     command: string,
     args: string[],
     options: {
@@ -192,8 +188,3 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
     });
   }
 }
-
-/**
- * Default repository instance
- */
-export const setupUninstallRepository = new SetupUninstallRepositoryImpl();

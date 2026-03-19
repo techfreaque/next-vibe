@@ -11,14 +11,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeWindowSum } from "./repository";
+import { WindowSumIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, size, resolution, lookback } = data;
-      const result = computeWindowSum(source, size);
+      const result = WindowSumIndicatorRepository.computeWindowSum(
+        source,
+        size,
+      );
       return success({
         result,
         meta: {

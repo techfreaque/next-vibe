@@ -40,7 +40,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
-import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
+import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { HelpToolMetadataSerialized } from "@/app/api/[locale]/system/help/definition";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
@@ -215,13 +215,13 @@ export function ToolsConfigEdit({
     if (skillEnabledTools !== null) {
       return skillEnabledTools;
     }
-    const defaultPinnedSet = new Set<string>(getDefaultToolIds());
+    const defaultPinnedSet = new Set<string>(getDefaultToolIdsForUser(user));
     return availableTools.map((tool) => ({
       id: tool.id,
       requiresConfirmation: tool.requiresConfirmation ?? false,
       pinned: defaultPinnedSet.has(tool.id),
     }));
-  }, [enabledTools, skillEnabledTools, availableTools]);
+  }, [enabledTools, skillEnabledTools, availableTools, user]);
 
   const isInherited = enabledTools === null;
 

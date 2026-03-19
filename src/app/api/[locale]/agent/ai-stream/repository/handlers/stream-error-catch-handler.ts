@@ -6,7 +6,7 @@ import "server-only";
 
 import type { JSONValue } from "ai";
 
-import type { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
+import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -15,8 +15,6 @@ import type { StreamContext } from "../core/stream-context";
 import { clearStreamingState } from "../core/stream-registry";
 import { StreamErrorHandler } from "./stream-error-handler";
 import { TimeoutErrorHandler } from "./timeout-error-handler";
-
-type AiStreamModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class StreamErrorCatchHandler {
   /**
@@ -30,7 +28,7 @@ export class StreamErrorCatchHandler {
     threadId: string;
     userId: string | undefined;
     logger: EndpointLogger;
-    t: AiStreamModuleT;
+    t: AiStreamT;
   }): Promise<void> {
     const { error, ctx, maxDuration, model, threadId, userId, logger, t } =
       params;
@@ -55,7 +53,7 @@ export class StreamErrorCatchHandler {
         t,
       });
 
-      await clearStreamingState(threadId);
+      await clearStreamingState(threadId, logger);
       ctx.cleanup();
       return;
     }
@@ -71,7 +69,7 @@ export class StreamErrorCatchHandler {
       t,
     });
 
-    await clearStreamingState(threadId);
+    await clearStreamingState(threadId, logger);
     ctx.cleanup();
   }
 }

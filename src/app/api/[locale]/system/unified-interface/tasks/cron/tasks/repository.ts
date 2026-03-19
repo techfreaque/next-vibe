@@ -36,7 +36,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "../../cron/db";
-import { fetchLastExecutionSummaries } from "../../cron/repository";
+import { CronTasksRepository } from "../../cron/repository";
 import {
   CronTaskEnabledFilter,
   CronTaskHiddenFilter,
@@ -53,132 +53,107 @@ import type {
   CronTaskListResponseOutput,
   CronTaskResponseType,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Database error message pattern for unique constraint violations
- */
-const UNIQUE_CONSTRAINT_ERROR = "unique constraint";
-
-/**
- * Translate task displayName and description using the endpoint's scoped translation.
- * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
- * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
- */
-async function translateTaskFields(
-  task: CronTaskResponseType,
-  locale: CountryLanguage,
-): Promise<CronTaskResponseType> {
-  const endpoint = await getEndpoint(task.routeId);
-  if (!endpoint) {
-    return task;
-  }
-
-  const { t } = endpoint.scopedTranslation.scopedT(locale);
-  const translatedName = t(task.displayName as Parameters<typeof t>[0]);
-  const translatedDesc = task.description
-    ? t(task.description as Parameters<typeof t>[0])
-    : null;
-
-  return {
-    ...task,
-    displayName:
-      translatedName !== task.displayName ? translatedName : task.displayName,
-    description:
-      translatedDesc && translatedDesc !== task.description
-        ? translatedDesc
-        : task.description,
-  };
-}
-
-/**
- * Format task response with DB fields
- */
-function formatTaskResponse(
-  task: typeof cronTasks.$inferSelect,
-  logger: EndpointLogger,
-): CronTaskResponseType {
-  const nextExecutionAt = task.enabled
-    ? (calculateNextExecutionTime(
-        task.schedule,
-        task.timezone ?? "UTC",
-        logger,
-      )?.toISOString() ?? null)
-    : null;
-
-  const formatted: CronTaskResponseType = {
-    id: task.id,
-    shortId: task.shortId,
-    routeId: task.routeId,
-    displayName: task.displayName,
-    description: task.description ?? null,
-    version: task.version,
-    category: (TaskCategoryDB as readonly string[]).includes(task.category)
-      ? task.category
-      : TaskCategory.SYSTEM,
-    schedule: task.schedule,
-    timezone: task.timezone ?? null,
-    enabled: task.enabled,
-    hidden: task.hidden,
-    priority: task.priority,
-    timeout: task.timeout ?? null,
-    retries: task.retries ?? null,
-    retryDelay: task.retryDelay ?? null,
-    taskInput: task.taskInput,
-    runOnce: task.runOnce,
-    outputMode: task.outputMode,
-    notificationTargets: task.notificationTargets,
-    lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
-    lastExecutionStatus: task.lastExecutionStatus ?? null,
-    lastExecutionError: null, // populated by caller from execution history
-    lastExecutionDuration: task.lastExecutionDuration ?? null,
-    nextExecutionAt,
-    executionCount: task.executionCount,
-    successCount: task.successCount,
-    errorCount: task.errorCount,
-    averageExecutionTime: task.averageExecutionTime ?? null,
-    consecutiveFailures: task.consecutiveFailures,
-    targetInstance: task.targetInstance ?? null,
-    tags: task.tags,
-    userId: task.userId ?? null,
-    createdAt: task.createdAt.toISOString(),
-    updatedAt: task.updatedAt.toISOString(),
-  };
-  return formatted;
-}
-
-/**
- * Cron Tasks Repository Interface
- */
-export interface ICronTasksListRepository {
-  getTasks(
-    data: CronTaskListRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskListResponseOutput>>;
-
-  createTask(
-    data: CronTaskCreateRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CronTaskCreateResponseOutput>>;
-}
+import type { CronTasksT } from "./i18n";
 
 /**
  * Cron Tasks Repository Implementation
  */
-class CronTasksListRepositoryImpl implements ICronTasksListRepository {
-  async getTasks(
+export class CronTasksListRepository {
+  /**
+   * Database error message pattern for unique constraint violations
+   */
+  private static readonly UNIQUE_CONSTRAINT_ERROR = "unique constraint";
+
+  /**
+   * Translate task displayName and description using the endpoint's scoped translation.
+   * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
+   * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
+   */
+  private static async translateTaskFields(
+    task: CronTaskResponseType,
+    locale: CountryLanguage,
+  ): Promise<CronTaskResponseType> {
+    const endpoint = await getEndpoint(task.routeId);
+    if (!endpoint) {
+      return task;
+    }
+
+    const { t } = endpoint.scopedTranslation.scopedT(locale);
+    const translatedName = t(task.displayName);
+    const translatedDesc = task.description ? t(task.description) : null;
+
+    return {
+      ...task,
+      displayName:
+        translatedName !== task.displayName ? translatedName : task.displayName,
+      description:
+        translatedDesc && translatedDesc !== task.description
+          ? translatedDesc
+          : task.description,
+    };
+  }
+
+  /**
+   * Format task response with DB fields
+   */
+  private static formatTaskResponse(
+    task: typeof cronTasks.$inferSelect,
+    logger: EndpointLogger,
+  ): CronTaskResponseType {
+    const nextExecutionAt = task.enabled
+      ? (calculateNextExecutionTime(
+          task.schedule,
+          task.timezone ?? "UTC",
+          logger,
+        )?.toISOString() ?? null)
+      : null;
+
+    const formatted: CronTaskResponseType = {
+      id: task.id,
+      shortId: task.shortId,
+      routeId: task.routeId,
+      displayName: task.displayName,
+      description: task.description ?? null,
+      version: task.version,
+      category: (TaskCategoryDB as readonly string[]).includes(task.category)
+        ? task.category
+        : TaskCategory.SYSTEM,
+      schedule: task.schedule,
+      timezone: task.timezone ?? null,
+      enabled: task.enabled,
+      hidden: task.hidden,
+      priority: task.priority,
+      timeout: task.timeout ?? null,
+      retries: task.retries ?? null,
+      retryDelay: task.retryDelay ?? null,
+      taskInput: task.taskInput,
+      runOnce: task.runOnce,
+      outputMode: task.outputMode,
+      notificationTargets: task.notificationTargets,
+      lastExecutedAt: task.lastExecutedAt?.toISOString() ?? null,
+      lastExecutionStatus: task.lastExecutionStatus ?? null,
+      lastExecutionError: null, // populated by caller from execution history
+      lastExecutionDuration: task.lastExecutionDuration ?? null,
+      nextExecutionAt,
+      executionCount: task.executionCount,
+      successCount: task.successCount,
+      errorCount: task.errorCount,
+      averageExecutionTime: task.averageExecutionTime ?? null,
+      consecutiveFailures: task.consecutiveFailures,
+      targetInstance: task.targetInstance ?? null,
+      tags: task.tags,
+      userId: task.userId ?? null,
+      createdAt: task.createdAt.toISOString(),
+      updatedAt: task.updatedAt.toISOString(),
+    };
+    return formatted;
+  }
+
+  static async getTasks(
     data: CronTaskListRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: CronTasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>> {
     try {
@@ -449,16 +424,19 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.info("Retrieved tasks from database", { count: tasks.length });
 
       // Batch-load last execution summaries for all tasks
-      const summaries = await fetchLastExecutionSummaries(
+      const summaries = await CronTasksRepository.fetchLastExecutionSummaries(
         tasks.map((task) => task.id),
       );
 
       // Format tasks with computed fields and translate displayName/description
       const formattedTasks = await Promise.all(
         tasks.map(async (task) => {
-          const formatted = formatTaskResponse(task, logger);
+          const formatted = CronTasksListRepository.formatTaskResponse(
+            task,
+            logger,
+          );
           formatted.lastExecutionError = summaries.get(task.id) ?? null;
-          return translateTaskFields(formatted, locale);
+          return CronTasksListRepository.translateTaskFields(formatted, locale);
         }),
       );
 
@@ -482,11 +460,11 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
     }
   }
 
-  async createTask(
+  static async createTask(
     data: CronTaskCreateRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: CronTasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
     try {
@@ -524,16 +502,44 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         }
       }
 
-      const userId = !user.isPublic ? user.id : null;
-      const isAdmin =
-        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-
-      // Only admins can set targetInstance — it controls cross-instance task routing
-      if (data.targetInstance && !isAdmin) {
+      // Public (unauthenticated) users must never create tasks — tasks without
+      // a userId run as the system ADMIN user, which would be a privilege escalation.
+      // Auth is enforced at the route level but we guard here as a safety net.
+      if (user.isPublic) {
         return fail({
-          message: t("errors.targetInstanceForbidden"),
+          message: t("errors.createCronTask"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
+      }
+
+      const userId = user.id;
+      const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
+
+      // Validate targetInstance — everyone can set it, but only to instances
+      // they own (i.e. have an active remote connection for). This prevents
+      // a customer from routing tasks to another user's instance, which would
+      // execute as ADMIN on the remote (synced tasks have no userId locally).
+      let resolvedTargetInstance: string | null = null;
+      if (data.targetInstance) {
+        if (isAdmin) {
+          resolvedTargetInstance = data.targetInstance;
+        } else {
+          const { RemoteConnectionRepository } =
+            await import("@/app/api/[locale]/user/remote-connection/repository");
+          const conn =
+            await RemoteConnectionRepository.getConnectionForInstance(
+              userId,
+              data.targetInstance,
+            );
+          if (!conn) {
+            return fail({
+              message: t("errors.targetInstanceForbidden"),
+              errorType: ErrorResponseTypes.FORBIDDEN,
+            });
+          }
+          // Use the canonical remoteInstanceId so task-sync routes it correctly.
+          resolvedTargetInstance = conn.remoteInstanceId ?? data.targetInstance;
+        }
       }
 
       // Prepare task data for insertion
@@ -558,7 +564,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         version: "1.0.0",
         taskInput: data.taskInput,
         runOnce: data.runOnce ?? false,
-        targetInstance: isAdmin ? (data.targetInstance ?? null) : null,
+        targetInstance: resolvedTargetInstance,
         outputMode: data.outputMode ?? TaskOutputMode.STORE_ONLY,
         notificationTargets: [] as NotificationTarget[],
         executionCount: 0,
@@ -592,9 +598,15 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       });
 
       // Format the response with translated fields
-      const formatted = formatTaskResponse(createdTask, logger);
+      const formatted = CronTasksListRepository.formatTaskResponse(
+        createdTask,
+        logger,
+      );
       const response: CronTaskCreateResponseOutput = {
-        task: await translateTaskFields(formatted, locale),
+        task: await CronTasksListRepository.translateTaskFields(
+          formatted,
+          locale,
+        ),
       };
 
       logger.vibe("🚀 Successfully created cron task");
@@ -604,7 +616,11 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.error("Failed to create cron task", parsedError);
 
       // Check for unique constraint violation (system tasks with same routeId)
-      if (parsedError.message?.includes(UNIQUE_CONSTRAINT_ERROR)) {
+      if (
+        parsedError.message?.includes(
+          CronTasksListRepository.UNIQUE_CONSTRAINT_ERROR,
+        )
+      ) {
         return fail({
           message: t("errors.createCronTask"),
           errorType: ErrorResponseTypes.CONFLICT,
@@ -618,5 +634,3 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
     }
   }
 }
-
-export const cronTasksListRepository = new CronTasksListRepositoryImpl();

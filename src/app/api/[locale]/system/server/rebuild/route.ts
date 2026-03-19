@@ -9,13 +9,18 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import rebuildEndpoints from "./definition";
-import { rebuildRepository } from "./repository";
+import { RebuildRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: rebuildEndpoints,
   [Methods.POST]: {
-    handler: ({ locale, logger, t }) => {
-      return rebuildRepository.execute(locale, logger, t);
+    handler: ({ locale, logger, t, streamContext }) => {
+      return RebuildRepository.execute(
+        locale,
+        logger,
+        t,
+        streamContext.abortSignal,
+      );
     },
   },
 });

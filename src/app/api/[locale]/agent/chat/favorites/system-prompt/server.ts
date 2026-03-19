@@ -15,13 +15,14 @@ export async function loadFavoritesData(
   }
 
   try {
-    const { loadFavoritesItems } =
+    const { ChatFavoritesRepository } =
       await import("@/app/api/[locale]/agent/chat/favorites/repository");
-    const favorites: FavoriteSummaryItem[] = await loadFavoritesItems({
-      userId,
-      locale,
-      logger,
-    });
+    const favorites: FavoriteSummaryItem[] =
+      await ChatFavoritesRepository.loadFavoritesItems({
+        userId,
+        locale,
+        logger,
+      });
     return { favorites };
   } catch (error) {
     logger.error("Failed to load favorites for system prompt", {

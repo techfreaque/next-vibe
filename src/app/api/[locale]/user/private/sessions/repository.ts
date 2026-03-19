@@ -27,9 +27,7 @@ import type {
   SessionsGetResponseOutput,
   SessionsPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { PrivateSessionsT } from "./i18n";
 
 export class SessionManagementRepository {
   /**
@@ -40,7 +38,7 @@ export class SessionManagementRepository {
     user: JwtPrivatePayloadType,
     currentToken: string | undefined,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PrivateSessionsT,
   ): Promise<ResponseType<SessionsGetResponseOutput>> {
     try {
       const rows = await db
@@ -82,7 +80,7 @@ export class SessionManagementRepository {
     name: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: PrivateSessionsT,
   ): Promise<ResponseType<SessionsPostResponseOutput>> {
     try {
       const payload: JwtPrivatePayloadType = {
@@ -135,7 +133,7 @@ export class SessionManagementRepository {
     user: JwtPrivatePayloadType,
     sessionId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PrivateSessionsT,
   ): Promise<ResponseType<SessionDeleteResponseOutput>> {
     try {
       const deleted = await db

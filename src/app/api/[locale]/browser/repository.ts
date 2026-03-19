@@ -25,41 +25,9 @@ import { BrowserTool, BrowserToolStatus } from "./enum";
 import type { BrowserT } from "./i18n";
 
 /**
- * Map translation keys to MCP tool names
- */
-const TOOL_NAME_MAP: Record<string, string> = {
-  [BrowserTool.CLICK]: "click",
-  [BrowserTool.DRAG]: "drag",
-  [BrowserTool.FILL]: "fill",
-  [BrowserTool.FILL_FORM]: "fill_form",
-  [BrowserTool.HANDLE_DIALOG]: "handle_dialog",
-  [BrowserTool.HOVER]: "hover",
-  [BrowserTool.PRESS_KEY]: "press_key",
-  [BrowserTool.UPLOAD_FILE]: "upload_file",
-  [BrowserTool.CLOSE_PAGE]: "close_page",
-  [BrowserTool.LIST_PAGES]: "list_pages",
-  [BrowserTool.NAVIGATE_PAGE]: "navigate_page",
-  [BrowserTool.NEW_PAGE]: "new_page",
-  [BrowserTool.SELECT_PAGE]: "select_page",
-  [BrowserTool.WAIT_FOR]: "wait_for",
-  [BrowserTool.EMULATE]: "emulate",
-  [BrowserTool.RESIZE_PAGE]: "resize_page",
-  [BrowserTool.PERFORMANCE_ANALYZE_INSIGHT]: "performance_analyze_insight",
-  [BrowserTool.PERFORMANCE_START_TRACE]: "performance_start_trace",
-  [BrowserTool.PERFORMANCE_STOP_TRACE]: "performance_stop_trace",
-  [BrowserTool.GET_NETWORK_REQUEST]: "get_network_request",
-  [BrowserTool.LIST_NETWORK_REQUESTS]: "list_network_requests",
-  [BrowserTool.EVALUATE_SCRIPT]: "evaluate_script",
-  [BrowserTool.GET_CONSOLE_MESSAGE]: "get_console_message",
-  [BrowserTool.LIST_CONSOLE_MESSAGES]: "list_console_messages",
-  [BrowserTool.TAKE_SCREENSHOT]: "take_screenshot",
-  [BrowserTool.TAKE_SNAPSHOT]: "take_snapshot",
-};
-
-/**
  * MCP bridge response — the shape executeTool always returns
  */
-export interface MCPBridgeResponse {
+interface MCPBridgeResponse {
   success: boolean;
   result: Array<{
     type: string;
@@ -69,17 +37,6 @@ export interface MCPBridgeResponse {
   }>;
   status: string[];
   executionId: string;
-}
-
-/**
- * Browser repository interface
- */
-export interface BrowserRepository {
-  executeTool(
-    data: { tool: string; arguments?: string },
-    t: BrowserT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MCPBridgeResponse> | ContentResponse>;
 }
 
 /**
@@ -112,21 +69,53 @@ interface MCPResponse {
 }
 
 /**
- * Browser repository implementation
+ * Browser repository
  */
-export class BrowserRepositoryImpl implements BrowserRepository {
-  private mcpProcess: ChildProcess | null = null;
-  private nextRequestId = 1;
-  private pendingRequests = new Map<
+export class BrowserRepository {
+  /**
+   * Map translation keys to MCP tool names
+   */
+  private static readonly TOOL_NAME_MAP: Record<string, string> = {
+    [BrowserTool.CLICK]: "click",
+    [BrowserTool.DRAG]: "drag",
+    [BrowserTool.FILL]: "fill",
+    [BrowserTool.FILL_FORM]: "fill_form",
+    [BrowserTool.HANDLE_DIALOG]: "handle_dialog",
+    [BrowserTool.HOVER]: "hover",
+    [BrowserTool.PRESS_KEY]: "press_key",
+    [BrowserTool.UPLOAD_FILE]: "upload_file",
+    [BrowserTool.CLOSE_PAGE]: "close_page",
+    [BrowserTool.LIST_PAGES]: "list_pages",
+    [BrowserTool.NAVIGATE_PAGE]: "navigate_page",
+    [BrowserTool.NEW_PAGE]: "new_page",
+    [BrowserTool.SELECT_PAGE]: "select_page",
+    [BrowserTool.WAIT_FOR]: "wait_for",
+    [BrowserTool.EMULATE]: "emulate",
+    [BrowserTool.RESIZE_PAGE]: "resize_page",
+    [BrowserTool.PERFORMANCE_ANALYZE_INSIGHT]: "performance_analyze_insight",
+    [BrowserTool.PERFORMANCE_START_TRACE]: "performance_start_trace",
+    [BrowserTool.PERFORMANCE_STOP_TRACE]: "performance_stop_trace",
+    [BrowserTool.GET_NETWORK_REQUEST]: "get_network_request",
+    [BrowserTool.LIST_NETWORK_REQUESTS]: "list_network_requests",
+    [BrowserTool.EVALUATE_SCRIPT]: "evaluate_script",
+    [BrowserTool.GET_CONSOLE_MESSAGE]: "get_console_message",
+    [BrowserTool.LIST_CONSOLE_MESSAGES]: "list_console_messages",
+    [BrowserTool.TAKE_SCREENSHOT]: "take_screenshot",
+    [BrowserTool.TAKE_SNAPSHOT]: "take_snapshot",
+  };
+
+  private static mcpProcess: ChildProcess | null = null;
+  private static nextRequestId = 1;
+  private static pendingRequests = new Map<
     number,
     { resolve: (value: MCPResponse) => void; reject: (error: Error) => void }
   >();
-  private isInitialized = false;
+  private static isInitialized = false;
 
   /**
    * Execute a Chrome DevTools MCP tool
    */
-  async executeTool(
+  static async executeTool(
     data: { tool: string; arguments?: string },
     t: BrowserT,
     logger: EndpointLogger,
@@ -138,7 +127,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
 
     try {
       // Ensure MCP server is running
-      const serverReady = await this.ensureMCPServer(logger);
+      const serverReady = await BrowserRepository.ensureMCPServer(logger);
       if (!serverReady) {
         return fail({
           message: t("repository.mcp.connect.failedToInitialize"),
@@ -147,7 +136,8 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       }
 
       // Map translation key to MCP tool name
-      const mcpToolName = TOOL_NAME_MAP[data.tool] || data.tool;
+      const mcpToolName =
+        BrowserRepository.TOOL_NAME_MAP[data.tool] || data.tool;
 
       logger.debug("[Browser Repository] Tool name mapping", {
         translationKey: data.tool,
@@ -175,7 +165,11 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       }
 
       // Execute the tool with mapped name
-      const result = await this.callTool(mcpToolName, parsedArgs, logger);
+      const result = await BrowserRepository.callTool(
+        mcpToolName,
+        parsedArgs,
+        logger,
+      );
 
       const executionId = `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
@@ -257,14 +251,16 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Ensure the MCP server is running and initialized
    */
-  private async ensureMCPServer(logger: EndpointLogger): Promise<boolean> {
-    if (this.isInitialized && this.mcpProcess) {
+  private static async ensureMCPServer(
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    if (BrowserRepository.isInitialized && BrowserRepository.mcpProcess) {
       return true;
     }
 
     try {
-      await this.startMCPServer(logger);
-      const initialized = await this.initializeMCP(logger);
+      await BrowserRepository.startMCPServer(logger);
+      const initialized = await BrowserRepository.initializeMCP(logger);
       return initialized;
     } catch (error) {
       logger.error("[Browser Repository] Failed to ensure MCP server", {
@@ -277,34 +273,34 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Start the chrome-devtools-mcp server process
    */
-  private async startMCPServer(logger: EndpointLogger): Promise<void> {
-    if (this.mcpProcess) {
-      this.mcpProcess.kill();
+  private static async startMCPServer(logger: EndpointLogger): Promise<void> {
+    if (BrowserRepository.mcpProcess) {
+      BrowserRepository.mcpProcess.kill();
     }
 
     logger.info("[Browser Repository] Starting chrome-devtools-mcp server");
 
     const config = getChromeMCPConfig();
 
-    this.mcpProcess = spawn(config.command, config.args, {
+    BrowserRepository.mcpProcess = spawn(config.command, config.args, {
       stdio: ["pipe", "pipe", "pipe"],
       env: { ...process.env, ...config.env },
     });
 
     // Set up message handling
-    this.setupMessageHandling(logger);
+    BrowserRepository.setupMessageHandling(logger);
 
     // Handle process lifecycle
-    this.mcpProcess.on("error", (error) => {
+    BrowserRepository.mcpProcess.on("error", (error) => {
       logger.error("[Browser Repository] MCP process error", {
         error: error.message,
       });
-      this.isInitialized = false;
+      BrowserRepository.isInitialized = false;
     });
 
-    this.mcpProcess.on("exit", (code) => {
+    BrowserRepository.mcpProcess.on("exit", (code) => {
       logger.warn("[Browser Repository] MCP process exited", { code });
-      this.isInitialized = false;
+      BrowserRepository.isInitialized = false;
     });
 
     // Wait for process to start
@@ -316,10 +312,10 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Initialize MCP connection
    */
-  private async initializeMCP(logger: EndpointLogger): Promise<boolean> {
+  private static async initializeMCP(logger: EndpointLogger): Promise<boolean> {
     const initRequest: MCPRequest = {
       jsonrpc: "2.0",
-      id: this.nextRequestId++,
+      id: BrowserRepository.nextRequestId++,
       method: "initialize",
       params: {
         protocolVersion: "2024-11-05",
@@ -334,7 +330,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
     };
 
     try {
-      const response = await this.sendRequest(initRequest, logger);
+      const response = await BrowserRepository.sendRequest(initRequest, logger);
 
       if (response.error) {
         logger.error("[Browser Repository] MCP initialization failed", {
@@ -343,7 +339,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
         return false;
       }
 
-      this.isInitialized = true;
+      BrowserRepository.isInitialized = true;
       logger.info("[Browser Repository] MCP server initialized");
       return true;
     } catch (error) {
@@ -357,14 +353,14 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Call a tool via MCP
    */
-  private async callTool(
+  private static async callTool(
     toolName: string,
     args: Record<string, JsonValue>,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; result?: JsonValue; error?: string }> {
     const toolRequest: MCPRequest = {
       jsonrpc: "2.0",
-      id: this.nextRequestId++,
+      id: BrowserRepository.nextRequestId++,
       method: "tools/call",
       params: {
         name: toolName,
@@ -373,7 +369,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
     };
 
     try {
-      const response = await this.sendRequest(toolRequest, logger);
+      const response = await BrowserRepository.sendRequest(toolRequest, logger);
 
       if (response.error) {
         return {
@@ -397,18 +393,18 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Send a request to the MCP server
    */
-  private sendRequest(
+  private static sendRequest(
     request: MCPRequest,
     logger: EndpointLogger,
   ): Promise<MCPResponse> {
     return new Promise((resolve, reject) => {
-      if (!this.mcpProcess) {
+      if (!BrowserRepository.mcpProcess) {
         reject(new Error("MCP process not running"));
         return;
       }
 
       const id = request.id;
-      this.pendingRequests.set(id, { resolve, reject });
+      BrowserRepository.pendingRequests.set(id, { resolve, reject });
 
       const message = `${JSON.stringify(request)}\n`;
       logger.debug("[Browser Repository] Sending MCP request", {
@@ -416,12 +412,12 @@ export class BrowserRepositoryImpl implements BrowserRepository {
         id,
       });
 
-      this.mcpProcess.stdin?.write(message);
+      BrowserRepository.mcpProcess.stdin?.write(message);
 
       // Timeout after 30 seconds
       setTimeout(() => {
-        if (this.pendingRequests.has(id)) {
-          this.pendingRequests.delete(id);
+        if (BrowserRepository.pendingRequests.has(id)) {
+          BrowserRepository.pendingRequests.delete(id);
           reject(new Error(`Request timeout for ${request.method}`));
         }
       }, 30000);
@@ -431,14 +427,14 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Set up message handling from MCP server
    */
-  private setupMessageHandling(logger: EndpointLogger): void {
-    if (!this.mcpProcess) {
+  private static setupMessageHandling(logger: EndpointLogger): void {
+    if (!BrowserRepository.mcpProcess) {
       return;
     }
 
     let buffer = "";
 
-    this.mcpProcess.stdout?.on("data", (data) => {
+    BrowserRepository.mcpProcess.stdout?.on("data", (data) => {
       buffer += data.toString();
       const lines = buffer.split("\n");
 
@@ -455,9 +451,9 @@ export class BrowserRepositoryImpl implements BrowserRepository {
               hasError: !!response.error,
             });
 
-            const pending = this.pendingRequests.get(response.id);
+            const pending = BrowserRepository.pendingRequests.get(response.id);
             if (pending) {
-              this.pendingRequests.delete(response.id);
+              BrowserRepository.pendingRequests.delete(response.id);
               if (response.error) {
                 pending.reject(new Error(response.error.message));
               } else {
@@ -474,7 +470,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       }
     });
 
-    this.mcpProcess.stderr?.on("data", (data) => {
+    BrowserRepository.mcpProcess.stderr?.on("data", (data) => {
       logger.warn("[Browser Repository] MCP stderr", {
         data: data.toString().trim(),
       });
@@ -484,32 +480,29 @@ export class BrowserRepositoryImpl implements BrowserRepository {
   /**
    * Clean up resources
    */
-  cleanup(): void {
-    if (this.mcpProcess) {
-      this.mcpProcess.kill();
-      this.mcpProcess = null;
-      this.isInitialized = false;
+  static cleanup(): void {
+    if (BrowserRepository.mcpProcess) {
+      BrowserRepository.mcpProcess.kill();
+      BrowserRepository.mcpProcess = null;
+      BrowserRepository.isInitialized = false;
     }
-    this.pendingRequests.clear();
+    BrowserRepository.pendingRequests.clear();
   }
 }
-
-// Export singleton instance of the repository
-export const browserRepository = new BrowserRepositoryImpl();
 
 // Cleanup on process exit
 if (typeof process !== "undefined") {
   process.on("exit", () => {
-    browserRepository.cleanup();
+    BrowserRepository.cleanup();
   });
 
   process.on("SIGINT", () => {
-    browserRepository.cleanup();
+    BrowserRepository.cleanup();
     // Don't call process.exit() - let other handlers (like dev server) manage exit
   });
 
   process.on("SIGTERM", () => {
-    browserRepository.cleanup();
+    BrowserRepository.cleanup();
     process.exit();
   });
 }

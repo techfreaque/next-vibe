@@ -329,11 +329,20 @@ function handleContentDone(
   const tokenMetadata: MessageMetadata = {
     totalTokens: e.totalTokens ?? undefined,
     finishReason: e.finishReason ?? undefined,
+    isStreaming: false,
   };
-  patchMessage(threadId, rootFolderId, logger, e.messageId, {
-    content: e.content,
-    metadata: tokenMetadata,
-  });
+  updateMessages(threadId, rootFolderId, logger, (msgs) =>
+    msgs.map((m) =>
+      m.id === e.messageId
+        ? {
+            ...m,
+            content: e.content,
+            metadata: { ...m.metadata, ...tokenMetadata },
+            updatedAt: new Date(),
+          }
+        : m,
+    ),
+  );
 }
 
 function handleTokensUpdated(
@@ -595,7 +604,7 @@ export function createMessageEventHandlers(
       handleFilesUploaded(e, threadId, rootFolderId, logger);
     },
     [StreamEventType.CREDITS_DEDUCTED]: () => {
-      // Credits are user-scoped, refreshed independently
+      // Handled via onCreditsDeducted callback in use-messages-subscription → deductCredits
     },
     [StreamEventType.TOKENS_UPDATED]: (e) => {
       handleTokensUpdated(e, threadId, rootFolderId, logger);

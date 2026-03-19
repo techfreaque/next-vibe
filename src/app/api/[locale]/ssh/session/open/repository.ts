@@ -30,21 +30,19 @@ import {
   saveFingerprint,
 } from "../../client";
 import { SshSessionStatus } from "../../enum";
-import type { scopedTranslation } from "../../i18n";
+import type { SshT } from "../../i18n";
 import { sessionPool } from "../pool";
 import type {
   SessionOpenRequestOutput,
   SessionOpenResponseOutput,
 } from "./definition";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 export class SessionOpenRepository {
   static async open(
     data: SessionOpenRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SshT,
   ): Promise<ResponseType<SessionOpenResponseOutput>> {
     const cols = data.cols ?? 220;
     const rows = data.rows ?? 50;
@@ -88,7 +86,7 @@ export class SessionOpenRepository {
     cols: number,
     rows: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SshT,
   ): Promise<ResponseType<SessionOpenResponseOutput>> {
     const credsResult = await getConnectionCredentials(
       connectionId,
@@ -187,7 +185,7 @@ export class SessionOpenRepository {
 
   private static async openLocal(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SshT,
   ): Promise<ResponseType<SessionOpenResponseOutput>> {
     try {
       const sessionId = randomUUID();

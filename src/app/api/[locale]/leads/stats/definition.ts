@@ -1417,6 +1417,29 @@ export type LeadsStatsRequestInput = typeof GET.types.RequestInput;
 export type LeadsStatsRequestOutput = typeof GET.types.RequestOutput;
 export type LeadsStatsResponseInput = typeof GET.types.ResponseInput;
 export type LeadsStatsResponseOutput = typeof GET.types.ResponseOutput;
+export type LeadsTopPerformingSource =
+  LeadsStatsResponseOutput["topPerformingSources"][number];
+export type LeadsStatsHistoricalData =
+  LeadsStatsResponseOutput["historicalData"];
+export type LeadsStatsGroupedStats = LeadsStatsResponseOutput["groupedStats"];
+export type LeadsStatsRecentActivity =
+  LeadsStatsResponseOutput["recentActivity"];
+export type LeadsStatsTopPerformingCampaigns =
+  LeadsStatsResponseOutput["topPerformingCampaigns"];
+export type LeadsStatsTopPerformingSources =
+  LeadsStatsResponseOutput["topPerformingSources"];
+export type LeadsStatsGroupedByStatus = LeadsStatsGroupedStats["byStatus"];
+export type LeadsStatsGroupedBySource = LeadsStatsGroupedStats["bySource"];
+export type LeadsStatsGroupedByCountry = LeadsStatsGroupedStats["byCountry"];
+export type LeadsStatsGroupedByLanguage = LeadsStatsGroupedStats["byLanguage"];
+export type LeadsStatsGroupedByCampaignStage =
+  LeadsStatsGroupedStats["byCampaignStage"];
+export type LeadsStatsGroupedByJourneyVariant =
+  LeadsStatsGroupedStats["byJourneyVariant"];
+export type LeadsStatsGroupedByEngagementLevel =
+  LeadsStatsGroupedStats["byEngagementLevel"];
+export type LeadsStatsGroupedByConversionFunnel =
+  LeadsStatsGroupedStats["byConversionFunnel"];
 
 /**
  * Export definitions

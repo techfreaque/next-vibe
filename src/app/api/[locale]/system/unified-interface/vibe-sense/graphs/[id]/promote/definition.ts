@@ -113,3 +113,5 @@ const { POST } = createEndpoint({
 
 const definitions = { POST };
 export default definitions;
+
+export type GraphPromotePostResponseOutput = typeof POST.types.ResponseOutput;

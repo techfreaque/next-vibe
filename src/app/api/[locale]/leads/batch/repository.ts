@@ -23,10 +23,8 @@ import type {
   BatchUpdateRequestOutput,
   BatchUpdateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-type LeadsModuleT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
+import type { LeadsT } from "../i18n";
+import type { LeadsBatchT } from "./i18n";
 
 /**
  * Batch Operations Repository - Static class pattern
@@ -40,14 +38,14 @@ export class BatchRepository {
   static async batchUpdateLeads(
     data: BatchUpdateRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsBatchT,
     locale: CountryLanguage,
   ): Promise<ResponseType<BatchUpdateResponseOutput>> {
     logger.debug("Batch update leads operation", {
       dataKeys: Object.keys(data),
     });
 
-    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
+    const leadsT: LeadsT = leadsScopedTranslation.scopedT(locale).t;
     const result = await LeadsRepository.batchUpdateLeads(data, logger, leadsT);
 
     if (result.success && result.data) {
@@ -70,13 +68,13 @@ export class BatchRepository {
     data: BatchDeleteRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: LeadsBatchT,
   ): Promise<ResponseType<BatchDeleteResponseOutput>> {
     logger.debug("Batch delete leads operation", {
       dataKeys: Object.keys(data),
     });
 
-    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
+    const leadsT: LeadsT = leadsScopedTranslation.scopedT(locale).t;
     const result = await LeadsRepository.batchDeleteLeads(data, logger, leadsT);
 
     if (result.success && result.data) {

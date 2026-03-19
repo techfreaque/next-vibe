@@ -24,33 +24,21 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
-import { scopedTranslation } from "./i18n";
 import type {
-  SessionCleanupConfigType,
-  SessionCleanupRequestOutput,
-  SessionCleanupResponseOutput,
-} from "./types";
+  SessionCleanupPostRequestOutput,
+  SessionCleanupPostResponseOutput,
+} from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
- * Session Cleanup Repository Interface
+ * Session Cleanup Repository
  */
-export interface SessionCleanupRepository {
-  executeSessionCleanup(
-    data: SessionCleanupRequestOutput,
+export class SessionCleanupRepository {
+  static async executeSessionCleanup(
+    data: SessionCleanupPostRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<SessionCleanupResponseOutput>>;
-}
-
-/**
- * Session Cleanup Repository Implementation
- */
-export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
-  async executeSessionCleanup(
-    data: SessionCleanupRequestOutput,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<SessionCleanupResponseOutput>> {
+  ): Promise<ResponseType<SessionCleanupPostResponseOutput>> {
     const startTime = Date.now();
 
     try {
@@ -138,16 +126,16 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
       totalProcessed = sessionsDeleted + tokensDeleted;
       const executionTimeMs = Date.now() - startTime;
 
-      const result: SessionCleanupResponseOutput = {
+      const result: SessionCleanupPostResponseOutput = {
         sessionsDeleted,
         tokensDeleted,
         totalProcessed,
         executionTimeMs,
-        errors,
       };
 
       logger.debug("Session cleanup task completed", {
         result,
+        errors,
       });
 
       // Return error if there were any errors, otherwise success
@@ -157,8 +145,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
           message: t("errors.partial_failure.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            errors:
-              result.errors?.join(", ") || t("errors.unknown_error.title"),
+            errors: errors.join(", ") || t("errors.unknown_error.title"),
           },
         });
       }
@@ -185,7 +172,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
   /**
    * Get default configuration for session cleanup
    */
-  getDefaultConfig(): SessionCleanupConfigType {
+  static getDefaultConfig(): SessionCleanupPostRequestOutput {
     return {
       sessionRetentionDays: AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
       tokenRetentionDays: RESET_TOKEN_EXPIRY,
@@ -197,8 +184,8 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
   /**
    * Validate task configuration
    */
-  async validateConfig(
-    config: SessionCleanupConfigType,
+  static async validateConfig(
+    config: SessionCleanupPostRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
@@ -252,5 +239,3 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
     }
   }
 }
-
-export const sessionCleanupRepository = new SessionCleanupRepositoryImpl();

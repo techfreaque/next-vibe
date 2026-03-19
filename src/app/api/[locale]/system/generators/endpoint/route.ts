@@ -6,13 +6,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { endpointGeneratorRepository } from "./repository";
+import { EndpointGeneratorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async (props) => {
-      return await endpointGeneratorRepository.generateEndpoint(
+      return await EndpointGeneratorRepository.generateEndpoint(
         props.data,
         props.logger,
         props.t,

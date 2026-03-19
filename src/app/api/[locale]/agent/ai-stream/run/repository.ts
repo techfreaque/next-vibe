@@ -23,11 +23,11 @@ import {
   DefaultFolderId,
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
-import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
-import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
+import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
+import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
@@ -44,68 +44,63 @@ import type {
   AiStreamRunPostResponseOutput,
 } from "./definition";
 
-/**
- * Strip <think>...</think> reasoning tags from AI message content.
- * Handles both complete tags and incomplete (streaming-cut) trailing tags.
- */
-function stripThinkTags(content: string): string {
-  let result = content.replace(/<think>[\s\S]*?<\/think>/gi, "");
-  result = result.replace(/<think>[\s\S]*$/i, "");
-  return result.trim();
-}
-
-interface PreCallResult {
-  routeId: string;
-  args: CliRequestData;
-  success: boolean;
-  data?: CliRequestData;
-  error?: string;
-  executionTimeMs?: number;
-}
-
-/**
- * Execute a single pre-call and return its result.
- * Args are passed as flat merged data — RouteExecutionExecutor auto-splits
- * urlPathParams from data using the endpoint's requestUrlPathParamsSchema.
- */
-async function executePreCall(
-  routeId: string,
-  mergedArgs: CliRequestData,
-  user: JwtPayloadType,
-  locale: CountryLanguage,
-  logger: EndpointLogger,
-  streamContext: ToolExecutionContext,
-): Promise<PreCallResult> {
-  logger.debug("[AiStreamRun] Executing pre-call", { routeId });
-
-  const result = await RouteExecutionExecutor.executeGenericHandler({
-    toolName: routeId,
-    data: mergedArgs,
-    user,
-    locale,
-    logger,
-    platform: Platform.AI,
-    streamContext,
-  });
-
-  if (!result.success) {
-    return {
-      routeId,
-      args: mergedArgs,
-      success: false,
-      error: result.message ?? "Pre-call failed",
-    };
+export class AiStreamRunRepository {
+  /**
+   * Strip <think>...</think> reasoning tags from AI message content.
+   * Handles both complete tags and incomplete (streaming-cut) trailing tags.
+   */
+  private static stripThinkTags(content: string): string {
+    let result = content.replace(/<think>[\s\S]*?<\/think>/gi, "");
+    result = result.replace(/<think>[\s\S]*$/i, "");
+    return result.trim();
   }
 
-  return {
-    routeId,
-    args: mergedArgs,
-    success: true,
-    data: result.data as CliRequestData,
-  };
-}
+  /**
+   * Execute a single pre-call and return its result.
+   * Args are passed as flat merged data — RouteExecutionExecutor auto-splits
+   * urlPathParams from data using the endpoint's requestUrlPathParamsSchema.
+   */
+  private static async executePreCall(
+    routeId: string,
+    mergedArgs: CliRequestData,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    streamContext: ToolExecutionContext,
+  ): Promise<
+    ResponseType<{
+      routeId: string;
+      args: CliRequestData;
+      data: CliRequestData;
+    }>
+  > {
+    logger.debug("[AiStreamRun] Executing pre-call", { routeId });
 
-export class AiStreamRunRepository {
+    const result = await RouteExecutionExecutor.executeGenericHandler({
+      toolName: routeId,
+      data: mergedArgs,
+      user,
+      locale,
+      logger,
+      platform: Platform.AI,
+      streamContext,
+    });
+
+    if (!result.success) {
+      return fail({
+        message:
+          result.message ?? "app.api.agent.ai-stream.run.errors.preCallFailed",
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    return success({
+      routeId,
+      args: mergedArgs,
+      data: result.data as CliRequestData,
+    });
+  }
+
   static async run(
     data: AiStreamRunPostRequestOutput,
     user: JwtPayloadType,
@@ -143,12 +138,21 @@ export class AiStreamRunRepository {
           : "new";
 
       // ── Step 1: Execute pre-calls sequentially ──────────────────────────
-      const preCallResults: PreCallResult[] = [];
+      const preCallResults: Array<{
+        routeId: string;
+        args: CliRequestData;
+        success: boolean;
+        data?: CliRequestData;
+        error?: string;
+        executionTimeMs?: number;
+      }> = [];
+
+      const preCallAbortController = new AbortController();
 
       if (preCalls && preCalls.length > 0) {
         for (const call of preCalls) {
           const startTime = Date.now();
-          const result = await executePreCall(
+          const result = await AiStreamRunRepository.executePreCall(
             call.routeId,
             call.args as CliRequestData,
             user,
@@ -168,12 +172,20 @@ export class AiStreamRunRepository {
               favoriteId: undefined,
               headless: undefined,
               waitingForRemoteResult: undefined,
-              abortSignal: undefined,
+              abortSignal: preCallAbortController.signal,
               escalateToTask: undefined,
+              callerCallbackMode: undefined,
+              onEscalatedTaskCancel: undefined,
             },
           );
           preCallResults.push({
-            ...result,
+            routeId: result.success ? result.data.routeId : call.routeId,
+            args: result.success
+              ? result.data.args
+              : (call.args as CliRequestData),
+            success: result.success,
+            data: result.success ? result.data.data : undefined,
+            error: result.success ? undefined : result.message,
             executionTimeMs: Date.now() - startTime,
           });
         }
@@ -237,7 +249,7 @@ export class AiStreamRunRepository {
 
       // When tools is still not provided, inject base tools (same as interactive chat defaults)
       // so the AI can call execute-tool, web-search, fetch-url, memories, etc.
-      const defaultTools = getDefaultToolIds().map((id) => ({
+      const defaultTools = getDefaultToolIdsForUser(user).map((id) => ({
         toolId: id,
         requiresConfirmation: false,
       }));
@@ -339,7 +351,9 @@ export class AiStreamRunRepository {
         completionTokens = aiMessage?.metadata?.completionTokens ?? null;
       }
 
-      const text = rawText ? stripThinkTags(rawText) : null;
+      const text = rawText
+        ? AiStreamRunRepository.stripThinkTags(rawText)
+        : null;
       const resultThreadId =
         (headlessThreadMode !== "none" ? threadId : null) ?? null;
 

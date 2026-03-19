@@ -6,11 +6,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { endpoints } from "./definition";
-import { completeTask } from "./repository";
+import { CompleteTaskRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, t }) => completeTask(data, logger, t),
+    handler: ({ data, logger, t, user, locale }) =>
+      CompleteTaskRepository.completeTask(data, logger, t, user, locale),
   },
 });

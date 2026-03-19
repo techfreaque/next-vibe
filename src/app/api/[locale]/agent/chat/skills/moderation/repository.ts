@@ -26,8 +26,8 @@ import type {
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 
-export const SkillModerationRepository = {
-  async listReported(
+export class SkillModerationRepository {
+  static async listReported(
     data: { minReports?: number; limit?: number; offset?: number },
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -79,9 +79,9 @@ export const SkillModerationRepository = {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  },
+  }
 
-  async moderate(
+  static async moderate(
     data: { id: string; action: "hide" | "clear" },
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -133,5 +133,5 @@ export const SkillModerationRepository = {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  },
-};
+  }
+}

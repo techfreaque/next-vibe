@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import schemaVerifyEndpoints from "./definition";
-import { schemaVerifyRepository } from "./repository";
+import { SchemaVerifyRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: schemaVerifyEndpoints,
   [Methods.POST]: {
     handler: ({ data, t, logger }) => {
-      return schemaVerifyRepository.execute(data, t, logger);
+      return SchemaVerifyRepository.execute(data, t, logger);
     },
   },
 });

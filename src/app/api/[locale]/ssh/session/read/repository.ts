@@ -9,26 +9,24 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { scopedTranslation } from "../../i18n";
+import type { SshT } from "../../i18n";
 import { sessionPool } from "../pool";
 import type {
   SessionReadRequestOutput,
   SessionReadResponseOutput,
 } from "./definition";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 export class SessionReadRepository {
+  private static sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
+
   static async read(
     data: SessionReadRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SshT,
   ): Promise<ResponseType<SessionReadResponseOutput>> {
     const entry = sessionPool.get(data.sessionId);
     if (!entry) {
@@ -43,7 +41,7 @@ export class SessionReadRepository {
 
     // Wait for output
     if (waitMs > 0 && entry.outputBuffer().length === 0) {
-      await sleep(waitMs);
+      await SessionReadRepository.sleep(waitMs);
     }
 
     const raw = entry.drainOutput();

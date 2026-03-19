@@ -238,6 +238,8 @@ const { PATCH } = createEndpoint({
 });
 
 export type TaskSyncSettingsGetOutput = typeof GET.types.ResponseOutput;
+export type TaskSyncSettingsPatchResponseOutput =
+  typeof PATCH.types.ResponseOutput;
 
 const endpoints = { GET, PATCH };
 export default endpoints;

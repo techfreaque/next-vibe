@@ -1,29 +1,33 @@
 /**
  * Claude Code Run API Definition
  * POST endpoint that spawns `claude` CLI.
- * - interactiveMode:false (DEFAULT) → non-interactive `-p` print mode; output collected and returned programmatically. Use this for all automated tasks, cron jobs, and AI tool calls.
- * - interactiveMode:true → interactive session; stdio inherited, user can watch/participate live. Only use when Max is actively watching the terminal.
+ * - interactiveMode:false (DEFAULT) → batch mode; output collected and returned.
+ * - interactiveMode:true → live terminal session; result delivered back automatically when done.
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { CLAUDE_CODE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
+const ClaudeCodeWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.ClaudeCodeWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -50,17 +54,18 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   aliases: [CLAUDE_CODE_ALIAS, "claude"],
 
+  // No stream timeout — claude-code sessions can run indefinitely
+  streamTimeoutMs: 0,
+
   cli: {
     firstCliArgKey: "prompt",
   },
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: ClaudeCodeWidget,
     usage: { request: "data", response: true },
     children: {
-      // Request
+      // ── Request fields ──────────────────────────────────────────────────
       prompt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
@@ -114,30 +119,27 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(false),
       }),
-      timeoutSeconds: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.NUMBER,
-        label: "claudeCode.run.post.fields.timeoutSeconds.label",
-        description: "claudeCode.run.post.fields.timeoutSeconds.description",
-        columns: 6,
-        schema: z.coerce.number().default(60 * 30), // 30 minutes
-      }),
 
-      // Response
+      // ── Response fields ─────────────────────────────────────────────────
       output: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "claudeCode.run.post.fields.output.label",
         schema: z.string(),
       }),
-      exitCode: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "claudeCode.run.post.fields.exitCode.label",
-        schema: z.number(),
-      }),
       durationMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "claudeCode.run.post.fields.durationMs.label",
         schema: z.number(),
+      }),
+      taskId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+      hint: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -197,20 +199,28 @@ const { POST } = createEndpoint({
         prompt:
           "Read src/app/api/[locale]/system/agent/claude-code/repository.ts and summarize what it does in 2 sentences.",
         interactiveMode: false,
-        timeoutSeconds: 60,
+      },
+      interactive: {
+        prompt: "Fix the login bug — check the auth flow and patch it.",
+        interactiveMode: true,
+        taskTitle: "Fix login bug",
       },
     },
     responses: {
       default: {
         output: "",
-        exitCode: 0,
         durationMs: 184200,
       },
       batch: {
         output:
           "The repository spawns a `claude` CLI process in either interactive or batch mode. Interactive mode inherits the terminal for live back-and-forth; batch mode uses `-p` print mode and collects all output before returning.",
-        exitCode: 0,
         durationMs: 8342,
+      },
+      escalated: {
+        output: "",
+        durationMs: 0,
+        taskId: "escalated-1234567890-abc123",
+        hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
       },
     },
   },

@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
       interactive: "Włącz tryb interaktywny",
     },
     errors: {
-      routeNotFound: "Trasa nie znaleziona",
+      routeNotFound: "Narzędzie nie znalezione: {{toolName}}",
       executionFailed: "Wykonanie nie powiodło się",
       unknownError: "Wystąpił nieznany błąd",
       publicPayloadNotSupported: "Publiczny ładunek nie jest obsługiwany",

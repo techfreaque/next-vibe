@@ -15,7 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { getNewsletterSubscriptionStatus } from "@/app/api/[locale]/leads/enum";
-import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -28,9 +27,7 @@ import type {
   SubscribePostRequestOutput,
   SubscribePostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { NewsletterSubscribeT } from "./i18n";
 
 export class NewsletterSubscribeRepository {
   static async subscribe(
@@ -38,7 +35,7 @@ export class NewsletterSubscribeRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: NewsletterSubscribeT,
   ): Promise<ResponseType<SubscribePostResponseOutput>> {
     try {
       // Get leadId from user prop (JWT payload) - always present
@@ -58,11 +55,10 @@ export class NewsletterSubscribeRepository {
           email: data.email,
         });
 
-        const leadsT = leadsScopedTranslation.scopedT(locale).t;
         const leadResult = await LeadsRepository.getLeadById(
           leadId,
           logger,
-          leadsT,
+          locale,
         );
         if (leadResult.success) {
           logger.debug("Lead found for newsletter subscription", {
@@ -89,7 +85,7 @@ export class NewsletterSubscribeRepository {
             leadId,
             updateData,
             logger,
-            leadsT,
+            locale,
           );
 
           if (updateResult.success) {

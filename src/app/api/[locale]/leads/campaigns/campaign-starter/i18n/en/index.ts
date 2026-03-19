@@ -74,5 +74,6 @@ export const translations = {
       description:
         "An error occurred while processing the campaign starter request",
     },
+    invalidTransition: "Invalid status transition for campaign start",
   },
 };

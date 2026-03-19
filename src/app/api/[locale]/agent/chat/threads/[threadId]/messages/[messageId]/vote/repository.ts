@@ -19,23 +19,21 @@ import type {
   VotePostResponseOutput,
   VotePostUrlVariablesOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type VoteT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { MessageVoteT } from "./i18n";
 
 /**
  * Vote Message Repository
  * Handles voting on messages with permission checks
  */
-export const voteRepository = {
+export class voteRepository {
   /**
    * Vote on a message (upvote, downvote, or remove vote)
    */
-  async voteMessage(
+  static async voteMessage(
     urlPathParams: VotePostUrlVariablesOutput,
     data: VotePostRequestOutput,
     user: JwtPayloadType,
-    t: VoteT,
+    t: MessageVoteT,
     logger: EndpointLogger,
   ): Promise<ResponseType<VotePostResponseOutput>> {
     try {
@@ -91,21 +89,13 @@ export const voteRepository = {
       }
 
       // Get current metadata
-      const currentMetadata = message.metadata || {};
-      const voterIds: string[] = Array.isArray(currentMetadata.voterIds)
-        ? currentMetadata.voterIds
-        : [];
+      const currentMetadata = message.metadata;
+      const voterIds: string[] = currentMetadata?.voterIds ?? [];
       const voteDetails: Array<{
         userId: string;
         vote: "up" | "down";
         timestamp: number;
-      }> = Array.isArray(currentMetadata.voteDetails)
-        ? (currentMetadata.voteDetails as Array<{
-            userId: string;
-            vote: "up" | "down";
-            timestamp: number;
-          }>)
-        : [];
+      }> = currentMetadata?.voteDetails ?? [];
 
       // Find existing vote by this user
       const existingVoteIndex = voteDetails.findIndex(
@@ -190,5 +180,5 @@ export const voteRepository = {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  },
-};
+  }
+}

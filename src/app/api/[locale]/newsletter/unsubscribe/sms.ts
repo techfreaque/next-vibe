@@ -18,7 +18,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as sendScopedTranslation } from "../../messenger/send/i18n";
-import { smsServiceRepository } from "../../messenger/sms-service/repository";
+import { SmsServiceRepository } from "../../messenger/sms-service/repository";
 import { CampaignType } from "../../messenger/accounts/enum";
 import { smsEnv } from "../../sms/env";
 import { scopedTranslation } from "../i18n";
@@ -89,7 +89,7 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
 
       const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
-      const smsResult = await smsServiceRepository.sendSms(
+      const smsResult = await SmsServiceRepository.sendSms(
         {
           to: userPhone,
           message,
@@ -167,7 +167,7 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
 
       const { t: sendT2 } = sendScopedTranslation.scopedT(locale);
 
-      const smsResult = await smsServiceRepository.sendSms(
+      const smsResult = await SmsServiceRepository.sendSms(
         {
           to: adminPhone,
           message,

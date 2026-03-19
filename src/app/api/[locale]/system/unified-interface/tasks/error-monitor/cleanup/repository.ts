@@ -15,21 +15,24 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { errorLogs } from "../db";
 import type { CleanupPostResponseOutput } from "./definition";
 
-/** Retention period in days (6 months) */
-const RETENTION_DAYS = 180;
-
-/** Maximum number of rows to keep */
-const MAX_ROWS = 100_000;
-
 export class ErrorLogsCleanupRepository {
+  /** Retention period in days (6 months) */
+  private static readonly RETENTION_DAYS = 180;
+
+  /** Maximum number of rows to keep */
+  private static readonly MAX_ROWS = 100_000;
+
   static async cleanup(
     logger: EndpointLogger,
   ): Promise<ResponseType<CleanupPostResponseOutput>> {
     // 1. Time-based: delete logs older than 6 months
-    const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000);
+    const cutoff = new Date(
+      Date.now() -
+        ErrorLogsCleanupRepository.RETENTION_DAYS * 24 * 60 * 60 * 1000,
+    );
 
     logger.debug(
-      `Cleaning up error logs older than ${cutoff.toISOString()} (${RETENTION_DAYS} days)`,
+      `Cleaning up error logs older than ${cutoff.toISOString()} (${ErrorLogsCleanupRepository.RETENTION_DAYS} days)`,
     );
 
     const timeResult = await db
@@ -44,8 +47,8 @@ export class ErrorLogsCleanupRepository {
     const total = countResult?.count ?? 0;
     let deletedByCount = 0;
 
-    if (total > MAX_ROWS) {
-      const excess = total - MAX_ROWS;
+    if (total > ErrorLogsCleanupRepository.MAX_ROWS) {
+      const excess = total - ErrorLogsCleanupRepository.MAX_ROWS;
       const oldestToDelete = await db
         .select({ id: errorLogs.id })
         .from(errorLogs)
@@ -73,8 +76,8 @@ export class ErrorLogsCleanupRepository {
       deletedCount,
       deletedByTime,
       deletedByCount,
-      retentionDays: RETENTION_DAYS,
-      maxRows: MAX_ROWS,
+      retentionDays: ErrorLogsCleanupRepository.RETENTION_DAYS,
+      maxRows: ErrorLogsCleanupRepository.MAX_ROWS,
     });
   }
 }

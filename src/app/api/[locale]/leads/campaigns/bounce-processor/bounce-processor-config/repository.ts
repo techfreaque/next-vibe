@@ -22,37 +22,32 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 
 import type { JwtPayloadType } from "../../../../user/auth/types";
-import type { scopedTranslation } from "./i18n";
+import { BOUNCE_PROCESSOR_ALIAS } from "../constants";
 import type {
   BounceProcessorConfigGetResponseOutput,
   BounceProcessorConfigPutResponseOutput,
 } from "./definition";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-const TASK_ID = "bounce-processor";
-const ROUTE_ID = "bounce-processor";
-
-function getDefaultConfig(): BounceProcessorConfigGetResponseOutput {
-  return {
-    enabled: false,
-    dryRun: false,
-    batchSize: 100,
-    schedule: "*/15 * * * *",
-    priority: CronTaskPriority.MEDIUM,
-    timeout: 300000,
-    retries: 3,
-    retryDelay: 30000,
-  };
-}
+import type { BounceProcessorConfigT } from "./i18n";
 
 export class BounceProcessorConfigRepository {
+  private static getDefaultConfig(): BounceProcessorConfigGetResponseOutput {
+    return {
+      enabled: false,
+      dryRun: false,
+      batchSize: 100,
+      schedule: "*/15 * * * *",
+      priority: CronTaskPriority.MEDIUM,
+      timeout: 300000,
+      retries: 3,
+      retryDelay: 30000,
+    };
+  }
+
   static async getConfig(
     user: JwtPayloadType,
-    t: ModuleT,
+    t: BounceProcessorConfigT,
     logger: EndpointLogger,
   ): Promise<ResponseType<BounceProcessorConfigGetResponseOutput>> {
     try {
@@ -61,15 +56,15 @@ export class BounceProcessorConfigRepository {
       const [existing] = await db
         .select()
         .from(cronTasks)
-        .where(eq(cronTasks.id, TASK_ID))
+        .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS))
         .limit(1);
 
       if (!existing) {
-        return success(getDefaultConfig());
+        return success(BounceProcessorConfigRepository.getDefaultConfig());
       }
 
-      const defaults = getDefaultConfig();
-      const taskInput = existing.taskInput as Record<string, JsonValue> | null;
+      const defaults = BounceProcessorConfigRepository.getDefaultConfig();
+      const taskInput = existing.taskInput;
 
       return success({
         enabled: existing.enabled,
@@ -82,9 +77,7 @@ export class BounceProcessorConfigRepository {
             ? taskInput.batchSize
             : defaults.batchSize,
         schedule: existing.schedule,
-        priority:
-          (existing.priority as BounceProcessorConfigGetResponseOutput["priority"]) ??
-          defaults.priority,
+        priority: existing.priority ?? defaults.priority,
         timeout: existing.timeout ?? defaults.timeout,
         retries: existing.retries ?? defaults.retries,
         retryDelay: existing.retryDelay ?? defaults.retryDelay,
@@ -101,7 +94,7 @@ export class BounceProcessorConfigRepository {
   static async updateConfig(
     data: BounceProcessorConfigGetResponseOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: BounceProcessorConfigT,
     logger: EndpointLogger,
   ): Promise<ResponseType<BounceProcessorConfigPutResponseOutput>> {
     try {
@@ -113,15 +106,17 @@ export class BounceProcessorConfigRepository {
 
       if (!data.enabled) {
         // Remove the cron task when disabled
-        await db.delete(cronTasks).where(eq(cronTasks.id, TASK_ID));
+        await db
+          .delete(cronTasks)
+          .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS));
         logger.debug("Removed bounce-processor cron task (disabled)");
         return success();
       }
 
       const cronData: NewCronTask = {
-        id: TASK_ID,
-        shortId: TASK_ID,
-        routeId: ROUTE_ID,
+        id: BOUNCE_PROCESSOR_ALIAS,
+        shortId: BOUNCE_PROCESSOR_ALIAS,
+        routeId: BOUNCE_PROCESSOR_ALIAS,
         displayName: "Bounce Processor",
         description:
           "Scan IMAP for bounce notifications and update lead status",
@@ -143,14 +138,14 @@ export class BounceProcessorConfigRepository {
       const [existing] = await db
         .select({ id: cronTasks.id })
         .from(cronTasks)
-        .where(eq(cronTasks.id, TASK_ID))
+        .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS))
         .limit(1);
 
       if (existing) {
         await db
           .update(cronTasks)
           .set(cronData)
-          .where(eq(cronTasks.id, TASK_ID));
+          .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS));
       } else {
         await db.insert(cronTasks).values(cronData);
       }

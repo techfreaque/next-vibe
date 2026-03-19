@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { seedsGeneratorRepository } from "./repository";
+import { SeedsGeneratorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) => {
-      return seedsGeneratorRepository.generateSeeds(data, logger, t);
+      return SeedsGeneratorRepository.generateSeeds(data, logger, t);
     },
   },
 });

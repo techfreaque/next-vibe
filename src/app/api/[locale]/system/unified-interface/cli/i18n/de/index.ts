@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
       interactive: "Interaktiven Modus aktivieren",
     },
     errors: {
-      routeNotFound: "Route nicht gefunden",
+      routeNotFound: "Tool nicht gefunden: {{toolName}}",
       executionFailed: "Ausführung fehlgeschlagen",
       unknownError: "Unbekannter Fehler aufgetreten",
       publicPayloadNotSupported: "Öffentliche Nutzlast nicht unterstützt",

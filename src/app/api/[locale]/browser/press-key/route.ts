@@ -6,7 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import { executePressKey, filterUndefinedArgs } from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import pressKeyEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -14,10 +14,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executePressKey(
+      BrowserSharedRepository.executePressKey(
         {
           toolName: BrowserTool.PRESS_KEY,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             key: data.key,
           }),
         },

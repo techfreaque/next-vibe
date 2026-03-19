@@ -87,16 +87,48 @@ export class ResumeStreamRepository {
 
     try {
       // Read thread state — streamingState tells us if the live loop is still running.
-      const [thread] = await db
-        .select({
-          streamingState: chatThreads.streamingState,
-          rootFolderId: chatThreads.rootFolderId,
-        })
-        .from(chatThreads)
-        .where(eq(chatThreads.id, threadId))
-        .limit(1);
+      // If state is 'streaming', wait for it to settle (the stream is ending soon —
+      // escalateToTask already set 'waiting' in DB; we just need to let the stream
+      // finish its finally block before we attempt revival).
+      let thread:
+        | { streamingState: string | null; rootFolderId: string | null }
+        | undefined;
+      const maxWaitMs = 10_000;
+      const pollIntervalMs = 500;
+      const waitStart = Date.now();
+      while (true) {
+        const [row] = await db
+          .select({
+            streamingState: chatThreads.streamingState,
+            rootFolderId: chatThreads.rootFolderId,
+          })
+          .from(chatThreads)
+          .where(eq(chatThreads.id, threadId))
+          .limit(1);
+        thread = row;
+        const state = row?.streamingState ?? "idle";
+        if (state !== "streaming" || Date.now() - waitStart >= maxWaitMs) {
+          break;
+        }
+        logger.info(
+          "[ResumeStream] Stream still active — waiting for it to settle",
+          {
+            threadId,
+            streamingState: state,
+            elapsedMs: Date.now() - waitStart,
+          },
+        );
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, pollIntervalMs);
+        });
+      }
 
-      const isLive = thread?.streamingState === "streaming";
+      const streamingState = thread?.streamingState ?? "idle";
+      // A live stream is actively running ('streaming'). 'aborting' means user
+      // requested cancel — the live stream will die shortly; treat as dead so we
+      // don't try to signal a dying stream via publishWakeUpSignal.
+      const isLive = streamingState === "streaming";
+      const isAborting = streamingState === "aborting";
 
       // Atomic revival claim: atomically flip streamingState 'idle'→'streaming'.
       // If 0 rows updated, another resume-stream task already claimed this revival slot.
@@ -110,7 +142,7 @@ export class ResumeStreamRepository {
           .where(
             and(
               eq(chatThreads.id, claimThreadId),
-              sql`${chatThreads.streamingState} = 'idle'`,
+              sql`${chatThreads.streamingState} IN ('idle', 'waiting')`,
             ),
           )
           .returning({ id: chatThreads.id });
@@ -126,8 +158,21 @@ export class ResumeStreamRepository {
         threadId,
         toolMessageId,
         isLive,
+        isAborting,
+        streamingState,
         threadFound: !!thread,
       });
+
+      // If the stream is aborting (user cancelled), skip revival entirely.
+      // The live stream's abort handler + finally block will clear streamingState
+      // and emit STREAM_FINISHED. No deferred messages or headless revival needed.
+      if (isAborting) {
+        logger.info(
+          "[ResumeStream] Thread is aborting — skipping revival (user cancelled)",
+          { threadId, toolMessageId },
+        );
+        return success({ resumed: false, lastAiMessageId: null });
+      }
 
       // For wakeUp: inject a deferred result message so it appears in the thread UI.
       // Live case:  emit TOOL_RESULT WS event — the running loop already has the
@@ -337,8 +382,19 @@ export class ResumeStreamRepository {
                   .from(chatThreads)
                   .where(eq(chatThreads.id, effectiveThreadId))
                   .limit(1);
-                if (currentThread?.streamingState === "idle") {
+                const siblingState = currentThread?.streamingState;
+                if (siblingState === "idle") {
                   break;
+                }
+                // If thread is aborting (user cancelled), bail out immediately.
+                // The aborting stream will clear itself to 'idle', but we should
+                // not attempt revival on a cancelled thread.
+                if (siblingState === "aborting") {
+                  logger.info(
+                    "[ResumeStream] wakeUp — thread aborting during backoff, skipping revival",
+                    { threadId: effectiveThreadId, toolMessageId },
+                  );
+                  return success({ resumed: false, lastAiMessageId: null });
                 }
               }
 
@@ -445,6 +501,7 @@ export class ResumeStreamRepository {
                     data: createStreamEvent.streamFinished({
                       threadId,
                       reason: "completed",
+                      finalState: "idle",
                     }).data,
                   },
                   logger,
@@ -599,6 +656,7 @@ export class ResumeStreamRepository {
                     data: createStreamEvent.streamFinished({
                       threadId,
                       reason: "completed",
+                      finalState: "idle",
                     }).data,
                   },
                   logger,

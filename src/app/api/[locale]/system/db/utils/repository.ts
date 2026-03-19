@@ -20,20 +20,18 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as resetScopedTranslation } from "../reset/i18n";
 // Logger will be provided by the route handler
 import type { DbUtilsRequestOutput, DbUtilsResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { UtilsT } from "./i18n";
 
 /**
  * Database Utils Repository Implementation
  */
-class DbUtilsRepositoryImpl {
+export class DbUtilsRepository {
   /**
    * Check database health and connectivity
    */
-  async checkHealth(
+  static async checkHealth(
     request: DbUtilsRequestOutput,
-    t: ModuleT,
+    t: UtilsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<DbUtilsResponseOutput>> {
     try {
@@ -43,7 +41,7 @@ class DbUtilsRepositoryImpl {
       let status: "healthy" | "degraded" | "unhealthy" = "healthy";
 
       // Test primary connection
-      const primaryHealthy = await this.testConnection(t, logger);
+      const primaryHealthy = await DbUtilsRepository.testConnection(t, logger);
       if (!primaryHealthy.success) {
         status = "unhealthy";
         logger.error("Primary database connection failed");
@@ -64,7 +62,7 @@ class DbUtilsRepositoryImpl {
         | undefined;
       if (request.includeDetails) {
         logger.debug("Including detailed health information");
-        const statsResult = await this.getStats(t, logger);
+        const statsResult = await DbUtilsRepository.getStats(t, logger);
         if (statsResult.success) {
           details = {
             version: statsResult.data.version,
@@ -97,8 +95,8 @@ class DbUtilsRepositoryImpl {
   /**
    * Test database connection
    */
-  async testConnection(
-    t: ModuleT,
+  static async testConnection(
+    t: UtilsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
     try {
@@ -121,8 +119,8 @@ class DbUtilsRepositoryImpl {
   /**
    * Get database statistics
    */
-  async getStats(
-    t: ModuleT,
+  static async getStats(
+    t: UtilsT,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -163,8 +161,8 @@ class DbUtilsRepositoryImpl {
   /**
    * Check if Docker is available
    */
-  async isDockerAvailable(
-    t: ModuleT,
+  static async isDockerAvailable(
+    t: UtilsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
     try {
@@ -195,7 +193,7 @@ class DbUtilsRepositoryImpl {
   /**
    * Manage the database (reset or initialize)
    */
-  async manageDatabase(
+  static async manageDatabase(
     options: {
       runMigrations?: boolean;
       initialize?: boolean;
@@ -203,7 +201,7 @@ class DbUtilsRepositoryImpl {
       fastDbReset?: boolean;
     } = {},
     logger: EndpointLogger,
-    t: ModuleT,
+    t: UtilsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
@@ -223,10 +221,10 @@ class DbUtilsRepositoryImpl {
 
       try {
         // Import reset functionality from the reset subdomain
-        const { databaseResetRepository } = await import("../reset/repository");
+        const { DatabaseResetRepository } = await import("../reset/repository");
         const { t: resetT } = resetScopedTranslation.scopedT(locale);
 
-        const resetResult = await databaseResetRepository.resetDatabase(
+        const resetResult = await DatabaseResetRepository.resetDatabase(
           {
             force: true,
             skipMigrations: !runMigrations,
@@ -271,14 +269,17 @@ class DbUtilsRepositoryImpl {
    * Reset the database by truncating all tables
    * @deprecated Use manageDatabase() instead
    */
-  async resetDatabase(
+  static async resetDatabase(
     runMigrations = false,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: UtilsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
-    return await this.manageDatabase({ runMigrations }, logger, t, locale);
+    return await DbUtilsRepository.manageDatabase(
+      { runMigrations },
+      logger,
+      t,
+      locale,
+    );
   }
 }
-
-export const dbUtilsRepository = new DbUtilsRepositoryImpl();

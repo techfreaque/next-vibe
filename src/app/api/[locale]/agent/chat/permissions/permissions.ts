@@ -571,31 +571,14 @@ export async function canViewThread(
 ): Promise<boolean> {
   const userId = user.id;
 
-  logger.debug("canViewThread: Checking permissions", {
-    userId,
-    threadId: thread.id,
-    threadUserId: thread.userId,
-    threadRootFolderId: thread.rootFolderId,
-    folderId: thread.folderId,
-    folderName: folder?.name,
-  });
-
   // Owner can always view
   if (userId && isOwner(userId, thread.userId)) {
-    logger.debug("canViewThread: User is owner", {
-      userId,
-      threadUserId: thread.userId,
-    });
     return true;
   }
 
   // Admin can always view
-  if (userId) {
-    const isAdminUser = await isAdmin(userId, logger, locale);
-    logger.debug("canViewThread: Admin check", { userId, isAdminUser });
-    if (isAdminUser) {
-      return true;
-    }
+  if (userId && (await isAdmin(userId, logger, locale))) {
+    return true;
   }
 
   // Build folder map for inheritance
@@ -607,26 +590,8 @@ export async function canViewThread(
   // Get effective rolesView (with inheritance from folder)
   const effectiveRoles = getEffectiveRoles(thread, "rolesView", folderMap);
 
-  logger.debug("canViewThread: Checking role permission", {
-    effectiveRoles,
-    userId: user.id,
-    isPublic: user.isPublic,
-  });
-
   // Check if user has required role
-  const hasPermission = await hasRolePermission(
-    user,
-    effectiveRoles,
-    logger,
-    locale,
-  );
-
-  logger.debug("canViewThread: Final result", {
-    hasPermission,
-    threadId: thread.id,
-  });
-
-  return hasPermission;
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**

@@ -15,7 +15,7 @@ import { UserRepository } from "../user/repository";
 import { UserPermissionRole, UserRole } from "../user/user-roles/enum";
 import type { UserCreateRequestOutput } from "./create/definition";
 import { scopedTranslation as createScopedTranslation } from "./create/i18n";
-import { userCreateRepository } from "./create/repository";
+import { UserCreateRepository } from "./create/repository";
 
 /**
  * Helper function to create user management seed data
@@ -144,7 +144,7 @@ export async function dev(
         const { t } = createScopedTranslation.scopedT(locale);
 
         // Create the user
-        const createResponse = await userCreateRepository.createUser(
+        const createResponse = await UserCreateRepository.createUser(
           userData,
           adminJwtPayload,
           locale,
@@ -252,7 +252,7 @@ export async function test(
     const { t } = createScopedTranslation.scopedT(locale);
 
     // Create test user
-    const createResponse = await userCreateRepository.createUser(
+    const createResponse = await UserCreateRepository.createUser(
       testUserData,
       adminJwtPayload,
       locale,

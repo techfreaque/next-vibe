@@ -37,15 +37,13 @@ import { SMTP_ERROR_MESSAGES } from "./constants";
 import { CampaignType } from "../../../accounts/enum";
 import type { CampaignTypeValue } from "../../../accounts/enum";
 import { EmailSecurityType } from "../enum";
-import type { scopedTranslation } from "./i18n";
+import type { SmtpClientT } from "./i18n";
 import { MessageChannel } from "../../../accounts/enum";
 import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,
 } from "@/app/api/[locale]/leads/enum";
 import type { Countries, Languages } from "@/i18n/core/config";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export interface SmtpSelectionCriteria {
   campaignType: typeof CampaignTypeValue;
@@ -70,8 +68,6 @@ export interface SmtpSendParams {
   campaignId?: string;
 }
 
-export type SmtpSendRequestOutput = SmtpSendParams;
-
 export interface SmtpSendResult {
   messageId: string;
   accountId: string;
@@ -80,10 +76,6 @@ export interface SmtpSendResult {
   rejected: string[];
   response: string;
 }
-
-export type SmtpSendResponseOutput = SmtpSendResult;
-
-export type SmtpCapacityRequestOutput = Record<string, never>;
 
 export interface SmtpCapacityResponseOutput {
   totalCapacity: number;
@@ -119,38 +111,10 @@ interface SmtpAccountShape {
   lastUsedAt: MessengerAccount["lastUsedAt"];
 }
 
-function toSmtpShape(row: MessengerAccount): SmtpAccountShape {
-  return {
-    id: row.id,
-    name: row.name,
-    host: row.smtpHost ?? "",
-    port: row.smtpPort ?? 587,
-    securityType: row.smtpSecurityType ?? EmailSecurityType.STARTTLS,
-    username: row.smtpUsername ?? "",
-    password: row.smtpPassword ?? "",
-    fromEmail: row.smtpFromEmail ?? "",
-    connectionTimeout: row.smtpConnectionTimeout,
-    rateLimitPerHour: row.smtpRateLimitPerHour,
-    status: row.status,
-    isDefault: row.isDefault,
-    priority: row.priority,
-    campaignTypes: row.campaignTypes,
-    emailJourneyVariants: row.emailJourneyVariants,
-    emailCampaignStages: row.emailCampaignStages,
-    countries: row.countries,
-    languages: row.languages,
-    isExactMatch: row.isExactMatch,
-    weight: row.weight,
-    isFailover: row.isFailover,
-    lastUsedAt: row.lastUsedAt,
-  };
+interface TestConnectionResult {
+  success: boolean;
+  message: TranslationKey;
 }
-
-const SMTP_ACTIVE_CONDITIONS = [
-  eq(messengerAccounts.channel, MessageChannel.EMAIL),
-  eq(messengerAccounts.provider, MessengerProvider.SMTP),
-  eq(messengerAccounts.status, MessengerAccountStatus.ACTIVE),
-] as const;
 
 /**
  * SMTP Repository — reads from messenger_accounts (channel=EMAIL, provider=SMTP)
@@ -161,15 +125,48 @@ export class SmtpRepository {
     Transporter<SMTPTransport.SentMessageInfo>
   >();
 
+  private static readonly SMTP_ACTIVE_CONDITIONS = [
+    eq(messengerAccounts.channel, MessageChannel.EMAIL),
+    eq(messengerAccounts.provider, MessengerProvider.SMTP),
+    eq(messengerAccounts.status, MessengerAccountStatus.ACTIVE),
+  ] as const;
+
+  private static toSmtpShape(row: MessengerAccount): SmtpAccountShape {
+    return {
+      id: row.id,
+      name: row.name,
+      host: row.smtpHost ?? "",
+      port: row.smtpPort ?? 587,
+      securityType: row.smtpSecurityType ?? EmailSecurityType.STARTTLS,
+      username: row.smtpUsername ?? "",
+      password: row.smtpPassword ?? "",
+      fromEmail: row.smtpFromEmail ?? "",
+      connectionTimeout: row.smtpConnectionTimeout,
+      rateLimitPerHour: row.smtpRateLimitPerHour,
+      status: row.status,
+      isDefault: row.isDefault,
+      priority: row.priority,
+      campaignTypes: row.campaignTypes,
+      emailJourneyVariants: row.emailJourneyVariants,
+      emailCampaignStages: row.emailCampaignStages,
+      countries: row.countries,
+      languages: row.languages,
+      isExactMatch: row.isExactMatch,
+      weight: row.weight,
+      isFailover: row.isFailover,
+      lastUsedAt: row.lastUsedAt,
+    };
+  }
+
   /**
    * Send email using database-configured SMTP account with retry and fallback support
    */
   static async sendEmail(
-    data: SmtpSendRequestOutput,
+    data: SmtpSendParams,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SmtpClientT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SmtpSendResponseOutput>> {
+  ): Promise<ResponseType<SmtpSendResult>> {
     try {
       logger.info("Sending email via SMTP service", {
         to: data.to,
@@ -270,9 +267,9 @@ export class SmtpRepository {
    * Get total sending capacity across all active SMTP accounts
    */
   static async getTotalSendingCapacity(
-    data: SmtpCapacityRequestOutput,
+    data: Record<string, never>,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SmtpClientT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
@@ -281,13 +278,13 @@ export class SmtpRepository {
       const rows = await db
         .select()
         .from(messengerAccounts)
-        .where(and(...SMTP_ACTIVE_CONDITIONS));
+        .where(and(...SmtpRepository.SMTP_ACTIVE_CONDITIONS));
 
       if (rows.length === 0) {
         return success({ totalCapacity: 0, remainingCapacity: 0 });
       }
 
-      const accounts = rows.map(toSmtpShape);
+      const accounts = rows.map((r) => SmtpRepository.toSmtpShape(r));
       let totalCapacity = 0;
       let totalRemainingCapacity = 0;
 
@@ -325,9 +322,9 @@ export class SmtpRepository {
   static async testConnection(
     data: { accountId: string },
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SmtpClientT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: TranslationKey }>> {
+  ): Promise<ResponseType<TestConnectionResult>> {
     try {
       logger.info("Testing SMTP connection", {
         accountId: data.accountId,
@@ -348,7 +345,7 @@ export class SmtpRepository {
         });
       }
 
-      const account = toSmtpShape(row);
+      const account = SmtpRepository.toSmtpShape(row);
       const transportResult = await SmtpRepository.getTransport(
         account,
         logger,
@@ -392,7 +389,7 @@ export class SmtpRepository {
     logger: EndpointLogger,
   ): Promise<SmtpAccountShape | null> {
     try {
-      const sqlConditions = [...SMTP_ACTIVE_CONDITIONS];
+      const sqlConditions = [...SmtpRepository.SMTP_ACTIVE_CONDITIONS];
 
       const isLeadCampaign =
         selectionCriteria?.campaignType === CampaignType.LEAD_CAMPAIGN;
@@ -469,7 +466,7 @@ export class SmtpRepository {
         const fallbackRows = await db
           .select()
           .from(messengerAccounts)
-          .where(and(...SMTP_ACTIVE_CONDITIONS))
+          .where(and(...SmtpRepository.SMTP_ACTIVE_CONDITIONS))
           .orderBy(
             desc(messengerAccounts.isDefault),
             desc(messengerAccounts.priority),
@@ -486,10 +483,10 @@ export class SmtpRepository {
           accountName: fallbackRows[0].name,
         });
 
-        return toSmtpShape(fallbackRows[0]);
+        return SmtpRepository.toSmtpShape(fallbackRows[0]);
       }
 
-      return toSmtpShape(rows[0]);
+      return SmtpRepository.toSmtpShape(rows[0]);
     } catch (error) {
       logger.error(
         "Error getting SMTP account with criteria",
@@ -509,7 +506,7 @@ export class SmtpRepository {
       const rows = await db
         .select()
         .from(messengerAccounts)
-        .where(and(...SMTP_ACTIVE_CONDITIONS))
+        .where(and(...SmtpRepository.SMTP_ACTIVE_CONDITIONS))
         .orderBy(
           desc(messengerAccounts.isDefault),
           desc(messengerAccounts.priority),
@@ -528,7 +525,7 @@ export class SmtpRepository {
         accountName: rows[0].name,
       });
 
-      return toSmtpShape(rows[0]);
+      return SmtpRepository.toSmtpShape(rows[0]);
     } catch (error) {
       logger.error("Error getting fallback SMTP account", parseError(error));
       return null;
@@ -541,7 +538,7 @@ export class SmtpRepository {
   private static async getTransport(
     account: SmtpAccountShape,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SmtpClientT,
   ): Promise<ResponseType<Transporter<SMTPTransport.SentMessageInfo>>> {
     const cacheKey = account.id;
 
@@ -603,14 +600,14 @@ export class SmtpRepository {
    * Attempt to send email with retry logic for connection issues
    */
   private static async attemptEmailSendWithRetry(
-    params: SmtpSendRequestOutput,
+    params: SmtpSendParams,
     account: SmtpAccountShape,
     isFallback: boolean,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SmtpClientT,
     maxRetries = 2,
-  ): Promise<ResponseType<SmtpSendResponseOutput>> {
-    let lastError: ResponseType<SmtpSendResponseOutput> | null = null;
+  ): Promise<ResponseType<SmtpSendResult>> {
+    let lastError: ResponseType<SmtpSendResult> | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -711,11 +708,11 @@ export class SmtpRepository {
    * Perform the actual email sending with an account
    */
   private static async performEmailSend(
-    params: SmtpSendRequestOutput,
+    params: SmtpSendParams,
     account: SmtpAccountShape,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<SmtpSendResponseOutput>> {
+    t: SmtpClientT,
+  ): Promise<ResponseType<SmtpSendResult>> {
     try {
       if (!params.skipRateLimitCheck) {
         const rateLimitCheck = await SmtpRepository.checkRateLimit(
@@ -890,7 +887,7 @@ export class SmtpRepository {
   private static async checkRateLimit(
     account: SmtpAccountShape,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SmtpClientT,
   ): Promise<
     ResponseType<{
       canSend: boolean;

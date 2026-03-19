@@ -15,7 +15,7 @@ import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import type { ModuleT } from "@/app/api/[locale]/credits/repository";
+import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -31,12 +31,7 @@ import {
 import { ChatMessageRole } from "../../../chat/enum";
 import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../../chat/threads/[threadId]/messages/events";
-import {
-  createErrorMessage,
-  createTextMessage,
-  createToolMessage,
-  updateMessageContent,
-} from "../../../chat/threads/[threadId]/messages/repository";
+import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import { serializeError } from "../error-utils";
 
 /** Throttle window in ms - coalesces content updates to same message */
@@ -117,7 +112,7 @@ export class MessageDbWriter {
 
     // Persist to DB
     if (!this.isIncognito) {
-      const result = await createTextMessage({
+      const result = await MessagesRepository.createTextMessage({
         messageId,
         threadId,
         content,
@@ -273,7 +268,7 @@ export class MessageDbWriter {
         amount: params.amount,
         feature: params.feature,
         type: params.type,
-        partial: deductResult.partialDeduction,
+        partial: deductResult.data.partialDeduction,
       });
       this.enqueue(creditEvent);
     } else {
@@ -328,7 +323,7 @@ export class MessageDbWriter {
 
     // DB: insert immediately (even for incognito the SSE is needed - only skip DB)
     if (!this.isIncognito) {
-      const result = await createTextMessage({
+      const result = await MessagesRepository.createTextMessage({
         messageId,
         threadId,
         content: "",
@@ -408,7 +403,7 @@ export class MessageDbWriter {
 
     // DB: create tool message immediately
     if (!this.isIncognito) {
-      const createResult = await createToolMessage({
+      const createResult = await MessagesRepository.createToolMessage({
         messageId: toolMessageId,
         threadId,
         toolCall,
@@ -512,7 +507,7 @@ export class MessageDbWriter {
           },
         );
         // Fallback: create if update failed
-        const fallbackResult = await createToolMessage({
+        const fallbackResult = await MessagesRepository.createToolMessage({
           messageId: toolMessageId,
           threadId,
           toolCall,
@@ -824,7 +819,11 @@ export class MessageDbWriter {
 
     // DB: update content + token metadata
     if (!this.isIncognito) {
-      await updateMessageContent({ messageId, content, logger: this.logger });
+      await MessagesRepository.updateMessageContent({
+        messageId,
+        content,
+        logger: this.logger,
+      });
 
       await db
         .update(chatMessages)
@@ -925,7 +924,7 @@ export class MessageDbWriter {
 
     // DB: save error message
     if (!this.isIncognito) {
-      await createErrorMessage({
+      await MessagesRepository.createErrorMessage({
         messageId: errorMessageId,
         threadId,
         content: serializedError,

@@ -267,3 +267,6 @@ const definitions = {
   POST,
 };
 export default definitions;
+
+export type GraphsGetResponseOutput = typeof GET.types.ResponseOutput;
+export type GraphsPostResponseOutput = typeof POST.types.ResponseOutput;

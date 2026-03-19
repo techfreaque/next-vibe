@@ -36,10 +36,8 @@ import {
   formatFavoritesSummary,
 } from "./favorites-formatter";
 import type { FavoriteSummaryItem } from "./system-prompt/prompt";
-import type { scopedTranslation } from "./i18n";
+import type { FavoritesT } from "./i18n";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
-
-type FavoritesT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Chat Favorites Repository
@@ -197,20 +195,97 @@ export class ChatFavoritesRepository {
       });
     }
   }
-}
 
-/**
- * Generate favorites summary for system prompt (server-side)
- * Fetches favorites from database and formats them using shared formatter
- */
-export async function generateFavoritesSummary(params: {
-  userId: string;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-}): Promise<string> {
-  const { userId, locale, logger } = params;
+  /**
+   * Generate favorites summary for system prompt (server-side)
+   * Fetches favorites from database and formats them using shared formatter
+   */
+  static async generateFavoritesSummary(params: {
+    userId: string;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+  }): Promise<string> {
+    const { userId, locale, logger } = params;
 
-  try {
+    try {
+      const [settingsRow] = await db
+        .select({ activeFavoriteId: chatSettings.activeFavoriteId })
+        .from(chatSettings)
+        .where(eq(chatSettings.userId, userId))
+        .limit(1);
+
+      const activeFavoriteId = settingsRow?.activeFavoriteId ?? null;
+
+      const rows = await db
+        .select()
+        .from(chatFavorites)
+        .where(eq(chatFavorites.userId, userId))
+        .orderBy(asc(chatFavorites.position));
+
+      if (rows.length === 0) {
+        return formatEmptyFavoritesGuidance();
+      }
+
+      // Resolve localized skill names
+      const { t: charT } = charactersScopedTranslation.scopedT(locale);
+      const skillNameMap = new Map<string, string>();
+      for (const char of DEFAULT_SKILLS) {
+        skillNameMap.set(char.id, charT(char.name));
+      }
+
+      // Look up custom skill names for any non-default skillIds
+      const customSkillIds = rows
+        .map((r) => r.skillId)
+        .filter((id) => id !== NO_SKILL_ID && !skillNameMap.has(id));
+      if (customSkillIds.length > 0) {
+        const { customSkills: customSkillsTable } =
+          await import("../skills/db");
+        const customSkillsList = await db
+          .select({ id: customSkillsTable.id, name: customSkillsTable.name })
+          .from(customSkillsTable)
+          .where(inArray(customSkillsTable.id, customSkillIds));
+        for (const s of customSkillsList) {
+          skillNameMap.set(s.id, s.name);
+        }
+      }
+
+      const items = rows.map((row) => ({
+        id: row.id,
+        name: row.customName ?? row.skillId,
+        skillId: row.skillId,
+        characterName: skillNameMap.get(row.skillId) ?? null,
+        modelId: null as string | null, // model resolved client-side; not stored server-side
+        modelInfo: "",
+        isActive: row.id === activeFavoriteId,
+        position: row.position,
+        useCount: row.useCount,
+        lastUsedAt: row.lastUsedAt,
+      }));
+
+      logger.debug("Generated favorites summary", {
+        userId,
+        count: items.length,
+        activeFavoriteId,
+      });
+
+      return formatFavoritesSummary(items);
+    } catch (error) {
+      logger.error("Failed to generate favorites summary", parseError(error));
+      return "";
+    }
+  }
+
+  /**
+   * Load raw favorites items for system prompt (server-side).
+   * Returns empty array when user has no favorites.
+   */
+  static async loadFavoritesItems(params: {
+    userId: string;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+  }): Promise<FavoriteSummaryItem[]> {
+    const { userId, locale, logger } = params;
+
     const [settingsRow] = await db
       .select({ activeFavoriteId: chatSettings.activeFavoriteId })
       .from(chatSettings)
@@ -226,7 +301,7 @@ export async function generateFavoritesSummary(params: {
       .orderBy(asc(chatFavorites.position));
 
     if (rows.length === 0) {
-      return formatEmptyFavoritesGuidance();
+      return [];
     }
 
     // Resolve localized skill names
@@ -251,12 +326,12 @@ export async function generateFavoritesSummary(params: {
       }
     }
 
-    const items = rows.map((row) => ({
+    const items: FavoriteSummaryItem[] = rows.map((row) => ({
       id: row.id,
       name: row.customName ?? row.skillId,
       skillId: row.skillId,
       characterName: skillNameMap.get(row.skillId) ?? null,
-      modelId: null as string | null, // model resolved client-side; not stored server-side
+      modelId: null,
       modelInfo: "",
       isActive: row.id === activeFavoriteId,
       position: row.position,
@@ -264,88 +339,12 @@ export async function generateFavoritesSummary(params: {
       lastUsedAt: row.lastUsedAt,
     }));
 
-    logger.debug("Generated favorites summary", {
+    logger.debug("Loaded favorites items", {
       userId,
       count: items.length,
       activeFavoriteId,
     });
 
-    return formatFavoritesSummary(items);
-  } catch (error) {
-    logger.error("Failed to generate favorites summary", parseError(error));
-    return "";
+    return items;
   }
-}
-
-/**
- * Load raw favorites items for system prompt (server-side).
- * Returns empty array when user has no favorites.
- */
-export async function loadFavoritesItems(params: {
-  userId: string;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-}): Promise<FavoriteSummaryItem[]> {
-  const { userId, locale, logger } = params;
-
-  const [settingsRow] = await db
-    .select({ activeFavoriteId: chatSettings.activeFavoriteId })
-    .from(chatSettings)
-    .where(eq(chatSettings.userId, userId))
-    .limit(1);
-
-  const activeFavoriteId = settingsRow?.activeFavoriteId ?? null;
-
-  const rows = await db
-    .select()
-    .from(chatFavorites)
-    .where(eq(chatFavorites.userId, userId))
-    .orderBy(asc(chatFavorites.position));
-
-  if (rows.length === 0) {
-    return [];
-  }
-
-  // Resolve localized skill names
-  const { t: charT } = charactersScopedTranslation.scopedT(locale);
-  const skillNameMap = new Map<string, string>();
-  for (const char of DEFAULT_SKILLS) {
-    skillNameMap.set(char.id, charT(char.name));
-  }
-
-  // Look up custom skill names for any non-default skillIds
-  const customSkillIds = rows
-    .map((r) => r.skillId)
-    .filter((id) => id !== NO_SKILL_ID && !skillNameMap.has(id));
-  if (customSkillIds.length > 0) {
-    const { customSkills: customSkillsTable } = await import("../skills/db");
-    const customSkillsList = await db
-      .select({ id: customSkillsTable.id, name: customSkillsTable.name })
-      .from(customSkillsTable)
-      .where(inArray(customSkillsTable.id, customSkillIds));
-    for (const s of customSkillsList) {
-      skillNameMap.set(s.id, s.name);
-    }
-  }
-
-  const items: FavoriteSummaryItem[] = rows.map((row) => ({
-    id: row.id,
-    name: row.customName ?? row.skillId,
-    skillId: row.skillId,
-    characterName: skillNameMap.get(row.skillId) ?? null,
-    modelId: null,
-    modelInfo: "",
-    isActive: row.id === activeFavoriteId,
-    position: row.position,
-    useCount: row.useCount,
-    lastUsedAt: row.lastUsedAt,
-  }));
-
-  logger.debug("Loaded favorites items", {
-    userId,
-    count: items.length,
-    activeFavoriteId,
-  });
-
-  return items;
 }

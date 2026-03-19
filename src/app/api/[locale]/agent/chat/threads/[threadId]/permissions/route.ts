@@ -7,14 +7,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { getThreadPermissions, updateThreadPermissions } from "./repository";
+import { ThreadPermissionsRepository } from "./repository";
 
 export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: async (props) => {
-      return await getThreadPermissions(
+      return await ThreadPermissionsRepository.getThreadPermissions(
         props.user,
         { threadId: props.urlPathParams.threadId },
         props.t,
@@ -30,7 +30,7 @@ export const { GET, PATCH, tools } = endpointsHandler({
         ...props.data,
         threadId: props.urlPathParams.threadId,
       };
-      return await updateThreadPermissions(
+      return await ThreadPermissionsRepository.updateThreadPermissions(
         props.user,
         dataWithId,
         props.t,

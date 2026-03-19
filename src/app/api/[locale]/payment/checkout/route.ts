@@ -10,7 +10,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import { BillingInterval } from "../../subscription/enum";
 import endpoints from "./definition";
-import { subscriptionCheckoutRepository } from "./repository";
+import { SubscriptionCheckoutRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
@@ -30,7 +30,7 @@ export const { POST, tools } = endpointsHandler({
       };
 
       // Delegate to repository for business logic and data access
-      return await subscriptionCheckoutRepository.createCheckoutSession(
+      return await SubscriptionCheckoutRepository.createCheckoutSession(
         requestData,
         user,
         locale,

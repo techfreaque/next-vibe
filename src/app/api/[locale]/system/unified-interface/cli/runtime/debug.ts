@@ -275,26 +275,6 @@ export class ResourceMonitor {
 }
 
 /**
- * Format performance breakdown for verbose output
- */
-function formatPerformanceBreakdown(breakdown: PerformanceBreakdown): string {
-  return JSON.stringify(
-    {
-      binaryStartup: `${breakdown.binaryOverhead}ms`,
-      routeDiscovery: `${Math.round(breakdown.preRouteOverhead * 0.7)}ms`,
-      cliInit: `${breakdown.initOverhead}ms`,
-      dataParsing: `${breakdown.parseOverhead}ms`,
-      routeExecution: `${breakdown.routeExecution}ms`,
-      rendering: `${breakdown.renderOverhead}ms`,
-      cleanup: `${Math.round(breakdown.postRouteOverhead)}ms`,
-      totalOverhead: `${breakdown.totalDuration - breakdown.routeExecution}ms`,
-    },
-    null,
-    2,
-  );
-}
-
-/**
  * Format active handles for debugging
  */
 function formatActiveHandles(handles: ActiveHandle[]): string {
@@ -311,67 +291,66 @@ function formatActiveHandles(handles: ActiveHandle[]): string {
     .join(", ");
 }
 
+// Performance keys are translated label strings (e.g. "Oxlint", "ESLint", "TypeScript")
+// The order controls display sequence in the summary line.
+const CHECKER_KEY_ORDER: string[] = ["Oxlint", "ESLint", "TypeScript"];
+const TOTAL_KEY = "Total";
+
 /**
- * Format simple execution summary for non-verbose output
+ * Format simple execution summary shown after every command (non-verbose).
+ * Layout: overhead | load | [checker timings] | total
  */
 function formatExecutionSummary(
   breakdown: PerformanceBreakdown,
-  performanceMetadata?: Partial<Record<string, number>>,
+  result: {
+    performance?: Partial<Record<string, number>>;
+    endpointLoadMs?: number;
+    renderMs?: number;
+  },
 ): string {
-  // Check if we have detailed performance metadata (e.g., oxlint, eslint, typecheck timings)
-  if (performanceMetadata && Object.keys(performanceMetadata).length > 0) {
-    // Build detailed timing string
-    const timingParts: string[] = [];
+  const parts: string[] = [];
 
-    // Sort keys to ensure consistent order: oxlint, eslint, typecheck (exclude total - we'll add it manually)
-    const sortedKeys = Object.keys(performanceMetadata)
-      .filter((key) => !key.includes(".total"))
-      .toSorted((a, b) => {
-        const order: Record<string, number> = {
-          oxlint: 1,
-          eslint: 2,
-          typecheck: 3,
-        };
-        const aKey = a.split(".").pop() || "";
-        const bKey = b.split(".").pop() || "";
-        return (order[aKey] || 99) - (order[bKey] || 99);
-      });
+  // Render time comes from inside the route execution (result-formatter.ts)
+  const renderMs = result.renderMs ?? 0;
 
-    for (const key of sortedKeys) {
-      const value = performanceMetadata[key];
-      if (value !== undefined) {
-        // Extract the last part of the translation key (e.g., "oxlint" from "vibeCheck.performance.oxlint")
-        const label = key.split(".").pop() || key;
+  // Overhead = total minus route execution (which includes render) — i.e. startup + tool load
+  const overhead = breakdown.totalDuration - breakdown.routeExecution;
+  parts.push(`Overhead ${Math.max(0, overhead)}ms`);
 
-        // Capitalize first letter for display
-        const displayLabel =
-          label === "oxlint"
-            ? "Oxlint"
-            : label === "eslint"
-              ? "ESLint"
-              : label === "typecheck"
-                ? "TypeScript"
-                : label.charAt(0).toUpperCase() + label.slice(1);
+  // Endpoint load time (dominant part of overhead)
+  if (result.endpointLoadMs !== undefined) {
+    parts.push(`Tool load ${result.endpointLoadMs}ms`);
+  }
 
-        const seconds = (value / 1000).toFixed(2);
-        timingParts.push(`${displayLabel}: ${seconds}s`);
+  // Per-checker timings in fixed order, skipping the "Total" key
+  if (result.performance) {
+    for (const key of CHECKER_KEY_ORDER) {
+      const ms = result.performance[key];
+      if (ms !== undefined) {
+        parts.push(`${key} ${(ms / 1000).toFixed(2)}s`);
       }
     }
-
-    // Add total time from breakdown (complete time from first to last line of script)
-    const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
-    timingParts.push(`Total: ${totalSeconds}s`);
-
-    if (timingParts.length > 0) {
-      return `\n${timingParts.join(" | ")}`;
+    // Also handle any unknown keys (future checkers) not in CHECKER_KEY_ORDER
+    for (const [key, ms] of Object.entries(result.performance)) {
+      if (
+        !CHECKER_KEY_ORDER.includes(key) &&
+        key !== TOTAL_KEY &&
+        ms !== undefined
+      ) {
+        parts.push(`${key} ${(ms / 1000).toFixed(2)}s`);
+      }
     }
   }
 
-  // Fallback to simple format if no performance metadata
-  const executionSeconds = (breakdown.routeExecution / 1000).toFixed(2);
-  const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
+  // Render time (Ink widget tree)
+  if (renderMs > 0) {
+    parts.push(`Render ${renderMs}ms`);
+  }
 
-  return `\nExecution: ${executionSeconds}s | Total: ${totalSeconds}s`;
+  // Total wall-clock time
+  parts.push(`Total ${(breakdown.totalDuration / 1000).toFixed(2)}s`);
+
+  return `\n${parts.join(" | ")}`;
 }
 
 /**
@@ -467,20 +446,22 @@ export class CliResourceManager {
       const breakdown = this.performanceMonitor.calculateBreakdown();
       if (breakdown) {
         if (verbose) {
-          const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
-          logger.info("CLI execution time", {
-            totalSeconds,
-          });
-          logger.info("CLI performance breakdown");
-          logger.info(formatPerformanceBreakdown(breakdown));
+          const endpointLoad =
+            result.endpointLoadMs !== undefined
+              ? ` tool-load=${result.endpointLoadMs}ms`
+              : "";
+          const renderMs = result.renderMs ?? 0;
+          const overhead = Math.max(
+            0,
+            breakdown.totalDuration - breakdown.routeExecution,
+          );
+          logger.debug(
+            `[CLI] startup=${breakdown.binaryOverhead}ms${endpointLoad} overhead=${overhead}ms exec=${breakdown.routeExecution}ms render=${renderMs}ms total=${breakdown.totalDuration}ms`,
+          );
         }
-        if (mcpSilentMode) {
-          // In MCP mode, dynamically import and log to file instead of console
-        } else {
-          // Use console.log directly to avoid duplicate timestamp from logger
-          // The execution summary is already formatted and translated
+        if (!mcpSilentMode) {
           // oxlint-disable-next-line no-console
-          console.log(formatExecutionSummary(breakdown, result.performance));
+          console.log(formatExecutionSummary(breakdown, result));
         }
       }
 

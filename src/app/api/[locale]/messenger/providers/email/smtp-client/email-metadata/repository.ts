@@ -20,11 +20,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { emails } from "../../../../messages/db";
 import type { MessageStatus, MessageType } from "../../../../messages/enum";
 import { MessageStatus as MS } from "../../../../messages/enum";
-import type { scopedTranslation } from "../i18n";
+import type { SmtpClientT } from "../i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-export interface StoreEmailMetadataParams {
+interface StoreEmailMetadataParams {
   subject: string;
   recipientEmail: string;
   recipientName: string | null;
@@ -48,7 +46,7 @@ export interface StoreEmailMetadataParams {
   metadata?: Record<string, string | number | boolean | undefined>;
 }
 
-export interface UpdateEmailEngagementParams {
+interface UpdateEmailEngagementParams {
   emailId: string;
   engagement: {
     deliveredAt?: Date;
@@ -60,12 +58,16 @@ export interface UpdateEmailEngagementParams {
   };
 }
 
-class EmailMetadataRepositoryImpl {
-  async storeEmailMetadata(
+interface EmailMetadataOperationResult {
+  success: boolean;
+}
+
+export class EmailMetadataRepository {
+  static async storeEmailMetadata(
     params: StoreEmailMetadataParams,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<{ success: boolean }>> {
+    t: SmtpClientT,
+  ): Promise<ResponseType<EmailMetadataOperationResult>> {
     try {
       logger.debug("Storing email metadata", {
         recipient: params.recipientEmail,
@@ -137,11 +139,11 @@ class EmailMetadataRepositoryImpl {
     }
   }
 
-  async updateEmailEngagement(
+  static async updateEmailEngagement(
     params: UpdateEmailEngagementParams,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<{ success: boolean }>> {
+    t: SmtpClientT,
+  ): Promise<ResponseType<EmailMetadataOperationResult>> {
     try {
       logger.debug("Updating email engagement", {
         emailId: params.emailId,
@@ -219,5 +221,3 @@ class EmailMetadataRepositoryImpl {
     }
   }
 }
-
-export const emailMetadataRepository = new EmailMetadataRepositoryImpl();

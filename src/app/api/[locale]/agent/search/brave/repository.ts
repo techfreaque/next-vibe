@@ -5,30 +5,31 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { BraveSearchGetResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { BraveT } from "./i18n";
 
 /**
- * Map readable freshness values to Brave API codes
+ * Normalized Search Result
  */
-const FRESHNESS_API_MAP: Record<string, string> = {
-  past_day: "pd",
-  past_week: "pw",
-  past_month: "pm",
-  past_year: "py",
-};
+interface SearchResult {
+  title: string;
+  url: string;
+  snippet: string;
+  age?: string;
+  source?: string;
+}
 
-/**
- * Brave Search API Response Types
- */
 interface BraveWebResult {
   title: string;
   url: string;
@@ -60,20 +61,6 @@ interface BraveSearchApiResponse {
   };
 }
 
-/**
- * Normalized Search Result
- */
-export interface SearchResult {
-  title: string;
-  url: string;
-  snippet: string;
-  age?: string;
-  source?: string;
-}
-
-/**
- * Search Configuration
- */
 interface SearchConfig {
   maxResults?: number;
   includeNews?: boolean;
@@ -88,7 +75,12 @@ export class BraveSearchRepository {
   private static readonly TIMEOUT = 10000; // 10 seconds
   private static readonly MAX_QUERY_LENGTH = 400;
   private static readonly DEFAULT_MAX_RESULTS = 5;
-  private static readonly DEFAULT_SAFESEARCH = "moderate";
+  private static readonly FRESHNESS_API_MAP: Record<string, string> = {
+    past_day: "pd",
+    past_week: "pw",
+    past_month: "pm",
+    past_year: "py",
+  };
 
   /**
    * Search the web with Brave Search API
@@ -101,11 +93,8 @@ export class BraveSearchRepository {
       freshness?: "past_day" | "past_week" | "past_month" | "past_year";
     },
     logger: EndpointLogger,
-    t: ModuleT,
+    t: BraveT,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
-    const { fail, success, ErrorResponseTypes } =
-      await import("next-vibe/shared/types/response.schema");
-
     // Guard: key not configured
     if (!agentEnv.BRAVE_SEARCH_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.braveSearch;
@@ -115,59 +104,43 @@ export class BraveSearchRepository {
       });
     }
 
-    try {
-      // Validate query
-      if (!query || typeof query !== "string" || query.trim() === "") {
-        return fail({
-          message: t("get.errors.queryEmpty.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        });
-      }
-
-      if (query.length > this.MAX_QUERY_LENGTH) {
-        return fail({
-          message: t("get.errors.queryTooLong.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { maxLength: this.MAX_QUERY_LENGTH },
-        });
-      }
-
-      const config: SearchConfig = {
-        maxResults: options.maxResults,
-        includeNews: options.includeNews,
-        freshness: options.freshness,
-      };
-
-      const results = await this.fetchResults(
-        query,
-        config,
-        agentEnv.BRAVE_SEARCH_API_KEY,
-      );
-
-      return success({
-        results,
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
-      logger.error("Brave Search error", {
-        error: errorMessage,
-        query,
-      });
-
-      if (error instanceof Error && error.name === "AbortError") {
-        return fail({
-          message: t("get.errors.timeout.title"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        });
-      }
-
+    // Validate query
+    if (!query || typeof query !== "string" || query.trim() === "") {
       return fail({
-        message: t("get.errors.searchFailed.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: t("get.errors.queryEmpty.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
+
+    if (query.length > this.MAX_QUERY_LENGTH) {
+      return fail({
+        message: t("get.errors.queryTooLong.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: { maxLength: this.MAX_QUERY_LENGTH },
+      });
+    }
+
+    const config: SearchConfig = {
+      maxResults: options.maxResults,
+      includeNews: options.includeNews,
+      freshness: options.freshness,
+    };
+
+    const fetchResult = await this.fetchResults(
+      query,
+      config,
+      agentEnv.BRAVE_SEARCH_API_KEY,
+      logger,
+      t,
+    );
+
+    if (!fetchResult.success) {
+      return fetchResult;
+    }
+
+    return success({
+      results: fetchResult.data.results,
+    });
   }
 
   /**
@@ -177,15 +150,18 @@ export class BraveSearchRepository {
     query: string,
     config: SearchConfig,
     apiKey: string,
-  ): Promise<SearchResult[]> {
+    logger: EndpointLogger,
+    t: BraveT,
+  ): Promise<ResponseType<{ results: SearchResult[] }>> {
     const params = new URLSearchParams({
       q: query,
       count: String(config.maxResults ?? this.DEFAULT_MAX_RESULTS),
-      safesearch: config.safesearch ?? this.DEFAULT_SAFESEARCH,
+      safesearch: config.safesearch ?? "moderate",
     });
 
     if (config.freshness) {
-      const apiCode = FRESHNESS_API_MAP[config.freshness] ?? config.freshness;
+      const apiCode =
+        this.FRESHNESS_API_MAP[config.freshness] ?? config.freshness;
       params.append("freshness", apiCode);
     }
 
@@ -210,16 +186,35 @@ export class BraveSearchRepository {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-        throw new Error(`Brave Search API error: ${response.statusText}`);
+        logger.error("Brave Search API error", {
+          status: response.status,
+          statusText: response.statusText,
+          query,
+        });
+        return fail({
+          message: t("get.errors.searchFailed.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       const data = (await response.json()) as BraveSearchApiResponse;
-      return this.parseResults(data, config.includeNews);
+      return success({ results: this.parseResults(data, config.includeNews) });
     } catch (error) {
       clearTimeout(timeoutId);
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw to propagate error to caller
-      throw error;
+      const isTimeout = error instanceof Error && error.name === "AbortError";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      logger.error("Brave Search fetch error", { error: errorMessage });
+      if (isTimeout) {
+        return fail({
+          message: t("get.errors.timeout.title"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+      return fail({
+        message: t("get.errors.searchFailed.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

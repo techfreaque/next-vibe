@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeClamp } from "./repository";
+import { ClampIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, min, max, resolution, lookback } = data;
-      const result = computeClamp(source, min, max);
+      const result = ClampIndicatorRepository.computeClamp(source, min, max);
       return success({
         result,
         meta: {

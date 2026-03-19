@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { envGeneratorRepository } from "./repository";
+import { EnvGeneratorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) => {
-      return envGeneratorRepository.generateEnv(data, logger, t);
+      return EnvGeneratorRepository.generateEnv(data, logger, t);
     },
   },
 });

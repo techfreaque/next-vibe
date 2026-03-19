@@ -6,12 +6,12 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
-import type { NextRequest } from "next/server";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
+import type { NextRequest } from "next/server";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
@@ -25,7 +25,7 @@ import {
   type WsEmitCallback,
 } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
-import { createErrorMessage } from "../../chat/threads/[threadId]/messages/repository";
+import { MessagesRepository } from "../../chat/threads/[threadId]/messages/repository";
 import { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
 import type {
   AiStreamPostRequestOutput,
@@ -44,54 +44,46 @@ import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { StreamErrorCatchHandler } from "./handlers/stream-error-catch-handler";
 import { StreamExecutionHandler } from "./handlers/stream-execution-handler";
 import { StreamStartHandler } from "./handlers/stream-start-handler";
+import type { HeadlessAiStreamResult } from "./headless";
 import { setupAiStream } from "./stream-setup";
-
-/**
- * Maximum duration for streaming responses (in seconds)
- */
-export const maxDuration = 900; // 15 minutes for multi-step tool calling
-
-export interface HeadlessAiStreamResult {
-  /** Thread ID where the conversation was stored */
-  threadId: string;
-  /** ID of the last assistant message — caller reads content from DB */
-  lastAiMessageId: string;
-  /** Final text content of the last assistant message — populated even in incognito (no DB read needed) */
-  lastAiMessageContent: string | null;
-}
-
-/**
- * Extract user identifiers from request
- */
-function extractUserIdentifiers(
-  user: JwtPayloadType,
-  request: NextRequest | undefined,
-  headless: boolean,
-): {
-  userId?: string;
-  leadId?: string;
-  ipAddress?: string;
-} {
-  const userId = !user.isPublic && "id" in user ? user.id : undefined;
-  const leadId =
-    "leadId" in user && typeof user.leadId === "string"
-      ? user.leadId
-      : undefined;
-  const ipAddress = request
-    ? request.headers.get("x-forwarded-for") ||
-      request.headers.get("x-real-ip") ||
-      undefined
-    : headless
-      ? "headless"
-      : "cli";
-
-  return { userId, leadId, ipAddress };
-}
 
 /**
  * AI Stream Repository Implementation
  */
 export class AiStreamRepository {
+  /**
+   * Maximum duration for streaming responses (in seconds)
+   */
+  private static readonly maxDuration = 900; // 15 minutes for multi-step tool calling
+
+  /**
+   * Extract user identifiers from request
+   */
+  private static extractUserIdentifiers(
+    user: JwtPayloadType,
+    request: NextRequest | undefined,
+    headless: boolean,
+  ): {
+    userId?: string;
+    leadId?: string;
+    ipAddress?: string;
+  } {
+    const userId = !user.isPublic && "id" in user ? user.id : undefined;
+    const leadId =
+      "leadId" in user && typeof user.leadId === "string"
+        ? user.leadId
+        : undefined;
+    const ipAddress = request
+      ? request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip") ||
+        undefined
+      : headless
+        ? "headless"
+        : "cli";
+
+    return { userId, leadId, ipAddress };
+  }
+
   /** Headless overload — returns structured result with threadId + lastAiMessageId */
   static createAiStream(params: {
     data: AiStreamPostRequestOutput;
@@ -149,11 +141,8 @@ export class AiStreamRepository {
     | ResponseType<AiStreamPostResponseOutput>
     | ResponseType<HeadlessAiStreamResult>
   > {
-    const { userId, leadId, ipAddress } = extractUserIdentifiers(
-      user,
-      request,
-      headless,
-    );
+    const { userId, leadId, ipAddress } =
+      AiStreamRepository.extractUserIdentifiers(user, request, headless);
 
     const sttT = sttScopedTranslation.scopedT(locale).t;
 
@@ -167,7 +156,7 @@ export class AiStreamRepository {
       ipAddress,
       aiStreamT,
       sttT,
-      maxDuration,
+      maxDuration: AiStreamRepository.maxDuration,
       request,
       headless,
       extraInstructions,
@@ -186,7 +175,7 @@ export class AiStreamRepository {
           const errorType = setupResult.errorType
             ? `${setupResult.errorType.errorCode}`
             : "SETUP_ERROR";
-          await createErrorMessage({
+          await MessagesRepository.createErrorMessage({
             messageId: errorMessageId,
             threadId,
             content: errorContent,
@@ -643,7 +632,7 @@ export class AiStreamRepository {
             await StreamErrorCatchHandler.handleError({
               error: error as Error | JSONValue,
               ctx,
-              maxDuration,
+              maxDuration: AiStreamRepository.maxDuration,
               model: data.model,
               threadId: threadResultThreadId,
               userId,
@@ -659,9 +648,26 @@ export class AiStreamRepository {
         try {
           await runStream();
         } finally {
-          await clearStreamingState(threadResultThreadId);
+          await clearStreamingState(threadResultThreadId, logger);
           // wakeUp revival: insert deferred (single stream = no race) then revive.
-          await handleWakeUpRevivalBatch(capturedWakeUpPayloads);
+          // Skip if stream was aborted (user cancel or timeout) — don't revive cancelled streams.
+          if (
+            capturedWakeUpPayloads.length > 0 &&
+            !streamAbortController.signal.aborted
+          ) {
+            await handleWakeUpRevivalBatch(capturedWakeUpPayloads);
+          } else if (
+            capturedWakeUpPayloads.length > 0 &&
+            streamAbortController.signal.aborted
+          ) {
+            logger.info(
+              "[WakeUp] Headless: skipping revival — stream was aborted",
+              {
+                threadId: threadResultThreadId,
+                pendingWakeUps: capturedWakeUpPayloads.length,
+              },
+            );
+          }
         }
 
         logger.info("[AI Stream] Headless execution complete", {
@@ -713,20 +719,42 @@ export class AiStreamRepository {
               : "cancelled";
           }
 
-          // Emit STREAM_FINISHED so all WS subscribers know the stream is done
-          wsEmit(
-            createStreamEvent.streamFinished({
-              threadId: threadResultThreadId,
-              reason: streamFinishReason,
-            }),
-          );
+          // Skip wakeUp revival if the stream was cancelled by the user.
+          // A wakeUp signal may have arrived mid-stream but the user aborted — don't revive.
+          const wasAborted = streamAbortController.signal.aborted;
+          const shouldReviveWakeUp =
+            capturedWakeUpPayloads.length > 0 && !wasAborted;
 
-          void clearStreamingState(threadResultThreadId)
-            .then(() =>
+          // clearStreamingState must run BEFORE STREAM_FINISHED is emitted so that
+          // if it emits streaming-state-changed:waiting, clients receive it first.
+          void clearStreamingState(threadResultThreadId, logger)
+            .then(async (finalState) => {
+              // Emit STREAM_FINISHED with finalState so the client knows whether
+              // to show the stop button (waiting) or go idle after stream ends.
+              wsEmit(
+                createStreamEvent.streamFinished({
+                  threadId: threadResultThreadId,
+                  reason: streamFinishReason,
+                  finalState,
+                }),
+              );
+
               // wakeUp revival: if a pub/sub signal arrived mid-stream, insert the deferred
               // message now (stream is done, single-inserter guarantee holds) then fire revival.
-              handleWakeUpRevivalBatch(capturedWakeUpPayloads),
-            )
+              if (shouldReviveWakeUp) {
+                return handleWakeUpRevivalBatch(capturedWakeUpPayloads);
+              }
+              if (capturedWakeUpPayloads.length > 0) {
+                logger.info(
+                  "[WakeUp] Skipping revival — stream was aborted by user",
+                  {
+                    threadId: threadResultThreadId,
+                    pendingWakeUps: capturedWakeUpPayloads.length,
+                  },
+                );
+              }
+              return Promise.resolve();
+            })
             .catch((err) => {
               logger.error("[AI Stream] Failed to clear streaming state", {
                 error: err instanceof Error ? err.message : String(err),
@@ -758,7 +786,7 @@ export class AiStreamRepository {
 
       // Safety net: clear streaming state if threadId is available
       if (threadResultThreadId) {
-        await clearStreamingState(threadResultThreadId).catch((err) => {
+        await clearStreamingState(threadResultThreadId, logger).catch((err) => {
           logger.error(
             "[AI Stream] Failed to clear streaming state in outer catch",
             {

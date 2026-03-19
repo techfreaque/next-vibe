@@ -218,11 +218,12 @@ export const selectCronTaskExecutionSchema =
 
 /**
  * Type exports for cron tasks
+ *
+ * Use $inferSelect / $inferInsert so that db.select().from(table) and
+ * .insert().returning() unify to the same types without casts.
  */
-export type CronTaskRow = z.infer<typeof selectCronTaskSchema>;
-export type NewCronTask = z.infer<typeof insertCronTaskSchema>;
+export type CronTaskRow = typeof cronTasks.$inferSelect;
+export type NewCronTask = typeof cronTasks.$inferInsert;
 
-export type CronTaskExecution = z.infer<typeof selectCronTaskExecutionSchema>;
-export type NewCronTaskExecution = z.infer<
-  typeof insertCronTaskExecutionSchema
->;
+export type CronTaskExecution = typeof cronTaskExecutions.$inferSelect;
+export type NewCronTaskExecution = typeof cronTaskExecutions.$inferInsert;

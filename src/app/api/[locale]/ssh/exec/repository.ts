@@ -22,67 +22,69 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import {
   getConnectionCredentials,
+  isNodeError,
   openSshClient,
   sshExecCommand,
 } from "../client";
 import { ExecBackend, SshCommandStatus } from "../enum";
 import type { SshExecRequestOutput, SshExecResponseOutput } from "./definition";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-const execAsync = promisify(exec);
-
-const LOCAL_MAX_OUTPUT_BYTES = Number(
-  process.env["LOCAL_MAX_OUTPUT_BYTES"] ?? 32768,
-);
-const LOCAL_DEFAULT_TIMEOUT_MS = Number(
-  process.env["LOCAL_DEFAULT_TIMEOUT_MS"] ?? 30000,
-);
-
-function isValidWorkingDir(dir: string): boolean {
-  if (!dir.startsWith("/")) {
-    return false;
-  }
-  if (dir.includes("..")) {
-    return false;
-  }
-  return true;
-}
-
-function capOutput(
-  str: string,
-  maxBytes: number,
-): { value: string; truncated: boolean } {
-  const buf = Buffer.from(str, "utf8");
-  if (buf.length <= maxBytes) {
-    return { value: str, truncated: false };
-  }
-  const truncated = buf.subarray(0, maxBytes).toString("utf8");
-  return {
-    value: `${truncated}\n[output truncated — use ssh_files_read_GET to retrieve full output]`,
-    truncated: true,
-  };
-}
-
-// Threshold above which we escalate to a wakeUp task instead of blocking the stream.
-// Anything >90s risks the stream dying before the command returns.
-const ESCALATE_THRESHOLD_MS = 89_000;
+import type { SshExecT } from "./i18n";
 
 export class SshExecRepository {
+  private static readonly execAsync = promisify(exec);
+
+  private static readonly LOCAL_MAX_OUTPUT_BYTES = Number(
+    process.env["LOCAL_MAX_OUTPUT_BYTES"] ?? 32768,
+  );
+
+  private static readonly LOCAL_DEFAULT_TIMEOUT_MS = Number(
+    process.env["LOCAL_DEFAULT_TIMEOUT_MS"] ?? 30000,
+  );
+
+  // Threshold above which we escalate to a wakeUp task instead of blocking the stream.
+  // Anything >90s risks the stream dying before the command returns.
+  private static readonly ESCALATE_THRESHOLD_MS = 89_000;
+  private static isValidWorkingDir(dir: string): boolean {
+    if (!dir.startsWith("/")) {
+      return false;
+    }
+    if (dir.includes("..")) {
+      return false;
+    }
+    return true;
+  }
+
+  private static capOutput(
+    str: string,
+    maxBytes: number,
+  ): { value: string; truncated: boolean } {
+    const buf = Buffer.from(str, "utf8");
+    if (buf.length <= maxBytes) {
+      return { value: str, truncated: false };
+    }
+    const truncated = buf.subarray(0, maxBytes).toString("utf8");
+    return {
+      value: `${truncated}\n[output truncated — use ssh_files_read_GET to retrieve full output]`,
+      truncated: true,
+    };
+  }
+
   static async exec(
     data: SshExecRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SshExecT,
     streamContext?: ToolExecutionContext,
   ): Promise<ResponseType<SshExecResponseOutput>> {
-    const timeoutMs = data.timeoutMs ?? LOCAL_DEFAULT_TIMEOUT_MS;
+    const timeoutMs =
+      data.timeoutMs ?? SshExecRepository.LOCAL_DEFAULT_TIMEOUT_MS;
     const command = data.command;
 
     // Validate workingDir if provided
-    if (data.workingDir && !isValidWorkingDir(data.workingDir)) {
+    if (
+      data.workingDir &&
+      !SshExecRepository.isValidWorkingDir(data.workingDir)
+    ) {
       return fail({
         message: t("errors.invalidWorkingDir"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -91,7 +93,10 @@ export class SshExecRepository {
 
     // Escalate long-running commands to a wakeUp task so the stream doesn't time out.
     // Only applies in streaming contexts where escalateToTask is available.
-    if (timeoutMs > ESCALATE_THRESHOLD_MS && streamContext?.escalateToTask) {
+    if (
+      timeoutMs > SshExecRepository.ESCALATE_THRESHOLD_MS &&
+      streamContext?.escalateToTask
+    ) {
       const { taskId, onComplete } = await streamContext.escalateToTask();
       logger.info("[SshExec] Escalated long-running command to wakeUp task", {
         taskId,
@@ -110,7 +115,17 @@ export class SshExecRepository {
         await onComplete({
           success: result.success,
           data: result.success
-            ? (result.data as Record<string, JsonValue>)
+            ? {
+                stdout: result.data.stdout,
+                stderr: result.data.stderr,
+                exitCode: result.data.exitCode,
+                status: result.data.status,
+                durationMs: result.data.durationMs,
+                backend: result.data.backend,
+                ...(result.data.truncated !== undefined
+                  ? { truncated: result.data.truncated }
+                  : {}),
+              }
             : undefined,
           message: result.success ? undefined : result.message,
         });
@@ -144,25 +159,25 @@ export class SshExecRepository {
     try {
       logger.info(`Running local command: ${command.slice(0, 200)}`);
 
-      const { stdout: rawStdout, stderr: rawStderr } = await execAsync(
-        command,
-        {
+      const { stdout: rawStdout, stderr: rawStderr } =
+        await SshExecRepository.execAsync(command, {
           cwd: data.workingDir ?? undefined,
           timeout: timeoutMs,
-          maxBuffer: LOCAL_MAX_OUTPUT_BYTES * 4,
-        },
-      );
+          maxBuffer: SshExecRepository.LOCAL_MAX_OUTPUT_BYTES * 4,
+        });
 
       const durationMs = Date.now() - start;
 
-      const { value: stdout, truncated: stdoutTruncated } = capOutput(
-        rawStdout,
-        LOCAL_MAX_OUTPUT_BYTES,
-      );
-      const { value: stderr, truncated: stderrTruncated } = capOutput(
-        rawStderr,
-        LOCAL_MAX_OUTPUT_BYTES,
-      );
+      const { value: stdout, truncated: stdoutTruncated } =
+        SshExecRepository.capOutput(
+          rawStdout,
+          SshExecRepository.LOCAL_MAX_OUTPUT_BYTES,
+        );
+      const { value: stderr, truncated: stderrTruncated } =
+        SshExecRepository.capOutput(
+          rawStderr,
+          SshExecRepository.LOCAL_MAX_OUTPUT_BYTES,
+        );
       const truncated = stdoutTruncated || stderrTruncated;
 
       logger.debug(`Command completed in ${durationMs}ms, exit 0`);
@@ -178,18 +193,18 @@ export class SshExecRepository {
       });
     } catch (error) {
       const durationMs = Date.now() - start;
-      const err = error as NodeJS.ErrnoException & {
-        stdout?: string;
-        stderr?: string;
-        code?: number | string;
-        signal?: string;
-        killed?: boolean;
-      };
+      if (!isNodeError(error)) {
+        logger.error(`Unexpected error type in execLocal`, parseError(error));
+        return fail({
+          message: t("post.errors.server.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
 
       if (
-        err.killed ||
-        err.signal === "SIGTERM" ||
-        String(err.code) === "ETIMEDOUT"
+        error.killed ||
+        error.signal === "SIGTERM" ||
+        String(error.code) === "ETIMEDOUT"
       ) {
         logger.warn(`Command timed out after ${durationMs}ms`);
         return fail({
@@ -199,18 +214,20 @@ export class SshExecRepository {
       }
 
       // Non-zero exit code — still a valid result
-      const rawStdout = err.stdout ?? "";
-      const rawStderr = err.stderr ?? String(parseError(error));
-      const { value: stdout, truncated: stdoutTruncated } = capOutput(
-        rawStdout,
-        LOCAL_MAX_OUTPUT_BYTES,
-      );
-      const { value: stderr, truncated: stderrTruncated } = capOutput(
-        rawStderr,
-        LOCAL_MAX_OUTPUT_BYTES,
-      );
+      const rawStdout = error.stdout ?? "";
+      const rawStderr = error.stderr ?? String(parseError(error));
+      const { value: stdout, truncated: stdoutTruncated } =
+        SshExecRepository.capOutput(
+          rawStdout,
+          SshExecRepository.LOCAL_MAX_OUTPUT_BYTES,
+        );
+      const { value: stderr, truncated: stderrTruncated } =
+        SshExecRepository.capOutput(
+          rawStderr,
+          SshExecRepository.LOCAL_MAX_OUTPUT_BYTES,
+        );
 
-      const exitCode = typeof err.code === "number" ? err.code : 1;
+      const exitCode = typeof error.code === "number" ? error.code : 1;
 
       logger.debug(`Command exited with code ${exitCode} in ${durationMs}ms`);
 
@@ -232,7 +249,7 @@ export class SshExecRepository {
     timeoutMs: number,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SshExecT,
   ): Promise<ResponseType<SshExecResponseOutput>> {
     const credsResult = await getConnectionCredentials(
       connectionId,
@@ -268,14 +285,16 @@ export class SshExecRepository {
       } = await sshExecCommand(client, command, timeoutMs);
 
       const durationMs = Date.now() - start;
-      const { value: stdout, truncated: stdoutTruncated } = capOutput(
-        rawStdout,
-        LOCAL_MAX_OUTPUT_BYTES,
-      );
-      const { value: stderr, truncated: stderrTruncated } = capOutput(
-        rawStderr,
-        LOCAL_MAX_OUTPUT_BYTES,
-      );
+      const { value: stdout, truncated: stdoutTruncated } =
+        SshExecRepository.capOutput(
+          rawStdout,
+          SshExecRepository.LOCAL_MAX_OUTPUT_BYTES,
+        );
+      const { value: stderr, truncated: stderrTruncated } =
+        SshExecRepository.capOutput(
+          rawStderr,
+          SshExecRepository.LOCAL_MAX_OUTPUT_BYTES,
+        );
 
       logger.debug(
         `SSH command completed in ${durationMs}ms, exit ${exitCode}`,

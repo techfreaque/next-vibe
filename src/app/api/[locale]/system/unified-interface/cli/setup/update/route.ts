@@ -9,14 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import updateEndpoints from "./definition";
-import { setupUpdateRepository } from "./repository";
+import { SetupUpdateRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: updateEndpoints,
   [Methods.POST]: {
     handler: ({ data, user, logger, t }) => {
       logger.info("Setup update operation started", { verbose: data.verbose });
-      return setupUpdateRepository.updateCli(data, user, t);
+      return SetupUpdateRepository.updateCli(data, user, t);
     },
   },
 });

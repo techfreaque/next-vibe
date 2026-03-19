@@ -30,9 +30,7 @@ import {
   getRelativeImportPath,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { GeneratorsSeedsT } from "./i18n";
 
 // Type definitions for seeds generator
 interface SeedsRequestType {
@@ -50,25 +48,11 @@ interface SeedsResponseType {
   outputPath: string;
 }
 
-/**
- * Seeds Generator Repository Interface
- */
-interface SeedsGeneratorRepository {
-  generateSeeds(
+export class SeedsGeneratorRepository {
+  static async generateSeeds(
     data: SeedsRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<BaseResponseType<SeedsResponseType>>;
-}
-
-/**
- * Seeds Generator Repository Implementation
- */
-class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
-  async generateSeeds(
-    data: SeedsRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsSeedsT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<SeedsResponseType>> {
     const startTime = Date.now();
@@ -94,7 +78,10 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       logger.debug(`Found ${seedFiles.length} seed files`);
 
       // Generate content
-      const content = this.generateContent(seedFiles, outputFile);
+      const content = SeedsGeneratorRepository.generateContent(
+        seedFiles,
+        outputFile,
+      );
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -135,7 +122,10 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
   /**
    * Generate seeds content with dynamic imports
    */
-  private generateContent(seedFiles: string[], outputFile: string): string {
+  private static generateContent(
+    seedFiles: string[],
+    outputFile: string,
+  ): string {
     const switchCases: string[] = [];
     const seedPaths: string[] = [];
 
@@ -162,7 +152,6 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
     return `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 import type { EnvironmentSeeds } from "@/app/api/[locale]/system/db/seed/seed-manager";
 
@@ -199,5 +188,3 @@ export function hasSeedModule(moduleName: string): boolean {
 `;
   }
 }
-
-export const seedsGeneratorRepository = new SeedsGeneratorRepositoryImpl();

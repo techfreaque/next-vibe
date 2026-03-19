@@ -7,19 +7,21 @@ import "server-only";
 
 import type { TimeSeries } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
-/**
- * Compute rolling window maximum over a fixed window size.
- */
-export function computeWindowMax(points: TimeSeries, size: number): TimeSeries {
-  if (size <= 0 || points.length === 0) {
-    return points;
+export class WindowMaxIndicatorRepository {
+  /**
+   * Compute rolling window maximum over a fixed window size.
+   */
+  static computeWindowMax(points: TimeSeries, size: number): TimeSeries {
+    if (size <= 0 || points.length === 0) {
+      return points;
+    }
+    return points.map((point, i) => {
+      const start = Math.max(0, i - size + 1);
+      const window = points.slice(start, i + 1).map((p) => p.value);
+      return {
+        timestamp: point.timestamp,
+        value: Math.max(...window),
+      };
+    });
   }
-  return points.map((point, i) => {
-    const start = Math.max(0, i - size + 1);
-    const window = points.slice(start, i + 1).map((p) => p.value);
-    return {
-      timestamp: point.timestamp,
-      value: Math.max(...window),
-    };
-  });
 }

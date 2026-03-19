@@ -100,7 +100,7 @@ export function shouldUseColors(): boolean {
   }
 
   // Disable colors if not in a TTY
-  if (!process.stdout.isTTY) {
+  if (!process.stdout?.isTTY) {
     return false;
   }
 

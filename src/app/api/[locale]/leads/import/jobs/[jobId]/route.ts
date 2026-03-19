@@ -3,11 +3,10 @@
  * Individual job operations (update, delete)
  */
 
-import { scopedTranslation as importScopedTranslation } from "@/app/api/[locale]/import/i18n";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { leadsImportRepository } from "../../repository";
+import { LeadsImportRepository } from "../../repository";
 import definitions from "./definition";
 
 /**
@@ -16,39 +15,33 @@ import definitions from "./definition";
 export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ user, urlPathParams, logger, locale }) => {
-      const { t } = importScopedTranslation.scopedT(locale);
-      return await leadsImportRepository.getImportJobFormatted(
+    handler: ({ user, urlPathParams, logger, locale }) =>
+      LeadsImportRepository.getImportJobFormatted(
         user.id,
         urlPathParams.jobId,
         logger,
-        t,
-      );
-    },
+        locale,
+      ),
   },
   [Methods.PATCH]: {
-    handler: async ({ user, data, urlPathParams, logger, locale }) => {
-      const { t } = importScopedTranslation.scopedT(locale);
-      return await leadsImportRepository.updateImportJobFormatted(
+    handler: ({ user, data, urlPathParams, logger, locale }) =>
+      LeadsImportRepository.updateImportJobFormatted(
         user.id,
         {
           jobId: urlPathParams.jobId,
           ...data.settings,
         },
         logger,
-        t,
-      );
-    },
+        locale,
+      ),
   },
   [Methods.DELETE]: {
-    handler: async ({ user, urlPathParams, logger, locale }) => {
-      const { t } = importScopedTranslation.scopedT(locale);
-      return await leadsImportRepository.deleteImportJobFormatted(
+    handler: ({ user, urlPathParams, logger, locale }) =>
+      LeadsImportRepository.deleteImportJobFormatted(
         user.id,
         urlPathParams.jobId,
         logger,
-        t,
-      );
-    },
+        locale,
+      ),
   },
 });

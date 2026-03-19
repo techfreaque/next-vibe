@@ -19,7 +19,7 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { MessageStatus, MessageType } from "../../../../messages/enum";
-import { emailMetadataRepository } from "../email-metadata/repository";
+import { EmailMetadataRepository } from "../email-metadata/repository";
 import { EmailSendingRepository } from "../email-sending/repository";
 import { scopedTranslation } from "../i18n";
 import type {
@@ -28,30 +28,10 @@ import type {
 } from "./handler";
 
 /**
- * Email Handling Repository Interface
+ * Email Handling Repository
  */
-export interface EmailHandlingRepository {
-  handleEmails<
-    TRequest,
-    TResponse,
-    TUrlVariables,
-    TScopedTranslationKey extends string,
-  >(
-    data: EmailHandleRequestOutput<
-      TRequest,
-      TResponse,
-      TUrlVariables,
-      TScopedTranslationKey
-    >,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<EmailHandleResponseOutput>>;
-}
-
-/**
- * Email Handling Repository Implementation
- */
-export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
-  async handleEmails<
+export class EmailHandlingRepository {
+  static async handleEmails<
     TRequest,
     TResponse,
     TUrlVariables,
@@ -157,7 +137,7 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
 
               // Try to store email metadata even for exceptions
               try {
-                await emailMetadataRepository.storeEmailMetadata(
+                await EmailMetadataRepository.storeEmailMetadata(
                   {
                     subject: smtpT(
                       "emailHandling.email.errors.email_failed_subject",
@@ -246,5 +226,3 @@ export class EmailHandlingRepositoryImpl implements EmailHandlingRepository {
     return success({ success: true });
   }
 }
-
-export const emailHandlingRepository = new EmailHandlingRepositoryImpl();

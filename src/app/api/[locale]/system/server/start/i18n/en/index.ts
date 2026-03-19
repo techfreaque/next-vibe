@@ -113,6 +113,11 @@ export const translations = {
         title: "Conflict",
         description: "Data conflict occurred",
       },
+      tanstackBuildNotFound:
+        "No TanStack Start build found — did 'vibe build --tanstack' run?",
+      tanstackServerExited: "TanStack Start server exited immediately",
+      nextBuildNotFound: "No .next-prod build found — did 'vibe build' run?",
+      startFailed: "Failed to start server",
     },
     success: {
       title: "Success",

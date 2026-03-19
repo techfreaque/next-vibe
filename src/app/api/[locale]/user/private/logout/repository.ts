@@ -22,9 +22,7 @@ import type { JwtPrivatePayloadType } from "../../auth/types";
 import { scopedTranslation as sessionScopedTranslation } from "../session/i18n";
 import { SessionRepository } from "../session/repository";
 import type { LogoutPostResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { LogoutT } from "./i18n";
 
 /**
  * Logout Repository - Static class pattern
@@ -42,7 +40,7 @@ export class LogoutRepository {
     logger: EndpointLogger,
     platform: Platform,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: LogoutT,
   ): Promise<ResponseType<LogoutPostResponseOutput>> {
     const { t: sessionT } = sessionScopedTranslation.scopedT(locale);
     try {

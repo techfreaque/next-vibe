@@ -380,9 +380,10 @@ export const chatThreads = pgTable(
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
 
-    // Streaming state — 'idle' | 'streaming' | 'aborting'
+    // Streaming state — 'idle' | 'streaming' | 'aborting' | 'waiting'
+    // 'waiting' = stream ended but an escalated task is still in flight (e.g. interactive claude-code)
     streamingState: text("streaming_state")
-      .$type<"idle" | "streaming" | "aborting">()
+      .$type<"idle" | "streaming" | "aborting" | "waiting">()
       .default("idle")
       .notNull(),
 

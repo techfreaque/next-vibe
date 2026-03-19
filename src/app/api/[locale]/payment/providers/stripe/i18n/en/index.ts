@@ -153,6 +153,8 @@ export const translations = {
       description:
         "Stripe is not configured — set STRIPE_SECRET_KEY in your .env",
     },
+    stripeCliNotInstalled: "Stripe CLI is not installed",
+    listenerFailed: "Failed to start Stripe webhook listener",
   },
 
   success: {

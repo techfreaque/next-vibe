@@ -26,62 +26,60 @@ import type {
   ConnectionCreateRequestOutput,
   ConnectionCreateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-function getSecretKey(): Buffer | null {
-  const raw = process.env["SSH_SECRET_KEY"];
-  if (!raw || raw.length < 64) {
-    return null;
-  }
-  return Buffer.from(raw.slice(0, 64), "hex");
-}
-
-export function encryptSecret(plaintext: string): string | null {
-  const key = getSecretKey();
-  if (!key) {
-    return null;
-  }
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", key, iv);
-  const encrypted = Buffer.concat([
-    cipher.update(plaintext, "utf8"),
-    cipher.final(),
-  ]);
-  const authTag = cipher.getAuthTag();
-  return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted.toString("hex")}`;
-}
-
-export function decryptSecret(ciphertext: string): string | null {
-  const key = getSecretKey();
-  if (!key) {
-    return null;
-  }
-  const parts = ciphertext.split(":");
-  if (parts.length !== 3) {
-    return null;
-  }
-  const [ivHex, tagHex, encHex] = parts;
-  const iv = Buffer.from(ivHex!, "hex");
-  const authTag = Buffer.from(tagHex!, "hex");
-  const encrypted = Buffer.from(encHex!, "hex");
-  const decipher = createDecipheriv("aes-256-gcm", key, iv);
-  decipher.setAuthTag(authTag);
-  return `${decipher.update(encrypted)}${decipher.final("utf8")}`;
-}
+import type { ConnectionsCreateT } from "./i18n";
 
 export class ConnectionCreateRepository {
+  private static getSecretKey(): Buffer | null {
+    const raw = process.env["SSH_SECRET_KEY"];
+    if (!raw || raw.length < 64) {
+      return null;
+    }
+    return Buffer.from(raw.slice(0, 64), "hex");
+  }
+
+  static encryptSecret(plaintext: string): string | null {
+    const key = ConnectionCreateRepository.getSecretKey();
+    if (!key) {
+      return null;
+    }
+    const iv = randomBytes(12);
+    const cipher = createCipheriv("aes-256-gcm", key, iv);
+    const encrypted = Buffer.concat([
+      cipher.update(plaintext, "utf8"),
+      cipher.final(),
+    ]);
+    const authTag = cipher.getAuthTag();
+    return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted.toString("hex")}`;
+  }
+
+  static decryptSecret(ciphertext: string): string | null {
+    const key = ConnectionCreateRepository.getSecretKey();
+    if (!key) {
+      return null;
+    }
+    const parts = ciphertext.split(":");
+    if (parts.length !== 3) {
+      return null;
+    }
+    const [ivHex, tagHex, encHex] = parts;
+    const iv = Buffer.from(ivHex!, "hex");
+    const authTag = Buffer.from(tagHex!, "hex");
+    const encrypted = Buffer.from(encHex!, "hex");
+    const decipher = createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(authTag);
+    return `${decipher.update(encrypted)}${decipher.final("utf8")}`;
+  }
+
   static async create(
     data: ConnectionCreateRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: ConnectionsCreateT,
   ): Promise<ResponseType<ConnectionCreateResponseOutput>> {
     const isLocal = data.authType === SshAuthType.LOCAL;
 
     if (!isLocal) {
-      const secretKey = getSecretKey();
+      const secretKey = ConnectionCreateRepository.getSecretKey();
       if (!secretKey) {
         return fail({
           message: t("errors.sshSecretKeyNotSet"),
@@ -103,7 +101,7 @@ export class ConnectionCreateRepository {
 
       if (!isLocal) {
         const rawSecret = data.secret ?? "";
-        const enc = encryptSecret(rawSecret);
+        const enc = ConnectionCreateRepository.encryptSecret(rawSecret);
         if (!enc) {
           return fail({
             message: t("errors.encryptionFailed"),
@@ -112,7 +110,7 @@ export class ConnectionCreateRepository {
         }
         encryptedSecret = enc;
         encryptedPassphrase = data.passphrase
-          ? (encryptSecret(data.passphrase) ?? null)
+          ? (ConnectionCreateRepository.encryptSecret(data.passphrase) ?? null)
           : null;
       }
 

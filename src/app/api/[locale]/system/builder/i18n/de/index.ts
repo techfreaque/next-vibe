@@ -229,6 +229,10 @@ export const translations: typeof enTranslations = {
       fileToCompile: {
         title: "Dateikonfiguration",
       },
+      disabled: {
+        title: "Deaktiviert",
+        description: "Diesen Eintrag beim Build überspringen",
+      },
       input: {
         title: "Eingabedatei",
         description: "Einstiegspunkt-Dateipfad (z.B. src/index.ts)",

@@ -250,4 +250,7 @@ const { POST } = createEndpoint({
   },
 });
 
+export type GenerateTrpcRouterRequestOutput = typeof POST.types.RequestOutput;
+export type GenerateTrpcRouterResponseOutput = typeof POST.types.ResponseOutput;
+
 export default { POST };

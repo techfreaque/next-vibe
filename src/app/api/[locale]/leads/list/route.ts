@@ -7,12 +7,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { leadsListRepository as repository } from "./repository";
+import { LeadsListRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     handler: ({ data, t, logger, locale }) =>
-      repository.listLeads(data, t, logger, locale),
+      LeadsListRepository.listLeads(data, t, logger, locale),
   },
 });

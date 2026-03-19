@@ -12,15 +12,12 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type {
-  SmtpCapacityRequestOutput,
   SmtpCapacityResponseOutput,
-  SmtpSendRequestOutput,
-  SmtpSendResponseOutput,
+  SmtpSendParams,
+  SmtpSendResult,
 } from "../repository";
 import { SmtpRepository } from "../repository";
-import type { scopedTranslation as SmtpScopedTranslation } from "../i18n";
-
-type ModuleT = ReturnType<typeof SmtpScopedTranslation.scopedT>["t"];
+import type { SmtpClientT } from "../i18n";
 
 /**
  * SMTP Sending Repository — thin wrapper over SmtpRepository.
@@ -31,10 +28,10 @@ export class SmtpSendingRepository {
    * Send email — delegates entirely to SmtpRepository which now reads messenger_accounts.
    */
   static async sendEmail(
-    data: SmtpSendRequestOutput,
+    data: SmtpSendParams,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<SmtpSendResponseOutput>> {
+    t: SmtpClientT,
+  ): Promise<ResponseType<SmtpSendResult>> {
     // SmtpRepository.sendEmail requires a user — use a minimal service user shape
     const serviceUser: JwtPayloadType = {
       id: "00000000-0000-0000-0000-000000000001",
@@ -49,10 +46,10 @@ export class SmtpSendingRepository {
    * Get total sending capacity — delegates to SmtpRepository.
    */
   static async getTotalSendingCapacity(
-    data: SmtpCapacityRequestOutput,
+    data: Record<string, never>,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SmtpClientT,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     return SmtpRepository.getTotalSendingCapacity(data, user, t, logger);
   }

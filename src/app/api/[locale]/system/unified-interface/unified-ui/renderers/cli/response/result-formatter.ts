@@ -4,7 +4,7 @@
  */
 
 import { parseError } from "next-vibe/shared/utils";
-import { createElement } from "react";
+import React, { createElement } from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -17,6 +17,59 @@ import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import { InkEndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
+
+/**
+ * Pre-warm React.lazy widgets so their promises resolve before sync rendering.
+ * The fast reconciler renders synchronously — lazy components that haven't
+ * resolved yet will suspend and produce no output.
+ */
+interface ReactLazyRef {
+  _payload: {
+    _status: number;
+    _result:
+      | (() => Promise<{ default: React.ComponentType }>)
+      | { default: React.ComponentType };
+  };
+}
+
+async function prewarmLazy(render: ReactLazyRef): Promise<void> {
+  // React.lazy stores { _status, _result } on _payload where:
+  //   _status: -1 = uninitialized, 0 = pending, 1 = fulfilled, 2 = rejected
+  const payload = Reflect.get(render, "_payload") as {
+    _status: number;
+    _result:
+      | (() => Promise<{ default: React.ComponentType }>)
+      | { default: React.ComponentType };
+  };
+  if (payload._status === -1) {
+    const factory = payload._result as () => Promise<{
+      default: React.ComponentType;
+    }>;
+    const result = await factory();
+    payload._status = 1;
+    payload._result = result;
+  }
+}
+
+async function prewarmLazyWidgets(
+  endpoint: CreateApiEndpointAny,
+): Promise<void> {
+  const fields = endpoint.fields;
+  if (!fields || typeof fields !== "object") {
+    return;
+  }
+
+  // fields.render is the lazy component directly (customWidgetObject puts render at top level)
+  const render = Reflect.get(fields, "render");
+  if (
+    render &&
+    typeof render === "object" &&
+    "_payload" in render &&
+    "_init" in render
+  ) {
+    await prewarmLazy(render as ReactLazyRef);
+  }
+}
 
 /**
  * Static class for formatting CLI execution results and rendering responses
@@ -33,16 +86,20 @@ export class CliResultFormatter {
     logger: EndpointLogger,
     endpoint: CreateApiEndpointAny | null,
     user: JwtPayloadType,
-  ): Promise<string> {
+  ): Promise<{ output: string; renderMs: number }> {
     if (!result.success) {
-      return CliErrorFormatter.formatErrorResult(
-        result,
-        locale,
-        verbose,
-        endpoint,
-      );
+      return {
+        output: CliErrorFormatter.formatErrorResult(
+          result,
+          locale,
+          verbose,
+          endpoint,
+        ),
+        renderMs: 0,
+      };
     }
 
+    const renderStart = performance.now();
     let output = "";
 
     // Only show metadata in verbose mode
@@ -91,7 +148,7 @@ export class CliResultFormatter {
       }
     }
 
-    return output;
+    return { output, renderMs: Math.round(performance.now() - renderStart) };
   }
 
   /**
@@ -107,6 +164,9 @@ export class CliResultFormatter {
   ): Promise<string> {
     try {
       const perfStart = performance.now();
+
+      // Pre-warm any lazy CLI widgets so they're resolved before sync rendering
+      await prewarmLazyWidgets(endpoint);
 
       // Create component
       const createStart = performance.now();

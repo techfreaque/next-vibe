@@ -22,15 +22,13 @@ import type { JwtPayloadType } from "../../../../../user/auth/types";
 import { messengerAccounts } from "../../../../accounts/db";
 import { MessengerAccountStatus } from "../../../../accounts/enum";
 import { toImapShape } from "../db";
-import { imapSyncRepository } from "../sync-service/repository";
+import { ImapSyncRepository as ImapSyncServiceRepository } from "../sync-service/repository";
 import type {
   ImapSyncPostRequestOutput,
   ImapSyncPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { ImapSyncT } from "./i18n";
 import { MessageChannel } from "../../../../accounts/enum";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * IMAP Sync Repository
@@ -43,7 +41,7 @@ export class ImapSyncRepository {
     data: ImapSyncPostRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapSyncT,
     locale: CountryLanguage,
   ): Promise<ResponseType<ImapSyncPostResponseOutput>> {
     try {
@@ -103,6 +101,7 @@ export class ImapSyncRepository {
       }
 
       const startTime = new Date();
+      const errors: Array<{ code: string; message: string }> = [];
       const results = {
         accountsProcessed: 0,
         foldersProcessed: 0,
@@ -110,7 +109,7 @@ export class ImapSyncRepository {
         messagesAdded: 0,
         messagesUpdated: 0,
         messagesDeleted: 0,
-        errors: [] as Array<{ code: string; message: string }>,
+        errors,
       };
 
       // Process each account
@@ -123,7 +122,7 @@ export class ImapSyncRepository {
 
           // No intermediate status update — messenger_accounts doesn't have syncStatus field
 
-          const syncResult = await imapSyncRepository.syncAccount(
+          const syncResult = await ImapSyncServiceRepository.syncAccount(
             account,
             logger,
             locale,
@@ -225,7 +224,7 @@ export class ImapSyncRepository {
   static getSyncStatus(
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapSyncT,
   ): ResponseType<ImapSyncPostResponseOutput> {
     try {
       logger.info("Getting IMAP sync status", { userId: user.id });

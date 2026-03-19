@@ -15,7 +15,7 @@ import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, MessageMetadata, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
-import { fetchMessageHistory } from "../../../chat/threads/[threadId]/messages/repository";
+import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import { COMPACT_TRIGGER, COMPACT_TRIGGER_PERCENTAGE } from "../core/constants";
 import { formatAbsoluteTimestamp } from "../system-prompt/message-metadata";
 import { MessageConverter } from "./message-converter";
@@ -209,14 +209,14 @@ export class MessageContextBuilder {
       ) {
         // For answer-as-ai/wakeup-resume: walk up parent chain (same as fetchMessageHistory)
         // to respect compacting boundaries.
-        history = await fetchMessageHistory(
+        history = await MessagesRepository.fetchMessageHistory(
           params.threadId,
           params.logger,
           params.parentMessageId,
         );
       } else {
         // For other operations: fetch history filtered by branch
-        history = await fetchMessageHistory(
+        history = await MessagesRepository.fetchMessageHistory(
           params.threadId,
           params.logger,
           params.parentMessageId ?? null,

@@ -30,195 +30,196 @@ import type {
   BounceProcessorPostRequestOutput,
   BounceProcessorPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { BounceProcessorT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+export class BounceProcessorRepository {
+  /**
+   * Sender patterns that indicate a bounce/DSN notification
+   */
+  private static readonly BOUNCE_SENDER_PATTERNS = [
+    "mailer-daemon@%",
+    "postmaster@%",
+    "MAILER-DAEMON@%",
+    "Mail Delivery Subsystem<%",
+    "%mailer-daemon@%",
+    "%MAILER-DAEMON@%",
+    "%Mail Delivery System%",
+    "%Mail Delivery Subsystem%",
+  ] as const;
 
-/**
- * Sender patterns that indicate a bounce/DSN notification
- */
-const BOUNCE_SENDER_PATTERNS = [
-  "mailer-daemon@%",
-  "postmaster@%",
-  "MAILER-DAEMON@%",
-  "Mail Delivery Subsystem<%",
-  "%mailer-daemon@%",
-  "%MAILER-DAEMON@%",
-  "%Mail Delivery System%",
-  "%Mail Delivery Subsystem%",
-] as const;
+  /**
+   * Subject keywords that indicate a bounce notification
+   */
+  private static readonly BOUNCE_SUBJECT_KEYWORDS = [
+    "Delivery Status Notification",
+    "Mail Delivery Failed",
+    "Undelivered Mail",
+    "Delivery Failure",
+    "Failed Delivery",
+    "Returned mail",
+    "Mail delivery failed",
+    "Undeliverable",
+  ];
 
-/**
- * Subject keywords that indicate a bounce notification
- */
-const BOUNCE_SUBJECT_KEYWORDS = [
-  "Delivery Status Notification",
-  "Mail Delivery Failed",
-  "Undelivered Mail",
-  "Delivery Failure",
-  "Failed Delivery",
-  "Returned mail",
-  "Mail delivery failed",
-  "Undeliverable",
-];
-
-/**
- * Extract email addresses from text using RFC 5321 compliant regex
- */
-function extractEmailsFromText(text: string): string[] {
-  const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-  const matches = text.match(emailRegex);
-  return matches ? [...new Set(matches.map((e) => e.toLowerCase()))] : [];
-}
-
-/**
- * Move an IMAP message to the trash folder, then delete from DB.
- * Falls back to direct DB delete if IMAP move fails.
- */
-async function moveToImapTrash(
-  emailId: string,
-  imapUid: number | null | undefined,
-  imapFolderId: string | null | undefined,
-  imapAccountId: string | null | undefined,
-  logger: EndpointLogger,
-): Promise<void> {
-  // Always clean up DB record at the end
-  const deleteFromDb = async (): Promise<void> => {
-    await db.delete(emails).where(eq(emails.id, emailId));
-  };
-
-  if (!imapUid || !imapFolderId || !imapAccountId) {
-    await deleteFromDb();
-    return;
+  /**
+   * Extract email addresses from text using RFC 5321 compliant regex
+   */
+  private static extractEmailsFromText(text: string): string[] {
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    const matches = text.match(emailRegex);
+    return matches ? [...new Set(matches.map((e) => e.toLowerCase()))] : [];
   }
 
-  try {
-    // Look up account credentials and source folder path
-    const [account] = await db
-      .select()
-      .from(imapAccounts)
-      .where(eq(imapAccounts.id, imapAccountId))
-      .limit(1);
+  /**
+   * Move an IMAP message to the trash folder, then delete from DB.
+   * Falls back to direct DB delete if IMAP move fails.
+   */
+  private static async moveToImapTrash(
+    emailId: string,
+    imapUid: number | null | undefined,
+    imapFolderId: string | null | undefined,
+    imapAccountId: string | null | undefined,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    // Always clean up DB record at the end
+    const deleteFromDb = async (): Promise<void> => {
+      await db.delete(emails).where(eq(emails.id, emailId));
+    };
 
-    const [sourceFolder] = await db
-      .select({ path: imapFolders.path })
-      .from(imapFolders)
-      .where(eq(imapFolders.id, imapFolderId))
-      .limit(1);
-
-    const [trashFolder] = await db
-      .select({ path: imapFolders.path })
-      .from(imapFolders)
-      .where(
-        and(
-          eq(imapFolders.accountId, imapAccountId),
-          eq(imapFolders.specialUseType, ImapSpecialUseType.TRASH),
-        ),
-      )
-      .limit(1);
-
-    if (!account || !sourceFolder || !trashFolder) {
-      logger.warn("bounce.processor.imap.trash.missing_data", {
-        emailId,
-        hasAccount: Boolean(account),
-        hasSourceFolder: Boolean(sourceFolder),
-        hasTrashFolder: Boolean(trashFolder),
-      });
+    if (!imapUid || !imapFolderId || !imapAccountId) {
       await deleteFromDb();
       return;
     }
 
-    await new Promise<void>((resolve) => {
-      const imap = new Imap({
-        user: account.imapUsername ?? "",
-        password: account.imapPassword ?? "",
-        host: account.imapHost ?? "",
-        port: account.imapPort ?? 993,
-        tls: account.imapSecure ?? false,
-        tlsOptions: { rejectUnauthorized: false },
-        connTimeout: 10000,
-        authTimeout: 5000,
-      });
+    try {
+      // Look up account credentials and source folder path
+      const [account] = await db
+        .select()
+        .from(imapAccounts)
+        .where(eq(imapAccounts.id, imapAccountId))
+        .limit(1);
 
-      imap.once("ready", () => {
-        imap.openBox(sourceFolder.path, false, (openErr) => {
-          if (openErr) {
-            logger.warn("bounce.processor.imap.trash.open_failed", {
-              emailId,
-              folder: sourceFolder.path,
-              error: openErr.message,
-            });
-            imap.end();
-            resolve();
-            return;
-          }
+      const [sourceFolder] = await db
+        .select({ path: imapFolders.path })
+        .from(imapFolders)
+        .where(eq(imapFolders.id, imapFolderId))
+        .limit(1);
 
-          imap.move([imapUid], trashFolder.path, (moveErr) => {
-            if (moveErr) {
-              logger.warn("bounce.processor.imap.trash.move_failed", {
+      const [trashFolder] = await db
+        .select({ path: imapFolders.path })
+        .from(imapFolders)
+        .where(
+          and(
+            eq(imapFolders.accountId, imapAccountId),
+            eq(imapFolders.specialUseType, ImapSpecialUseType.TRASH),
+          ),
+        )
+        .limit(1);
+
+      if (!account || !sourceFolder || !trashFolder) {
+        logger.warn("bounce.processor.imap.trash.missing_data", {
+          emailId,
+          hasAccount: Boolean(account),
+          hasSourceFolder: Boolean(sourceFolder),
+          hasTrashFolder: Boolean(trashFolder),
+        });
+        await deleteFromDb();
+        return;
+      }
+
+      await new Promise<void>((resolve) => {
+        const imap = new Imap({
+          user: account.imapUsername ?? "",
+          password: account.imapPassword ?? "",
+          host: account.imapHost ?? "",
+          port: account.imapPort ?? 993,
+          tls: account.imapSecure ?? false,
+          tlsOptions: { rejectUnauthorized: false },
+          connTimeout: 10000,
+          authTimeout: 5000,
+        });
+
+        imap.once("ready", () => {
+          imap.openBox(sourceFolder.path, false, (openErr) => {
+            if (openErr) {
+              logger.warn("bounce.processor.imap.trash.open_failed", {
                 emailId,
-                imapUid,
-                trashFolder: trashFolder.path,
-                error: moveErr.message,
+                folder: sourceFolder.path,
+                error: openErr.message,
               });
-            } else {
-              logger.debug("bounce.processor.imap.trash.moved", {
-                emailId,
-                imapUid,
-                trashFolder: trashFolder.path,
-              });
+              imap.end();
+              resolve();
+              return;
             }
-            imap.end();
-            resolve();
+
+            imap.move([imapUid], trashFolder.path, (moveErr) => {
+              if (moveErr) {
+                logger.warn("bounce.processor.imap.trash.move_failed", {
+                  emailId,
+                  imapUid,
+                  trashFolder: trashFolder.path,
+                  error: moveErr.message,
+                });
+              } else {
+                logger.debug("bounce.processor.imap.trash.moved", {
+                  emailId,
+                  imapUid,
+                  trashFolder: trashFolder.path,
+                });
+              }
+              imap.end();
+              resolve();
+            });
           });
         });
-      });
 
-      imap.once("error", (err: Error) => {
-        logger.warn("bounce.processor.imap.trash.connect_failed", {
-          emailId,
-          error: err.message,
+        imap.once("error", (err: Error) => {
+          logger.warn("bounce.processor.imap.trash.connect_failed", {
+            emailId,
+            error: err.message,
+          });
+          resolve();
         });
-        resolve();
+
+        imap.connect();
       });
+    } catch (err) {
+      logger.warn("bounce.processor.imap.trash.error", {
+        emailId,
+        ...parseError(err),
+      });
+    }
 
-      imap.connect();
-    });
-  } catch (err) {
-    logger.warn("bounce.processor.imap.trash.error", {
-      emailId,
-      ...parseError(err),
-    });
+    await deleteFromDb();
   }
 
-  await deleteFromDb();
-}
+  /**
+   * Determine if an email message is a bounce notification
+   */
+  private static isBounceMessage(
+    senderEmail: string,
+    subject: string,
+  ): boolean {
+    const senderLower = senderEmail.toLowerCase();
+    if (
+      senderLower.startsWith("mailer-daemon@") ||
+      senderLower.startsWith("postmaster@") ||
+      senderLower === "mailer-daemon" ||
+      senderLower.includes("mail delivery subsystem")
+    ) {
+      return true;
+    }
 
-/**
- * Determine if an email message is a bounce notification
- */
-function isBounceMessage(senderEmail: string, subject: string): boolean {
-  const senderLower = senderEmail.toLowerCase();
-  if (
-    senderLower.startsWith("mailer-daemon@") ||
-    senderLower.startsWith("postmaster@") ||
-    senderLower === "mailer-daemon" ||
-    senderLower.includes("mail delivery subsystem")
-  ) {
-    return true;
+    const subjectLower = subject.toLowerCase();
+    return BounceProcessorRepository.BOUNCE_SUBJECT_KEYWORDS.some((kw) =>
+      subjectLower.includes(kw.toLowerCase()),
+    );
   }
 
-  const subjectLower = subject.toLowerCase();
-  return BOUNCE_SUBJECT_KEYWORDS.some((kw) =>
-    subjectLower.includes(kw.toLowerCase()),
-  );
-}
-
-export class BounceProcessorRepository {
   static async run(
     data: BounceProcessorPostRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: BounceProcessorT,
   ): Promise<ResponseType<BounceProcessorPostResponseOutput>> {
     try {
       const { dryRun, batchSize } = data;
@@ -246,8 +247,8 @@ export class BounceProcessorRepository {
             // Only IMAP-synced inbound messages (have accountId)
             sql`${emails.accountId} IS NOT NULL`,
             or(
-              ...BOUNCE_SENDER_PATTERNS.map((pattern) =>
-                like(emails.senderEmail, pattern),
+              ...BounceProcessorRepository.BOUNCE_SENDER_PATTERNS.map(
+                (pattern) => like(emails.senderEmail, pattern),
               ),
             ),
           ),
@@ -272,7 +273,7 @@ export class BounceProcessorRepository {
             isNull(emails.bouncedAt),
             sql`${emails.accountId} IS NOT NULL`,
             or(
-              ...BOUNCE_SUBJECT_KEYWORDS.map(
+              ...BounceProcessorRepository.BOUNCE_SUBJECT_KEYWORDS.map(
                 (kw) =>
                   sql`lower(${emails.subject}) LIKE ${`%${kw.toLowerCase()}%`}`,
               ),
@@ -298,13 +299,22 @@ export class BounceProcessorRepository {
       let campaignsCancelled = 0;
 
       for (const msg of allMessages) {
-        if (!isBounceMessage(msg.senderEmail, msg.subject)) {
+        if (
+          !BounceProcessorRepository.isBounceMessage(
+            msg.senderEmail,
+            msg.subject,
+          )
+        ) {
           continue;
         }
 
         // Extract all email addresses from the bounce body
-        const bodyEmails = extractEmailsFromText(msg.bodyText ?? "");
-        const subjectEmails = extractEmailsFromText(msg.subject);
+        const bodyEmails = BounceProcessorRepository.extractEmailsFromText(
+          msg.bodyText ?? "",
+        );
+        const subjectEmails = BounceProcessorRepository.extractEmailsFromText(
+          msg.subject,
+        );
         const candidateEmails = [...new Set([...bodyEmails, ...subjectEmails])];
 
         bouncesFound++;
@@ -320,7 +330,7 @@ export class BounceProcessorRepository {
         }
 
         // Move bounce email to IMAP trash, then delete from DB
-        await moveToImapTrash(
+        await BounceProcessorRepository.moveToImapTrash(
           msg.id,
           msg.uid,
           msg.folderId,

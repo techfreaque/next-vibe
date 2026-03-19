@@ -7,8 +7,8 @@ export const { tools } = endpointsHandler({
   endpoint: serveDefinition,
   [Methods.POST]: {
     handler: async ({ logger, locale, user }) => {
-      const { mcpServeRepository } = await import("./repository");
-      return await mcpServeRepository.startServer(logger, locale, user);
+      const { MCPServeRepository } = await import("./repository");
+      return await MCPServeRepository.startServer(logger, locale, user);
     },
   },
 });

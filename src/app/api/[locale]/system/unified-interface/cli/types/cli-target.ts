@@ -7,8 +7,6 @@
  * - REMOTE: Production/staging via HTTP (`--target remote`)
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 export const CliTarget = {
   /** Raw development — default DB port, no preview mode */
   DEV: "dev",

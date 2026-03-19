@@ -272,13 +272,15 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       params: Parameters<typeof messageOps.sendMessage>[0],
       onNewThread?: Parameters<typeof messageOps.sendMessage>[1],
     ) => {
-      if (activeThreadId) {
-        startStream(activeThreadId, logger);
-      }
+      // Always set isStreaming=true immediately so the stop button shows before
+      // the first WS chunk arrives. For existing threads use the real ID; for
+      // new/null threads use "new" as a placeholder (nav store sets isStreaming
+      // globally, not per-thread, so the placeholder is sufficient).
+      startStream(activeThreadId ?? "new", logger);
       const result = await messageOps.sendMessage(params, onNewThread);
       // If stream failed, reset nav store streaming state (STREAM_FINISHED won't arrive)
-      if (!result.success && activeThreadId) {
-        stopStream(activeThreadId, logger);
+      if (!result.success) {
+        stopStream(activeThreadId ?? "new", logger);
       }
       return result;
     },
@@ -381,11 +383,14 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     [deleteTaskMutation, activeThreadId, currentRootFolderId, logger],
   );
 
-  // Show stop button when streaming OR when TTS is playing OR when aborting.
+  // Show stop button when streaming OR when TTS is playing OR when aborting OR when waiting.
   // isStreaming from navigation store is the authoritative signal.
   const isActivelyStreaming = isLoading || isStreaming;
+  const isWaiting = useAIStreamStore((s) =>
+    activeThreadId ? s.isWaiting(activeThreadId) : false,
+  );
   const showStopButton =
-    isActivelyStreaming || isAborting || voiceRuntime.isSpeaking;
+    isActivelyStreaming || isAborting || isWaiting || voiceRuntime.isSpeaking;
 
   // Voice recording state
   const voice = useVoiceRecording({

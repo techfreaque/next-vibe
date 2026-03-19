@@ -15,7 +15,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { scopedTranslation } from "@/app/api/[locale]/agent/i18n";
+import type { AgentT } from "@/app/api/[locale]/agent/i18n";
 import { scopedTranslation as sttScopedTranslation } from "@/app/api/[locale]/agent/speech-to-text/i18n";
 import { SpeechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -24,10 +24,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import {
-  CreditRepository,
-  type ModuleT as CreditModuleT,
-} from "../../../credits/repository";
+import { CreditRepository } from "../../../credits/repository";
+import type { CreditsT as CreditModuleT } from "../../../credits/i18n";
 import { createAdapters } from "./adapters/factory";
 import type {
   SttHotkeyPostRequestOutput,
@@ -37,25 +35,23 @@ import { HotkeyAction, RecordingStatus } from "./enum";
 import { createSession, type SpeechHotkeySession } from "./session";
 import { checkPlatformDependencies, platformDetector } from "./utils/platform";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Session store (in-memory for now, could be Redis in production)
- */
-const sessions = new Map<string, SpeechHotkeySession>();
-
-/**
- * Get session key for user
- */
-function getSessionKey(user: JwtPayloadType): string {
-  const userId = user.isPublic ? user.leadId : user.id;
-  return `stt_hotkey_${userId}`;
-}
-
 /**
  * Speech-to-Text Hotkey Repository
  */
 export class SttHotkeyRepository {
+  /**
+   * Session store (in-memory for now, could be Redis in production)
+   */
+  private static readonly sessions = new Map<string, SpeechHotkeySession>();
+
+  /**
+   * Get session key for user
+   */
+  private static getSessionKey(user: JwtPayloadType): string {
+    const userId = user.isPublic ? user.leadId : user.id;
+    return `stt_hotkey_${userId}`;
+  }
+
   /**
    * Handle hotkey action
    */
@@ -64,7 +60,7 @@ export class SttHotkeyRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AgentT,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     logger.info("Handling hotkey action", {
       action: data.action,
@@ -92,8 +88,8 @@ export class SttHotkeyRepository {
       }
 
       // Get or create session
-      const sessionKey = getSessionKey(user);
-      let session = sessions.get(sessionKey);
+      const sessionKey = SttHotkeyRepository.getSessionKey(user);
+      let session = SttHotkeyRepository.sessions.get(sessionKey);
 
       if (!session) {
         session = await SttHotkeyRepository.createNewSession(
@@ -102,7 +98,7 @@ export class SttHotkeyRepository {
           locale,
           logger,
         );
-        sessions.set(sessionKey, session);
+        SttHotkeyRepository.sessions.set(sessionKey, session);
       }
 
       const tCredits = creditsScopedTranslation.scopedT(locale).t;
@@ -214,8 +210,10 @@ export class SttHotkeyRepository {
       );
 
       if (!result.success) {
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- STT error
-        throw new Error(result.message || "Transcription failed");
+        logger.error("Transcription failed in STT hotkey", {
+          error: result.message,
+        });
+        return "";
       }
 
       return result.data.response.text;
@@ -240,7 +238,7 @@ export class SttHotkeyRepository {
   private static async handleStart(
     session: SpeechHotkeySession,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AgentT,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
       logger.warn("Recording already in progress");
@@ -269,7 +267,7 @@ export class SttHotkeyRepository {
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AgentT,
     tCredits: CreditModuleT,
     locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
@@ -324,7 +322,7 @@ export class SttHotkeyRepository {
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AgentT,
     tCredits: CreditModuleT,
     locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {

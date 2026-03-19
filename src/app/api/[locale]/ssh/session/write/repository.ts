@@ -9,20 +9,18 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { scopedTranslation } from "../../i18n";
+import type { SshT } from "../../i18n";
 import { sessionPool } from "../pool";
 import type {
   SessionWriteRequestOutput,
   SessionWriteResponseOutput,
 } from "./definition";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 export class SessionWriteRepository {
   static async write(
     data: SessionWriteRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: SshT,
   ): Promise<ResponseType<SessionWriteResponseOutput>> {
     const entry = sessionPool.get(data.sessionId);
     if (!entry) {

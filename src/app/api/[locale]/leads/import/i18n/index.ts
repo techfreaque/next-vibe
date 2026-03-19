@@ -12,3 +12,7 @@ export type LeadsImportTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
 
 export type LeadsImportT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
+// Aliases for backward-compatibility with import/ module consumers
+export type ImportTranslationKey = LeadsImportTranslationKey;
+export type ImportT = LeadsImportT;

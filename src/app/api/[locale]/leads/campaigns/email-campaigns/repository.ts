@@ -22,7 +22,7 @@ import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/em
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
 
 import { leads } from "../../db";
@@ -31,7 +31,7 @@ import { EmailProvider, LeadStatus } from "../../enum";
 import type { LeadWithEmailType } from "../../types";
 import { emailRendererService } from "../emails/services/renderer";
 import { campaignSchedulerService } from "../emails/services/scheduler";
-import type { scopedTranslation } from "./i18n";
+import type { EmailCampaignsT } from "./i18n";
 import type { EmailCampaignResultType } from "./types";
 import { createEmptyEmailCampaignResult } from "./types";
 
@@ -43,39 +43,19 @@ interface StageProcessOptions {
   dryRun: boolean;
 }
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 /**
- * Email Campaigns Repository Interface
+ * Email Campaigns Repository
  */
-export interface IEmailCampaignsRepository {
-  bootstrapPendingLeads(
-    batchSize: number,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<number>>;
-
-  processStage(
-    stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
-    options: StageProcessOptions,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<EmailCampaignResultType>>;
-}
-
-/**
- * Email Campaigns Repository Implementation
- */
-export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
+export class EmailCampaignsRepository {
   /**
    * Bootstrap PENDING leads into active campaigns.
    * Finds leads with status=PENDING (set by campaign-starter) that don't yet
    * have an emailCampaigns entry, schedules their initial email, and transitions
    * them to CAMPAIGN_RUNNING.
    */
-  async bootstrapPendingLeads(
+  static async bootstrapPendingLeads(
     batchSize: number,
-    t: ModuleT,
+    t: EmailCampaignsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
     try {
@@ -145,10 +125,10 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
     }
   }
 
-  async processStage(
+  static async processStage(
     stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
     options: StageProcessOptions,
-    t: ModuleT,
+    t: EmailCampaignsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailCampaignResultType>> {
     try {
@@ -205,8 +185,10 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
           }
 
           // Build locale from lead's country + language
-          const leadLocale =
-            `${fullLead.country}-${fullLead.language}` as CountryLanguage;
+          const leadLocale = getLocaleFromLanguageAndCountry(
+            fullLead.language,
+            fullLead.country,
+          );
           const { t: simpleLocalT } = simpleT(leadLocale);
 
           // Render the email template (returns JSX + subject)
@@ -362,8 +344,3 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const emailCampaignsRepository = new EmailCampaignsRepositoryImpl();

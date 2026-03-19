@@ -5,91 +5,86 @@
 import "server-only";
 
 import { and, count, eq, gt, isNull, or } from "drizzle-orm";
-import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
-  success,
   ErrorResponseTypes,
   fail,
+  success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
+import type { NextRequest } from "next/server";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
+import type { LeadsT } from "../../../leads/i18n";
+import { scopedTranslation as leadsScopedTranslation } from "../../../leads/i18n";
+import type { Platform } from "../../../system/unified-interface/shared/types/platform";
 import { AuthRepository } from "../../auth/repository";
 import type {
   JWTPublicPayloadType,
   JwtPrivatePayloadType,
 } from "../../auth/types";
-import { UserPermissionRole } from "../../user-roles/enum";
 import { loginAttempts, users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { SessionRepository } from "../../private/session/repository";
 import { UserRepository } from "../../repository";
+import { UserPermissionRole } from "../../user-roles/enum";
 import { UserRolesRepository } from "../../user-roles/repository";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
 } from "./definition";
+import type { LoginT, LoginTranslationKey } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import type {
   LoginOptionsGetRequestOutput,
   LoginOptionsGetResponseOutput,
 } from "./options/definition";
 import { SocialProviders } from "./options/enum";
-import type { Platform } from "../../../system/unified-interface/shared/types/platform";
-import type { scopedTranslation, LoginTranslationKey } from "./i18n";
-import type { scopedTranslation as leadsScopedTranslation } from "../../../leads/i18n";
-import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-type LeadsT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
-
-export interface SocialProvidersOptions {
-  enabled: boolean;
-  name: LoginTranslationKey;
-  providers: (typeof SocialProviders)[keyof typeof SocialProviders][];
-}
-
-/**
- * Login options interface
- */
 export interface LoginOptions {
   allowPasswordAuth: boolean;
   allowSocialAuth: boolean;
-  maxAttempts?: number;
-  requireTwoFactor?: boolean;
-  socialProviders?: SocialProvidersOptions[];
-}
-
-/**
- * DB-backed rate limiting constants.
- * An account is locked when MAX_FAILED_ATTEMPTS failures exist within WINDOW_MS.
- */
-const MAX_FAILED_ATTEMPTS = 5;
-const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-
-/**
- * A pre-computed Argon2id hash of a random placeholder used to normalise
- * timing for non-existent email lookups (prevents user-enumeration via timing).
- * Generated once at module load; value is never compared to real user data.
- */
-let DUMMY_HASH: string | null = null;
-async function getDummyHash(): Promise<string> {
-  if (!DUMMY_HASH) {
-    const { hashPassword } =
-      await import("@/app/api/[locale]/shared/utils/password");
-    DUMMY_HASH = await hashPassword("__dummy_constant_time_placeholder__");
-  }
-  return DUMMY_HASH;
+  maxAttempts: number;
+  requireTwoFactor: boolean;
+  socialProviders: Array<{
+    enabled: boolean;
+    name: LoginTranslationKey;
+    providers: string[];
+  }>;
 }
 
 /**
  * Login repository implementation
  */
 export class LoginRepository {
+  /**
+   * DB-backed rate limiting constants.
+   * An account is locked when MAX_FAILED_ATTEMPTS failures exist within WINDOW_MS.
+   */
+  private static readonly MAX_FAILED_ATTEMPTS = 5;
+  private static readonly WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+  /**
+   * A pre-computed Argon2id hash of a random placeholder used to normalise
+   * timing for non-existent email lookups (prevents user-enumeration via timing).
+   * Generated once; value is never compared to real user data.
+   */
+  private static dummyHash: string | null = null;
+  private static async getDummyHash(): Promise<string> {
+    if (!LoginRepository.dummyHash) {
+      const { hashPassword } =
+        await import("@/app/api/[locale]/shared/utils/password");
+      LoginRepository.dummyHash = await hashPassword(
+        "__dummy_constant_time_placeholder__",
+      );
+    }
+    return LoginRepository.dummyHash;
+  }
   /**
    * Login a user with email and password
    * @param email - User email
@@ -106,14 +101,20 @@ export class LoginRepository {
     request: NextRequest | undefined,
     logger: EndpointLogger,
     platform: Platform,
-    t: ModuleT,
-    leadsT: LeadsT,
+    t: LoginT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     // Extract data from request
     const { email, password, rememberMe } = data;
+    const leadsT = leadsScopedTranslation.scopedT(locale).t;
 
-    // Get leadId from user prop (JWT payload) - always present
+    // Get leadId from user prop (JWT payload) - must be present
     const leadId = user.leadId;
+    if (!leadId) {
+      return fail({
+        message: t("errors.invalid_credentials"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
 
     // Get client IP for security monitoring from request headers
     // In CLI context, request may be undefined
@@ -147,7 +148,8 @@ export class LoginRepository {
         .where(eq(users.email, email))
         .then((rows) => rows[0]);
 
-      const storedHash = userRow?.password ?? (await getDummyHash());
+      const storedHash =
+        userRow?.password ?? (await LoginRepository.getDummyHash());
 
       // Always run Argon2 — constant-time regardless of whether user exists
       const isPasswordValid = await verifyPassword(password, storedHash);
@@ -251,7 +253,7 @@ export class LoginRepository {
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
-    t: ModuleT,
+    t: LoginT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
@@ -284,7 +286,7 @@ export class LoginRepository {
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
-    t: ModuleT,
+    t: LoginT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
@@ -319,7 +321,7 @@ export class LoginRepository {
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
-    t: ModuleT,
+    t: LoginT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     try {
       // Create session and get user data
@@ -500,8 +502,8 @@ export class LoginRepository {
     data: LoginOptionsGetRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
   ): Promise<ResponseType<LoginOptionsGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const email = data.email;
     const optionsResult = await this.getLoginOptions(logger, locale, t, email);
 
@@ -561,7 +563,7 @@ export class LoginRepository {
   static async getLoginOptions(
     logger: EndpointLogger,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: LoginT,
     email?: string,
   ): Promise<ResponseType<LoginOptions>> {
     try {
@@ -664,7 +666,7 @@ export class LoginRepository {
     ipAddress: string,
   ): Promise<boolean> {
     try {
-      const windowStart = new Date(Date.now() - WINDOW_MS);
+      const windowStart = new Date(Date.now() - LoginRepository.WINDOW_MS);
       const [row] = await db
         .select({ cnt: count() })
         .from(loginAttempts)
@@ -681,7 +683,7 @@ export class LoginRepository {
             gt(loginAttempts.createdAt, windowStart),
           ),
         );
-      return (row?.cnt ?? 0) >= MAX_FAILED_ATTEMPTS;
+      return (row?.cnt ?? 0) >= LoginRepository.MAX_FAILED_ATTEMPTS;
     } catch {
       // If DB is unreachable, fail open (don't lock out all users)
       return false;

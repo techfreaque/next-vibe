@@ -23,7 +23,7 @@ import {
   ImapConnectionStatus,
   ImapSpecialUseType,
 } from "../enum";
-import type { scopedTranslation } from "../i18n";
+import type { ImapClientT } from "../i18n";
 import type {
   ImapConnectionCloseRequestOutput,
   ImapConnectionCloseResponseOutput,
@@ -37,8 +37,6 @@ import type {
   ImapMessageListRequestOutput,
   ImapMessageListResponseOutput,
 } from "./config";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * IMAP Box Information from node-imap library
@@ -91,86 +89,46 @@ interface ImapConnectionImpl {
 }
 
 /**
- * IMAP Connection Repository Interface
- */
-export interface ImapConnectionRepository {
-  testConnection(
-    data: ImapConnectionTestRequestOutput,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<ImapConnectionTestResponseOutput>>;
-
-  connect(
-    account: ImapAccountShape,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<ImapConnectionImpl>>;
-
-  disconnect(
-    data: ImapConnectionCloseRequestOutput,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<ImapConnectionCloseResponseOutput>>;
-
-  listFolders(
-    data: ImapFolderListRequestOutput,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<ImapFolderListResponseOutput>>;
-
-  listMessages(
-    data: ImapMessageListRequestOutput,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<ImapMessageListResponseOutput>>;
-
-  closeAllConnections(
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<{ success: boolean; message: string }>;
-}
-
-/**
- * Map IMAP special use attributes to our enum values
- */
-function mapImapSpecialUseType(
-  specialUseAttrib?: string,
-): (typeof ImapSpecialUseType)[keyof typeof ImapSpecialUseType] | undefined {
-  if (!specialUseAttrib) {
-    return undefined;
-  }
-
-  // IMAP special use attributes come with backslashes (e.g., "\Trash", "\Drafts")
-  // We need to map them to our enum values
-  switch (specialUseAttrib.toLowerCase()) {
-    case "\\trash":
-      return ImapSpecialUseType.TRASH;
-    case "\\drafts":
-      return ImapSpecialUseType.DRAFTS;
-    case "\\sent":
-      return ImapSpecialUseType.SENT;
-    case "\\archive":
-      return ImapSpecialUseType.ARCHIVE;
-    case "\\junk":
-    case "\\spam":
-      return ImapSpecialUseType.JUNK;
-    case "\\inbox":
-      return ImapSpecialUseType.INBOX;
-    default:
-      return undefined;
-  }
-}
-
-/**
  * IMAP Connection Repository Implementation
  */
-export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
-  private connections: Map<string, ImapConnectionImpl> = new Map();
+export class ImapConnectionRepository {
+  private static connections: Map<string, ImapConnectionImpl> = new Map();
+
+  /**
+   * Map IMAP special use attributes to our enum values
+   */
+  private static mapImapSpecialUseType(
+    specialUseAttrib?: string,
+  ): (typeof ImapSpecialUseType)[keyof typeof ImapSpecialUseType] | undefined {
+    if (!specialUseAttrib) {
+      return undefined;
+    }
+
+    // IMAP special use attributes come with backslashes (e.g., "\Trash", "\Drafts")
+    // We need to map them to our enum values
+    switch (specialUseAttrib.toLowerCase()) {
+      case "\\trash":
+        return ImapSpecialUseType.TRASH;
+      case "\\drafts":
+        return ImapSpecialUseType.DRAFTS;
+      case "\\sent":
+        return ImapSpecialUseType.SENT;
+      case "\\archive":
+        return ImapSpecialUseType.ARCHIVE;
+      case "\\junk":
+      case "\\spam":
+        return ImapSpecialUseType.JUNK;
+      case "\\inbox":
+        return ImapSpecialUseType.INBOX;
+      default:
+        return undefined;
+    }
+  }
 
   /**
    * Create connection configuration from account
    */
-  private createConnectionConfig(
+  private static createConnectionConfig(
     account: ImapAccountShape,
   ): ImapConnectionConfig {
     return {
@@ -188,13 +146,15 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Test IMAP connection
    */
-  async testConnection(
+  static async testConnection(
     data: ImapConnectionTestRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapClientT,
   ): Promise<ResponseType<ImapConnectionTestResponseOutput>> {
     const startTime = Date.now();
-    const config = this.createConnectionConfig(data.account);
+    const config = ImapConnectionRepository.createConnectionConfig(
+      data.account,
+    );
 
     try {
       logger.debug("Testing IMAP connection", {
@@ -352,12 +312,12 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Connect to IMAP server
    */
-  async connect(
+  static async connect(
     account: ImapAccountShape,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapClientT,
   ): Promise<ResponseType<ImapConnectionImpl>> {
-    const config = this.createConnectionConfig(account);
+    const config = ImapConnectionRepository.createConnectionConfig(account);
     const connectionKey = `${config.host}:${config.port}:${config.username}`;
 
     try {
@@ -368,8 +328,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       });
 
       // Check if connection already exists
-      if (this.connections.has(connectionKey)) {
-        const existingConnection = this.connections.get(connectionKey);
+      if (ImapConnectionRepository.connections.has(connectionKey)) {
+        const existingConnection =
+          ImapConnectionRepository.connections.get(connectionKey);
         if (
           existingConnection &&
           existingConnection.state === "authenticated"
@@ -402,12 +363,12 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
               capabilities: [],
               close: () => {
                 logger.debug("Closing IMAP connection", { connectionKey });
-                this.connections.delete(connectionKey);
+                ImapConnectionRepository.connections.delete(connectionKey);
                 imap.end();
               },
             };
 
-            this.connections.set(connectionKey, connection);
+            ImapConnectionRepository.connections.set(connectionKey, connection);
 
             logger.debug("IMAP connection established", {
               host: config.host,
@@ -444,19 +405,22 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Disconnect from IMAP server
    */
-  async disconnect(
+  static async disconnect(
     data: ImapConnectionCloseRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapClientT,
   ): Promise<ResponseType<ImapConnectionCloseResponseOutput>> {
-    const config = this.createConnectionConfig(data.account);
+    const config = ImapConnectionRepository.createConnectionConfig(
+      data.account,
+    );
     const connectionKey = `${config.host}:${config.port}:${config.username}`;
 
     try {
-      const connection = this.connections.get(connectionKey);
+      const connection =
+        ImapConnectionRepository.connections.get(connectionKey);
       if (connection) {
         connection.close();
-        this.connections.delete(connectionKey);
+        ImapConnectionRepository.connections.delete(connectionKey);
         logger.debug("IMAP connection closed", { connectionKey });
       }
 
@@ -481,10 +445,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * List folders from IMAP server
    */
-  async listFolders(
+  static async listFolders(
     data: ImapFolderListRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapClientT,
   ): Promise<ResponseType<ImapFolderListResponseOutput>> {
     try {
       logger.debug("Listing IMAP folders", { accountId: data.account.id });
@@ -526,7 +490,9 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                   box.children && Object.keys(box.children).length > 0,
                 ),
                 isSpecialUse: Boolean(box.special_use_attrib),
-                specialUseType: mapImapSpecialUseType(box.special_use_attrib),
+                specialUseType: ImapConnectionRepository.mapImapSpecialUseType(
+                  box.special_use_attrib,
+                ),
                 uidValidity: box.uidvalidity || undefined,
                 uidNext: box.uidnext || undefined,
                 messageCount: box.messages?.total || 0,
@@ -573,10 +539,10 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * List messages from IMAP folder
    */
-  async listMessages(
+  static async listMessages(
     data: ImapMessageListRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapClientT,
   ): Promise<ResponseType<ImapMessageListResponseOutput>> {
     try {
       logger.debug("Listing IMAP messages", {
@@ -699,12 +665,14 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                           headers,
                           bodyText: parsed.text || undefined,
                           bodyHtml: parsed.html || undefined,
-                          hasAttachments: this.checkHasAttachments(
-                            attributes.struct,
-                          ),
-                          attachmentCount: this.countAttachments(
-                            attributes.struct,
-                          ),
+                          hasAttachments:
+                            ImapConnectionRepository.checkHasAttachments(
+                              attributes.struct,
+                            ),
+                          attachmentCount:
+                            ImapConnectionRepository.countAttachments(
+                              attributes.struct,
+                            ),
                         });
                       } catch {
                         // ignore parse errors for individual messages
@@ -749,7 +717,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Check if message has attachments based on structure
    */
-  private checkHasAttachments(
+  private static checkHasAttachments(
     struct: ImapMessageStruct | ImapMessageStruct[] | undefined,
   ): boolean {
     if (!struct) {
@@ -780,7 +748,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Count attachments in message structure
    */
-  private countAttachments(
+  private static countAttachments(
     struct: ImapMessageStruct | ImapMessageStruct[] | undefined,
   ): number {
     if (!struct) {
@@ -811,19 +779,19 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   /**
    * Close all connections
    */
-  closeAllConnections(
+  static closeAllConnections(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ImapClientT,
   ): ResponseType<{ success: boolean; message: string }> {
     try {
       logger.debug("Closing all IMAP connections");
 
       // Close all connections synchronously (close() returns void, not Promise)
-      [...this.connections.values()].forEach((connection) =>
+      [...ImapConnectionRepository.connections.values()].forEach((connection) =>
         connection.close(),
       );
 
-      this.connections.clear();
+      ImapConnectionRepository.connections.clear();
 
       logger.debug("All IMAP connections closed");
 
@@ -840,6 +808,3 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     }
   }
 }
-
-// Export singleton instance
-export const imapConnectionRepository = new ImapConnectionRepositoryImpl();

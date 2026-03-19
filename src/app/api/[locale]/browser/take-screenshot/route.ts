@@ -6,10 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import {
-  executeTakeScreenshot,
-  filterUndefinedArgs,
-} from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import takeScreenshotEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -17,10 +14,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeTakeScreenshot(
+      BrowserSharedRepository.executeTakeScreenshot(
         {
           toolName: BrowserTool.TAKE_SCREENSHOT,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             uid: data.uid,
             fullPage: data.fullPage,
             format: data.format,

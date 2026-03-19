@@ -17,51 +17,24 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type migrateRepairEndpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-// Constants to avoid literal strings
-const MIGRATION_TABLE_NAME = "__drizzle_migrations__";
-const SQL_FILE_EXTENSION = ".sql";
-const DRIZZLE_SCHEMA = "drizzle";
-
-type MigrateRepairRequestType =
-  typeof migrateRepairEndpoints.POST.types.RequestOutput;
-type MigrateRepairResponseType =
-  typeof migrateRepairEndpoints.POST.types.ResponseOutput;
+import type {
+  MigrateRepairRequestOutput,
+  MigrateRepairResponseOutput,
+} from "./definition";
+import type { MigrateRepairT } from "./i18n";
 
 /**
- * Migration state interface
+ * Database Migration Repair Repository
  */
-interface MigrationState {
-  hasTable: boolean;
-  schema: string;
-  tableName: string;
-  trackedMigrations: number;
-}
-
-/**
- * Database Migration Repair Repository Interface
- */
-export interface DatabaseMigrateRepairRepository {
-  repairMigrations(
-    data: MigrateRepairRequestType,
-    t: ModuleT,
+export class DatabaseMigrateRepairRepository {
+  private static readonly MIGRATION_TABLE_NAME = "__drizzle_migrations__";
+  private static readonly SQL_FILE_EXTENSION = ".sql";
+  private static readonly DRIZZLE_SCHEMA = "drizzle";
+  static async repairMigrations(
+    data: MigrateRepairRequestOutput,
+    t: MigrateRepairT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateRepairResponseType>>;
-}
-
-/**
- * Database Migration Repair Repository Implementation
- */
-export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepairRepository {
-  async repairMigrations(
-    data: MigrateRepairRequestType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateRepairResponseType>> {
+  ): Promise<ResponseType<MigrateRepairResponseOutput>> {
     try {
       logger.info("Starting migration repair process", { options: data });
 
@@ -71,7 +44,8 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
 
       // Step 1: Check current migration state
       logger.info("Checking current migration state");
-      const migrationState = await this.checkMigrationState(logger);
+      const migrationState =
+        await DatabaseMigrateRepairRepository.checkMigrationState(logger);
 
       logger.info("Migration state checked", {
         hasTable: migrationState.hasTable,
@@ -81,7 +55,8 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
       });
 
       // Step 2: Check migration files
-      const migrationFiles = this.getMigrationFiles();
+      const migrationFiles =
+        DatabaseMigrateRepairRepository.getMigrationFiles();
       logger.info("Migration files found", { count: migrationFiles.length });
 
       // Step 3: Determine what needs to be fixed
@@ -127,14 +102,17 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
       // Step 4: Reset migration tracking if requested
       if (data.reset) {
         logger.info("Resetting migration tracking");
-        await this.resetMigrationTracking(logger);
+        await DatabaseMigrateRepairRepository.resetMigrationTracking(logger);
       }
 
       // Step 5: Ensure proper migration table exists
-      await this.ensureMigrationTable(logger);
+      await DatabaseMigrateRepairRepository.ensureMigrationTable(logger);
 
       // Step 6: Mark all existing migrations as applied
-      await this.markMigrationsAsApplied(migrationFiles, logger);
+      await DatabaseMigrateRepairRepository.markMigrationsAsApplied(
+        migrationFiles,
+        logger,
+      );
 
       const output =
         repairedCount > 0
@@ -149,8 +127,8 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
         success: true,
         output,
         hasTable: true,
-        schema: DRIZZLE_SCHEMA,
-        tableName: MIGRATION_TABLE_NAME,
+        schema: DatabaseMigrateRepairRepository.DRIZZLE_SCHEMA,
+        tableName: DatabaseMigrateRepairRepository.MIGRATION_TABLE_NAME,
         trackedMigrations: migrationFiles.length,
         migrationFiles: migrationFiles.length,
         repaired: repairedCount,
@@ -168,9 +146,12 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
   /**
    * Check current migration state
    */
-  private async checkMigrationState(
-    logger: EndpointLogger,
-  ): Promise<MigrationState> {
+  private static async checkMigrationState(logger: EndpointLogger): Promise<{
+    hasTable: boolean;
+    schema: string;
+    tableName: string;
+    trackedMigrations: number;
+  }> {
     try {
       // Ensure drizzle schema exists
       await db.execute(sql`CREATE SCHEMA IF NOT EXISTS drizzle`);
@@ -194,8 +175,8 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
 
         return {
           hasTable: true,
-          schema: DRIZZLE_SCHEMA,
-          tableName: MIGRATION_TABLE_NAME,
+          schema: DatabaseMigrateRepairRepository.DRIZZLE_SCHEMA,
+          tableName: DatabaseMigrateRepairRepository.MIGRATION_TABLE_NAME,
           trackedMigrations:
             Number((count.rows[0] as { count: string | number })?.count) || 0,
         };
@@ -203,16 +184,16 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
 
       return {
         hasTable: false,
-        schema: DRIZZLE_SCHEMA,
-        tableName: MIGRATION_TABLE_NAME,
+        schema: DatabaseMigrateRepairRepository.DRIZZLE_SCHEMA,
+        tableName: DatabaseMigrateRepairRepository.MIGRATION_TABLE_NAME,
         trackedMigrations: 0,
       };
     } catch (error) {
       logger.error("Error checking migration state", { error: String(error) });
       return {
         hasTable: false,
-        schema: DRIZZLE_SCHEMA,
-        tableName: MIGRATION_TABLE_NAME,
+        schema: DatabaseMigrateRepairRepository.DRIZZLE_SCHEMA,
+        tableName: DatabaseMigrateRepairRepository.MIGRATION_TABLE_NAME,
         trackedMigrations: 0,
       };
     }
@@ -221,7 +202,7 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
   /**
    * Get list of migration files
    */
-  private getMigrationFiles(): string[] {
+  private static getMigrationFiles(): string[] {
     const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 
     if (!existsSync(migrationsFolder)) {
@@ -229,14 +210,18 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
     }
 
     return readdirSync(migrationsFolder)
-      .filter((file) => file.endsWith(SQL_FILE_EXTENSION))
+      .filter((file) =>
+        file.endsWith(DatabaseMigrateRepairRepository.SQL_FILE_EXTENSION),
+      )
       .toSorted();
   }
 
   /**
    * Reset migration tracking by clearing the migration table
    */
-  private async resetMigrationTracking(logger: EndpointLogger): Promise<void> {
+  private static async resetMigrationTracking(
+    logger: EndpointLogger,
+  ): Promise<void> {
     try {
       logger.debug("Clearing migration tracking table");
       await db.execute(
@@ -254,7 +239,9 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
   /**
    * Ensure proper migration table exists
    */
-  private async ensureMigrationTable(logger: EndpointLogger): Promise<void> {
+  private static async ensureMigrationTable(
+    logger: EndpointLogger,
+  ): Promise<void> {
     try {
       // Ensure drizzle schema exists
       await db.execute(sql`CREATE SCHEMA IF NOT EXISTS drizzle`);
@@ -278,7 +265,7 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
   /**
    * Mark all migrations as applied
    */
-  private async markMigrationsAsApplied(
+  private static async markMigrationsAsApplied(
     migrationFiles: string[],
     logger: EndpointLogger,
   ): Promise<void> {
@@ -305,11 +292,17 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
       // Create a map of migration files to journal entries
       const journalMap = new Map<string, { tag: string; when: number }>();
       for (const entry of journalData.entries || []) {
-        journalMap.set(`${entry.tag}${SQL_FILE_EXTENSION}`, entry);
+        journalMap.set(
+          `${entry.tag}${DatabaseMigrateRepairRepository.SQL_FILE_EXTENSION}`,
+          entry,
+        );
       }
 
       for (const file of migrationFiles) {
-        const hash = file.replace(SQL_FILE_EXTENSION, "");
+        const hash = file.replace(
+          DatabaseMigrateRepairRepository.SQL_FILE_EXTENSION,
+          "",
+        );
         const journalEntry = journalMap.get(file);
         const timestamp = journalEntry?.when || Date.now();
 
@@ -348,9 +341,3 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
     }
   }
 }
-
-/**
- * Export repository instance
- */
-export const databaseMigrateRepairRepository =
-  new DatabaseMigrateRepairRepositoryImpl();

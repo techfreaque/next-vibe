@@ -16,54 +16,42 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type guardStatusEndpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type GuardStatusRequestType =
-  typeof guardStatusEndpoints.POST.types.RequestOutput;
-type GuardStatusResponseType =
-  typeof guardStatusEndpoints.POST.types.ResponseOutput;
+import type {
+  GuardStatusRequestOutput,
+  GuardStatusResponseOutput,
+} from "./definition";
+import type { GuardStatusT } from "./i18n";
 
 /**
- * Guard Status Repository Interface
+ * Guard Status Repository
  */
-export interface GuardStatusRepository {
-  getStatus(
-    data: GuardStatusRequestType,
+export class GuardStatusRepository {
+  static getStatus(
+    data: GuardStatusRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<GuardStatusResponseType>;
-}
-
-/**
- * Guard Status Repository Implementation
- */
-export class GuardStatusRepositoryImpl implements GuardStatusRepository {
-  getStatus(
-    data: GuardStatusRequestType,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<GuardStatusResponseType> {
+    t: GuardStatusT,
+  ): ResponseType<GuardStatusResponseOutput> {
     try {
       logger.info("Checking guard status");
       logger.debug("Guard status request data", { data });
 
       if (data.guardId) {
-        return this.getStatusByGuardId(data.guardId, logger);
+        return GuardStatusRepository.getStatusByGuardId(data.guardId, logger);
       }
 
       if (data.projectPath) {
-        return this.getStatusByProject(data.projectPath, logger);
+        return GuardStatusRepository.getStatusByProject(
+          data.projectPath,
+          logger,
+        );
       }
 
       if (data.listAll) {
-        return this.getAllGuardStatus(logger);
+        return GuardStatusRepository.getAllGuardStatus(logger);
       }
 
       // Default: list all guards
-      return this.getAllGuardStatus(logger);
+      return GuardStatusRepository.getAllGuardStatus(logger);
     } catch (error) {
       logger.error("Guard status check failed", parseError(error));
       const parsedError =
@@ -77,10 +65,10 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
     }
   }
 
-  private getStatusByGuardId(
+  private static getStatusByGuardId(
     guardId: string,
     logger: EndpointLogger,
-  ): ResponseType<GuardStatusResponseType> {
+  ): ResponseType<GuardStatusResponseOutput> {
     logger.debug(`Checking status for guard: ${guardId}`);
 
     // Mock implementation - in real system would check actual guard status
@@ -96,7 +84,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       userHome: `/tmp/projects/${guardId}/.guard_home_${guardId}`,
     };
 
-    const response: GuardStatusResponseType = {
+    const response: GuardStatusResponseOutput = {
       success: true,
       output: `📊 Guard '${guardId}' status: ${mockGuard.status}`, // eslint-disable-line i18next/no-literal-string
       guards: [mockGuard],
@@ -107,17 +95,17 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
     return success(response);
   }
 
-  private getStatusByProject(
+  private static getStatusByProject(
     projectPath: string,
     logger: EndpointLogger,
-  ): ResponseType<GuardStatusResponseType> {
+  ): ResponseType<GuardStatusResponseOutput> {
     logger.debug(`Checking status for project: ${projectPath}`);
 
     const projectName = path.basename(projectPath);
     const guardScriptPath = path.join(projectPath, ".vscode", ".guard.sh"); // eslint-disable-line i18next/no-literal-string
 
     if (!fs.existsSync(guardScriptPath)) {
-      const response: GuardStatusResponseType = {
+      const response: GuardStatusResponseOutput = {
         success: true,
         output: `❌ No guard found for project '${projectName}'`, // eslint-disable-line i18next/no-literal-string
         guards: [],
@@ -145,7 +133,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
       userHome: `${projectPath}/.guard_home_${username}`,
     };
 
-    const response: GuardStatusResponseType = {
+    const response: GuardStatusResponseOutput = {
       success: true,
       output: `📊 Guard status for project '${projectName}': ${mockGuard.status}`, // eslint-disable-line i18next/no-literal-string
       guards: [mockGuard],
@@ -156,9 +144,9 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
     return success(response);
   }
 
-  private getAllGuardStatus(
+  private static getAllGuardStatus(
     logger: EndpointLogger,
-  ): ResponseType<GuardStatusResponseType> {
+  ): ResponseType<GuardStatusResponseOutput> {
     logger.debug("Getting status for all guards");
 
     // Mock implementation - in real system would scan for all guards
@@ -179,7 +167,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
 
     const activeCount = mockGuards.filter((guard) => guard.isRunning).length;
 
-    const response: GuardStatusResponseType = {
+    const response: GuardStatusResponseOutput = {
       success: true,
       output: `📋 Found ${mockGuards.length} guard environment${mockGuards.length === 1 ? "" : "s"} (${activeCount} active)`, // eslint-disable-line i18next/no-literal-string
       guards: mockGuards,
@@ -190,5 +178,3 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
     return success(response);
   }
 }
-
-export const guardStatusRepository = new GuardStatusRepositoryImpl();

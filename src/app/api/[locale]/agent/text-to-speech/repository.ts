@@ -31,13 +31,8 @@ import type {
   TextToSpeechPostResponseOutput,
 } from "./definition";
 import { TtsVoice } from "./enum";
-import type { scopedTranslation } from "./i18n";
+import type { TextToSpeechT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Eden AI TTS response structure
- */
 interface EdenAITTSResponse {
   [provider: string]: {
     audio_resource_url?: string;
@@ -51,33 +46,33 @@ interface EdenAITTSResponse {
 }
 
 /**
- * Map locale to language code for TTS
- * Uses getLanguageFromLocale to extract language
- */
-function mapLocaleToLanguage(locale: CountryLanguage): string {
-  return getLanguageFromLocale(locale);
-}
-
-/**
- * Convert localized TtsVoiceValue to raw API string
- * Converts "voices.MALE" -> "MALE"
- */
-function convertVoiceToApiFormat(voice: string): "MALE" | "FEMALE" {
-  switch (voice) {
-    case TtsVoice.MALE:
-      return "MALE";
-    case TtsVoice.FEMALE:
-      return "FEMALE";
-    default:
-      // Default to MALE if unknown
-      return "FEMALE";
-  }
-}
-
-/**
  * Text-to-Speech Repository - Static class pattern
  */
 export class TextToSpeechRepository {
+  /**
+   * Map locale to language code for TTS
+   * Uses getLanguageFromLocale to extract language
+   */
+  private static mapLocaleToLanguage(locale: CountryLanguage): string {
+    return getLanguageFromLocale(locale);
+  }
+
+  /**
+   * Convert localized TtsVoiceValue to raw API string
+   * Converts "voices.MALE" -> "MALE"
+   */
+  private static convertVoiceToApiFormat(voice: string): "MALE" | "FEMALE" {
+    switch (voice) {
+      case TtsVoice.MALE:
+        return "MALE";
+      case TtsVoice.FEMALE:
+        return "FEMALE";
+      default:
+        // Default to MALE if unknown
+        return "FEMALE";
+    }
+  }
+
   /**
    * Convert text to speech
    */
@@ -86,12 +81,12 @@ export class TextToSpeechRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: TextToSpeechT,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
     // Server-side configuration
     const provider = "openai";
-    const language = mapLocaleToLanguage(locale);
-    const apiVoice = convertVoiceToApiFormat(data.voice);
+    const language = TextToSpeechRepository.mapLocaleToLanguage(locale);
+    const apiVoice = TextToSpeechRepository.convertVoiceToApiFormat(data.voice);
 
     logger.info("Starting text-to-speech conversion", {
       provider,
@@ -299,7 +294,7 @@ export class TextToSpeechRepository {
         });
       }
 
-      if (deductResult.partialDeduction) {
+      if (deductResult.data.partialDeduction) {
         logger.info(
           "TTS: Partial credit deduction (insufficient funds, deducted to 0)",
           {

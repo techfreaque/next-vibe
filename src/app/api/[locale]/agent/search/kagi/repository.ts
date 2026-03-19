@@ -5,7 +5,12 @@
 
 import "server-only";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/shared/types/response.schema";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
@@ -15,13 +20,8 @@ import type {
   KagiSearchGetRequestOutput,
   KagiSearchGetResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { KagiT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Kagi FastGPT API Response Types
- */
 interface KagiFastGPTReference {
   title: string;
   url: string;
@@ -29,30 +29,13 @@ interface KagiFastGPTReference {
 }
 
 interface KagiFastGPTResponse {
-  meta: {
-    id: string;
-    node: string;
-    ms: number;
-    api_balance: number | null;
-  };
+  meta: { id: string; node: string; ms: number; api_balance: number | null };
   data: {
     output: string;
     tokens: number;
     references: KagiFastGPTReference[];
   } | null;
-  error?: Array<{
-    code: number;
-    msg: string;
-  }>;
-}
-
-/**
- * Normalized Search Reference
- */
-export interface SearchReference {
-  title: string;
-  url: string;
-  snippet?: string;
+  error?: Array<{ code: number; msg: string }>;
 }
 
 /**
@@ -68,11 +51,8 @@ export class KagiSearchRepository {
   static async search(
     data: KagiSearchGetRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: KagiT,
   ): Promise<ResponseType<KagiSearchGetResponseOutput>> {
-    const { fail, success, ErrorResponseTypes } =
-      await import("next-vibe/shared/types/response.schema");
-
     // Guard: key not configured
     if (!agentEnv.KAGI_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.kagiSearch;
@@ -82,56 +62,38 @@ export class KagiSearchRepository {
       });
     }
 
-    try {
-      // Validate query
-      if (
-        !data.query ||
-        typeof data.query !== "string" ||
-        data.query.trim() === ""
-      ) {
-        return fail({
-          message: t("get.errors.queryEmpty.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        });
-      }
-
-      if (data.query.length > this.MAX_QUERY_LENGTH) {
-        return fail({
-          message: t("get.errors.queryTooLong.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { maxLength: this.MAX_QUERY_LENGTH },
-        });
-      }
-
-      const result = await this.fetchFastGPT(data.query);
-
-      return success({
-        success: true,
-        output: result.output,
-        references: result.references,
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
-      logger.error("Kagi Search error", {
-        error: errorMessage,
-        query: data.query,
-      });
-
-      if (error instanceof Error && error.name === "AbortError") {
-        return fail({
-          message: t("get.errors.timeout.title"),
-          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        });
-      }
-
+    // Validate query
+    if (
+      !data.query ||
+      typeof data.query !== "string" ||
+      data.query.trim() === ""
+    ) {
       return fail({
-        message: t("get.errors.searchFailed.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: t("get.errors.queryEmpty.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
+
+    if (data.query.length > this.MAX_QUERY_LENGTH) {
+      return fail({
+        message: t("get.errors.queryTooLong.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        messageParams: { maxLength: this.MAX_QUERY_LENGTH },
+      });
+    }
+
+    const fetchResult = await this.fetchFastGPT(data.query, logger, t);
+
+    if (!fetchResult.success) {
+      return fetchResult;
+    }
+
+    return success({
+      success: true,
+      output: fetchResult.data.output,
+      references: fetchResult.data.references,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   /**
@@ -139,7 +101,11 @@ export class KagiSearchRepository {
    */
   private static async fetchFastGPT(
     query: string,
-  ): Promise<{ output: string; references: SearchReference[] }> {
+    logger: EndpointLogger,
+    t: KagiT,
+  ): Promise<
+    ResponseType<{ output: string; references: KagiFastGPTReference[] }>
+  > {
     const url = "https://kagi.com/api/v0/fastgpt";
 
     const controller = new AbortController();
@@ -163,34 +129,56 @@ export class KagiSearchRepository {
       if (!response.ok) {
         const errorData = (await response.json()) as KagiFastGPTResponse;
         const errorMsg = errorData.error?.[0]?.msg ?? `HTTP ${response.status}`;
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-        throw new Error(`Kagi API error: ${errorMsg}`);
+        logger.error("Kagi Search API error", { error: errorMsg, query });
+        return fail({
+          message: t("get.errors.searchFailed.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       const data = (await response.json()) as KagiFastGPTResponse;
 
       if (data.error && data.error.length > 0) {
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-        throw new Error(`Kagi API error: ${data.error[0]?.msg}`);
+        const errorMsg = data.error[0]?.msg;
+        logger.error("Kagi API returned error", { error: errorMsg, query });
+        return fail({
+          message: t("get.errors.searchFailed.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       if (!data.data) {
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-        throw new Error("No data returned from Kagi API");
+        logger.error("Kagi API returned no data", { query });
+        return fail({
+          message: t("get.errors.searchFailed.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
-      return {
+      return success({
         output: data.data.output,
         references: data.data.references.map((ref) => ({
           title: this.sanitizeText(ref.title),
           url: ref.url,
           snippet: ref.snippet ? this.sanitizeText(ref.snippet) : undefined,
         })),
-      };
+      });
     } catch (error) {
       clearTimeout(timeoutId);
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw to propagate error to caller
-      throw error;
+      const isTimeout = error instanceof Error && error.name === "AbortError";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      logger.error("Kagi fetch error", { error: errorMessage });
+      if (isTimeout) {
+        return fail({
+          message: t("get.errors.timeout.title"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+      return fail({
+        message: t("get.errors.searchFailed.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
   }
 

@@ -6,12 +6,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { endpointsMetaGeneratorRepository } from "./repository";
+import { EndpointsMetaGeneratorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) =>
-      endpointsMetaGeneratorRepository.generateEndpointsMeta(data, logger, t),
+      EndpointsMetaGeneratorRepository.generateEndpointsMeta(data, logger, t),
   },
 });

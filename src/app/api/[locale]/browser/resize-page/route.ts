@@ -6,7 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import { executeResizePage, filterUndefinedArgs } from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import resizePageEndpoints, {
   type ResizePageResponseOutput,
 } from "./definition";
@@ -16,10 +16,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeResizePage<ResizePageResponseOutput>(
+      BrowserSharedRepository.executeResizePage<ResizePageResponseOutput>(
         {
           toolName: BrowserTool.RESIZE_PAGE,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             width: data.width,
             height: data.height,
           }),

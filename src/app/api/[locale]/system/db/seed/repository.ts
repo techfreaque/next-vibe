@@ -14,37 +14,20 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type endpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
+import type { SeedRequestOutput, SeedResponseOutput } from "./definition";
+import type { SeedT } from "./i18n";
 import { seedDatabase } from "./seed-manager";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type RequestType = typeof endpoints.POST.types.RequestOutput;
-type SeedResponseType = typeof endpoints.POST.types.ResponseOutput;
-
 /**
- * Run database seeds Repository Interface
+ * Run database seeds Repository
  */
-export interface SeedRepositoryInterface {
-  execute(
-    data: RequestType,
+export class SeedRepository {
+  static async execute(
+    data: SeedRequestOutput,
     locale: CountryLanguage,
-    t: ModuleT,
+    t: SeedT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<SeedResponseType>>;
-}
-
-/**
- * Run database seeds Repository Implementation
- */
-export class SeedRepositoryImpl implements SeedRepositoryInterface {
-  async execute(
-    data: RequestType,
-    locale: CountryLanguage,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SeedResponseType>> {
+  ): Promise<ResponseType<SeedResponseOutput>> {
     const startTime = Date.now();
 
     logger.debug("🚀 Seed repository execute method called", {
@@ -70,7 +53,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
 
         const duration = Date.now() - startTime;
 
-        const response: SeedResponseType = {
+        const response: SeedResponseOutput = {
           success: true,
           isDryRun: true,
           seedsExecuted: 0,
@@ -109,7 +92,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
       logger.debug("✅ Database seeding completed successfully");
 
       // Return success response with actual seed execution
-      const response: SeedResponseType = {
+      const response: SeedResponseOutput = {
         success: true,
         isDryRun: false,
         seedsExecuted: 1, // At least one seed module was executed
@@ -146,8 +129,3 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const seedRepository = new SeedRepositoryImpl();

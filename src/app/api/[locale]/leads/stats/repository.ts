@@ -52,46 +52,24 @@ import {
   mapStatusFilter,
 } from "../enum";
 import type {
+  LeadsStatsGroupedByCampaignStage,
+  LeadsStatsGroupedByConversionFunnel,
+  LeadsStatsGroupedByCountry,
+  LeadsStatsGroupedByEngagementLevel,
+  LeadsStatsGroupedByJourneyVariant,
+  LeadsStatsGroupedByLanguage,
+  LeadsStatsGroupedBySource,
+  LeadsStatsGroupedByStatus,
+  LeadsStatsGroupedStats,
+  LeadsStatsHistoricalData,
+  LeadsStatsRecentActivity,
   LeadsStatsRequestOutput,
   LeadsStatsResponseOutput,
+  LeadsStatsTopPerformingCampaigns,
+  LeadsStatsTopPerformingSources,
+  LeadsTopPerformingSource,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-// Constants for metric types to avoid literal strings
-const METRIC_TYPES = {
-  TOTAL: "total",
-  NEW: "new",
-  ACTIVE: "active",
-  CAMPAIGN_RUNNING: "campaign_running",
-  WEBSITE_USER: "website_user",
-  NEWSLETTER_SUBSCRIBER: "newsletter_subscriber",
-  CONVERTED: "converted",
-  SIGNED_UP: "signed_up",
-  SUBSCRIPTION_CONFIRMED: "subscription_confirmed",
-  UNSUBSCRIBED: "unsubscribed",
-  BOUNCED: "bounced",
-  INVALID: "invalid",
-  EMAILS_SENT: "emails_sent",
-  EMAILS_OPENED: "emails_opened",
-  EMAILS_CLICKED: "emails_clicked",
-} as const;
-
-// PostgreSQL date truncation constants
-const DATE_TRUNC = {
-  HOUR: "'hour'",
-  DAY: "'day'",
-  WEEK: "'week'",
-  MONTH: "'month'",
-  QUARTER: "'quarter'",
-  YEAR: "'year'",
-} as const;
-
-// Constants for default values
-const DEFAULT_VALUES = {
-  UNKNOWN_CAMPAIGN: "unknown_campaign",
-  UNKNOWN_SOURCE: "unknown_source",
-  UNKNOWN: "unknown",
-} as const;
+import type { LeadsStatsT } from "./i18n";
 
 // Type for historical metric query results
 interface HistoricalMetricResult {
@@ -99,33 +77,66 @@ interface HistoricalMetricResult {
   value: number;
 }
 
-// Map LeadStatus to ActivityType for recent activity
-const mapLeadStatusToActivityType = (
-  status: (typeof LeadStatus)[keyof typeof LeadStatus],
-): (typeof ActivityType)[keyof typeof ActivityType] => {
-  switch (status) {
-    case LeadStatus.NEW:
-      return ActivityType.LEAD_CREATED;
-    case LeadStatus.CAMPAIGN_RUNNING:
-    case LeadStatus.SIGNED_UP:
-    case LeadStatus.SUBSCRIPTION_CONFIRMED:
-      return ActivityType.LEAD_CONVERTED;
-    case LeadStatus.UNSUBSCRIBED:
-      return ActivityType.LEAD_UNSUBSCRIBED;
-    default:
-      return ActivityType.LEAD_UPDATED;
-  }
-};
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 export class LeadStatsRepository {
+  // Map LeadStatus to ActivityType for recent activity
+  private static mapLeadStatusToActivityType(
+    status: (typeof LeadStatus)[keyof typeof LeadStatus],
+  ): (typeof ActivityType)[keyof typeof ActivityType] {
+    switch (status) {
+      case LeadStatus.NEW:
+        return ActivityType.LEAD_CREATED;
+      case LeadStatus.CAMPAIGN_RUNNING:
+      case LeadStatus.SIGNED_UP:
+      case LeadStatus.SUBSCRIPTION_CONFIRMED:
+        return ActivityType.LEAD_CONVERTED;
+      case LeadStatus.UNSUBSCRIBED:
+        return ActivityType.LEAD_UNSUBSCRIBED;
+      default:
+        return ActivityType.LEAD_UPDATED;
+    }
+  }
+
+  // Constants for metric types to avoid literal strings
+  private static readonly METRIC_TYPES = {
+    TOTAL: "total",
+    NEW: "new",
+    ACTIVE: "active",
+    CAMPAIGN_RUNNING: "campaign_running",
+    WEBSITE_USER: "website_user",
+    NEWSLETTER_SUBSCRIBER: "newsletter_subscriber",
+    CONVERTED: "converted",
+    SIGNED_UP: "signed_up",
+    SUBSCRIPTION_CONFIRMED: "subscription_confirmed",
+    UNSUBSCRIBED: "unsubscribed",
+    BOUNCED: "bounced",
+    INVALID: "invalid",
+    EMAILS_SENT: "emails_sent",
+    EMAILS_OPENED: "emails_opened",
+    EMAILS_CLICKED: "emails_clicked",
+  } as const;
+
+  // PostgreSQL date truncation constants
+  private static readonly DATE_TRUNC = {
+    HOUR: "'hour'",
+    DAY: "'day'",
+    WEEK: "'week'",
+    MONTH: "'month'",
+    QUARTER: "'quarter'",
+    YEAR: "'year'",
+  } as const;
+
+  // Constants for default values
+  private static readonly DEFAULT_VALUES = {
+    UNKNOWN_CAMPAIGN: "unknown_campaign",
+    UNKNOWN_SOURCE: "unknown_source",
+    UNKNOWN: "unknown",
+  } as const;
   /**
    * Get comprehensive leads statistics
    */
   static async getLeadsStats(
     query: LeadsStatsRequestOutput,
-    t: ModuleT,
+    t: LeadsStatsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadsStatsResponseOutput>> {
     // Initialize date variables for error handling scope
@@ -580,7 +591,7 @@ export class LeadStatsRepository {
     timePeriod: TimePeriod,
     filters: LeadsStatsRequestOutput,
     logger: EndpointLogger,
-  ): Promise<LeadsStatsResponseOutput["historicalData"]> {
+  ): Promise<LeadsStatsHistoricalData> {
     try {
       logger.debug("Generating historical data", {
         dateFrom: dateFrom.toISOString(),
@@ -634,7 +645,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.NEW,
+          LeadStatsRepository.METRIC_TYPES.NEW,
           timePeriod,
           filters,
           logger,
@@ -642,7 +653,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.ACTIVE,
+          LeadStatsRepository.METRIC_TYPES.ACTIVE,
           timePeriod,
           filters,
           logger,
@@ -650,7 +661,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.CAMPAIGN_RUNNING,
+          LeadStatsRepository.METRIC_TYPES.CAMPAIGN_RUNNING,
           timePeriod,
           filters,
           logger,
@@ -658,7 +669,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.WEBSITE_USER,
+          LeadStatsRepository.METRIC_TYPES.WEBSITE_USER,
           timePeriod,
           filters,
           logger,
@@ -666,7 +677,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.NEWSLETTER_SUBSCRIBER,
+          LeadStatsRepository.METRIC_TYPES.NEWSLETTER_SUBSCRIBER,
           timePeriod,
           filters,
           logger,
@@ -674,7 +685,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.CONVERTED,
+          LeadStatsRepository.METRIC_TYPES.CONVERTED,
           timePeriod,
           filters,
           logger,
@@ -682,7 +693,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.SIGNED_UP,
+          LeadStatsRepository.METRIC_TYPES.SIGNED_UP,
           timePeriod,
           filters,
           logger,
@@ -690,7 +701,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.SUBSCRIPTION_CONFIRMED,
+          LeadStatsRepository.METRIC_TYPES.SUBSCRIPTION_CONFIRMED,
           timePeriod,
           filters,
           logger,
@@ -698,7 +709,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.UNSUBSCRIBED,
+          LeadStatsRepository.METRIC_TYPES.UNSUBSCRIBED,
           timePeriod,
           filters,
           logger,
@@ -706,7 +717,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.BOUNCED,
+          LeadStatsRepository.METRIC_TYPES.BOUNCED,
           timePeriod,
           filters,
           logger,
@@ -714,7 +725,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.INVALID,
+          LeadStatsRepository.METRIC_TYPES.INVALID,
           timePeriod,
           filters,
           logger,
@@ -722,7 +733,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.EMAILS_SENT,
+          LeadStatsRepository.METRIC_TYPES.EMAILS_SENT,
           timePeriod,
           filters,
           logger,
@@ -730,7 +741,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.EMAILS_OPENED,
+          LeadStatsRepository.METRIC_TYPES.EMAILS_OPENED,
           timePeriod,
           filters,
           logger,
@@ -738,7 +749,7 @@ export class LeadStatsRepository {
         LeadStatsRepository.getHistoricalMetric(
           intervals,
           whereConditions,
-          METRIC_TYPES.EMAILS_CLICKED,
+          LeadStatsRepository.METRIC_TYPES.EMAILS_CLICKED,
           timePeriod,
           filters,
           logger,
@@ -1015,7 +1026,7 @@ export class LeadStatsRepository {
    */
   private static async generateGroupedStats(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]> {
+  ): Promise<LeadsStatsGroupedStats> {
     // Get grouped statistics from database
     const [
       byStatusData,
@@ -1054,7 +1065,7 @@ export class LeadStatsRepository {
    */
   private static async generateRecentActivity(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["recentActivity"]> {
+  ): Promise<LeadsStatsRecentActivity> {
     // Get recent leads activity (last 10 activities)
     const recentLeads = await db
       .select({
@@ -1081,7 +1092,7 @@ export class LeadStatsRepository {
       leadEmail: lead.email || "",
       leadBusinessName: lead.businessName || "",
       timestamp: lead.timestamp.toISOString(),
-      type: mapLeadStatusToActivityType(lead.status),
+      type: LeadStatsRepository.mapLeadStatusToActivityType(lead.status),
       details: {
         status: lead.status,
         source: lead.source || "unknown",
@@ -1103,7 +1114,7 @@ export class LeadStatsRepository {
    */
   private static async generateTopPerformingCampaigns(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["topPerformingCampaigns"]> {
+  ): Promise<LeadsStatsTopPerformingCampaigns> {
     // Get top performing campaigns based on conversion rates
     const campaignStats = await db
       .select({
@@ -1130,8 +1141,10 @@ export class LeadStatsRepository {
       const emailsClicked = Number(campaign.emailsClicked);
 
       return {
-        campaignId: campaign.stage || DEFAULT_VALUES.UNKNOWN,
-        campaignName: campaign.stage || DEFAULT_VALUES.UNKNOWN_CAMPAIGN,
+        campaignId:
+          campaign.stage || LeadStatsRepository.DEFAULT_VALUES.UNKNOWN,
+        campaignName:
+          campaign.stage || LeadStatsRepository.DEFAULT_VALUES.UNKNOWN_CAMPAIGN,
         leadsGenerated: totalLeads,
         conversionRate: totalLeads > 0 ? convertedLeads / totalLeads : 0,
         openRate: emailsSent > 0 ? emailsOpened / emailsSent : 0,
@@ -1145,7 +1158,7 @@ export class LeadStatsRepository {
    */
   private static async generateTopPerformingSources(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["topPerformingSources"]> {
+  ): Promise<LeadsStatsTopPerformingSources> {
     // Get top performing sources based on conversion rates
     const sourceStats = await db
       .select({
@@ -1177,7 +1190,7 @@ export class LeadStatsRepository {
         leadsGenerated: totalLeads,
         conversionRate: totalLeads > 0 ? convertedLeads / totalLeads : 0,
         qualityScore: totalLeads > 0 ? (convertedLeads / totalLeads) * 10 : 0, // Simple quality score based on conversion rate
-      } satisfies LeadsStatsResponseOutput["topPerformingSources"][number];
+      } satisfies LeadsTopPerformingSource;
     });
   }
 
@@ -1392,7 +1405,7 @@ export class LeadStatsRepository {
 
       // Build efficient query based on metric type
       switch (metricType) {
-        case METRIC_TYPES.TOTAL: {
+        case LeadStatsRepository.METRIC_TYPES.TOTAL: {
           // For total leads, we need to calculate cumulative totals properly
           // Get all leads created up to each time period, not just in that period
           query = db
@@ -1409,7 +1422,7 @@ export class LeadStatsRepository {
           break;
         }
 
-        case METRIC_TYPES.NEW: {
+        case LeadStatsRepository.METRIC_TYPES.NEW: {
           // For "new" leads, we count leads created in each time period (same as total for historical data)
           query = db
             .select({
@@ -1425,7 +1438,7 @@ export class LeadStatsRepository {
           break;
         }
 
-        case METRIC_TYPES.ACTIVE: {
+        case LeadStatsRepository.METRIC_TYPES.ACTIVE: {
           // For active leads, use lastEngagementAt or updatedAt to better reflect activity
           const activeConditions: SQL[] = [
             notInArray(leads.status, [
@@ -1876,7 +1889,7 @@ export class LeadStatsRepository {
       const periodData = await LeadStatsRepository.getHistoricalMetric(
         intervals,
         whereConditions,
-        METRIC_TYPES.NEW,
+        LeadStatsRepository.METRIC_TYPES.NEW,
         timePeriod,
         filters,
         logger,
@@ -1973,19 +1986,19 @@ export class LeadStatsRepository {
   private static getDateTruncString(timePeriod: TimePeriod): string {
     switch (timePeriod) {
       case TimePeriod.HOUR:
-        return DATE_TRUNC.HOUR;
+        return LeadStatsRepository.DATE_TRUNC.HOUR;
       case TimePeriod.DAY:
-        return DATE_TRUNC.DAY;
+        return LeadStatsRepository.DATE_TRUNC.DAY;
       case TimePeriod.WEEK:
-        return DATE_TRUNC.WEEK;
+        return LeadStatsRepository.DATE_TRUNC.WEEK;
       case TimePeriod.MONTH:
-        return DATE_TRUNC.MONTH;
+        return LeadStatsRepository.DATE_TRUNC.MONTH;
       case TimePeriod.QUARTER:
-        return DATE_TRUNC.QUARTER;
+        return LeadStatsRepository.DATE_TRUNC.QUARTER;
       case TimePeriod.YEAR:
-        return DATE_TRUNC.YEAR;
+        return LeadStatsRepository.DATE_TRUNC.YEAR;
       default:
-        return DATE_TRUNC.DAY;
+        return LeadStatsRepository.DATE_TRUNC.DAY;
     }
   }
 
@@ -2167,7 +2180,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedByStatus(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byStatus"]> {
+  ): Promise<LeadsStatsGroupedByStatus> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2199,7 +2212,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedBySource(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["bySource"]> {
+  ): Promise<LeadsStatsGroupedBySource> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2233,7 +2246,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedByCountry(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCountry"]> {
+  ): Promise<LeadsStatsGroupedByCountry> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2267,7 +2280,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedByLanguage(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byLanguage"]> {
+  ): Promise<LeadsStatsGroupedByLanguage> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2301,7 +2314,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedByCampaignStage(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byCampaignStage"]> {
+  ): Promise<LeadsStatsGroupedByCampaignStage> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -2980,7 +2993,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedByJourneyVariant(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byJourneyVariant"]> {
+  ): Promise<LeadsStatsGroupedByJourneyVariant> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -3016,7 +3029,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedByEngagementLevel(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byEngagementLevel"]> {
+  ): Promise<LeadsStatsGroupedByEngagementLevel> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -3068,7 +3081,7 @@ export class LeadStatsRepository {
    */
   private static async getGroupedByConversionFunnel(
     whereConditions: SQL | undefined,
-  ): Promise<LeadsStatsResponseOutput["groupedStats"]["byConversionFunnel"]> {
+  ): Promise<LeadsStatsGroupedByConversionFunnel> {
     // Get total count for percentage calculation
     const totalCountResult = await db
       .select({ count: count() })
@@ -3114,7 +3127,7 @@ export class LeadStatsRepository {
   /**
    * Create an empty historical data structure for error fallback
    */
-  private static createEmptyHistoricalDataStructure(): LeadsStatsResponseOutput["historicalData"] {
+  private static createEmptyHistoricalDataStructure(): LeadsStatsHistoricalData {
     const emptyData = {
       name: "errors.server.title" as const,
       type: "line" as ChartType,

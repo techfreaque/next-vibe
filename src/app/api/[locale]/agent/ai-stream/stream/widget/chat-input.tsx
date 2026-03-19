@@ -68,6 +68,26 @@ export interface WidgetChatInputProps {
   threadHref?: string | null;
   /** Called when the cancel/stop button is clicked */
   onCancel?: () => void;
+  /**
+   * Optional override for the Selector slot.
+   * When provided, replaces the default <Selector> with a custom element
+   * (e.g. a filtered model picker that only shows specific models).
+   */
+  selectorSlot?: ReactNode;
+  /**
+   * Optional mic / voice-input button rendered to the right of the send button.
+   * Caller is responsible for wiring up the recording logic.
+   */
+  micSlot?: ReactNode;
+  /**
+   * When true, suppresses the tools button even if the model supports tools.
+   */
+  hideTools?: boolean;
+  /**
+   * When true, hides the textarea and mic/send button while keeping the selector slot.
+   * Useful for "sent" state in single-turn widgets.
+   */
+  hideInputWhenSubmitting?: boolean;
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -90,6 +110,10 @@ export function WidgetChatInput({
   disabled = false,
   threadHref,
   onCancel,
+  selectorSlot,
+  micSlot,
+  hideTools = false,
+  hideInputWhenSubmitting = false,
 }: WidgetChatInputProps): JSX.Element {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -150,8 +174,8 @@ export function WidgetChatInput({
         className,
       )}
     >
-      {/* Input area — hidden in disabled mode */}
-      {!disabled && (
+      {/* Input area — hidden in disabled mode or when hideInputWhenSubmitting+submitting */}
+      {!disabled && !(hideInputWhenSubmitting && isSubmitting) && (
         <Div className="relative mb-2 @sm:mb-3">
           <Textarea
             ref={inputRef}
@@ -201,17 +225,19 @@ export function WidgetChatInput({
             disabled && "pointer-events-none",
           )}
         >
-          <Selector
-            skillId={skillId}
-            modelId={modelId}
-            locale={locale}
-            buttonClassName={cn(
-              "px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9",
-              disabled && "opacity-70",
-            )}
-          />
+          {selectorSlot ?? (
+            <Selector
+              skillId={skillId}
+              modelId={modelId}
+              locale={locale}
+              buttonClassName={cn(
+                "px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9",
+                disabled && "opacity-70",
+              )}
+            />
+          )}
 
-          {modelSupportsTools && (
+          {modelSupportsTools && !hideTools && (
             <ToolsButton
               disabled={isInactive}
               locale={locale}
@@ -238,68 +264,74 @@ export function WidgetChatInput({
           )}
         </Div>
 
-        {/* Right: Go-to-thread (disabled) / Send / Stop */}
-        {disabled ? (
-          threadHref && (
+        {/* Right: mic slot + Go-to-thread (disabled) / Send / Stop */}
+        {micSlot &&
+          !isSubmitting &&
+          !disabled &&
+          !(hideInputWhenSubmitting && isSubmitting) &&
+          micSlot}
+        {!(hideInputWhenSubmitting && isSubmitting) &&
+          (disabled ? (
+            threadHref && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-8 w-8 @sm:h-9 @sm:w-9"
+                      onClick={() => {
+                        window.open(threadHref, "_blank");
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{"Open thread"}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )
+          ) : isSubmitting ? (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     type="button"
                     size="icon"
-                    variant="outline"
+                    variant="destructive"
                     className="h-8 w-8 @sm:h-9 @sm:w-9"
-                    onClick={() => {
-                      window.open(threadHref, "_blank");
-                    }}
+                    onClick={onCancel}
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <Square className="h-3.5 w-3.5 fill-current" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{"Open thread"}</TooltipContent>
+                <TooltipContent>
+                  {t("app.chat.actions.stopGeneration")}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )
-        ) : isSubmitting ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="destructive"
-                  className="h-8 w-8 @sm:h-9 @sm:w-9"
-                  onClick={onCancel}
-                >
-                  <Square className="h-3.5 w-3.5 fill-current" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {t("app.chat.actions.stopGeneration")}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="default"
-                  disabled={!canSubmit}
-                  onClick={onSubmit}
-                  className="h-8 w-8 @sm:h-9 @sm:w-9"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {t("app.chat.actions.sendMessage")}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
+          ) : (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="default"
+                    disabled={!canSubmit}
+                    onClick={onSubmit}
+                    className="h-8 w-8 @sm:h-9 @sm:w-9"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {t("app.chat.actions.sendMessage")}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
       </Div>
 
       {/* Advanced section */}

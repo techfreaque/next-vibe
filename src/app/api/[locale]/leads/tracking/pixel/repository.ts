@@ -14,20 +14,15 @@ import { scopedTranslation as leadsScopedTranslation } from "../../i18n";
 import { leadId } from "../../types";
 import { LeadTrackingRepository } from "../repository";
 
-const pixelTrackingRequestSchema = z.object({
-  leadId: leadId,
-  campaignId: z.uuid().optional(),
-  t: z.string().optional(), // Timestamp parameter to prevent caching
-});
-
-export type PixelTrackingRequestType = z.infer<
-  typeof pixelTrackingRequestSchema
->;
-
 /**
  * Repository for handling tracking pixel requests
  */
 export class PixelTrackingRepository {
+  private static readonly pixelTrackingRequestSchema = z.object({
+    leadId: leadId,
+    campaignId: z.uuid().optional(),
+    t: z.string().optional(), // Timestamp parameter to prevent caching
+  });
   /**
    * Handle pixel tracking request
    * Returns a 1x1 transparent GIF and records engagement asynchronously
@@ -129,7 +124,7 @@ export class PixelTrackingRepository {
    */
   private static validateTrackingParams(searchParams: URLSearchParams): {
     success: boolean;
-    data?: PixelTrackingRequestType;
+    data?: z.infer<typeof PixelTrackingRepository.pixelTrackingRequestSchema>;
     error?: string;
   } {
     try {
@@ -144,7 +139,10 @@ export class PixelTrackingRepository {
         Object.entries(params).filter(([, value]) => value !== null),
       );
 
-      const result = pixelTrackingRequestSchema.safeParse(filteredParams);
+      const result =
+        PixelTrackingRepository.pixelTrackingRequestSchema.safeParse(
+          filteredParams,
+        );
 
       if (!result.success) {
         // Use Zod's built-in error formatting

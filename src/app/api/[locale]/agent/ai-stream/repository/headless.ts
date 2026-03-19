@@ -337,7 +337,7 @@ export async function runHeadlessAiStream(
     if (preCalls && preCalls.length > 0 && !isIncognito) {
       // Ensure the thread exists first
       const userId = user.isPublic ? undefined : user.id;
-      await ThreadsRepository.ensureThread({
+      const ensureResult = await ThreadsRepository.ensureThread({
         threadId: effectiveThreadId,
         rootFolderId,
         subFolderId: subFolderId ?? null,
@@ -349,6 +349,9 @@ export async function runHeadlessAiStream(
         user,
         locale,
       });
+      if (!ensureResult.success) {
+        return ensureResult;
+      }
 
       // Write the user message first
       await db.insert(chatMessages).values({

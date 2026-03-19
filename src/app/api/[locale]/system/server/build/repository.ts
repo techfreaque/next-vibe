@@ -15,98 +15,44 @@ import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { scopedTranslation } from "./i18n";
-import { databaseMigrationRepository } from "../../db/migrate/repository";
+import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
 import { scopedTranslation as builderScopedTranslation } from "../../builder/i18n";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
-import { generateAllRepository } from "../../generators/generate-all/repository";
-import type endpoints from "./definition";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-type RequestType = typeof endpoints.POST.types.RequestOutput;
-type BuildResponseType = typeof endpoints.POST.types.ResponseOutput;
-
-// Repository messages
-const MESSAGES = {
-  BUILD_START: "🚀 Starting application build...",
-  PACKAGE_BUILD_START: "Building package...",
-  PACKAGE_BUILD_SUCCESS: "✅ Package build completed successfully",
-  PACKAGE_BUILD_FAILED: "Package build failed",
-  BUILD_PREREQUISITES: "Running build prerequisites...",
-  SKIP_GENERATION: "Skipping API endpoint generation (--skip-generation)",
-  GENERATING_ENDPOINTS: "Generating API endpoints...",
-  GENERATION_SUCCESS: "✅ Code generation completed successfully",
-  GENERATION_FAILED: "Code generation failed",
-  SKIP_NEXT_BUILD: "Skipping Next.js build (will be handled by package.json)",
-  BUILDING_NEXTJS: "Building Next.js application...",
-  NEXTJS_BUILD_SUCCESS: "✅ Next.js build completed successfully",
-  NEXTJS_BUILD_FAILED: "Next.js build failed",
-  SKIP_PROD_DB:
-    "Skipping production database operations (--run-prod-database=false)",
-  BUILD_FAILED: "❌ Build failed",
-  SCHEMA_GENERATION_START: "Generating database schema...",
-  SCHEMA_GENERATION_SUCCESS: "✅ Database schema generation completed",
-  SCHEMA_GENERATION_FAILED: "Database schema generation failed",
-  SKIP_SCHEMA_GENERATION:
-    "Skipping database schema generation (--run-prod-database=false)",
-  REPORTS_GENERATION_START: "Generating all reports...",
-  REPORTS_GENERATION_SUCCESS: "✅ Reports generation completed",
-  REPORTS_GENERATION_FAILED: "Reports generation failed",
-  PROD_DB_START: "Running production database operations...",
-  PROD_DB_SUCCESS: "✅ Production database operations completed successfully",
-  PROD_DB_FAILED: "Production database operations failed",
-  PROD_DB_NOT_READY: "Production database is not ready",
-  DEPLOYMENT_READY: "✅ Application is ready for deployment",
-  DB_CONNECTION_ERROR:
-    "Database connection failed. Please ensure the database is running and accessible.",
-  DB_START_SUGGESTION:
-    "Try running 'docker compose -f docker-compose-dev.yml up -d' to start the database",
-  FAILED_PROD_MIGRATIONS: "Failed to run production migrations",
-} as const;
+import { GenerateAllRepository } from "../../generators/generate-all/repository";
+import type { BuildRequestOutput, BuildResponseOutput } from "./definition";
+import type { ServerBuildT } from "./i18n";
 
 /**
- * Build the application Repository Interface
+ * Build Repository
  */
-export interface BuildRepositoryInterface {
-  execute(
-    data: RequestType,
+export class BuildRepository {
+  static async execute(
+    data: BuildRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<BuildResponseType>>;
-}
-
-/**
- * Build the application Repository Implementation
- */
-export class BuildRepositoryImpl implements BuildRepositoryInterface {
-  async execute(
-    data: RequestType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<BuildResponseType>> {
+    t: ServerBuildT,
+  ): Promise<ResponseType<BuildResponseOutput>> {
+    type BuildResponseType = BuildResponseOutput;
     const startTime = Date.now();
     const output: string[] = [];
     const errors: string[] = [];
     const steps: Array<{ label: string; ok: boolean; skipped: boolean }> = [];
 
     try {
-      output.push(MESSAGES.BUILD_START);
+      output.push(t("post.repository.messages.buildStart"));
 
       // Generate API endpoints first — package build (vibe-runtime) bundles
       // interactive.cli.tsx which statically imports generated/endpoints-meta/en,
       // so generated files must exist before the package build runs.
       if (!data.generate) {
-        output.push(MESSAGES.SKIP_GENERATION);
+        output.push(t("post.repository.messages.skipGeneration"));
         steps.push({ label: "Generate", ok: true, skipped: true });
       } else {
-        output.push(MESSAGES.GENERATING_ENDPOINTS);
+        output.push(t("post.repository.messages.generatingEndpoints"));
         try {
-          const generateResult = await generateAllRepository.generateAll(
+          const generateResult = await GenerateAllRepository.generateAll(
             {
               outputDir: "src/app/api/[locale]/v1",
               verbose: false,
@@ -121,11 +67,11 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           );
 
           if (generateResult.success) {
-            output.push(MESSAGES.GENERATION_SUCCESS);
+            output.push(t("post.repository.messages.generationSuccess"));
             steps.push({ label: "Generate", ok: true, skipped: false });
           } else {
             steps.push({ label: "Generate", ok: false, skipped: false });
-            errors.push(MESSAGES.GENERATION_FAILED);
+            errors.push(t("post.repository.messages.generationFailed"));
             if (!data.force) {
               const response: BuildResponseType = {
                 success: false,
@@ -138,7 +84,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             }
           }
         } catch (generatorError) {
-          const errorMsg = `${MESSAGES.GENERATION_FAILED}: ${parseError(generatorError).message}`;
+          const errorMsg = `${t("post.repository.messages.generationFailed")}: ${parseError(generatorError).message}`;
           steps.push({ label: "Generate", ok: false, skipped: false });
           errors.push(errorMsg);
           if (!data.force) {
@@ -156,7 +102,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
       if (data.package) {
         // Build package using the builder with build.config.ts
-        output.push(MESSAGES.PACKAGE_BUILD_START);
+        output.push(t("post.repository.messages.packageBuildStart"));
         const { builderRepository } = await import("../../builder/repository");
         const { t: builderT } = builderScopedTranslation.scopedT(locale);
         const builderResult = await builderRepository.execute(
@@ -168,11 +114,21 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         );
         if (builderResult.success && builderResult.data) {
           output.push(builderResult.data.output);
-          output.push(MESSAGES.PACKAGE_BUILD_SUCCESS);
+          output.push(t("post.repository.messages.packageBuildSuccess"));
           steps.push({ label: "Package", ok: true, skipped: false });
         } else {
           steps.push({ label: "Package", ok: false, skipped: false });
-          errors.push(MESSAGES.PACKAGE_BUILD_FAILED);
+          errors.push(t("post.repository.messages.packageBuildFailed"));
+          if (!builderResult.success) {
+            const detail =
+              builderResult.messageParams &&
+              typeof builderResult.messageParams["error"] === "string"
+                ? builderResult.messageParams["error"]
+                : builderResult.message;
+            if (detail) {
+              errors.push(detail);
+            }
+          }
           if (!data.force) {
             const response: BuildResponseType = {
               success: false,
@@ -187,7 +143,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       }
 
       if (!data.nextBuild) {
-        output.push(MESSAGES.SKIP_NEXT_BUILD);
+        output.push(t("post.repository.messages.skipNextBuild"));
         steps.push({ label: "Next.js", ok: true, skipped: true });
       } else if (data.tanstack) {
         // Build TanStack Start (SSR) via vibe builder (uses build.config.ts)
@@ -231,7 +187,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         }
       } else {
         // Build Next.js application with proper NODE_ENV
-        output.push(MESSAGES.BUILDING_NEXTJS);
+        output.push(t("post.repository.messages.buildingNextjs"));
 
         // Run Next.js build command using bun (works in both dev and Docker)
         const { execSync } = await import("node:child_process");
@@ -245,11 +201,11 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               NEXT_DIST_DIR: ".next-prod",
             },
           });
-          output.push(MESSAGES.NEXTJS_BUILD_SUCCESS);
+          output.push(t("post.repository.messages.nextjsBuildSuccess"));
           steps.push({ label: "Next.js", ok: true, skipped: false });
         } catch (buildError) {
           const parsedError = parseError(buildError);
-          const errorMsg = `${MESSAGES.NEXTJS_BUILD_FAILED}: ${parsedError.message}`;
+          const errorMsg = `${t("post.repository.messages.nextjsBuildFailed")}: ${parsedError.message}`;
           steps.push({ label: "Next.js", ok: false, skipped: false });
           errors.push(errorMsg);
 
@@ -272,26 +228,26 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         process.env["NEXT_PUBLIC_LOCAL_MODE"] === "true"
       ) {
         try {
-          const { dbUtilsRepository } =
+          const { DbUtilsRepository } =
             await import("../../db/utils/repository");
           const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
-          const dockerCheckResult = await dbUtilsRepository.isDockerAvailable(
+          const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
             dbUtilsT,
             logger,
           );
 
           if (dockerCheckResult.success && dockerCheckResult.data) {
-            output.push(MESSAGES.PROD_DB_START);
+            output.push(t("post.repository.messages.prodDbStart"));
             output.push(
               "🐘 Starting preview PostgreSQL (docker-compose.preview.yml)...",
             );
 
-            const { dockerOperationsRepository } =
+            const { DockerOperationsRepository } =
               await import("../../db/utils/docker-operations/repository");
             const { t: dockerOpsT } =
               dockerOperationsScopedTranslation.scopedT(locale);
             const dbStartResult =
-              await dockerOperationsRepository.dockerComposeUp(
+              await DockerOperationsRepository.dockerComposeUp(
                 logger,
                 dockerOpsT,
                 "docker-compose.preview.yml",
@@ -313,7 +269,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             }
 
             // Wait for database to be ready
-            await this.waitForPreviewDb(logger);
+            await BuildRepository.waitForPreviewDb(logger);
           }
         } catch (error) {
           logger.warn("Preview DB setup failed, continuing anyway", {
@@ -324,12 +280,12 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
       // Run production database operations after successful build
       if (data.migrate || data.seed) {
-        output.push(MESSAGES.PROD_DB_START);
+        output.push(t("post.repository.messages.prodDbStart"));
         try {
           if (data.migrate) {
             const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
             const migrateResult =
-              await databaseMigrationRepository.runMigrations(
+              await DatabaseMigrationRepository.runMigrations(
                 {
                   generate: false,
                   dryRun: false,
@@ -342,12 +298,14 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
             if (!migrateResult.success) {
               steps.push({ label: "Migrate", ok: false, skipped: false });
-              errors.push(MESSAGES.FAILED_PROD_MIGRATIONS);
+              errors.push(t("post.repository.messages.failedProdMigrations"));
               if (!data.force) {
                 return fail({
                   message: t("post.errors.server.title"),
                   errorType: ErrorResponseTypes.DATABASE_ERROR,
-                  messageParams: { error: MESSAGES.FAILED_PROD_MIGRATIONS },
+                  messageParams: {
+                    error: t("post.repository.messages.failedProdMigrations"),
+                  },
                   cause: migrateResult,
                 });
               }
@@ -361,16 +319,16 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             steps.push({ label: "Seed", ok: true, skipped: false });
           }
 
-          output.push(MESSAGES.PROD_DB_SUCCESS);
+          output.push(t("post.repository.messages.prodDbSuccess"));
         } catch (dbError) {
           const parsedError = parseError(dbError);
-          let errorMsg = `${MESSAGES.PROD_DB_FAILED}: ${parsedError.message}`;
+          let errorMsg = `${t("post.repository.messages.prodDbFailed")}: ${parsedError.message}`;
 
           if (
             parsedError.message.includes("ECONNREFUSED") ||
             parsedError.message.includes("connect")
           ) {
-            errorMsg = `${MESSAGES.PROD_DB_FAILED}: ${MESSAGES.DB_CONNECTION_ERROR}`;
+            errorMsg = `${t("post.repository.messages.prodDbFailed")}: ${t("post.repository.messages.dbConnectionError")}`;
           }
 
           steps.push({ label: "DB", ok: false, skipped: false });
@@ -382,13 +340,13 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               messageParams: {
                 error: errorMsg,
                 details: parsedError.message,
-                suggestion: MESSAGES.DB_START_SUGGESTION,
+                suggestion: t("post.repository.messages.dbStartSuggestion"),
               },
             });
           }
         }
       } else {
-        output.push(MESSAGES.SKIP_PROD_DB);
+        output.push(t("post.repository.messages.skipProdDb"));
         if (data.migrate === false) {
           steps.push({ label: "Migrate", ok: true, skipped: true });
         }
@@ -411,7 +369,9 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
     } catch (error) {
       const parsedError = parseError(error);
 
-      errors.push(`${MESSAGES.BUILD_FAILED}: ${parsedError.message}`);
+      errors.push(
+        `${t("post.repository.messages.buildFailed")}: ${parsedError.message}`,
+      );
 
       // Return error response with proper structure
       return fail({
@@ -427,7 +387,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
   /**
    * Wait for preview database connection to be ready
    */
-  private async waitForPreviewDb(logger: EndpointLogger): Promise<void> {
+  private static async waitForPreviewDb(logger: EndpointLogger): Promise<void> {
     const maxAttempts = 60;
     const delayMs = 500;
 
@@ -467,8 +427,3 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const buildRepository = new BuildRepositoryImpl();

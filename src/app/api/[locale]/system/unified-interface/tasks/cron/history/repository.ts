@@ -33,12 +33,11 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { cronTaskExecutions, cronTasks } from "../../cron/db";
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import type {
+  CronHistoryExecution,
   CronHistoryRequestOutput,
   CronHistoryResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { CronHistoryT } from "./i18n";
 
 /**
  * Repository implementation
@@ -47,7 +46,7 @@ export class CronHistoryRepository {
   static async getTaskHistory(
     data: CronHistoryRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: CronHistoryT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronHistoryResponseOutput>> {
     try {
@@ -215,7 +214,7 @@ export class CronHistoryRepository {
       // Database already returns correct enum types, no parsing needed
       const response: CronHistoryResponseOutput = {
         executions: executions.map((exec) => {
-          const execution: CronHistoryResponseOutput["executions"][number] = {
+          const execution: CronHistoryExecution = {
             id: exec.id,
             taskId: exec.taskId,
             taskName: exec.taskName ?? t("errors.cronTaskNotFound"),

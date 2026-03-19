@@ -7,7 +7,6 @@ import "server-only";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { scopedTranslation as leadsScopedTranslation } from "../../i18n";
 import { LeadTrackingRepository } from "../repository";
 import definitions from "./definition";
 
@@ -17,29 +16,17 @@ import definitions from "./definition";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ data, request, locale, user, logger }) => {
-      const clientInfo = LeadTrackingRepository.extractClientInfo(request);
-      const leadsT = leadsScopedTranslation.scopedT(locale).t;
-      return await LeadTrackingRepository.handleEngagementWithRelationship(
+    handler: ({ data, request, locale, user, logger }) =>
+      LeadTrackingRepository.handleEngagementWithRelationship(
         data,
-        clientInfo,
+        LeadTrackingRepository.extractClientInfo(request),
         locale,
-        leadsT,
         user,
         logger,
-      );
-    },
+      ),
   },
   [Methods.GET]: {
-    handler: async ({ data, user, locale, logger }) => {
-      const leadsT = leadsScopedTranslation.scopedT(locale).t;
-      return await LeadTrackingRepository.handleClickTracking(
-        data,
-        user,
-        locale,
-        logger,
-        leadsT,
-      );
-    },
+    handler: ({ data, user, locale, logger }) =>
+      LeadTrackingRepository.handleClickTracking(data, user, locale, logger),
   },
 });

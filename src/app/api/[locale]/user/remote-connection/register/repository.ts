@@ -27,199 +27,198 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { instanceIdentities, remoteConnections } from "../db";
-import {
-  deriveDefaultSelfInstanceId,
-  encryptToken,
-  invalidateInstanceIdCache,
-} from "../repository";
+import { RemoteConnectionRepository } from "../repository";
 import type { RemoteRegisterPostRequestInput } from "./definition";
 import type { RemoteRegisterT } from "./i18n";
 
-/**
- * Ping a localUrl to check if it is directly reachable via HTTP.
- * Used at connect time and on re-sync to set isDirectlyAccessible.
- * Tries GET /api/health with a 5s timeout. Returns true only if 2xx response.
- */
-export async function checkDirectAccessibility(
-  localUrl: string | null | undefined,
-  logger: EndpointLogger,
-): Promise<boolean> {
-  if (!localUrl) {
-    return false;
-  }
-  try {
-    const healthUrl = `${localUrl.replace(/\/$/, "")}/api/health`;
-    const resp = await fetch(healthUrl, {
-      method: "GET",
-      signal: AbortSignal.timeout(5000),
-    });
-    return resp.ok;
-  } catch {
-    logger.debug(
-      "[REGISTER] Accessibility ping failed (expected for NAT/private networks)",
-      {
-        localUrl,
-      },
-    );
-    return false;
-  }
-}
-
-export async function registerLocalInstance(
-  data: RemoteRegisterPostRequestInput,
-  user: JwtPrivatePayloadType,
-  logger: EndpointLogger,
-  t: RemoteRegisterT,
-): Promise<
-  ResponseType<{
-    registered: boolean;
-    remoteInstanceId: string;
-    remoteFriendlyName: string | null;
-  }>
-> {
-  const { instanceId, localUrl, reverseToken, reverseLeadId } = data;
-
-  // Reject if the remote's instanceId collides with our own self-identity.
-  const selfInstanceId = deriveDefaultSelfInstanceId();
-  if (instanceId === selfInstanceId) {
-    logger.warn("[REGISTER] Instance ID collides with cloud self-identity", {
-      userId: user.id,
-      instanceId,
-      selfInstanceId,
-    });
-    return fail({
-      message: t("post.errors.conflict.title"),
-      errorType: ErrorResponseTypes.CONFLICT,
-    });
-  }
-
-  // Upsert cloud-side record with optional reverse token for bidirectional auth.
-  // remoteInstanceId = instanceId: the connecting client's own identity, used by
-  // execute-tool to set targetInstance correctly when routing tasks back to this client.
-  // reverseToken: JWT from the connecting instance, encrypted before storage. Enables
-  // this instance to call /report on the connector (push task completion status back).
-  // Reconnect is allowed — update localUrl/isActive if the record already exists.
-  const encryptedReverseToken = reverseToken
-    ? encryptToken(reverseToken)
-    : null;
-
-  await db
-    .insert(remoteConnections)
-    .values({
-      userId: user.id,
-      instanceId,
-      friendlyName: data.friendlyName ?? instanceId,
-      remoteFriendlyName: data.friendlyName ?? null,
-      remoteUrl: localUrl, // from cloud's perspective, the local IS the remote
-      localUrl,
-      token: encryptedReverseToken,
-      leadId: reverseLeadId ?? null,
-      isActive: true,
-      remoteInstanceId: instanceId,
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: [remoteConnections.userId, remoteConnections.instanceId],
-      set: {
-        localUrl,
-        remoteUrl: localUrl,
-        remoteFriendlyName: data.friendlyName ?? null,
-        isActive: true,
-        remoteInstanceId: instanceId,
-        ...(encryptedReverseToken ? { token: encryptedReverseToken } : {}),
-        ...(reverseLeadId ? { leadId: reverseLeadId } : {}),
-        updatedAt: new Date(),
-      },
-    });
-
-  logger.info("Registered local instance on cloud", {
-    userId: user.id,
-    instanceId,
-    localUrl,
-  });
-
-  // Ping localUrl to check direct accessibility.
-  // If reachable: set isDirectlyAccessible=true so execute-tool can use direct HTTP.
-  // If not reachable (NAT, firewall): keep false, fall back to task-queue pull.
-  // Fire-and-forget: registration succeeds regardless of ping result.
-  void (async (): Promise<void> => {
-    const isDirectlyAccessible = await checkDirectAccessibility(
-      localUrl,
-      logger,
-    );
-    if (isDirectlyAccessible) {
-      try {
-        await db
-          .update(remoteConnections)
-          .set({ isDirectlyAccessible: true, updatedAt: new Date() })
-          .where(
-            and(
-              eq(remoteConnections.userId, user.id),
-              eq(remoteConnections.instanceId, instanceId),
-            ),
-          );
-        logger.info("[REGISTER] Local instance is directly accessible", {
-          instanceId,
-          localUrl,
-        });
-      } catch (updateErr) {
-        logger.warn(
-          "[REGISTER] Failed to update isDirectlyAccessible (non-fatal)",
-          {
-            instanceId,
-            error:
-              updateErr instanceof Error
-                ? updateErr.message
-                : String(updateErr),
-          },
-        );
-      }
-    } else {
-      logger.info(
-        "[REGISTER] Local instance not directly accessible — using task-queue",
+export class RemoteConnectionRegisterRepository {
+  /**
+   * Ping a localUrl to check if it is directly reachable via HTTP.
+   * Used at connect time and on re-sync to set isDirectlyAccessible.
+   * Tries GET /api/health with a 5s timeout. Returns true only if 2xx response.
+   */
+  static async checkDirectAccessibility(
+    localUrl: string | null | undefined,
+    logger: EndpointLogger,
+  ): Promise<boolean> {
+    if (!localUrl) {
+      return false;
+    }
+    try {
+      const healthUrl = `${localUrl.replace(/\/$/, "")}/api/health`;
+      const resp = await fetch(healthUrl, {
+        method: "GET",
+        signal: AbortSignal.timeout(5000),
+      });
+      return resp.ok;
+    } catch {
+      logger.debug(
+        "[REGISTER] Accessibility ping failed (expected for NAT/private networks)",
         {
-          instanceId,
           localUrl,
         },
       );
+      return false;
     }
-  })();
-
-  // ── Also set the cloud's own self-identity record (if not already set) ──
-  // Reuses selfInstanceId from the collision check above.
-  const [selfIdentity] = await db
-    .insert(instanceIdentities)
-    .values({
-      userId: user.id,
-      instanceId: selfInstanceId,
-      friendlyName: selfInstanceId,
-      isDefault: true,
-      updatedAt: new Date(),
-    })
-    .onConflictDoNothing()
-    .returning({ friendlyName: instanceIdentities.friendlyName });
-
-  // If onConflictDoNothing fired (record exists), fetch the existing name
-  let selfFriendlyName = selfIdentity?.friendlyName ?? null;
-  if (!selfFriendlyName) {
-    const [existing] = await db
-      .select({ friendlyName: instanceIdentities.friendlyName })
-      .from(instanceIdentities)
-      .where(
-        and(
-          eq(instanceIdentities.userId, user.id),
-          eq(instanceIdentities.instanceId, selfInstanceId),
-        ),
-      )
-      .limit(1);
-    selfFriendlyName = existing?.friendlyName ?? selfInstanceId;
   }
+  static async registerLocalInstance(
+    data: RemoteRegisterPostRequestInput,
+    user: JwtPrivatePayloadType,
+    logger: EndpointLogger,
+    t: RemoteRegisterT,
+  ): Promise<
+    ResponseType<{
+      registered: boolean;
+      remoteInstanceId: string;
+      remoteFriendlyName: string | null;
+    }>
+  > {
+    const { instanceId, localUrl, reverseToken, reverseLeadId } = data;
 
-  invalidateInstanceIdCache();
+    // Reject if the remote's instanceId collides with our own self-identity.
+    const selfInstanceId =
+      RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+    if (instanceId === selfInstanceId) {
+      logger.warn("[REGISTER] Instance ID collides with cloud self-identity", {
+        userId: user.id,
+        instanceId,
+        selfInstanceId,
+      });
+      return fail({
+        message: t("post.errors.conflict.title"),
+        errorType: ErrorResponseTypes.CONFLICT,
+      });
+    }
 
-  return success({
-    registered: true,
-    remoteInstanceId: selfInstanceId,
-    remoteFriendlyName: selfFriendlyName,
-  });
+    // Upsert cloud-side record with optional reverse token for bidirectional auth.
+    // remoteInstanceId = instanceId: the connecting client's own identity, used by
+    // execute-tool to set targetInstance correctly when routing tasks back to this client.
+    // reverseToken: JWT from the connecting instance, encrypted before storage. Enables
+    // this instance to call /report on the connector (push task completion status back).
+    // Reconnect is allowed — update localUrl/isActive if the record already exists.
+    const encryptedReverseToken = reverseToken
+      ? RemoteConnectionRepository.encryptToken(reverseToken)
+      : null;
+
+    await db
+      .insert(remoteConnections)
+      .values({
+        userId: user.id,
+        instanceId,
+        friendlyName: data.friendlyName ?? instanceId,
+        remoteFriendlyName: data.friendlyName ?? null,
+        remoteUrl: localUrl, // from cloud's perspective, the local IS the remote
+        localUrl,
+        token: encryptedReverseToken,
+        leadId: reverseLeadId ?? null,
+        isActive: true,
+        remoteInstanceId: instanceId,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: [remoteConnections.userId, remoteConnections.instanceId],
+        set: {
+          localUrl,
+          remoteUrl: localUrl,
+          remoteFriendlyName: data.friendlyName ?? null,
+          isActive: true,
+          remoteInstanceId: instanceId,
+          ...(encryptedReverseToken ? { token: encryptedReverseToken } : {}),
+          ...(reverseLeadId ? { leadId: reverseLeadId } : {}),
+          updatedAt: new Date(),
+        },
+      });
+
+    logger.info("Registered local instance on cloud", {
+      userId: user.id,
+      instanceId,
+      localUrl,
+    });
+
+    // Ping localUrl to check direct accessibility.
+    // If reachable: set isDirectlyAccessible=true so execute-tool can use direct HTTP.
+    // If not reachable (NAT, firewall): keep false, fall back to task-queue pull.
+    // Fire-and-forget: registration succeeds regardless of ping result.
+    void (async (): Promise<void> => {
+      const isDirectlyAccessible =
+        await RemoteConnectionRegisterRepository.checkDirectAccessibility(
+          localUrl,
+          logger,
+        );
+      if (isDirectlyAccessible) {
+        try {
+          await db
+            .update(remoteConnections)
+            .set({ isDirectlyAccessible: true, updatedAt: new Date() })
+            .where(
+              and(
+                eq(remoteConnections.userId, user.id),
+                eq(remoteConnections.instanceId, instanceId),
+              ),
+            );
+          logger.info("[REGISTER] Local instance is directly accessible", {
+            instanceId,
+            localUrl,
+          });
+        } catch (updateErr) {
+          logger.warn(
+            "[REGISTER] Failed to update isDirectlyAccessible (non-fatal)",
+            {
+              instanceId,
+              error:
+                updateErr instanceof Error
+                  ? updateErr.message
+                  : String(updateErr),
+            },
+          );
+        }
+      } else {
+        logger.info(
+          "[REGISTER] Local instance not directly accessible — using task-queue",
+          {
+            instanceId,
+            localUrl,
+          },
+        );
+      }
+    })();
+
+    // ── Also set the cloud's own self-identity record (if not already set) ──
+    // Reuses selfInstanceId from the collision check above.
+    const [selfIdentity] = await db
+      .insert(instanceIdentities)
+      .values({
+        userId: user.id,
+        instanceId: selfInstanceId,
+        friendlyName: selfInstanceId,
+        isDefault: true,
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing()
+      .returning({ friendlyName: instanceIdentities.friendlyName });
+
+    // If onConflictDoNothing fired (record exists), fetch the existing name
+    let selfFriendlyName = selfIdentity?.friendlyName ?? null;
+    if (!selfFriendlyName) {
+      const [existing] = await db
+        .select({ friendlyName: instanceIdentities.friendlyName })
+        .from(instanceIdentities)
+        .where(
+          and(
+            eq(instanceIdentities.userId, user.id),
+            eq(instanceIdentities.instanceId, selfInstanceId),
+          ),
+        )
+        .limit(1);
+      selfFriendlyName = existing?.friendlyName ?? selfInstanceId;
+    }
+
+    RemoteConnectionRepository.invalidateInstanceIdCache();
+
+    return success({
+      registered: true,
+      remoteInstanceId: selfInstanceId,
+      remoteFriendlyName: selfFriendlyName,
+    });
+  }
 }

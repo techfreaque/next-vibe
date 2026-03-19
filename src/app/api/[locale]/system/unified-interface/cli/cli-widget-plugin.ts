@@ -25,6 +25,15 @@ import { dirname, resolve } from "node:path";
 
 import { plugin } from "bun";
 
+// Import JSX runtimes before NODE_ENV can be set to "production" by environment.ts.
+// Bun always uses jsxDEV for .tsx transpilation. React's jsx-dev-runtime.js gates
+// its exports on NODE_ENV — importing here caches the dev version in Bun's module
+// registry before loadEnvironment() runs and changes NODE_ENV.
+// This file is the first static import in vibe-runtime.ts, so it evaluates before
+// run-cli.ts (which calls loadEnvironment() at module level).
+import "react/jsx-dev-runtime";
+import "react/jsx-runtime";
+
 /**
  * Extract named export identifiers from a .tsx/.ts file using simple regex.
  */

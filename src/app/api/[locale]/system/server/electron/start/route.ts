@@ -8,13 +8,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import electronStartDefinition from "./definition";
-import { electronStartRepository } from "./repository";
+import { ElectronStartRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: electronStartDefinition,
   [Methods.POST]: {
     handler: ({ data, logger, t }) => {
-      return electronStartRepository(data, logger, t);
+      return ElectronStartRepository.electronStartRepository(data, logger, t);
     },
   },
 });

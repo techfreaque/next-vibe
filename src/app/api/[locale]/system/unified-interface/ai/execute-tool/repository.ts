@@ -14,7 +14,7 @@
 
 import "server-only";
 
-import { and, eq, sql as drizzleSql } from "drizzle-orm";
+import { and, sql as drizzleSql, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -51,79 +51,76 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { buildRemoteUrl } from "@/app/api/[locale]/system/unified-interface/remote/remote-call";
 
-import type { scopedTranslation } from "../i18n";
+import type { AiT } from "../i18n";
 import { CallbackMode } from "./constants";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseInput,
 } from "./definition";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Execute a tool directly on a remote instance via HTTP.
- * Used when isDirectlyAccessible=true — skips task-queue, gets result in ms.
- * Returns the parsed JSON response body (tool result) or null on network error.
- *
- * The tool's route path is derived from its toolName (which IS the routeId / path).
- * Auth: Bearer token from the stored connection.
- *
- * For wait/endLoop: blocking — caller awaits the result.
- * For detach/wakeUp: caller ignores the returned promise (fire-and-forget).
- */
-async function executeRemoteDirect(params: {
-  remoteUrl: string;
-  token: string;
-  toolName: string;
-  input: Record<string, JsonValue> | null;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
-}): Promise<Record<string, JsonValue> | null> {
-  const { remoteUrl, token, toolName, input, locale, logger } = params;
-  // Build URL from the execute-tool definition so the path is always in sync.
-  const executeDefinition = (await import("./definition")).default;
-  const url = buildRemoteUrl(remoteUrl, locale, executeDefinition.POST, {
-    toolName,
-    input: (input ?? {}) as Parameters<typeof buildRemoteUrl>[3]["input"],
-  });
-  try {
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ toolName, input: input ?? {} }),
-      signal: AbortSignal.timeout(90_000),
+export class RouteExecuteRepository {
+  /**
+   * Execute a tool directly on a remote instance via HTTP.
+   * Used when isDirectlyAccessible=true — skips task-queue, gets result in ms.
+   * Returns the parsed JSON response body (tool result) or null on network error.
+   *
+   * The tool's route path is derived from its toolName (which IS the routeId / path).
+   * Auth: Bearer token from the stored connection.
+   *
+   * For wait/endLoop: blocking — caller awaits the result.
+   * For detach/wakeUp: caller ignores the returned promise (fire-and-forget).
+   */
+  private static async executeRemoteDirect(params: {
+    remoteUrl: string;
+    token: string;
+    toolName: string;
+    input: Record<string, JsonValue> | null;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+  }): Promise<Record<string, JsonValue> | null> {
+    const { remoteUrl, token, toolName, input, locale, logger } = params;
+    // Build URL from the execute-tool definition so the path is always in sync.
+    const executeDefinition = (await import("./definition")).default;
+    const url = buildRemoteUrl(remoteUrl, locale, executeDefinition.POST, {
+      toolName,
+      input: (input ?? {}) as Parameters<typeof buildRemoteUrl>[3]["input"],
     });
-    if (!resp.ok) {
-      logger.warn("[RouteExecute] Direct HTTP call failed", {
+    try {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ toolName, input: input ?? {} }),
+        signal: AbortSignal.timeout(90_000),
+      });
+      if (!resp.ok) {
+        logger.warn("[RouteExecute] Direct HTTP call failed", {
+          toolName,
+          status: resp.status,
+        });
+        return null;
+      }
+      const body = (await resp.json()) as {
+        data?: Record<string, JsonValue>;
+        success?: boolean;
+      };
+      return body.data ?? null;
+    } catch (err) {
+      logger.warn("[RouteExecute] Direct HTTP call error", {
         toolName,
-        status: resp.status,
+        error: err instanceof Error ? err.message : String(err),
       });
       return null;
     }
-    const body = (await resp.json()) as {
-      data?: Record<string, JsonValue>;
-      success?: boolean;
-    };
-    return body.data ?? null;
-  } catch (err) {
-    logger.warn("[RouteExecute] Direct HTTP call error", {
-      toolName,
-      error: err instanceof Error ? err.message : String(err),
-    });
-    return null;
   }
-}
-
-export class RouteExecuteRepository {
   static async execute(
     data: RouteExecuteRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: AiT,
     streamContext: ToolExecutionContext,
   ): Promise<ResponseType<RouteExecuteResponseInput>> {
     try {
@@ -216,9 +213,13 @@ export class RouteExecuteRepository {
         });
 
         // Validate toolName against stored capability snapshot
-        const { getConnectionForInstance } =
+        const { RemoteConnectionRepository } =
           await import("@/app/api/[locale]/user/remote-connection/repository");
-        const connInfo = await getConnectionForInstance(user.id, instanceId);
+        const connInfo =
+          await RemoteConnectionRepository.getConnectionForInstance(
+            user.id,
+            instanceId,
+          );
 
         if (connInfo === null || connInfo.capabilities === null) {
           // Capability snapshot not yet synced — fail closed.
@@ -286,14 +287,15 @@ export class RouteExecuteRepository {
               instanceId,
               callbackMode,
             });
-            const directResult = await executeRemoteDirect({
-              remoteUrl: connInfo.remoteUrl,
-              token: connInfo.token,
-              toolName,
-              input: strippedInput as Record<string, JsonValue> | null,
-              locale,
-              logger,
-            });
+            const directResult =
+              await RouteExecuteRepository.executeRemoteDirect({
+                remoteUrl: connInfo.remoteUrl,
+                token: connInfo.token,
+                toolName,
+                input: strippedInput as Record<string, JsonValue> | null,
+                locale,
+                logger,
+              });
             if (directResult !== null) {
               // Result returned inline — loop continues normally (wait/endLoop).
               return success({ result: directResult });
@@ -320,14 +322,15 @@ export class RouteExecuteRepository {
             const capturedRemoteUrl = connInfo.remoteUrl;
 
             void (async (): Promise<void> => {
-              const directResult = await executeRemoteDirect({
-                remoteUrl: capturedRemoteUrl,
-                token: capturedToken,
-                toolName,
-                input: strippedInput as Record<string, JsonValue> | null,
-                locale,
-                logger,
-              });
+              const directResult =
+                await RouteExecuteRepository.executeRemoteDirect({
+                  remoteUrl: capturedRemoteUrl,
+                  token: capturedToken,
+                  toolName,
+                  input: strippedInput as Record<string, JsonValue> | null,
+                  locale,
+                  logger,
+                });
 
               if (directResult === null) {
                 logger.warn(
@@ -508,13 +511,25 @@ export class RouteExecuteRepository {
           })();
         }
 
-        // callbackMode=WAIT: pause the stream after all parallel tool calls finish.
-        // Set pendingTimeoutMs so finish-step-handler starts the 90s abort timer.
-        // handleTaskCompletion (via /report) backfills the real result and schedules
-        // resume-stream to revive the thread. Clean abort — no error shown to user.
-        if (callbackMode === CallbackMode.WAIT && streamContext) {
+        // WAIT or END_LOOP (remote queue): abort stream after parallel batch.
+        // handleTaskCompletion (via /report) delivers the result. Clean abort — no error shown.
+        // - WAIT: revival fires after completion (backfills original tool message, AI continues)
+        // - END_LOOP: no revival, just backfill + deferred message, TASK_COMPLETED WS event
+        if (
+          (callbackMode === CallbackMode.WAIT ||
+            callbackMode === CallbackMode.END_LOOP) &&
+          streamContext
+        ) {
           streamContext.waitingForRemoteResult = true;
-          streamContext.pendingTimeoutMs = 90_000;
+          // Use per-tool timeout from definition (callerTimeoutMs). 0 = no timer.
+          const remoteTimeoutMs = streamContext.callerTimeoutMs;
+          if (remoteTimeoutMs === undefined) {
+            streamContext.pendingTimeoutMs = 90_000; // default
+          } else if (remoteTimeoutMs > 0) {
+            streamContext.pendingTimeoutMs = remoteTimeoutMs;
+          }
+          // remoteTimeoutMs === 0 → no timer
+          // The stream abort handler sets thread → waiting when it sees REMOTE_TOOL_WAIT.
         }
 
         // Return pending status.
@@ -614,11 +629,12 @@ export class RouteExecuteRepository {
                 // Reset per-call fields — detach goroutine is independent of parent stream
                 currentToolMessageId: undefined,
                 callerToolCallId: undefined,
+                callerCallbackMode: CallbackMode.DETACH,
                 pendingToolMessages: undefined,
                 pendingTimeoutMs: undefined,
                 waitingForRemoteResult: undefined,
-                // Do NOT inherit parent abortSignal — detach goroutine must outlive parent stream
-                abortSignal: undefined,
+                onEscalatedTaskCancel: undefined,
+                abortSignal: streamContext.abortSignal,
                 escalateToTask: undefined,
               },
             });
@@ -821,6 +837,41 @@ export class RouteExecuteRepository {
         // the stream is no longer active.
         void (async (): Promise<void> => {
           const startedAt = new Date();
+          // Goroutine-local streamContext — mutable, used to detect self-escalation.
+          // escalateToTask is inherited from the parent so long-running tools (like
+          // interactive claude-code) can call it to set waitingForRemoteResult=true
+          // and manage their own revival via complete-task. When that happens we skip
+          // our own handleTaskCompletion below.
+          // selfEscalated is a shared mutable flag. When escalateToTask fires inside
+          // the tool, the wrapper below sets it to true so we can skip our own
+          // handleTaskCompletion (the tool self-manages revival via complete-task).
+          let selfEscalated = false;
+          type EscalateOpts = Parameters<
+            NonNullable<typeof streamContext.escalateToTask>
+          >[0];
+          type EscalateResult = ReturnType<
+            NonNullable<typeof streamContext.escalateToTask>
+          >;
+          const wrappedEscalateToTask = streamContext?.escalateToTask
+            ? async (opts?: EscalateOpts): EscalateResult => {
+                selfEscalated = true;
+                return streamContext!.escalateToTask!(opts);
+              }
+            : undefined;
+          const goroutineStreamContext: typeof streamContext = {
+            ...streamContext,
+            // Reset per-call fields — wakeUp goroutine is independent of parent stream
+            currentToolMessageId: undefined,
+            callerToolCallId: undefined,
+            callerCallbackMode: CallbackMode.WAKE_UP,
+            pendingToolMessages: undefined,
+            pendingTimeoutMs: undefined,
+            waitingForRemoteResult: undefined,
+            onEscalatedTaskCancel: undefined,
+            abortSignal: streamContext.abortSignal,
+            // Wrapped escalateToTask: sets selfEscalated=true so we skip handleTaskCompletion.
+            escalateToTask: wrappedEscalateToTask,
+          };
           try {
             const result = await RouteExecutionExecutor.executeGenericHandler<
               Record<string, JsonValue>
@@ -831,18 +882,7 @@ export class RouteExecuteRepository {
               locale,
               logger,
               platform: Platform.MCP,
-              streamContext: {
-                ...streamContext,
-                // Reset per-call fields — wakeUp goroutine is independent of parent stream
-                currentToolMessageId: undefined,
-                callerToolCallId: undefined,
-                pendingToolMessages: undefined,
-                pendingTimeoutMs: undefined,
-                waitingForRemoteResult: undefined,
-                // Do NOT inherit parent abortSignal — wakeUp goroutine must outlive parent stream
-                abortSignal: undefined,
-                escalateToTask: undefined,
-              },
+              streamContext: goroutineStreamContext,
             });
 
             const completedAt = new Date();
@@ -859,7 +899,14 @@ export class RouteExecuteRepository {
               durationMs: completedAt.getTime() - startedAt.getTime(),
             });
 
-            if (effectiveToolMessageId && effectiveThreadId && user.id) {
+            // Skip handleTaskCompletion if the tool self-escalated via escalateToTask.
+            // Revival is managed by complete-task — we must not fire an early revival here.
+            if (selfEscalated) {
+              logger.info(
+                "[RouteExecute] wakeUp: tool self-escalated, skipping handleTaskCompletion",
+                { taskId, toolName },
+              );
+            } else if (effectiveToolMessageId && effectiveThreadId && user.id) {
               await handleTaskCompletion({
                 toolMessageId: effectiveToolMessageId,
                 threadId: effectiveThreadId ?? null,
@@ -907,6 +954,11 @@ export class RouteExecuteRepository {
 
       logger.debug("[RouteExecute] Executing route", { toolName });
 
+      // Set callerCallbackMode so the tool knows what mode was requested.
+      if (streamContext) {
+        streamContext.callerCallbackMode = callbackMode ?? undefined;
+      }
+
       const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName,
         data: input ?? {},
@@ -928,6 +980,9 @@ export class RouteExecuteRepository {
           headless: undefined,
           waitingForRemoteResult: undefined,
           abortSignal: undefined,
+          callerToolCallId: undefined,
+          callerCallbackMode: callbackMode ?? undefined,
+          onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
         },
       });

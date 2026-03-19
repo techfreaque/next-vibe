@@ -14,28 +14,30 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 // Import types from the endpoint definition
-import type generateTrpcRouterEndpoints from "./definition";
+import type {
+  GenerateTrpcRouterRequestOutput,
+  GenerateTrpcRouterResponseOutput,
+} from "./definition";
 import { scopedTranslation } from "./i18n";
 
-type GenerateTrpcRouterRequestType =
-  typeof generateTrpcRouterEndpoints.POST.types.RequestOutput;
-type GenerateTrpcRouterResponseType =
-  typeof generateTrpcRouterEndpoints.POST.types.ResponseOutput;
-
 /**
- * Generate tRPC Router Repository Implementation
+ * Generate tRPC Router Repository
  */
-export class GenerateTrpcRouterRepositoryImpl {
-  async generateTrpcRouter(
-    data: GenerateTrpcRouterRequestType,
+export class GenerateTrpcRouterRepository {
+  static async generateTrpcRouter(
+    data: GenerateTrpcRouterRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<GenerateTrpcRouterResponseType>> {
+  ): Promise<ResponseType<GenerateTrpcRouterResponseOutput>> {
     try {
       // Execute tRPC router generation based on the original logic
-      const result = await this.executeTrpcRouterGeneration(data, logger);
+      const result =
+        await GenerateTrpcRouterRepository.executeTrpcRouterGeneration(
+          data,
+          logger,
+        );
 
-      const response: GenerateTrpcRouterResponseType = {
+      const response: GenerateTrpcRouterResponseOutput = {
         success: result.success,
         generationCompleted: result.generationCompleted,
         output: result.output,
@@ -56,8 +58,8 @@ export class GenerateTrpcRouterRepositoryImpl {
   /**
    * Execute tRPC router generation using the original logic from generate-trpc-router.ts
    */
-  private async executeTrpcRouterGeneration(
-    data: GenerateTrpcRouterRequestType,
+  private static async executeTrpcRouterGeneration(
+    data: GenerateTrpcRouterRequestOutput,
     logger: EndpointLogger,
   ): Promise<{
     success: boolean;
@@ -122,9 +124,10 @@ export class GenerateTrpcRouterRepositoryImpl {
       outputLines.push(GENERATING_ROUTER);
 
       // Check if router was generated successfully
-      routerGenerated = await this.checkRouterFileExists(
-        data.outputFile || "src/app/api/[locale]/trpc/[...trpc]/router.ts",
-      );
+      routerGenerated =
+        await GenerateTrpcRouterRepository.checkRouterFileExists(
+          data.outputFile || "src/app/api/[locale]/trpc/[...trpc]/router.ts",
+        );
 
       outputLines.push(GENERATION_SUCCESS);
 
@@ -170,7 +173,9 @@ export class GenerateTrpcRouterRepositoryImpl {
   /**
    * Check if the router file was generated
    */
-  private async checkRouterFileExists(outputFile: string): Promise<boolean> {
+  private static async checkRouterFileExists(
+    outputFile: string,
+  ): Promise<boolean> {
     try {
       const fs = await import("node:fs");
       return fs.existsSync(outputFile);
@@ -179,9 +184,3 @@ export class GenerateTrpcRouterRepositoryImpl {
     }
   }
 }
-
-/**
- * Export repository instance
- */
-export const generateTrpcRouterRepository =
-  new GenerateTrpcRouterRepositoryImpl();

@@ -161,6 +161,7 @@ export function useMessageOperations(
           currentRootFolderId,
           currentSubFolderId,
           leafMessageId,
+          user,
           settings,
         },
         onThreadCreated,
@@ -173,6 +174,7 @@ export function useMessageOperations(
       currentRootFolderId,
       currentSubFolderId,
       leafMessageId,
+      user,
       settings,
     ],
   );
@@ -188,6 +190,7 @@ export function useMessageOperations(
         currentRootFolderId,
         currentSubFolderId,
         activeThreadId,
+        user,
         settings,
         setLeafMessageId,
       });
@@ -198,6 +201,7 @@ export function useMessageOperations(
       currentRootFolderId,
       currentSubFolderId,
       activeThreadId,
+      user,
       settings,
       setLeafMessageId,
     ],
@@ -216,6 +220,7 @@ export function useMessageOperations(
         currentRootFolderId,
         currentSubFolderId,
         activeThreadId,
+        user,
         settings,
         setLeafMessageId,
       });
@@ -226,6 +231,7 @@ export function useMessageOperations(
       currentRootFolderId,
       currentSubFolderId,
       activeThreadId,
+      user,
       settings,
       setLeafMessageId,
     ],

@@ -7,15 +7,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { scopedTranslation } from "./i18n";
 import { UserSearchRepository } from "./repository";
 
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ data, logger, locale }) => {
-      const { t } = scopedTranslation.scopedT(locale);
-      return UserSearchRepository.searchUsers(data, logger, locale, t);
-    },
+    handler: ({ data, logger, locale, t }) =>
+      UserSearchRepository.searchUsers(data, logger, locale, t),
   },
 });

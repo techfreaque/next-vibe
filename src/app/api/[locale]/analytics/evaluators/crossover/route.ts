@@ -11,14 +11,17 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeCrossover } from "./repository";
+import { CrossoverEvaluatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { seriesA, seriesB } = data;
-      const signals = computeCrossover(seriesA, seriesB);
+      const signals = CrossoverEvaluatorRepository.computeCrossover(
+        seriesA,
+        seriesB,
+      );
       return success({ signals });
     },
   },

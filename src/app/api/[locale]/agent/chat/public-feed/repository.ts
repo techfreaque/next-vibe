@@ -87,7 +87,7 @@ export class PublicFeedRepository {
             sql<number>`count(distinct ${chatMessages.authorId})::int`.as(
               "author_count",
             ),
-          modelNames: sql<string[]>`coalesce(
+          modelNames: sql<string[] | null>`coalesce(
             array_remove(
               array_agg(distinct ${chatMessages.model}),
               null
@@ -159,7 +159,7 @@ export class PublicFeedRepository {
           upvotes,
           downvotes,
           score: upvotes - downvotes,
-          modelNames: (row.modelNames as string[] | null) ?? [],
+          modelNames: row.modelNames ?? [],
           streamingState: row.streamingState,
           createdAt: row.createdAt,
           updatedAt: row.updatedAt,

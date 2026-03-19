@@ -14,16 +14,17 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import {
-  CreditRepository,
-  type ModuleT as CreditsModuleT,
-} from "@/app/api/[locale]/credits/repository";
+import type { CreditsT } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { CodesListGetResponseOutput } from "./codes/list/definition";
+import type {
+  CodesListGetResponseOutput,
+  ReferralCode,
+} from "./codes/list/definition";
 import {
   leadReferrals,
   payoutRequests,
@@ -43,12 +44,28 @@ import {
   type PayoutStatusValue,
   ReferralEarningStatus,
 } from "./enum";
+import type { ReferralT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import type { StatsGetResponseOutput } from "./stats/definition";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+/**
+ * Internal result type for referral code validation
+ */
+interface ReferralCodeValidationResult {
+  id: string;
+  ownerUserId: string;
+}
 
-// Internal types
+/**
+ * Internal result type for lead referral code lookup
+ */
+interface LeadReferralCodeResult {
+  referralCode: string | null;
+}
+
+/**
+ * Internal type for commission share calculation
+ */
 interface CommissionShare {
   earnerUserId: string;
   level: number;
@@ -56,18 +73,24 @@ interface CommissionShare {
 }
 
 /**
- * Configuration for referral payout algorithm
+ * Internal result type for payout request creation
  */
-const REFERRAL_CONFIG = {
-  POOL_PERCENTAGE: 0.2, // 20% of transaction goes to referral pool
-  DECAY_RATIO: 0.5, // Each level gets 50% of previous level
-  MAX_LEVELS: 10, // Maximum depth of referral chain
-} as const;
+interface PayoutRequestResult {
+  payoutRequestId: string;
+}
 
 /**
  * Referral Repository Implementation
  */
 export class ReferralRepository {
+  /**
+   * Configuration for referral payout algorithm
+   */
+  private static readonly REFERRAL_CONFIG = {
+    POOL_PERCENTAGE: 0.2, // 20% of transaction goes to referral pool
+    DECAY_RATIO: 0.5, // Each level gets 50% of previous level
+    MAX_LEVELS: 10, // Maximum depth of referral chain
+  } as const;
   /**
    * Create a new referral code
    */
@@ -126,7 +149,7 @@ export class ReferralRepository {
   static async getUserReferralCodes(
     userId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ReferralT,
   ): Promise<ResponseType<CodesListGetResponseOutput>> {
     try {
       logger.debug("Getting referral codes for user", { userId });
@@ -176,7 +199,7 @@ export class ReferralRepository {
               totalRevenueCents: stats?.totalRevenue ?? 0,
               totalEarningsCents: stats?.totalEarnings ?? 0,
               isActive: code.isActive,
-            } satisfies CodesListGetResponseOutput["codes"][number];
+            } satisfies ReferralCode;
           }),
         );
 
@@ -198,7 +221,7 @@ export class ReferralRepository {
     code: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ id: string; ownerUserId: string }>> {
+  ): Promise<ResponseType<ReferralCodeValidationResult>> {
     try {
       logger.debug("Validating referral code", { code });
 
@@ -315,7 +338,7 @@ export class ReferralRepository {
     leadId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ referralCode: string | null }>> {
+  ): Promise<ResponseType<LeadReferralCodeResult>> {
     try {
       logger.debug("Getting latest referral code for lead", { leadId });
 
@@ -503,7 +526,7 @@ export class ReferralRepository {
   static async getReferralStats(
     userId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ReferralT,
   ): Promise<ResponseType<StatsGetResponseOutput>> {
     try {
       logger.debug("Getting referral stats", { userId });
@@ -591,7 +614,7 @@ export class ReferralRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ReferralT,
   ): Promise<ResponseType<EarningsListGetResponseOutput>> {
     try {
       logger.debug("Getting referral earnings", { userId, limit, offset });
@@ -643,7 +666,7 @@ export class ReferralRepository {
     userId: string,
     creditsAmount: number,
     logger: EndpointLogger,
-    creditsT: CreditsModuleT,
+    creditsT: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
@@ -738,7 +761,7 @@ export class ReferralRepository {
     let currentUserId: string | null = userId;
 
     // Traverse up the referral chain
-    for (let i = 0; i < REFERRAL_CONFIG.MAX_LEVELS; i++) {
+    for (let i = 0; i < ReferralRepository.REFERRAL_CONFIG.MAX_LEVELS; i++) {
       const [referral] = await db
         .select()
         .from(userReferrals)
@@ -767,9 +790,14 @@ export class ReferralRepository {
     amountCents: number,
     chain: string[],
   ): CommissionShare[] {
-    const poolCents = Math.floor(amountCents * REFERRAL_CONFIG.POOL_PERCENTAGE);
-    const q = REFERRAL_CONFIG.DECAY_RATIO;
-    const n = Math.min(chain.length, REFERRAL_CONFIG.MAX_LEVELS);
+    const poolCents = Math.floor(
+      amountCents * ReferralRepository.REFERRAL_CONFIG.POOL_PERCENTAGE,
+    );
+    const q = ReferralRepository.REFERRAL_CONFIG.DECAY_RATIO;
+    const n = Math.min(
+      chain.length,
+      ReferralRepository.REFERRAL_CONFIG.MAX_LEVELS,
+    );
 
     if (n === 0) {
       return [];
@@ -816,7 +844,7 @@ export class ReferralRepository {
   static async getEarnedBalance(
     userId: string,
     logger: EndpointLogger,
-    creditsT: CreditsModuleT,
+    creditsT: CreditsT,
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
@@ -888,9 +916,9 @@ export class ReferralRepository {
     currency: typeof PayoutCurrencyValue,
     walletAddress: string | null,
     logger: EndpointLogger,
-    creditsT: CreditsModuleT,
+    creditsT: CreditsT,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ payoutRequestId: string }>> {
+  ): Promise<ResponseType<PayoutRequestResult>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       // Validate minimum amount
@@ -975,7 +1003,7 @@ export class ReferralRepository {
     userId: string,
     amountCents: number,
     logger: EndpointLogger,
-    creditsT: CreditsModuleT,
+    creditsT: CreditsT,
   ): Promise<void> {
     // Deduct from earned credits
     const deductResult = await CreditRepository.deductEarnedCredits(
@@ -1229,7 +1257,7 @@ export class ReferralRepository {
     adminUserId: string,
     adminNotes: string | null,
     logger: EndpointLogger,
-    creditsT: CreditsModuleT,
+    creditsT: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     const { t } = scopedTranslation.scopedT(locale);

@@ -25,8 +25,8 @@ import { SkillOwnershipType, SkillStatus } from "../../enum";
 import type { SkillReportPostResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
-export const SkillReportRepository = {
-  async submitReport(
+export class SkillReportRepository {
+  static async submitReport(
     urlPathParams: { id: string },
     data: { reason: string },
     user: JwtPayloadType,
@@ -127,5 +127,5 @@ export const SkillReportRepository = {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  },
-};
+  }
+}

@@ -6,12 +6,19 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { endpoints } from "./definition";
-import { runClaudeCode } from "./repository";
+import { ClaudeCodeRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, t, cronTaskId, streamContext }) =>
-      runClaudeCode(data, logger, t, cronTaskId, streamContext),
+    handler: ({ data, user, logger, t, cronTaskId, streamContext }) =>
+      ClaudeCodeRepository.runClaudeCode(
+        data,
+        user,
+        logger,
+        t,
+        cronTaskId,
+        streamContext,
+      ),
   },
 });

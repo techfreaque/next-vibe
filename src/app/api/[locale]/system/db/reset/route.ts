@@ -15,8 +15,8 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     handler: async ({ data, t, logger }) => {
       // Lazy import to avoid creating database connections during route discovery
-      const { databaseResetRepository } = await import("./repository");
-      return await databaseResetRepository.resetDatabase(data, t, logger);
+      const { DatabaseResetRepository } = await import("./repository");
+      return await DatabaseResetRepository.resetDatabase(data, t, logger);
     },
   },
 });

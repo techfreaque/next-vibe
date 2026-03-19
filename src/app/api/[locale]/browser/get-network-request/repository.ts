@@ -16,10 +16,7 @@ import type {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { BrowserT } from "../i18n";
 import type { MCPContentBlock } from "../shared/repository";
-import {
-  executeGetNetworkRequest,
-  filterUndefinedArgs,
-} from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import { BrowserTool } from "../enum";
 import type {
   GetNetworkRequestRequestOutput,
@@ -33,10 +30,10 @@ export class GetNetworkRequestRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<GetNetworkRequestResponseOutput> | ContentResponse> {
     const result =
-      await executeGetNetworkRequest<GetNetworkRequestResponseOutput>(
+      await BrowserSharedRepository.executeGetNetworkRequest<GetNetworkRequestResponseOutput>(
         {
           toolName: BrowserTool.GET_NETWORK_REQUEST,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             reqid: data.reqid,
             requestFilePath: data.requestFilePath,
             responseFilePath: data.responseFilePath,

@@ -156,3 +156,5 @@ const { PUT } = createEndpoint({
 
 const definitions = { PUT };
 export default definitions;
+
+export type GraphEditPutResponseOutput = typeof PUT.types.ResponseOutput;

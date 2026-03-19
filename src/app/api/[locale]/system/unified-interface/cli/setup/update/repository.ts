@@ -15,37 +15,24 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { JwtPayloadType } from "../../../../../user/auth/types";
-import { setupInstallRepository } from "../install/repository";
-import { setupUninstallRepository } from "../uninstall/repository";
+import { SetupInstallRepository } from "../install/repository";
+import { SetupUninstallRepository } from "../uninstall/repository";
 import type { UpdateRequestOutput, UpdateResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Setup Update Repository Interface
- */
-export interface SetupUpdateRepository {
-  updateCli(
-    data: UpdateRequestOutput,
-    user: JwtPayloadType,
-    t: ModuleT,
-  ): Promise<ResponseType<UpdateResponseOutput>>;
-}
+import type { SetupUpdateT } from "./i18n";
 
 /**
  * Setup Update Repository Implementation
  * Uses other repositories to perform uninstall + install
  */
-class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
-  async updateCli(
+export class SetupUpdateRepository {
+  static async updateCli(
     data: UpdateRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: SetupUpdateT,
   ): Promise<ResponseType<UpdateResponseOutput>> {
     try {
       // First uninstall existing CLI
-      const uninstallResult = await setupUninstallRepository.uninstallCli(
+      const uninstallResult = await SetupUninstallRepository.uninstallCli(
         { verbose: data.verbose },
         user,
         t,
@@ -63,7 +50,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
       }
 
       // Then install CLI with force
-      const installResult = await setupInstallRepository.installCli(
+      const installResult = await SetupInstallRepository.installCli(
         { force: true, verbose: data.verbose },
         user,
         t,
@@ -96,8 +83,3 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const setupUpdateRepository = new SetupUpdateRepositoryImpl();

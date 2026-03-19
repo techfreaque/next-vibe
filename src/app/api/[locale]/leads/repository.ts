@@ -14,9 +14,9 @@ import {
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
-import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { withTransaction } from "@/app/api/[locale]/system/db/utils/repository-helpers";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 import {
   convertCountryFilter,
   convertLanguageFilter,
@@ -70,7 +70,8 @@ import type {
   LeadExportRequestOutput,
   LeadExportResponseOutput,
 } from "./export/definition";
-import type { scopedTranslation } from "./i18n";
+import { scopedTranslation } from "./i18n";
+import type { LeadsT } from "./i18n";
 import type { LeadListGetRequestTypeOutput } from "./list/definition";
 import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
 import type {
@@ -82,52 +83,45 @@ import type {
   UnsubscribeType,
 } from "./types";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Utility function to ensure a lead has an email
- * Returns the lead if it has an email, otherwise returns null
- * @deprecated Use leadHasEmail type guard instead and handle null case
- */
-export function ensureLeadHasEmail(
-  lead: LeadResponseType,
-): LeadWithEmailType | null {
-  if (!leadHasEmail(lead)) {
-    return null;
-  }
-  return lead;
-}
-
-/**
- * Type guard to check if a lead has an email
- */
-export function leadHasEmail(
-  lead: LeadResponseType,
-): lead is LeadWithEmailType {
-  return Boolean(lead.email);
-}
-
-/**
- * Filter leads to only include those with email addresses
- * Returns an array of LeadWithEmailType
- */
-export function filterLeadsWithEmail(
-  leadList: LeadResponseType[],
-): LeadWithEmailType[] {
-  return leadList.filter(leadHasEmail);
-}
-
 /**
  * Leads Repository - Static class pattern
  */
 export class LeadsRepository {
+  /**
+   * Utility function to ensure a lead has an email
+   * Returns the lead if it has an email, otherwise returns null
+   * @deprecated Use LeadsRepository.leadHasEmail type guard instead and handle null case
+   */
+  static ensureLeadHasEmail(lead: LeadResponseType): LeadWithEmailType | null {
+    if (!LeadsRepository.leadHasEmail(lead)) {
+      return null;
+    }
+    return lead;
+  }
+
+  /**
+   * Type guard to check if a lead has an email
+   */
+  static leadHasEmail(lead: LeadResponseType): lead is LeadWithEmailType {
+    return Boolean(lead.email);
+  }
+
+  /**
+   * Filter leads to only include those with email addresses
+   * Returns an array of LeadWithEmailType
+   */
+  static filterLeadsWithEmail(
+    leadList: LeadResponseType[],
+  ): LeadWithEmailType[] {
+    return leadList.filter(LeadsRepository.leadHasEmail);
+  }
   /**
    * Create a new lead with business logic
    */
   static async createLead(
     data: LeadCreateRequestTypeOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       lead: {
@@ -156,6 +150,7 @@ export class LeadsRepository {
       };
     }>
   > {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Creating new lead", {
         email: data.contactInfo?.email,
@@ -257,8 +252,9 @@ export class LeadsRepository {
   static async getLeadById(
     id: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<LeadDetailResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
     logger.debug("Getting lead by ID", { id });
     return await LeadsRepository.getLeadByIdInternal(id, logger, t);
   }
@@ -269,7 +265,7 @@ export class LeadsRepository {
   static async getLeadByTrackingId(
     leadId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
       logger.debug("Fetching lead by tracking ID", { leadId });
@@ -303,7 +299,7 @@ export class LeadsRepository {
   static async getLeadByEmail(
     email: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
       logger.debug("Fetching lead by email", { email });
@@ -339,8 +335,9 @@ export class LeadsRepository {
     id: string,
     data: Partial<LeadUpdateType>,
     logger: EndpointLogger,
-    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<LeadDetailResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Updating lead", {
         id,
@@ -423,7 +420,7 @@ export class LeadsRepository {
   static async listLeads(
     query: LeadListGetRequestTypeOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadListResponseType>> {
     try {
       // Extract values from nested structure with type safety
@@ -813,7 +810,7 @@ export class LeadsRepository {
   static async convertLead(
     leadId: string,
     options: {
-      userId: DbId;
+      userId: string;
       email: string;
       additionalData?: {
         businessName?: string;
@@ -823,7 +820,7 @@ export class LeadsRepository {
       };
     },
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadResponseType>> {
     return await LeadsRepository.convertLeadInternal(
       leadId,
@@ -942,7 +939,7 @@ export class LeadsRepository {
   static async unsubscribeLead(
     data: UnsubscribeType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<
     ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
   > {
@@ -1102,8 +1099,8 @@ export class LeadsRepository {
   static async updateLeadStatusOnNewsletterUnsubscribe(
     email: string,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<{ success: boolean; leadFound: boolean }>> {
+    t: LeadsT,
+  ) {
     try {
       logger.debug("Updating lead status on newsletter unsubscribe", { email });
 
@@ -1169,7 +1166,7 @@ export class LeadsRepository {
   static async getLeadByIdInternal(
     id: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Fetching lead by ID (internal)", { id });
@@ -1217,7 +1214,7 @@ export class LeadsRepository {
     id: string,
     data: Partial<LeadUpdateType>,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Updating lead (internal)", {
@@ -1277,7 +1274,7 @@ export class LeadsRepository {
   static async convertLeadInternal(
     leadId: string,
     options: {
-      userId: DbId;
+      userId: string;
       email: string;
       additionalData?: {
         businessName?: string;
@@ -1287,7 +1284,7 @@ export class LeadsRepository {
       };
     },
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
       logger.debug("Converting lead (internal)", {
@@ -1474,7 +1471,7 @@ export class LeadsRepository {
       userAgent?: string;
     },
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
       logger.debug("Recording lead engagement", {
@@ -1600,7 +1597,7 @@ export class LeadsRepository {
       userAgent?: string;
     },
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     return await LeadsRepository.recordEngagementInternal(data, logger, t);
   }
@@ -1611,8 +1608,9 @@ export class LeadsRepository {
   static async exportLeads(
     query: LeadExportRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<LeadExportResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Exporting leads", {
         format: query.format,
@@ -1718,7 +1716,7 @@ export class LeadsRepository {
     leadsData: Lead[],
     includeMetadata: boolean,
     includeEngagementData: boolean,
-    t: ModuleT,
+    t: LeadsT,
   ): string {
     const headers = [
       t("export.headers.email"),
@@ -1831,7 +1829,7 @@ export class LeadsRepository {
   static async batchUpdateLeads(
     data: BatchUpdateRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<
     ResponseType<{
       success: boolean;
@@ -2118,7 +2116,7 @@ export class LeadsRepository {
       maxRecords?: number;
     },
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<
     ResponseType<{
       success: boolean;
@@ -2463,7 +2461,7 @@ export class LeadsRepository {
     leadId2: string,
     linkReason: "track_page" | "referral" | "manual" | "test" | "ip_match",
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<void>> {
     try {
       // Ensure leads are different
@@ -2650,10 +2648,11 @@ export class LeadsRepository {
    * Delete a single lead by ID
    */
   static async deleteLead(
-    id: DbId,
+    id: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<never>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const result = await db
         .delete(leads)

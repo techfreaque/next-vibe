@@ -20,351 +20,350 @@ import type {
   GuardStartRequestOutput,
   GuardStartResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-interface GuardJailConfig {
-  project: {
-    name: string;
-    description?: string;
-  };
-  security: {
-    level: "minimal" | "standard" | "strict" | "maximum";
-    isolationMethod: "chroot" | "bubblewrap" | "firejail" | "docker";
-    enableNetworking: boolean;
-    enableFileSystemWrite: boolean;
-  };
-  whitelist: {
-    binaries: string[];
-    directories: string[];
-    fileExtensions: string[];
-    environmentVariables: string[];
-  };
-  blacklist: {
-    paths: string[];
-    binaries: string[];
-    networkHosts?: string[];
-  };
-  limits: {
-    maxMemoryMB: number;
-    maxCpuPercent: number;
-    maxProcesses: number;
-    maxFileSize: string;
-    maxDiskUsage: string;
-  };
-  network: {
-    allowedHosts: string[];
-    allowedPorts: number[];
-    blockInternet: boolean;
-    allowLocalhost: boolean;
-  };
-  filesystem: {
-    jailRoot: string;
-    mountPoints: Array<{
-      source: string;
-      target: string;
-      readonly: boolean;
-    }>;
-    tempDirectory: string;
-  };
-}
+import type { GuardStartT } from "./i18n";
 
 /**
- * Create default guard jail configuration
+ * Guard Start Repository
  */
-function createDefaultGuardConfig(projectName: string): GuardJailConfig {
-  /* eslint-disable i18next/no-literal-string */
-  return {
-    project: {
-      name: projectName,
-      description: "Development environment",
-    },
+export class GuardStartRepository {
+  /**
+   * Create default guard jail configuration
+   */
+  private static createDefaultGuardConfig(projectName: string): {
+    project: { name: string; description?: string };
     security: {
-      level: "standard",
-      isolationMethod: "chroot",
-      enableNetworking: true,
-      enableFileSystemWrite: false,
-    },
+      level: "minimal" | "standard" | "strict" | "maximum";
+      isolationMethod: "chroot" | "bubblewrap" | "firejail" | "docker";
+      enableNetworking: boolean;
+      enableFileSystemWrite: boolean;
+    };
     whitelist: {
-      binaries: [
-        "/bin/ls",
-        "/bin/cat",
-        "/bin/grep",
-        "/bin/find",
-        "/bin/head",
-        "/bin/tail",
-        "/bin/wc",
-        "/usr/bin/vim",
-        "/usr/bin/nano",
-        "/usr/bin/git",
-        "/usr/bin/node",
-        "/usr/bin/npm",
-        "/usr/bin/yarn",
-        "/usr/bin/pnpm",
-        "/usr/bin/bun",
-        "~/.bun/bin/bun",
-        "/usr/bin/tree",
-        "~/.local/bin/vibe",
-      ],
-      directories: [
-        "src",
-        "public",
-        ".tmp",
-        ".next",
-        "node_modules",
-        ".git",
-        ".vscode",
-      ],
-      fileExtensions: [
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        ".json",
-        ".md",
-        ".txt",
-        ".css",
-        ".scss",
-        ".sass",
-        ".html",
-        ".svg",
-        ".png",
-        ".jpg",
-        ".jpeg",
-        ".gif",
-        ".webp",
-        ".env",
-        ".env.local",
-        ".gitignore",
-        ".eslintrc",
-      ],
-      environmentVariables: [
-        "NODE_ENV",
-        "TERM",
-        "PATH",
-        "HOME",
-        "USER",
-        "GUARD_MODE",
-        "GUARD_PROJECT",
-      ],
-    },
-    blacklist: {
-      paths: [
-        "/etc/passwd",
-        "/etc/shadow",
-        "/etc/sudoers",
-        "/home/*/.ssh",
-        "/root",
-        "/var/log",
-        "/proc",
-        "/sys",
-        "/dev",
-        "/boot",
-      ],
-      binaries: [
-        "/bin/su",
-        "/usr/bin/sudo",
-        "/bin/chmod",
-        "/bin/chown",
-        "/usr/bin/passwd",
-        "/usr/bin/ssh",
-        "/usr/bin/scp",
-        "/usr/bin/rsync",
-        "/bin/mount",
-        "/bin/umount",
-      ],
-      networkHosts: ["malicious-site.com", "*.suspicious.domain"],
-    },
+      binaries: string[];
+      directories: string[];
+      fileExtensions: string[];
+      environmentVariables: string[];
+    };
+    blacklist: { paths: string[]; binaries: string[]; networkHosts?: string[] };
     limits: {
-      maxMemoryMB: 2048,
-      maxCpuPercent: 80,
-      maxProcesses: 50,
-      maxFileSize: "100M",
-      maxDiskUsage: "1G",
-    },
+      maxMemoryMB: number;
+      maxCpuPercent: number;
+      maxProcesses: number;
+      maxFileSize: string;
+      maxDiskUsage: string;
+    };
     network: {
-      allowedHosts: [
-        "localhost",
-        "127.0.0.1",
-        "*.npmjs.org",
-        "*.github.com",
-        "*.githubusercontent.com",
-        "*.vercel.com",
-        "*.nodejs.org",
-      ],
-      allowedPorts: [3000, 3001, 3002, 5432, 8080, 8081],
-      blockInternet: false,
-      allowLocalhost: true,
-    },
+      allowedHosts: string[];
+      allowedPorts: number[];
+      blockInternet: boolean;
+      allowLocalhost: boolean;
+    };
     filesystem: {
-      jailRoot: ".vibe-guard-instance/guard-jail",
-      mountPoints: [
-        { source: "src", target: "/jail/project/src", readonly: false },
-        { source: "public", target: "/jail/project/public", readonly: false },
-        {
-          source: "package.json",
-          target: "/jail/project/package.json",
-          readonly: true,
-        },
-        {
-          source: "node_modules",
-          target: "/jail/project/node_modules",
-          readonly: true,
-        },
-      ],
-      tempDirectory: ".vibe-guard-instance/guard-temp",
-    },
-  };
-  /* eslint-enable i18next/no-literal-string */
-}
-
-/**
- * Setup guard jail environment based on configuration
- */
-function setupGuardJailEnvironment(
-  config: GuardJailConfig,
-  projectPath: string,
-  logger: EndpointLogger,
-): { success: boolean; message: string } {
-  const username = `guard_${config.project.name.replaceAll(/[^a-zA-Z0-9]/g, "_")}`;
-  const jailRoot = path.join(projectPath, config.filesystem.jailRoot);
-
-  logger.info(`Setting up guard jail for ${config.project.name}`, {
-    username,
-    jailRoot,
-  });
-
-  try {
-    // Create jail root directory
-    if (!fs.existsSync(jailRoot)) {
-      fs.mkdirSync(jailRoot, { mode: 0o755, recursive: true });
-      logger.info(`🏠 Created jail root: ${jailRoot}`);
-    }
-
-    // Create temp directory
-    const tempDir = path.join(projectPath, config.filesystem.tempDirectory);
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { mode: 0o755, recursive: true });
-      logger.info(`📁 Created temp directory: ${tempDir}`);
-    }
-
-    // Create jail configuration file
-    const jailConfigPath = path.join(jailRoot, "jail.config.json");
-    fs.writeFileSync(jailConfigPath, JSON.stringify(config, null, 2));
-    logger.info(`⚙️ Created jail config: ${jailConfigPath}`);
-
-    // Create whitelist file for binaries
-    const whitelistPath = path.join(jailRoot, "whitelist.txt");
-    fs.writeFileSync(
-      whitelistPath,
-      `${config.whitelist.binaries.join("\n")}\n`,
-    );
-    logger.info(`📋 Created binary whitelist: ${whitelistPath}`);
-
-    return {
-      success: true,
-      message: `✅ Guard jail setup complete for ${config.project.name}`,
+      jailRoot: string;
+      mountPoints: Array<{ source: string; target: string; readonly: boolean }>;
+      tempDirectory: string;
     };
-  } catch (error) {
-    logger.error("Failed to setup guard jail:", parseError(error));
+  } {
+    /* eslint-disable i18next/no-literal-string */
     return {
-      success: false,
-      message: `❌ Failed to setup guard jail: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
-}
-
-/**
- * Setup VSCode integration
- */
-function setupVSCodeIntegration(
-  projectPath: string,
-  logger: EndpointLogger,
-): { success: boolean; message: string } {
-  const vscodePath = path.join(projectPath, ".vscode");
-
-  try {
-    // Create .vscode directory if it doesn't exist
-    if (!fs.existsSync(vscodePath)) {
-      fs.mkdirSync(vscodePath, { recursive: true });
-      logger.info(`📁 Created .vscode directory: ${vscodePath}`);
-    }
-
-    // Create or update VSCode settings
-    const settingsPath = path.join(vscodePath, "settings.json");
-    interface VSCodeSettings {
-      "terminal.integrated.profiles.linux"?: Record<string, { path: string }>;
-      "terminal.integrated.defaultProfile.linux"?: string;
-    }
-    let existingSettings: VSCodeSettings = {};
-
-    // Load existing settings if they exist
-    if (fs.existsSync(settingsPath)) {
-      try {
-        const existingContent = fs.readFileSync(settingsPath, "utf8");
-        existingSettings = JSON.parse(existingContent);
-        logger.info(`📖 Loaded existing VSCode settings`);
-      } catch {
-        logger.info(`⚠️ Could not parse existing settings, creating new ones`);
-        existingSettings = {};
-      }
-    }
-
-    // Merge guard settings with existing settings
-    const existingProfiles =
-      existingSettings["terminal.integrated.profiles.linux"] || {};
-    const guardSettings: VSCodeSettings = {
-      "terminal.integrated.profiles.linux": {
-        ...existingProfiles,
-        "Vibe Guard": {
-          // eslint-disable-next-line i18next/no-literal-string, eslint/no-template-curly-in-string
-          path: "${workspaceFolder}/.vibe-guard-instance/.guard.sh",
-        },
+      project: {
+        name: projectName,
+        description: "Development environment",
       },
-      "terminal.integrated.defaultProfile.linux": "Vibe Guard",
+      security: {
+        level: "standard",
+        isolationMethod: "chroot",
+        enableNetworking: true,
+        enableFileSystemWrite: false,
+      },
+      whitelist: {
+        binaries: [
+          "/bin/ls",
+          "/bin/cat",
+          "/bin/grep",
+          "/bin/find",
+          "/bin/head",
+          "/bin/tail",
+          "/bin/wc",
+          "/usr/bin/vim",
+          "/usr/bin/nano",
+          "/usr/bin/git",
+          "/usr/bin/node",
+          "/usr/bin/npm",
+          "/usr/bin/yarn",
+          "/usr/bin/pnpm",
+          "/usr/bin/bun",
+          "~/.bun/bin/bun",
+          "/usr/bin/tree",
+          "~/.local/bin/vibe",
+        ],
+        directories: [
+          "src",
+          "public",
+          ".tmp",
+          ".next",
+          "node_modules",
+          ".git",
+          ".vscode",
+        ],
+        fileExtensions: [
+          ".ts",
+          ".tsx",
+          ".js",
+          ".jsx",
+          ".json",
+          ".md",
+          ".txt",
+          ".css",
+          ".scss",
+          ".sass",
+          ".html",
+          ".svg",
+          ".png",
+          ".jpg",
+          ".jpeg",
+          ".gif",
+          ".webp",
+          ".env",
+          ".env.local",
+          ".gitignore",
+          ".eslintrc",
+        ],
+        environmentVariables: [
+          "NODE_ENV",
+          "TERM",
+          "PATH",
+          "HOME",
+          "USER",
+          "GUARD_MODE",
+          "GUARD_PROJECT",
+        ],
+      },
+      blacklist: {
+        paths: [
+          "/etc/passwd",
+          "/etc/shadow",
+          "/etc/sudoers",
+          "/home/*/.ssh",
+          "/root",
+          "/var/log",
+          "/proc",
+          "/sys",
+          "/dev",
+          "/boot",
+        ],
+        binaries: [
+          "/bin/su",
+          "/usr/bin/sudo",
+          "/bin/chmod",
+          "/bin/chown",
+          "/usr/bin/passwd",
+          "/usr/bin/ssh",
+          "/usr/bin/scp",
+          "/usr/bin/rsync",
+          "/bin/mount",
+          "/bin/umount",
+        ],
+        networkHosts: ["malicious-site.com", "*.suspicious.domain"],
+      },
+      limits: {
+        maxMemoryMB: 2048,
+        maxCpuPercent: 80,
+        maxProcesses: 50,
+        maxFileSize: "100M",
+        maxDiskUsage: "1G",
+      },
+      network: {
+        allowedHosts: [
+          "localhost",
+          "127.0.0.1",
+          "*.npmjs.org",
+          "*.github.com",
+          "*.githubusercontent.com",
+          "*.vercel.com",
+          "*.nodejs.org",
+        ],
+        allowedPorts: [3000, 3001, 3002, 5432, 8080, 8081],
+        blockInternet: false,
+        allowLocalhost: true,
+      },
+      filesystem: {
+        jailRoot: ".vibe-guard-instance/guard-jail",
+        mountPoints: [
+          { source: "src", target: "/jail/project/src", readonly: false },
+          { source: "public", target: "/jail/project/public", readonly: false },
+          {
+            source: "package.json",
+            target: "/jail/project/package.json",
+            readonly: true,
+          },
+          {
+            source: "node_modules",
+            target: "/jail/project/node_modules",
+            readonly: true,
+          },
+        ],
+        tempDirectory: ".vibe-guard-instance/guard-temp",
+      },
     };
-
-    const mergedSettings: VSCodeSettings = {
-      ...existingSettings,
-      ...guardSettings,
-    };
-
-    fs.writeFileSync(settingsPath, JSON.stringify(mergedSettings, null, 2));
-    logger.info(
-      `⚙️ Updated VSCode settings with guard integration: ${settingsPath}`,
-    );
-
-    // Create guard script in .vibe-guard-instance
-    const guardInstancePath = path.join(projectPath, ".vibe-guard-instance");
-    if (!fs.existsSync(guardInstancePath)) {
-      fs.mkdirSync(guardInstancePath, { recursive: true });
-      logger.info(`📁 Created guard instance directory: ${guardInstancePath}`);
-    }
-
-    const guardScriptPath = path.join(guardInstancePath, ".guard.sh");
-    const guardScript = createGuardScript();
-    fs.writeFileSync(guardScriptPath, guardScript, { mode: 0o755 });
-    logger.info(`🛡️ Created guard script: ${guardScriptPath}`);
-
-    return {
-      success: true,
-      message: `✅ VSCode integration setup complete`,
-    };
-  } catch (error) {
-    logger.error("Failed to setup VSCode integration:", parseError(error));
-    return {
-      success: false,
-      message: `❌ Failed to setup VSCode integration: ${error instanceof Error ? error.message : String(error)}`,
-    };
+    /* eslint-enable i18next/no-literal-string */
   }
-}
 
-/**
- * Create guard script for VSCode
- */
-function createGuardScript(): string {
-  return `#!/bin/bash
+  /**
+   * Setup guard jail environment based on configuration
+   */
+  private static setupGuardJailEnvironment(
+    config: ReturnType<typeof GuardStartRepository.createDefaultGuardConfig>,
+    projectPath: string,
+    logger: EndpointLogger,
+    t: GuardStartT,
+  ): ResponseType<{ message: string }> {
+    const username = `guard_${config.project.name.replaceAll(/[^a-zA-Z0-9]/g, "_")}`;
+    const jailRoot = path.join(projectPath, config.filesystem.jailRoot);
+
+    logger.info(`Setting up guard jail for ${config.project.name}`, {
+      username,
+      jailRoot,
+    });
+
+    try {
+      // Create jail root directory
+      if (!fs.existsSync(jailRoot)) {
+        fs.mkdirSync(jailRoot, { mode: 0o755, recursive: true });
+        logger.info(`🏠 Created jail root: ${jailRoot}`);
+      }
+
+      // Create temp directory
+      const tempDir = path.join(projectPath, config.filesystem.tempDirectory);
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { mode: 0o755, recursive: true });
+        logger.info(`📁 Created temp directory: ${tempDir}`);
+      }
+
+      // Create jail configuration file
+      const jailConfigPath = path.join(jailRoot, "jail.config.json");
+      fs.writeFileSync(jailConfigPath, JSON.stringify(config, null, 2));
+      logger.info(`⚙️ Created jail config: ${jailConfigPath}`);
+
+      // Create whitelist file for binaries
+      const whitelistPath = path.join(jailRoot, "whitelist.txt");
+      fs.writeFileSync(
+        whitelistPath,
+        `${config.whitelist.binaries.join("\n")}\n`,
+      );
+      logger.info(`📋 Created binary whitelist: ${whitelistPath}`);
+
+      return success({
+        message: `✅ Guard jail setup complete for ${config.project.name}`,
+      });
+    } catch (error) {
+      logger.error("Failed to setup guard jail:", parseError(error));
+      return fail({
+        message: t("errors.internal.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      });
+    }
+  }
+
+  /**
+   * Setup VSCode integration
+   */
+  private static setupVSCodeIntegration(
+    projectPath: string,
+    logger: EndpointLogger,
+    t: GuardStartT,
+  ): ResponseType<{ message: string }> {
+    const vscodePath = path.join(projectPath, ".vscode");
+
+    try {
+      // Create .vscode directory if it doesn't exist
+      if (!fs.existsSync(vscodePath)) {
+        fs.mkdirSync(vscodePath, { recursive: true });
+        logger.info(`📁 Created .vscode directory: ${vscodePath}`);
+      }
+
+      // Create or update VSCode settings
+      const settingsPath = path.join(vscodePath, "settings.json");
+      interface VSCodeSettings {
+        "terminal.integrated.profiles.linux"?: Record<string, { path: string }>;
+        "terminal.integrated.defaultProfile.linux"?: string;
+      }
+      let existingSettings: VSCodeSettings = {};
+
+      // Load existing settings if they exist
+      if (fs.existsSync(settingsPath)) {
+        try {
+          const existingContent = fs.readFileSync(settingsPath, "utf8");
+          existingSettings = JSON.parse(existingContent);
+          logger.info(`📖 Loaded existing VSCode settings`);
+        } catch {
+          logger.info(
+            `⚠️ Could not parse existing settings, creating new ones`,
+          );
+          existingSettings = {};
+        }
+      }
+
+      // Merge guard settings with existing settings
+      const existingProfiles =
+        existingSettings["terminal.integrated.profiles.linux"] || {};
+      const guardSettings: VSCodeSettings = {
+        "terminal.integrated.profiles.linux": {
+          ...existingProfiles,
+          "Vibe Guard": {
+            // eslint-disable-next-line i18next/no-literal-string, eslint/no-template-curly-in-string
+            path: "${workspaceFolder}/.vibe-guard-instance/.guard.sh",
+          },
+        },
+        "terminal.integrated.defaultProfile.linux": "Vibe Guard",
+      };
+
+      const mergedSettings: VSCodeSettings = {
+        ...existingSettings,
+        ...guardSettings,
+      };
+
+      fs.writeFileSync(settingsPath, JSON.stringify(mergedSettings, null, 2));
+      logger.info(
+        `⚙️ Updated VSCode settings with guard integration: ${settingsPath}`,
+      );
+
+      // Create guard script in .vibe-guard-instance
+      const guardInstancePath = path.join(projectPath, ".vibe-guard-instance");
+      if (!fs.existsSync(guardInstancePath)) {
+        fs.mkdirSync(guardInstancePath, { recursive: true });
+        logger.info(
+          `📁 Created guard instance directory: ${guardInstancePath}`,
+        );
+      }
+
+      const guardScriptPath = path.join(guardInstancePath, ".guard.sh");
+      const guardScript = GuardStartRepository.createGuardScript();
+      fs.writeFileSync(guardScriptPath, guardScript, { mode: 0o755 });
+      logger.info(`🛡️ Created guard script: ${guardScriptPath}`);
+
+      return success({
+        message: `✅ VSCode integration setup complete`,
+      });
+    } catch (error) {
+      logger.error("Failed to setup VSCode integration:", parseError(error));
+      return fail({
+        message: t("errors.internal.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      });
+    }
+  }
+
+  /**
+   * Create guard script for VSCode
+   */
+  private static createGuardScript(): string {
+    return `#!/bin/bash
 # Vibe Guard - Environment-Based Security
 set -e
 
@@ -461,55 +460,48 @@ chmod 644 "$GUARD_PROFILE"
 echo "🔄 Starting isolated guard environment: $GUARD_USER"
 
 # Use restricted environment with clean environment variables
-exec env -i \
-    HOME="$GUARD_HOME" \
-    USER="$GUARD_USER" \
-    SHELL="/bin/bash" \
-    TERM="$TERM" \
-    PATH="$PATH" \
-    GUARD_MODE=1 \
-    GUARD_PROJECT="$GUARD_PROJECT" \
-    GUARD_JAIL_ROOT="$GUARD_JAIL_ROOT" \
-    ORIGINAL_USER_HOME="$ORIGINAL_USER_HOME" \
-    PWD="$GUARD_PROJECT" \
+exec env -i \\
+    HOME="$GUARD_HOME" \\
+    USER="$GUARD_USER" \\
+    SHELL="/bin/bash" \\
+    TERM="$TERM" \\
+    PATH="$PATH" \\
+    GUARD_MODE=1 \\
+    GUARD_PROJECT="$GUARD_PROJECT" \\
+    GUARD_JAIL_ROOT="$GUARD_JAIL_ROOT" \\
+    ORIGINAL_USER_HOME="$ORIGINAL_USER_HOME" \\
+    PWD="$GUARD_PROJECT" \\
     bash --rcfile "$GUARD_PROFILE"
 `;
-}
+  }
 
-/**
- * Guard Start Repository Interface
- */
-export interface GuardStartRepository {
-  startGuard(
+  static async startGuard(
     data: GuardStartRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<GuardStartResponseOutput>>;
-}
-
-/**
- * Guard Start Repository Implementation
- */
-export class GuardStartRepositoryImpl implements GuardStartRepository {
-  async startGuard(
-    data: GuardStartRequestOutput,
-    logger: EndpointLogger,
-    t: ModuleT,
+    t: GuardStartT,
   ): Promise<ResponseType<GuardStartResponseOutput>> {
     try {
       logger.info("Starting guard environment");
       logger.debug("Guard start request data", { data });
 
       if (data.guardIdInput) {
-        return await this.startByGuardId(data.guardIdInput, logger, t);
+        return await GuardStartRepository.startByGuardId(
+          data.guardIdInput,
+          logger,
+          t,
+        );
       }
 
       if (data.projectPath) {
-        return await this.startByProject(data.projectPath, logger, t);
+        return await GuardStartRepository.startByProject(
+          data.projectPath,
+          logger,
+          t,
+        );
       }
 
       if (data.startAll) {
-        return this.startAllGuards(logger);
+        return GuardStartRepository.startAllGuards(logger);
       }
 
       // Default to current project if no parameters specified
@@ -517,7 +509,11 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       logger.info(
         `No parameters specified, defaulting to current project: ${currentProjectPath}`,
       );
-      return await this.startByProject(currentProjectPath, logger, t);
+      return await GuardStartRepository.startByProject(
+        currentProjectPath,
+        logger,
+        t,
+      );
     } catch (error) {
       logger.error("Guard start failed", parseError(error));
       const parsedError =
@@ -531,10 +527,10 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     }
   }
 
-  private async startByGuardId(
+  private static async startByGuardId(
     guardId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GuardStartT,
   ): Promise<ResponseType<GuardStartResponseOutput>> {
     logger.debug(`Starting guard: ${guardId}`);
 
@@ -548,10 +544,10 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     });
   }
 
-  private async startByProject(
+  private static async startByProject(
     projectPath: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GuardStartT,
   ): Promise<ResponseType<GuardStartResponseOutput>> {
     logger.debug(`Starting guard for project: ${projectPath}`);
 
@@ -570,30 +566,31 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     }
 
     // Create default guard jail configuration
-    const config = createDefaultGuardConfig(projectName);
+    const config = GuardStartRepository.createDefaultGuardConfig(projectName);
 
     logger.info(
       `🛡️ Guard jail configuration loaded for ${config.project.name}`,
     );
 
     // Setup guard jail environment
-    const setupResult = setupGuardJailEnvironment(config, projectPath, logger);
+    const setupResult = GuardStartRepository.setupGuardJailEnvironment(
+      config,
+      projectPath,
+      logger,
+      t,
+    );
     if (!setupResult.success) {
-      return fail({
-        message: t("errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: setupResult.message },
-      });
+      return setupResult;
     }
 
     // Setup VSCode integration
-    const vscodeResult = setupVSCodeIntegration(projectPath, logger);
+    const vscodeResult = GuardStartRepository.setupVSCodeIntegration(
+      projectPath,
+      logger,
+      t,
+    );
     if (!vscodeResult.success) {
-      return fail({
-        message: t("errors.internal.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: vscodeResult.message },
-      });
+      return vscodeResult;
     }
 
     const guardId = `guard_${config.project.name.replaceAll(/[^a-zA-Z0-9]/g, "_")}`;
@@ -662,7 +659,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     return success(response);
   }
 
-  private startAllGuards(
+  private static startAllGuards(
     logger: EndpointLogger,
   ): ResponseType<GuardStartResponseOutput> {
     logger.debug("Starting all guards");
@@ -695,5 +692,3 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     return success(response);
   }
 }
-
-export const guardStartRepository = new GuardStartRepositoryImpl();

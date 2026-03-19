@@ -3,7 +3,7 @@
  * Replaces scattered closure variables to prevent memory leaks
  */
 
-import type { ModuleT } from "@/app/api/[locale]/credits/repository";
+import type { CreditsT as ModuleT } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 

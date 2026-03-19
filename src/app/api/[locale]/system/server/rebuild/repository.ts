@@ -11,8 +11,6 @@
  * 6. Hot-restart via SIGUSR1
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, renameSync, rmSync } from "node:fs";
 
@@ -32,46 +30,21 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as checkScopedTranslation } from "../../check/vibe-check/i18n";
 import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
-import { databaseMigrationRepository } from "../../db/migrate/repository";
+import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { VIBE_START_PID_FILE } from "../pid";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-interface RebuildStep {
-  label: string;
-  ok: boolean;
-  skipped: boolean;
-  durationMs: number;
-}
-
-interface RebuildResponse {
-  success: string;
-  duration: number;
-  steps: RebuildStep[];
-  errors?: string[];
-}
+import type { RebuildResponseOutput, RebuildStep } from "./definition";
+import type { RebuildT } from "./i18n";
 
 /**
- * Rebuild Repository Interface
+ * Rebuild Repository
  */
-export interface RebuildRepositoryInterface {
-  execute(
+export class RebuildRepository {
+  static async execute(
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<RebuildResponse>>;
-}
-
-/**
- * Rebuild Repository Implementation
- */
-export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
-  async execute(
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<RebuildResponse>> {
+    t: RebuildT,
+    signal: AbortSignal,
+  ): Promise<ResponseType<RebuildResponseOutput>> {
     const errors: string[] = [];
     const steps: RebuildStep[] = [];
     const totalStart = Date.now();
@@ -129,6 +102,7 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
           Platform.CLI,
           checkT,
           locale,
+          signal,
         );
         if (checkResult.success) {
           const { totalIssues, totalErrors } = checkResult.data;
@@ -221,7 +195,7 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
       // Step 4: Database migrations
       const migrateOk = await runStep(t("post.steps.migrate"), async () => {
         const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-        const migrateResult = await databaseMigrationRepository.runMigrations(
+        const migrateResult = await DatabaseMigrationRepository.runMigrations(
           { generate: false, dryRun: false, redo: false, schema: "public" },
           migrateT,
           logger,
@@ -259,7 +233,7 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
       }
 
       // Step 6: Signal vibe start to restart Next.js
-      const restartResult = this.signalRestart(logger);
+      const restartResult = RebuildRepository.signalRestart(logger, t);
       steps.push({
         label: t("post.steps.restart"),
         ok: restartResult.success,
@@ -268,7 +242,7 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
       });
       if (!restartResult.success) {
         errors.push(
-          t("post.steps.restartFailed", { error: restartResult.reason }),
+          t("post.steps.restartFailed", { error: restartResult.message }),
         );
         return success({
           success: t("post.errors.server.title"),
@@ -296,49 +270,48 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
   /**
    * Read PID from .vibe-pid and send SIGUSR1 to the running vibe start process
    */
-  private signalRestart(
+  private static signalRestart(
     logger: EndpointLogger,
-  ): { success: true; pid: number } | { success: false; reason: string } {
+    t: RebuildT,
+  ): ResponseType<{ pid: number }> {
     if (!existsSync(VIBE_START_PID_FILE)) {
-      return {
-        success: false,
-        reason: "No .vibe-pid file found — is vibe start running?",
-      };
+      return fail({
+        message: t("post.steps.noPidFile"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
 
     const pidStr = readFileSync(VIBE_START_PID_FILE, "utf-8").trim();
     const pid = parseInt(pidStr, 10);
 
     if (isNaN(pid) || pid <= 0) {
-      return {
-        success: false,
-        reason: `Invalid PID in .vibe-pid: ${pidStr}`,
-      };
+      return fail({
+        message: t("post.steps.invalidPid"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { pid: pidStr },
+      });
     }
 
     try {
       process.kill(pid, 0);
     } catch {
-      return {
-        success: false,
-        reason: `Process ${pid} is not running`,
-      };
+      return fail({
+        message: t("post.steps.processNotRunning"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { pid: String(pid) },
+      });
     }
 
     try {
       process.kill(pid, "SIGUSR1");
-      logger.info(`🔄 Server restart signal sent (pid: ${pid})`);
-      return { success: true, pid };
+      logger.info(`Server restart signal sent (pid: ${pid})`);
+      return success({ pid });
     } catch (error) {
-      return {
-        success: false,
-        reason: `Failed to send SIGUSR1: ${parseError(error).message}`,
-      };
+      return fail({
+        message: t("post.steps.signalFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 }
-
-/**
- * Default repository instance
- */
-export const rebuildRepository = new RebuildRepositoryImpl();

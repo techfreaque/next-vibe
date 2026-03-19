@@ -297,7 +297,6 @@ const defaultFeatures: ModelFeatures = {
 };
 
 // Model names and icons are technical identifiers that should not be translated
-/* eslint-disable i18next/no-literal-string */
 export const modelDefinitions: Record<string, ModelDefinition> = {
   [ModelId.UNCENSORED_LM_V1_2]: {
     name: "UncensoredLM v1.2",

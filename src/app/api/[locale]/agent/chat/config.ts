@@ -3,8 +3,9 @@
  * Default folder definitions and utilities
  */
 
-import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   type UserPermissionRoleValue,
   UserRole,
@@ -77,6 +78,12 @@ export interface ToolExecutionContext {
    */
   pendingTimeoutMs: number | undefined;
   /**
+   * Stream timeout from the called tool's endpoint definition (streamTimeoutMs).
+   * Injected by tools-loader before execute() is called.
+   * undefined = use default (90_000). 0 = no timeout (long-running tools).
+   */
+  callerTimeoutMs?: number;
+  /**
    * The branch leaf message ID at the time this tool call was initiated.
    * Set by tools-loader from PendingToolData.toolCallData.parentId before each execute() call.
    * Stored on wakeUp task rows so resume-stream can append the deferred result to the
@@ -100,10 +107,17 @@ export interface ToolExecutionContext {
    */
   waitingForRemoteResult: boolean | undefined;
   /**
+   * Set by escalateToTask(callbackMode=wait) to trigger endLoop semantics:
+   * wait for all parallel tools to finish, then stop the AI loop without a
+   * new request. Bridged to StreamContext.shouldStopLoop in index.ts.
+   * Optional — only present in streaming contexts (bridged via defineProperty).
+   */
+  shouldStopLoop?: boolean;
+  /**
    * The stream's abort signal — set when streaming, undefined for non-stream contexts.
    * Tool executions check this before starting to bail out if the stream was cancelled.
    */
-  abortSignal: AbortSignal | undefined;
+  abortSignal: AbortSignal;
   /**
    * The AI SDK toolCallId for the current tool call being executed.
    * Set by tools-loader execute() wrapper from options.toolCallId before calling execute().
@@ -112,21 +126,40 @@ export interface ToolExecutionContext {
    */
   callerToolCallId: string | undefined;
   /**
+   * The callbackMode the AI caller requested for the current tool call.
+   * Set by execute-tool before invoking the tool handler so long-running tools
+   * (like claude-code interactive) can pass it to escalateToTask() and honour
+   * the exact semantics the caller expects (wait/wakeUp/detach/endLoop).
+   * Undefined outside of execute-tool invocations.
+   */
+  callerCallbackMode: CallbackModeValue | undefined;
+  /**
    * Call this from inside a long-running tool execute() to escape the 90s stream timeout.
-   * Creates a wakeUp cron task row for this tool call, sets pendingTimeoutMs=90_000 so
-   * the stream times out cleanly, and registers the tool with WAKE_UP semantics.
-   * The tool continues running after this returns. When done, call handleTaskCompletion.
+   * Creates a task row with the requested callbackMode and stops the stream cleanly:
+   * - wait: sets shouldStopLoop (endLoop semantics, all parallel tools finish first)
+   * - wakeUp/detach: sets waitingForRemoteResult (REMOTE_TOOL_WAIT, stream aborts immediately)
+   * Also wires cancel propagation. The tool continues running after this returns.
+   * When the tool finishes, call onComplete() — or for tools that delegate completion
+   * to an external process (e.g. claude-code calling complete-task), ignore onComplete.
    * Only available in streaming contexts — undefined for cron/headless invocations.
    *
    * Usage:
    *   if (context.streamContext?.escalateToTask) {
-   *     const { taskId, onComplete } = await context.streamContext.escalateToTask();
+   *     const { taskId, onComplete } = await context.streamContext.escalateToTask({
+   *       callbackMode: context.streamContext.callerCallbackMode,
+   *       displayName: "My long task",
+   *     });
    *     // ... do long-running work ...
    *     await onComplete({ success: true, data: result });
    *   }
    */
   escalateToTask:
-    | (() => Promise<{
+    | ((options?: {
+        /** callbackMode to honour — defaults to wakeUp for backward compat */
+        callbackMode?: CallbackModeValue;
+        /** Human-readable name shown in task dashboard */
+        displayName?: string;
+      }) => Promise<{
         taskId: string;
         onComplete: (result: {
           success: boolean;
@@ -135,6 +168,13 @@ export interface ToolExecutionContext {
         }) => Promise<void>;
       }>)
     | undefined;
+  /**
+   * Set by escalateToTask when a task is in flight.
+   * Called by the abort signal listener when USER_CANCELLED fires so the task
+   * row is marked CANCELLED and the UI unlocks for a new message.
+   * Cleared after the cancel runs (or after onComplete).
+   */
+  onEscalatedTaskCancel: (() => Promise<void>) | undefined;
 }
 
 /**

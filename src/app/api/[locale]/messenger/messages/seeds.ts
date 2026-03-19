@@ -14,7 +14,7 @@ import { UserDetailLevel } from "../../user/enum";
 import { UserRepository } from "../../user/repository";
 import type { NewEmail } from "./db";
 import { MessageStatus, MessageType } from "./enum";
-import { emailRepository } from "./repository";
+import { EmailsRepository } from "./repository";
 
 /**
  * Helper function to create email message seed data
@@ -192,7 +192,7 @@ export async function dev(
     for (const email of emails) {
       if (email.userId) {
         try {
-          const result = await emailRepository.create(email, logger, locale);
+          const result = await EmailsRepository.create(email, logger, locale);
           if (result.success) {
             logger.debug(`✅ Created email message: ${email.subject}`);
           } else {
@@ -256,7 +256,7 @@ export async function test(
         },
       });
 
-      const result = await emailRepository.create(testEmail, logger, locale);
+      const result = await EmailsRepository.create(testEmail, logger, locale);
       if (result.success) {
         logger.debug("✅ Created test email message");
       } else {

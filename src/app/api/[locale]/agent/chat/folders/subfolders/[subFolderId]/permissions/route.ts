@@ -7,14 +7,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { getFolderPermissions, updateFolderPermissions } from "./repository";
+import { FolderPermissionsRepository } from "./repository";
 
 export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
     handler: async ({ user, urlPathParams, logger, t, locale }) => {
-      return await getFolderPermissions(
+      return await FolderPermissionsRepository.getFolderPermissions(
         user,
         { id: urlPathParams.subFolderId },
         logger,
@@ -26,7 +26,7 @@ export const { GET, PATCH, tools } = endpointsHandler({
   [Methods.PATCH]: {
     email: undefined,
     handler: async ({ data, urlPathParams, user, logger, t, locale }) => {
-      return await updateFolderPermissions(
+      return await FolderPermissionsRepository.updateFolderPermissions(
         user,
         { ...data, id: urlPathParams.subFolderId },
         logger,

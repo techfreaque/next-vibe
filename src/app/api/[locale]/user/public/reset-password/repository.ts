@@ -24,6 +24,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
+import type { ResetPasswordT } from "./i18n";
+
 import { UserDetailLevel } from "../../enum";
 import { UserRepository } from "../../repository";
 import { PasswordUpdateRepository } from "../../private/me/password/repository";
@@ -33,8 +35,6 @@ import { insertPasswordResetSchema, passwordResets } from "./db";
 import type { ResetPasswordRequestPostResponseOutput } from "./request/definition";
 import type { ResetPasswordValidateGetResponseOutput } from "./validate/definition";
 import type { ResetPasswordConfirmPostResponseOutput } from "./confirm/definition";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Password reset token payload
@@ -181,7 +181,7 @@ export class PasswordRepository {
     email: string,
     userId: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
     locale: CountryLanguage,
   ): Promise<ResponseType<string>> {
     try {
@@ -250,7 +250,7 @@ export class PasswordRepository {
   private static async verifyJwtToken(
     token: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
     locale: CountryLanguage,
   ): Promise<ResponseType<PasswordResetTokenPayload>> {
     try {
@@ -320,7 +320,7 @@ export class PasswordRepository {
     email: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
   ): Promise<ResponseType<string>> {
     try {
       logger.debug("Creating password reset token", { email });
@@ -356,7 +356,7 @@ export class PasswordRepository {
   private static async verifyTokenInternal(
     token: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
     locale: CountryLanguage,
   ): Promise<ResponseType<string>> {
     try {
@@ -389,7 +389,7 @@ export class PasswordRepository {
   static async verifyResetToken(
     token: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
     locale: CountryLanguage,
   ): Promise<ResponseType<ResetPasswordValidateGetResponseOutput>> {
     logger.debug("Verifying password reset token");
@@ -437,7 +437,7 @@ export class PasswordRepository {
     token: string,
     newPassword: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
     locale: CountryLanguage,
   ): Promise<ResponseType<ResetPasswordConfirmPostResponseOutput>> {
     try {
@@ -491,7 +491,7 @@ export class PasswordRepository {
     email: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
   ): Promise<ResponseType<string>> {
     try {
       logger.debug("Password reset request received", { email });
@@ -518,7 +518,7 @@ export class PasswordRepository {
     password: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ResetPasswordT,
   ): Promise<ResponseType<ResetPasswordConfirmPostResponseOutput>> {
     try {
       logger.debug("Processing password reset confirmation", { email });

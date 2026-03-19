@@ -28,17 +28,17 @@ import {
   formatTask,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import { unifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
+import { UnifiedTaskRunnerRepository } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/repository";
 import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
-import { databaseMigrationRepository } from "../../db/migrate/repository";
+import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as dockerScopedTranslation } from "../../db/utils/docker-operations/i18n";
-import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
+import { DockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
-import { dbUtilsRepository } from "../../db/utils/repository";
+import { DbUtilsRepository } from "../../db/utils/repository";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
 import {
   addPidToFile,
@@ -48,104 +48,64 @@ import {
   VIBE_DEV_PID_FILE,
   writePidFile,
 } from "../pid";
-import type endpoints from "./definition";
-
-/** Extract port number from a URL string, returns undefined if not parseable */
-function portFromUrl(url: string | undefined): number | undefined {
-  if (!url) {
-    return undefined;
-  }
-  try {
-    const parsed = new URL(url);
-    return parsed.port ? parseInt(parsed.port, 10) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/**
- * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
- * Only patches localhost URLs — production URLs are left untouched.
- * Child processes inherit process.env so they automatically get the correct URL.
- */
-function patchPublicUrlPort(port: number): void {
-  const current = process.env["NEXT_PUBLIC_APP_URL"];
-  if (!current) {
-    process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
-    return;
-  }
-  try {
-    const parsed = new URL(current);
-    if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
-      parsed.port = String(port);
-      process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
-    }
-  } catch {
-    // Not a valid URL — leave it as-is
-  }
-}
-
-type RequestType = typeof endpoints.POST.types.RequestOutput;
-
-// Constants to avoid literal strings
-const DEV_PROJECT_NAME = "vibe-dev";
-const DEV_CONTAINER_NAME = "dev-postgres";
-const DOCKER_VOLUME_SUFFIX = "postgres_data";
-const DATABASE_TEST_QUERY = "SELECT 1";
-const DATABASE_TIMEOUT_PREFIX = "Database connection timeout after";
-const DATABASE_TIMEOUT_SUFFIX = "attempts";
-
-// Funny shutdown messages - randomly picked when server stops
-const SHUTDOWN_MESSAGES = [
-  "👋 Peace out! The vibes have left the building",
-  "🌙 Server has left the chat",
-  "🌙 Going dark... catch you on the flip side",
-  "🎬 And... scene! That's a wrap folks",
-  "🚪 Server has stopped responding (just kidding, it's fine)",
-  "☕ Taking a coffee break... indefinitely",
-  "🎮 Game over! Insert coin to continue",
-  "🛌 Server is going to bed. Sweet dreams!",
-  "🎪 The circus has left town",
-  "🦖 Server went extinct (but it'll be back)",
-];
-
-/**
- * Returns database connection timeout error message
- * Internal dev utility - not user-facing
- * @param maxAttempts - Maximum number of connection attempts
- * @param delayMs - Delay between attempts in milliseconds
- */
-const getDatabaseTimeoutMessage = (
-  maxAttempts: number,
-  delayMs: number,
-): string =>
-  // eslint-disable-next-line i18next/no-literal-string -- Internal dev error message not user-facing
-  `${DATABASE_TIMEOUT_PREFIX} ${maxAttempts} ${DATABASE_TIMEOUT_SUFFIX} (${(maxAttempts * delayMs) / 1000}s)`;
+import type { DevRequestOutput } from "./definition";
 
 /**
  * Dev Repository Interface
  */
-export interface DevRepositoryInterface {
-  execute(
-    data: RequestType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<never>;
-}
-
 /**
- * Dev Repository Implementation
+ * Dev Repository
  */
-export class DevRepositoryImpl implements DevRepositoryInterface {
-  private runningProcesses: Map<string, ChildProcess> = new Map();
-  private shuttingDown = false;
-
-  constructor() {
-    // Set up clean exit handlers for crashes only
-    this.setupExitHandlers();
+export class DevRepository {
+  private static log(msg: string): void {
+    // eslint-disable-next-line no-console
+    console.log(msg);
   }
 
-  private setupExitHandlers(): void {
+  /** Extract port number from a URL string, returns undefined if not parseable */
+  private static portFromUrl(url: string | undefined): number | undefined {
+    if (!url) {
+      return undefined;
+    }
+    try {
+      const parsed = new URL(url);
+      return parsed.port ? parseInt(parsed.port, 10) : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
+   * Only patches localhost URLs — production URLs are left untouched.
+   * Child processes inherit process.env so they automatically get the correct URL.
+   */
+  private static patchPublicUrlPort(port: number): void {
+    const current = process.env["NEXT_PUBLIC_APP_URL"];
+    if (!current) {
+      process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
+      return;
+    }
+    try {
+      const parsed = new URL(current);
+      if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
+        parsed.port = String(port);
+        process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+      }
+    } catch {
+      // Not a valid URL — leave it as-is
+    }
+  }
+
+  private static runningProcesses: Map<string, ChildProcess> = new Map();
+  private static shuttingDown = false;
+
+  static {
+    // Set up clean exit handlers for crashes only
+    DevRepository.setupExitHandlers();
+  }
+
+  private static setupExitHandlers(): void {
     // Swallow crashes in dev — log and continue rather than killing the whole server
 
     // Handle uncaught exceptions
@@ -173,7 +133,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Perform hard database reset: stop containers, delete data, restart
    */
-  private async performHardDatabaseReset(
+  private static async performHardDatabaseReset(
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<void> {
@@ -184,12 +144,12 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     // 1. Stop Docker containers
     logger.debug("Stopping Docker containers...");
     const { t: dockerT } = dockerScopedTranslation.scopedT(locale);
-    const downResult = await dockerOperationsRepository.dockerComposeDown(
+    const downResult = await DockerOperationsRepository.dockerComposeDown(
       logger,
       dockerT,
       "docker-compose-dev.yml",
       30000,
-      DEV_PROJECT_NAME,
+      "vibe-dev",
     );
 
     if (!downResult.success) {
@@ -199,26 +159,25 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     // 2. Force-remove the container (hardcoded container_name in compose
     //    means `docker compose down` may not clean it up properly)
     try {
-      await execAsync(
-        `docker rm -f ${DEV_CONTAINER_NAME} 2>/dev/null || true`,
-        { timeout: 10000 },
-      );
+      await execAsync("docker rm -f dev-postgres 2>/dev/null || true", {
+        timeout: 10000,
+      });
       logger.debug("Removed dev-postgres container");
     } catch {
       logger.debug("No dev-postgres container to remove");
     }
 
     // 3. Delete postgres data volume
-    await this.deletePostgresDataVolume(logger);
+    await DevRepository.deletePostgresDataVolume(logger);
 
     // 4. Start Docker containers
     logger.debug("Starting Docker containers...");
-    const upResult = await dockerOperationsRepository.dockerComposeUp(
+    const upResult = await DockerOperationsRepository.dockerComposeUp(
       logger,
       dockerT,
       "docker-compose-dev.yml",
       60000,
-      DEV_PROJECT_NAME,
+      "vibe-dev",
     );
 
     if (!upResult.success) {
@@ -231,13 +190,13 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       );
     }
     // 5. Wait for database to be ready
-    await this.waitForDatabaseConnection(logger);
+    await DevRepository.waitForDatabaseConnection(logger);
   }
 
   /**
    * Delete postgres data volume for clean reset
    */
-  private async deletePostgresDataVolume(
+  private static async deletePostgresDataVolume(
     logger: EndpointLogger,
   ): Promise<void> {
     try {
@@ -245,7 +204,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       const { promisify } = await import("node:util");
       const execAsync = promisify(exec);
 
-      const volumeName = `${DEV_PROJECT_NAME}_${DOCKER_VOLUME_SUFFIX}`;
+      const volumeName = "vibe-dev_postgres_data";
       logger.debug(`Deleting postgres data volume: ${volumeName}...`);
 
       try {
@@ -267,7 +226,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    * Wait for database connection to be ready using proper database ping
    * Uses the same approach as CLI reset script for consistency
    */
-  private async waitForDatabaseConnection(
+  private static async waitForDatabaseConnection(
     logger: EndpointLogger,
   ): Promise<void> {
     const maxAttempts = 60; // 60 attempts = 30 seconds
@@ -291,8 +250,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         });
 
         try {
-          const testQuery = DATABASE_TEST_QUERY;
-          await pool.query(testQuery);
+          await pool.query("SELECT 1");
           await pool.end();
 
           logger.debug(
@@ -316,7 +274,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
             "❌ Database connection timeout - this will cause errors",
           );
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI fatal error requires throw to halt execution
-          throw new Error(getDatabaseTimeoutMessage(maxAttempts, delayMs));
+          throw new Error(
+            `Database connection timeout after ${maxAttempts} attempts (${(maxAttempts * delayMs) / 1000}s)`,
+          );
         }
 
         if (attempt % 10 === 0) {
@@ -328,19 +288,20 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     }
   }
 
-  async execute(
-    data: RequestType,
+  static async execute(
+    data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
-    const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
+    const port =
+      data.port ?? DevRepository.portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
 
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port.
     // This ensures runtime env reads (and all child processes) see the correct URL.
-    patchPublicUrlPort(port);
+    DevRepository.patchPublicUrlPort(port);
 
-    this.logStartupInfo(port, logger, data);
+    DevRepository.logStartupInfo(port, logger, data);
 
     // Kill any previous dev instance, then write our PID
     killPreviousInstance(VIBE_DEV_PID_FILE, logger);
@@ -355,10 +316,14 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     process.on("SIGTERM", earlyExitHandler);
 
     // Setup database if not skipped
-    const dbSetupSuccess = await this.setupDatabase(data, locale, logger);
+    const dbSetupSuccess = await DevRepository.setupDatabase(
+      data,
+      locale,
+      logger,
+    );
     if (!dbSetupSuccess) {
       // Database setup failed critically, start server anyway
-      return await this.startNextJsAndWait(
+      return await DevRepository.startNextJsAndWait(
         port,
         logger,
         earlyExitHandler,
@@ -368,10 +333,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     }
 
     // Start task runner if not skipped
-    void this.startTaskRunnerIfEnabled(data, locale, logger);
+    void DevRepository.startTaskRunnerIfEnabled(data, locale, logger);
 
     // Start Next.js (or Vite for TanStack) and keep process alive
-    return await this.startNextJsAndWait(
+    return await DevRepository.startNextJsAndWait(
       port,
       logger,
       earlyExitHandler,
@@ -383,10 +348,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Log startup information
    */
-  private logStartupInfo(
+  private static logStartupInfo(
     port: number,
     logger: EndpointLogger,
-    data: RequestType,
+    data: DevRequestOutput,
   ): void {
     logger.vibe(
       formatStartup(
@@ -396,62 +361,64 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         "⚡",
       ),
     );
-    log("");
-    log(`  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`);
+    DevRepository.log("");
+    DevRepository.log(
+      `  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`,
+    );
     if (data.tanstack) {
-      log(
+      DevRepository.log(
         `  ${formatConfig("Mode", "TanStack/Vite")} ${formatHint("(--tanstack)")}`,
       );
     }
-    log(
+    DevRepository.log(
       `  ${formatConfig("Debug", logger.isDebugEnabled ? "ON" : "OFF")}  ${formatHint(logger.isDebugEnabled ? "(remove -v or --verbose to disable)" : "(-v or --verbose to enable)")}`,
     );
-    log("");
+    DevRepository.log("");
 
     if (data.skipDbSetup) {
-      log(
+      DevRepository.log(
         `  ${formatConfig("Database", "DISABLED")} ${formatHint("(remove --skip-db-setup to enable)")}`,
       );
     } else {
-      log(
+      DevRepository.log(
         `  ${formatConfig("Database", "ENABLED")} ${formatHint("(--skip-db-setup to disable)")}`,
       );
-      log(
+      DevRepository.log(
         `    ${formatConfig("Reset", data.dbReset || data.r ? "YES" : "NO")} ${formatHint(data.dbReset || data.r ? "(remove -r to skip)" : "(-r to reset)")}`,
       );
-      log(
+      DevRepository.log(
         `    ${formatConfig("Migrations", data.skipMigrations ? "NO" : "YES")} ${formatHint(data.skipMigrations ? "(remove --skip-migrations)" : "(--skip-migrations)")}`,
       );
       if (!data.skipMigrations) {
-        log(
+        DevRepository.log(
           `    ${formatConfig("Generation", data.skipMigrationGeneration ? "NO" : "YES")} ${formatHint(data.skipMigrationGeneration ? "(remove --skip-migration-generation)" : "(--skip-migration-generation)")}`,
         );
       }
-      log(
+      DevRepository.log(
         `    ${formatConfig("Seeding", data.skipSeeding ? "NO" : "YES")} ${formatHint(data.skipSeeding ? "(remove --skip-seeding to enable)" : "(--skip-seeding to disable)")}`,
       );
     }
 
-    log("");
-    log(
+    DevRepository.log("");
+    DevRepository.log(
       `  ${formatConfig("Background Tasks", data.skipTaskRunner ? "DISABLED" : "ENABLED")} ${formatHint(data.skipTaskRunner ? "(remove --skip-task-runner)" : "(--skip-task-runner)")}`,
     );
-    log(
+    DevRepository.log(
       `  ${formatConfig("Code Generators", data.skipGeneratorWatcher ? "DISABLED" : "ENABLED")} ${formatHint(data.skipGeneratorWatcher ? "(remove --skip-generator-watcher)" : "(--skip-generator-watcher)")}`,
     );
-    log("");
-    log(
+    DevRepository.log("");
+    DevRepository.log(
       `  ${formatHint("💡 Edit src/app/api/[locale]/system/server/dev/definition.ts to change defaults")}`,
     );
-    log("");
+    DevRepository.log("");
   }
 
   /**
    * Setup database based on configuration
    * Returns false if setup failed critically and Next.js should start immediately
    */
-  private async setupDatabase(
-    data: RequestType,
+  private static async setupDatabase(
+    data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean> {
@@ -462,7 +429,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
     try {
       const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
-      const dockerCheckResult = await dbUtilsRepository.isDockerAvailable(
+      const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
         dbUtilsT,
         logger,
       );
@@ -476,7 +443,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       }
 
       // Perform database operations based on reset flag
-      const dbOperationSuccess = await this.performDatabaseOperations(
+      const dbOperationSuccess = await DevRepository.performDatabaseOperations(
         data,
         locale,
         logger,
@@ -501,24 +468,24 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    * Perform database operations (reset or start) and migrations
    * Returns false if critical failure occurred
    */
-  private async performDatabaseOperations(
-    data: RequestType,
+  private static async performDatabaseOperations(
+    data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<boolean> {
     try {
       if (data.dbReset || data.r) {
         // Reset includes migrations, so we pass the migration flags
-        await this.resetDatabase(locale, logger, data);
+        await DevRepository.resetDatabase(locale, logger, data);
       } else {
-        await this.startDatabaseWithoutReset(locale, logger);
+        await DevRepository.startDatabaseWithoutReset(locale, logger);
 
         // Run migrations if not skipped (only when not resetting)
         if (data.skipMigrations) {
           logger.vibe(formatSkip("Migrations skipped"));
         } else {
           const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-          const migrateResult = await databaseMigrationRepository.runMigrations(
+          const migrateResult = await DatabaseMigrationRepository.runMigrations(
             {
               generate: !data.skipMigrationGeneration,
               redo: false,
@@ -529,7 +496,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
             logger,
           );
           if (!migrateResult.success) {
-            this.logDatabaseError(
+            DevRepository.logDatabaseError(
               new Error(migrateResult.message ?? "Migration failed"),
               logger,
             );
@@ -553,7 +520,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
       return true;
     } catch (error) {
-      this.logDatabaseError(error, logger);
+      DevRepository.logDatabaseError(
+        error instanceof Error ? error : new Error(String(error)),
+        logger,
+      );
       cleanupPidFile(VIBE_DEV_PID_FILE);
       process.exit(1);
     }
@@ -562,16 +532,16 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Reset database with hard reset
    */
-  private async resetDatabase(
+  private static async resetDatabase(
     locale: CountryLanguage,
     logger: EndpointLogger,
-    data: RequestType,
+    data: DevRequestOutput,
   ): Promise<void> {
     const startTime = Date.now();
     logger.debug(
       `🔄 ${formatActionCommand("Resetting database using:", "docker compose down && docker volume rm")}`,
     );
-    await this.performHardDatabaseReset(logger, locale);
+    await DevRepository.performHardDatabaseReset(logger, locale);
     const duration = Date.now() - startTime;
     logger.info(`✓  Reset completed in ${formatDuration(duration)}`);
 
@@ -580,7 +550,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       logger.vibe(formatSkip("Migrations skipped"));
     } else {
       const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-      const migrateResult = await databaseMigrationRepository.runMigrations(
+      const migrateResult = await DatabaseMigrationRepository.runMigrations(
         {
           generate: !data.skipMigrationGeneration,
           redo: false,
@@ -591,7 +561,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         logger,
       );
       if (!migrateResult.success) {
-        this.logDatabaseError(
+        DevRepository.logDatabaseError(
           new Error(migrateResult.message ?? "Migration failed"),
           logger,
         );
@@ -604,7 +574,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Start database without reset
    */
-  private async startDatabaseWithoutReset(
+  private static async startDatabaseWithoutReset(
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -613,7 +583,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       `🐘 ${formatActionCommand("Starting PostgreSQL using:", "docker compose -f docker-compose-dev.yml up -d")}`,
     );
     const { t: dockerT } = dockerScopedTranslation.scopedT(locale);
-    const dbStartResult = await dockerOperationsRepository.dockerComposeUp(
+    const dbStartResult = await DockerOperationsRepository.dockerComposeUp(
       logger,
       dockerT,
       "docker-compose-dev.yml",
@@ -645,8 +615,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Log database error with helpful suggestions
    */
-  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error handling: Database errors can be any type (Drizzle errors, connection errors, etc), so unknown is correct before narrowing.
-  private logDatabaseError(error: unknown, logger: EndpointLogger): void {
+  private static logDatabaseError(error: Error, logger: EndpointLogger): void {
     const parsedError = parseError(error);
     logger.vibe(
       formatError(`Database operation failed: ${parsedError.message}`),
@@ -657,8 +626,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Start task runner if enabled
    */
-  private async startTaskRunnerIfEnabled(
-    data: RequestType,
+  private static async startTaskRunnerIfEnabled(
+    data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<void> {
@@ -669,7 +638,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
     try {
       logger.debug(formatTask("Starting task runner"));
-      await this.startUnifiedTaskRunner(locale, logger, data);
+      await DevRepository.startUnifiedTaskRunner(locale, logger, data);
       logger.debug(formatTask("Task runner started"));
     } catch (error) {
       const parsedError = parseError(error);
@@ -686,7 +655,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Start Next.js (or Vite for TanStack) dev server + WebSocket sidecar and wait forever
    */
-  private async startNextJsAndWait(
+  private static async startNextJsAndWait(
     port: number,
     logger: EndpointLogger,
     earlyExitHandler?: () => void,
@@ -722,8 +691,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
     // Kill stale processes on all used ports.
     // TanStack mode: Vite runs on nextPort (internal), proxy on wsPort (public) — same offsets as Next.js.
-    this.killProcessOnPort(nextPort, logger);
-    this.killProcessOnPort(wsPort, logger);
+    DevRepository.killProcessOnPort(nextPort, logger);
+    DevRepository.killProcessOnPort(wsPort, logger);
 
     // --- Start WS server (once — outlives Next.js restarts) ---
     const wsHandle = startWebSocketServer({ port: wsPort, logger });
@@ -741,7 +710,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     };
 
     const shutdown = (code: number, message?: string): void => {
-      this.shuttingDown = true;
+      DevRepository.shuttingDown = true;
       restoreTty();
       if (message) {
         process.stdout.write(`\n${message}\n`);
@@ -749,7 +718,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       // Stop Bun WS server
       wsHandle.stop();
       // Kill Next.js child process (current one tracked in runningProcesses)
-      const currentNext = this.runningProcesses.get("next");
+      const currentNext = DevRepository.runningProcesses.get("next");
       if (currentNext && !currentNext.killed) {
         currentNext.stdout?.unpipe();
         currentNext.stderr?.unpipe();
@@ -758,8 +727,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         currentNext.kill("SIGTERM");
       }
       // Force-kill anything still on the ports (catches stale processes)
-      this.killProcessOnPort(nextPort, logger);
-      this.killProcessOnPort(wsPort, logger);
+      DevRepository.killProcessOnPort(nextPort, logger);
+      DevRepository.killProcessOnPort(wsPort, logger);
       cleanupPidFile(VIBE_DEV_PID_FILE);
       process.exit(code);
     };
@@ -770,9 +739,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       process.off("SIGTERM", earlyExitHandler);
     }
     const sigintHandler = (): void => {
-      const randomMessage =
-        SHUTDOWN_MESSAGES[Math.floor(Math.random() * SHUTDOWN_MESSAGES.length)];
-      shutdown(0, randomMessage);
+      shutdown(0);
     };
     process.on("SIGINT", sigintHandler);
     process.on("SIGTERM", sigintHandler);
@@ -814,10 +781,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               "\n⏹  Stopping server to collect profiles…\n",
             );
             // Kill Next.js so it flushes NEXT_CPU_PROF output
-            this.shuttingDown = true;
+            DevRepository.shuttingDown = true;
             restoreTty();
             wsHandle.stop();
-            const currentNext = this.runningProcesses.get("next");
+            const currentNext = DevRepository.runningProcesses.get("next");
             if (currentNext && !currentNext.killed) {
               currentNext.stdout?.unpipe();
               currentNext.stderr?.unpipe();
@@ -825,8 +792,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               currentNext.stderr?.destroy();
               currentNext.kill("SIGTERM");
             }
-            this.killProcessOnPort(nextPort, logger);
-            this.killProcessOnPort(wsPort, logger);
+            DevRepository.killProcessOnPort(nextPort, logger);
+            DevRepository.killProcessOnPort(wsPort, logger);
             cleanupPidFile(VIBE_DEV_PID_FILE);
 
             // Give the process a moment to flush files, then open results
@@ -926,12 +893,12 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     let restartCount = 0;
 
     const spawnNext = (): void => {
-      if (this.shuttingDown) {
+      if (DevRepository.shuttingDown) {
         return;
       }
 
       // Drop stale reference from previous run to allow GC
-      this.runningProcesses.delete("next");
+      DevRepository.runningProcesses.delete("next");
 
       const profilingEnv = profile
         ? {
@@ -960,7 +927,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         },
         cwd: process.cwd(),
       });
-      this.runningProcesses.set("next", nextProcess);
+      DevRepository.runningProcesses.set("next", nextProcess);
 
       // Track child PID in PID file so it gets killed on next startup too
       if (nextProcess.pid) {
@@ -995,9 +962,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         // Free streams to allow GC
         nextProcess.stdout?.destroy();
         nextProcess.stderr?.destroy();
-        this.runningProcesses.delete("next");
+        DevRepository.runningProcesses.delete("next");
 
-        if (this.shuttingDown) {
+        if (DevRepository.shuttingDown) {
           return; // Intentional shutdown — don't restart
         }
 
@@ -1027,7 +994,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         );
 
         // Kill anything still on the port before restarting
-        this.killProcessOnPort(nextPort, logger);
+        DevRepository.killProcessOnPort(nextPort, logger);
 
         setTimeout(spawnNext, backoffMs);
       });
@@ -1045,10 +1012,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Start the unified task runner with filtered tasks for development
    */
-  private async startUnifiedTaskRunner(
+  private static async startUnifiedTaskRunner(
     locale: CountryLanguage,
     logger: EndpointLogger,
-    data: RequestType,
+    data: DevRequestOutput,
   ): Promise<void> {
     try {
       // Load the task registry
@@ -1056,7 +1023,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         await import("@/app/api/[locale]/system/generated/tasks-index");
 
       // Filter tasks for development environment
-      const devTasks = this.filterTasksForDevelopment(
+      const devTasks = DevRepository.filterTasksForDevelopment(
         taskRegistry.allTasks,
         data,
         logger,
@@ -1069,7 +1036,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       });
 
       // Set environment to development
-      unifiedTaskRunnerRepository.environment = "development";
+      UnifiedTaskRunnerRepository.environment = "development";
 
       // Create abort controller so task runners can be stopped on shutdown
       const controller = new AbortController();
@@ -1081,7 +1048,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       });
 
       // Start the task runner with filtered tasks
-      const startResult = unifiedTaskRunnerRepository.start(
+      const startResult = UnifiedTaskRunnerRepository.start(
         devTasks,
         controller.signal,
         locale,
@@ -1113,9 +1080,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   /**
    * Filter tasks that are appropriate for development environment
    */
-  private filterTasksForDevelopment(
+  private static filterTasksForDevelopment(
     allTasks: Task[],
-    data: RequestType,
+    data: DevRequestOutput,
     logger: EndpointLogger,
   ): Task[] {
     const filtered = allTasks.filter((task) => {
@@ -1148,7 +1115,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
    * Kill a process occupying the given port ONLY if its PID is in our PID file.
    * This prevents killing processes from other project instances running on the same port.
    */
-  private killProcessOnPort(port: number, logger: EndpointLogger): void {
+  private static killProcessOnPort(port: number, logger: EndpointLogger): void {
     // Get PIDs on this port
     let pidOnPort: number | undefined;
     try {
@@ -1212,12 +1179,3 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger.warn(`Port ${port} did not free up within 5 seconds`);
   }
 }
-
-/**
- * Default repository instance
- */
-export const devRepository = new DevRepositoryImpl();
-
-// Use console.log directly to avoid timestamps for the config section
-// oxlint-disable-next-line no-console
-const log = (msg: string): void => console.log(msg);

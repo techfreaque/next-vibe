@@ -51,9 +51,7 @@ import {
   jsonToTs,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { GeneratorsEndpointsMetaT } from "./i18n";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -74,7 +72,7 @@ interface EndpointsMetaResponseType {
  * The shape of each entry in the generated metadata array.
  * Kept as a plain interface (no Zod) — this lives in generated files only.
  */
-export interface EndpointMeta {
+interface EndpointMeta {
   /** Full tool name: path segments joined by "_" + "_" + METHOD */
   toolName: string;
   method: string;
@@ -102,33 +100,39 @@ export interface EndpointMeta {
   };
 }
 
-/** Locales we generate metadata for */
-const GENERATE_LOCALES: CountryLanguage[] = ["en-US", "de-DE", "pl-PL"];
-
-/** Mapping from CountryLanguage to short file basename */
-const LOCALE_FILE_NAMES: Partial<Record<CountryLanguage, string>> = {
-  "en-US": "en",
-  "de-DE": "de",
-  "pl-PL": "pl",
-};
-
-const HTTP_METHODS: Methods[] = [
-  "GET",
-  "POST",
-  "PUT",
-  "PATCH",
-  "DELETE",
-  "HEAD",
-  "OPTIONS",
-] as Methods[];
-
 // ─── Repository ──────────────────────────────────────────────────────────────
 
-class EndpointsMetaGeneratorRepositoryImpl {
-  async generateEndpointsMeta(
+export class EndpointsMetaGeneratorRepository {
+  /** Locales we generate metadata for */
+  private static readonly GENERATE_LOCALES: CountryLanguage[] = [
+    "en-US",
+    "de-DE",
+    "pl-PL",
+  ];
+
+  /** Mapping from CountryLanguage to short file basename */
+  private static readonly LOCALE_FILE_NAMES: Partial<
+    Record<CountryLanguage, string>
+  > = {
+    "en-US": "en",
+    "de-DE": "de",
+    "pl-PL": "pl",
+  };
+
+  private static readonly HTTP_METHODS: Methods[] = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "HEAD",
+    "OPTIONS",
+  ] as Methods[];
+
+  static async generateEndpointsMeta(
     data: EndpointsMetaRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsEndpointsMetaT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<EndpointsMetaResponseType>> {
     const startTime = Date.now();
@@ -182,10 +186,11 @@ class EndpointsMetaGeneratorRepositoryImpl {
       }
 
       // ── 3. Load all definitions once ────────────────────────────────────
-      const loadedEndpoints = await this.loadDefinitions(
-        validDefinitionFiles,
-        logger,
-      );
+      const loadedEndpoints =
+        await EndpointsMetaGeneratorRepository.loadDefinitions(
+          validDefinitionFiles,
+          logger,
+        );
 
       logger.debug(
         `Loaded ${loadedEndpoints.length} endpoint definitions (method entries)`,
@@ -194,17 +199,24 @@ class EndpointsMetaGeneratorRepositoryImpl {
       // ── 4. Generate one file per locale ─────────────────────────────────
       let filesWritten = 0;
 
-      for (const [localeIndex, locale] of GENERATE_LOCALES.entries()) {
-        const fileName = LOCALE_FILE_NAMES[locale] ?? locale;
+      for (const [
+        localeIndex,
+        locale,
+      ] of EndpointsMetaGeneratorRepository.GENERATE_LOCALES.entries()) {
+        const fileName =
+          EndpointsMetaGeneratorRepository.LOCALE_FILE_NAMES[locale] ?? locale;
         const outputFile = join(data.outputDir, `${fileName}.ts`);
 
         // Run collision detection only on the first locale pass (names are locale-independent)
-        const entries = this.serializeForLocale(
+        const entries = EndpointsMetaGeneratorRepository.serializeForLocale(
           loadedEndpoints,
           locale,
           localeIndex === 0 ? logger : undefined,
         );
-        const content = this.renderFile(entries, locale);
+        const content = EndpointsMetaGeneratorRepository.renderFile(
+          entries,
+          locale,
+        );
 
         await writeGeneratedFile(outputFile, content, data.dryRun);
         filesWritten++;
@@ -216,7 +228,7 @@ class EndpointsMetaGeneratorRepositoryImpl {
 
       logger.info(
         formatGenerator(
-          `Generated endpoints meta for ${GENERATE_LOCALES.length} locales with ${formatCount(loadedEndpoints.length, "endpoint")} in ${formatDuration(duration)}`,
+          `Generated endpoints meta for ${EndpointsMetaGeneratorRepository.GENERATE_LOCALES.length} locales with ${formatCount(loadedEndpoints.length, "endpoint")} in ${formatDuration(duration)}`,
           "🗂️ ",
         ),
       );
@@ -249,7 +261,7 @@ class EndpointsMetaGeneratorRepositoryImpl {
    * Import a single definition file and safely access its default export,
    * retrying once on Bun TDZ race errors (both import and .default access).
    */
-  private async importDefinitionFile(
+  private static async importDefinitionFile(
     defFile: string,
     logger: EndpointLogger,
   ): Promise<ApiSection | null> {
@@ -312,18 +324,22 @@ class EndpointsMetaGeneratorRepositoryImpl {
    * Dynamically import each definition file and collect one entry per
    * (definition file × HTTP method).
    */
-  private async loadDefinitions(
+  private static async loadDefinitions(
     defFiles: string[],
     logger: EndpointLogger,
   ): Promise<Array<{ definition: CreateApiEndpointAny }>> {
     const results: Array<{ definition: CreateApiEndpointAny }> = [];
 
     for (const defFile of defFiles) {
-      const defaultExport = await this.importDefinitionFile(defFile, logger);
+      const defaultExport =
+        await EndpointsMetaGeneratorRepository.importDefinitionFile(
+          defFile,
+          logger,
+        );
       if (!defaultExport || typeof defaultExport !== "object") {
         continue;
       }
-      for (const method of HTTP_METHODS) {
+      for (const method of EndpointsMetaGeneratorRepository.HTTP_METHODS) {
         const definition = defaultExport[method];
         if (!definition) {
           continue;
@@ -340,7 +356,7 @@ class EndpointsMetaGeneratorRepositoryImpl {
    * Translates title, description, category, and tags at generation time.
    * Runs alias collision detection and logs pretty errors for any conflicts.
    */
-  private serializeForLocale(
+  private static serializeForLocale(
     loaded: Array<{ definition: CreateApiEndpointAny }>,
     locale: CountryLanguage,
     logger?: EndpointLogger,
@@ -514,7 +530,10 @@ class EndpointsMetaGeneratorRepositoryImpl {
    * Render the TypeScript source for one locale file.
    * Pure data export — no imports of definition files.
    */
-  private renderFile(entries: EndpointMeta[], locale: CountryLanguage): string {
+  private static renderFile(
+    entries: EndpointMeta[],
+    locale: CountryLanguage,
+  ): string {
     // eslint-disable-next-line i18next/no-literal-string
     const header = generateFileHeader(
       "AUTO-GENERATED FILE - DO NOT EDIT",
@@ -552,6 +571,3 @@ export const endpointsMeta: EndpointMeta[] = ${entriesTs};
 `;
   }
 }
-
-export const endpointsMetaGeneratorRepository =
-  new EndpointsMetaGeneratorRepositoryImpl();

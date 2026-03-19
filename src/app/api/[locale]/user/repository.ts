@@ -16,7 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { hashPassword } from "next-vibe/shared/utils/password";
 
 import { db } from "@/app/api/[locale]/system/db";
-import type { DbId } from "@/app/api/[locale]/system/db/types";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -42,15 +42,17 @@ import { UserRole, type UserRoleValue } from "./user-roles/enum";
 import { UserRolesRepository } from "./user-roles/repository";
 
 /**
- * 24h cache for active user count
- */
-let activeUserCountCache: { count: number; timestamp: number } | null = null;
-const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-/**
  * User Repository
  */
 export class UserRepository {
+  /**
+   * 24h cache for active user count
+   */
+  private static activeUserCountCache: {
+    count: number;
+    timestamp: number;
+  } | null = null;
+  private static readonly CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
   /**
    * Get authenticated user with specified detail level
    */
@@ -129,7 +131,7 @@ export class UserRepository {
   static async getUserById<
     T extends ExtendedUserDetailLevel = typeof UserDetailLevel.STANDARD,
   >(
-    userId: DbId,
+    userId: string,
     detailLevel: T = UserDetailLevel.STANDARD as T,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -256,7 +258,7 @@ export class UserRepository {
    * Check if user exists by ID
    */
   static async exists(
-    userId: DbId,
+    userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
@@ -309,7 +311,7 @@ export class UserRepository {
    */
   static async emailExistsByOtherUser(
     email: string,
-    excludeUserId: DbId,
+    excludeUserId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
@@ -717,14 +719,15 @@ export class UserRepository {
       const now = Date.now();
 
       if (
-        activeUserCountCache &&
-        now - activeUserCountCache.timestamp < CACHE_DURATION_MS
+        UserRepository.activeUserCountCache &&
+        now - UserRepository.activeUserCountCache.timestamp <
+          UserRepository.CACHE_DURATION_MS
       ) {
         logger.debug("Returning cached active user count", {
-          count: activeUserCountCache.count,
-          age: `${Math.floor((now - activeUserCountCache.timestamp) / 1000 / 60 / 60)}h`,
+          count: UserRepository.activeUserCountCache.count,
+          age: `${Math.floor((now - UserRepository.activeUserCountCache.timestamp) / 1000 / 60 / 60)}h`,
         });
-        return success(activeUserCountCache.count);
+        return success(UserRepository.activeUserCountCache.count);
       }
 
       logger.debug("Fetching fresh active user count from database");
@@ -734,7 +737,7 @@ export class UserRepository {
         .from(users)
         .where(eq(users.isActive, true));
 
-      activeUserCountCache = {
+      UserRepository.activeUserCountCache = {
         count: total,
         timestamp: now,
       };
@@ -783,8 +786,8 @@ export class UserRepository {
   }
 }
 
-/**
- * Type for the static interface of UserRepository
- * Used by repository.native.ts for compile-time type checking
- */
-export type UserRepositoryType = typeof UserRepository;
+// Type for native repository type checking
+export type UserRepositoryType = Pick<
+  typeof UserRepository,
+  keyof typeof UserRepository
+>;

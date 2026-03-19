@@ -15,7 +15,7 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { Environment } from "../../../../shared/utils";
-import { generateAllRepository } from "../../../generators/generate-all/repository";
+import { GenerateAllRepository } from "../../../generators/generate-all/repository";
 import type { LiveIndex } from "../../../generators/shared/live-index";
 import {
   buildLiveIndex,
@@ -136,7 +136,7 @@ const startSmartFileWatcher = async (
     clearDirtyFlags(liveIndex);
 
     try {
-      await generateAllRepository.generateDirty(
+      await GenerateAllRepository.generateDirty(
         dirtySnapshot,
         liveIndex,
         logger,
@@ -355,7 +355,7 @@ const startPollingWatcher = async (
       const action = watchCount === 1 ? "Initial startup" : "Polling cycle";
       logger.info(`⏰ ${action} #${watchCount} - Running generators...`);
 
-      await generateAllRepository.generateAll(
+      await GenerateAllRepository.generateAll(
         {
           outputDir: "src/app/api/[locale]/system/generated",
           verbose: false,

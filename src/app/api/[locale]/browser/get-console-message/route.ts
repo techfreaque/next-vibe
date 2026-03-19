@@ -6,10 +6,7 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { BrowserTool } from "../enum";
-import {
-  executeGetConsoleMessage,
-  filterUndefinedArgs,
-} from "../shared/repository";
+import { BrowserSharedRepository } from "../shared/repository";
 import getConsoleMessageEndpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
@@ -17,10 +14,10 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, t, logger }) =>
-      executeGetConsoleMessage(
+      BrowserSharedRepository.executeGetConsoleMessage(
         {
           toolName: BrowserTool.GET_CONSOLE_MESSAGE,
-          args: filterUndefinedArgs({
+          args: BrowserSharedRepository.filterUndefinedArgs({
             msgid: data.msgid,
           }),
         },

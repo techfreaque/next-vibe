@@ -9,12 +9,13 @@ import "server-only";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { pullFromRemote } from "../repository";
+import { TaskSyncRepository } from "../repository";
 import endpoints from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ logger, locale }) => pullFromRemote(logger, locale),
+    handler: ({ logger, locale }) =>
+      TaskSyncRepository.pullFromRemote(logger, locale),
   },
 });

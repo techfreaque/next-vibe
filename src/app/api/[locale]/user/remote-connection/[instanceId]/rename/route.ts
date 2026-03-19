@@ -9,14 +9,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definition from "./definition";
-import { renameConnection } from "./repository";
+import { RemoteConnectionRenameRepository } from "./repository";
 
 export const { PATCH, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.PATCH]: {
     email: undefined,
     handler: ({ user, logger, t, data, urlPathParams }) =>
-      renameConnection(
+      RemoteConnectionRenameRepository.renameConnection(
         user,
         logger,
         t,

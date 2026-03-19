@@ -21,15 +21,13 @@ import type {
   InboxFoldersRequestOutput,
   InboxFoldersResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { InboxFoldersT } from "./i18n";
 
 export class InboxFoldersRepository {
   static async list(
     data: InboxFoldersRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: InboxFoldersT,
     locale: CountryLanguage,
   ): Promise<ResponseType<InboxFoldersResponseOutput>> {
     try {

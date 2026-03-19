@@ -22,52 +22,25 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { scopedTranslation } from "../i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { StripeT } from "../i18n";
 import type {
   CliStripeRequestOutput,
   CliStripeResponseOutput,
 } from "./definition";
 
-// ===== REPOSITORY INTERFACE =====
-
 /**
- * CLI Stripe Repository Interface
+ * CLI Stripe Repository
  */
-export interface CliStripeRepository {
-  processStripe(
-    data: CliStripeRequestOutput,
-    user: JwtPayloadType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CliStripeResponseOutput>>;
-
-  checkInstallation(logger: EndpointLogger, t: ModuleT): ResponseType<boolean>;
-  startListener(
-    webhookUrl: string | undefined,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<string>;
-  checkAuthentication(
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): ResponseType<boolean>;
-}
-
-/**
- * CLI Stripe Repository Implementation
- */
-export class CliStripeRepositoryImpl implements CliStripeRepository {
-  private activeListeners: Map<string, ChildProcess> = new Map();
+export class CliStripeRepository {
+  private static activeListeners: Map<string, ChildProcess> = new Map();
 
   /**
    * Process Stripe CLI operations
    */
-  async processStripe(
+  static async processStripe(
     data: CliStripeRequestOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: StripeT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CliStripeResponseOutput>> {
     try {
@@ -84,17 +57,19 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
 
       switch (data.operation) {
         case "check": {
-          const installed = this.isStripeCLIInstalled();
+          const installed = CliStripeRepository.isStripeCLIInstalled();
           response.installed = installed;
           if (installed) {
-            response.version = this.getStripeVersion();
+            response.version = CliStripeRepository.getStripeVersion();
           } else {
-            response.instructions = this.getStripeCLIInstallInstructions();
+            response.instructions =
+              CliStripeRepository.getStripeCLIInstallInstructions();
           }
           break;
         }
         case "install": {
-          response.instructions = this.getStripeCLIInstallInstructions();
+          response.instructions =
+            CliStripeRepository.getStripeCLIInstallInstructions();
           response.success = false; // Cannot auto-install, only provide instructions
           break;
         }
@@ -104,12 +79,17 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
             "http://localhost:3000/api/en-GLOBAL/payment/providers/stripe/webhook";
 
           // Execute stripe listen synchronously and block forever
-          await this.executeStripeListenBlocking(
-            webhookUrl,
-            data.events,
-            data.skipSslVerify || false,
-            logger,
-          );
+          const listenResult =
+            await CliStripeRepository.executeStripeListenBlocking(
+              webhookUrl,
+              data.events,
+              data.skipSslVerify || false,
+              logger,
+              t,
+            );
+          if (!listenResult.success) {
+            return listenResult;
+          }
 
           // This will never be reached unless Ctrl+C is pressed
           response.success = true;
@@ -123,10 +103,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           break;
         }
         case "status": {
-          response.installed = this.isStripeCLIInstalled();
+          response.installed = CliStripeRepository.isStripeCLIInstalled();
           if (response.installed) {
-            response.version = this.getStripeVersion();
-            const authenticated = this.checkStripeAuth(logger);
+            response.version = CliStripeRepository.getStripeVersion();
+            const authenticated = CliStripeRepository.checkStripeAuth(logger);
             response.status = authenticated
               ? t("status.authenticated")
               : t("status.not_authenticated");
@@ -171,10 +151,13 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check if Stripe CLI is installed
    */
-  checkInstallation(logger: EndpointLogger, t: ModuleT): ResponseType<boolean> {
+  static checkInstallation(
+    logger: EndpointLogger,
+    t: StripeT,
+  ): ResponseType<boolean> {
     try {
       logger.debug("Checking Stripe CLI installation");
-      const installed = this.isStripeCLIInstalled();
+      const installed = CliStripeRepository.isStripeCLIInstalled();
       logger.debug(`Stripe CLI installation status: ${installed}`);
       return success(installed);
     } catch (error) {
@@ -193,16 +176,22 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Start Stripe webhook listener
    */
-  startListener(
+  static startListener(
     webhookUrl: string | undefined,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: StripeT,
   ): ResponseType<string> {
     try {
       const url =
         webhookUrl ||
         "http://localhost:3000/api/en-GLOBAL/v1/payment/webhook/stripe";
-      const result = this.startStripeListener(url, undefined, false, logger);
+      const result = CliStripeRepository.startStripeListener(
+        url,
+        undefined,
+        false,
+        logger,
+        t,
+      );
 
       if (result.success) {
         return success(url);
@@ -224,12 +213,12 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check Stripe CLI authentication
    */
-  checkAuthentication(
+  static checkAuthentication(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: StripeT,
   ): ResponseType<boolean> {
     try {
-      const authenticated = this.checkStripeAuth(logger);
+      const authenticated = CliStripeRepository.checkStripeAuth(logger);
       return success(authenticated);
     } catch (error) {
       return fail({
@@ -245,7 +234,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check if Stripe CLI is installed
    */
-  private isStripeCLIInstalled(): boolean {
+  private static isStripeCLIInstalled(): boolean {
     try {
       // eslint-disable-next-line i18next/no-literal-string
       execSync("stripe --version", { stdio: "pipe" });
@@ -258,7 +247,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Get Stripe CLI version
    */
-  private getStripeVersion(): string {
+  private static getStripeVersion(): string {
     try {
       // eslint-disable-next-line i18next/no-literal-string
       const version = execSync("stripe --version", {
@@ -274,7 +263,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
    * Get Stripe CLI installation instructions
    */
   /* eslint-disable i18next/no-literal-string */
-  private getStripeCLIInstallInstructions(): string {
+  private static getStripeCLIInstallInstructions(): string {
     // Hardcoded installation instructions
     const instructionsArray = [
       "Stripe CLI is not installed. Please install it following the official documentation:",
@@ -316,17 +305,20 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Execute Stripe listen command synchronously and block forever
    */
-  private async executeStripeListenBlocking(
+  private static async executeStripeListenBlocking(
     webhookUrl: string,
     events: string[] | undefined,
     skipSslVerify: boolean,
     logger: EndpointLogger,
-  ): Promise<void> {
-    if (!this.isStripeCLIInstalled()) {
+    t: StripeT,
+  ): Promise<ResponseType<void>> {
+    if (!CliStripeRepository.isStripeCLIInstalled()) {
       logger.error("Stripe CLI is not installed");
-      logger.debug(this.getStripeCLIInstallInstructions());
-      // eslint-disable-next-line @typescript-eslint/only-throw-error, oxlint-plugin-restricted/restricted-syntax
-      throw new Error("Stripe CLI is not installed");
+      logger.debug(CliStripeRepository.getStripeCLIInstallInstructions());
+      return fail({
+        message: t("status.not_installed"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
     }
 
     logger.debug("🎧 Starting Stripe webhook listener...");
@@ -359,7 +351,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       // Display output directly to console
       process.stdout.write(output);
       // Also handle it to extract webhook secret
-      this.handleStripeOutput(data, logger);
+      CliStripeRepository.handleStripeOutput(data, logger);
     });
 
     stripeProcess.stderr?.on("data", (data: Buffer) => {
@@ -367,44 +359,58 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       // Display output directly to console
       process.stderr.write(output);
       // Also handle it to extract webhook secret
-      this.handleStripeOutput(data, logger);
+      CliStripeRepository.handleStripeOutput(data, logger);
     });
 
     // Wait for the process to exit (only happens on Ctrl+C or error)
-    await new Promise<void>((resolve, reject) => {
-      stripeProcess.on("close", (code: number | null) => {
-        if (code === 0 || code === null) {
-          logger.debug("🛑 Stripe webhook listener stopped gracefully");
-          resolve();
-        } else {
-          logger.debug(`🛑 Stripe webhook listener exited with code ${code}`);
-          reject(new Error(`Stripe listener exited with code ${code}`));
-        }
-      });
+    try {
+      await new Promise<void>((resolve, reject) => {
+        stripeProcess.on("close", (code: number | null) => {
+          if (code === 0 || code === null) {
+            logger.debug("🛑 Stripe webhook listener stopped gracefully");
+            resolve();
+          } else {
+            logger.debug(`🛑 Stripe webhook listener exited with code ${code}`);
+            reject(new Error(`Stripe listener exited with code ${code}`));
+          }
+        });
 
-      stripeProcess.on("error", (error: Error) => {
-        logger.error(
-          "Failed to start Stripe webhook listener:",
-          parseError(error),
-        );
-        reject(error);
+        stripeProcess.on("error", (error: Error) => {
+          logger.error(
+            "Failed to start Stripe webhook listener:",
+            parseError(error),
+          );
+          reject(error);
+        });
       });
-    });
+    } catch (error) {
+      return fail({
+        message: t("errors.serverError.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
+
+    return success(undefined);
   }
 
   /**
    * Start Stripe webhook listener
    */
-  private startStripeListener(
+  private static startStripeListener(
     webhookUrl: string,
     events: string[] | undefined,
     skipSslVerify: boolean,
     logger: EndpointLogger,
-  ): { success: boolean; process?: ChildProcess } {
-    if (!this.isStripeCLIInstalled()) {
+    t: StripeT,
+  ): ResponseType<{ process: ChildProcess }> {
+    if (!CliStripeRepository.isStripeCLIInstalled()) {
       logger.error("Stripe CLI is not installed");
-      logger.debug(this.getStripeCLIInstallInstructions());
-      return { success: false };
+      logger.debug(CliStripeRepository.getStripeCLIInstallInstructions());
+      return fail({
+        message: t("errors.stripeCliNotInstalled"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
 
     try {
@@ -428,10 +434,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       });
 
       stripeProcess.stdout?.on("data", (data) =>
-        this.handleStripeOutput(data as Buffer, logger),
+        CliStripeRepository.handleStripeOutput(data as Buffer, logger),
       );
       stripeProcess.stderr?.on("data", (data) =>
-        this.handleStripeOutput(data as Buffer, logger),
+        CliStripeRepository.handleStripeOutput(data as Buffer, logger),
       );
 
       // Handle process exit
@@ -441,7 +447,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         } else {
           logger.debug(`🎧 Stripe webhook listener exited with code ${code}`);
         }
-        this.activeListeners.delete(webhookUrl);
+        CliStripeRepository.activeListeners.delete(webhookUrl);
       });
 
       // Handle process errors
@@ -450,26 +456,30 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           "Failed to start Stripe webhook listener:",
           parseError(error),
         );
-        this.activeListeners.delete(webhookUrl);
+        CliStripeRepository.activeListeners.delete(webhookUrl);
       });
 
       // Store the process for later management
-      this.activeListeners.set(webhookUrl, stripeProcess);
+      CliStripeRepository.activeListeners.set(webhookUrl, stripeProcess);
 
-      return { success: true, process: stripeProcess };
+      return success({ process: stripeProcess });
     } catch (error) {
       logger.error(
         "Failed to start Stripe webhook listener:",
         parseError(error),
       );
-      return { success: false };
+      return fail({
+        message: t("errors.listenerFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
     }
   }
 
   /**
    * Stop Stripe webhook listener
    */
-  private stopStripeListener(
+  private static stopStripeListener(
     stripeProcess: ChildProcess,
     logger: EndpointLogger,
   ): void {
@@ -488,8 +498,8 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check Stripe CLI authentication status
    */
-  private checkStripeAuth(logger: EndpointLogger): boolean {
-    if (!this.isStripeCLIInstalled()) {
+  private static checkStripeAuth(logger: EndpointLogger): boolean {
+    if (!CliStripeRepository.isStripeCLIInstalled()) {
       return false;
     }
 
@@ -508,7 +518,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Handle Stripe CLI output
    */
-  private handleStripeOutput(data: Buffer, logger: EndpointLogger): void {
+  private static handleStripeOutput(
+    data: Buffer,
+    logger: EndpointLogger,
+  ): void {
     const output = data.toString().trim();
     if (output) {
       // Show all Stripe output as debug logs so they're visible
@@ -560,7 +573,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           logger.debug(`🔑 Webhook signing secret: ${webhookSecret}`);
 
           // Update the .env file automatically
-          const updated = this.updateWebhookSecret(webhookSecret, logger);
+          const updated = CliStripeRepository.updateWebhookSecret(
+            webhookSecret,
+            logger,
+          );
           if (updated) {
             logger.debug(
               "✅ Updated STRIPE_WEBHOOK_SECRET in .env file automatically",
@@ -587,7 +603,10 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Update the webhook secret in the .env file
    */
-  private updateWebhookSecret(secret: string, logger: EndpointLogger): boolean {
+  private static updateWebhookSecret(
+    secret: string,
+    logger: EndpointLogger,
+  ): boolean {
     try {
       // Determine the base directory for the project
       const projectRoot = process.cwd();
@@ -631,5 +650,3 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
     }
   }
 }
-
-export const cliStripeRepository = new CliStripeRepositoryImpl();

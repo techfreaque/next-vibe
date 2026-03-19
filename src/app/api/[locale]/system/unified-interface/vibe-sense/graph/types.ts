@@ -81,3 +81,62 @@ export interface GraphSeedEntry {
   description: string;
   config: GraphConfigInferred;
 }
+
+// ─── Graph Repository Shapes ──────────────────────────────────────────────────
+
+/** Summary of a stored graph row (shared across list/get responses) */
+export interface GraphSummary {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  ownerType: string;
+  ownerId: string | null;
+  parentVersionId: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+/** Time-series data payload for a graph (used by data + get endpoints) */
+export interface GraphDataPayload {
+  series: Array<{
+    nodeId: string;
+    points: Array<{ timestamp: string; value: number }>;
+  }>;
+  signals: Array<{
+    nodeId: string;
+    events: Array<{ timestamp: string; fired: boolean }>;
+  }>;
+}
+
+// ─── Repository Return Types ───────────────────────────────────────────────────
+
+/** Return type for listGraphs */
+export interface GraphListResult {
+  graphs: GraphSummary[];
+}
+
+/** Return type for createGraph */
+export interface GraphCreateResult {
+  id: string;
+}
+
+/** Return type for editGraph (branch) */
+export interface GraphEditResult {
+  newId: string;
+}
+
+/** Return type for promoteGraph */
+export interface GraphPromoteResult {
+  promotedId: string;
+}
+
+/** Return type for archiveGraph */
+export interface GraphArchiveResult {
+  archivedId: string;
+}
+
+/** Return type for deleteGraph */
+export interface GraphDeleteResult {
+  deletedId: string;
+}

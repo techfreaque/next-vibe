@@ -36,209 +36,211 @@ import type {
   PathGetResponseOutput,
   PathGetUrlVariablesOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type PathT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-interface AncestorRow extends QueryResultRow {
-  id: string;
-  parentId: string | null;
-  isCompacting: boolean;
-}
-
-/**
- * Walk UP the parentId chain from startId, stopping at (and including)
- * the first compacting message or a root message.
- *
- * Returns the ancestor chain ordered oldest→newest (ASC by created_at).
- */
-async function fetchAncestorChain(
-  startId: string,
-  threadId: string,
-): Promise<AncestorRow[]> {
-  // Raw SQL is required for WITH RECURSIVE — Drizzle doesn't support recursive CTEs.
-  // db.execute<T>() returns QueryResult<T> (from pg), so .rows is T[] — fully typed.
-  const result: QueryResult<AncestorRow> = await db.execute<AncestorRow>(sql`
-    WITH RECURSIVE ancestor_chain AS (
-      SELECT
-        id,
-        parent_id AS "parentId",
-        COALESCE((metadata->>'isCompacting')::boolean, false) AS "isCompacting",
-        0 AS depth
-      FROM chat_messages
-      WHERE id = ${startId}
-        AND thread_id = ${threadId}
-
-      UNION ALL
-
-      SELECT
-        m.id,
-        m.parent_id AS "parentId",
-        COALESCE((m.metadata->>'isCompacting')::boolean, false) AS "isCompacting",
-        ac.depth + 1
-      FROM chat_messages m
-      INNER JOIN ancestor_chain ac ON m.id = ac."parentId"
-      WHERE NOT ac."isCompacting"
-    )
-    SELECT id, "parentId", "isCompacting"
-    FROM ancestor_chain
-    ORDER BY depth DESC
-  `);
-
-  return result.rows.map((r) => ({
-    id: r.id,
-    parentId: r.parentId ?? null,
-    isCompacting: Boolean(r.isCompacting),
-  }));
-}
-
-/**
- * Collect all descendant IDs starting from the given root IDs, stopping BEFORE
- * any compacting messages. Compacting messages mark the START of the next chunk —
- * they are NOT included in the current chunk (the client loads them as the top of
- * the next chunk when "Show newer messages" is clicked).
- *
- * Returns:
- *   - ids: all message IDs in this chunk (roots + descendants, excluding next compaction)
- *   - newerChunkAnchorId: ID of the first compacting message found below, or null
- */
-interface DescendantRow extends QueryResultRow {
-  id: string;
-}
-
-interface NewerChunkRow extends QueryResultRow {
-  id: string;
-  parentId: string;
-}
-
-async function fetchAllDescendantIds(
-  rootIds: string[],
-  threadId: string,
-): Promise<{ ids: string[] }> {
-  if (rootIds.length === 0) {
-    return { ids: [] };
-  }
-  const rootIdsLiteral = rootIds.map((id) => sql`${id}`);
-  const rootIdsArray = sql.join(rootIdsLiteral, sql`, `);
-
-  // Walk DOWN from chunk roots, stopping BEFORE the next compacting boundary.
-  // The seed row may itself be a compacting boundary (chunk header) — it is seeded
-  // unconditionally so its children are walked, but filtered out of the final SELECT
-  // (the caller adds it explicitly via allIds.add(oldestAncestor.id)).
-  // Expansion stops when a CHILD is compacting (next chunk boundary).
-  const descendantsResult: QueryResult<DescendantRow> =
-    await db.execute<DescendantRow>(sql`
-    WITH RECURSIVE descendants AS (
-      -- Seed: include chunk roots unconditionally (even if compacting boundary).
-      SELECT id, parent_id, COALESCE((metadata->>'isCompacting')::boolean, false) AS is_compacting
-      FROM chat_messages
-      WHERE id = ANY(ARRAY[${rootIdsArray}]::uuid[])
-        AND thread_id = ${threadId}
-
-      UNION ALL
-
-      -- Recursive step: expand children that are NOT themselves a next compaction boundary.
-      -- Stop when the CHILD is compacting (that's the start of the next chunk, not this one).
-      SELECT m.id, m.parent_id, COALESCE((m.metadata->>'isCompacting')::boolean, false)
-      FROM chat_messages m
-      INNER JOIN descendants d ON m.parent_id = d.id
-      WHERE m.thread_id = ${threadId}
-        AND NOT COALESCE((m.metadata->>'isCompacting')::boolean, false)
-    )
-    -- Exclude compacting rows from the result; caller adds the chunk-header explicitly.
-    SELECT id FROM descendants
-    WHERE NOT is_compacting
-  `);
-
-  const ids = descendantsResult.rows.map((r) => r.id);
-
-  return { ids };
-}
-
-/**
- * Given the ancestor chain, fetch ALL messages in the chunk:
- * - The ancestors themselves (active path)
- * - ALL siblings of the oldest ancestor
- * - ALL descendants of all siblings, stopping at (and including) the next compacting message
- *
- * This returns the complete chunk so branch switching is purely local (no server fetch).
- * Returns messages + whether any compacting boundary was found at the bottom.
- */
-async function fetchChunkMessages(
-  ancestorChain: AncestorRow[],
-  threadId: string,
-): Promise<{
-  messages: (typeof chatMessages.$inferSelect)[];
-}> {
-  if (ancestorChain.length === 0) {
-    return { messages: [] };
-  }
-
-  const oldestAncestor = ancestorChain[0]!;
-
-  // Find all siblings of the oldest ancestor (same parentId).
-  // These are the roots of all branch paths in this chunk.
-  const siblingCondition =
-    oldestAncestor.parentId !== null
-      ? eq(chatMessages.parentId, oldestAncestor.parentId)
-      : isNull(chatMessages.parentId);
-
-  const chunkRoots = await db
-    .select({ id: chatMessages.id })
-    .from(chatMessages)
-    .where(and(eq(chatMessages.threadId, threadId), siblingCondition));
-
-  const chunkRootIds = chunkRoots.map((r) => r.id);
-
-  // Fetch ALL descendants of all chunk roots, stopping BEFORE the next compaction boundary.
-  // Note: fetchAllDescendantIds excludes isCompacting messages from the walk itself,
-  // so the compaction boundary (oldestAncestor) is not returned by the CTE.
-  // We always include the oldest ancestor explicitly so it appears as the chunk header.
-  const { ids: allDescendantIds } = await fetchAllDescendantIds(
-    chunkRootIds,
-    threadId,
-  );
-
-  // Combine: oldest ancestor (always) + all descendants.
-  // The oldest ancestor may be a compaction boundary excluded by fetchAllDescendantIds —
-  // explicitly adding it ensures the chunk header is always present.
-  // NOTE: do NOT add oldestAncestor.parentId — the parent belongs to the older chunk,
-  // not the current one.
-  const allIds = new Set<string>(allDescendantIds);
-  allIds.add(oldestAncestor.id);
-
-  if (allIds.size === 0) {
-    return { messages: [] };
-  }
-
-  const rows = await db
-    .select()
-    .from(chatMessages)
-    .where(
-      and(
-        eq(chatMessages.threadId, threadId),
-        inArray(chatMessages.id, [...allIds]),
-      ),
-    )
-    .orderBy(chatMessages.createdAt);
-
-  return { messages: rows };
-}
+import type { MessagePathT } from "./i18n";
 
 /**
  * Conversation Path Repository
  */
-export const pathRepository = {
+export class pathRepository {
+  /**
+   * Walk UP the parentId chain from startId, stopping at (and including)
+   * the first compacting message or a root message.
+   *
+   * Returns the ancestor chain ordered oldest→newest (ASC by created_at).
+   */
+  private static async fetchAncestorChain(
+    startId: string,
+    threadId: string,
+  ): Promise<
+    (QueryResultRow & {
+      id: string;
+      parentId: string | null;
+      isCompacting: boolean;
+    })[]
+  > {
+    // Raw SQL is required for WITH RECURSIVE — Drizzle doesn't support recursive CTEs.
+    // db.execute<T>() returns QueryResult<T> (from pg), so .rows is T[] — fully typed.
+    const result: QueryResult<
+      QueryResultRow & {
+        id: string;
+        parentId: string | null;
+        isCompacting: boolean;
+      }
+    > = await db.execute<
+      QueryResultRow & {
+        id: string;
+        parentId: string | null;
+        isCompacting: boolean;
+      }
+    >(sql`
+      WITH RECURSIVE ancestor_chain AS (
+        SELECT
+          id,
+          parent_id AS "parentId",
+          COALESCE((metadata->>'isCompacting')::boolean, false) AS "isCompacting",
+          0 AS depth
+        FROM chat_messages
+        WHERE id = ${startId}
+          AND thread_id = ${threadId}
+
+        UNION ALL
+
+        SELECT
+          m.id,
+          m.parent_id AS "parentId",
+          COALESCE((m.metadata->>'isCompacting')::boolean, false) AS "isCompacting",
+          ac.depth + 1
+        FROM chat_messages m
+        INNER JOIN ancestor_chain ac ON m.id = ac."parentId"
+        WHERE NOT ac."isCompacting"
+      )
+      SELECT id, "parentId", "isCompacting"
+      FROM ancestor_chain
+      ORDER BY depth DESC
+    `);
+
+    return result.rows.map((r) => ({
+      id: r.id,
+      parentId: r.parentId ?? null,
+      isCompacting: Boolean(r.isCompacting),
+    }));
+  }
+
+  /**
+   * Collect all descendant IDs starting from the given root IDs, stopping BEFORE
+   * any compacting messages. Compacting messages mark the START of the next chunk —
+   * they are NOT included in the current chunk (the client loads them as the top of
+   * the next chunk when "Show newer messages" is clicked).
+   *
+   * Returns:
+   *   - ids: all message IDs in this chunk (roots + descendants, excluding next compaction)
+   */
+  private static async fetchAllDescendantIds(
+    rootIds: string[],
+    threadId: string,
+  ): Promise<{ ids: string[] }> {
+    if (rootIds.length === 0) {
+      return { ids: [] };
+    }
+    const rootIdsLiteral = rootIds.map((id) => sql`${id}`);
+    const rootIdsArray = sql.join(rootIdsLiteral, sql`, `);
+
+    // Walk DOWN from chunk roots, stopping BEFORE the next compacting boundary.
+    // The seed row may itself be a compacting boundary (chunk header) — it is seeded
+    // unconditionally so its children are walked, but filtered out of the final SELECT
+    // (the caller adds it explicitly via allIds.add(oldestAncestor.id)).
+    // Expansion stops when a CHILD is compacting (next chunk boundary).
+    const descendantsResult: QueryResult<QueryResultRow & { id: string }> =
+      await db.execute<QueryResultRow & { id: string }>(sql`
+      WITH RECURSIVE descendants AS (
+        -- Seed: include chunk roots unconditionally (even if compacting boundary).
+        SELECT id, parent_id, COALESCE((metadata->>'isCompacting')::boolean, false) AS is_compacting
+        FROM chat_messages
+        WHERE id = ANY(ARRAY[${rootIdsArray}]::uuid[])
+          AND thread_id = ${threadId}
+
+        UNION ALL
+
+        -- Recursive step: expand children that are NOT themselves a next compaction boundary.
+        -- Stop when the CHILD is compacting (that's the start of the next chunk, not this one).
+        SELECT m.id, m.parent_id, COALESCE((m.metadata->>'isCompacting')::boolean, false)
+        FROM chat_messages m
+        INNER JOIN descendants d ON m.parent_id = d.id
+        WHERE m.thread_id = ${threadId}
+          AND NOT COALESCE((m.metadata->>'isCompacting')::boolean, false)
+      )
+      -- Exclude compacting rows from the result; caller adds the chunk-header explicitly.
+      SELECT id FROM descendants
+      WHERE NOT is_compacting
+    `);
+
+    const ids = descendantsResult.rows.map((r) => r.id);
+
+    return { ids };
+  }
+
+  /**
+   * Given the ancestor chain, fetch ALL messages in the chunk:
+   * - The ancestors themselves (active path)
+   * - ALL siblings of the oldest ancestor
+   * - ALL descendants of all siblings, stopping at (and including) the next compacting message
+   *
+   * This returns the complete chunk so branch switching is purely local (no server fetch).
+   * Returns messages + whether any compacting boundary was found at the bottom.
+   */
+  private static async fetchChunkMessages(
+    ancestorChain: (QueryResultRow & {
+      id: string;
+      parentId: string | null;
+      isCompacting: boolean;
+    })[],
+    threadId: string,
+  ): Promise<{
+    messages: (typeof chatMessages.$inferSelect)[];
+  }> {
+    if (ancestorChain.length === 0) {
+      return { messages: [] };
+    }
+
+    const oldestAncestor = ancestorChain[0]!;
+
+    // Find all siblings of the oldest ancestor (same parentId).
+    // These are the roots of all branch paths in this chunk.
+    const siblingCondition =
+      oldestAncestor.parentId !== null
+        ? eq(chatMessages.parentId, oldestAncestor.parentId)
+        : isNull(chatMessages.parentId);
+
+    const chunkRoots = await db
+      .select({ id: chatMessages.id })
+      .from(chatMessages)
+      .where(and(eq(chatMessages.threadId, threadId), siblingCondition));
+
+    const chunkRootIds = chunkRoots.map((r) => r.id);
+
+    // Fetch ALL descendants of all chunk roots, stopping BEFORE the next compaction boundary.
+    // Note: fetchAllDescendantIds excludes isCompacting messages from the walk itself,
+    // so the compaction boundary (oldestAncestor) is not returned by the CTE.
+    // We always include the oldest ancestor explicitly so it appears as the chunk header.
+    const { ids: allDescendantIds } =
+      await pathRepository.fetchAllDescendantIds(chunkRootIds, threadId);
+
+    // Combine: oldest ancestor (always) + all descendants.
+    // The oldest ancestor may be a compaction boundary excluded by fetchAllDescendantIds —
+    // explicitly adding it ensures the chunk header is always present.
+    // NOTE: do NOT add oldestAncestor.parentId — the parent belongs to the older chunk,
+    // not the current one.
+    const allIds = new Set<string>(allDescendantIds);
+    allIds.add(oldestAncestor.id);
+
+    if (allIds.size === 0) {
+      return { messages: [] };
+    }
+
+    const rows = await db
+      .select()
+      .from(chatMessages)
+      .where(
+        and(
+          eq(chatMessages.threadId, threadId),
+          inArray(chatMessages.id, [...allIds]),
+        ),
+      )
+      .orderBy(chatMessages.createdAt);
+
+    return { messages: rows };
+  }
+
   /**
    * Get all messages in the current chunk.
    * Returns all messages from the compaction boundary, including ALL branch paths
    * within that chunk so the client can navigate branches locally without refetching.
    */
-  async getPath(
+  static async getPath(
     urlPathParams: PathGetUrlVariablesOutput,
     data: PathGetRequestOutput,
     user: JwtPayloadType,
-    t: PathT,
+    t: MessagePathT,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<PathGetResponseOutput>> {
@@ -356,7 +358,7 @@ export const pathRepository = {
       }
 
       // Step 1: Get the ancestor chain (recursive CTE, minimal columns)
-      const ancestorChain = await fetchAncestorChain(
+      const ancestorChain = await pathRepository.fetchAncestorChain(
         startId,
         urlPathParams.threadId,
       );
@@ -374,12 +376,12 @@ export const pathRepository = {
       }
 
       // Step 2: Fetch ALL messages in the chunk (all branch paths, stopping at next compaction)
-      const { messages } = await fetchChunkMessages(
+      const { messages } = await pathRepository.fetchChunkMessages(
         ancestorChain,
         urlPathParams.threadId,
       );
 
-      const oldestAncestor: AncestorRow = ancestorChain[0]!;
+      const oldestAncestor = ancestorChain[0]!;
       // hasOlderHistory: true if the oldest ancestor has a parent (history exists above it).
       // This includes the case where the oldest is a compaction boundary — the compacted
       // messages are older history that can be loaded via "Show older messages".
@@ -400,8 +402,11 @@ export const pathRepository = {
         if (chunkIds.length > 0) {
           const chunkIdsLiteral = chunkIds.map((id) => sql`${id}`);
           const chunkIdsArray = sql.join(chunkIdsLiteral, sql`, `);
-          const newerResult: QueryResult<NewerChunkRow> =
-            await db.execute<NewerChunkRow>(sql`
+          const newerResult: QueryResult<
+            QueryResultRow & { id: string; parentId: string }
+          > = await db.execute<
+            QueryResultRow & { id: string; parentId: string }
+          >(sql`
             SELECT id, parent_id AS "parentId" FROM chat_messages
             WHERE thread_id = ${urlPathParams.threadId}
               AND parent_id = ANY(ARRAY[${chunkIdsArray}]::uuid[])
@@ -473,5 +478,5 @@ export const pathRepository = {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  },
-};
+  }
+}

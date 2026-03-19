@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeDelta } from "./repository";
+import { DeltaIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, resolution, lookback } = data;
-      const result = computeDelta(source);
+      const result = DeltaIndicatorRepository.computeDelta(source);
       return success({
         result,
         meta: {

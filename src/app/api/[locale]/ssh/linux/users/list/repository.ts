@@ -27,18 +27,16 @@ import {
 } from "../../../client";
 import type { LinuxUsersListResponseOutput } from "./definition";
 import type { LinuxUsersListRequestOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-const execAsync = promisify(exec);
+import type { UsersListT } from "./i18n";
 
 export class LinuxUsersListRepository {
+  private static readonly execAsync = promisify(exec);
+
   static async list(
     data: LinuxUsersListRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: UsersListT,
   ): Promise<ResponseType<LinuxUsersListResponseOutput>> {
     if (data.connectionId) {
       return LinuxUsersListRepository.listSsh(
@@ -82,7 +80,8 @@ export class LinuxUsersListRepository {
         let locked = false;
 
         try {
-          const { stdout: groupsOut } = await execAsync(`groups ${username}`);
+          const { stdout: groupsOut } =
+            await LinuxUsersListRepository.execAsync(`groups ${username}`);
           const groupParts = groupsOut.trim().split(/\s+/);
           const colonIdx = groupParts.indexOf(":");
           groups = colonIdx >= 0 ? groupParts.slice(colonIdx + 1) : groupParts;
@@ -91,9 +90,8 @@ export class LinuxUsersListRepository {
         }
 
         try {
-          const { stdout: passwdStatus } = await execAsync(
-            `passwd -S ${username}`,
-          );
+          const { stdout: passwdStatus } =
+            await LinuxUsersListRepository.execAsync(`passwd -S ${username}`);
           locked = passwdStatus.includes(" L ");
         } catch {
           /* ignore */
@@ -117,7 +115,7 @@ export class LinuxUsersListRepository {
     connectionId: string,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: UsersListT,
   ): Promise<ResponseType<LinuxUsersListResponseOutput>> {
     const credsResult = await getConnectionCredentials(
       connectionId,

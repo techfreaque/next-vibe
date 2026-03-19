@@ -13,7 +13,6 @@
 
 import "server-only";
 
-/* eslint-disable i18next/no-literal-string */
 // Generator output messages and error strings don't need internationalization
 import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -56,11 +55,9 @@ import {
   jsonToTs,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
+import type { RemoteCapabilitiesT } from "./i18n";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface RemoteCapabilitiesRequestType {
   outputDir: string;
@@ -76,39 +73,6 @@ interface RemoteCapabilitiesResponseType {
   version: string;
 }
 
-/** Locales we generate files for */
-const GENERATE_LOCALES: CountryLanguage[] = ["en-US", "de-DE", "pl-PL"];
-
-/** Locale → short basename */
-const LOCALE_FILE_NAMES: Partial<Record<CountryLanguage, string>> = {
-  "en-US": "en",
-  "de-DE": "de",
-  "pl-PL": "pl",
-};
-
-/** User roles we generate snapshots for */
-const GENERATE_ROLES = [
-  UserPermissionRole.PUBLIC,
-  UserPermissionRole.CUSTOMER,
-  UserPermissionRole.ADMIN,
-] as const;
-
-/** Role → file basename */
-const ROLE_FILE_NAMES: Partial<Record<typeof UserPermissionRoleValue, string>> =
-  {
-    [UserPermissionRole.PUBLIC]: "public",
-    [UserPermissionRole.CUSTOMER]: "customer",
-    [UserPermissionRole.ADMIN]: "admin",
-  };
-
-const HTTP_METHODS = [
-  Methods.GET,
-  Methods.POST,
-  Methods.PUT,
-  Methods.PATCH,
-  Methods.DELETE,
-] as const;
-
 // ─── Build version ────────────────────────────────────────────────────────────
 
 /**
@@ -118,49 +82,95 @@ const HTTP_METHODS = [
  * Uses execSync("git rev-parse") instead of reading .git/ files directly —
  * subprocess calls are opaque to Turbopack's static file-glob analysis.
  */
-function getBuildVersion(): string {
-  try {
-    // execSync is opaque to Turbopack — no file-glob warnings
-    const sha = execSync("git rev-parse --short=12 HEAD", {
-      encoding: "utf-8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-    if (sha) {
-      return sha;
-    }
-  } catch {
-    // Not a git repo or git not installed — fall through
-  }
-
-  try {
-    const cwd = process.env["PWD"] ?? process.cwd();
-    const pkgPath = join(cwd, "package.json");
-    if (existsSync(pkgPath)) {
-      const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
-        version?: string;
-      };
-      if (pkg.version) {
-        return pkg.version;
-      }
-    }
-  } catch {
-    // Ignore
-  }
-
-  // Fallback: hash the current timestamp to something short and stable per build
-  return createHash("sha256")
-    .update(String(Date.now()))
-    .digest("hex")
-    .slice(0, 12);
-}
-
 // ─── Repository ───────────────────────────────────────────────────────────────
 
-class RemoteCapabilitiesGeneratorRepositoryImpl {
-  async generateRemoteCapabilities(
+export class RemoteCapabilitiesGeneratorRepository {
+  /**
+   * Compute build version: git SHA if available, else package version, else timestamp.
+   * This changes only on deploy — used by remote sync to skip unchanged snapshots.
+   *
+   * Uses execSync("git rev-parse") instead of reading .git/ files directly —
+   * subprocess calls are opaque to Turbopack's static file-glob analysis.
+   */
+  private static getBuildVersion(): string {
+    try {
+      // execSync is opaque to Turbopack — no file-glob warnings
+      const sha = execSync("git rev-parse --short=12 HEAD", {
+        encoding: "utf-8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+      if (sha) {
+        return sha;
+      }
+    } catch {
+      // Not a git repo or git not installed — fall through
+    }
+
+    try {
+      const cwd = process.env["PWD"] ?? process.cwd();
+      const pkgPath = join(cwd, "package.json");
+      if (existsSync(pkgPath)) {
+        const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
+          version?: string;
+        };
+        if (pkg.version) {
+          return pkg.version;
+        }
+      }
+    } catch {
+      // Ignore
+    }
+
+    // Fallback: hash the current timestamp to something short and stable per build
+    return createHash("sha256")
+      .update(String(Date.now()))
+      .digest("hex")
+      .slice(0, 12);
+  }
+  /** Locales we generate files for */
+  private static readonly GENERATE_LOCALES: CountryLanguage[] = [
+    "en-US",
+    "de-DE",
+    "pl-PL",
+  ];
+
+  /** Locale → short basename */
+  private static readonly LOCALE_FILE_NAMES: Partial<
+    Record<CountryLanguage, string>
+  > = {
+    "en-US": "en",
+    "de-DE": "de",
+    "pl-PL": "pl",
+  };
+
+  /** User roles we generate snapshots for */
+  private static readonly GENERATE_ROLES = [
+    UserPermissionRole.PUBLIC,
+    UserPermissionRole.CUSTOMER,
+    UserPermissionRole.ADMIN,
+  ] as const;
+
+  /** Role → file basename */
+  private static readonly ROLE_FILE_NAMES: Partial<
+    Record<typeof UserPermissionRoleValue, string>
+  > = {
+    [UserPermissionRole.PUBLIC]: "public",
+    [UserPermissionRole.CUSTOMER]: "customer",
+    [UserPermissionRole.ADMIN]: "admin",
+  };
+
+  private static readonly HTTP_METHODS = [
+    Methods.GET,
+    Methods.POST,
+    Methods.PUT,
+    Methods.PATCH,
+    Methods.DELETE,
+  ] as const;
+
+  static async generateRemoteCapabilities(
     data: RemoteCapabilitiesRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: RemoteCapabilitiesT,
   ): Promise<BaseResponseType<RemoteCapabilitiesResponseType>> {
     const startTime = Date.now();
 
@@ -187,48 +197,57 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
       );
 
       // ── 2. Load all definitions ─────────────────────────────────────────
-      const loadedEndpoints = await this.loadDefinitions(
-        validDefinitionFiles,
-        logger,
-      );
+      const loadedEndpoints =
+        await RemoteCapabilitiesGeneratorRepository.loadDefinitions(
+          validDefinitionFiles,
+          logger,
+        );
 
       logger.debug(`Loaded ${loadedEndpoints.length} endpoint definitions`);
 
       // ── 3. Build version string ─────────────────────────────────────────
-      const version = getBuildVersion();
+      const version = RemoteCapabilitiesGeneratorRepository.getBuildVersion();
 
       // ── 4. Generate per-locale × per-role files ─────────────────────────
       let filesWritten = 0;
       let maxFilteredCount = 0;
 
-      for (const locale of GENERATE_LOCALES) {
-        const localeName = LOCALE_FILE_NAMES[locale] ?? locale;
+      for (const locale of RemoteCapabilitiesGeneratorRepository.GENERATE_LOCALES) {
+        const localeName =
+          RemoteCapabilitiesGeneratorRepository.LOCALE_FILE_NAMES[locale] ??
+          locale;
         // Use template string to prevent Turbopack from statically tracing paths
         const localeDir = `${data.outputDir}/${localeName}`;
 
-        for (const role of GENERATE_ROLES) {
-          const roleName = ROLE_FILE_NAMES[role] ?? role;
+        for (const role of RemoteCapabilitiesGeneratorRepository.GENERATE_ROLES) {
+          const roleName =
+            RemoteCapabilitiesGeneratorRepository.ROLE_FILE_NAMES[role] ?? role;
 
           // Filter endpoints accessible to this role
           const roleEndpoints = loadedEndpoints.filter(({ definition }) =>
-            this.isAccessibleByRole(definition, role),
+            RemoteCapabilitiesGeneratorRepository.isAccessibleByRole(
+              definition,
+              role,
+            ),
           );
 
           if (roleEndpoints.length > maxFilteredCount) {
             maxFilteredCount = roleEndpoints.length;
           }
 
-          const capabilities = this.serializeForLocaleRole(
-            roleEndpoints,
-            locale,
-          );
+          const capabilities =
+            RemoteCapabilitiesGeneratorRepository.serializeForLocaleRole(
+              roleEndpoints,
+              locale,
+            );
 
           const outputFile = join(localeDir, `${roleName}.ts`);
-          const content = this.renderCapabilitiesFile(
-            capabilities,
-            locale,
-            role,
-          );
+          const content =
+            RemoteCapabilitiesGeneratorRepository.renderCapabilitiesFile(
+              capabilities,
+              locale,
+              role,
+            );
           await writeGeneratedFile(outputFile, content, data.dryRun);
           filesWritten++;
 
@@ -242,7 +261,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
       const versionFile = join(data.outputDir, "version.ts");
       await writeGeneratedFile(
         versionFile,
-        this.renderVersionFile(version),
+        RemoteCapabilitiesGeneratorRepository.renderVersionFile(version),
         data.dryRun,
       );
       filesWritten++;
@@ -251,7 +270,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
 
       logger.info(
         formatGenerator(
-          `Generated remote capabilities for ${GENERATE_LOCALES.length} locales × ${GENERATE_ROLES.length} roles with ${formatCount(maxFilteredCount, "endpoint")} in ${formatDuration(duration)} (version: ${version})`,
+          `Generated remote capabilities for ${RemoteCapabilitiesGeneratorRepository.GENERATE_LOCALES.length} locales × ${RemoteCapabilitiesGeneratorRepository.GENERATE_ROLES.length} roles with ${formatCount(maxFilteredCount, "endpoint")} in ${formatDuration(duration)} (version: ${version})`,
           "🔌",
         ),
       );
@@ -280,7 +299,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
 
   // ─── Private helpers ──────────────────────────────────────────────────────
 
-  private async loadDefinitions(
+  private static async loadDefinitions(
     defFiles: string[],
     logger: EndpointLogger,
   ): Promise<Array<{ definition: CreateApiEndpointAny }>> {
@@ -295,7 +314,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
         if (!defaultExport || typeof defaultExport !== "object") {
           continue;
         }
-        for (const method of HTTP_METHODS) {
+        for (const method of RemoteCapabilitiesGeneratorRepository.HTTP_METHODS) {
           const definition = defaultExport[method];
           if (definition) {
             results.push({ definition });
@@ -317,7 +336,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
    * so we only include endpoints that are accessible on AI + NEXT_API —
    * i.e. not marked WEB_OFF and not marked AI_TOOL_OFF.
    */
-  private isAccessibleByRole(
+  private static isAccessibleByRole(
     definition: CreateApiEndpointAny,
     role: typeof UserPermissionRoleValue,
   ): boolean {
@@ -363,7 +382,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
    * All translatable string values in fields are resolved through t() so the
    * remote side receives pre-translated labels, descriptions, placeholders etc.
    */
-  private serializeForLocaleRole(
+  private static serializeForLocaleRole(
     loaded: Array<{ definition: CreateApiEndpointAny }>,
     locale: CountryLanguage,
   ): RemoteToolCapability[] {
@@ -414,10 +433,11 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
 
         // Serialize fields — JSON.stringify drops render/function refs,
         // then walk the result and resolve all translatable string values.
-        const fields = this.translateFieldStrings(
-          JSON.parse(JSON.stringify(definition.fields ?? {})) as JsonObject,
-          t,
-        );
+        const fields =
+          RemoteCapabilitiesGeneratorRepository.translateFieldStrings(
+            JSON.parse(JSON.stringify(definition.fields ?? {})) as JsonObject,
+            t,
+          );
 
         capabilities.push({
           toolName,
@@ -448,7 +468,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
    * Translatable keys: label, description, placeholder, helpText,
    *                    content, title, hint
    */
-  private translateFieldStrings(
+  private static translateFieldStrings(
     obj: JsonObject,
     t: (key: string) => string,
   ): JsonObject {
@@ -491,7 +511,7 @@ class RemoteCapabilitiesGeneratorRepositoryImpl {
     return walk(obj);
   }
 
-  private renderCapabilitiesFile(
+  private static renderCapabilitiesFile(
     capabilities: RemoteToolCapability[],
     locale: CountryLanguage,
     role: typeof UserPermissionRoleValue,
@@ -514,7 +534,7 @@ export const remoteCapabilities: RemoteToolCapability[] = ${capTs};
 `;
   }
 
-  private renderVersionFile(version: string): string {
+  private static renderVersionFile(version: string): string {
     // eslint-disable-next-line i18next/no-literal-string
     const header = generateFileHeader(
       "AUTO-GENERATED FILE - DO NOT EDIT",
@@ -534,6 +554,3 @@ export const CAPABILITIES_VERSION = ${JSON.stringify(version)};
 `;
   }
 }
-
-export const remoteCapabilitiesGeneratorRepository =
-  new RemoteCapabilitiesGeneratorRepositoryImpl();

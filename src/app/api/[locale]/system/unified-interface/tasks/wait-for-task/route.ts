@@ -6,12 +6,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { endpoints } from "./definition";
-import { waitForTask } from "./repository";
+import { WaitForTaskRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, user, logger, t, streamContext }) =>
-      waitForTask(data, user, logger, t, streamContext),
+      WaitForTaskRepository.waitForTask(data, user, logger, t, streamContext),
   },
 });

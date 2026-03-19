@@ -16,28 +16,15 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { StudioRequestOutput, StudioResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { StudioT } from "./i18n";
 
 /**
- * Open database studio Repository Interface
- */
-export interface StudioRepositoryInterface {
-  execute(
-    data: StudioRequestOutput,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<StudioResponseOutput>>;
-}
-
-/**
- * Open database studio Repository Implementation
+ * Open database studio Repository
  */
 export class StudioRepository {
   static async execute(
     data: StudioRequestOutput,
-    t: ModuleT,
+    t: StudioT,
     logger: EndpointLogger,
   ): Promise<ResponseType<StudioResponseOutput>> {
     const startTime = Date.now();

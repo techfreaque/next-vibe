@@ -7,122 +7,111 @@
 import "server-only";
 
 import { and, eq, isNull, or, sql } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { GraphConfig } from "./graph/types";
-import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { pipelineDatapoints, pipelineGraphs } from "./db";
 import { runBacktest } from "./engine/backtest";
 import { runGraph } from "./engine/runner";
 import { runDueGraphs } from "./engine/scheduler";
-import { evictExpiredSnapshots } from "./store/cache";
-import { runAllRetentionCleanup } from "./store/datapoints";
-import { cleanupOldSignals } from "./store/signals";
-import { pipelineDatapoints, pipelineGraphs } from "./db";
+import type {
+  GraphConfig,
+  GraphDataPayload,
+  GraphSummary,
+} from "./graph/types";
+import type { GraphEditPutResponseOutput } from "./graphs/[id]/edit/definition";
+import type { GraphPromotePostResponseOutput } from "./graphs/[id]/promote/definition";
+import type {
+  GraphsGetResponseOutput,
+  GraphsPostResponseOutput,
+} from "./graphs/definition";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { VibeSenseT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
-// ─── Graph CRUD ───────────────────────────────────────────────────────────────
+// ─── Private Input/Response Types ────────────────────────────────────────────
 
-export interface GraphSummary {
-  id: string;
+interface GraphCreateInput {
   slug: string;
   name: string;
-  description: string | null;
-  ownerType: string;
-  ownerId: string | null;
-  parentVersionId: string | null;
-  isActive: boolean;
-  createdAt: string;
-}
-
-export interface GraphListResponse {
-  graphs: GraphSummary[];
-}
-
-export interface GraphCreateInput {
-  name: string;
-  slug: string;
   description?: string;
   config: GraphConfig;
 }
 
-export interface GraphCreateResponse {
-  id: string;
+interface GraphGetResponse {
+  graph: {
+    id: string;
+    slug: string;
+    name: string;
+    description: string | null;
+    ownerType: string;
+    ownerId: string | null;
+    parentVersionId: string | null;
+    isActive: boolean;
+    createdAt: string;
+    config: GraphConfig;
+  };
+  series: GraphDataPayload["series"];
+  signals: GraphDataPayload["signals"];
 }
 
-export interface GraphGetResponse {
-  graph: GraphSummary & { config: GraphConfig };
-  series: GraphDataResponse["series"];
-  signals: GraphDataResponse["signals"];
-}
-
-export interface GraphEditInput {
-  name?: string;
+interface GraphEditInput {
   slug?: string;
+  name?: string;
   description?: string;
   config: GraphConfig;
 }
 
-export interface GraphEditResponse {
-  newId: string;
-}
-
-export interface GraphTriggerInput {
+interface GraphTriggerInput {
   rangeFrom: string;
   rangeTo: string;
 }
 
-export interface GraphTriggerResponse {
+interface GraphTriggerResponse {
   nodeCount: number;
   errorCount: number;
   errors: Array<{ nodeId: string; error: string }>;
 }
 
-export interface GraphBacktestInput {
+interface GraphBacktestInput {
   rangeFrom: string;
   rangeTo: string;
   resolution: Resolution;
 }
 
-export interface GraphBacktestResponse {
+interface GraphBacktestResponse {
   runId: string;
   eligible: boolean;
   ineligibleNodes: string[];
 }
 
-export interface GraphDataInput {
+interface GraphDataInput {
   resolution: Resolution;
   cursor?: string;
 }
 
-export interface GraphDataResponse {
-  series: Array<{
-    nodeId: string;
-    points: Array<{ timestamp: string; value: number }>;
-  }>;
-  signals: Array<{
-    nodeId: string;
-    events: Array<{ timestamp: string; fired: boolean }>;
-  }>;
-}
-
-export interface CleanupResponse {
+interface CleanupResponse {
   nodesProcessed: number;
   totalDeleted: number;
   snapshotsDeleted: number;
   graphsChecked: number;
   graphsExecuted: number;
 }
+import { evictExpiredSnapshots } from "./store/cache";
+import { runAllRetentionCleanup } from "./store/datapoints";
+import { cleanupOldSignals } from "./store/signals";
 
 /**
  * Downsample a raw (typically 1-minute) series into buckets of `bucketMs` width.
@@ -130,35 +119,47 @@ export interface CleanupResponse {
  * Bucket value = average of all points that fall within the bucket.
  * If bucketMs < the smallest stored interval (1 minute) the original points are returned unchanged.
  */
-function downsampleToResolution(
-  points: Array<{ timestamp: Date; value: number }>,
-  bucketMs: number,
-): Array<{ timestamp: Date; value: number }> {
-  const ONE_MINUTE_MS = 60_000;
-  if (bucketMs <= ONE_MINUTE_MS || points.length === 0) {
-    return points;
-  }
-
-  const buckets = new Map<number, number[]>();
-  for (const p of points) {
-    const bucketKey = Math.floor(p.timestamp.getTime() / bucketMs) * bucketMs;
-    const existing = buckets.get(bucketKey);
-    if (existing) {
-      existing.push(p.value);
-    } else {
-      buckets.set(bucketKey, [p.value]);
-    }
-  }
-
-  return [...buckets.entries()]
-    .toSorted(([a], [b]) => a - b)
-    .map(([ts, values]) => ({
-      timestamp: new Date(ts),
-      value: values.reduce((sum, v) => sum + v, 0) / values.length,
-    }));
+interface ArchiveGraphResult {
+  archivedId: string;
+}
+interface DeleteGraphResult {
+  deletedId: string;
 }
 
 export class VibeSenseRepository {
+  /**
+   * Downsample a raw (typically 1-minute) series into buckets of `bucketMs` width.
+   * Each bucket timestamp = floor of first point in bucket.
+   * Bucket value = average of all points that fall within the bucket.
+   * If bucketMs < the smallest stored interval (1 minute) the original points are returned unchanged.
+   */
+  private static downsampleToResolution(
+    points: Array<{ timestamp: Date; value: number }>,
+    bucketMs: number,
+  ): Array<{ timestamp: Date; value: number }> {
+    const ONE_MINUTE_MS = 60_000;
+    if (bucketMs <= ONE_MINUTE_MS || points.length === 0) {
+      return points;
+    }
+
+    const buckets = new Map<number, number[]>();
+    for (const p of points) {
+      const bucketKey = Math.floor(p.timestamp.getTime() / bucketMs) * bucketMs;
+      const existing = buckets.get(bucketKey);
+      if (existing) {
+        existing.push(p.value);
+      } else {
+        buckets.set(bucketKey, [p.value]);
+      }
+    }
+
+    return [...buckets.entries()]
+      .toSorted(([a], [b]) => a - b)
+      .map(([ts, values]) => ({
+        timestamp: new Date(ts),
+        value: values.reduce((sum, v) => sum + v, 0) / values.length,
+      }));
+  }
   // ─── Config Validation ──────────────────────────────────────────────────────
 
   /**
@@ -198,8 +199,9 @@ export class VibeSenseRepository {
   static async listGraphs(
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<GraphListResponse>> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<GraphsGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -244,8 +246,9 @@ export class VibeSenseRepository {
     data: GraphCreateInput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<GraphCreateResponse>> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<GraphsPostResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       // Validate config referential integrity
       const configError = VibeSenseRepository.validateConfig(
@@ -316,8 +319,9 @@ export class VibeSenseRepository {
     params: { resolution: Resolution; cursor?: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<GraphGetResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -341,15 +345,15 @@ export class VibeSenseRepository {
         });
       }
 
-      let series: GraphDataResponse["series"] = [];
-      let signals: GraphDataResponse["signals"] = [];
+      let series: GraphDataPayload["series"] = [];
+      let signals: GraphDataPayload["signals"] = [];
 
       const dataResult = await VibeSenseRepository.getGraphData(
         id,
         { resolution: params.resolution, cursor: params.cursor },
         user,
         logger,
-        t,
+        locale,
       );
       if (dataResult.success) {
         series = dataResult.data.series;
@@ -388,8 +392,9 @@ export class VibeSenseRepository {
     data: GraphEditInput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<GraphEditResponse>> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<GraphEditPutResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       // Validate config referential integrity
       const configError = VibeSenseRepository.validateConfig(
@@ -496,7 +501,7 @@ export class VibeSenseRepository {
     id: string,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       versions: Array<{
@@ -507,6 +512,7 @@ export class VibeSenseRepository {
       }>;
     }>
   > {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const MAX_CHAIN = 50;
       const chain: Array<{
@@ -588,8 +594,9 @@ export class VibeSenseRepository {
   static async promoteGraph(
     id: string,
     logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<{ promotedId: string }>> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<GraphPromotePostResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -641,8 +648,9 @@ export class VibeSenseRepository {
     data: GraphTriggerInput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<GraphTriggerResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -693,8 +701,9 @@ export class VibeSenseRepository {
     data: GraphBacktestInput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<GraphBacktestResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -751,8 +760,9 @@ export class VibeSenseRepository {
     data: GraphDataInput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<GraphDataResponse>> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<GraphDataPayload>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -791,10 +801,12 @@ export class VibeSenseRepository {
 
       const series = [...result.series.entries()].map(([nodeId, points]) => ({
         nodeId,
-        points: downsampleToResolution(points, resMs).map((p) => ({
-          timestamp: p.timestamp.toISOString(),
-          value: p.value,
-        })),
+        points: VibeSenseRepository.downsampleToResolution(points, resMs).map(
+          (p) => ({
+            timestamp: p.timestamp.toISOString(),
+            value: p.value,
+          }),
+        ),
       }));
 
       const signals = [...result.signals.entries()].map(([nodeId, events]) => ({
@@ -821,8 +833,9 @@ export class VibeSenseRepository {
     id: string,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<{ archivedId: string }>> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<ArchiveGraphResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -874,8 +887,9 @@ export class VibeSenseRepository {
     id: string,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: VibeSenseT,
-  ): Promise<ResponseType<{ deletedId: string }>> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<DeleteGraphResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const rows = await db
         .select()
@@ -936,8 +950,9 @@ export class VibeSenseRepository {
 
   static async runCleanup(
     logger: EndpointLogger,
-    t: VibeSenseT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CleanupResponse>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [retention, snapshots, scheduler, signalsDeleted] =
         await Promise.all([

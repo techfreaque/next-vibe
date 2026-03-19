@@ -26,18 +26,16 @@ import type {
   JourneyVariantsPostRequestOutput,
   JourneyVariantsPostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-// Valid enum keys at runtime
-const VALID_VARIANT_KEYS = new Set<string>(Object.values(EmailJourneyVariant));
+import type { JourneyVariantsT } from "./i18n";
 
 export class JourneyVariantsRepository {
+  private static readonly VALID_VARIANT_KEYS = new Set<string>(
+    Object.values(EmailJourneyVariant),
+  );
   // ── GET — list all ──────────────────────────────────────────────────────────
   static async getAll(
     logger: EndpointLogger,
-    t: ModuleT,
+    t: JourneyVariantsT,
   ): Promise<ResponseType<JourneyVariantsGetResponseOutput>> {
     try {
       const rows = await db
@@ -80,10 +78,10 @@ export class JourneyVariantsRepository {
   static async register(
     data: JourneyVariantsPostRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: JourneyVariantsT,
   ): Promise<ResponseType<JourneyVariantsPostResponseOutput>> {
     // Validate that variantKey exists in the enum
-    if (!VALID_VARIANT_KEYS.has(data.variantKey)) {
+    if (!JourneyVariantsRepository.VALID_VARIANT_KEYS.has(data.variantKey)) {
       return fail({
         message: t("post.errors.notFound.description"),
         errorType: ErrorResponseTypes.NOT_FOUND,
@@ -155,7 +153,7 @@ export class JourneyVariantsRepository {
   static async update(
     data: JourneyVariantsPatchRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: JourneyVariantsT,
   ): Promise<ResponseType<JourneyVariantsPatchResponseOutput>> {
     const [existing] = await db
       .select()

@@ -186,6 +186,8 @@ const { PATCH } = createEndpoint({
 
 export type RemoteConnectionRenamePatchRequestInput =
   typeof PATCH.types.RequestInput;
+export type RemoteConnectionRenamePatchResponseOutput =
+  typeof PATCH.types.ResponseOutput;
 
 const definitions = { PATCH };
 export default definitions;

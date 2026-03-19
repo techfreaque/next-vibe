@@ -255,6 +255,8 @@ export type CronHistoryRequestInput = typeof GET.types.RequestInput;
 export type CronHistoryRequestOutput = typeof GET.types.RequestOutput;
 export type CronHistoryResponseInput = typeof GET.types.ResponseInput;
 export type CronHistoryResponseOutput = typeof GET.types.ResponseOutput;
+export type CronHistoryExecution =
+  CronHistoryResponseOutput["executions"][number];
 
 const endpoints = { GET };
 export default endpoints;

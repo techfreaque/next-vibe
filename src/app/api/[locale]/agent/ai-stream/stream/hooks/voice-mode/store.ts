@@ -8,15 +8,81 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import {
-  DEFAULT_VOICE_MODE,
-  DEFAULT_VOICE_RUNTIME_STATE,
-  getCallModeKey,
-  VOICE_MODE_STORAGE_KEY,
-  type VoiceInputMode,
-  type VoiceMode,
-  type VoiceRuntimeState,
-} from "./types";
+// ─── Voice Mode Types ─────────────────────────────────────────────────────────
+
+/**
+ * Voice input mode - how voice input is handled
+ * - transcribe: Record audio → transcribe → put text in input field (current behavior)
+ * - talk: Record audio → transcribe → immediately send to AI
+ */
+export type VoiceInputMode = "transcribe" | "talk";
+
+/**
+ * Voice mode state
+ * Controls voice/call mode behavior
+ */
+export interface VoiceMode {
+  /** Whether voice mode features are enabled */
+  enabled: boolean;
+  /** How voice input is handled */
+  inputMode: VoiceInputMode;
+  /** Auto-play TTS for AI responses */
+  autoPlayTTS: boolean;
+  /**
+   * Call mode enabled per model+skill combination
+   * Key format: `${modelId}:${skillId}`
+   */
+  callModeByConfig: Record<string, boolean>;
+}
+
+/**
+ * Create a key for model+skill combination
+ */
+export function getCallModeKey(modelId: string, skillId: string): string {
+  return `${modelId}:${skillId}`;
+}
+
+/**
+ * Voice mode runtime state (not persisted)
+ */
+export interface VoiceRuntimeState {
+  /** Currently recording audio */
+  isRecording: boolean;
+  /** Processing STT */
+  isTranscribing: boolean;
+  /** AI is generating response */
+  isAIResponding: boolean;
+  /** TTS is playing */
+  isSpeaking: boolean;
+  /** Current transcription preview (while recording) */
+  transcriptionPreview: string | null;
+}
+
+/**
+ * Default voice mode settings
+ */
+export const DEFAULT_VOICE_MODE: VoiceMode = {
+  enabled: true,
+  inputMode: "transcribe",
+  autoPlayTTS: false,
+  callModeByConfig: {},
+};
+
+/**
+ * Default voice runtime state
+ */
+export const DEFAULT_VOICE_RUNTIME_STATE: VoiceRuntimeState = {
+  isRecording: false,
+  isTranscribing: false,
+  isAIResponding: false,
+  isSpeaking: false,
+  transcriptionPreview: null,
+};
+
+/**
+ * Storage keys for voice mode persistence
+ */
+export const VOICE_MODE_STORAGE_KEY = "chat-voice-mode" as const;
 
 /**
  * Voice mode store state

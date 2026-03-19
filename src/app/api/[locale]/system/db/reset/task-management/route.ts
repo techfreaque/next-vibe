@@ -8,12 +8,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { resetTaskManagementRepository as repository } from "./repository";
+import { ResetTaskManagementRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, t, logger }) =>
-      repository.executeTaskOperation(data, t, logger),
+      ResetTaskManagementRepository.executeTaskOperation(data, t, logger),
   },
 });

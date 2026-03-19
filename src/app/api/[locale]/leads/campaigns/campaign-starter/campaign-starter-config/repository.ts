@@ -28,9 +28,8 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../../user/auth/types";
-import type { scopedTranslation } from "./i18n";
+import type { CampaignStarterCampaignStarterConfigT } from "./i18n";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 import { type CampaignStarterConfig, campaignStarterConfigs } from "./db";
 import {
   type CronSettings,
@@ -204,7 +203,7 @@ export class CampaignStarterConfigRepository {
    */
   static async getConfig(
     user: JwtPayloadType,
-    t: ModuleT,
+    t: CampaignStarterCampaignStarterConfigT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
     try {
@@ -252,7 +251,7 @@ export class CampaignStarterConfigRepository {
   static async updateConfig(
     data: CampaignStarterConfigGetResponseOutput,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: CampaignStarterCampaignStarterConfigT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigPutResponseOutput>> {
     try {

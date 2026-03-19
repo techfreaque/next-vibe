@@ -137,5 +137,6 @@ export const { GET } = createEndpoint({
 });
 
 export type CodesListGetResponseOutput = typeof GET.types.ResponseOutput;
+export type ReferralCode = CodesListGetResponseOutput["codes"][number];
 
 export default { GET };

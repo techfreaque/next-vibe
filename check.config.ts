@@ -31,7 +31,7 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   mcpLimit: 20, // Compact limit for MCP platform
   editorUriScheme: "vscode://file/", // URI scheme for clickable file links
   // Extensive mode: when false (default), test and generated files are excluded.
-  // Set to true for release validation to catch issues in all files.
+  // use "vibe check --extensive" for release validation to catch issues in all files.
   extensive: false,
 };
 
@@ -667,6 +667,7 @@ const oxlint: CheckConfig["oxlint"] = {
 const prettier: CheckConfig["prettier"] = {
   enabled: true,
   configPath: ".tmp/.oxfmtrc.json",
+  ignoreFilePath: ".tmp/.prettierignore",
   semi: true,
   singleQuote: false,
   trailingComma: "all",

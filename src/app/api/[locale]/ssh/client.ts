@@ -22,7 +22,7 @@ import { Client } from "ssh2";
 import { db } from "@/app/api/[locale]/system/db";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
-import { decryptSecret } from "./connections/create/repository";
+import { ConnectionCreateRepository } from "./connections/create/repository";
 import { sshConnections } from "./db";
 import { SshAuthType, type SshAuthTypeType } from "./enum";
 
@@ -56,6 +56,23 @@ export interface SshCredentials {
   secret: string;
   passphrase: string | null;
   fingerprint: string | null;
+}
+
+/**
+ * Type guard for Node.js filesystem errors that have a `code` property.
+ * Replaces `error as NodeJS.ErrnoException` casts in catch blocks.
+ */
+export interface NodeError extends Error {
+  code?: string | number;
+  stdout?: string;
+  stderr?: string;
+  signal?: string;
+  killed?: boolean;
+}
+
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Type guard requires unknown to handle any error from catch blocks
+export function isNodeError(error: unknown): error is NodeError {
+  return error instanceof Error;
 }
 
 /** Compute SHA256 fingerprint of host key buffer (hex string) */
@@ -98,7 +115,7 @@ export async function getConnectionCredentials(
     });
   }
 
-  const secret = decryptSecret(row.encryptedSecret);
+  const secret = ConnectionCreateRepository.decryptSecret(row.encryptedSecret);
   if (secret === null) {
     return fail({
       message: t("errors.encryptionFailed"),
@@ -107,7 +124,7 @@ export async function getConnectionCredentials(
   }
 
   const passphrase = row.encryptedPassphrase
-    ? decryptSecret(row.encryptedPassphrase)
+    ? ConnectionCreateRepository.decryptSecret(row.encryptedPassphrase)
     : null;
 
   return success({

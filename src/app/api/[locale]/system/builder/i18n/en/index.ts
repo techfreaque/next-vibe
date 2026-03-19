@@ -220,6 +220,10 @@ export const translations = {
       fileToCompile: {
         title: "File Configuration",
       },
+      disabled: {
+        title: "Disabled",
+        description: "Skip this entry during build",
+      },
       input: {
         title: "Input File",
         description: "Entry point file path (e.g., src/index.ts)",

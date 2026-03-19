@@ -118,7 +118,7 @@ const { POST } = createEndpoint({
         label: "post.fields.skipTanstack.label",
         description: "post.fields.skipTanstack.description",
         columns: 4,
-        schema: z.boolean().optional().default(false),
+        schema: z.boolean().optional().default(true),
       }),
 
       // === RESPONSE FIELDS ===
@@ -310,3 +310,8 @@ const { POST } = createEndpoint({
 
 const generateAllEndpoints = { POST };
 export default generateAllEndpoints;
+
+export type GenerateAllRequestInput = typeof POST.types.RequestInput;
+export type GenerateAllRequestOutput = typeof POST.types.RequestOutput;
+export type GenerateAllResponseInput = typeof POST.types.ResponseInput;
+export type GenerateAllResponseOutput = typeof POST.types.ResponseOutput;

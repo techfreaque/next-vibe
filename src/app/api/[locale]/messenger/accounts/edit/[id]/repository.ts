@@ -23,55 +23,52 @@ import type {
   MessengerAccountEditPUTRequestOutput,
   MessengerAccountEditPUTResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-function mapAccount(
-  account: typeof messengerAccounts.$inferSelect,
-): MessengerAccountEditGETResponseOutput {
-  return {
-    id: account.id,
-    name: account.name,
-    description: account.description ?? null,
-    channel: account.channel,
-    provider: account.provider,
-    status: account.status,
-    healthStatus: account.healthStatus ?? null,
-    isDefault: account.isDefault ?? false,
-    priority: account.priority ?? 0,
-    smtpHost: account.smtpHost ?? null,
-    smtpPort: account.smtpPort ?? null,
-    smtpSecurityType: account.smtpSecurityType ?? null,
-    smtpUsername: account.smtpUsername ?? null,
-    smtpFromEmail: account.smtpFromEmail ?? null,
-    smtpConnectionTimeout: account.smtpConnectionTimeout ?? null,
-    smtpMaxConnections: account.smtpMaxConnections ?? null,
-    smtpRateLimitPerHour: account.smtpRateLimitPerHour ?? null,
-    fromId: account.fromId ?? null,
-    webhookUrl: account.webhookUrl ?? null,
-    imapHost: account.imapHost ?? null,
-    imapPort: account.imapPort ?? null,
-    imapSecure: account.imapSecure ?? null,
-    imapUsername: account.imapUsername ?? null,
-    imapAuthMethod: account.imapAuthMethod ?? null,
-    imapSyncEnabled: account.imapSyncEnabled ?? false,
-    imapSyncInterval: account.imapSyncInterval ?? null,
-    imapMaxMessages: account.imapMaxMessages ?? null,
-    imapLastSyncAt: account.imapLastSyncAt ?? null,
-    messagesSentTotal: account.messagesSentTotal ?? 0,
-    lastUsedAt: account.lastUsedAt ?? null,
-    createdAt: account.createdAt,
-    updatedAt: account.updatedAt,
-  };
-}
+import type { MessengerAccountEditT } from "./i18n";
 
 export class MessengerAccountEditRepository {
+  private static mapAccount(
+    account: typeof messengerAccounts.$inferSelect,
+  ): MessengerAccountEditGETResponseOutput {
+    return {
+      id: account.id,
+      name: account.name,
+      description: account.description ?? null,
+      channel: account.channel,
+      provider: account.provider,
+      status: account.status,
+      healthStatus: account.healthStatus ?? null,
+      isDefault: account.isDefault ?? false,
+      priority: account.priority ?? 0,
+      smtpHost: account.smtpHost ?? null,
+      smtpPort: account.smtpPort ?? null,
+      smtpSecurityType: account.smtpSecurityType ?? null,
+      smtpUsername: account.smtpUsername ?? null,
+      smtpFromEmail: account.smtpFromEmail ?? null,
+      smtpConnectionTimeout: account.smtpConnectionTimeout ?? null,
+      smtpMaxConnections: account.smtpMaxConnections ?? null,
+      smtpRateLimitPerHour: account.smtpRateLimitPerHour ?? null,
+      fromId: account.fromId ?? null,
+      webhookUrl: account.webhookUrl ?? null,
+      imapHost: account.imapHost ?? null,
+      imapPort: account.imapPort ?? null,
+      imapSecure: account.imapSecure ?? null,
+      imapUsername: account.imapUsername ?? null,
+      imapAuthMethod: account.imapAuthMethod ?? null,
+      imapSyncEnabled: account.imapSyncEnabled ?? false,
+      imapSyncInterval: account.imapSyncInterval ?? null,
+      imapMaxMessages: account.imapMaxMessages ?? null,
+      imapLastSyncAt: account.imapLastSyncAt ?? null,
+      messagesSentTotal: account.messagesSentTotal ?? 0,
+      lastUsedAt: account.lastUsedAt ?? null,
+      createdAt: account.createdAt,
+      updatedAt: account.updatedAt,
+    };
+  }
   static async getAccount(
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MessengerAccountEditT,
   ): Promise<ResponseType<MessengerAccountEditGETResponseOutput>> {
     try {
       logger.info("Getting messenger account", {
@@ -92,7 +89,7 @@ export class MessengerAccountEditRepository {
         });
       }
 
-      return success(mapAccount(account));
+      return success(MessengerAccountEditRepository.mapAccount(account));
     } catch (error) {
       logger.error("Error getting messenger account", parseError(error));
       return fail({
@@ -107,7 +104,7 @@ export class MessengerAccountEditRepository {
     data: MessengerAccountEditPUTRequestOutput & { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MessengerAccountEditT,
   ): Promise<ResponseType<MessengerAccountEditPUTResponseOutput>> {
     try {
       logger.info("Updating messenger account", {
@@ -292,7 +289,7 @@ export class MessengerAccountEditRepository {
       }
 
       logger.info("Messenger account updated", { id: updated.id });
-      return success(mapAccount(updated));
+      return success(MessengerAccountEditRepository.mapAccount(updated));
     } catch (error) {
       logger.error("Error updating messenger account", parseError(error));
       return fail({

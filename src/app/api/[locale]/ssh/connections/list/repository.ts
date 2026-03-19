@@ -20,15 +20,13 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { SshAuthType } from "../../enum";
 import { sshConnections } from "../../db";
 import type { ConnectionsListResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { ConnectionsListT } from "./i18n";
 
 export class ConnectionsListRepository {
   static async list(
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: ConnectionsListT,
   ): Promise<ResponseType<ConnectionsListResponseOutput>> {
     try {
       const rows = await db

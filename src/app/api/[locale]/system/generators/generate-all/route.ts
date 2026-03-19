@@ -9,12 +9,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import generateAllEndpoints from "./definition";
-import { generateAllRepository } from "./repository";
+import { GenerateAllRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: generateAllEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger, locale }) =>
-      generateAllRepository.generateAll(data, logger, locale),
+      GenerateAllRepository.generateAll(data, logger, locale),
   },
 });

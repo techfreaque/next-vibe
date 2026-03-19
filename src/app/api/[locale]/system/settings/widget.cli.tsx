@@ -313,7 +313,9 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
           leafMessageId: undefined,
           waitingForRemoteResult: undefined,
           favoriteId: undefined,
-          abortSignal: undefined,
+          abortSignal: new AbortController().signal,
+          callerCallbackMode: undefined,
+          onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
         },
       });
@@ -604,7 +606,9 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           leafMessageId: undefined,
           waitingForRemoteResult: undefined,
           favoriteId: undefined,
-          abortSignal: undefined,
+          abortSignal: new AbortController().signal,
+          callerCallbackMode: undefined,
+          onEscalatedTaskCancel: undefined,
           escalateToTask: undefined,
         },
       });
@@ -932,7 +936,9 @@ export function SystemSettingsPatchWidget(): JSX.Element {
             leafMessageId: undefined,
             waitingForRemoteResult: undefined,
             favoriteId: undefined,
-            abortSignal: undefined,
+            abortSignal: new AbortController().signal,
+            callerCallbackMode: undefined,
+            onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
           },
         });

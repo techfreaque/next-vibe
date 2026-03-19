@@ -21,15 +21,13 @@ import type {
   InboxMarkReadRequestOutput,
   InboxMarkReadResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { InboxMarkReadT } from "./i18n";
 
 export class InboxMarkReadRepository {
   static async markRead(
     data: InboxMarkReadRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: InboxMarkReadT,
     locale: CountryLanguage,
   ): Promise<ResponseType<InboxMarkReadResponseOutput>> {
     try {

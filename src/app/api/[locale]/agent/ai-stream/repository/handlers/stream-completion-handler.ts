@@ -138,7 +138,7 @@ export class StreamCompletionHandler {
     });
 
     // Clear streaming state in DB + registry
-    await clearStreamingState(threadId);
+    await clearStreamingState(threadId, logger);
 
     // Cleanup stream context
     ctx.cleanup();

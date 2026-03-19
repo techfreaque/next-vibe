@@ -45,6 +45,13 @@ export interface MessagesSubscriptionOptions {
   onStreamStarted?: () => void;
   /** Called when STREAM_FINISHED fires */
   onStreamFinished?: () => void;
+  /** Called when STREAMING_STATE_CHANGED fires with state="waiting" */
+  onStreamingStateWaiting?: () => void;
+  /**
+   * Initial streaming state from DB (passed on mount for page load recovery).
+   * If "waiting", sets the waitingThreadIds flag in the store immediately.
+   */
+  initialStreamingState?: "idle" | "streaming" | "aborting" | "waiting";
   /** Whether TTS audio chunks should be played — guards against cross-client audio bleed */
   ttsAutoplay?: boolean;
 }
@@ -69,6 +76,17 @@ export function useMessagesSubscription(
   // Use refs for callbacks to avoid re-subscribing on every render
   const optionsRef = useRef(options);
   optionsRef.current = options;
+
+  // Page load recovery: if the thread is in "waiting" state from DB, set it immediately.
+  // This restores the stop button visibility after a page refresh.
+  const initialStreamingState = options.initialStreamingState;
+  useEffect(() => {
+    if (threadId && initialStreamingState === "waiting") {
+      useAIStreamStore.getState().setWaiting(threadId, true);
+      optionsRef.current.onStreamingStateWaiting?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threadId, initialStreamingState]);
 
   useEffect(() => {
     if (!threadId) {
@@ -295,13 +313,32 @@ export function useMessagesSubscription(
           });
         },
 
+        // STREAMING_STATE_CHANGED: thread state changed server-side (e.g. → "waiting" or back to "idle")
+        [StreamEventType.STREAMING_STATE_CHANGED]: (e) => {
+          if (e.state === "waiting") {
+            store().setWaiting(threadId, true);
+            optionsRef.current.onStreamingStateWaiting?.();
+          } else if (e.state === "idle") {
+            store().setWaiting(threadId, false);
+            optionsRef.current.onStreamFinished?.();
+          }
+        },
+
         // STREAM_FINISHED: definitive "stream is over" signal
-        [StreamEventType.STREAM_FINISHED]: () => {
-          logger.info("[Messages] STREAM_FINISHED received", { threadId });
+        [StreamEventType.STREAM_FINISHED]: (e) => {
+          logger.info("[Messages] STREAM_FINISHED received", {
+            threadId,
+            finalState: e.finalState,
+          });
 
           const wasLocalStream = store().isLocalStream(threadId);
           store().stopStream(threadId);
-          optionsRef.current.onStreamFinished?.();
+          if (e.finalState === "waiting") {
+            store().setWaiting(threadId, true);
+            optionsRef.current.onStreamingStateWaiting?.();
+          } else {
+            optionsRef.current.onStreamFinished?.();
+          }
 
           // Seed the path cache with the messages already in the messages cache.
           // This prevents the path endpoint from refetching from the server when
@@ -368,9 +405,12 @@ export function useMessagesSubscription(
     return (): void => {
       cleanup();
       // If a local stream is still running when the component unmounts,
-      // stop it in the store (STREAM_FINISHED won't arrive after unmount).
+      // stop it in the store AND fire onStreamFinished so the nav store
+      // patches the sidebar threads cache back to "idle".
+      // (STREAM_FINISHED won't arrive after unmount — WS is being disconnected.)
       if (store().isLocalStream(threadId)) {
         store().stopStream(threadId);
+        optionsRef.current.onStreamFinished?.();
       }
       // Always disconnect the channel on unmount — the thread is no longer viewed.
       disconnectChannel(buildMessagesChannel(threadId));

@@ -14,48 +14,12 @@ import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { FetchUrlContentGetResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Fetch URL error and success messages for AI tool responses
- * These are technical messages for AI, not user-facing translations
- */
-export const FETCH_MESSAGES = {
-  URL_REQUIRED: "Error: URL is required but was not provided by the model.",
-  INVALID_URL: "Error: Invalid URL format provided.",
-  FETCH_FAILED_PREFIX: "Failed to fetch URL",
-  SUCCESS_PREFIX: "Successfully fetched content from",
-  UNKNOWN_ERROR: "Unknown error occurred",
-} as const;
-
-/**
- * Scrappey API Response Types
- */
-interface ScrappeyResponse {
-  solution: {
-    verified: boolean;
-    currentUrl: string;
-    statusCode: number;
-    userAgent: string;
-    response: string; // HTML content
-    cookies: Array<{
-      name: string;
-      value: string;
-      domain: string;
-    }>;
-    responseHeaders: Record<string, string>;
-  };
-  timeElapsed: number;
-  data: string;
-  session: string;
-}
+import type { FetchUrlContentT } from "./i18n";
 
 /**
  * Fetch URL Result
  */
-export interface FetchUrlResult {
+interface FetchUrlResult {
   url: string;
   content: string; // Markdown content
   statusCode: number;
@@ -63,19 +27,17 @@ export interface FetchUrlResult {
   timestamp: number;
 }
 
-/**
- * Custom error for Fetch URL operations
- */
-export class FetchUrlError extends Error {
-  constructor(
-    message: string,
-    public statusCode?: number,
-    public originalError?: Error,
-  ) {
-    super(message);
-    // eslint-disable-next-line i18next/no-literal-string
-    this.name = "FetchUrlError";
-  }
+type FetchResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; isTimeout?: boolean };
+
+interface ScrappeyResponse {
+  solution: {
+    response: string;
+    currentUrl: string;
+    statusCode: number;
+  };
+  timeElapsed: number;
 }
 
 /**
@@ -109,40 +71,45 @@ class FetchUrlService {
   /**
    * Fetch URL content and convert to markdown
    */
-  async fetchUrl(url: string): Promise<FetchUrlResult> {
+  async fetchUrl(url: string): Promise<FetchResult<FetchUrlResult>> {
     // Validate URL
-    this.validateUrl(url);
+    const validateResult = this.validateUrl(url);
+    if (!validateResult.ok) {
+      return validateResult;
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, this.TIMEOUT);
 
-    try {
-      const scrappeyResponse = await this.fetchFromScrappey(
-        url,
-        controller.signal,
-      );
+    const scrappeyResult = await this.fetchFromScrappey(url, controller.signal);
+    clearTimeout(timeoutId);
 
-      clearTimeout(timeoutId);
+    if (!scrappeyResult.ok) {
+      return scrappeyResult;
+    }
 
-      // Convert HTML to Markdown
-      const markdown = this.convertHtmlToMarkdown(
-        scrappeyResponse.solution.response,
-      );
+    const scrappeyResponse = scrappeyResult.data;
 
-      return {
+    // Convert HTML to Markdown
+    const markdownResult = this.convertHtmlToMarkdown(
+      scrappeyResponse.solution.response,
+    );
+    if (!markdownResult.ok) {
+      return markdownResult;
+    }
+
+    return {
+      ok: true,
+      data: {
         url: scrappeyResponse.solution.currentUrl,
-        content: markdown,
+        content: markdownResult.data,
         statusCode: scrappeyResponse.solution.statusCode,
         timeElapsed: scrappeyResponse.timeElapsed,
         timestamp: Date.now(),
-      };
-    } catch (error) {
-      clearTimeout(timeoutId);
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw to propagate error to caller
-      throw error;
-    }
+      },
+    };
   }
 
   /**
@@ -151,7 +118,7 @@ class FetchUrlService {
   private async fetchFromScrappey(
     url: string,
     signal: AbortSignal,
-  ): Promise<ScrappeyResponse> {
+  ): Promise<FetchResult<ScrappeyResponse>> {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
 
     try {
@@ -168,46 +135,41 @@ class FetchUrlService {
       });
 
       if (!response.ok) {
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-        throw new FetchUrlError(
+        return {
+          ok: false,
           // eslint-disable-next-line i18next/no-literal-string
-          `Scrappey API error: ${response.statusText}`,
-          response.status,
-        );
+          error: `Scrappey API error: ${response.statusText}`,
+        };
       }
 
       const data = (await response.json()) as ScrappeyResponse;
 
       // Check if the fetch was successful
       if (!data.solution?.response) {
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-        throw new FetchUrlError(
+        return {
+          ok: false,
           // eslint-disable-next-line i18next/no-literal-string
-          "No content received from Scrappey API",
-          data.solution?.statusCode,
-        );
+          error: "No content received from Scrappey API",
+        };
       }
 
-      return data;
+      return { ok: true, data };
     } catch (error) {
-      if (error instanceof FetchUrlError) {
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw to propagate error to caller
-        throw error;
-      }
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw to propagate error to caller
-      throw new FetchUrlError(
-        // eslint-disable-next-line i18next/no-literal-string
-        `Failed to fetch from Scrappey: ${error instanceof Error ? error.message : "Unknown error"}`,
-        undefined,
-        error instanceof Error ? error : undefined,
-      );
+      const isTimeout = error instanceof Error && error.name === "AbortError";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      return {
+        ok: false,
+        error: `Failed to fetch from Scrappey: ${errorMessage}`,
+        isTimeout,
+      };
     }
   }
 
   /**
    * Convert HTML to Markdown using Turndown
    */
-  private convertHtmlToMarkdown(html: string): string {
+  private convertHtmlToMarkdown(html: string): FetchResult<string> {
     try {
       // Clean up the HTML before conversion
       const cleanedHtml = this.cleanHtml(html);
@@ -216,15 +178,14 @@ class FetchUrlService {
       const markdown = this.turndownService.turndown(cleanedHtml);
 
       // Post-process markdown
-      return this.cleanMarkdown(markdown);
+      return { ok: true, data: this.cleanMarkdown(markdown) };
     } catch (error) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Internal helper throws, caught by caller
-      throw new FetchUrlError(
-        // eslint-disable-next-line i18next/no-literal-string
-        `Failed to convert HTML to Markdown: ${error instanceof Error ? error.message : "Unknown error"}`,
-        undefined,
-        error instanceof Error ? error : undefined,
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      return {
+        ok: false,
+        error: `Failed to convert HTML to Markdown: ${errorMessage}`,
+      };
     }
   }
 
@@ -285,178 +246,140 @@ class FetchUrlService {
   /**
    * Validate URL
    */
-  private validateUrl(url: string): void {
+  private validateUrl(url: string): FetchResult<void> {
     if (!url || url.trim().length === 0) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Validation helper throws, caught by caller
-      throw new FetchUrlError("URL cannot be empty");
+      return {
+        ok: false,
+        error: "URL cannot be empty",
+      };
     }
 
     try {
       const urlObj = new URL(url);
       // Only allow http and https protocols
       if (!["http:", "https:"].includes(urlObj.protocol)) {
-        // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Validation helper throws, caught by caller
-        throw new FetchUrlError("Only HTTP and HTTPS URLs are allowed");
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-restricted-syntax, oxlint-plugin-restricted/restricted-syntax -- Re-throw to propagate error to caller
-      throw new FetchUrlError(
-        // eslint-disable-next-line i18next/no-literal-string
-        `Invalid URL format: ${error instanceof Error ? error.message : "Unknown error"}`,
-        undefined,
-        error instanceof Error ? error : undefined,
-      );
-    }
-  }
-
-  /**
-   * Handle and normalize errors
-   */
-  handleError(error: Error | FetchUrlError): FetchUrlError {
-    if (error instanceof FetchUrlError) {
-      return error;
-    }
-
-    if (error.name === "AbortError") {
-      // eslint-disable-next-line i18next/no-literal-string
-      return new FetchUrlError("Request timed out", 408, error);
-    }
-
-    return new FetchUrlError(
-      // eslint-disable-next-line i18next/no-literal-string
-      `Fetch failed: ${error.message}`,
-      undefined,
-      error,
-    );
-  }
-}
-
-/**
- * Singleton instance
- */
-let fetchUrlInstance: FetchUrlService | null = null;
-
-/**
- * Get or create Fetch URL service instance
- */
-function getFetchUrlService(): FetchUrlService {
-  if (!fetchUrlInstance) {
-    fetchUrlInstance = new FetchUrlService();
-  }
-  return fetchUrlInstance;
-}
-
-/**
- * AI SDK Tool for Fetch URL Content
- * Provides web scraping and content extraction capability to AI agents
- */
-export const fetchUrlContent = tool({
-  // eslint-disable-next-line i18next/no-literal-string
-  description: `Fetch and extract content from any URL, converting it to readable markdown format.
-Use this when:
-- User asks to fetch content from a specific URL
-- You need to read or analyze web page content
-- User wants to extract information from a website
-- You need to get the current state of a web page`,
-  inputSchema: z.object({
-    url: z.string().url().describe(
-      // eslint-disable-next-line i18next/no-literal-string
-      "The complete URL to fetch (must include http:// or https://)",
-    ),
-  }),
-  execute: async ({ url }: { url: string }) => {
-    try {
-      // Validate that URL is provided
-      if (!url || typeof url !== "string" || url.trim() === "") {
         return {
-          success: false,
-          message: FETCH_MESSAGES.URL_REQUIRED,
-          url: url || "",
-          content: "",
+          ok: false,
+          error: "Only HTTP and HTTPS URLs are allowed",
         };
       }
-
-      const fetchService = getFetchUrlService();
-      const result = await fetchService.fetchUrl(url);
-
-      const successResult = {
-        success: true,
-        message: `${FETCH_MESSAGES.SUCCESS_PREFIX}: ${result.url}`,
-        fetchedUrl: result.url,
-        content: result.content,
-        statusCode: result.statusCode,
-        timeElapsed: result.timeElapsed,
-        timestamp: new Date(result.timestamp).toISOString(),
-      };
-      return successResult;
+      return { ok: true, data: undefined };
     } catch (error) {
-      const fetchService = getFetchUrlService();
-      const fetchError =
-        error instanceof Error
-          ? fetchService.handleError(error)
-          : new FetchUrlError(FETCH_MESSAGES.UNKNOWN_ERROR);
-
-      const errorResult = {
-        success: false,
-        message: `${FETCH_MESSAGES.FETCH_FAILED_PREFIX}: ${fetchError.message}`,
-        url,
-        content: "",
-        error: fetchError.message,
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      return {
+        ok: false,
+        error: `Invalid URL format: ${errorMessage}`,
       };
-      return errorResult;
     }
-  },
-});
+  }
+}
 
 /**
  * Fetch URL Content Repository Implementation
  */
 export class FetchUrlContentRepository {
+  private static fetchUrlInstance: FetchUrlService | null = null;
+
+  static getFetchUrlService(): FetchUrlService {
+    if (!FetchUrlContentRepository.fetchUrlInstance) {
+      FetchUrlContentRepository.fetchUrlInstance = new FetchUrlService();
+    }
+    return FetchUrlContentRepository.fetchUrlInstance;
+  }
+
+  /**
+   * AI SDK Tool for Fetch URL Content
+   * Provides web scraping and content extraction capability to AI agents
+   */
+  static readonly fetchUrlTool = tool({
+    // eslint-disable-next-line i18next/no-literal-string
+    description: `Fetch and extract content from any URL, converting it to readable markdown format.
+Use this when:
+- User asks to fetch content from a specific URL
+- You need to read or analyze web page content
+- User wants to extract information from a website
+- You need to get the current state of a web page`,
+    inputSchema: z.object({
+      url: z.string().url().describe(
+        // eslint-disable-next-line i18next/no-literal-string
+        "The complete URL to fetch (must include http:// or https://)",
+      ),
+    }),
+    execute: async ({ url }: { url: string }) => {
+      // Validate that URL is provided
+      if (!url || typeof url !== "string" || url.trim() === "") {
+        return {
+          success: false,
+          message: "Error: URL is required but was not provided by the model.",
+          url: url || "",
+          content: "",
+        };
+      }
+
+      const fetchService = FetchUrlContentRepository.getFetchUrlService();
+      const result = await fetchService.fetchUrl(url);
+
+      if (!result.ok) {
+        return {
+          success: false,
+          message: `Failed to fetch URL: ${result.error}`,
+          url,
+          content: "",
+          error: result.error,
+        };
+      }
+
+      return {
+        success: true,
+        message: `Successfully fetched content from: ${result.data.url}`,
+        fetchedUrl: result.data.url,
+        content: result.data.content,
+        statusCode: result.data.statusCode,
+        timeElapsed: result.data.timeElapsed,
+        timestamp: new Date(result.data.timestamp).toISOString(),
+      };
+    },
+  });
+
   static async fetchUrl(
     url: string,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: FetchUrlContentT,
   ): Promise<ResponseType<FetchUrlContentGetResponseOutput>> {
     const { fail, success, ErrorResponseTypes } =
       await import("next-vibe/shared/types/response.schema");
 
-    try {
-      if (!url || typeof url !== "string" || url.trim() === "") {
-        return fail({
-          message: t("get.errors.validation.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { message: FETCH_MESSAGES.URL_REQUIRED },
-        });
-      }
-
-      const fetchService = getFetchUrlService();
-      const result = await fetchService.fetchUrl(url);
-
-      return success({
-        success: true,
-        message: `${FETCH_MESSAGES.SUCCESS_PREFIX}: ${result.url}`,
-        content: result.content,
-        fetchedUrl: result.url,
-        statusCode: result.statusCode,
-        timeElapsed: result.timeElapsed,
+    if (!url || typeof url !== "string" || url.trim() === "") {
+      return fail({
+        message: t("get.errors.validation.title"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
-    } catch (error) {
-      const fetchService = getFetchUrlService();
-      const fetchError =
-        error instanceof Error
-          ? fetchService.handleError(error)
-          : new Error(FETCH_MESSAGES.UNKNOWN_ERROR);
+    }
 
+    const fetchService = FetchUrlContentRepository.getFetchUrlService();
+    const result = await fetchService.fetchUrl(url);
+
+    if (!result.ok) {
       logger.error("Fetch URL error", {
-        error: fetchError.message,
+        error: result.error,
         url,
       });
 
       return fail({
         message: t("get.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { message: fetchError.message },
+        messageParams: { message: result.error },
       });
     }
+
+    return success({
+      success: true,
+      message: `${t("get.success.title")}: ${result.data.url}`,
+      content: result.data.content,
+      fetchedUrl: result.data.url,
+      statusCode: result.data.statusCode,
+      timeElapsed: result.data.timeElapsed,
+    });
   }
 }

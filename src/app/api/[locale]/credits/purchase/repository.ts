@@ -30,9 +30,7 @@ import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { CreditsPurchaseT } from "./i18n";
 
 /**
  * Credit Purchase Repository
@@ -54,7 +52,7 @@ export class CreditPurchaseRepository {
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CreditsPurchaseT,
   ): Promise<ResponseType<CreditsPurchasePostResponseOutput>> {
     try {
       logger.debug("createCheckoutSession START", {

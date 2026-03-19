@@ -40,8 +40,12 @@ export interface IMCPProtocolHandler {
   handleRequest(request: JsonRpcRequest): Promise<JsonRpcResponse>;
   handleInitialize(params: WidgetData): Promise<MCPInitializeResult>;
   handleToolsList(params: WidgetData): Promise<MCPToolsListResult>;
-  handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult>;
+  handleToolCall(
+    params: MCPToolCallParams,
+    requestId?: string | number,
+  ): Promise<MCPToolCallResult>;
   handlePing(): Promise<{ [key: string]: never }>;
+  abortAllToolCalls(): void;
 }
 
 /**
@@ -54,6 +58,10 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   private user: JwtPayloadType;
   private readonly registry: MCPRegistry;
   private readonly defRegistry: IDefinitionsRegistry;
+  private readonly activeToolCalls = new Map<
+    string | number,
+    AbortController
+  >();
 
   constructor(
     logger: EndpointLogger,
@@ -160,7 +168,10 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
                 ? (request.params.arguments as Record<string, WidgetData>)
                 : undefined,
           };
-          result = await this.handleToolCall(toolCallParams);
+          result = await this.handleToolCall(
+            toolCallParams,
+            request.id ?? undefined,
+          );
           break;
 
         default:
@@ -283,34 +294,57 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   /**
    * Handle tools/call request
    */
-  async handleToolCall(params: MCPToolCallParams): Promise<MCPToolCallResult> {
+  async handleToolCall(
+    params: MCPToolCallParams,
+    requestId?: string | number,
+  ): Promise<MCPToolCallResult> {
     this.logger.info("[MCP Protocol] Calling tool", {
       toolName: params.name,
       argumentsKeys: Object.keys(params.arguments || {}),
       argumentsData: JSON.stringify(params.arguments),
     });
 
-    // Execute tool - params.arguments is already properly typed from MCPToolCallParams
-    const result = await this.registry.executeTool(
-      {
+    const callId = requestId ?? Date.now();
+    const abortController = new AbortController();
+    this.activeToolCalls.set(callId, abortController);
+
+    try {
+      // Execute tool - params.arguments is already properly typed from MCPToolCallParams
+      const result = await this.registry.executeTool(
+        {
+          toolName: params.name,
+          data: (params.arguments || {}) as CliRequestData,
+          user: this.user,
+          locale: this.locale,
+          requestId: callId,
+          timestamp: Date.now(),
+          logger: this.logger,
+          platform: Platform.MCP,
+          signal: abortController.signal,
+        },
+        this.logger,
+      );
+
+      this.logger.info("[MCP Protocol] Tool call complete", {
         toolName: params.name,
-        data: (params.arguments || {}) as CliRequestData,
-        user: this.user,
-        locale: this.locale,
-        requestId: Date.now(),
-        timestamp: Date.now(),
-        logger: this.logger,
-        platform: Platform.MCP,
-      },
-      this.logger,
-    );
+        isError: result.isError,
+      });
 
-    this.logger.info("[MCP Protocol] Tool call complete", {
-      toolName: params.name,
-      isError: result.isError,
-    });
+      return result;
+    } finally {
+      this.activeToolCalls.delete(callId);
+    }
+  }
 
-    return result;
+  /**
+   * Abort all in-flight tool calls (e.g. on transport disconnect)
+   */
+  abortAllToolCalls(): void {
+    for (const [id, controller] of this.activeToolCalls) {
+      this.logger.info("[MCP Protocol] Aborting in-flight tool call", { id });
+      controller.abort(new Error("MCP connection closed"));
+    }
+    this.activeToolCalls.clear();
   }
 
   /**

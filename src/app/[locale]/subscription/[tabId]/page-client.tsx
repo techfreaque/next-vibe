@@ -83,11 +83,7 @@ export function SubscriptionPageClient({
       )}
 
       {/* Tabs Navigation - same for all tabs */}
-      <SubscriptionTabsNav
-        locale={locale}
-        activeTab={activeTab}
-        isAdmin={isAdmin}
-      />
+      <SubscriptionTabsNav locale={locale} activeTab={activeTab} user={user} />
 
       {/* Tab Content - changes based on active tab */}
       {activeTab === "overview" && (

@@ -296,6 +296,14 @@ export function runCli({
             return;
           }
 
+          // Wire SIGINT → AbortController so long-running child processes
+          // (e.g. vibe check) are cancelled when the user presses Ctrl+C
+          const cliAbortController = new AbortController();
+          const sigintHandler = (): void => {
+            cliAbortController.abort(new Error("SIGINT"));
+          };
+          process.once("SIGINT", sigintHandler);
+
           if (
             !command ||
             command === "-h" ||
@@ -317,6 +325,7 @@ export function runCli({
                 dryRun: options.dryRun ?? false,
                 cliTarget,
                 remoteUrl: resolvedRemoteUrl,
+                signal: cliAbortController.signal,
               },
               logger,
               loader,
@@ -359,6 +368,7 @@ export function runCli({
                 dryRun: options.dryRun ?? false,
                 cliTarget,
                 remoteUrl: resolvedRemoteUrl,
+                signal: cliAbortController.signal,
               },
               logger,
               loader,
@@ -409,14 +419,14 @@ export function runCli({
           // start the MCP server directly so it uses the scoped registries.
           if (command === "mcp" && (loader || defRegistry)) {
             performanceMonitor.mark("routeStart");
-            const { mcpServeRepository } =
+            const { MCPServeRepository } =
               await import("@/app/api/[locale]/system/unified-interface/mcp/serve/repository");
             const mcpPublicUser: JwtPayloadType = {
               isPublic: true,
               leadId: "00000000-0000-0000-0000-000000000000",
               roles: ["enums.userRole.public"],
             };
-            await mcpServeRepository.startServer(
+            await MCPServeRepository.startServer(
               logger,
               options.locale,
               mcpPublicUser,
@@ -436,6 +446,7 @@ export function runCli({
           const forceInteractive =
             options.interactive || ALWAYS_INTERACTIVE.has(command ?? "");
 
+          logger.debug("[CLI] routeStart");
           performanceMonitor.mark("routeStart");
           const result = await RouteDelegationHandler.executeRoute(
             command,
@@ -455,10 +466,13 @@ export function runCli({
               dryRun: options.dryRun ?? false,
               cliTarget,
               remoteUrl: resolvedRemoteUrl,
+              signal: cliAbortController.signal,
             },
             logger,
             loader,
-          );
+          ).finally(() => {
+            process.off("SIGINT", sigintHandler);
+          });
           performanceMonitor.mark("routeEnd");
 
           performanceMonitor.mark("renderStart");

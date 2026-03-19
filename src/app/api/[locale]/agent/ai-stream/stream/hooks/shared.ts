@@ -6,7 +6,7 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
+import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
@@ -15,6 +15,7 @@ import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { UseAIStreamReturn } from "./use-ai-stream";
 
@@ -41,6 +42,7 @@ export interface MessageOperationDeps {
   startStream: StartStreamFn;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
+  user: JwtPayloadType;
   settings: {
     selectedModel: ModelId;
     selectedSkill: string;
@@ -66,6 +68,7 @@ export async function createAndSendUserMessage(
     startStream,
     currentRootFolderId,
     currentSubFolderId,
+    user,
     settings,
     setLeafMessageId,
   } = deps;
@@ -196,7 +199,7 @@ export async function createAndSendUserMessage(
       })) ?? null;
     const pinnedToolsPayload = (
       settings.pinnedTools ??
-      getDefaultToolIds().map((id) => ({
+      getDefaultToolIdsForUser(user).map((id) => ({
         toolId: id,
         requiresConfirmation: false,
       }))

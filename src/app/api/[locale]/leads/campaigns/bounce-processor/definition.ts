@@ -19,6 +19,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { BounceProcessorWidget } from "./widget";
 
@@ -26,7 +27,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["leads", "campaigns", "bounce-processor"],
-  aliases: ["bounce-processor"],
+  aliases: [BOUNCE_PROCESSOR_ALIAS],
   title: "post.title",
   description: "post.description",
   category: "app.endpointCategories.leadsCampaigns",

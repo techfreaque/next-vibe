@@ -4,8 +4,6 @@
  * IMPORTANT: No database imports or server-only code allowed
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import { SKILL_CREATE_ALIAS, SKILLS_LIST_ALIAS } from "../skills/constants";
 import {
   FAVORITE_CREATE_ALIAS,

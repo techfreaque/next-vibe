@@ -182,6 +182,9 @@ export interface MCPExecutionContext<TData = CliRequestData> extends Omit<
 
   /** Request ID for tracking (required for MCP) */
   requestId: string | number;
+
+  /** Optional abort signal to cancel long-running tool executions */
+  signal: AbortSignal;
 }
 
 /**

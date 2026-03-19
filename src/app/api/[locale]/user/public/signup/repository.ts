@@ -20,8 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { scopedTranslation as signupScopedTranslation } from "./i18n";
-import type { scopedTranslation } from "./i18n";
-
+import type { SignupT } from "./i18n";
 import { AuthRepository } from "../../auth/repository";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
 import { UserDetailLevel } from "../../enum";
@@ -41,38 +40,10 @@ import type {
 } from "./definition";
 import type { NewUser } from "../../db";
 
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
 /**
- * Signup repository interface
+ * Signup repository
  */
-export interface SignupRepository {
-  /**
-   * Register a new user
-   * @param data - User registration data
-   * @param user - User from JWT (public user for signup)
-   * @param locale - User locale
-   * @param logger - Logger instance for debugging and monitoring
-   * @param request - Next.js request object (optional for CLI context)
-   * @param platform - Platform context (web, cli, ai-tool, etc.)
-   * @param t - Scoped translation function
-   * @returns Success or error result
-   */
-  registerUser(
-    data: SignupPostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    request: NextRequest | undefined,
-    platform: Platform,
-    t: ModuleT,
-  ): Promise<ResponseType<SignupPostResponseOutput>>;
-}
-
-/**
- * Signup repository implementation
- */
-export class SignupRepositoryImpl implements SignupRepository {
+export class SignupRepository {
   /**
    * Register a new user
    * @param data - User registration data
@@ -82,14 +53,14 @@ export class SignupRepositoryImpl implements SignupRepository {
    * @param request - Next.js request object for platform detection
    * @returns Success or error result
    */
-  async registerUser(
+  static async registerUser(
     data: SignupPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
     request: NextRequest | undefined,
     platform: Platform,
-    t: ModuleT,
+    t: SignupT,
   ): Promise<ResponseType<SignupPostResponseOutput>> {
     try {
       // Extract fields from flat structure
@@ -119,11 +90,12 @@ export class SignupRepositoryImpl implements SignupRepository {
       }
 
       // Check if email already exists
-      const emailCheckResponse = await this.checkEmailAvailabilityInternal(
-        email,
-        locale,
-        logger,
-      );
+      const emailCheckResponse =
+        await SignupRepository.checkEmailAvailabilityInternal(
+          email,
+          locale,
+          logger,
+        );
       if (!emailCheckResponse.success) {
         return emailCheckResponse;
       }
@@ -139,7 +111,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       }
 
       // Create the user account with extracted data
-      const result = await this.createUserInternal(
+      const result = await SignupRepository.createUserInternal(
         { email, password, privateName, publicName, subscribeToNewsletter },
         user.leadId,
         locale,
@@ -338,7 +310,7 @@ export class SignupRepositoryImpl implements SignupRepository {
    * @param role - User role (default: CUSTOMER)
    * @returns Success or error result
    */
-  private async createUserInternal(
+  private static async createUserInternal(
     userInput: {
       email: string;
       password: string;
@@ -424,7 +396,7 @@ export class SignupRepositoryImpl implements SignupRepository {
         : [UserPermissionRole.CUSTOMER];
 
       // Link leadId to user (always happens during signup)
-      await this.handleLeadConversion(
+      await SignupRepository.handleLeadConversion(
         email,
         leadId,
         userResponse.data.id,
@@ -454,7 +426,7 @@ export class SignupRepositoryImpl implements SignupRepository {
    * @param logger - Logger instance
    * @returns Success or error result with boolean indicating if email exists
    */
-  private async checkEmailAvailabilityInternal(
+  private static async checkEmailAvailabilityInternal(
     email: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -485,7 +457,7 @@ export class SignupRepositoryImpl implements SignupRepository {
    * @param userId - Created user ID
    * @param logger - Logger instance
    */
-  private async handleLeadConversion(
+  private static async handleLeadConversion(
     email: string,
     leadId: string,
     userId: string,
@@ -538,6 +510,3 @@ export class SignupRepositoryImpl implements SignupRepository {
     }
   }
 }
-
-// Export singleton instance of the repository
-export const signupRepository = new SignupRepositoryImpl();

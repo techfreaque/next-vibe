@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import generateTrpcRouterEndpoints from "./definition";
-import { generateTrpcRouterRepository } from "./repository";
+import { GenerateTrpcRouterRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: generateTrpcRouterEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger, locale }) => {
-      return generateTrpcRouterRepository.generateTrpcRouter(
+      return GenerateTrpcRouterRepository.generateTrpcRouter(
         data,
         logger,
         locale,

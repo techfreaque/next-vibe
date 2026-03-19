@@ -31,9 +31,7 @@ import type {
   ShareLinkUpdateRequestOutput,
   ShareLinkUpdateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ShareLinksT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { ThreadShareLinksT } from "./i18n";
 
 /**
  * Thread Share Links Repository
@@ -46,7 +44,7 @@ export class ShareLinksRepository {
   static async list(
     urlPathParams: ShareLinksGetUrlVariablesOutput,
     user: JwtPayloadType,
-    t: ShareLinksT,
+    t: ThreadShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinksGetResponseOutput>> {
     if (user.isPublic || !user.id) {
@@ -120,7 +118,7 @@ export class ShareLinksRepository {
     data: ShareLinkCreateRequestOutput,
     urlPathParams: ShareLinkCreateUrlVariablesOutput,
     user: JwtPayloadType,
-    t: ShareLinksT,
+    t: ThreadShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinkCreateResponseOutput>> {
     if (user.isPublic || !user.id) {
@@ -209,7 +207,7 @@ export class ShareLinksRepository {
   static async update(
     data: ShareLinkUpdateRequestOutput,
     user: JwtPayloadType,
-    t: ShareLinksT,
+    t: ThreadShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinkUpdateResponseOutput>> {
     if (user.isPublic || !user.id) {
@@ -288,7 +286,7 @@ export class ShareLinksRepository {
   static async revoke(
     data: ShareLinkRevokeRequestOutput,
     user: JwtPayloadType,
-    t: ShareLinksT,
+    t: ThreadShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinkRevokeResponseOutput>> {
     if (user.isPublic || !user.id) {
@@ -361,7 +359,7 @@ export class ShareLinksRepository {
    */
   static async getByToken(
     token: string,
-    t: ShareLinksT,
+    t: ThreadShareLinksT,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{

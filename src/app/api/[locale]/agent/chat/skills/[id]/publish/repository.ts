@@ -25,8 +25,8 @@ import { SkillOwnershipType, SkillStatus } from "../../enum";
 import type { SkillPublishPatchResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
-export const SkillPublishRepository = {
-  async publish(
+export class SkillPublishRepository {
+  static async publish(
     urlPathParams: { id: string },
     data: { status: typeof SkillStatusValue; changeNote?: string },
     user: JwtPayloadType,
@@ -113,5 +113,5 @@ export const SkillPublishRepository = {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
-  },
-};
+  }
+}

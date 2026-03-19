@@ -8,8 +8,6 @@
  * config.ts imports from the generated file instead of 50+ individual files.
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import "server-only";
 
 import { readFileSync } from "node:fs";
@@ -37,9 +35,7 @@ import {
   getRelativeImportPath,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { GeneratorsSkillsIndexT } from "./i18n";
 
 interface SkillsIndexRequestType {
   outputFile: string;
@@ -66,14 +62,13 @@ interface SkillEntry {
   isCompanion: boolean;
 }
 
-/** Skill IDs that go into COMPANION_SKILLS (order matters) */
-const COMPANION_SKILL_IDS = ["thea", "hermes"] as const;
-
-class SkillsIndexGeneratorRepositoryImpl {
-  async generateSkillsIndex(
+export class SkillsIndexGeneratorRepository {
+  /** Skill IDs that go into COMPANION_SKILLS (order matters) */
+  private static readonly COMPANION_SKILL_IDS = ["thea", "hermes"] as const;
+  static async generateSkillsIndex(
     data: SkillsIndexRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsSkillsIndexT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<SkillsIndexResponseType>> {
     const startTime = Date.now();
@@ -94,14 +89,20 @@ class SkillsIndexGeneratorRepositoryImpl {
       }
 
       // ── 2. Parse each skill.ts and extract the export name + skill id ──
-      const skills = this.extractSkills(skillFiles, logger);
+      const skills = SkillsIndexGeneratorRepository.extractSkills(
+        skillFiles,
+        logger,
+      );
 
       logger.debug(
         `Extracted ${skills.length} skills: ${skills.map((s) => s.skillId).join(", ")}`,
       );
 
       // ── 3. Generate file content ───────────────────────────────────────
-      const content = this.generateContent(skills, data.outputFile);
+      const content = SkillsIndexGeneratorRepository.generateContent(
+        skills,
+        data.outputFile,
+      );
 
       // ── 4. Write file ──────────────────────────────────────────────────
       await writeGeneratedFile(data.outputFile, content, data.dryRun);
@@ -138,7 +139,7 @@ class SkillsIndexGeneratorRepositoryImpl {
     }
   }
 
-  private extractSkills(
+  private static extractSkills(
     skillFiles: string[],
     logger: EndpointLogger,
   ): SkillEntry[] {
@@ -161,14 +162,11 @@ class SkillsIndexGeneratorRepositoryImpl {
 
         const exportName = exportMatch[1];
         const skillId = idMatch[1];
-        const isCompanion = (COMPANION_SKILL_IDS as readonly string[]).includes(
-          skillId,
-        );
+        const isCompanion = (
+          SkillsIndexGeneratorRepository.COMPANION_SKILL_IDS as readonly string[]
+        ).includes(skillId);
 
         skills.push({ exportName, skillId, absPath: skillFile, isCompanion });
-        logger.debug(
-          `Found skill "${skillId}" (${exportName}) in ${skillFile}`,
-        );
       } catch (error) {
         logger.warn(
           `Could not read skill file ${skillFile}: ${parseError(error).message}`,
@@ -178,7 +176,8 @@ class SkillsIndexGeneratorRepositoryImpl {
 
     // Stable sort: companions first (in defined order), then alphabetical by id
     return skills.toSorted((a, b) => {
-      const companions: readonly string[] = COMPANION_SKILL_IDS;
+      const companions: readonly string[] =
+        SkillsIndexGeneratorRepository.COMPANION_SKILL_IDS;
       const aCompIdx = companions.indexOf(a.skillId);
       const bCompIdx = companions.indexOf(b.skillId);
       if (aCompIdx !== -1 && bCompIdx !== -1) {
@@ -194,7 +193,10 @@ class SkillsIndexGeneratorRepositoryImpl {
     });
   }
 
-  private generateContent(skills: SkillEntry[], outputFile: string): string {
+  private static generateContent(
+    skills: SkillEntry[],
+    outputFile: string,
+  ): string {
     const companions = skills.filter((s) => s.isCompanion);
     const nonCompanions = skills.filter((s) => !s.isCompanion);
 
@@ -251,6 +253,3 @@ ${nonCompanions.map((s) => `  ${s.exportName},`).join("\n")}
 `;
   }
 }
-
-export const skillsIndexGeneratorRepository =
-  new SkillsIndexGeneratorRepositoryImpl();

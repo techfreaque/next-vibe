@@ -22,15 +22,13 @@ import type {
   PulseHistoryRequestOutput,
   PulseHistoryResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { PulseHistoryT } from "./i18n";
 
 export class PulseHistoryRepository {
   static async getHistory(
     data: PulseHistoryRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: PulseHistoryT,
   ): Promise<ResponseType<PulseHistoryResponseOutput>> {
     try {
       const limit =

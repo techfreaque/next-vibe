@@ -13,7 +13,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { encryptSecret } from "../create/repository";
+import { ConnectionCreateRepository } from "../create/repository";
 import type { NewSshConnection } from "../../db";
 import { sshConnections } from "../../db";
 import type {
@@ -22,16 +22,14 @@ import type {
   ConnectionUpdateRequestOutput,
   ConnectionUpdateResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { ConnectionsIdT } from "./i18n";
 
 export class ConnectionDetailRepository {
   static async get(
     logger: EndpointLogger,
     user: JwtPayloadType,
     id: string,
-    t: ModuleT,
+    t: ConnectionsIdT,
   ): Promise<ResponseType<ConnectionDetailResponseOutput>> {
     try {
       const [row] = await db
@@ -85,7 +83,7 @@ export class ConnectionDetailRepository {
     user: JwtPayloadType,
     id: string,
     data: ConnectionUpdateRequestOutput,
-    t: ModuleT,
+    t: ConnectionsIdT,
   ): Promise<ResponseType<ConnectionUpdateResponseOutput>> {
     try {
       const [existing] = await db
@@ -133,7 +131,7 @@ export class ConnectionDetailRepository {
       }
 
       if (data.secret !== undefined && data.secret !== "") {
-        const enc = encryptSecret(data.secret);
+        const enc = ConnectionCreateRepository.encryptSecret(data.secret);
         if (!enc) {
           return fail({
             message: t("errors.encryptionFailed"),
@@ -144,7 +142,9 @@ export class ConnectionDetailRepository {
       }
       if (data.passphrase !== undefined) {
         updates.encryptedPassphrase =
-          data.passphrase === "" ? null : encryptSecret(data.passphrase);
+          data.passphrase === ""
+            ? null
+            : ConnectionCreateRepository.encryptSecret(data.passphrase);
       }
 
       const [updated] = await db
@@ -177,7 +177,7 @@ export class ConnectionDetailRepository {
     logger: EndpointLogger,
     user: JwtPayloadType,
     id: string,
-    t: ModuleT,
+    t: ConnectionsIdT,
   ): Promise<ResponseType<ConnectionDeleteResponseOutput>> {
     try {
       const [deleted] = await db

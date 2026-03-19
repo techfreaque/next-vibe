@@ -42,105 +42,22 @@ interface PackageEndpointGeneratorResult {
 }
 
 // ============================================================================
-// Alias resolution
+// Repository
 // ============================================================================
 
-/**
- * Extract all aliases and canonical tool names from a definition file.
- * Returns a Set of strings (aliases + tool names) that identify this endpoint.
- */
-async function extractEndpointIdentifiers(
-  defFile: string,
-): Promise<Set<string>> {
-  const identifiers = new Set<string>();
+export class PackageEndpointGeneratorRepository {
+  // ============================================================================
+  // Alias resolution
+  // ============================================================================
 
-  let definition;
-  try {
-    definition = await import(defFile);
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes("before initialization")) {
-      await Bun.sleep(10);
-      try {
-        definition = await import(defFile);
-      } catch {
-        return identifiers;
-      }
-    } else {
-      return identifiers;
-    }
-  }
-
-  const defaultExport = definition.default;
-  if (!defaultExport) {
-    return identifiers;
-  }
-
-  const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
-  for (const method of methods) {
-    const endpoint = defaultExport[method];
-    if (!endpoint) {
-      continue;
-    }
-
-    // Add canonical tool name
-    identifiers.add(endpointToToolName(endpoint));
-
-    // Add all declared aliases
-    if (Array.isArray(endpoint.aliases)) {
-      for (const alias of endpoint.aliases) {
-        identifiers.add(alias);
-      }
-    }
-  }
-
-  return identifiers;
-}
-
-/**
- * Check if a definition file matches any of the declared manifest aliases/names.
- * Loads the definition and compares its identifiers against the manifest set.
- */
-async function fileMatchesManifest(
-  defFile: string,
-  manifestAliases: Set<string>,
-): Promise<boolean> {
-  const identifiers = await extractEndpointIdentifiers(defFile);
-  for (const id of identifiers) {
-    if (manifestAliases.has(id)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// ============================================================================
-// Content generation (mirrors endpoint/repository.ts logic)
-// ============================================================================
-
-// Build import path for a definition file — same @/app/api/[locale]/... format
-function toImportPath(filePath: string): string {
-  const marker = "[locale]/";
-  const idx = filePath.indexOf(marker);
-  if (idx === -1) {
-    return filePath;
-  }
-  const after = filePath.slice(idx + marker.length);
-  const segment = after.replace(/\/definition\.ts$/, "");
-  return `@/app/api/[locale]/${segment}/definition`;
-}
-
-async function generateContent(filteredDefinitionFiles: string[]): Promise<{
-  endpointContent: string;
-  aliasMapContent: string;
-  endpointCount: number;
-}> {
-  const pathMap: Record<string, { importPath: string; method: string }> = {};
-  const allPaths: string[] = [];
-  let endpointCount = 0;
-
-  for (const defFile of filteredDefinitionFiles) {
-    const importPath = toImportPath(defFile);
+  /**
+   * Extract all aliases and canonical tool names from a definition file.
+   * Returns a Set of strings (aliases + tool names) that identify this endpoint.
+   */
+  private static async extractEndpointIdentifiers(
+    defFile: string,
+  ): Promise<Set<string>> {
+    const identifiers = new Set<string>();
 
     let definition;
     try {
@@ -152,156 +69,257 @@ async function generateContent(filteredDefinitionFiles: string[]): Promise<{
         try {
           definition = await import(defFile);
         } catch {
-          continue;
+          return identifiers;
         }
       } else {
-        continue;
+        return identifiers;
       }
     }
 
     const defaultExport = definition.default;
     if (!defaultExport) {
-      continue;
+      return identifiers;
     }
 
-    const methodEntries = [
-      { method: "GET" as const, endpoint: defaultExport.GET },
-      { method: "POST" as const, endpoint: defaultExport.POST },
-      { method: "PUT" as const, endpoint: defaultExport.PUT },
-      { method: "PATCH" as const, endpoint: defaultExport.PATCH },
-      { method: "DELETE" as const, endpoint: defaultExport.DELETE },
-      { method: "HEAD" as const, endpoint: defaultExport.HEAD },
-      { method: "OPTIONS" as const, endpoint: defaultExport.OPTIONS },
+    const methods = [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "HEAD",
+      "OPTIONS",
     ];
-
-    for (const { method, endpoint } of methodEntries) {
+    for (const method of methods) {
+      const endpoint = defaultExport[method];
       if (!endpoint) {
         continue;
       }
 
-      const toolName = endpointToToolName(endpoint);
+      // Add canonical tool name
+      identifiers.add(endpointToToolName(endpoint));
 
-      if (!pathMap[toolName]) {
-        pathMap[toolName] = { importPath, method };
-        allPaths.push(toolName);
-        endpointCount++;
-      }
-
-      if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
+      // Add all declared aliases
+      if (Array.isArray(endpoint.aliases)) {
         for (const alias of endpoint.aliases) {
-          if (!pathMap[alias]) {
-            pathMap[alias] = { importPath, method };
-            allPaths.push(alias);
-          }
+          identifiers.add(alias);
         }
       }
     }
+
+    return identifiers;
   }
 
-  allPaths.sort();
-
-  // Build alias map
-  const pathToAliasMap: Record<string, string> = {};
-  for (const defFile of filteredDefinitionFiles) {
-    let definition;
-    try {
-      definition = await import(defFile);
-    } catch {
-      continue;
+  /**
+   * Check if a definition file matches any of the declared manifest aliases/names.
+   * Loads the definition and compares its identifiers against the manifest set.
+   */
+  private static async fileMatchesManifest(
+    defFile: string,
+    manifestAliases: Set<string>,
+  ): Promise<boolean> {
+    const identifiers =
+      await PackageEndpointGeneratorRepository.extractEndpointIdentifiers(
+        defFile,
+      );
+    for (const id of identifiers) {
+      if (manifestAliases.has(id)) {
+        return true;
+      }
     }
-    const defaultExport = definition.default;
-    if (!defaultExport) {
-      continue;
+    return false;
+  }
+
+  // ============================================================================
+  // Content generation (mirrors endpoint/repository.ts logic)
+  // ============================================================================
+
+  // Build import path for a definition file — same @/app/api/[locale]/... format
+  private static toImportPath(filePath: string): string {
+    const marker = "[locale]/";
+    const idx = filePath.indexOf(marker);
+    if (idx === -1) {
+      return filePath;
     }
+    const after = filePath.slice(idx + marker.length);
+    const segment = after.replace(/\/definition\.ts$/, "");
+    return `@/app/api/[locale]/${segment}/definition`;
+  }
 
-    const methodEntries = [
-      { endpoint: defaultExport.GET },
-      { endpoint: defaultExport.POST },
-      { endpoint: defaultExport.PUT },
-      { endpoint: defaultExport.PATCH },
-      { endpoint: defaultExport.DELETE },
-      { endpoint: defaultExport.HEAD },
-      { endpoint: defaultExport.OPTIONS },
-    ];
+  private static async generateContent(
+    filteredDefinitionFiles: string[],
+  ): Promise<{
+    endpointContent: string;
+    aliasMapContent: string;
+    endpointCount: number;
+  }> {
+    const pathMap: Record<string, { importPath: string; method: string }> = {};
+    const allPaths: string[] = [];
+    let endpointCount = 0;
 
-    for (const { endpoint } of methodEntries) {
-      if (!endpoint) {
+    for (const defFile of filteredDefinitionFiles) {
+      const importPath =
+        PackageEndpointGeneratorRepository.toImportPath(defFile);
+
+      let definition;
+      try {
+        definition = await import(defFile);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        if (msg.includes("before initialization")) {
+          await Bun.sleep(10);
+          try {
+            definition = await import(defFile);
+          } catch {
+            continue;
+          }
+        } else {
+          continue;
+        }
+      }
+
+      const defaultExport = definition.default;
+      if (!defaultExport) {
         continue;
       }
-      const canonicalName = endpointToToolName(endpoint);
-      const preferred = getPreferredToolName(endpoint);
-      pathToAliasMap[canonicalName] = preferred;
-      if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
-        for (const alias of endpoint.aliases) {
-          if (!pathToAliasMap[alias]) {
-            pathToAliasMap[alias] = preferred;
+
+      const methodEntries = [
+        { method: "GET" as const, endpoint: defaultExport.GET },
+        { method: "POST" as const, endpoint: defaultExport.POST },
+        { method: "PUT" as const, endpoint: defaultExport.PUT },
+        { method: "PATCH" as const, endpoint: defaultExport.PATCH },
+        { method: "DELETE" as const, endpoint: defaultExport.DELETE },
+        { method: "HEAD" as const, endpoint: defaultExport.HEAD },
+        { method: "OPTIONS" as const, endpoint: defaultExport.OPTIONS },
+      ];
+
+      for (const { method, endpoint } of methodEntries) {
+        if (!endpoint) {
+          continue;
+        }
+
+        const toolName = endpointToToolName(endpoint);
+
+        if (!pathMap[toolName]) {
+          pathMap[toolName] = { importPath, method };
+          allPaths.push(toolName);
+          endpointCount++;
+        }
+
+        if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
+          for (const alias of endpoint.aliases) {
+            if (!pathMap[alias]) {
+              pathMap[alias] = { importPath, method };
+              allPaths.push(alias);
+            }
           }
         }
       }
     }
-  }
 
-  // Generate switch cases
-  const cases: string[] = [];
-  for (const path of allPaths) {
-    const { importPath, method } = pathMap[path];
-    const fullLine = `      return (await import("${importPath}")).default.${method};`;
-    const returnWithDefault = `      return (await import("${importPath}")).default`;
-    const returnWithParen = `      return (await import("${importPath}"))`;
+    allPaths.sort();
 
-    if (fullLine.length <= 80) {
-      // eslint-disable-next-line i18next/no-literal-string
-      cases.push(`    case "${path}":
+    // Build alias map
+    const pathToAliasMap: Record<string, string> = {};
+    for (const defFile of filteredDefinitionFiles) {
+      let definition;
+      try {
+        definition = await import(defFile);
+      } catch {
+        continue;
+      }
+      const defaultExport = definition.default;
+      if (!defaultExport) {
+        continue;
+      }
+
+      const methodEntries = [
+        { endpoint: defaultExport.GET },
+        { endpoint: defaultExport.POST },
+        { endpoint: defaultExport.PUT },
+        { endpoint: defaultExport.PATCH },
+        { endpoint: defaultExport.DELETE },
+        { endpoint: defaultExport.HEAD },
+        { endpoint: defaultExport.OPTIONS },
+      ];
+
+      for (const { endpoint } of methodEntries) {
+        if (!endpoint) {
+          continue;
+        }
+        const canonicalName = endpointToToolName(endpoint);
+        const preferred = getPreferredToolName(endpoint);
+        pathToAliasMap[canonicalName] = preferred;
+        if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
+          for (const alias of endpoint.aliases) {
+            if (!pathToAliasMap[alias]) {
+              pathToAliasMap[alias] = preferred;
+            }
+          }
+        }
+      }
+    }
+
+    // Generate switch cases
+    const cases: string[] = [];
+    for (const path of allPaths) {
+      const { importPath, method } = pathMap[path];
+      const fullLine = `      return (await import("${importPath}")).default.${method};`;
+      const returnWithDefault = `      return (await import("${importPath}")).default`;
+      const returnWithParen = `      return (await import("${importPath}"))`;
+
+      if (fullLine.length <= 80) {
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
       return (await import("${importPath}")).default.${method};`);
-    } else if (returnWithDefault.length <= 80) {
-      // eslint-disable-next-line i18next/no-literal-string
-      cases.push(`    case "${path}":
+      } else if (returnWithDefault.length <= 80) {
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
       return (await import("${importPath}")).default
         .${method};`);
-    } else if (returnWithParen.length <= 80) {
-      // eslint-disable-next-line i18next/no-literal-string
-      cases.push(`    case "${path}":
+      } else if (returnWithParen.length <= 80) {
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
       return (await import("${importPath}"))
         .default.${method};`);
-    } else {
-      // eslint-disable-next-line i18next/no-literal-string
-      cases.push(`    case "${path}":
+      } else {
+        // eslint-disable-next-line i18next/no-literal-string
+        cases.push(`    case "${path}":
       return (
         await import("${importPath}")
       ).default.${method};`);
-    }
-  }
-
-  const header = generateFileHeader(
-    "AUTO-GENERATED FILE - DO NOT EDIT",
-    "generators/package-endpoints",
-    {
-      "Endpoints in package": endpointCount,
-      "Total paths (with aliases)": allPaths.length,
-    },
-  );
-
-  // Alias map entries
-  const entries = Object.entries(pathToAliasMap).toSorted(([a], [b]) =>
-    a.localeCompare(b),
-  );
-  const aliasMapEntries = entries
-    .map(([alias, fullPath]) => {
-      const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
-      const key = needsQuotes ? `"${alias}"` : alias;
-      const singleLine = `  ${key}: "${fullPath}",`;
-      if (singleLine.length >= 80) {
-        return `  ${key}:\n    "${fullPath}",`;
       }
-      return singleLine;
-    })
-    .join("\n");
+    }
 
-  // eslint-disable-next-line i18next/no-literal-string
-  const aliasMapContent = `${header}
+    const header = generateFileHeader(
+      "AUTO-GENERATED FILE - DO NOT EDIT",
+      "generators/package-endpoints",
+      {
+        "Endpoints in package": endpointCount,
+        "Total paths (with aliases)": allPaths.length,
+      },
+    );
+
+    // Alias map entries
+    const entries = Object.entries(pathToAliasMap).toSorted(([a], [b]) =>
+      a.localeCompare(b),
+    );
+    const aliasMapEntries = entries
+      .map(([alias, fullPath]) => {
+        const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
+        const key = needsQuotes ? `"${alias}"` : alias;
+        const singleLine = `  ${key}: "${fullPath}",`;
+        if (singleLine.length >= 80) {
+          return `  ${key}:\n    "${fullPath}",`;
+        }
+        return singleLine;
+      })
+      .join("\n");
+
+    // eslint-disable-next-line i18next/no-literal-string
+    const aliasMapContent = `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 /**
  * Map of aliases to their canonical full paths (scoped to this package).
@@ -311,11 +329,10 @@ ${aliasMapEntries}
 } as const;
 `;
 
-  // eslint-disable-next-line i18next/no-literal-string
-  const endpointContent = `${header}
+    // eslint-disable-next-line i18next/no-literal-string
+    const endpointContent = `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
@@ -333,19 +350,18 @@ ${cases.join("\n")}
 }
 `;
 
-  return { endpointContent, aliasMapContent, endpointCount };
-}
+    return { endpointContent, aliasMapContent, endpointCount };
+  }
 
-// ============================================================================
-// Main generator
-// ============================================================================
+  // ============================================================================
+  // Main generator
+  // ============================================================================
 
-class PackageEndpointGeneratorRepositoryImpl {
   /**
    * Generate scoped endpoint.ts + alias-map.ts for a package manifest.
    * Writes files to outputDir/endpoint.ts and outputDir/alias-map.ts.
    */
-  async generate(
+  static async generate(
     input: PackageEndpointGeneratorInput,
   ): Promise<PackageEndpointGeneratorResult> {
     const { manifest, outputDir, dryRun = false } = input;
@@ -373,14 +389,20 @@ class PackageEndpointGeneratorRepositoryImpl {
       if (!allRouteFiles.has(routePath)) {
         continue;
       }
-      const matches = await fileMatchesManifest(defFile, manifestAliases);
+      const matches =
+        await PackageEndpointGeneratorRepository.fileMatchesManifest(
+          defFile,
+          manifestAliases,
+        );
       if (matches) {
         filteredDefinitionFiles.push(defFile);
       }
     }
 
     const { endpointContent, aliasMapContent, endpointCount } =
-      await generateContent(filteredDefinitionFiles);
+      await PackageEndpointGeneratorRepository.generateContent(
+        filteredDefinitionFiles,
+      );
 
     const endpointFile = join(outputDir, "endpoint.ts");
     const aliasMapFile = join(outputDir, "alias-map.ts");
@@ -391,6 +413,3 @@ class PackageEndpointGeneratorRepositoryImpl {
     return { endpointFile, aliasMapFile, endpointCount };
   }
 }
-
-export const packageEndpointGeneratorRepository =
-  new PackageEndpointGeneratorRepositoryImpl();

@@ -16,9 +16,7 @@ import { db, rawPool } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { PingRequestOutput, PingResponseOutput } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { PingT } from "./i18n";
 
 /**
  * Database Ping Repository Implementation
@@ -26,7 +24,7 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 export class DatabasePingRepository {
   static async pingDatabase(
     data: PingRequestOutput,
-    t: ModuleT,
+    t: PingT,
     logger: EndpointLogger,
   ): Promise<ResponseType<PingResponseOutput>> {
     try {

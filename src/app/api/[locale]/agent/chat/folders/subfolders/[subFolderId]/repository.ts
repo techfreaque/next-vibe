@@ -25,27 +25,6 @@ import type {
   FolderUpdateResponseOutput,
 } from "./update/definition";
 
-export interface FolderRepositoryType {
-  getFolder(
-    user: JwtPayloadType,
-    data: { id: string },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<FolderGetResponseOutput>>;
-  updateFolder(
-    user: JwtPayloadType,
-    data: FolderUpdateRequestOutput & { id: string },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<FolderUpdateResponseOutput>>;
-  deleteFolder(
-    user: JwtPayloadType,
-    data: { id: string },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<FolderDeleteResponseOutput>>;
-}
-
 /**
  * Folder Repository - Static class pattern
  */
@@ -241,6 +220,8 @@ export class FolderRepository {
   }
 }
 
-// Compile-time type check
-const _typeCheck: FolderRepositoryType = FolderRepository;
-void _typeCheck;
+// Type for native repository type checking
+export type FolderRepositoryType = Pick<
+  typeof FolderRepository,
+  keyof typeof FolderRepository
+>;

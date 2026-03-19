@@ -15,7 +15,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 
 import type { ChatMessageRole } from "../../../chat/enum";
-import { createUserMessage } from "../../../chat/threads/[threadId]/messages/repository";
+import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
 import type { AiStreamT } from "../../stream/i18n";
 import { FileAttachmentHandler } from "./file-attachment-handler";
 
@@ -206,7 +206,7 @@ export class UserMessageHandler {
 
     // Create user message in DB (server mode only - incognito stores in localStorage)
     if (!isIncognito) {
-      await createUserMessage({
+      await MessagesRepository.createUserMessage({
         messageId: userMessageId,
         threadId,
         role: effectiveRole,

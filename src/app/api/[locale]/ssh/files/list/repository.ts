@@ -22,6 +22,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import {
   getConnectionCredentials,
+  isNodeError,
   openSshClient,
   sftpListDir,
 } from "../../client";
@@ -29,36 +30,34 @@ import type {
   FilesListRequestOutput,
   FilesListResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-function resolvePath(inputPath?: string): string {
-  const raw = inputPath ?? "~";
-  if (raw === "~" || raw.startsWith("~/")) {
-    return join(homedir(), raw.slice(1));
-  }
-  return resolve(raw);
-}
-
-function isValidPath(p: string): boolean {
-  return p.startsWith("/") && !p.includes("..");
-}
+import type { FilesListT } from "./i18n";
 
 export class FilesListRepository {
+  private static resolvePath(inputPath?: string): string {
+    const raw = inputPath ?? "~";
+    if (raw === "~" || raw.startsWith("~/")) {
+      return join(homedir(), raw.slice(1));
+    }
+    return resolve(raw);
+  }
+
+  private static isValidPath(p: string): boolean {
+    return p.startsWith("/") && !p.includes("..");
+  }
+
   static async list(
     data: FilesListRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
-    t: ModuleT,
+    t: FilesListT,
   ): Promise<ResponseType<FilesListResponseOutput>> {
     if (data.connectionId) {
       return FilesListRepository.listSftp(data, user, logger, t);
     }
 
-    const dirPath = resolvePath(data.path);
+    const dirPath = FilesListRepository.resolvePath(data.path);
 
-    if (!isValidPath(dirPath)) {
+    if (!FilesListRepository.isValidPath(dirPath)) {
       return fail({
         message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -108,8 +107,7 @@ export class FilesListRepository {
 
       return success({ entries, currentPath: dirPath });
     } catch (error) {
-      const err = error as NodeJS.ErrnoException;
-      if (err.code === "ENOENT") {
+      if (isNodeError(error) && error.code === "ENOENT") {
         return fail({
           message: t("errors.directoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -127,7 +125,7 @@ export class FilesListRepository {
     data: FilesListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: FilesListT,
   ): Promise<ResponseType<FilesListResponseOutput>> {
     const credsResult = await getConnectionCredentials(
       data.connectionId!,
@@ -157,8 +155,10 @@ export class FilesListRepository {
       const entries = await sftpListDir(client, dirPath);
       return success({ entries, currentPath: dirPath });
     } catch (error) {
-      const err = error as NodeJS.ErrnoException & { code?: string };
-      if (err.code === "ENOENT" || err.code === "ERR_SFTP_NO_SUCH_FILE") {
+      if (
+        isNodeError(error) &&
+        (error.code === "ENOENT" || error.code === "ERR_SFTP_NO_SUCH_FILE")
+      ) {
         return fail({
           message: t("errors.directoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,

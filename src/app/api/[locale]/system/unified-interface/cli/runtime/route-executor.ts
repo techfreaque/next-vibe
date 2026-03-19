@@ -9,17 +9,16 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/user/auth/types";
 import {
-  UserPermissionRole,
-  type UserRoleValue,
-} from "@/app/api/[locale]/user/user-roles/enum";
-import {
   filterPlatformMarkers,
   PlatformMarker,
+  UserPermissionRole,
+  type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
@@ -38,12 +37,33 @@ import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { Platform } from "../../shared/types/platform";
 import type { WidgetData } from "../../shared/widgets/widget-data";
-import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
-import { createMockUser, getCliUser } from "../auth/cli-user";
+import type { CliResultFormatter as CliResultFormatterType } from "../../unified-ui/renderers/cli/response/result-formatter";
+import { createCliBypassUser } from "../auth/cli-bypass-user";
+import type { getCliUser } from "../auth/cli-user";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import { CliTarget, type CliTargetValue } from "../types/cli-target";
 import type { CliRequestData } from "./cli-request-data";
 import { CliInputParser, type CliObject, type CliUrlParams } from "./parsing";
+
+// Lazy-loaded: only needed for MCP + non-bypass paths, not for normal `vibe c`
+let _getCliUser: typeof getCliUser | null = null;
+async function loadGetCliUser(): Promise<typeof getCliUser> {
+  if (!_getCliUser) {
+    _getCliUser = (await import("../auth/cli-user")).getCliUser;
+  }
+  return _getCliUser;
+}
+
+// Lazy-loaded to avoid pulling in ~50 Ink widget modules at startup (~120ms)
+let _resultFormatter: typeof CliResultFormatterType | null = null;
+async function getResultFormatter(): Promise<typeof CliResultFormatterType> {
+  if (!_resultFormatter) {
+    const mod =
+      await import("../../unified-ui/renderers/cli/response/result-formatter");
+    _resultFormatter = mod.CliResultFormatter;
+  }
+  return _resultFormatter;
+}
 
 interface CliResponseData {
   [key: string]:
@@ -126,6 +146,12 @@ export interface RouteExecutionResult {
   /** Performance metadata from route execution (translation keys as keys) */
   performance?: Partial<Record<TranslationKey, number>>;
 
+  /** Time spent loading the endpoint definition + route handler (ms) */
+  endpointLoadMs?: number;
+
+  /** Time spent rendering the result (ms) */
+  renderMs?: number;
+
   /** Error cause chain for debugging - reuses ErrorResponseType */
   cause?: ErrorResponseType;
 
@@ -163,6 +189,8 @@ export interface CliExecutionOptions {
   cliTarget: CliTargetValue;
   /** Remote URL when cliTarget === REMOTE */
   remoteUrl?: string;
+  /** Optional abort signal (e.g. from SIGINT) to cancel long-running commands */
+  signal: AbortSignal;
 }
 
 /**
@@ -185,11 +213,19 @@ export class RouteDelegationHandler {
     const resolvedCommand = command || `${TOOL_HELP_ALIAS} --interactive`;
 
     try {
+      // Load route handler first — route.ts imports definition.ts transitively,
+      // so after this resolves, definition.ts is already in Bun's module cache.
+      // getEndpoint() then returns near-instantly with no TDZ risk.
+      logger.debug("[ROUTE] endpoint load start");
+      const endpointLoadStart = Date.now();
+      const routeHandler = await getRouteHandler(resolvedCommand);
+      const peekedEndpoint = await getEndpoint(resolvedCommand);
+      const endpointLoadMs = Date.now() - endpointLoadStart;
+      logger.debug(`[ROUTE] endpoint loaded (${endpointLoadMs}ms)`);
+
       // Get CLI user for authentication if not provided.
       // If the endpoint has CLI_AUTH_BYPASS, skip DB entirely and use a synthetic admin.
       let cliUser: JwtPayloadType;
-
-      const peekedEndpoint = await getEndpoint(resolvedCommand);
       const isCliAuthBypass =
         peekedEndpoint !== null &&
         peekedEndpoint !== undefined &&
@@ -199,13 +235,19 @@ export class RouteDelegationHandler {
 
       if (isCliAuthBypass && options.platform !== Platform.MCP) {
         // CLI / CLI_PACKAGE with CLI_AUTH_BYPASS: never touch the DB
-        cliUser = createMockUser();
+        cliUser = createCliBypassUser();
       } else if (isCliAuthBypass && options.platform === Platform.MCP) {
         // MCP with CLI_AUTH_BYPASS: try DB/session for a real user, fall back to bypass
-        const cliUserResult = await getCliUser(logger, options.locale);
-        cliUser = cliUserResult.success ? cliUserResult.data : createMockUser();
+        const cliUserResult = await (
+          await loadGetCliUser()
+        )(logger, options.locale);
+        cliUser = cliUserResult.success
+          ? cliUserResult.data
+          : createCliBypassUser();
       } else {
-        const cliUserResult = await getCliUser(logger, options.locale);
+        const cliUserResult = await (
+          await loadGetCliUser()
+        )(logger, options.locale);
 
         if (cliUserResult.success) {
           cliUser = cliUserResult.data;
@@ -267,6 +309,7 @@ export class RouteDelegationHandler {
                 locale: options.locale,
                 logger,
                 platform: options.platform,
+                preloadedHandler: routeHandler,
                 streamContext: {
                   rootFolderId: DefaultFolderId.CRON,
                   threadId: undefined,
@@ -281,7 +324,9 @@ export class RouteDelegationHandler {
                   leafMessageId: undefined,
                   waitingForRemoteResult: undefined,
                   favoriteId: undefined,
-                  abortSignal: undefined,
+                  abortSignal: new AbortController().signal,
+                  callerCallbackMode: undefined,
+                  onEscalatedTaskCancel: undefined,
                   escalateToTask: undefined,
                 },
               });
@@ -380,7 +425,9 @@ export class RouteDelegationHandler {
           },
         };
 
-        const formattedOutput = await CliResultFormatter.formatResult(
+        const { output: formattedOutput, renderMs } = await (
+          await getResultFormatter()
+        ).formatResult(
           routeResult,
           options.output || "pretty",
           options.locale,
@@ -390,13 +437,14 @@ export class RouteDelegationHandler {
           cliUser,
         );
 
-        return { ...routeResult, formattedOutput };
+        return { ...routeResult, formattedOutput, renderMs };
       }
 
       // CLI-specific: Show execution info if verbose
       if (options.verbose) {
-        logger.info(`🎯 Executing route: ${resolvedCommand}`);
-        logger.info(`Data: ${JSON.stringify(inputData.data, null, 2)}`);
+        logger.debug(
+          `[ROUTE] executing: ${resolvedCommand} data=${JSON.stringify(inputData.data)}`,
+        );
         if (
           inputData.urlPathParams &&
           Object.keys(inputData.urlPathParams).length > 0
@@ -417,6 +465,7 @@ export class RouteDelegationHandler {
           locale: options.locale,
           logger,
           platform: options.platform,
+          preloadedHandler: routeHandler,
           streamContext: {
             rootFolderId: DefaultFolderId.CRON,
             threadId: undefined,
@@ -431,7 +480,9 @@ export class RouteDelegationHandler {
             leafMessageId: undefined,
             waitingForRemoteResult: undefined,
             favoriteId: undefined,
-            abortSignal: undefined,
+            abortSignal: options.signal,
+            callerCallbackMode: undefined,
+            onEscalatedTaskCancel: undefined,
             escalateToTask: undefined,
           },
         });
@@ -462,10 +513,13 @@ export class RouteDelegationHandler {
           "performance" in result && result.performance
             ? result.performance
             : undefined,
+        endpointLoadMs,
       };
 
       // Format result for CLI output
-      const formattedOutput = await CliResultFormatter.formatResult(
+      const { output: formattedOutput, renderMs } = await (
+        await getResultFormatter()
+      ).formatResult(
         routeResult,
         options.output || "pretty",
         options.locale,
@@ -475,10 +529,11 @@ export class RouteDelegationHandler {
         cliUser,
       );
 
-      // Return result with formatted output
+      // Return result with formatted output and render timing
       return {
         ...routeResult,
         formattedOutput,
+        renderMs,
       };
     } catch (error) {
       logger.error("Command execution failed", {

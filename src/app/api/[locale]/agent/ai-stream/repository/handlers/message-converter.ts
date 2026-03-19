@@ -459,21 +459,11 @@ export class MessageConverter {
           seenToolCallIds.add(toolCall.toolCallId);
 
           // Add tool call to assistant message content.
-          // For deferred wakeUp results: strip the full execute-tool args and only
-          // pass {taskId} so the AI isn't flooded with the duplicated request data.
-          // The deferred TOOL message (with the real result) takes the original's place.
-          const inputForAi =
-            toolCall.isDeferred && toolCall.callbackMode === "wakeUp"
-              ? {
-                  taskId:
-                    typeof toolCall.args === "object" &&
-                    toolCall.args !== null &&
-                    !Array.isArray(toolCall.args) &&
-                    "taskId" in toolCall.args
-                      ? (toolCall.args as { taskId: ToolCallResult }).taskId
-                      : toolCall.toolCallId,
-                }
-              : toolCall.args;
+          // Use the original args — the original message is already suppressed (superseded),
+          // so the AI sees the deferred message with full args + real result, making it clear
+          // what call completed. Stripping to {taskId} confused the AI into thinking the
+          // deferred message was a separate call and caused it to re-call the same tool.
+          const inputForAi = toolCall.args;
           toolCallContent.push({
             type: "tool-call",
             toolCallId: toolCall.toolCallId,

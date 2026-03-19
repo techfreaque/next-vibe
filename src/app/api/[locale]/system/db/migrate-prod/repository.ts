@@ -12,41 +12,23 @@ import {
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type migrateProdEndpoints from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-// Constants to avoid lint issues
-const UNKNOWN_ERROR = "Unknown error";
-const SEED_COMMAND = ["vibe", "db:seed", "--data"];
-const SEED_ENV_PROD = { env: "prod" };
-
-type MigrateProdRequestType =
-  typeof migrateProdEndpoints.POST.types.RequestOutput;
-type MigrateProdResponseType =
-  typeof migrateProdEndpoints.POST.types.ResponseOutput;
+import type {
+  MigrateProdRequestOutput,
+  MigrateProdResponseOutput,
+} from "./definition";
+import type { MigrateProdT } from "./i18n";
 
 /**
- * Database Production Migration Repository Interface
+ * Database Production Migration Repository
  */
-export interface DatabaseMigrateProdRepository {
-  runProductionMigrations(
-    data: MigrateProdRequestType,
-    t: ModuleT,
+export class DatabaseMigrateProdRepository {
+  private static readonly SEED_COMMAND = ["vibe", "db:seed", "--data"];
+  private static readonly SEED_ENV_PROD = { env: "prod" };
+  static async runProductionMigrations(
+    data: MigrateProdRequestOutput,
+    t: MigrateProdT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateProdResponseType>>;
-}
-
-/**
- * Database Production Migration Repository Implementation
- */
-export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRepository {
-  async runProductionMigrations(
-    data: MigrateProdRequestType,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MigrateProdResponseType>> {
+  ): Promise<ResponseType<MigrateProdResponseOutput>> {
     try {
       logger.info("Starting production migration process", { options: data });
 
@@ -62,8 +44,8 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
         return success({
           success: true,
           output,
-          environment: this.getEnvironment(),
-          databaseUrl: this.getMaskedDatabaseUrl(),
+          environment: DatabaseMigrateProdRepository.getEnvironment(),
+          databaseUrl: DatabaseMigrateProdRepository.getMaskedDatabaseUrl(),
           migrationsGenerated: false,
           migrationsApplied: false,
           seedingCompleted: false,
@@ -77,24 +59,32 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
 
       // Step 1: Generate latest migrations
       logger.info("Generating Drizzle migrations");
-      const generateResult = await this.generateMigrations(logger);
+      const generateResult =
+        await DatabaseMigrateProdRepository.generateMigrations(logger, t);
       if (!generateResult.success) {
         return fail({
           message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: generateResult.error || UNKNOWN_ERROR },
+          messageParams: {
+            error: generateResult.message || t("post.errors.unknown.title"),
+          },
         });
       }
       migrationsGenerated = true;
 
       // Step 2: Apply migrations
       logger.info("Applying migrations to production database");
-      const applyResult = await this.applyMigrations(logger);
+      const applyResult = await DatabaseMigrateProdRepository.applyMigrations(
+        logger,
+        t,
+      );
       if (!applyResult.success) {
         return fail({
           message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: applyResult.error || UNKNOWN_ERROR },
+          messageParams: {
+            error: applyResult.message || t("post.errors.unknown.title"),
+          },
         });
       }
       migrationsApplied = true;
@@ -104,12 +94,15 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
         logger.info("Skipping production seeding (--skip-seeding)");
       } else {
         logger.info("Running production seeding");
-        const seedResult = await this.runProductionSeeding(logger);
+        const seedResult =
+          await DatabaseMigrateProdRepository.runProductionSeeding(logger, t);
         if (!seedResult.success) {
           return fail({
             message: t("post.errors.server.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
-            messageParams: { error: seedResult.error || UNKNOWN_ERROR },
+            messageParams: {
+              error: seedResult.message || t("post.errors.unknown.title"),
+            },
           });
         }
         seedingCompleted = true;
@@ -124,8 +117,8 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
       return success({
         success: true,
         output,
-        environment: this.getEnvironment(),
-        databaseUrl: this.getMaskedDatabaseUrl(),
+        environment: DatabaseMigrateProdRepository.getEnvironment(),
+        databaseUrl: DatabaseMigrateProdRepository.getMaskedDatabaseUrl(),
         migrationsGenerated,
         migrationsApplied,
         seedingCompleted,
@@ -143,9 +136,10 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
   /**
    * Generate migrations using the migrate repository
    */
-  private async generateMigrations(
+  private static async generateMigrations(
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; error?: string }> {
+    t: MigrateProdT,
+  ): Promise<ResponseType<void>> {
     try {
       // Run drizzle-kit generate command
       const { spawnSync } = await import("node:child_process");
@@ -155,27 +149,39 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
       });
 
       if (result.status !== 0) {
-        const error = result.stderr || result.error?.message || UNKNOWN_ERROR;
+        const errorDetail =
+          result.stderr ||
+          result.error?.message ||
+          t("post.errors.unknown.title");
         logger.error("Migration generation failed", {
-          error: parseError(error),
+          error: parseError(errorDetail),
         });
-        return { success: false, error: String(error) };
+        return fail({
+          message: t("post.errors.server.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: errorDetail },
+        });
       }
 
       logger.debug("Migrations generated successfully");
-      return { success: true };
+      return success(undefined);
     } catch (error) {
       logger.error("Error generating migrations", { error: String(error) });
-      return { success: false, error: String(error) };
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
+      });
     }
   }
 
   /**
    * Apply migrations using the migrate repository
    */
-  private async applyMigrations(
+  private static async applyMigrations(
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; error?: string }> {
+    t: MigrateProdT,
+  ): Promise<ResponseType<void>> {
     try {
       // Run migrations using Drizzle
       const { migrate } = await import("drizzle-orm/node-postgres/migrator");
@@ -184,25 +190,33 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
       await migrate(db, { migrationsFolder: "./drizzle" });
 
       logger.debug("Migrations applied successfully");
-      return { success: true };
+      return success(undefined);
     } catch (error) {
       logger.error("Error applying migrations", { error: String(error) });
-      return { success: false, error: String(error) };
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
+      });
     }
   }
 
   /**
    * Run production seeding using the seed repository
    */
-  private async runProductionSeeding(
+  private static async runProductionSeeding(
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; error?: string }> {
+    t: MigrateProdT,
+  ): Promise<ResponseType<void>> {
     try {
       // Run production seeds by executing seed command
       const { spawnSync } = await import("node:child_process");
       const result = spawnSync(
         "bunx",
-        [...SEED_COMMAND, JSON.stringify(SEED_ENV_PROD)],
+        [
+          ...DatabaseMigrateProdRepository.SEED_COMMAND,
+          JSON.stringify(DatabaseMigrateProdRepository.SEED_ENV_PROD),
+        ],
         {
           stdio: "pipe",
           encoding: "utf-8",
@@ -210,25 +224,38 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
       );
 
       if (result.status !== 0) {
-        const error = result.stderr || result.error?.message || UNKNOWN_ERROR;
-        logger.error("Production seeding failed", { error: parseError(error) });
-        return { success: false, error: String(error) };
+        const errorDetail =
+          result.stderr ||
+          result.error?.message ||
+          t("post.errors.unknown.title");
+        logger.error("Production seeding failed", {
+          error: parseError(errorDetail),
+        });
+        return fail({
+          message: t("post.errors.server.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: errorDetail },
+        });
       }
 
       logger.debug("Production seeding completed successfully");
-      return { success: true };
+      return success(undefined);
     } catch (error) {
       logger.error("Error running production seeding", {
         error: String(error),
       });
-      return { success: false, error: String(error) };
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(error) },
+      });
     }
   }
 
   /**
    * Get current environment
    */
-  private getEnvironment(): string {
+  private static getEnvironment(): string {
     // Return a static value since we can't access process.env directly
     return "production";
   }
@@ -236,14 +263,8 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
   /**
    * Get masked database URL for security
    */
-  private getMaskedDatabaseUrl(): string {
+  private static getMaskedDatabaseUrl(): string {
     // Return masked placeholder since we can't access process.env directly
     return "postgres://***:***@***:5432/***";
   }
 }
-
-/**
- * Export repository instance
- */
-export const databaseMigrateProdRepository =
-  new DatabaseMigrateProdRepositoryImpl();

@@ -258,6 +258,9 @@ const { POST } = createEndpoint({
 });
 
 const buildDefinition = { POST };
+export type BuildRequestInput = typeof POST.types.RequestInput;
+export type BuildRequestOutput = typeof POST.types.RequestOutput;
+export type BuildResponseInput = typeof POST.types.ResponseInput;
 export type BuildResponseOutput = typeof POST.types.ResponseOutput;
 export type BuildStep = NonNullable<BuildResponseOutput["steps"]>[number];
 

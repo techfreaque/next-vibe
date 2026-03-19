@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeAnd } from "./repository";
+import { AndEvaluatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { signals } = data;
-      const result = computeAnd(signals);
+      const result = AndEvaluatorRepository.computeAnd(signals);
       return success({ result });
     },
   },

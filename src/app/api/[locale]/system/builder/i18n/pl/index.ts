@@ -227,6 +227,10 @@ export const translations: typeof enTranslations = {
       fileToCompile: {
         title: "Konfiguracja pliku",
       },
+      disabled: {
+        title: "Wyłączony",
+        description: "Pomiń ten wpis podczas kompilacji",
+      },
       input: {
         title: "Plik wejściowy",
         description: "Ścieżka pliku punktu wejścia (np. src/index.ts)",

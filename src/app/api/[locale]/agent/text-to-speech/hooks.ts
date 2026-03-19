@@ -14,7 +14,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { TTS_COST_PER_CHARACTER } from "../../products/repository-client";
 import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";
 import type { TtsVoiceValue } from "./enum";
@@ -172,9 +171,8 @@ export function useTTSAudio({
               urlLength: audioDataUrl.length,
             });
 
-            // Optimistically update credit balance in UI
-            const characterCount = chunkText.length;
-            const creditCost = characterCount * TTS_COST_PER_CHARACTER;
+            // Optimistically update credit balance in UI using actual cost from server
+            const creditCost = responseData.creditCost ?? 0;
             if (creditCost > 0) {
               deductCredits(creditCost, "tts");
             }

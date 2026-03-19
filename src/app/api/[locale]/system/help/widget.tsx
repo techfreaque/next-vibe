@@ -42,7 +42,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
+import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
@@ -264,14 +264,14 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     if (enabledTools !== null) {
       return enabledTools;
     }
-    // null = default: all tools are allowed (enabled), only DEFAULT_TOOL_IDS are pinned
-    const defaultPinnedSet = new Set<string>(getDefaultToolIds());
+    // null = default: all tools are allowed (enabled), only role-appropriate DEFAULT_TOOL_IDS are pinned
+    const defaultPinnedSet = new Set<string>(getDefaultToolIdsForUser(user));
     return availableTools.map((tool) => ({
       id: tool.id,
       requiresConfirmation: tool.requiresConfirmation ?? false,
       pinned: defaultPinnedSet.has(tool.id),
     }));
-  }, [enabledTools, availableTools]);
+  }, [enabledTools, availableTools, user]);
 
   const filteredTools = useMemo((): HelpToolMetadataSerialized[] => {
     const enabledIds = new Set(effectiveEnabledTools.map((et) => et.id));

@@ -21,10 +21,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { contacts, type NewContact } from "./db";
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
 import { ContactStatus } from "./enum";
-import type { scopedTranslation } from "./i18n";
+import type { ContactT } from "./i18n";
 import { sendAdminNotificationSms, sendConfirmationSms } from "./sms";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Contact Repository Implementation
@@ -39,7 +37,7 @@ export class ContactRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ContactT,
   ): Promise<ResponseType<ContactResponseOutput>> {
     try {
       // Get leadId from user prop (JWT payload) - always present
@@ -150,7 +148,7 @@ export class ContactRepository {
   static async create(
     data: NewContact,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: ContactT,
   ): Promise<ResponseType<ContactResponseOutput>> {
     try {
       logger.debug(t("repository.seed.create.start"), {

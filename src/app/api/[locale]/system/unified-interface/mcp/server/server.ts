@@ -27,6 +27,7 @@ export class MCPServer {
   private readonly registry?: MCPRegistry;
   private readonly defRegistry?: IDefinitionsRegistry;
   private readonly definitionLdr?: IDefinitionLoader;
+  private protocolHandler?: ReturnType<typeof createMCPProtocolHandler>;
 
   constructor(
     registry?: MCPRegistry,
@@ -71,7 +72,7 @@ export class MCPServer {
       });
 
       // Create protocol handler
-      const protocolHandler = createMCPProtocolHandler(
+      this.protocolHandler = createMCPProtocolHandler(
         logger,
         locale,
         user,
@@ -85,7 +86,7 @@ export class MCPServer {
 
       // Connect transport to protocol handler
       this.transport.onMessage(async (request) => {
-        const response = await protocolHandler.handleRequest(request);
+        const response = await this.protocolHandler!.handleRequest(request);
 
         // Only send response if request had an ID (not a notification)
         // JSON-RPC 2.0: notifications (id: null) must not receive responses
@@ -123,6 +124,12 @@ export class MCPServer {
     }
 
     logger.info("[MCP Server] Stopping...");
+
+    // Abort any in-flight tool calls before tearing down the transport
+    if (this.protocolHandler) {
+      this.protocolHandler.abortAllToolCalls();
+      this.protocolHandler = undefined;
+    }
 
     if (this.transport) {
       await this.transport.stop();

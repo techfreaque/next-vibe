@@ -7,12 +7,12 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { taskIndexGeneratorRepository } from "./repository";
+import { TaskIndexGeneratorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) =>
-      taskIndexGeneratorRepository.generateTaskIndex(data, logger, t),
+      TaskIndexGeneratorRepository.generateTaskIndex(data, logger, t),
   },
 });

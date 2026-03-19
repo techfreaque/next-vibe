@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
@@ -35,41 +36,11 @@ import type {
   CampaignStarterPostResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
+import type { CampaignsCampaignStarterT } from "./i18n";
 import type {
   CampaignStarterConfigType,
   CampaignStarterResultType,
 } from "./types";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-const INVALID_TRANSITION_ERROR = "Invalid status transition for campaign start";
-
-/**
- * Campaign Starter Repository Interface
- */
-export interface ICampaignStarterRepository {
-  processLocaleLeads(
-    locale: CountryLanguage,
-    leadsPerRun: number | undefined,
-    minAgeDate: Date,
-    config: CampaignStarterConfigType,
-    result: CampaignStarterResultType,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<void>>;
-
-  getFailedLeadsCount(
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<number>>;
-
-  markFailedLeadsAsProcessed(
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ModuleT,
-  ): Promise<ResponseType<void>>;
-}
 
 /**
  * Campaign Starter Repository Implementation
@@ -82,7 +53,7 @@ export class CampaignStarterRepository {
     config: CampaignStarterConfigType,
     result: CampaignStarterResultType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CampaignsCampaignStarterT,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Processing locale leads for campaign starter", {
@@ -212,7 +183,7 @@ export class CampaignStarterRepository {
               result.errors.push({
                 leadId: lead.id,
                 email: lead.email!,
-                error: INVALID_TRANSITION_ERROR,
+                error: t("errors.invalidTransition"),
               });
               continue;
             }
@@ -266,7 +237,7 @@ export class CampaignStarterRepository {
   static async getFailedLeadsCount(
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CampaignsCampaignStarterT,
   ): Promise<ResponseType<number>> {
     try {
       logger.debug("Getting failed leads count for rebalancing", { locale });
@@ -332,7 +303,7 @@ export class CampaignStarterRepository {
   static async markFailedLeadsAsProcessed(
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CampaignsCampaignStarterT,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Marking failed leads as processed for rebalancing", {
@@ -432,11 +403,11 @@ export class CampaignStarterRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<CampaignStarterPostResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const systemUser = {
+    const systemUser: JwtPrivatePayloadType = {
       id: "00000000-0000-0000-0000-000000000001",
       leadId: "00000000-0000-0000-0000-000000000000",
-      isPublic: false as const,
-      roles: [UserPermissionRole.ADMIN] as (typeof UserPermissionRole.ADMIN)[],
+      isPublic: false,
+      roles: [UserPermissionRole.ADMIN],
     };
 
     const configResult =
@@ -520,12 +491,9 @@ export class CampaignStarterRepository {
     startOfWeek.setUTCDate(now.getUTCDate() - daysFromMonday);
     startOfWeek.setUTCHours(0, 0, 0, 0);
 
-    for (const [localeKey, weeklyQuota] of Object.entries(
-      config.leadsPerWeek,
-    )) {
-      const localeValue =
-        CountryLanguageValues[localeKey as keyof typeof CountryLanguageValues];
-      if (!localeValue) {
+    for (const localeValue of Object.values(CountryLanguageValues)) {
+      const weeklyQuota = config.leadsPerWeek[localeValue];
+      if (weeklyQuota === undefined) {
         continue;
       }
       const weeklyQuotaNum = typeof weeklyQuota === "number" ? weeklyQuota : 0;
@@ -583,7 +551,3 @@ export class CampaignStarterRepository {
     });
   }
 }
-
-/**
- * Default repository instance
- */

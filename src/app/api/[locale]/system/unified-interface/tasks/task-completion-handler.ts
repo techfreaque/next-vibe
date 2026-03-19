@@ -24,7 +24,7 @@ import type {
   ToolCall,
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
-import { chatMessages } from "@/app/api/[locale]/agent/chat/db";
+import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { buildMessagesChannel } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel";
 import { createStreamEvent } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events";
@@ -297,6 +297,40 @@ export async function handleTaskCompletion(params: {
       taskId,
       toolMessageId,
     });
+  }
+
+  // 2b. For endLoop: task is done, no AI continuation — clear thread from "waiting" → "idle".
+  //    The abort handler set thread to "waiting" when the stream died. Now that the task
+  //    has completed (and TASK_COMPLETED WS was just emitted above), the UI can unlock.
+  if (callbackMode === CallbackMode.END_LOOP && threadId) {
+    try {
+      await db
+        .update(chatThreads)
+        .set({ streamingState: "idle", updatedAt: new Date() })
+        .where(eq(chatThreads.id, threadId));
+
+      publishWsEvent(
+        {
+          channel: buildMessagesChannel(threadId),
+          event: "streaming-state-changed",
+          data: createStreamEvent.streamingStateChanged({
+            threadId,
+            state: "idle",
+          }).data,
+        },
+        logger,
+      );
+
+      logger.info(
+        "[TaskCompletion] endLoop — cleared thread from waiting to idle",
+        { threadId, taskId },
+      );
+    } catch (clearErr) {
+      logger.warn("[TaskCompletion] Failed to clear endLoop thread state", {
+        threadId,
+        error: clearErr instanceof Error ? clearErr.message : String(clearErr),
+      });
+    }
   }
 
   // 3. Schedule a resume-stream one-shot cron task for wakeUp or wait modes.

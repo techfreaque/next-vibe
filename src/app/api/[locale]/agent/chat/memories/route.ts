@@ -15,24 +15,11 @@ export const { GET, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: async ({ user, logger, streamContext }) => {
-      const result = await MemoriesRepository.getMemories({
+      return MemoriesRepository.getMemories({
         userId: user.id,
         logger,
         rootFolderId: streamContext.rootFolderId ?? DefaultFolderId.PRIVATE,
       });
-      if (!result.success) {
-        return result;
-      }
-      // Map memoryNumber → id so AI agents can chain list → update/delete
-      return {
-        ...result,
-        data: {
-          memories: result.data.memories.map((m) => ({
-            ...m,
-            id: m.memoryNumber,
-          })),
-        },
-      };
     },
   },
 });

@@ -43,8 +43,8 @@ import type {
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 
-class UsersStatsRepositoryImpl {
-  private getDateTruncFormat(
+export class UsersStatsRepository {
+  private static getDateTruncFormat(
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
   ): string {
     switch (timePeriod) {
@@ -63,7 +63,7 @@ class UsersStatsRepositoryImpl {
     }
   }
 
-  private formatPeriodLabel(
+  private static formatPeriodLabel(
     period: string,
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
   ): string {
@@ -75,7 +75,7 @@ class UsersStatsRepositoryImpl {
           day: "numeric",
         });
       case TimePeriod.WEEK:
-        return `Week ${this.getWeekNumber(date)}`;
+        return `Week ${UsersStatsRepository.getWeekNumber(date)}`;
       case TimePeriod.MONTH:
         return date.toLocaleDateString("en-US", {
           month: "short",
@@ -90,7 +90,7 @@ class UsersStatsRepositoryImpl {
     }
   }
 
-  private getWeekNumber(date: Date): number {
+  private static getWeekNumber(date: Date): number {
     const startOfYear = new Date(date.getFullYear(), 0, 1);
     const diff = date.getTime() - startOfYear.getTime();
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
@@ -99,7 +99,7 @@ class UsersStatsRepositoryImpl {
     );
   }
 
-  async getUserStats(
+  static async getUserStats(
     rawQuery: UserStatsRequestOutput | undefined,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -224,7 +224,7 @@ class UsersStatsRepositoryImpl {
         whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
       const timePeriod = timePeriodOptions?.timePeriod ?? TimePeriod.DAY;
-      const response = await this.buildResponse(
+      const response = await UsersStatsRepository.buildResponse(
         whereClause,
         dateRange,
         timePeriod,
@@ -241,7 +241,7 @@ class UsersStatsRepositoryImpl {
     }
   }
 
-  private async buildResponse(
+  private static async buildResponse(
     whereClause: SQL | undefined,
     dateRange: { from: Date; to: Date },
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
@@ -346,7 +346,7 @@ class UsersStatsRepositoryImpl {
       .where(whereClause);
 
     // Generate historical chart data based on the selected time period
-    const dateTruncFormat = this.getDateTruncFormat(timePeriod);
+    const dateTruncFormat = UsersStatsRepository.getDateTruncFormat(timePeriod);
     const historicalData = await db
       .select({
         period: sql<string>`date_trunc(${sql.raw(`'${dateTruncFormat}'`)}, ${users.createdAt})::text`,
@@ -367,9 +367,9 @@ class UsersStatsRepositoryImpl {
       );
 
     const growthChart = historicalData.map((item) => ({
-      x: this.formatPeriodLabel(item.period, timePeriod),
+      x: UsersStatsRepository.formatPeriodLabel(item.period, timePeriod),
       y: item.count,
-      label: this.formatPeriodLabel(item.period, timePeriod),
+      label: UsersStatsRepository.formatPeriodLabel(item.period, timePeriod),
     }));
 
     const roleStats = await db
@@ -503,5 +503,3 @@ class UsersStatsRepositoryImpl {
     };
   }
 }
-
-export const usersStatsRepository = new UsersStatsRepositoryImpl();

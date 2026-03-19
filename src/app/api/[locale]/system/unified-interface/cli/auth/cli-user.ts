@@ -79,24 +79,6 @@ function createCliUserFromDb(
 }
 
 /**
- * Create a mock user for testing/development
- * Used in tasks, generators, and other system operations
- */
-export function createMockUser(): {
-  id: string;
-  leadId: string;
-  isPublic: false;
-  roles: (typeof UserPermissionRole.ADMIN)[];
-} {
-  return {
-    id: DEFAULT_CLI_USER_ID,
-    leadId: DEFAULT_CLI_USER_ID,
-    isPublic: false,
-    roles: [UserPermissionRole.ADMIN],
-  };
-}
-
-/**
  * Get CLI user with proper authentication flow:
  * 1. Check for session user (from .vibe.session file)
  * 2. Check VIBE_ADMIN_USER_EMAIL from .env and authenticate from DB

@@ -18,37 +18,40 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { remoteConnections } from "../../db";
+import type { RemoteConnectionRenamePatchResponseOutput } from "./definition";
 import type { RemoteConnectionRenameT } from "./i18n";
 
-export async function renameConnection(
-  user: JwtPrivatePayloadType,
-  logger: EndpointLogger,
-  t: RemoteConnectionRenameT,
-  instanceId: string,
-  friendlyName: string,
-): Promise<ResponseType<{ updated: boolean }>> {
-  const result = await db
-    .update(remoteConnections)
-    .set({ friendlyName, updatedAt: new Date() })
-    .where(
-      and(
-        eq(remoteConnections.userId, user.id),
-        eq(remoteConnections.instanceId, instanceId),
-      ),
-    )
-    .returning({ instanceId: remoteConnections.instanceId });
+export class RemoteConnectionRenameRepository {
+  static async renameConnection(
+    user: JwtPrivatePayloadType,
+    logger: EndpointLogger,
+    t: RemoteConnectionRenameT,
+    instanceId: string,
+    friendlyName: string,
+  ): Promise<ResponseType<RemoteConnectionRenamePatchResponseOutput>> {
+    const result = await db
+      .update(remoteConnections)
+      .set({ friendlyName, updatedAt: new Date() })
+      .where(
+        and(
+          eq(remoteConnections.userId, user.id),
+          eq(remoteConnections.instanceId, instanceId),
+        ),
+      )
+      .returning({ instanceId: remoteConnections.instanceId });
 
-  if (result.length === 0) {
-    return fail({
-      message: t("patch.errors.notFound.title"),
-      errorType: ErrorResponseTypes.NOT_FOUND,
+    if (result.length === 0) {
+      return fail({
+        message: t("patch.errors.notFound.title"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    logger.info("Renamed remote connection", {
+      userId: user.id,
+      instanceId,
+      friendlyName,
     });
+    return success({ updated: true });
   }
-
-  logger.info("Renamed remote connection", {
-    userId: user.id,
-    instanceId,
-    friendlyName,
-  });
-  return success({ updated: true });
 }

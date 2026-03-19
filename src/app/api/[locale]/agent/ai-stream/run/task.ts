@@ -27,8 +27,6 @@ import { HISTORY_INTERVALS } from "../../../system/unified-interface/tasks/const
 import aiRunDefinition from "./definition";
 import { tools } from "./route";
 
-/* eslint-disable i18next/no-literal-string */
-
 const aiHeartbeatTask = createCronTask(aiRunDefinition.POST, tools.POST, {
   id: "ai-heartbeat",
   name: "run.task.name",

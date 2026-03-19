@@ -161,6 +161,14 @@ export const translations: typeof enTranslations = {
       title: "Ungültiger Befehl",
       message: "Der TypeScript-Prüfbefehl ist ungültig oder fehlt",
     },
+    aborted: {
+      title: "Vorgang abgebrochen",
+      description: "Der Typprüfungsvorgang wurde abgebrochen",
+    },
+    parseTsconfig: {
+      title: "tsconfig.json konnte nicht geparst werden",
+      description: "Die tsconfig.json-Datei konnte nicht geparst werden",
+    },
   },
 
   // Success messages

@@ -525,6 +525,7 @@ export type SkillListResponseOutput = typeof GET.types.ResponseOutput;
 // Individual skill card type from list response
 export type SkillListItem =
   SkillListResponseOutput["sections"][number]["skills"][number];
+export type SkillListSections = SkillListResponseOutput["sections"];
 
 const skillsDefinitions = { GET } as const;
 export default skillsDefinitions;

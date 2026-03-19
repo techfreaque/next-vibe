@@ -12,74 +12,34 @@ import { existsSync, promises as fs } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+  success,
+} from "next-vibe/shared/types/response.schema";
+
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
-import type { CheckConfig, JsonObject, OxlintJsPlugin } from "./types";
-
-// ============================================================
-// Result Types
-// ============================================================
-
-export interface ConfigReadyResult {
-  ready: true;
-  config: CheckConfig;
-  regenerated: boolean;
-}
-
-export interface ConfigErrorResult {
-  ready: false;
-  error: "missing" | "exists" | "creation_failed" | "load_failed";
-  message: string;
-  configPath: string;
-}
-
-export type EnsureConfigResult = ConfigReadyResult | ConfigErrorResult;
-
-// ============================================================
-// Repository Interface
-// ============================================================
-
-export interface ConfigRepositoryInterface {
-  ensureConfigReady(
-    logger: EndpointLogger,
-    createConfig?: boolean,
-  ): Promise<EnsureConfigResult>;
-
-  generateAllConfigs(
-    logger: EndpointLogger,
-    config: CheckConfig,
-  ): Promise<{
-    success: boolean;
-    oxlintConfigPath?: string;
-    oxfmtConfigPath?: string;
-    eslintConfigPath?: string;
-    error?: string;
-  }>;
-
-  generateVSCodeSettings(
-    logger: EndpointLogger,
-    config: CheckConfig,
-    locale: CountryLanguage,
-  ): Promise<{ success: boolean; settingsPath: string; error?: string }>;
-
-  createDefaultCheckConfig(
-    logger: EndpointLogger,
-  ): Promise<{ success: boolean; configPath: string; error?: string }>;
-
-  createDefaultMcpConfig(
-    logger: EndpointLogger,
-    path: string,
-  ): Promise<{ success: boolean; mcpConfigPath: string; error?: string }>;
-}
+import { scopedTranslation } from "./i18n";
+import type {
+  CheckConfig,
+  CreateDefaultCheckConfigResult,
+  CreateDefaultMcpConfigResult,
+  EnsureConfigResult,
+  GenerateVSCodeSettingsResult,
+  JsonObject,
+  OxlintJsPlugin,
+} from "./types";
 
 // ============================================================
 // Repository Implementation
 // ============================================================
 
-export class ConfigRepositoryImpl implements ConfigRepositoryInterface {
+export class ConfigRepositoryImpl {
   // --------------------------------------------------------
   // Static Private Helpers - Path Resolution
   // --------------------------------------------------------
@@ -422,9 +382,10 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   // Public Methods
   // --------------------------------------------------------
 
-  async ensureConfigReady(
+  static async ensureConfigReady(
     logger: EndpointLogger,
-    createConfig = false,
+    locale: CountryLanguage,
+    createConfig: boolean,
   ): Promise<EnsureConfigResult> {
     const configPath = ConfigRepositoryImpl.getConfigFilePath();
     const configExists = existsSync(configPath);
@@ -443,12 +404,13 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     if (!configExists) {
       if (createConfig) {
         logger.info("Creating default check.config.ts...");
-        const createResult = await this.createDefaultCheckConfig(logger);
+        const createResult =
+          await ConfigRepositoryImpl.createDefaultCheckConfig(logger, locale);
         if (!createResult.success) {
           return {
             ready: false,
             error: "creation_failed",
-            message: `Failed to create check.config.ts: ${createResult.error}`,
+            message: `Failed to create check.config.ts: ${createResult.message}`,
             configPath,
           };
         }
@@ -465,8 +427,8 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       }
     }
 
-    const config = await this.loadCheckConfig(logger);
-    if (!config) {
+    const loaded = await ConfigRepositoryImpl.loadCheckConfig(logger);
+    if (!loaded) {
       return {
         ready: false,
         error: "load_failed",
@@ -476,18 +438,27 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       };
     }
 
-    const status = await this.checkConfigStatus(logger, config);
+    const { config, configMtimeMs } = loaded;
+    const status = await ConfigRepositoryImpl.checkConfigStatus(
+      logger,
+      config,
+      configMtimeMs,
+    );
     let regenerated = false;
 
     if (status.needsRegeneration) {
       logger.debug("Regenerating config files");
-      const genResult = await this.generateAllConfigs(logger, config);
+      const genResult = await ConfigRepositoryImpl.generateAllConfigs(
+        logger,
+        config,
+        locale,
+      );
       if (genResult.success) {
         regenerated = true;
         logger.debug("Config files regenerated successfully");
       } else {
         logger.warn("Failed to regenerate config files", {
-          error: genResult.error,
+          error: genResult.message,
         });
       }
     } else {
@@ -497,16 +468,18 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     return { ready: true, config, regenerated };
   }
 
-  async generateAllConfigs(
+  static async generateAllConfigs(
     logger: EndpointLogger,
     config: CheckConfig,
-  ): Promise<{
-    success: boolean;
-    oxlintConfigPath?: string;
-    oxfmtConfigPath?: string;
-    eslintConfigPath?: string;
-    error?: string;
-  }> {
+    locale: CountryLanguage,
+  ): Promise<
+    ResponseType<{
+      oxlintConfigPath?: string;
+      oxfmtConfigPath?: string;
+      eslintConfigPath?: string;
+    }>
+  > {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       let oxlintConfigPath: string | undefined;
       let oxfmtConfigPath: string | undefined;
@@ -514,7 +487,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       // Generate oxlint config if enabled
       if (config.oxlint.enabled) {
-        oxlintConfigPath = await this.generateOxlintConfig(
+        oxlintConfigPath = await ConfigRepositoryImpl.generateOxlintConfig(
           logger,
           config.oxlint,
         );
@@ -522,56 +495,72 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       // Generate prettier/oxfmt config if enabled
       if (config.prettier.enabled) {
-        oxfmtConfigPath = await this.generatePrettierConfig(
+        oxfmtConfigPath = await ConfigRepositoryImpl.generatePrettierConfig(
           logger,
           config.prettier,
         );
+
+        // Generate .prettierignore from oxlint ignore patterns for oxfmt --ignore-path
+        const ignorePatterns = config.oxlint.enabled
+          ? (config.oxlint.ignorePatterns ?? [])
+          : [];
+        if (config.prettier.ignoreFilePath && ignorePatterns.length > 0) {
+          await ConfigRepositoryImpl.generatePrettierIgnore(
+            logger,
+            config.prettier.ignoreFilePath,
+            ignorePatterns,
+          );
+        }
       }
 
       // Generate ESLint config if enabled
       if (config.eslint.enabled) {
-        eslintConfigPath = await this.generateEslintConfig(
+        eslintConfigPath = await ConfigRepositoryImpl.generateEslintConfig(
           logger,
           config.eslint,
         );
       }
 
-      return {
-        success: true,
+      return success({
         oxlintConfigPath,
         oxfmtConfigPath,
         eslintConfigPath,
-      };
+      });
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to generate configs", { error: errorMessage });
-      return { success: false, error: errorMessage };
+      return fail({
+        message: t("errors.generateConfigsFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 
-  async generateVSCodeSettings(
+  static async generateVSCodeSettings(
     logger: EndpointLogger,
     config: CheckConfig,
     locale: CountryLanguage,
-  ): Promise<{ success: boolean; settingsPath: string; error?: string }> {
+  ): Promise<ResponseType<GenerateVSCodeSettingsResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const settingsPath = `${process.cwd()}/.vscode/settings.json`;
 
     try {
       // Check if VSCode integration is enabled
       if (!config.vscode.enabled) {
         logger.debug("VSCode settings generation disabled");
-        return { success: true, settingsPath };
+        return success({ settingsPath });
       }
 
       const vscodeConfig = config.vscode;
       if (!vscodeConfig.autoGenerateSettings) {
         logger.debug("VSCode settings auto-generation disabled");
-        return { success: true, settingsPath };
+        return success({ settingsPath });
       }
 
       await fs.mkdir(dirname(settingsPath), { recursive: true });
 
-      const existingSettings = await this.loadExistingSettings(
+      const existingSettings = await ConfigRepositoryImpl.loadExistingSettings(
         settingsPath,
         locale,
       );
@@ -613,19 +602,25 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       );
       logger.debug("Generated VSCode settings", { path: settingsPath });
 
-      return { success: true, settingsPath };
+      return success({ settingsPath });
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to generate VSCode settings", {
         error: errorMessage,
       });
-      return { success: false, settingsPath, error: errorMessage };
+      return fail({
+        message: t("errors.generateVSCodeSettingsFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 
-  async createDefaultCheckConfig(
+  static async createDefaultCheckConfig(
     logger: EndpointLogger,
-  ): Promise<{ success: boolean; configPath: string; error?: string }> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<CreateDefaultCheckConfigResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const configPath = ConfigRepositoryImpl.getConfigFilePath();
 
     try {
@@ -634,21 +629,20 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         await ConfigRepositoryImpl.findPackageRoot(currentDir);
 
       if (!packageRoot) {
-        return {
-          success: false,
-          configPath,
-          error: "Could not find next-vibe package root",
-        };
+        return fail({
+          message: t("errors.packageRootNotFound"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
       }
 
       const templatePath = resolve(packageRoot, "check.config.ts");
 
       if (!existsSync(templatePath)) {
-        return {
-          success: false,
-          configPath,
-          error: `Template check.config.ts not found at ${templatePath}`,
-        };
+        return fail({
+          message: t("errors.templateNotFound"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { path: templatePath },
+        });
       }
 
       let templateContent = await fs.readFile(templatePath, "utf8");
@@ -662,44 +656,56 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       await fs.writeFile(configPath, templateContent, "utf8");
 
       // Also create .mcp.json
-      const mcpResult = await this.createDefaultMcpConfig(logger, ".mcp.json");
+      const mcpResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
+        logger,
+        ".mcp.json",
+        locale,
+      );
       if (!mcpResult.success) {
         logger.warn("Failed to create .mcp.json", {
-          error: mcpResult.error,
+          error: mcpResult.message,
         });
       }
-      const mcpCursorResult = await this.createDefaultMcpConfig(
+      const mcpCursorResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
         logger,
         ".cursor/mcp.json",
+        locale,
       );
       if (!mcpCursorResult.success) {
         logger.warn("Failed to create .cursor/mcp.json", {
-          error: mcpCursorResult.error,
+          error: mcpCursorResult.message,
         });
       }
 
-      const mcpVscodeResult = await this.createDefaultMcpConfig(
+      const mcpVscodeResult = await ConfigRepositoryImpl.createDefaultMcpConfig(
         logger,
         ".vscode/mcp.json",
+        locale,
       );
       if (!mcpVscodeResult.success) {
         logger.warn("Failed to create .vscode/mcp.json", {
-          error: mcpVscodeResult.error,
+          error: mcpVscodeResult.message,
         });
       }
 
-      return { success: true, configPath };
+      return success({ configPath });
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to create check.config.ts", { error: errorMessage });
-      return { success: false, configPath, error: errorMessage };
+      return fail({
+        message: t("errors.createConfigFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 
-  async createDefaultMcpConfig(
+  static async createDefaultMcpConfig(
     logger: EndpointLogger,
     path: string,
-  ): Promise<{ success: boolean; mcpConfigPath: string; error?: string }> {
+    locale: CountryLanguage,
+  ): Promise<ResponseType<CreateDefaultMcpConfigResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const mcpConfigPath = `${process.cwd()}/${path}`;
 
     try {
@@ -721,11 +727,15 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         "utf8",
       );
 
-      return { success: true, mcpConfigPath };
+      return success({ mcpConfigPath });
     } catch (error) {
       const errorMessage = parseError(error).message;
       logger.error("Failed to create .mcp.json", { error: errorMessage });
-      return { success: false, mcpConfigPath, error: errorMessage };
+      return fail({
+        message: t("errors.createMcpConfigFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: errorMessage },
+      });
     }
   }
 
@@ -733,9 +743,9 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   // Private Methods
   // --------------------------------------------------------
 
-  private async loadCheckConfig(
+  private static async loadCheckConfig(
     logger: EndpointLogger,
-  ): Promise<CheckConfig | null> {
+  ): Promise<{ config: CheckConfig; configMtimeMs: number } | null> {
     try {
       const configPath = ConfigRepositoryImpl.getConfigFilePath();
 
@@ -744,6 +754,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         return null;
       }
 
+      // Stat and dynamic import in parallel — stat is needed for stale check anyway
       // Use indirect import to prevent Turbopack static analysis
       // eslint-disable-next-line -- dynamic import required for runtime config loading
       const dynamicImport = new Function("p", "return import(p)") as (
@@ -752,7 +763,11 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         default?: CheckConfig | (() => CheckConfig);
         config?: CheckConfig | (() => CheckConfig);
       }>;
-      const configModule = await dynamicImport(configPath);
+      const [configStats, configModule] = await Promise.all([
+        fs.stat(configPath),
+        dynamicImport(configPath),
+      ]);
+
       const exportedValue = configModule.default ?? configModule.config;
 
       if (!exportedValue) {
@@ -765,7 +780,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         typeof exportedValue === "function" ? exportedValue() : exportedValue;
 
       logger.debug(`Loaded check.config.ts (path: ${configPath})`);
-      return config;
+      return { config, configMtimeMs: configStats.mtimeMs };
     } catch (error) {
       logger.debug(
         `Failed to load check.config.ts (error: ${parseError(error).message})`,
@@ -774,12 +789,11 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     }
   }
 
-  private async checkConfigStatus(
+  private static async checkConfigStatus(
     logger: EndpointLogger,
     config: CheckConfig,
+    configMtimeMs: number,
   ): Promise<{ needsRegeneration: boolean }> {
-    const configPath = ConfigRepositoryImpl.getConfigFilePath();
-
     // If no tools are enabled, no regeneration needed
     if (
       !config.oxlint.enabled &&
@@ -789,18 +803,19 @@ export default checkConfig.eslint?.buildFlatConfig?.(
       return { needsRegeneration: false };
     }
 
-    // Check if any enabled config file needs regeneration
-    try {
-      const configStats = await fs.stat(configPath);
+    // Collect all generated config paths to stat in parallel
+    const generatedPaths: string[] = [];
+    if (config.oxlint.enabled) {
+      generatedPaths.push(`${process.cwd()}/${config.oxlint.configPath}`);
+    }
 
-      // Check oxlint config if enabled
-      if (config.oxlint.enabled) {
-        const oxlintConfigPath = `${process.cwd()}/${config.oxlint.configPath}`;
-        if (!existsSync(oxlintConfigPath)) {
-          return { needsRegeneration: true };
-        }
-        const oxlintStats = await fs.stat(oxlintConfigPath);
-        if (configStats.mtime > oxlintStats.mtime) {
+    try {
+      const results = await Promise.all(
+        generatedPaths.map((p) => fs.stat(p).catch(() => null)),
+      );
+
+      for (const stat of results) {
+        if (!stat || configMtimeMs > stat.mtimeMs) {
           return { needsRegeneration: true };
         }
       }
@@ -814,7 +829,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     }
   }
 
-  private async loadExistingSettings(
+  private static async loadExistingSettings(
     settingsPath: string,
     locale: CountryLanguage,
   ): Promise<JsonObject> {
@@ -833,7 +848,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     return {};
   }
 
-  private async generateOxlintConfig(
+  private static async generateOxlintConfig(
     logger: EndpointLogger,
     oxlintConfig: CheckConfig["oxlint"] & { enabled: true },
   ): Promise<string> {
@@ -903,7 +918,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     return configPath;
   }
 
-  private async generatePrettierConfig(
+  private static async generatePrettierConfig(
     logger: EndpointLogger,
     prettierConfig: CheckConfig["prettier"] & { enabled: true },
   ): Promise<string> {
@@ -921,7 +936,18 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     return configPath;
   }
 
-  private async generateEslintConfig(
+  private static async generatePrettierIgnore(
+    logger: EndpointLogger,
+    ignoreFilePath: string,
+    ignorePatterns: string[],
+  ): Promise<void> {
+    const filePath = `${process.cwd()}/${ignoreFilePath}`;
+    await fs.mkdir(dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, `${ignorePatterns.join("\n")}\n`, "utf8");
+    logger.debug("Generated .prettierignore", { path: filePath });
+  }
+
+  private static async generateEslintConfig(
     logger: EndpointLogger,
     eslintConfig: CheckConfig["eslint"] & { enabled: true },
   ): Promise<string> {
@@ -938,13 +964,3 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     return configPath;
   }
 }
-
-// ============================================================
-// Default Repository Instance
-// ============================================================
-
-export const configRepository = new ConfigRepositoryImpl();
-
-// Legacy export for backwards compatibility
-export const ensureConfigReady =
-  configRepository.ensureConfigReady.bind(configRepository);

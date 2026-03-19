@@ -21,15 +21,13 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { leads } from "../../../db";
-import type { scopedTranslation } from "../../../i18n";
+import type { LeadsT } from "../../../i18n";
 import type {
   DistributionCalculationInputType,
   DistributionCalculationOutputType,
   LocaleProcessingInfoOutputType,
   LocaleQuotaCalculationInputType,
 } from "./types";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Distribution Repository Implementation
@@ -38,7 +36,7 @@ export class DistributionRepository {
   static calculateDistribution(
     data: DistributionCalculationInputType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): ResponseType<DistributionCalculationOutputType> {
     try {
       const { config, cronSchedule } = data;
@@ -84,7 +82,7 @@ export class DistributionRepository {
   static async calculateLocaleQuota(
     data: LocaleQuotaCalculationInputType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: LeadsT,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>> {
     try {
       const {

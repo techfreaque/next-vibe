@@ -21,15 +21,13 @@ import type {
   InboxMoveRequestOutput,
   InboxMoveResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { InboxMoveT } from "./i18n";
 
 export class InboxMoveRepository {
   static async move(
     data: InboxMoveRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: InboxMoveT,
     locale: CountryLanguage,
   ): Promise<ResponseType<InboxMoveResponseOutput>> {
     try {

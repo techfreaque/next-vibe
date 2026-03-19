@@ -19,28 +19,30 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { emailCampaigns, leadLeadLinks, leads } from "../../db";
-import type { EmailJourneyVariantValues } from "../../enum";
-import { LeadStatus } from "../../enum";
-import { EmailJourneyVariantFilter } from "../../enum";
+import {
+  EmailJourneyVariant,
+  EmailJourneyVariantFilter,
+  LeadStatus,
+} from "../../enum";
+import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import type {
   CampaignStatsGetRequestOutput,
   CampaignStatsGetResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { CampaignStatsT } from "./i18n";
 
 export class CampaignStatsRepository {
   static async getStats(
     data: CampaignStatsGetRequestOutput,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: CampaignStatsT,
   ): Promise<ResponseType<CampaignStatsGetResponseOutput>> {
     try {
       const variantValue =
         data.journeyVariant &&
-        data.journeyVariant !== EmailJourneyVariantFilter.ALL
-          ? (data.journeyVariant as typeof EmailJourneyVariantValues)
+        data.journeyVariant !== EmailJourneyVariantFilter.ALL &&
+        isValidEnumValue(EmailJourneyVariant, data.journeyVariant)
+          ? data.journeyVariant
           : null;
       const variantFilter = variantValue
         ? eq(emailCampaigns.journeyVariant, variantValue)

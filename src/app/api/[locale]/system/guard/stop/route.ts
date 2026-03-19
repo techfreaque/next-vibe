@@ -9,13 +9,13 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import guardStopEndpoints from "./definition";
-import { guardStopRepository } from "./repository";
+import { GuardStopRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: guardStopEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) => {
-      return guardStopRepository.stopGuard(data, logger, t);
+      return GuardStopRepository.stopGuard(data, logger, t);
     },
   },
 });

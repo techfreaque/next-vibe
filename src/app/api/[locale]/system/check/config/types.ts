@@ -196,6 +196,8 @@ interface PrettierConfigEnabled extends PrettierConfigOptions {
   enabled: true;
   /** Path to generated prettier/oxfmt config file */
   configPath: string;
+  /** Path to generated .prettierignore file for oxfmt --ignore-path */
+  ignoreFilePath?: string;
 }
 
 export type PrettierConfig = PrettierConfigDisabled | PrettierConfigEnabled;
@@ -636,4 +638,39 @@ export interface CheckConfig {
 
   /** Vibe Check defaults */
   vibeCheck?: VibeCheckConfig;
+}
+
+// ============================================================
+// Config Repository Result Types
+// ============================================================
+
+export interface ConfigReadyResult {
+  ready: true;
+  config: CheckConfig;
+  regenerated: boolean;
+}
+
+export interface ConfigErrorResult {
+  ready: false;
+  error: "missing" | "exists" | "creation_failed" | "load_failed";
+  message: string;
+  configPath: string;
+}
+
+export type EnsureConfigResult = ConfigReadyResult | ConfigErrorResult;
+
+// ============================================================
+// Config Repository Internal Result Types
+// ============================================================
+
+export interface GenerateVSCodeSettingsResult {
+  settingsPath: string;
+}
+
+export interface CreateDefaultCheckConfigResult {
+  configPath: string;
+}
+
+export interface CreateDefaultMcpConfigResult {
+  mcpConfigPath: string;
 }

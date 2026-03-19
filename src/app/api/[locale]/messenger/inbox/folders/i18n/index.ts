@@ -7,3 +7,5 @@ export const scopedTranslation = createScopedTranslation({
   de: () => require("./de").translations,
   pl: () => require("./pl").translations,
 });
+
+export type InboxFoldersT = ReturnType<typeof scopedTranslation.scopedT>["t"];

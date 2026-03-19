@@ -17,6 +17,7 @@ import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 
@@ -44,6 +45,7 @@ export interface SendMessageDeps {
   currentSubFolderId: string | null;
   /** leafMessageId from the navigation store — used as starting point for branch-aware parent resolution */
   leafMessageId: string | null;
+  user: JwtPayloadType;
   settings: {
     selectedModel: ModelId;
     selectedSkill: string;
@@ -70,6 +72,7 @@ export async function sendMessage(
     currentRootFolderId,
     currentSubFolderId,
     leafMessageId,
+    user,
     settings,
   } = deps;
   const { content } = params;
@@ -334,6 +337,7 @@ export async function sendMessage(
         startStream,
         currentRootFolderId,
         currentSubFolderId,
+        user,
         settings,
       },
     );

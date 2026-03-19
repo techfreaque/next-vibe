@@ -5,7 +5,9 @@
 
 import { envClient } from "@/config/env-client";
 
-import { CONTACT_FORM_ALIAS } from "../../contact/constants";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+
 import { SSH_EXEC_ALIAS } from "../../ssh/exec/constants";
 import { SSH_FILES_READ_ALIAS } from "../../ssh/files/read/constants";
 import { SSH_FILES_WRITE_ALIAS } from "../../ssh/files/write/constants";
@@ -23,7 +25,6 @@ import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
 } from "./memories/[id]/constants";
-import { MEMORY_LIST_ALIAS } from "./memories/constants";
 import { MEMORY_ADD_ALIAS } from "./memories/create/constants";
 
 /**
@@ -53,23 +54,59 @@ export const CHAT_CONSTANTS = {
 export const AGENT_MESSAGE_LENGTH = 40000; // TODO find a better way and also better error
 
 /**
- * Default AI tools enabled for new chats
- * These tools are enabled by default when creating a new chat or resetting tools
+ * Default AI tools for public (unauthenticated) users.
+ * Only includes tools accessible to PUBLIC role.
  */
-export const DEFAULT_TOOL_IDS = [
+export const DEFAULT_TOOL_IDS_PUBLIC = [
   TOOL_HELP_ALIAS,
   EXECUTE_TOOL_ALIAS,
   WAIT_FOR_TASK_ALIAS,
   BRAVE_SEARCH_ALIAS,
   KAGI_ALIAS,
   FETCH_URL_ALIAS,
-  MEMORY_LIST_ALIAS,
+  AI_RUN_ALIAS,
+] as const;
+
+/**
+ * Default AI tools for customer (authenticated non-admin) users.
+ * Adds memory tools, execute-tool, and wait-for-task on top of public defaults.
+ */
+export const DEFAULT_TOOL_IDS_CUSTOMER = [
+  TOOL_HELP_ALIAS,
+  EXECUTE_TOOL_ALIAS,
+  WAIT_FOR_TASK_ALIAS,
+  BRAVE_SEARCH_ALIAS,
+  KAGI_ALIAS,
+  FETCH_URL_ALIAS,
   MEMORY_ADD_ALIAS,
   MEMORY_UPDATE_ALIAS,
   MEMORY_DELETE_ALIAS,
-  CONTACT_FORM_ALIAS,
   AI_RUN_ALIAS,
 ] as const;
+
+/**
+ * Default AI tools for admin users.
+ * Adds claude-code and other admin-only tools on top of customer defaults.
+ */
+export const DEFAULT_TOOL_IDS_ADMIN = [
+  TOOL_HELP_ALIAS,
+  EXECUTE_TOOL_ALIAS,
+  WAIT_FOR_TASK_ALIAS,
+  BRAVE_SEARCH_ALIAS,
+  KAGI_ALIAS,
+  FETCH_URL_ALIAS,
+  MEMORY_ADD_ALIAS,
+  MEMORY_UPDATE_ALIAS,
+  MEMORY_DELETE_ALIAS,
+  CLAUDE_CODE_ALIAS,
+  AI_RUN_ALIAS,
+] as const;
+
+/**
+ * @deprecated Use DEFAULT_TOOL_IDS_ADMIN / DEFAULT_TOOL_IDS_CUSTOMER / DEFAULT_TOOL_IDS_PUBLIC
+ * or call getDefaultToolIds() with the user's role instead.
+ */
+export const DEFAULT_TOOL_IDS = DEFAULT_TOOL_IDS_ADMIN;
 
 /**
  * Default remote tools made available (enabled) when a remote instance is connected.
@@ -105,17 +142,46 @@ const LOCAL_ADMIN_EXTRA_TOOL_IDS = [
 ] as const;
 
 /**
- * Get the effective default pinned tool IDs based on environment and role.
- * - Local mode + admin: base defaults + dev tools (claude-code, sql, rebuild, etc.)
- * - All other cases: base defaults only
- *
- * When `isAdmin` is not provided, defaults to `true` in local mode (the common case
- * for self-hosted instances where only admin uses the AI).
+ * Convenience wrapper: derive role flags from a JWT payload and return the
+ * role-appropriate default tool IDs.  Use this whenever you have a full user object.
  */
-export function getDefaultToolIds(isAdmin?: boolean): readonly string[] {
-  const effectiveAdmin = isAdmin ?? envClient.NEXT_PUBLIC_LOCAL_MODE;
-  if (envClient.NEXT_PUBLIC_LOCAL_MODE && effectiveAdmin) {
-    return [...DEFAULT_TOOL_IDS, ...LOCAL_ADMIN_EXTRA_TOOL_IDS.filter(Boolean)];
+export function getDefaultToolIdsForUser(
+  user: JwtPayloadType,
+): readonly string[] {
+  if (user.isPublic) {
+    return getDefaultToolIds(false, false);
   }
-  return DEFAULT_TOOL_IDS;
+  const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
+  return getDefaultToolIds(isAdmin, !isAdmin);
+}
+
+/**
+ * Get the effective default pinned tool IDs based on user role and environment.
+ *
+ * Role-based defaults:
+ * - ADMIN (or local mode): admin tool set + dev tools (claude-code, sql, rebuild, etc.)
+ * - CUSTOMER (authenticated, non-admin): customer tool set (no claude-code)
+ * - PUBLIC (unauthenticated): public tool set (search, fetch, ai-run, help only)
+ *
+ * Pass `isAdmin=true` / `isCustomer=true` flags derived from the JWT payload roles.
+ * When neither flag is provided, defaults to admin in local mode.
+ */
+export function getDefaultToolIds(
+  isAdmin?: boolean,
+  isCustomer?: boolean,
+): readonly string[] {
+  const effectiveAdmin = isAdmin ?? envClient.NEXT_PUBLIC_LOCAL_MODE;
+  if (effectiveAdmin) {
+    if (envClient.NEXT_PUBLIC_LOCAL_MODE) {
+      return [
+        ...DEFAULT_TOOL_IDS_ADMIN,
+        ...LOCAL_ADMIN_EXTRA_TOOL_IDS.filter(Boolean),
+      ];
+    }
+    return DEFAULT_TOOL_IDS_ADMIN;
+  }
+  if (isCustomer) {
+    return DEFAULT_TOOL_IDS_CUSTOMER;
+  }
+  return DEFAULT_TOOL_IDS_PUBLIC;
 }

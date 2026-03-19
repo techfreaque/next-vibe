@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeOr } from "./repository";
+import { OrEvaluatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { signals } = data;
-      const result = computeOr(signals);
+      const result = OrEvaluatorRepository.computeOr(signals);
       return success({ result });
     },
   },

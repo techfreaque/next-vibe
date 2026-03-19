@@ -766,6 +766,26 @@ export type EmailStatsGetRequestTypeInput = typeof GET.types.RequestInput;
 export type EmailStatsGetRequestTypeOutput = typeof GET.types.RequestOutput;
 export type EmailStatsGetResponseTypeInput = typeof GET.types.ResponseInput;
 export type EmailStatsGetResponseTypeOutput = typeof GET.types.ResponseOutput;
+export type EmailStatsGroupedStats =
+  EmailStatsGetResponseTypeOutput["groupedStats"];
+export type EmailStatsByStatus = EmailStatsGroupedStats["byStatus"][number];
+export type EmailStatsByType = EmailStatsGroupedStats["byType"][number];
+export type EmailStatsByProvider = EmailStatsGroupedStats["byProvider"][number];
+export type EmailStatsByTemplate = EmailStatsGroupedStats["byTemplate"][number];
+export type EmailStatsByEngagement =
+  EmailStatsGroupedStats["byEngagement"][number];
+export type EmailStatsByRetryCount =
+  EmailStatsGroupedStats["byRetryCount"][number];
+export type EmailStatsByUserAssociation =
+  EmailStatsGroupedStats["byUserAssociation"][number];
+export type EmailStatsRecentActivity =
+  EmailStatsGetResponseTypeOutput["recentActivity"][number];
+export type EmailStatsTopPerformingTemplate =
+  EmailStatsGetResponseTypeOutput["topPerformingTemplates"][number];
+export type EmailStatsTopPerformingProvider =
+  EmailStatsGetResponseTypeOutput["topPerformingProviders"][number];
+export type EmailStatsHistoricalData =
+  EmailStatsGetResponseTypeOutput["historicalData"];
 
 /**
  * Export definitions

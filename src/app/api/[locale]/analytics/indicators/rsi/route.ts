@@ -11,14 +11,14 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import definitions from "./definition";
-import { computeRsi } from "./repository";
+import { RsiIndicatorRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: ({ data }) => {
       const { source, period, resolution, lookback } = data;
-      const result = computeRsi(source, period);
+      const result = RsiIndicatorRepository.computeRsi(source, period);
       return success({
         result,
         meta: {

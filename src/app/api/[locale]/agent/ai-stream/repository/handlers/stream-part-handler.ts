@@ -329,6 +329,7 @@ export class StreamPartHandler {
           isError: "isError" in part ? Boolean(part.isError) : false,
         },
         pendingToolMessage: pending,
+        streamContext,
         threadId,
         model,
         skill,

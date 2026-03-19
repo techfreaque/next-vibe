@@ -32,9 +32,7 @@ import type {
   FavoriteUpdateResponseOutput,
   FavoriteUpdateUrlVariablesOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type SingleFavoriteT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { FavoriteByIdT } from "./i18n";
 
 /**
  * Single Favorite Repository
@@ -47,7 +45,7 @@ export class SingleFavoriteRepository {
     urlPathParams: FavoriteGetUrlVariablesOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: SingleFavoriteT,
+    t: FavoriteByIdT,
     locale: CountryLanguage,
   ): Promise<ResponseType<FavoriteGetResponseOutput>> {
     const { t: charactersT } = charactersScopedTranslation.scopedT(locale);
@@ -166,7 +164,7 @@ export class SingleFavoriteRepository {
     urlPathParams: FavoriteUpdateUrlVariablesOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: SingleFavoriteT,
+    t: FavoriteByIdT,
     locale: CountryLanguage,
   ): Promise<ResponseType<FavoriteUpdateResponseOutput>> {
     const userId = user.id;
@@ -304,7 +302,7 @@ export class SingleFavoriteRepository {
     urlPathParams: FavoriteDeleteUrlVariablesOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: SingleFavoriteT,
+    t: FavoriteByIdT,
   ): Promise<ResponseType<FavoriteDeleteResponseOutput>> {
     const userId = user.id;
 

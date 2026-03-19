@@ -29,16 +29,14 @@ import type {
   MessengerAccountsListGETRequestOutput,
   MessengerAccountsListGETResponseOutput,
 } from "./definition";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { MessengerAccountsListT } from "./i18n";
 
 export class MessengerAccountsListRepository {
   static async listAccounts(
     data: MessengerAccountsListGETRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: MessengerAccountsListT,
   ): Promise<ResponseType<MessengerAccountsListGETResponseOutput>> {
     try {
       logger.info("Getting messenger accounts", { data, userId: user.id });

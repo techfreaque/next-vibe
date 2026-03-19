@@ -6,6 +6,7 @@ import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { ErrorResponseType } from "../../../../shared/types/response.schema";
+import { colors, maybeColorize, semantic } from "./colors";
 import { fileLog } from "./file-logger";
 
 /**
@@ -113,6 +114,32 @@ export function registerErrorSink(
  * Creates a logger instance for endpoint handlers
  * Provides pretty formatted logging with running time in seconds
  */
+/** Serialize debug metadata to a compact inline string */
+function serializeDebugMeta(meta: LoggerMetadata[]): string {
+  if (meta.length === 0) {
+    return "";
+  }
+  return ` ${meta
+    .map((m) => {
+      if (m === null || m === undefined) {
+        return "";
+      }
+      if (typeof m === "string") {
+        return m;
+      }
+      if (typeof m === "number" || typeof m === "boolean") {
+        return String(m);
+      }
+      try {
+        return JSON.stringify(m);
+      } catch {
+        return String(m);
+      }
+    })
+    .filter(Boolean)
+    .join(" ")}`;
+}
+
 export function createEndpointLogger(
   debugEnabled = false,
   startTime: number = Date.now(),
@@ -198,8 +225,11 @@ export function createEndpointLogger(
           const metadataObj = metadata.length > 0 ? { metadata } : undefined;
           writeToFile(`[DEBUG] ${formatMessage(message)}`, metadataObj);
         } else {
+          const meta = serializeDebugMeta(metadata);
+          const text = `${t(message as TranslationKey)}${meta}`;
+          const line = `${colors.dim}[${getTimePrefix()}]${colors.reset} ${maybeColorize(text, semantic.debug)}`;
           // oxlint-disable-next-line no-console
-          console.log(formatMessage(message), ...metadata);
+          console.log(line);
         }
       }
     },

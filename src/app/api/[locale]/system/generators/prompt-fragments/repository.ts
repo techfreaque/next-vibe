@@ -14,8 +14,6 @@
  *   module/system-prompt/client.ts   — React hook returning same data shape
  */
 
-/* eslint-disable i18next/no-literal-string */
-
 import "server-only";
 
 import { existsSync, readFileSync } from "node:fs";
@@ -41,9 +39,7 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
-import type { scopedTranslation } from "./i18n";
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+import type { GeneratorsPromptFragmentsT } from "./i18n";
 
 interface PromptFragmentsRequestType {
   outputFile: string;
@@ -90,11 +86,11 @@ interface FragmentEntry {
   hookExportName: string | null;
 }
 
-class PromptFragmentsGeneratorRepositoryImpl {
-  async generatePromptFragments(
+export class PromptFragmentsGeneratorRepository {
+  static async generatePromptFragments(
     data: PromptFragmentsRequestType,
     logger: EndpointLogger,
-    t: ModuleT,
+    t: GeneratorsPromptFragmentsT,
     liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<PromptFragmentsResponseType>> {
     const startTime = Date.now();
@@ -121,24 +117,31 @@ class PromptFragmentsGeneratorRepositoryImpl {
       logger.debug(`Found ${promptFiles.length} prompt fragment files`);
 
       // ── 2. Extract fragment data from each prompt.ts ──────────────────────
-      const fragments = await this.extractFragments(promptFiles, logger);
+      const fragments =
+        await PromptFragmentsGeneratorRepository.extractFragments(
+          promptFiles,
+          logger,
+        );
 
       logger.debug(
         `Extracted ${fragments.length} fragment IDs: ${fragments.map((f) => f.id).join(", ")}`,
       );
 
       // ── 3. Generate file content ─────────────────────────────────────────
-      const content = this.generateContent(fragments);
+      const content =
+        PromptFragmentsGeneratorRepository.generateContent(fragments);
       const serverOutputFile = outputFile.replace(
         /prompt-fragments\.ts$/,
         "prompt-fragments-server.ts",
       );
-      const serverContent = this.generateServerContent(fragments);
+      const serverContent =
+        PromptFragmentsGeneratorRepository.generateServerContent(fragments);
       const clientOutputFile = outputFile.replace(
         /prompt-fragments\.ts$/,
         "prompt-fragments-client.ts",
       );
-      const clientContent = this.generateClientContent(fragments);
+      const clientContent =
+        PromptFragmentsGeneratorRepository.generateClientContent(fragments);
 
       // ── 4. Write generated files ──────────────────────────────────────────
       await Promise.all([
@@ -181,7 +184,7 @@ class PromptFragmentsGeneratorRepositoryImpl {
   }
 
   /** Convert kebab-case fragment ID to camelCase variable name, e.g. "user-name" → "userName" */
-  private toCamel(id: string): string {
+  private static toCamel(id: string): string {
     return id.replace(/-([a-z])/g, (m) => m[1].toUpperCase());
   }
 
@@ -189,7 +192,7 @@ class PromptFragmentsGeneratorRepositoryImpl {
    * Import each prompt.ts file and extract the fragment ID(s) it exports.
    * Also reads client.ts (text-based) to find the hook export name.
    */
-  private async extractFragments(
+  private static async extractFragments(
     promptFiles: string[],
     logger: EndpointLogger,
   ): Promise<FragmentEntry[]> {
@@ -219,9 +222,6 @@ class PromptFragmentsGeneratorRepositoryImpl {
             const fragment = exported as AnyFragment;
             fragmentExportNames.push(exportName);
             idToExportName.set(fragment.id, exportName);
-            logger.debug(
-              `Found fragment "${fragment.id}" (${exportName}, ${fragment.placement}) from ${promptFile}`,
-            );
           }
         }
 
@@ -233,7 +233,8 @@ class PromptFragmentsGeneratorRepositoryImpl {
         }
 
         // Build @/ import paths, check file existence for server/client
-        const promptImportPath = this.toAbsoluteImportPath(promptFile);
+        const promptImportPath =
+          PromptFragmentsGeneratorRepository.toAbsoluteImportPath(promptFile);
         const serverFile = promptFile.replace(/\/prompt\.ts$/, "/server.ts");
         const clientFile = promptFile.replace(/\/prompt\.ts$/, "/client.ts");
         const serverImportPath = existsSync(serverFile)
@@ -245,12 +246,18 @@ class PromptFragmentsGeneratorRepositoryImpl {
 
         // Extract hook name from client.ts via text-based regex
         const hookExportName = clientImportPath
-          ? this.extractHookName(clientFile, logger)
+          ? PromptFragmentsGeneratorRepository.extractHookName(
+              clientFile,
+              logger,
+            )
           : null;
 
         // Extract server loader function name from server.ts via text-based regex
         const serverLoaderExportName = serverImportPath
-          ? this.extractServerLoaderName(serverFile, logger)
+          ? PromptFragmentsGeneratorRepository.extractServerLoaderName(
+              serverFile,
+              logger,
+            )
           : null;
 
         // One entry per fragment ID — each knows its own export name and placement
@@ -288,7 +295,7 @@ class PromptFragmentsGeneratorRepositoryImpl {
    * Extract the exported hook function name from a client.ts file using regex.
    * Looks for: export function useXxx or export const useXxx
    */
-  private extractHookName(
+  private static extractHookName(
     clientFile: string,
     logger: EndpointLogger,
   ): string | null {
@@ -310,7 +317,7 @@ class PromptFragmentsGeneratorRepositoryImpl {
    * Extract the exported server loader function name from a server.ts file using regex.
    * Looks for: export async function loadXxx or export function loadXxx
    */
-  private extractServerLoaderName(
+  private static extractServerLoaderName(
     serverFile: string,
     logger: EndpointLogger,
   ): string | null {
@@ -333,7 +340,7 @@ class PromptFragmentsGeneratorRepositoryImpl {
    * e.g. /home/.../src/app/api/[locale]/agent/chat/memories/system-prompt/prompt.ts
    *   → @/app/api/[locale]/agent/chat/memories/system-prompt/prompt
    */
-  private toAbsoluteImportPath(absPath: string): string {
+  private static toAbsoluteImportPath(absPath: string): string {
     const srcIndex = absPath.indexOf("/src/");
     if (srcIndex === -1) {
       return absPath.replace(/\.ts$/, "");
@@ -349,7 +356,7 @@ class PromptFragmentsGeneratorRepositoryImpl {
    *   useAllPromptFragmentsData(params) — calls every hook, returns Record<fragmentId, data>
    *   + re-exports all fragment objects (for use in hook.ts without individual imports)
    */
-  private generateClientContent(fragments: FragmentEntry[]): string {
+  private static generateClientContent(fragments: FragmentEntry[]): string {
     const header = generateFileHeader(
       "AUTO-GENERATED PROMPT FRAGMENTS CLIENT INDEX",
       "generators/prompt-fragments",
@@ -421,7 +428,7 @@ class PromptFragmentsGeneratorRepositoryImpl {
         }
         if (!seenBuilt.has(f.id)) {
           seenBuilt.add(f.id);
-          const camelId = this.toCamel(f.id);
+          const camelId = PromptFragmentsGeneratorRepository.toCamel(f.id);
           buildLines.push(
             `  const ${camelId}Built = ${f.ownExportName}.condition && !${f.ownExportName}.condition(${entry.dataVar}) ? null : ${f.ownExportName}.build(${entry.dataVar});`,
           );
@@ -433,7 +440,6 @@ class PromptFragmentsGeneratorRepositoryImpl {
     return `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 /* eslint-disable simple-import-sort/imports */
 
 "use client";
@@ -468,7 +474,7 @@ ${builtEntries.join("\n")}
 ${fragments
   .filter((f) => f.clientImportPath)
   .map((f) => {
-    const camel = this.toCamel(f.id);
+    const camel = PromptFragmentsGeneratorRepository.toCamel(f.id);
     return `  if (${camel}Built) { ${f.placement === "leading" ? "leading" : "trailing"}.push({ id: "${f.id}", priority: ${f.ownExportName}.priority, str: ${camel}Built }); }`;
   })
   .join("\n")}
@@ -483,7 +489,7 @@ ${fragments
    * Generate prompt-fragments.ts — isomorphic index with fragment IDs and getPromptFragment.
    * No server-only or client-only dependencies.
    */
-  private generateContent(fragments: FragmentEntry[]): string {
+  private static generateContent(fragments: FragmentEntry[]): string {
     const header = generateFileHeader(
       "AUTO-GENERATED PROMPT FRAGMENTS INDEX",
       "generators/prompt-fragments",
@@ -505,7 +511,6 @@ ${fragments
     return `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 /* eslint-disable simple-import-sort/imports */
 
 /**
@@ -539,7 +544,7 @@ ${allPromptCases.join("\n")}
    * Exports loadAllPromptFragments(params) that loads all fragment data in parallel
    * and builds leading/trailing arrays — mirrors useAllPromptFragments on the client.
    */
-  private generateServerContent(fragments: FragmentEntry[]): string {
+  private static generateServerContent(fragments: FragmentEntry[]): string {
     const header = generateFileHeader(
       "AUTO-GENERATED PROMPT FRAGMENTS SERVER INDEX",
       "generators/prompt-fragments",
@@ -615,7 +620,7 @@ ${allPromptCases.join("\n")}
           continue;
         }
         seenBuilt.add(f.id);
-        const camel = this.toCamel(f.id);
+        const camel = PromptFragmentsGeneratorRepository.toCamel(f.id);
         buildLines.push(
           `  const ${camel}Built = ${entry.dataVar} && (${f.ownExportName}.condition ? ${f.ownExportName}.condition(${entry.dataVar}) : true) ? ${f.ownExportName}.build(${entry.dataVar}) : null;`,
         );
@@ -626,7 +631,7 @@ ${allPromptCases.join("\n")}
     const pushLines = fragments
       .filter((f) => f.serverImportPath)
       .map((f) => {
-        const camel = this.toCamel(f.id);
+        const camel = PromptFragmentsGeneratorRepository.toCamel(f.id);
         return `  if (${camel}Built) { ${f.placement}.push({ id: "${f.id}", priority: ${f.ownExportName}.priority, str: ${camel}Built }); }`;
       })
       .join("\n");
@@ -634,7 +639,6 @@ ${allPromptCases.join("\n")}
     return `${header}
 
 /* eslint-disable prettier/prettier */
-/* eslint-disable i18next/no-literal-string */
 /* eslint-disable simple-import-sort/imports */
 
 import "server-only";
@@ -675,6 +679,3 @@ ${pushLines}
 `;
   }
 }
-
-export const promptFragmentsGeneratorRepository =
-  new PromptFragmentsGeneratorRepositoryImpl();

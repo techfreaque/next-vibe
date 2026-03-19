@@ -103,3 +103,5 @@ const { POST } = createEndpoint({
 
 export const endpoints = { POST };
 export default endpoints;
+
+export type TaskSyncPullPostResponseOutput = typeof POST.types.ResponseOutput;

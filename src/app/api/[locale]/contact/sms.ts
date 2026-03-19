@@ -18,7 +18,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as sendScopedTranslation } from "../messenger/send/i18n";
-import { smsServiceRepository } from "../messenger/sms-service/repository";
+import { SmsServiceRepository } from "../messenger/sms-service/repository";
 import { CampaignType } from "../messenger/accounts/enum";
 import type { ContactRequestOutput } from "./definition";
 import type { scopedTranslation } from "./i18n";
@@ -84,7 +84,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       const message = this.generateAdminNotificationMessage(contactData, t);
       const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
-      const smsResult = await smsServiceRepository.sendSms(
+      const smsResult = await SmsServiceRepository.sendSms(
         {
           to: adminPhone,
           message,
@@ -152,7 +152,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       const message = this.generateConfirmationMessage(contactData, t);
       const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
-      const smsResult = await smsServiceRepository.sendSms(
+      const smsResult = await SmsServiceRepository.sendSms(
         {
           to: userPhone,
           message,
