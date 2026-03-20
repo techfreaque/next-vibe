@@ -135,6 +135,11 @@ export const { GET } = createEndpoint({
         content: "get.response.hasMore.title",
         schema: z.boolean(),
       }),
+      unresolvedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.unresolvedCount.title",
+        schema: z.coerce.number(),
+      }),
     },
   }),
 
@@ -196,6 +201,7 @@ export const { GET } = createEndpoint({
         logs: [],
         totalCount: 0,
         hasMore: false,
+        unresolvedCount: 0,
       },
     },
   },

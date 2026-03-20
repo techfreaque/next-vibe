@@ -2395,7 +2395,6 @@ export class LeadsRepository {
         leadsToDelete: matchingLeads.length,
         scope,
         dryRun: false,
-        leadIds: matchingLeads.map((lead) => lead.id),
       });
 
       // Use transaction for batch delete

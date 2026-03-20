@@ -56,11 +56,6 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
-      friendlyName: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().nullable(),
-      }),
       remoteUrl: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -130,14 +125,12 @@ const { GET } = createEndpoint({
     responses: {
       connected: {
         isConnected: true,
-        friendlyName: "My Laptop",
         remoteUrl: "https://unbottled.ai",
         isActive: true,
         lastSyncedAt: "2026-03-01T12:00:00.000Z",
       },
       notConnected: {
         isConnected: false,
-        friendlyName: null,
         remoteUrl: null,
         isActive: null,
         lastSyncedAt: null,

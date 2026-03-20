@@ -36,9 +36,9 @@ import {
   type TaskOutputModeDB,
 } from "../enum";
 import { scopedTranslation } from "../i18n";
-import type { TaskSyncPullPostResponseOutput } from "./pull/definition";
 import type { JsonValue, NotificationTarget } from "../unified-runner/types";
 import type { SyncRequestOutput, SyncResponseOutput } from "./definition";
+import type { TaskSyncPullPostResponseOutput } from "./pull/definition";
 
 /**
  * Serialized cron task for sync payloads
@@ -348,21 +348,6 @@ export class TaskSyncRepository {
       const localInstanceId =
         RemoteConnectionRepository.deriveDefaultSelfInstanceId();
 
-      // Get our local friendly name for bidirectional name sync
-      let localFriendlyName: string | undefined;
-      try {
-        const { instanceIdentities: identitiesTable } =
-          await import("@/app/api/[locale]/user/remote-connection/db");
-        const [selfIdentity] = await db
-          .select({ friendlyName: identitiesTable.friendlyName })
-          .from(identitiesTable)
-          .where(eq(identitiesTable.isDefault, true))
-          .limit(1);
-        localFriendlyName = selfIdentity?.friendlyName;
-      } catch {
-        // Non-fatal
-      }
-
       // Get local capabilities version (build-time constant)
       const { CAPABILITIES_VERSION } =
         await import("@/app/api/[locale]/system/generated/remote-capabilities/version").catch(
@@ -453,25 +438,24 @@ export class TaskSyncRepository {
           // sent to cloud. On first sync it is null → send "none" (a non-empty sentinel)
           // so cloud's condition `if (data.capabilitiesJson)` fires and stores the caps.
           const body: Record<string, string> = {
-            instanceId: conn.instanceId,
+            // Tell the remote who we are — our own selfInstanceId
+            instanceId: conn.remoteInstanceId ?? localInstanceId,
             memoriesHash: localMemoriesHash,
             capabilitiesVersion: conn.capabilitiesVersion ?? "none",
             taskCursor,
-            ...(localFriendlyName ? { friendlyName: localFriendlyName } : {}),
           };
           if (capabilitiesJson !== undefined) {
             body.capabilitiesJson = capabilitiesJson;
           }
 
-          // Collect tasks this instance created that target the remote (outbound tasks).
-          // remoteInstanceId = what the remote calls itself; targetInstance must match that
-          // so remote's pulse picks them up.
-          if (conn.remoteInstanceId) {
+          // Collect tasks this instance created that target the remote.
+          // conn.instanceId = local label for the remote = remote's name in our tasks.
+          {
             const outbound = await db
               .select()
               .from(cronTasks)
               .where(
-                sql`${cronTasks.userId} = ${conn.userId} AND ${cronTasks.targetInstance} = ${conn.remoteInstanceId} AND ${cronTasks.lastExecutionStatus} IS NULL`,
+                sql`${cronTasks.userId} = ${conn.userId} AND ${cronTasks.targetInstance} = ${conn.instanceId} AND ${cronTasks.lastExecutionStatus} IS NULL`,
               )
               .limit(50);
             if (outbound.length > 0) {
@@ -491,10 +475,6 @@ export class TaskSyncRepository {
           });
 
           if (!response.ok) {
-            const responseBody = await response
-              .text()
-              .catch(() => "(unreadable)");
-
             // 401 — token expired. Mark connection inactive; user must reconnect.
             if (response.status === 401) {
               logger.warn(
@@ -513,7 +493,6 @@ export class TaskSyncRepository {
               logger.warn("Pull from remote failed", {
                 userId: conn.userId,
                 status: response.status,
-                body: responseBody,
               });
             }
             continue;
@@ -528,7 +507,6 @@ export class TaskSyncRepository {
               capabilities?: string | null;
               tasks?: string;
               memoriesSynced?: number;
-              remoteFriendlyName?: string | null;
               serverTime: string;
             };
           };
@@ -571,10 +549,6 @@ export class TaskSyncRepository {
               capabilities: caps,
               remoteMemoriesHash: data.remoteMemoriesHash,
               taskCursor: newTaskCursor,
-              // Store remote's friendly name for display
-              ...(data.remoteFriendlyName
-                ? { remoteFriendlyName: data.remoteFriendlyName }
-                : {}),
               // capabilitiesVersion on local side = last LOCAL version we sent to cloud.
               // After a successful send, record our LOCAL version so next pulse detects
               // changes (new local deploy → re-send). Don't store cloud's version here.
@@ -587,10 +561,6 @@ export class TaskSyncRepository {
             await RemoteRepo2.touchLastSynced(conn.userId, conn.instanceId, {
               remoteMemoriesHash: data.remoteMemoriesHash,
               taskCursor: newTaskCursor,
-              // Store remote's friendly name for display
-              ...(data.remoteFriendlyName
-                ? { remoteFriendlyName: data.remoteFriendlyName }
-                : {}),
               // If we sent caps, mark local version as sent regardless of cloud response
               ...(sendCapabilities
                 ? { capabilitiesVersion: CAPABILITIES_VERSION }
@@ -626,6 +596,7 @@ export class TaskSyncRepository {
             const nowAccessible = await RegisterRepo.checkDirectAccessibility(
               conn.localUrl,
               logger,
+              locale,
             );
             if (nowAccessible !== conn.isDirectlyAccessible) {
               await db
@@ -993,13 +964,6 @@ export class TaskSyncRepository {
 
     const instanceId = connRow?.instanceId ?? data.instanceId ?? "unknown";
 
-    // ── 0. Exchange friendly names (bidirectional name sync) ──────────────────
-    if (data.friendlyName && connRow) {
-      await RemoteRepoReport.touchLastSynced(user.id, instanceId, {
-        remoteFriendlyName: data.friendlyName,
-      });
-    }
-
     // ── 1. Process incoming capability snapshot (only if version changed) ──────
     let memoriesSynced = 0;
     if (data.capabilitiesJson) {
@@ -1143,26 +1107,6 @@ export class TaskSyncRepository {
       TaskSyncRepository.serializeForSync(t),
     );
 
-    // ── 6. Get our own friendly name for bidirectional sync ─────────────────────
-    let ownFriendlyName: string | null = null;
-    try {
-      const { instanceIdentities: identitiesTable } =
-        await import("@/app/api/[locale]/user/remote-connection/db");
-      const [selfIdentity] = await db
-        .select({ friendlyName: identitiesTable.friendlyName })
-        .from(identitiesTable)
-        .where(
-          and(
-            eq(identitiesTable.userId, user.id),
-            eq(identitiesTable.isDefault, true),
-          ),
-        )
-        .limit(1);
-      ownFriendlyName = selfIdentity?.friendlyName ?? null;
-    } catch {
-      // Non-fatal — identity may not exist yet
-    }
-
     return success({
       remoteMemoriesHash: ourMemoriesHash,
       memories: memoriesPayload,
@@ -1170,7 +1114,6 @@ export class TaskSyncRepository {
       capabilities: capabilitiesPayload,
       tasks: JSON.stringify(tasks),
       memoriesSynced,
-      remoteFriendlyName: ownFriendlyName,
       serverTime,
     });
   }

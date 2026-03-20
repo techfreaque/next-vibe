@@ -153,6 +153,12 @@ export const translations = {
           "Instance ID this task should run on. Leave empty to run only on the host instance.",
         placeholder: "e.g. hermes, thea-prod",
       },
+      lastExecutionStatus: {
+        label: "Execution Status",
+        description:
+          "Override the last execution status. Use to reset a stuck 'running' task.",
+        placeholder: "Select status",
+      },
     },
     response: {
       task: {

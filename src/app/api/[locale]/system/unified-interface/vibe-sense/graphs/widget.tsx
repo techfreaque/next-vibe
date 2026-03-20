@@ -22,17 +22,19 @@ import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetEndpointMutations,
+  useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
+import { GraphResolution } from "../enum";
 import type definition from "./definition";
 
 type GraphListResponseOutput = typeof definition.GET.types.ResponseOutput;
@@ -272,38 +274,18 @@ export function GraphListContainer({
   const navigation = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const endpointMutations = useWidgetEndpointMutations();
+  const form = useWidgetForm<typeof definition.GET>();
 
-  const [search, setSearch] = useState("");
+  const search = form?.watch("search") ?? "";
 
   const data = field.value;
   const isLoading = data === null || data === undefined;
   const isError = data !== null && data !== undefined && !data.graphs;
-  const isRefreshing = endpointMutations?.read?.isLoading ?? false;
+  const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
+  const isFetching = endpointMutations?.read?.isFetching ?? false;
+  const isRefreshing = isFetching;
 
   const graphs = useMemo(() => data?.graphs ?? [], [data?.graphs]);
-
-  // Sort newest first
-  const sortedGraphs = useMemo(
-    () =>
-      [...graphs].toSorted(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
-    [graphs],
-  );
-
-  const filteredGraphs = useMemo(() => {
-    if (!search.trim()) {
-      return sortedGraphs;
-    }
-    const q = search.toLowerCase();
-    return sortedGraphs.filter(
-      (g) =>
-        g.name.toLowerCase().includes(q) ||
-        g.slug.toLowerCase().includes(q) ||
-        (g.description ?? "").toLowerCase().includes(q),
-    );
-  }, [sortedGraphs, search]);
 
   const stats = useMemo(() => {
     const total = graphs.length;
@@ -322,6 +304,7 @@ export function GraphListContainer({
           await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/data/definition");
         navigation.push(dataDef.default.GET, {
           urlPathParams: { id: graph.id },
+          data: { resolution: GraphResolution.ONE_DAY },
         });
       })();
     },
@@ -475,39 +458,42 @@ export function GraphListContainer({
       )}
 
       {/* Search bar */}
-      {graphs.length > 0 && (
-        <Div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            value={search}
-            onChangeText={setSearch}
-            placeholder={t("widget.searchPlaceholder")}
-            className="pl-9 pr-9 h-9"
-          />
-          {search && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-              onClick={() => setSearch("")}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          )}
-        </Div>
-      )}
+      <Div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Input
+          value={search}
+          onChangeText={(v) => form?.setValue("search", v)}
+          placeholder={t("widget.searchPlaceholder")}
+          className="pl-9 pr-9 h-9"
+        />
+        {search && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+            onClick={() => form?.setValue("search", "")}
+          >
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        )}
+      </Div>
 
       {/* Graph grid or empty state */}
-      {filteredGraphs.length > 0 ? (
+      {graphs.length > 0 ? (
         <>
           {search && (
             <P className="text-xs text-muted-foreground">
-              {filteredGraphs.length} {t("widget.searchResults")} &ldquo;
+              {graphs.length} {t("widget.searchResults")} &ldquo;
               {search}&rdquo;
             </P>
           )}
-          <Div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredGraphs.map((graph) => (
+          <Div
+            className={cn(
+              "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4",
+              isFetching && !isLoadingFresh && "opacity-50 pointer-events-none",
+            )}
+          >
+            {graphs.map((graph) => (
               <GraphCard
                 key={graph.id}
                 graph={graph}
@@ -522,7 +508,7 @@ export function GraphListContainer({
       ) : (
         <EmptyState
           hasSearch={search.trim().length > 0}
-          onClear={() => setSearch("")}
+          onClear={() => form?.setValue("search", "")}
           onCreate={handleCreate}
           t={t}
         />

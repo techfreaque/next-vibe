@@ -176,18 +176,21 @@ export function loadEnvironment(): EnvironmentResult {
   // using PREVIEW_DB_PORT (default 5433) and PREVIEW_PORT (default 3001).
   // Must happen BEFORE the env singleton is created by defineEnv().
   //
-  // Only in development: production uses the real DATABASE_URL as-is.
+  // --local is an explicit override — always targets the local DB (5433) regardless
+  // of NODE_ENV. This allows MCP (NODE_ENV=production) to hit the local preview DB.
+  // Other triggers (build/start/rebuild) only apply in non-production to avoid
+  // accidentally switching a real prod server's DB.
   const args = process.argv.slice(2);
   const isProduction = process.env["NODE_ENV"] === "production";
+  const hasLocalFlag = args.includes("--preview") || args.includes("--local");
   const isPreviewMode =
-    !isProduction &&
-    (args.includes("--preview") ||
-      args.includes("--local") ||
-      args.includes(START_ALIAS) ||
-      args.includes(START_SERVER_ALIAS) ||
-      args.includes(BUILD_ALIAS) ||
-      args.includes(BUILD_SERVER_ALIAS) ||
-      args.includes(REBUILD_ALIAS));
+    hasLocalFlag ||
+    (!isProduction &&
+      (args.includes(START_ALIAS) ||
+        args.includes(START_SERVER_ALIAS) ||
+        args.includes(BUILD_ALIAS) ||
+        args.includes(BUILD_SERVER_ALIAS) ||
+        args.includes(REBUILD_ALIAS)));
 
   // Expose preview mode flag so tasks can distinguish vibe start from vibe dev.
   // Explicitly set to "false" when not in preview mode to clear any stale shell env.

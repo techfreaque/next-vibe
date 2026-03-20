@@ -3,7 +3,7 @@ import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/re
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 
 export interface RemoteInstancesData {
-  remoteConnections: Array<{ friendlyName: string; instanceId: string }>;
+  remoteConnections: Array<{ instanceId: string }>;
   instanceId?: string | null;
   knownInstanceIds?: string[];
   /** Whether the current user is an admin */
@@ -142,7 +142,7 @@ export const remoteInstancesFragment: SystemPromptFragment<RemoteInstancesData> 
 
       const lines = remoteConnections.map(
         (c) =>
-          `- "${c.friendlyName}" (id: "${c.instanceId}") — use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
+          `- "${c.instanceId}" — use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
       );
 
       return `## Remote Instances\n\nUser has ${remoteConnections.length} connected local instance${remoteConnections.length === 1 ? "" : "s"}:\n\n${lines.join("\n")}\n\nRemote tools use the same callbackMode system as local tools. Default is "wait" — the tool result arrives automatically once the remote instance finishes execution. No special handling needed.`;

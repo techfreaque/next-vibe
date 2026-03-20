@@ -42,9 +42,21 @@ const platform = {
 
 // Module registry for introspection
 export const envClientModules = {
-  env: { env: env_envClient, schema: env_envClientSchema, examples: envClientExamples },
-  contact: { env: contactClientEnv, schema: contactClientEnvSchema, examples: contactClientEnvExamples },
-  payment: { env: paymentClientEnv, schema: paymentClientEnvSchema, examples: paymentClientEnvExamples },
+  env: {
+    env: env_envClient,
+    schema: env_envClientSchema,
+    examples: envClientExamples,
+  },
+  contact: {
+    env: contactClientEnv,
+    schema: contactClientEnvSchema,
+    examples: contactClientEnvExamples,
+  },
+  payment: {
+    env: paymentClientEnv,
+    schema: paymentClientEnvSchema,
+    examples: paymentClientEnvExamples,
+  },
 } as const;
 
 // Export platform for external use

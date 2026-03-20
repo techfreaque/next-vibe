@@ -14,12 +14,13 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger, t }) =>
+    handler: ({ data, user, logger, t, locale }) =>
       RemoteConnectionRegisterRepository.registerLocalInstance(
         data,
         user,
         logger,
         t,
+        locale,
       ),
   },
 });

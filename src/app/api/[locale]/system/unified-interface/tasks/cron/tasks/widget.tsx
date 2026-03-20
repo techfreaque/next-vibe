@@ -1018,6 +1018,8 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             retries: task.retries ?? undefined,
             retryDelay: task.retryDelay ?? undefined,
           },
+          prefillFromGet: true,
+          getEndpoint: m.default.GET,
           popNavigationOnSuccess: 1,
         });
       })();

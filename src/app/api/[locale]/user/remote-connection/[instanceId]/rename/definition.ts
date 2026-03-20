@@ -50,14 +50,22 @@ const { PATCH } = createEndpoint({
         schema: z.string().min(1).max(32),
         hidden: true,
       }),
-      friendlyName: requestField(scopedTranslation, {
+      newInstanceId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "patch.friendlyName.label" as const,
-        description: "patch.friendlyName.description" as const,
-        placeholder: "patch.friendlyName.placeholder" as const,
+        label: "patch.newInstanceId.label" as const,
+        description: "patch.newInstanceId.description" as const,
+        placeholder: "patch.newInstanceId.placeholder" as const,
         columns: 12,
-        schema: z.string().min(1).max(64),
+        schema: z.string().min(1).max(32),
+      }),
+      propagate: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.newInstanceId.label" as const,
+        description: "patch.newInstanceId.description" as const,
+        hidden: true,
+        schema: z.boolean().optional().default(true),
       }),
       submitButton: widgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
@@ -142,7 +150,7 @@ const { PATCH } = createEndpoint({
                 ...prev.data,
                 connections: prev.data.connections.map((c) =>
                   c.instanceId === data.pathParams.instanceId
-                    ? { ...c, friendlyName: data.requestData.friendlyName }
+                    ? { ...c, instanceId: data.requestData.newInstanceId }
                     : c,
                 ),
               },
@@ -161,7 +169,7 @@ const { PATCH } = createEndpoint({
               success: true,
               data: {
                 ...prev.data,
-                friendlyName: data.requestData.friendlyName,
+                instanceId: data.requestData.newInstanceId,
               },
             };
           },
@@ -176,7 +184,7 @@ const { PATCH } = createEndpoint({
       default: { instanceId: "hermes" },
     },
     requests: {
-      default: { friendlyName: "My Work Laptop" },
+      default: { newInstanceId: "hermes-work" },
     },
     responses: {
       default: { updated: true },

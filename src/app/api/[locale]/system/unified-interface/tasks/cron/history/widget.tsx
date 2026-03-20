@@ -28,7 +28,6 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/react";
@@ -358,7 +357,6 @@ export function CronHistoryContainer({
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm();
-  const onSubmit = useWidgetOnSubmit();
 
   // expandedId: "<executionId>:<section>"
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -378,35 +376,14 @@ export function CronHistoryContainer({
     [value?.executions],
   );
 
-  const statusCounts = useMemo((): Record<StatusFilter, number> => {
-    const counts: Record<StatusFilter, number> = {
-      ALL: executions.length,
-      RUNNING: 0,
-      COMPLETED: 0,
-      FAILED: 0,
-      TIMEOUT: 0,
-      CANCELLED: 0,
-    };
-    for (const e of executions) {
-      if (e.status === CronTaskStatus.RUNNING) {
-        counts.RUNNING++;
-      } else if (e.status === CronTaskStatus.COMPLETED) {
-        counts.COMPLETED++;
-      } else if (
-        e.status === CronTaskStatus.FAILED ||
-        e.status === CronTaskStatus.ERROR ||
-        e.status === CronTaskStatus.TIMEOUT
-      ) {
-        counts.FAILED++;
-        if (e.status === CronTaskStatus.TIMEOUT) {
-          counts.TIMEOUT++;
-        }
-      } else if (e.status === CronTaskStatus.CANCELLED) {
-        counts.CANCELLED++;
-      }
-    }
-    return counts;
-  }, [executions]);
+  const statusCounts: Record<StatusFilter, number> = {
+    ALL: value?.statusCounts?.all ?? 0,
+    RUNNING: value?.statusCounts?.running ?? 0,
+    COMPLETED: value?.statusCounts?.completed ?? 0,
+    FAILED: value?.statusCounts?.failed ?? 0,
+    TIMEOUT: value?.statusCounts?.timeout ?? 0,
+    CANCELLED: value?.statusCounts?.cancelled ?? 0,
+  };
 
   const currentPage = Math.floor(offset / LIMIT) + 1;
   const totalPages = Math.ceil(totalCount / LIMIT) || 1;
@@ -414,13 +391,8 @@ export function CronHistoryContainer({
   const handlePageChange = useCallback(
     (newOffset: number): void => {
       form.setValue("offset", newOffset);
-      if (onSubmit) {
-        onSubmit();
-      } else {
-        endpointMutations?.read?.refetch?.();
-      }
     },
-    [form, onSubmit, endpointMutations],
+    [form],
   );
 
   const handleRefresh = useCallback((): void => {
@@ -453,9 +425,8 @@ export function CronHistoryContainer({
       const statusValue = filter === "ALL" ? "" : CronTaskStatus[filter];
       form.setValue("status", statusValue);
       setExpandedId(null);
-      endpointMutations?.read?.refetch?.();
     },
-    [form, endpointMutations],
+    [form],
   );
 
   const handleToggle = useCallback(

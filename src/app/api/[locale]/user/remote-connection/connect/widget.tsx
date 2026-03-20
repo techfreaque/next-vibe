@@ -32,7 +32,6 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/react";
 import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { UrlFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/url-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -105,20 +104,7 @@ export function RemoteConnectWidget({
             ))}
           </Div>
 
-          {/* Instance config — standard form fields (no credentials) */}
           <Div className="grid grid-cols-2 gap-4">
-            <Div className="col-span-1">
-              <TextFieldWidget
-                fieldName="instanceId"
-                field={field.children.instanceId}
-              />
-            </Div>
-            <Div className="col-span-1">
-              <TextFieldWidget
-                fieldName="friendlyName"
-                field={field.children.friendlyName}
-              />
-            </Div>
             <Div className="col-span-2">
               <UrlFieldWidget
                 fieldName="remoteUrl"

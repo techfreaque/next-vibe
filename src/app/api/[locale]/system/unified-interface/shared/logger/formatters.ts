@@ -71,7 +71,10 @@ export function formatSense(message: string, icon = "📊"): string {
  * Returns a function that accepts raw stdout/stderr chunks and returns the
  * formatted string ready for process.stdout.write().
  */
-export function createNextjsFormatter(): (chunk: string) => string {
+export function createNextjsFormatter(
+  internalPort: number,
+  publicPort: number,
+): (chunk: string) => string {
   const isProduction = process.env["NODE_ENV"] === "production";
 
   const getTimePrefix = (): string => {
@@ -84,7 +87,14 @@ export function createNextjsFormatter(): (chunk: string) => string {
   let lastPrefix = "";
 
   return (chunk: string): string => {
-    const lines = chunk.split("\n");
+    // Replace internal port with public port in Next.js output (proxy mode)
+    const normalized =
+      internalPort !== undefined &&
+      publicPort !== undefined &&
+      internalPort !== publicPort
+        ? chunk.replaceAll(String(internalPort), String(publicPort))
+        : chunk;
+    const lines = normalized.split("\n");
     const out: string[] = [];
 
     for (const raw of lines) {

@@ -63,6 +63,9 @@ export const translations = {
       hasMore: {
         title: "Has More",
       },
+      unresolvedCount: {
+        title: "Unresolved Count",
+      },
     },
     success: {
       title: "Logs Retrieved",

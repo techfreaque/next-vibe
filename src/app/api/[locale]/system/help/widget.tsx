@@ -7,29 +7,35 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Eye } from "next-vibe-ui/ui/icons/Eye";
 import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { Bot } from "next-vibe-ui/ui/icons/Bot";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
-import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
 import { Pre } from "next-vibe-ui/ui/pre";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { Switch } from "next-vibe-ui/ui/switch";
 import {
@@ -39,8 +45,11 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+
+import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
@@ -59,13 +68,13 @@ import {
 import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { Platform } from "../unified-interface/shared/types/platform";
 import type definition from "./definition";
 import type {
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
-import { Platform } from "../unified-interface/shared/types/platform";
 
 /**
  * Props for custom widget — follows the CustomWidgetProps pattern
@@ -114,21 +123,10 @@ function getSubcategory(toolName: string): string {
 
 // ─── Navigate to actual tool endpoint by toolName ───────────────────────────
 
-async function navigateToTool(
+async function navigateToLocalTool(
   toolName: string,
   navigate: ReturnType<typeof useWidgetNavigation>["push"],
 ): Promise<void> {
-  // Remote tools (instanceId__toolName) → navigate to execute-tool with toolName prefilled
-  if (toolName.includes("__")) {
-    const { getEndpoint } =
-      await import("@/app/api/[locale]/system/generated/endpoint");
-    const executeTool = await getEndpoint("execute-tool");
-    if (executeTool) {
-      navigate(executeTool, { data: { toolName } });
-    }
-    return;
-  }
-
   const { getEndpoint } =
     await import("@/app/api/[locale]/system/generated/endpoint");
   const endpointDef = await getEndpoint(toolName);
@@ -202,16 +200,16 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
   const searchQuery = form.watch("query") ?? "";
-  const setSearchQuery = useCallback(
-    (value: string) => {
-      form.setValue("query", value);
-    },
-    [form],
-  );
   const statsFilter = form.watch("statsFilter") ?? "pinned";
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
   );
+
+  // Vibe-frame overlay for remote tool execution
+  const [vibeFrame, setVibeFrame] = useState<{
+    serverUrl: string;
+    endpoint: string;
+  } | null>(null);
 
   const response = field.value;
   const availableTools: HelpToolMetadataSerialized[] = useMemo(
@@ -219,11 +217,12 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     [response],
   );
   const totalCount = response?.totalCount ?? 0;
+  const pinnedCount = response?.pinnedCount;
+  const allowedCount = response?.allowedCount;
   const categories = response?.categories ?? [];
   const hint = response?.hint;
 
   // Admin context from response
-  const isAdmin = response?.isAdmin ?? false;
   const currentPlatform = response?.currentPlatform;
   const currentEnv = response?.currentEnv;
 
@@ -239,16 +238,22 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
   // Instance switcher — fetch connected remote instances
   const activeInstanceId = form.watch("instanceId");
-  const connectionsState = useEndpoint(
-    remoteConnectionListDefinition,
-    {
+  const endpointOptions = useMemo(() => {
+    return {
       read: {
+        formOptions: {
+          defaultValues: { activeOnly: true },
+        },
         queryOptions: {
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000,
         },
       },
-    },
+    };
+  }, []);
+  const connectionsState = useEndpoint(
+    remoteConnectionListDefinition,
+    endpointOptions,
     logger,
     user,
   );
@@ -257,7 +262,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     if (!resp || resp.success !== true) {
       return [];
     }
-    return resp.data.connections.filter((c) => c.isActive);
+    return resp.data.connections;
   }, [connectionsState?.read?.response]);
 
   const effectiveEnabledTools = useMemo((): EnabledTool[] => {
@@ -273,31 +278,6 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     }));
   }, [enabledTools, availableTools, user]);
 
-  const filteredTools = useMemo((): HelpToolMetadataSerialized[] => {
-    const enabledIds = new Set(effectiveEnabledTools.map((et) => et.id));
-    const pinnedIds = new Set(
-      effectiveEnabledTools.filter((et) => et.pinned).map((et) => et.id),
-    );
-    let tools = availableTools;
-    if (statsFilter === "pinned") {
-      tools = tools.filter((tool) => pinnedIds.has(tool.id));
-    } else if (statsFilter === "allowed") {
-      tools = tools.filter((tool) => enabledIds.has(tool.id));
-    }
-    if (searchQuery.length === 0) {
-      return tools;
-    }
-    const query = searchQuery.toLowerCase();
-    return tools.filter(
-      (tool) =>
-        tool.name.toLowerCase().includes(query) ||
-        tool.description.toLowerCase().includes(query) ||
-        tool.category?.toLowerCase().includes(query) ||
-        tool.aliases?.some((a) => a.toLowerCase().includes(query)) ||
-        (tool.tags?.some((tag) => tag.toLowerCase().includes(query)) ?? false),
-    );
-  }, [availableTools, searchQuery, statsFilter, effectiveEnabledTools]);
-
   const toolsByCategory = useMemo(() => {
     const grouped: Record<
       string,
@@ -306,7 +286,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         subcategories: Record<string, HelpToolMetadataSerialized[]>;
       }
     > = {};
-    for (const tool of filteredTools) {
+    for (const tool of availableTools) {
       const category = tool.category;
       if (!grouped[category]) {
         grouped[category] = { tools: [], subcategories: {} };
@@ -319,26 +299,33 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       grouped[category].subcategories[subKey].push(tool);
     }
     return grouped;
-  }, [filteredTools]);
+  }, [availableTools]);
 
-  const stats = useMemo(() => {
-    const pinned = effectiveEnabledTools.filter((et) => et.pinned).length;
-    const enabled = effectiveEnabledTools.length;
-    return { pinned, enabled, total: totalCount };
-  }, [effectiveEnabledTools, totalCount]);
+  const stats = useMemo(
+    () => ({
+      pinned: pinnedCount ?? 0,
+      enabled: allowedCount ?? totalCount,
+      total: totalCount,
+    }),
+    [pinnedCount, allowedCount, totalCount],
+  );
 
   const allVisibleEnabled = useMemo(
     () =>
-      filteredTools.length > 0 &&
-      filteredTools.every((tool) =>
+      availableTools.length > 0 &&
+      availableTools.every((tool) =>
         effectiveEnabledTools.some((et) => et.id === tool.id),
       ),
-    [filteredTools, effectiveEnabledTools],
+    [availableTools, effectiveEnabledTools],
   );
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
   const handleToggleEnabled = (toolName: string): void => {
+    // Remote tools (instanceId__name) must not pollute local pinned settings
+    if (activeInstanceId) {
+      return;
+    }
     const existing = effectiveEnabledTools.find((et) => et.id === toolName);
     if (existing) {
       setEnabledTools(effectiveEnabledTools.filter((et) => et.id !== toolName));
@@ -356,6 +343,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   };
 
   const handleToggleActive = (toolName: string): void => {
+    if (activeInstanceId) {
+      return;
+    }
     setEnabledTools(
       effectiveEnabledTools.map((et) =>
         et.id === toolName ? { ...et, pinned: !et.pinned } : et,
@@ -364,6 +354,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   };
 
   const handleToggleConfirmation = (toolName: string): void => {
+    if (activeInstanceId) {
+      return;
+    }
     setEnabledTools(
       effectiveEnabledTools.map((et) =>
         et.id === toolName
@@ -374,7 +367,10 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   };
 
   const handleEnableAll = (): void => {
-    const allIds = filteredTools.map((tool) => tool.id);
+    if (activeInstanceId) {
+      return;
+    }
+    const allIds = availableTools.map((tool) => tool.id);
     const allEnabled = allIds.every((id) =>
       effectiveEnabledTools.some((et) => et.id === id),
     );
@@ -383,7 +379,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         effectiveEnabledTools.filter((et) => !allIds.includes(et.id)),
       );
     } else {
-      const toAdd = filteredTools
+      const toAdd = availableTools
         .filter(
           (tool) => !effectiveEnabledTools.some((et) => et.id === tool.id),
         )
@@ -433,9 +429,34 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     }
   };
 
-  const handleOpenTool = async (toolName: string): Promise<void> => {
-    await navigateToTool(toolName, navigate);
-  };
+  const handleOpenTool = useCallback(
+    async (toolName: string): Promise<void> => {
+      // Remote tool: instanceId__toolName → embed via vibe-frame if possible
+      const sepIdx = toolName.indexOf("__");
+      if (sepIdx !== -1) {
+        const instanceId = toolName.slice(0, sepIdx);
+        const bareToolName = toolName.slice(sepIdx + 2);
+        const conn = connectedInstances.find(
+          (c) => c.instanceId === instanceId,
+        );
+        const serverUrl = conn?.localUrl ?? conn?.remoteUrl;
+        if (serverUrl) {
+          setVibeFrame({ serverUrl, endpoint: bareToolName });
+          return;
+        }
+        // Fallback: no server URL known — navigate to execute-tool
+        const { getEndpoint } =
+          await import("@/app/api/[locale]/system/generated/endpoint");
+        const executeTool = await getEndpoint("execute-tool");
+        if (executeTool) {
+          navigate(executeTool, { data: { toolName } });
+        }
+        return;
+      }
+      await navigateToLocalTool(toolName, navigate);
+    },
+    [connectedInstances, navigate],
+  );
 
   const triggerRefetch = useCallback((): void => {
     if (onSubmit) {
@@ -445,9 +466,26 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     }
   }, [onSubmit, endpointMutations]);
 
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const setSearchQuery = useCallback(
+    (value: string) => {
+      form.setValue("query", value || undefined);
+      clearTimeout(searchDebounceRef.current);
+      searchDebounceRef.current = setTimeout(triggerRefetch, 400);
+    },
+    [form, triggerRefetch],
+  );
+
   const handleInstanceChange = useCallback(
     (instanceId: string | undefined): void => {
       form.setValue("instanceId", instanceId);
+      // Remote instance: send "all" so server skips pinned filtering on snapshot tools.
+      // Local: restore "pinned" default.
+      form.setValue("statsFilter", instanceId ? "all" : "pinned", {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
       setTimeout(triggerRefetch, 50);
     },
     [form, triggerRefetch],
@@ -464,6 +502,18 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const handleProdToggle = useCallback(
     (checked: boolean): void => {
       form.setValue("includeProdOnly", checked || undefined);
+      setTimeout(triggerRefetch, 50);
+    },
+    [form, triggerRefetch],
+  );
+
+  const handleStatsFilterChange = useCallback(
+    (filter: "pinned" | "allowed" | "all"): void => {
+      form.setValue("statsFilter", filter, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
       setTimeout(triggerRefetch, 50);
     },
     [form, triggerRefetch],
@@ -571,7 +621,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           variant="default"
           size="sm"
           onClick={(): void => {
-            void navigateToTool(tool.id, navigate);
+            void handleOpenTool(tool.id);
           }}
         >
           {t("get.fields.openTool.label")}
@@ -661,7 +711,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   return (
     <Div className="flex flex-col gap-0">
       {/* Admin Platform & Env Bar */}
-      {(isAdmin || isAdminUser) && (
+      {isAdminUser && (
         <Div className="px-4 pt-4 pb-2 flex flex-col gap-2">
           {/* Environment + Platform Info */}
           <Div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -685,26 +735,28 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
             )}
           </Div>
 
-          {/* Platform Tabs */}
-          <Div className="flex items-center gap-1">
-            {platformTabs
-
-              .map(({ key, label, icon }) => (
-                <Button
-                  key={key ?? "all"}
-                  variant={activePlatform === key ? "default" : "outline"}
-                  size="sm"
-                  className={cn(
-                    "h-7 text-xs gap-1.5 px-2.5",
-                    activePlatform === key &&
-                      "bg-primary text-primary-foreground",
-                  )}
-                  onClick={() => handlePlatformChange(key)}
-                >
-                  {icon}
-                  <Span>{label}</Span>
-                </Button>
-              ))}
+          {/* Platform Filter + Prod Toggle */}
+          <Div className="flex items-center gap-2">
+            <Select<Platform | "all">
+              value={activePlatform ?? "all"}
+              onValueChange={(v) =>
+                handlePlatformChange(v === "all" ? undefined : v)
+              }
+            >
+              <SelectTrigger className="h-7 text-xs w-36">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {platformTabs.map(({ key, label, icon }) => (
+                  <SelectItem key={key ?? "all"} value={key ?? "all"}>
+                    <Div className="flex items-center gap-1.5">
+                      {icon}
+                      <Span>{label}</Span>
+                    </Div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Dev/Prod Toggle (only visible in dev) */}
             {currentEnv === "development" && (
@@ -753,7 +805,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               onClick={() => handleInstanceChange(conn.instanceId)}
             >
               <Globe className="h-3 w-3" />
-              <Span>{conn.friendlyName}</Span>
+              <Span>{conn.instanceId}</Span>
               <Badge
                 variant="outline"
                 className={cn(
@@ -779,20 +831,24 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       <Div className="flex items-center gap-1.5 px-4 pt-4">
         {(
           [
+            ...(!user?.isPublic
+              ? [
+                  {
+                    key: "pinned" as const,
+                    icon: Eye,
+                    label: t("aiTools.modal.pinnedLabel"),
+                    count: stats.pinned,
+                  },
+                  {
+                    key: "allowed" as const,
+                    icon: Shield,
+                    label: t("aiTools.modal.enabledLabel"),
+                    count: stats.enabled,
+                  },
+                ]
+              : []),
             {
-              key: "pinned",
-              icon: Eye,
-              label: t("aiTools.modal.pinnedLabel"),
-              count: stats.pinned,
-            },
-            {
-              key: "allowed",
-              icon: Shield,
-              label: t("aiTools.modal.enabledLabel"),
-              count: stats.enabled,
-            },
-            {
-              key: "all",
+              key: "all" as const,
               icon: null,
               label: t("aiTools.modal.totalLabel"),
               count: stats.total,
@@ -804,13 +860,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() =>
-              form.setValue("statsFilter", key, {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-              })
-            }
+            onClick={() => handleStatsFilterChange(key)}
             className={cn(
               "h-7 px-2.5 gap-1.5 text-xs rounded-full transition-all border",
               statsFilter === key
@@ -840,7 +890,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           </Div>
 
           <Div className="flex gap-2">
-            {filteredTools.length > 0 && (
+            {availableTools.length > 0 && (
               <>
                 <Button
                   onClick={
@@ -902,15 +952,15 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         </Div>
 
         {/* Tools List */}
-        <Div
-          style={{
-            maxHeight: "45dvh",
-            overflowY: "auto",
-            paddingRight: "4px",
-            contain: "layout",
-          }}
-        >
-          {filteredTools.length === 0 ? (
+        <Div className="relative max-h-[45dvh] overflow-y-auto pr-1">
+          {endpointMutations?.read?.isLoading && (
+            <Div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-sm rounded-md">
+              <Span className="text-xs text-muted-foreground animate-pulse">
+                {t("aiTools.modal.loading")}
+              </Span>
+            </Div>
+          )}
+          {availableTools.length === 0 ? (
             <Div className="text-center py-8 text-muted-foreground text-sm">
               {searchQuery.length > 0
                 ? t("aiTools.modal.noToolsFound")
@@ -1065,6 +1115,33 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           </P>
         </Div>
       </Div>
+
+      {/* Vibe-frame overlay for remote tool execution */}
+      {vibeFrame && (
+        <Div className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm">
+          <Div className="flex items-center justify-between px-4 py-2 border-b shrink-0">
+            <Span className="text-sm font-medium text-muted-foreground font-mono">
+              {vibeFrame.endpoint}
+            </Span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() => setVibeFrame(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </Div>
+          <Div className="flex-1 overflow-auto">
+            <VibeFrameHost
+              serverUrl={vibeFrame.serverUrl}
+              endpoint={vibeFrame.endpoint}
+              locale={locale}
+              onClose={() => setVibeFrame(null)}
+            />
+          </Div>
+        </Div>
+      )}
     </Div>
   );
 }

@@ -1501,80 +1501,130 @@ function PaneDragHandle({
     <Div
       ref={handleElRef}
       role="separator"
-      className="h-[6px] shrink-0 cursor-row-resize flex items-center justify-center hover:bg-accent/50 transition-colors group"
+      className="h-[4px] shrink-0 cursor-row-resize relative overflow-visible bg-border/50 hover:bg-border transition-colors group"
     >
-      <Grip className="h-3 w-3 text-muted-foreground/40 group-hover:text-muted-foreground/80 transition-colors" />
+      <Grip className="h-3 w-3 text-muted-foreground/40 group-hover:text-muted-foreground/80 transition-colors absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2" />
     </Div>
   );
 }
 
 // ─── Responsive Resolution Picker ────────────────────────────────────────────
 
-const PILLS_MIN_WIDTH = 200;
+// Priority order for hiding: least important removed first.
+// 1m and 1M are trimmed before 3m and 1W, etc.
+const RESOLUTION_DROP_ORDER: Resolution[] = [
+  GraphResolution.ONE_MINUTE, // drop 1st — too granular for most use
+  GraphResolution.ONE_MONTH, // drop 2nd — too coarse for most use
+  GraphResolution.THREE_MINUTES,
+  GraphResolution.ONE_WEEK,
+  GraphResolution.FIVE_MINUTES,
+  GraphResolution.FOUR_HOURS,
+  GraphResolution.THIRTY_MINUTES,
+  GraphResolution.FIFTEEN_MINUTES,
+  // Last kept: 1H, 1D (most used)
+];
+
+// ~32px per pill; reserve ~28px for the overflow "chevron" button when needed.
+const PILL_WIDTH = 32;
+const OVERFLOW_BTN_WIDTH = 28;
+
+type ResolutionOption = (typeof RESOLUTION_OPTIONS)[number];
+
+function getVisibleOptions(
+  allOptions: readonly ResolutionOption[],
+  selectedValue: Resolution,
+  containerWidth: number,
+): {
+  visible: readonly ResolutionOption[];
+  hidden: readonly ResolutionOption[];
+} {
+  if (containerWidth >= allOptions.length * PILL_WIDTH) {
+    return { visible: allOptions, hidden: [] };
+  }
+
+  // Reserve space for overflow button
+  const maxFit = Math.max(
+    0,
+    Math.floor((containerWidth - OVERFLOW_BTN_WIDTH) / PILL_WIDTH),
+  );
+
+  if (maxFit === 0) {
+    return { visible: [], hidden: [...allOptions] };
+  }
+
+  const hiddenSet = new Set<Resolution>();
+  for (const res of RESOLUTION_DROP_ORDER) {
+    if (allOptions.length - hiddenSet.size <= maxFit) {
+      break;
+    }
+    if (res !== selectedValue) {
+      hiddenSet.add(res);
+    }
+  }
+
+  return {
+    visible: allOptions.filter((o) => !hiddenSet.has(o.value)),
+    hidden: allOptions.filter((o) => hiddenSet.has(o.value)),
+  };
+}
 
 function ResolutionPicker({
   value,
   onChange,
+  availableWidth,
 }: {
   value: Resolution;
   onChange: (r: Resolution) => void;
+  availableWidth: number;
 }): React.JSX.Element {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [collapsed, setCollapsed] = useState(false);
-  const [open, setOpen] = useState(false);
+  const overflowRef = useRef<HTMLDivElement>(null);
+  const [overflowOpen, setOverflowOpen] = useState(false);
 
   useEffect((): (() => void) => {
-    const el = containerRef.current;
-    if (!el) {
-      return (): void => undefined;
-    }
-    const obs = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width ?? PILLS_MIN_WIDTH + 1;
-      setCollapsed(width < PILLS_MIN_WIDTH);
-    });
-    obs.observe(el);
-    return (): void => obs.disconnect();
-  }, []);
-
-  useEffect((): (() => void) => {
-    if (!open) {
+    if (!overflowOpen) {
       return (): void => undefined;
     }
     const handler = (e: MouseEvent): void => {
-      if (!containerRef.current?.contains(e.target as Node)) {
-        setOpen(false);
+      if (!overflowRef.current?.contains(e.target as Node)) {
+        setOverflowOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return (): void => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  }, [overflowOpen]);
 
+  const { visible, hidden } = getVisibleOptions(
+    RESOLUTION_OPTIONS,
+    value,
+    availableWidth,
+  );
   const selected = RESOLUTION_OPTIONS.find((o) => o.value === value);
+  const popoverOptions = hidden.length > 0 ? hidden : RESOLUTION_OPTIONS;
 
   return (
-    <Div ref={containerRef} className="shrink-0">
-      {collapsed ? (
-        /* Dropdown mode */
-        <Div className="relative">
+    <Div className="flex items-center shrink-0">
+      {/* Full dropdown when nothing fits */}
+      {visible.length === 0 && (
+        <Div ref={overflowRef} className="relative">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setOpen((p) => !p)}
+            onClick={() => setOverflowOpen((p) => !p)}
             className="h-7 px-2 text-[11px] font-medium gap-1"
           >
             {selected?.label ?? value}
             <ChevronDown className="h-3 w-3 opacity-60" />
           </Button>
-          {open && (
+          {overflowOpen && (
             <Div className="absolute right-0 top-8 z-50 bg-popover border border-border rounded-lg shadow-lg overflow-hidden flex flex-col min-w-[80px]">
-              {RESOLUTION_OPTIONS.map((opt) => (
+              {popoverOptions.map((opt) => (
                 <Button
                   key={opt.value}
                   variant="ghost"
                   size="sm"
                   onClick={() => {
                     onChange(opt.value);
-                    setOpen(false);
+                    setOverflowOpen(false);
                   }}
                   className={cn(
                     "rounded-none h-8 px-3 text-[11px] justify-start font-medium",
@@ -1589,26 +1639,69 @@ function ResolutionPicker({
             </Div>
           )}
         </Div>
-      ) : (
-        /* Pill group mode */
-        <Div className="flex items-center gap-0 border rounded-lg overflow-hidden bg-muted/30">
-          {RESOLUTION_OPTIONS.map((opt) => (
-            <Button
-              key={opt.value}
-              variant="ghost"
-              size="sm"
-              onClick={() => onChange(opt.value)}
-              className={cn(
-                "h-7 px-2.5 text-[11px] font-medium rounded-none border-0 border-r last:border-0",
-                value === opt.value
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent",
+      )}
+
+      {/* Pill mode when there's enough space */}
+      {visible.length > 0 && (
+        <>
+          {/* Visible pills */}
+          <Div className="flex items-center gap-0 border rounded-lg overflow-hidden bg-muted/30">
+            {visible.map((opt) => (
+              <Button
+                key={opt.value}
+                variant="ghost"
+                size="sm"
+                onClick={() => onChange(opt.value)}
+                className={cn(
+                  "h-7 px-2.5 text-[11px] font-medium rounded-none border-0 border-r last:border-0",
+                  value === opt.value
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                )}
+              >
+                {opt.label}
+              </Button>
+            ))}
+          </Div>
+
+          {/* Overflow button — shows hidden resolutions in a popover */}
+          {hidden.length > 0 && (
+            <Div ref={overflowRef} className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setOverflowOpen((p) => !p)}
+                className="h-7 w-7 p-0 ml-0.5 text-muted-foreground hover:text-foreground"
+                title="More resolutions"
+              >
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+              {overflowOpen && (
+                <Div className="absolute right-0 top-8 z-50 bg-popover border border-border rounded-lg shadow-lg overflow-hidden flex flex-col min-w-[80px]">
+                  {hidden.map((opt) => (
+                    <Button
+                      key={opt.value}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        onChange(opt.value);
+                        setOverflowOpen(false);
+                      }}
+                      className={cn(
+                        "rounded-none h-8 px-3 text-[11px] justify-start font-medium",
+                        value === opt.value
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {opt.label}
+                    </Button>
+                  ))}
+                </Div>
               )}
-            >
-              {opt.label}
-            </Button>
-          ))}
-        </Div>
+            </Div>
+          )}
+        </>
       )}
     </Div>
   );
@@ -1648,6 +1741,22 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
   const lastCursorRef = useRef<string | undefined>(undefined);
   const lastResolutionRef = useRef<Resolution>(GraphResolution.ONE_DAY);
   const panBackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const [pickerAvailableWidth, setPickerAvailableWidth] = useState(9999);
+
+  useEffect((): (() => void) => {
+    const el = toolbarRef.current;
+    if (!el) {
+      return (): void => undefined;
+    }
+    const obs = new ResizeObserver((entries) => {
+      // Subtract fixed toolbar items: back+sep+name+badge (~240px) + actions (~130px) + gaps
+      const total = entries[0]?.contentRect.width ?? 9999;
+      setPickerAvailableWidth(Math.max(0, total - 370));
+    });
+    obs.observe(el);
+    return (): void => obs.disconnect();
+  }, []);
 
   const graph = field.value?.graph;
 
@@ -2074,9 +2183,12 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <Div className="flex flex-col h-[calc(100vh-120px)] min-h-[500px] border rounded-xl overflow-hidden bg-background shadow-sm">
+    <Div className="flex flex-col h-[calc(100vh-64px)] min-h-[500px] border rounded-xl overflow-hidden bg-background shadow-sm">
       {/* Toolbar */}
-      <Div className="flex items-center gap-2 px-3 h-11 border-b bg-background/95 shrink-0 overflow-hidden">
+      <Div
+        ref={toolbarRef}
+        className="flex items-center gap-2 px-3 h-11 border-b bg-background/95 shrink-0 relative"
+      >
         {/* Back */}
         <Button
           variant="ghost"
@@ -2154,6 +2266,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
         <ResolutionPicker
           value={resolution}
           onChange={handleResolutionChange}
+          availableWidth={pickerAvailableWidth}
         />
 
         {/* Action buttons */}

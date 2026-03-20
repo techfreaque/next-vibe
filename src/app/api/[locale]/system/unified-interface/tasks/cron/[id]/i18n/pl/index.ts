@@ -153,6 +153,12 @@ export const translations: typeof enTranslations = {
           "ID instancji, na której zadanie ma być uruchamiane. Pozostaw puste lub ustaw null dla wszystkich instancji.",
         placeholder: "np. hermes, thea-prod",
       },
+      lastExecutionStatus: {
+        label: "Status wykonania",
+        description:
+          "Nadpisz ostatni status wykonania. Użyj, aby zresetować zablokowane zadanie 'running'.",
+        placeholder: "Wybierz status",
+      },
     },
     response: {
       task: {

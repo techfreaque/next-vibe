@@ -9,6 +9,7 @@ import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { useMemo } from "react";
 
 import definitions from "../definition";
 
@@ -30,21 +31,23 @@ export function useMemories(
   logger: EndpointLogger,
 ): MemoriesEndpointReturn {
   const { enabled = true } = params;
-
-  return useEndpoint(
-    definitions,
-    {
+  const endpointOptions = useMemo(() => {
+    return {
       read: {
+        formOptions: {
+          autoSubmit: true,
+          debounceMs: 300,
+          persistForm: true,
+        },
         queryOptions: {
           enabled,
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000, // 5 minutes
         },
       },
-    },
-    logger,
-    user,
-  );
+    };
+  }, [enabled]);
+  return useEndpoint(definitions, endpointOptions, logger, user);
 }
 
 export type MemoriesEndpointReturn = EndpointReturn<typeof definitions>;

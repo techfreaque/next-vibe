@@ -155,8 +155,45 @@ function EditButton({
       const defs = await import("../[instanceId]/rename/definition");
       navigate(defs.default.PATCH, {
         urlPathParams: { instanceId: conn.instanceId },
-        data: { friendlyName: conn.friendlyName },
         popNavigationOnSuccess: 1,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Pencil className="h-4 w-4" />
+      )}
+    </Button>
+  );
+}
+
+function RenameSelfButton({
+  navigate,
+}: {
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+}): JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+    try {
+      const defs = await import("../self/rename/definition");
+      navigate(defs.default.PATCH, {
+        popNavigationOnSuccess: 1,
+        renderInModal: true,
       });
     } finally {
       setIsLoading(false);
@@ -249,9 +286,6 @@ function ConnectionRow({
       <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       <Div className="flex flex-col min-w-0 flex-1">
         <Div className="flex items-center gap-2">
-          <Span className="text-sm font-medium truncate">
-            {conn.friendlyName}
-          </Span>
           <Badge variant={badgeVariant} className="text-[10px]">
             {badge}
           </Badge>
@@ -489,14 +523,12 @@ function SyncSettingsCard({
 function LocalView({
   connections,
   selfInstanceId,
-  selfFriendlyName,
   syncEnabled,
   navigate,
   t,
 }: {
   connections: Connection[];
   selfInstanceId: string | null;
-  selfFriendlyName: string | null;
   syncEnabled: boolean | null;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
@@ -554,12 +586,10 @@ function LocalView({
                   </Badge>
                 </Div>
                 <CardDescription className="text-xs">
-                  {selfFriendlyName && selfFriendlyName !== selfInstanceId
-                    ? `${selfFriendlyName} — `
-                    : ""}
                   {t("widget.selfIdentity.description")}
                 </CardDescription>
               </Div>
+              <RenameSelfButton navigate={navigate} />
             </Div>
           </CardHeader>
         </Card>
@@ -617,7 +647,6 @@ export function RemoteConnectionsListContainer({
 
   const connections = field.value?.connections ?? [];
   const selfInstanceId = field.value?.selfInstanceId ?? null;
-  const selfFriendlyName = field.value?.selfFriendlyName ?? null;
   const syncEnabled = field.value?.syncEnabled ?? null;
   const isCloud = envClient.NEXT_PUBLIC_VIBE_IS_CLOUD;
 
@@ -629,7 +658,6 @@ export function RemoteConnectionsListContainer({
     <LocalView
       connections={connections}
       selfInstanceId={selfInstanceId}
-      selfFriendlyName={selfFriendlyName}
       syncEnabled={syncEnabled}
       navigate={navigate}
       t={t}

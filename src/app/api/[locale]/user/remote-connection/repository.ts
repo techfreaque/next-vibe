@@ -153,10 +153,9 @@ export class RemoteConnectionRepository {
   static async upsertInstanceIdentity(params: {
     userId: string;
     instanceId: string;
-    friendlyName: string;
     isDefault?: boolean;
   }): Promise<void> {
-    const { userId, instanceId, friendlyName, isDefault = false } = params;
+    const { userId, instanceId, isDefault = false } = params;
 
     if (isDefault) {
       await db
@@ -175,14 +174,12 @@ export class RemoteConnectionRepository {
       .values({
         userId,
         instanceId,
-        friendlyName,
         isDefault,
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
         target: [instanceIdentities.userId, instanceIdentities.instanceId],
         set: {
-          friendlyName,
           isDefault,
           updatedAt: new Date(),
         },
@@ -197,14 +194,7 @@ export class RemoteConnectionRepository {
    * For system-level code without a user (pulse, task-sync), use
    * deriveDefaultSelfInstanceId() directly instead.
    */
-  private static userInstanceIdCache = new Map<string, string>();
-
   static async getLocalInstanceId(userId: string): Promise<string> {
-    const cached = RemoteConnectionRepository.userInstanceIdCache.get(userId);
-    if (cached) {
-      return cached;
-    }
-
     const [row] = await db
       .select({ instanceId: instanceIdentities.instanceId })
       .from(instanceIdentities)
@@ -216,19 +206,10 @@ export class RemoteConnectionRepository {
       )
       .limit(1);
 
-    const result =
+    return (
       row?.instanceId ??
-      RemoteConnectionRepository.deriveDefaultSelfInstanceId();
-    RemoteConnectionRepository.userInstanceIdCache.set(userId, result);
-    return result;
-  }
-
-  static invalidateInstanceIdCache(userId?: string): void {
-    if (userId) {
-      RemoteConnectionRepository.userInstanceIdCache.delete(userId);
-    } else {
-      RemoteConnectionRepository.userInstanceIdCache.clear();
-    }
+      RemoteConnectionRepository.deriveDefaultSelfInstanceId()
+    );
   }
 
   // ─── Remote Connections ───────────────────────────────────────────────────────
@@ -247,8 +228,6 @@ export class RemoteConnectionRepository {
       isActive: boolean | null;
       lastSyncedAt: string | null;
       instanceId: string | null;
-      friendlyName: string | null;
-      remoteFriendlyName: string | null;
       healthStatus: ConnectionHealth | null;
     }>
   > {
@@ -275,8 +254,6 @@ export class RemoteConnectionRepository {
         isActive: null,
         lastSyncedAt: null,
         instanceId: null,
-        friendlyName: null,
-        remoteFriendlyName: null,
         healthStatus: null,
       });
     }
@@ -287,8 +264,6 @@ export class RemoteConnectionRepository {
       isActive: row.isActive,
       lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,
       instanceId: row.instanceId,
-      friendlyName: row.friendlyName,
-      remoteFriendlyName: row.remoteFriendlyName,
       healthStatus: RemoteConnectionRepository.getConnectionHealth(row),
     });
   }
@@ -303,9 +278,7 @@ export class RemoteConnectionRepository {
     token: string;
     leadId?: string;
     instanceId?: string;
-    friendlyName?: string;
     remoteInstanceId?: string;
-    remoteFriendlyName?: string;
     isDefault?: boolean;
     logger: EndpointLogger;
   }): Promise<ResponseType<ConnectToRemoteResult>> {
@@ -315,9 +288,7 @@ export class RemoteConnectionRepository {
       token,
       leadId,
       instanceId: rawInstanceId,
-      friendlyName,
       remoteInstanceId,
-      remoteFriendlyName,
       isDefault = false,
       logger,
     } = params;
@@ -361,9 +332,7 @@ export class RemoteConnectionRepository {
         token: encryptedToken,
         leadId: leadId ?? null,
         instanceId,
-        friendlyName: friendlyName ?? instanceId,
         remoteInstanceId: remoteInstanceId ?? null,
-        remoteFriendlyName: remoteFriendlyName ?? null,
         isActive: true,
         isDefault,
         updatedAt: new Date(),
@@ -374,9 +343,7 @@ export class RemoteConnectionRepository {
           remoteUrl,
           token: encryptedToken,
           leadId: leadId ?? null,
-          friendlyName: friendlyName ?? instanceId,
           remoteInstanceId: remoteInstanceId ?? null,
-          remoteFriendlyName: remoteFriendlyName ?? null,
           isActive: true,
           isDefault,
           updatedAt: new Date(),
@@ -414,7 +381,6 @@ export class RemoteConnectionRepository {
       });
     }
 
-    RemoteConnectionRepository.invalidateInstanceIdCache();
     logger.info("Cleared remote connection", { userId: user.id, instanceId });
     return success({ disconnected: true });
   }
@@ -473,7 +439,6 @@ export class RemoteConnectionRepository {
       token: string;
       leadId: string;
       instanceId: string;
-      friendlyName: string;
       memoriesHash: string | null;
       remoteMemoriesHash: string | null;
       capabilitiesVersion: string | null;
@@ -496,7 +461,6 @@ export class RemoteConnectionRepository {
         token: RemoteConnectionRepository.decryptToken(r.token),
         leadId: r.leadId ?? "",
         instanceId: r.instanceId,
-        friendlyName: r.friendlyName,
         memoriesHash: r.memoriesHash ?? null,
         remoteMemoriesHash: r.remoteMemoriesHash ?? null,
         capabilitiesVersion: r.capabilitiesVersion ?? null,
@@ -516,7 +480,6 @@ export class RemoteConnectionRepository {
       token: string;
       leadId: string;
       instanceId: string;
-      friendlyName: string;
       remoteInstanceId: string | null;
     }>
   > {
@@ -537,7 +500,6 @@ export class RemoteConnectionRepository {
         token: RemoteConnectionRepository.decryptToken(r.token),
         leadId: r.leadId ?? "",
         instanceId: r.instanceId,
-        friendlyName: r.friendlyName,
         remoteInstanceId: r.remoteInstanceId ?? null,
       }));
   }
@@ -593,7 +555,6 @@ export class RemoteConnectionRepository {
       capabilities?: RemoteToolCapability[];
       capabilitiesVersion?: string;
       remoteMemoriesHash?: string;
-      remoteFriendlyName?: string;
       taskCursor?: string;
       isActive?: boolean;
     },
@@ -611,9 +572,6 @@ export class RemoteConnectionRepository {
           : {}),
         ...(opts?.remoteMemoriesHash !== undefined
           ? { remoteMemoriesHash: opts.remoteMemoriesHash }
-          : {}),
-        ...(opts?.remoteFriendlyName !== undefined
-          ? { remoteFriendlyName: opts.remoteFriendlyName }
           : {}),
         ...(opts?.taskCursor !== undefined
           ? { taskCursor: opts.taskCursor }
@@ -657,6 +615,7 @@ export class RemoteConnectionRepository {
     /** Local instance URL — set on cloud-side records to push tasks/memories directly. */
     localUrl: string | null;
     token: string | null;
+    leadId: string | null;
   } | null> {
     const [row] = await db
       .select({
@@ -666,6 +625,7 @@ export class RemoteConnectionRepository {
         remoteUrl: remoteConnections.remoteUrl,
         localUrl: remoteConnections.localUrl,
         token: remoteConnections.token,
+        leadId: remoteConnections.leadId,
       })
       .from(remoteConnections)
       .where(
@@ -688,6 +648,49 @@ export class RemoteConnectionRepository {
       isDirectlyAccessible: row.isDirectlyAccessible,
       remoteUrl: row.remoteUrl,
       localUrl: row.localUrl,
+      leadId: row.leadId,
+      token: row.token
+        ? RemoteConnectionRepository.decryptToken(row.token)
+        : null,
+    };
+  }
+
+  /**
+   * Get connection info for a remote instance without requiring a specific userId.
+   * Used by CLI_AUTH_BYPASS / public contexts where userId is unavailable.
+   */
+  static async getConnectionAnyUser(instanceId: string): Promise<{
+    capabilities: RemoteToolCapability[] | null;
+    remoteUrl: string;
+    token: string | null;
+    leadId: string | null;
+  } | null> {
+    const [row] = await db
+      .select({
+        capabilities: remoteConnections.capabilities,
+        remoteUrl: remoteConnections.remoteUrl,
+        token: remoteConnections.token,
+        leadId: remoteConnections.leadId,
+      })
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.isActive, true),
+          or(
+            eq(remoteConnections.instanceId, instanceId),
+            eq(remoteConnections.remoteInstanceId, instanceId),
+          ),
+        ),
+      )
+      .limit(1);
+
+    if (!row) {
+      return null;
+    }
+    return {
+      capabilities: row.capabilities,
+      remoteUrl: row.remoteUrl,
+      leadId: row.leadId,
       token: row.token
         ? RemoteConnectionRepository.decryptToken(row.token)
         : null,

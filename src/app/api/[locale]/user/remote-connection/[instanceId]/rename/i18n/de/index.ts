@@ -13,10 +13,10 @@ export const translations: typeof enTranslations = {
       description: "Die umzubenennende Instanz",
       placeholder: "hermes",
     },
-    friendlyName: {
-      label: "Anzeigename",
-      description: "Ein lesbarer Name für diese Verbindung",
-      placeholder: "Mein Laptop",
+    newInstanceId: {
+      label: "Neue Instanz-ID",
+      description: "Der neue Bezeichner für diese Verbindung",
+      placeholder: "hermes-arbeit",
     },
     errors: {
       validation: {

@@ -343,7 +343,9 @@ export function LeadsListContainer({
   );
   const paginationInfo = field.value?.paginationInfo;
   const serverCountsByStatus = field.value?.countsByStatus;
-  const isLoading = field.value === null || field.value === undefined;
+  const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
+  const isFetching = endpointMutations?.read?.isFetching ?? false;
+  const isLoading = isLoadingFresh;
 
   // Status counts — from server (accurate across full DB, not just current page)
   const statusCounts = useMemo((): Partial<
@@ -627,6 +629,9 @@ export function LeadsListContainer({
             </Span>
           )}
         </Span>
+        {isFetching && !isLoadingFresh && (
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        )}
 
         {/* Spacer */}
         <Div className="flex-1" />
@@ -856,7 +861,12 @@ export function LeadsListContainer({
       )}
 
       {/* Lead list */}
-      <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-320px))]">
+      <Div
+        className={cn(
+          "px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-320px))]",
+          isFetching && !isLoadingFresh && "opacity-50 pointer-events-none",
+        )}
+      >
         {isLoading ? (
           <Div className="h-[300px] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

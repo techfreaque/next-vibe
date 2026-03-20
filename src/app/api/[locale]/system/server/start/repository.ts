@@ -19,7 +19,18 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createNextjsFormatter } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import {
+  createNextjsFormatter,
+  formatConfig,
+  formatDatabase,
+  formatDuration,
+  formatError,
+  formatHint,
+  formatSkip,
+  formatStartup,
+  formatTask,
+  formatWarning,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { WebSocketServerHandle } from "@/app/api/[locale]/system/unified-interface/websocket/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
@@ -27,8 +38,6 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
-import type { ServerStartT } from "./i18n";
-import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 import {
   cleanupPidFile,
   killPreviousInstance,
@@ -39,6 +48,8 @@ import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
+import type { ServerStartT } from "./i18n";
+import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 
 /**
  * Server Start Repository
@@ -109,6 +120,208 @@ export class ServerStartRepository {
     }
   }
 
+  private static log(msg: string): void {
+    // eslint-disable-next-line no-console
+    console.log(msg);
+  }
+
+  private static logStartupInfo(
+    port: number,
+    logger: EndpointLogger,
+    data: ServerStartRequestOutput,
+    runDb: boolean,
+    runTasks: boolean,
+    runSeed: boolean,
+    runNext: boolean,
+  ): void {
+    const currentEnv = process.env["NODE_ENV"] || "production";
+    const mode = data.mode ?? "all";
+    logger.vibe(
+      formatStartup(
+        data.tanstack
+          ? "Starting TanStack/Vite Production Server"
+          : "Starting Production Server",
+        "🚀",
+      ),
+    );
+    ServerStartRepository.log("");
+    ServerStartRepository.log(
+      `  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`,
+    );
+    ServerStartRepository.log(`  ${formatConfig("Env", currentEnv)}`);
+    ServerStartRepository.log(
+      `  ${formatConfig("Mode", mode)}  ${formatHint("(--mode=all|web|tasks)")}`,
+    );
+    ServerStartRepository.log("");
+    if (runDb) {
+      ServerStartRepository.log(
+        `  ${formatConfig("Database", "ENABLED")}  ${formatHint(`(${ServerStartRepository.maskDatabaseUrl(process.env["DATABASE_URL"])})`)}`,
+      );
+      ServerStartRepository.log(`    ${formatConfig("Migrations", "YES")}`);
+      ServerStartRepository.log(
+        `    ${formatConfig("Seeding", runSeed ? "YES" : "NO")}`,
+      );
+    } else {
+      ServerStartRepository.log(
+        `  ${formatConfig("Database", "DISABLED")}  ${formatHint(`(--mode=${mode})`)}`,
+      );
+    }
+    ServerStartRepository.log(
+      `  ${formatConfig("Task Runner", runTasks ? "ENABLED" : "DISABLED")}`,
+    );
+    ServerStartRepository.log(
+      `  ${formatConfig("Next.js", runNext ? "ENABLED" : "DISABLED")}`,
+    );
+    ServerStartRepository.log("");
+  }
+
+  private static async setupDatabase(
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    runSeed: boolean,
+  ): Promise<void> {
+    try {
+      const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
+      const { DbUtilsRepository } = await import("../../db/utils/repository");
+      const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
+        dbUtilsT,
+        logger,
+      );
+
+      if (!dockerCheckResult.success || !dockerCheckResult.data) {
+        logger.vibe(
+          formatWarning("Docker unavailable (continuing without managed DB)"),
+        );
+      } else {
+        const dbStart = Date.now();
+        const { DockerOperationsRepository } =
+          await import("../../db/utils/docker-operations/repository");
+        const { t: dockerOpsT } =
+          dockerOperationsScopedTranslation.scopedT(locale);
+        const dbStartResult = await DockerOperationsRepository.dockerComposeUp(
+          logger,
+          dockerOpsT,
+          "docker-compose.preview.yml",
+          60000,
+          "vibe-preview",
+        );
+
+        if (dbStartResult.success) {
+          logger.info(
+            formatDatabase(
+              `Started PostgreSQL using: 'docker-compose.preview.yml' (port ${process.env["PREVIEW_DB_PORT"] || "5433"}) in ${formatDuration(Date.now() - dbStart)}`,
+              "🐘",
+            ),
+          );
+        } else {
+          logger.vibe(formatWarning("PostgreSQL start failed, continuing"));
+          logger.warn("Failed to start preview postgres", {
+            error: dbStartResult.message,
+          });
+        }
+
+        await ServerStartRepository.waitForDatabaseConnection(logger);
+      }
+
+      // Run migrations
+      const migrateStart = Date.now();
+      try {
+        const migrateResult = execSync("bunx drizzle-kit migrate", {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: { ...process.env },
+        });
+        logger.debug("Migrations completed", { output: migrateResult.trim() });
+        logger.info(
+          formatDatabase(
+            `Migrations done in ${formatDuration(Date.now() - migrateStart)}`,
+            "🗄️ ",
+          ),
+        );
+      } catch (migrateError) {
+        const migrateMsg = parseError(migrateError).message;
+        logger.vibe(formatError(`Migration failed: ${migrateMsg}`));
+        logger.error("Migration failed during start", { error: migrateMsg });
+      }
+
+      // Deploy db-functions (idempotent — runs after every migration)
+      const { deployDbFunctions } =
+        await import("@/app/api/[locale]/system/db/db-functions/deploy");
+      await deployDbFunctions(logger);
+
+      // Seed database if enabled
+      if (runSeed) {
+        const { seedDatabase } =
+          await import("@/app/api/[locale]/system/db/seed/seed-manager");
+        await seedDatabase("prod", logger, locale);
+      } else {
+        logger.vibe(formatSkip("Database seeding skipped"));
+      }
+
+      logger.info(formatDatabase("Database ready", "🗄️ "));
+    } catch (error) {
+      const parsedError = parseError(error);
+      logger.vibe(formatError("Database setup failed (continuing anyway)"));
+      logger.error("Database setup error details", parsedError);
+    }
+  }
+
+  private static async startTaskRunnerIfEnabled(
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      logger.debug(formatTask("Starting task runner"));
+      const { UnifiedTaskRunnerRepository } =
+        await import("../../unified-interface/tasks/unified-runner/repository");
+
+      UnifiedTaskRunnerRepository.environment = "production";
+
+      // manageRunner("start") blocks forever — must NOT await
+      void UnifiedTaskRunnerRepository.manageRunner(
+        { action: "start", taskFilter: "cron", dryRun: false },
+        user,
+        locale,
+        logger,
+      ).catch((catchError) => {
+        logger.error("Task runner exited unexpectedly", {
+          error: parseError(catchError).message,
+        });
+      });
+
+      // Poll until running or timeout
+      const pollStart = Date.now();
+      const POLL_TIMEOUT_MS = 10_000;
+      const POLL_INTERVAL_MS = 200;
+      while (
+        !UnifiedTaskRunnerRepository.isRunning &&
+        Date.now() - pollStart < POLL_TIMEOUT_MS
+      ) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, POLL_INTERVAL_MS);
+        });
+      }
+
+      const status = UnifiedTaskRunnerRepository.getStatus();
+      if (status.running) {
+        ServerStartRepository.taskRunnerStarted = true;
+        logger.debug(formatTask("Task runner started"));
+      } else {
+        logger.vibe(
+          formatWarning("Task runner startup failed (continuing anyway)"),
+        );
+        logger.error("Task runner did not reach running state", {});
+      }
+    } catch (error) {
+      const parsedError = parseError(error);
+      logger.vibe(
+        formatWarning("Task runner startup failed (continuing anyway)"),
+      );
+      logger.error("Task runner startup error details", parsedError);
+    }
+  }
+
   static async startServer(
     data: ServerStartRequestOutput,
     user: JwtPayloadType,
@@ -116,9 +329,6 @@ export class ServerStartRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ServerStartResponseOutput>> {
     const { t } = serverStartScopedTranslation.scopedT(locale);
-    const startTime = Date.now();
-    const output: string[] = [];
-    const errors: string[] = [];
 
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
     const port =
@@ -136,596 +346,203 @@ export class ServerStartRepository {
     const runSeed = data.seed && (mode === "all" || mode === "tasks");
     const runNext = data.nextServer && (mode === "all" || mode === "web");
 
-    try {
-      output.push("🚀 Starting Vibe Production Server");
-      output.push(
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-      );
+    // Print config summary immediately, before any async work
+    ServerStartRepository.logStartupInfo(
+      port,
+      logger,
+      data,
+      runDb,
+      runTasks,
+      runSeed,
+      runNext,
+    );
 
-      // Ensure production environment (NODE_ENV should be set externally)
-      const currentEnv = process.env["NODE_ENV"] || "production";
-      output.push("🌍 Environment Setup");
-      output.push(`   ✅ Environment: ${currentEnv}`);
-      output.push(`   🌐 Target port: ${port}`);
+    // Kill any previous vibe start instance, then write our PID
+    killPreviousInstance(VIBE_START_PID_FILE, logger);
+    writePidFile(VIBE_START_PID_FILE, logger);
 
-      output.push(`   🔀 Mode: ${mode}`);
+    // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
+    const earlyExitHandler = (): void => {
+      cleanupPidFile(VIBE_START_PID_FILE);
+      process.exit(0);
+    };
+    process.on("SIGINT", earlyExitHandler);
+    process.on("SIGTERM", earlyExitHandler);
 
-      // Database setup FIRST — must happen before task runner so all DB
-      // connections (seeds, pulse) use the preview postgres.
-      if (runDb) {
-        output.push("");
-        output.push("🗄️  Database Setup");
+    // Setup database if enabled
+    if (runDb) {
+      await ServerStartRepository.setupDatabase(locale, logger, runSeed);
+    } else {
+      logger.vibe(formatSkip("Database setup skipped"));
+    }
 
-        // DATABASE_URL port was already swapped to PREVIEW_DB_PORT by the CLI
-        // environment loader (runtime/environment.ts) before any module loaded.
-        output.push(
-          `   🔗 Using preview DATABASE_URL: ${ServerStartRepository.maskDatabaseUrl(process.env["DATABASE_URL"])}`,
-        );
+    // Start task runner if enabled (non-blocking — fires before Next.js)
+    if (runTasks) {
+      void ServerStartRepository.startTaskRunnerIfEnabled(user, locale, logger);
+    } else {
+      logger.vibe(formatSkip("Task runner skipped"));
+    }
 
-        try {
-          // Dynamic import: must happen AFTER DATABASE_URL is set
-          const { DbUtilsRepository } =
-            await import("../../db/utils/repository");
-          const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
-          const dockerCheckResult = await DbUtilsRepository.isDockerAvailable(
-            dbUtilsT,
-            logger,
-          );
-
-          if (dockerCheckResult.success && dockerCheckResult.data) {
-            output.push(
-              "   🐘 Starting preview PostgreSQL (docker-compose.preview.yml)...",
-            );
-
-            const { DockerOperationsRepository } =
-              await import("../../db/utils/docker-operations/repository");
-            const { t: dockerOpsT } =
-              dockerOperationsScopedTranslation.scopedT(locale);
-            const dbStartResult =
-              await DockerOperationsRepository.dockerComposeUp(
-                logger,
-                dockerOpsT,
-                "docker-compose.preview.yml",
-                60000,
-                "vibe-preview",
-              );
-
-            if (dbStartResult.success) {
-              output.push(
-                `   ✅ Preview PostgreSQL started (port ${process.env["PREVIEW_DB_PORT"] || "5433"})`,
-              );
-            } else {
-              output.push(
-                "   ⚠️ Failed to start preview PostgreSQL, continuing anyway",
-              );
-              logger.warn("Failed to start preview postgres", {
-                error: dbStartResult.message,
-              });
-            }
-
-            // Wait for database to be ready
-            await ServerStartRepository.waitForDatabaseConnection(logger);
-          } else {
-            output.push(
-              "   ⚠️ Docker unavailable (continuing without managed DB)",
-            );
-          }
-
-          // Run migrations against the preview database
-          output.push("   🔄 Running database migrations...");
-          try {
-            const migrateResult = execSync("bunx drizzle-kit migrate", {
-              encoding: "utf-8",
-              cwd: process.cwd(),
-              env: { ...process.env },
-            });
-            logger.debug("Migrations completed", {
-              output: migrateResult.trim(),
-            });
-            output.push("   ✅ Database migrations completed");
-          } catch (migrateError) {
-            const migrateMsg = parseError(migrateError).message;
-            errors.push(`Migration failed: ${migrateMsg}`);
-            output.push(`   ❌ Migration failed: ${migrateMsg}`);
-            logger.error("Migration failed during start", {
-              error: migrateMsg,
-            });
-          }
-        } catch (error) {
-          const errorMsg = parseError(error).message;
-          output.push(`   ⚠️ Database setup failed: ${errorMsg}`);
-          logger.warn("Database setup failed, continuing anyway", {
-            error: errorMsg,
-          });
-        }
-      } else {
-        output.push("");
-        output.push("🗄️  Database Setup");
-        output.push(
-          `   ⏭️  Database setup skipped (${mode !== "all" ? `--mode=${mode}` : "--db-setup=false"})`,
-        );
-      }
-
-      // Deploy db-functions (idempotent — runs after every migration)
-      try {
-        const { deployDbFunctions } =
-          await import("@/app/api/[locale]/system/db/db-functions/deploy");
-        await deployDbFunctions(logger);
-      } catch (error) {
-        const errorMsg = parseError(error).message;
-        output.push(
-          `   \u26A0\uFE0F DB functions deployment failed: ${errorMsg}`,
-        );
-        logger.warn("DB functions deployment failed, continuing anyway", {
-          error: errorMsg,
-        });
-      }
-
-      output.push("");
-      output.push("📋 Task Runner Setup");
-
-      // Initialize single unified task runner for production environment
-      if (runTasks) {
-        logger.debug("Starting unified task runner for production");
-        output.push(
-          "   🔄 Initializing unified task runner for production environment...",
-        );
-
-        try {
-          // Import and start the unified task runner
-          const { UnifiedTaskRunnerRepository } =
-            await import("../../unified-interface/tasks/unified-runner/repository");
-
-          // Set environment to production
-          UnifiedTaskRunnerRepository.environment = "production";
-
-          // Start the task runner in the background - manageRunner("start") blocks forever,
-          // so we must NOT await it or Next.js will never start.
-          void UnifiedTaskRunnerRepository.manageRunner(
-            { action: "start", taskFilter: "cron", dryRun: false },
-            user,
-            locale,
-            logger,
-          ).catch((catchError) => {
-            logger.error("Task runner exited unexpectedly", {
-              error: parseError(catchError).message,
-            });
-          });
-
-          // Poll until running or timeout (imports + seed can take several seconds)
-          const pollStart = Date.now();
-          const POLL_TIMEOUT_MS = 10_000;
-          const POLL_INTERVAL_MS = 200;
-          while (
-            !UnifiedTaskRunnerRepository.isRunning &&
-            Date.now() - pollStart < POLL_TIMEOUT_MS
-          ) {
-            await new Promise<void>((resolve) => {
-              setTimeout(resolve, POLL_INTERVAL_MS);
-            });
-          }
-
-          const status = UnifiedTaskRunnerRepository.getStatus();
-          if (status.running) {
-            ServerStartRepository.taskRunnerStarted = true;
-            output.push("   ✅ Unified task runner started successfully");
-            output.push(
-              "   📊 Environment: production | Side tasks: disabled (cron only)",
-            );
-            logger.debug("Task runner started successfully", {
-              environment: "production",
-              supportsTaskRunners: false,
-            });
-          } else {
-            errors.push("Failed to start unified task runner");
-            output.push("   ❌ Failed to start unified task runner");
-            logger.error("Failed to start task runner", {
-              message: "Task runner did not reach running state",
-            });
-          }
-        } catch (error) {
-          const errorMsg = `Failed to initialize task runner: ${parseError(error).message}`;
-          errors.push(errorMsg);
-          output.push(`   ❌ Task runner initialization failed: ${errorMsg}`);
-          logger.error("Task runner initialization failed", {
-            error: errorMsg,
-          });
-        }
-      } else {
-        output.push(
-          `   ⏭️ Task runner skipped (${mode !== "all" ? `--mode=${mode}` : "--task-runner=false"})`,
-        );
-      }
-
-      if (runSeed) {
-        output.push("");
-        output.push("🌱 Database Seeding");
-
-        try {
-          const { seedDatabase } =
-            await import("@/app/api/[locale]/system/db/seed/seed-manager");
-          await seedDatabase("prod", logger, locale);
-          output.push("   ✅ Database seeding completed");
-        } catch (error) {
-          const errorMsg = `Failed to seed database: ${parseError(error).message}`;
-          errors.push(errorMsg);
-          output.push(`   ❌ ${errorMsg}`);
-        }
-      } else {
-        output.push("");
-        output.push("🌱 Database Seeding");
-        output.push("   ⏭️ Seeding skipped (--seed=false)");
-      }
-
-      // Load task registry and verify task runner system
-      if (runTasks && ServerStartRepository.taskRunnerStarted) {
-        output.push("");
-        output.push("📋 Task Registry & Runner System");
-
-        try {
-          output.push("   🔍 Loading production task registry...");
-
-          try {
-            // Import task registry (this will auto-generate if needed)
-            const { taskRegistry } =
-              await import("../../generated/tasks-index");
-
-            logger.debug("Task registry loaded successfully", {
-              cronTasks: taskRegistry.cronTasks.length,
-              taskRunners: taskRegistry.taskRunners.length,
-              totalTasks: taskRegistry.allTasks.length,
-            });
-
-            output.push(`   ✅ Task registry loaded successfully`);
-            output.push(
-              `   📊 Found ${taskRegistry.cronTasks.length} cron tasks (side tasks disabled in production)`,
-            );
-            output.push(
-              `   🎯 Total tasks available: ${taskRegistry.allTasks.length}`,
-            );
-
-            // Get task runner status
-            const { UnifiedTaskRunnerRepository } =
-              await import("../../unified-interface/tasks/unified-runner/repository");
-            const status = UnifiedTaskRunnerRepository.getStatus();
-
-            logger.debug("Task runner system operational", {
-              environment: "production",
-              running: status.running,
-              activeTasks: status.activeTasks.length,
-              supportsTaskRunners: false,
-            });
-
-            output.push("   ✅ Production task runner system is operational");
-            output.push(
-              `   🔄 Active cron tasks: ${status.activeTasks.length}`,
-            );
-          } catch (registryError) {
-            logger.warn(
-              "Task registry not available, task runner will start without tasks",
-              {
-                error: parseError(registryError).message,
-              },
-            );
-            output.push("   ⚠️ Task registry not available");
-            output.push("   🔄 Task runner starting without predefined tasks");
-          }
-        } catch (error) {
-          const errorMsg = `Failed to start production task runner: ${parseError(error).message}`;
-          errors.push(errorMsg);
-          output.push(`   ❌ Task runner system failed: ${errorMsg}`);
-        }
-      } else if (!runTasks) {
-        output.push("");
-        output.push("📋 Task Registry & Runner System");
-        output.push(
-          `   ⏭️ Task runner skipped (${mode !== "all" ? `--mode=${mode}` : "--task-runner=false"})`,
-        );
-      } else {
-        output.push("");
-        output.push("📋 Task Registry & Runner System");
-        output.push("   ❌ Task runner not initialized (startup failed)");
-      }
-
-      output.push("");
-      const serverLabel = data.tanstack
-        ? "TanStack/Vite Production Server"
-        : "Next.js Production Server";
-      output.push(`⚡ ${serverLabel}`);
-
-      if (runNext) {
-        if (data.tanstack) {
-          output.push("   🚀 Starting TanStack/Vite preview server...");
-          output.push(`   🌐 Target port: ${port}`);
-
-          try {
-            const tanstackResult =
-              await ServerStartRepository.startTanstackServer(port, logger, t);
-
-            if (tanstackResult.success) {
-              output.push(
-                "   ✅ TanStack/Vite preview server started successfully",
-              );
-              output.push(`   🌍 Server is live at http://localhost:${port}`);
-            } else {
-              errors.push("Failed to start TanStack/Vite preview server");
-              output.push("   ❌ Failed to start TanStack/Vite preview server");
-              if (tanstackResult.message) {
-                output.push(`   💡 Reason: ${tanstackResult.message}`);
-              }
-            }
-          } catch (error) {
-            const errorMsg = `Failed to start TanStack server: ${parseError(error).message}`;
-            errors.push(errorMsg);
-            output.push(`   ❌ TanStack server startup failed: ${errorMsg}`);
-            logger.error("TanStack server startup failed", { error: errorMsg });
-          }
-        } else {
-          output.push(
-            "   🚀 Starting Next.js production server in parallel...",
-          );
-          output.push(`   🌐 Target port: ${port}`);
-
-          try {
-            // Start Next.js production server as a child process
-            const nextServerResult =
-              await ServerStartRepository.startNextServer(
-                port,
-                logger,
-                t,
-                data.profile,
-              );
-
-            if (nextServerResult.success) {
-              output.push(
-                "   ✅ Next.js production server started successfully",
-              );
-              output.push(`   🌍 Server is live at http://localhost:${port}`);
-              output.push("   🏭 Production mode enabled");
-            } else {
-              errors.push("Failed to start Next.js production server");
-              output.push("   ❌ Failed to start Next.js production server");
-              if (nextServerResult.message) {
-                output.push(`   💡 Reason: ${nextServerResult.message}`);
-              }
-            }
-          } catch (error) {
-            const errorMsg = `Failed to start Next.js server: ${parseError(error).message}`;
-            errors.push(errorMsg);
-            output.push(`   ❌ Next.js server startup failed: ${errorMsg}`);
-            logger.error("Next.js server startup failed", { error: errorMsg });
-          }
-        }
-      } else {
-        output.push(
-          `   ⏭️ ${data.tanstack ? "TanStack" : "Next.js"} server skipped (${mode !== "all" ? `--mode=${mode}` : "--next-server=false"})`,
-        );
-      }
-
-      const duration = Date.now() - startTime;
-      const serverUrl = `http://localhost:${port}`;
-
-      // Add summary section
-      output.push("");
-      output.push(
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-      );
-      output.push("🎉 Production Server Setup Complete");
-      output.push("");
-
-      const runningServices = [];
-      if (ServerStartRepository.taskRunnerStarted) {
-        runningServices.push("unified-task-runner");
-      }
-      if (runNext && ServerStartRepository.nextServerProcess) {
-        runningServices.push(`next-server (HTTP on port ${port})`);
-      }
-      if (ServerStartRepository.wsServerHandle) {
-        runningServices.push(`ws-proxy (WebSocket on port ${port} at /ws)`);
-      }
-
-      if (runningServices.length > 0) {
-        output.push("✅ Running Services:");
-        runningServices.forEach((service) => {
-          output.push(`   • ${service}`);
-        });
-      }
-
-      if (errors.length > 0) {
-        output.push("");
-        output.push("❌ Issues:");
-        errors.forEach((error) => {
-          output.push(`   • ${error}`);
-        });
-      }
-
-      output.push("");
-      output.push(`🌐 Server URL: ${serverUrl}`);
-      output.push(`🏭 Environment: production`);
-      output.push(`⏱️  Setup time: ${(duration / 1000).toFixed(2)}s`);
-
-      if (errors.length === 0) {
-        output.push("");
-        output.push("🚀 Production server ready! 🎯");
-      } else {
-        output.push("");
-        output.push(`⚠️  Setup completed with ${errors.length} warning(s)`);
-      }
-
-      output.push(
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-      );
-      output.push("");
-      output.push("🔄 Production server is running...");
-      if (data.profile) {
-        output.push(
-          "🔬 Profiling active — press  p  to stop and open CPU profile",
-        );
-      }
-      output.push("💡 Press Ctrl+C to stop");
-      output.push("");
-
-      // Log the initial output using stdout for CLI display
-      process.stdout.write(`${output.join("\n")}\n`);
-
-      // Kill any previous vibe start instance, then write our PID
-      killPreviousInstance(VIBE_START_PID_FILE, logger);
-      writePidFile(VIBE_START_PID_FILE, logger);
-
-      // Set up signal handlers for graceful shutdown
-      const handleShutdown = (signal: string): void => {
-        process.stdout.write(
-          `\n🛑 Received ${signal}, shutting down gracefully...\n`,
-        );
+    // Start Next.js / TanStack and wait forever
+    if (!runNext) {
+      logger.vibe(formatSkip("Next.js server skipped"));
+      // Replace early exit handler with graceful shutdown
+      process.off("SIGINT", earlyExitHandler);
+      process.off("SIGTERM", earlyExitHandler);
+      const handleShutdown = (): void => {
         cleanupPidFile(VIBE_START_PID_FILE);
         ServerStartRepository.stopAllProcesses();
-        process.stdout.write("✅ All processes stopped. Goodbye! 👋\n");
         process.exit(0);
       };
+      process.on("SIGINT", handleShutdown);
+      process.on("SIGTERM", handleShutdown);
+      return await new Promise<never>(() => {
+        /* runs forever — only signal handlers exit */
+      });
+    }
 
-      process.on("SIGINT", () => handleShutdown("SIGINT"));
-      process.on("SIGTERM", () => handleShutdown("SIGTERM"));
-
-      // SIGUSR1: hot-restart server (triggered by `vibe rebuild`) — only when running Next.js
-      if (!runNext) {
-        logger.debug(
-          "SIGUSR1 handler not registered (Next.js not running in this mode)",
+    if (data.tanstack) {
+      try {
+        const tanstackResult = await ServerStartRepository.startTanstackServer(
+          port,
+          logger,
+          t,
         );
-      }
-      if (runNext) {
-        process.on("SIGUSR1", () => {
-          logger.info("Received SIGUSR1 — restarting server...");
-          process.stdout.write(
-            "\n🔄 SIGUSR1 received — restarting server...\n",
+        if (!tanstackResult.success) {
+          logger.vibe(
+            formatError(
+              `TanStack start failed: ${tanstackResult.message ?? "unknown error"}`,
+            ),
           );
+        }
+      } catch (error) {
+        const parsedError = parseError(error);
+        logger.vibe(
+          formatError(`TanStack startup failed: ${parsedError.message}`),
+        );
+        logger.error("TanStack server startup failed", parsedError);
+      }
+    } else {
+      try {
+        const nextServerResult = await ServerStartRepository.startNextServer(
+          port,
+          logger,
+          t,
+          data.profile,
+        );
+        if (!nextServerResult.success) {
+          logger.vibe(
+            formatError(
+              `Next.js start failed: ${nextServerResult.message ?? "unknown error"}`,
+            ),
+          );
+        }
+      } catch (error) {
+        const parsedError = parseError(error);
+        logger.vibe(
+          formatError(`Next.js startup failed: ${parsedError.message}`),
+        );
+        logger.error("Next.js server startup failed", parsedError);
+      }
+    }
 
-          // Stop old servers, then start new ones
-          if (ServerStartRepository.wsServerHandle) {
-            ServerStartRepository.wsServerHandle.stop();
-            ServerStartRepository.wsServerHandle = null;
-          }
-          if (
-            ServerStartRepository.nextServerProcess &&
-            !ServerStartRepository.nextServerProcess.killed
-          ) {
-            ServerStartRepository.nextServerProcess.kill("SIGTERM");
-            ServerStartRepository.nextServerProcess = null;
-          }
+    // Replace early exit handler with full graceful shutdown
+    process.off("SIGINT", earlyExitHandler);
+    process.off("SIGTERM", earlyExitHandler);
 
-          ServerStartRepository.startNextServer(port, logger, t, data.profile)
-            .then((result) => {
-              if (result.success) {
-                process.stdout.write("✅ Server restarted successfully\n");
-                logger.info("Server restarted via SIGUSR1");
+    const handleShutdown = (): void => {
+      cleanupPidFile(VIBE_START_PID_FILE);
+      ServerStartRepository.stopAllProcesses();
+      process.exit(0);
+    };
+
+    process.on("SIGINT", handleShutdown);
+    process.on("SIGTERM", handleShutdown);
+
+    // SIGUSR1: hot-restart Next.js (triggered by `vibe rebuild`)
+    process.on("SIGUSR1", () => {
+      logger.info("🔄 Received SIGUSR1 — restarting server...");
+
+      if (ServerStartRepository.wsServerHandle) {
+        ServerStartRepository.wsServerHandle.stop();
+        ServerStartRepository.wsServerHandle = null;
+      }
+      if (
+        ServerStartRepository.nextServerProcess &&
+        !ServerStartRepository.nextServerProcess.killed
+      ) {
+        ServerStartRepository.nextServerProcess.kill("SIGTERM");
+        ServerStartRepository.nextServerProcess = null;
+      }
+
+      ServerStartRepository.startNextServer(port, logger, t, data.profile)
+        .then((result) => {
+          if (result.success) {
+            logger.info("Server restarted via SIGUSR1");
+          } else {
+            logger.error("Server restart failed", { message: result.message });
+          }
+          return result;
+        })
+        .catch((error) => {
+          logger.error("Server restart error after SIGUSR1", {
+            error: parseError(error).message,
+          });
+        });
+    });
+
+    // Profiling keypress: 'p' → stop server and open CPU profile
+    if (data.profile && process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+      process.stdin.resume();
+      process.stdin.setEncoding("utf8");
+      process.stdin.on("data", (key: string) => {
+        if (key === "\u0003") {
+          handleShutdown();
+          return;
+        }
+        if (key === "p" || key === "P") {
+          process.stdout.write(
+            // eslint-disable-next-line i18next/no-literal-string
+            "\n⏹  Stopping server to collect CPU profile…\n",
+          );
+          cleanupPidFile(VIBE_START_PID_FILE);
+          ServerStartRepository.stopAllProcesses();
+
+          setTimeout((): void => {
+            void (async (): Promise<void> => {
+              const { default: open } = await import("open");
+              const { readdirSync } = await import("node:fs");
+              const { resolve } = await import("node:path");
+
+              const cpuProfiles = readdirSync(process.cwd()).filter(
+                (f: string) => f.endsWith(".cpuprofile"),
+              );
+              if (cpuProfiles.length > 0) {
+                const latest = cpuProfiles.toSorted().at(-1)!;
+                // eslint-disable-next-line i18next/no-literal-string
+                process.stdout.write(`🔥 Opening CPU profile: ${latest}\n`);
+                await open(resolve(latest));
               } else {
                 process.stdout.write(
-                  `❌ Server restart failed: ${result.message}\n`,
+                  // eslint-disable-next-line i18next/no-literal-string
+                  "⚠️  No .cpuprofile found — try running with --profile again\n",
                 );
-                logger.error("Server restart failed", {
-                  message: result.message,
-                });
               }
-              return result;
-            })
-            .catch((error) => {
-              logger.error("Server restart error after SIGUSR1", {
-                error: parseError(error).message,
-              });
-            });
-        });
-      }
 
-      // Profiling keypress: 'p' → stop server and open CPU profile
-      if (data.profile && process.stdin.isTTY) {
-        process.stdin.setRawMode(true);
-        process.stdin.resume();
-        process.stdin.setEncoding("utf8");
-        process.stdin.on("data", (key: string) => {
-          if (key === "\u0003") {
-            handleShutdown("SIGINT");
-            return;
-          }
-          if (key === "p" || key === "P") {
-            process.stdout.write(
               // eslint-disable-next-line i18next/no-literal-string
-              "\n⏹  Stopping server to collect CPU profile…\n",
-            );
-            cleanupPidFile(VIBE_START_PID_FILE);
-            ServerStartRepository.stopAllProcesses();
-
-            setTimeout((): void => {
-              void (async (): Promise<void> => {
-                const { default: open } = await import("open");
-                const { readdirSync } = await import("node:fs");
-                const { resolve } = await import("node:path");
-
-                const cpuProfiles = readdirSync(process.cwd()).filter(
-                  (f: string) => f.endsWith(".cpuprofile"),
-                );
-                if (cpuProfiles.length > 0) {
-                  const latest = cpuProfiles.toSorted().at(-1)!;
-                  // eslint-disable-next-line i18next/no-literal-string
-                  process.stdout.write(`🔥 Opening CPU profile: ${latest}\n`);
-                  await open(resolve(latest));
-                } else {
-                  process.stdout.write(
-                    // eslint-disable-next-line i18next/no-literal-string
-                    "⚠️  No .cpuprofile found — try running with --profile again\n",
-                  );
-                }
-
-                process.stdout.write(
-                  // eslint-disable-next-line i18next/no-literal-string
-                  "\n✅ Done. Goodbye!\n",
-                );
-                process.exit(0);
-              })();
-            }, 1500);
-          }
-        });
-      }
-
-      // Keep the process alive and log periodic status
-      let logCounter = 0;
-      setInterval(() => {
-        logCounter++;
-
-        // Log status every 60 seconds (production is less chatty)
-        if (logCounter % 60 === 0) {
-          const uptime = Math.floor((Date.now() - startTime) / 1000);
-          const minutes = Math.floor(uptime / 60);
-          const seconds = uptime % 60;
-
-          logger.info(
-            `Status: ${runningServices.length} services running | Uptime: ${minutes}m ${seconds}s`,
-          );
-
-          // The Bun server runs in-process, so it doesn't "die" like a child process.
-          // No restart watchdog needed — Bun.serve() is stable within the process.
+              process.stdout.write("\n✅ Done. Goodbye!\n");
+              process.exit(0);
+            })();
+          }, 1500);
         }
-      }, 1000);
-
-      // Never return - keep the process alive indefinitely
-      return await new Promise<never>(() => {
-        // This promise never resolves, keeping the API call alive
-        // The only way out is through signal handlers
       });
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      const parsedError = parseError(error);
-
-      errors.push(
-        `❌ Failed to start production server: ${parsedError.message}`,
-      );
-
-      logger.error("Production server startup failed", {
-        output: output.join("\n"),
-        error: parsedError.message,
-        duration: `${(duration / 1000).toFixed(2)}s`,
-      });
-
-      process.exit(1);
     }
+
+    // Keep the process alive indefinitely — only signal handlers exit
+    return await new Promise<never>(() => {
+      /* runs forever — only signal handlers exit */
+    });
   }
 
   /**
@@ -929,7 +746,8 @@ export class ServerStartRepository {
       ServerStartRepository.nextServerProcess = nextProcess;
 
       // Pipe Next.js output so crashes are never silent
-      const formatNextjs = createNextjsFormatter();
+      // Replace internal nextPort with public port in output (proxy mode)
+      const formatNextjs = createNextjsFormatter(nextPort, port);
       nextProcess.stdout?.on("data", (chunk: Buffer) => {
         process.stdout.write(formatNextjs(chunk.toString()));
       });
@@ -959,7 +777,6 @@ export class ServerStartRepository {
         logger,
       );
 
-      logger.info(`Next.js production server ready on port ${port}`);
       return success(undefined);
     } catch (error) {
       logger.error("Failed to start server", {

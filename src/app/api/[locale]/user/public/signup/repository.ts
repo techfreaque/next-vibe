@@ -178,6 +178,7 @@ export class SignupRepository {
         [user.leadId, ...linkedLeadIds],
         logger,
         creditsT,
+        locale,
       );
       let creditMergeFailed = false;
       if (!mergeResult.success) {

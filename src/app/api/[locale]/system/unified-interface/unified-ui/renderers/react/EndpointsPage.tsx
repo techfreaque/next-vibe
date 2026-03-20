@@ -597,6 +597,7 @@ function EndpointsPageInternal<
           },
           isLoading: endpointState.read.isLoading,
           isLoadingFresh: endpointState.read.isLoadingFresh,
+          isFetching: endpointState.read.isFetching,
         }
       : undefined,
   };

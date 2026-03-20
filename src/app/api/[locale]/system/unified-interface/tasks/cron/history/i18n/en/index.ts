@@ -85,6 +85,9 @@ export const translations = {
       hasMore: {
         title: "Has More Results",
       },
+      statusCounts: {
+        title: "Status Counts",
+      },
       summary: {
         title: "Execution Summary",
       },

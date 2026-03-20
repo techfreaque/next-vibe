@@ -16,20 +16,25 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type {
   RecentExecution,
   TaskSummaryItem,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
 import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
-import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
-import { scopedTranslation } from "../i18n";
 import type { TasksT } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { JsonValue } from "../unified-runner/types";
+import type {
+  CronTaskDeleteResponseOutput,
+  CronTaskGetResponseOutput,
+  CronTaskPutResponseOutput,
+} from "./[id]/definition";
 import type {
   CronTaskExecution,
   CronTaskRow,
@@ -37,11 +42,6 @@ import type {
   NewCronTaskExecution,
 } from "./db";
 import { cronTaskExecutions, cronTasks } from "./db";
-import type {
-  CronTaskDeleteResponseOutput,
-  CronTaskGetResponseOutput,
-  CronTaskPutResponseOutput,
-} from "./[id]/definition";
 import type { CronTaskResponseType as CronTaskResponse } from "./tasks/definition";
 
 /**
@@ -367,6 +367,14 @@ export class CronTasksRepository {
 
       // Only admins can set targetInstance — it controls cross-instance task routing
       if ("targetInstance" in updates && !isAdmin) {
+        return fail({
+          message: t("errors.repositoryUpdateTaskForbidden"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
+      // Only admins can override lastExecutionStatus — used to reset stuck RUNNING tasks
+      if (updates.lastExecutionStatus && !isAdmin) {
         return fail({
           message: t("errors.repositoryUpdateTaskForbidden"),
           errorType: ErrorResponseTypes.FORBIDDEN,

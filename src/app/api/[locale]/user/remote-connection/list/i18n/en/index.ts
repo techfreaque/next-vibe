@@ -6,6 +6,12 @@ export const translations = {
   get: {
     title: "Remote Connections",
     description: "List all remote connections for your account",
+    fields: {
+      activeOnly: {
+        label: "Active only",
+        description: "Only return active connections",
+      },
+    },
     errors: {
       validation: {
         title: "Validation Error",
@@ -58,7 +64,6 @@ export const translations = {
     connectButtonLocal: "Connect to Cloud",
     inactiveBadge: "Inactive",
     instanceId: "Instance ID",
-    friendlyName: "Name",
     remoteUrl: "Remote URL",
     viewButton: "View",
     editButton: "Rename",

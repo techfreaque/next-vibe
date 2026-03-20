@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -405,21 +405,35 @@ export class LeadsImportRepository {
     t: ImportT,
   ): Promise<ResponseType<ImportJobsStatusGetResponseOutput>> {
     try {
-      const conditions = [eq(csvImportJobs.uploadedBy, userId)];
+      const baseCondition = eq(csvImportJobs.uploadedBy, userId);
+      const conditions = [baseCondition];
       if (filters.status) {
         conditions.push(eq(csvImportJobs.status, filters.status));
       }
 
-      const jobs = await db
-        .select()
-        .from(csvImportJobs)
-        .where(and(...conditions))
-        .limit(filters.limit ?? 50)
-        .offset(filters.offset ?? 0)
-        .orderBy(sql`${csvImportJobs.createdAt} DESC`);
+      const [jobs, statusCountRows] = await Promise.all([
+        db
+          .select()
+          .from(csvImportJobs)
+          .where(and(...conditions))
+          .limit(filters.limit ?? 50)
+          .offset(filters.offset ?? 0)
+          .orderBy(sql`${csvImportJobs.createdAt} DESC`),
+        db
+          .select({ status: csvImportJobs.status, cnt: count() })
+          .from(csvImportJobs)
+          .where(baseCondition)
+          .groupBy(csvImportJobs.status),
+      ]);
+
+      const statusCounts: Record<string, number> = {};
+      for (const row of statusCountRows) {
+        statusCounts[row.status] = row.cnt;
+      }
 
       return success({
         jobs: {
+          statusCounts,
           items: jobs.map((job) => ({
             id: job.id,
             fileName: job.fileName,

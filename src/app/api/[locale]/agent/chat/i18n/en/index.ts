@@ -478,6 +478,8 @@ export const translations = {
       claudeHaiku45:
         "Claude Haiku 4.5 - Fast and efficient Claude model optimized for speed and cost-effectiveness",
       glm5: "GLM-5 - Z.AI's flagship open-source foundation model engineered for complex systems design and long-horizon agent workflows, rivaling leading closed-source models",
+      glm5Turbo:
+        "GLM-5 Turbo - Z.AI's next-generation model deeply optimized for agent-driven environments with fast inference, improved complex instruction decomposition, and extended task stability",
       glm46:
         "GLM-4 6B - Efficient Chinese-English bilingual AI model with strong general capabilities",
       glm47:
@@ -500,6 +502,8 @@ export const translations = {
         "Grok 4 - xAI's flagship reasoning model with vision and web search capabilities",
       grok4Fast:
         "Grok 4 Fast - xAI's high-speed model with 2M token context optimized for quick responses",
+      grok420Beta:
+        "Grok 4.20 Beta - xAI's newest flagship model with industry-leading speed, agentic tool calling, the lowest hallucination rate on the market, and 2M token context",
       gpt5Pro:
         "GPT-5 Pro - OpenAI's premium model with top-tier reasoning and advanced coding capabilities",
       gpt5Codex:
@@ -509,6 +513,10 @@ export const translations = {
       gpt51:
         "GPT 5.1 - OpenAI's efficient general-purpose model with strong reasoning and analysis",
       gpt5: "GPT-5 - OpenAI's flagship model with broad intelligence and versatile capabilities",
+      gpt54Mini:
+        "GPT-5.4 Mini - OpenAI's efficient GPT-5.4 variant optimized for high-throughput workloads with strong reasoning, coding, and tool use at reduced cost",
+      gpt54Nano:
+        "GPT-5.4 Nano - OpenAI's most lightweight and cost-efficient model optimized for speed-critical tasks such as classification, data extraction, and sub-agent execution",
       gpt5Mini:
         "GPT-5 Mini - OpenAI's lightweight fast model for quick everyday tasks",
       gpt5Nano:
@@ -517,6 +525,10 @@ export const translations = {
         "GPT-OSS 120B - OpenAI's open-source 120B parameter model with strong coding capabilities",
       kimiK2Thinking:
         "Kimi K2 Thinking - Kimi's reasoning-focused model with enhanced analytical and step-by-step thinking",
+      minimaxM27:
+        "MiniMax M2.7 - MiniMax's next-generation agentic model built for autonomous real-world productivity, multi-agent collaboration, and production workflows including code debugging, financial modeling, and document generation",
+      mimoV2Pro:
+        "MiMo V2 Pro - Xiaomi's flagship 1T+ parameter foundation model with 1M context, deeply optimized for agent orchestration, complex workflow automation, and production engineering tasks",
       glm45Air:
         "GLM 4.5 AIR - Z.AI's ultra-fast lightweight model for quick conversational interactions",
       glm45v:

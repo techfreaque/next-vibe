@@ -150,6 +150,18 @@ export const { GET } = createEndpoint({
         content: "get.response.totalCount.title",
         schema: z.coerce.number(),
       }),
+      statusCounts: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.statusCounts.title",
+        schema: z.object({
+          all: z.coerce.number(),
+          running: z.coerce.number(),
+          completed: z.coerce.number(),
+          failed: z.coerce.number(),
+          timeout: z.coerce.number(),
+          cancelled: z.coerce.number(),
+        }),
+      }),
       hasMore: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.hasMore.title",
@@ -226,6 +238,14 @@ export const { GET } = createEndpoint({
         executions: [],
         totalCount: 0,
         hasMore: false,
+        statusCounts: {
+          all: 0,
+          running: 0,
+          completed: 0,
+          failed: 0,
+          timeout: 0,
+          cancelled: 0,
+        },
         summary: {
           totalExecutions: 0,
           successfulExecutions: 0,
@@ -238,6 +258,14 @@ export const { GET } = createEndpoint({
         executions: [],
         totalCount: 0,
         hasMore: false,
+        statusCounts: {
+          all: 0,
+          running: 0,
+          completed: 0,
+          failed: 0,
+          timeout: 0,
+          cancelled: 0,
+        },
         summary: {
           totalExecutions: 0,
           successfulExecutions: 0,

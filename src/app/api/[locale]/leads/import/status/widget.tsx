@@ -370,7 +370,7 @@ export function ImportStatusContainer({
             {t(tab.key)}
             {tab.value !== null && (
               <Span className="ml-1 opacity-70">
-                ({allJobs.filter((j) => j.status === tab.value).length})
+                ({data?.jobs?.statusCounts?.[tab.value] ?? 0})
               </Span>
             )}
           </Button>

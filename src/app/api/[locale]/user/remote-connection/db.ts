@@ -74,9 +74,6 @@ export const instanceIdentities = pgTable(
     // Canonical identifier for this instance (e.g. "hermes", "thea")
     instanceId: text("instance_id").notNull(),
 
-    // Human-friendly display name (e.g. "Hermes Dev", "Thea Cloud")
-    friendlyName: text("friendly_name").notNull(),
-
     // Whether this is the default identity for this user
     isDefault: boolean("is_default").notNull().default(false),
 
@@ -126,9 +123,6 @@ export const remoteConnections = pgTable(
     // Local label for the remote (e.g. "thea" when hermes connects to thea)
     instanceId: text("instance_id").notNull(),
 
-    // User-chosen friendly display name for this connection
-    friendlyName: text("friendly_name").notNull(),
-
     // Remote instance URL (e.g. "https://unbottled.ai")
     remoteUrl: text("remote_url").notNull(),
 
@@ -143,9 +137,6 @@ export const remoteConnections = pgTable(
 
     // The instanceId the remote uses to identify itself (from register endpoint)
     remoteInstanceId: text("remote_instance_id"),
-
-    // What the remote calls itself — synced bidirectionally
-    remoteFriendlyName: text("remote_friendly_name"),
 
     // Whether the local instance is directly reachable via HTTP (not behind NAT).
     // Set at connect time by pinging localUrl; re-checked on each sync.

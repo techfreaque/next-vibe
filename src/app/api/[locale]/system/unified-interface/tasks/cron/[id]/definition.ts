@@ -14,6 +14,7 @@ import {
   requestUrlPathParamsField,
   responseField,
   submitButton,
+  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -26,6 +27,8 @@ import {
   CronTaskPriority,
   CronTaskPriorityDB,
   CronTaskPriorityOptions,
+  CronTaskStatusDB,
+  CronTaskStatusOptions,
   TaskCategory,
   TaskOutputModeDB,
   TaskOutputModeOptions,
@@ -226,6 +229,12 @@ const { PUT } = createEndpoint({
         },
       }),
 
+      formAlert: widgetField(scopedTranslation, {
+        type: WidgetType.FORM_ALERT,
+        order: 3.5,
+        usage: { request: "data&urlPathParams" },
+      }),
+
       // URL parameter
       id: requestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -362,6 +371,17 @@ const { PUT } = createEndpoint({
         placeholder: "put.fields.targetInstance.placeholder",
         columns: 6,
         schema: z.string().nullable().optional(),
+      }),
+
+      lastExecutionStatus: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "put.fields.lastExecutionStatus.label",
+        description: "put.fields.lastExecutionStatus.description",
+        placeholder: "put.fields.lastExecutionStatus.placeholder",
+        options: CronTaskStatusOptions,
+        columns: 6,
+        schema: z.enum(CronTaskStatusDB).nullable().optional(),
       }),
 
       // Response fields

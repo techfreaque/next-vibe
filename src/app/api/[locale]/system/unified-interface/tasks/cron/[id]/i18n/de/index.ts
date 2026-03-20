@@ -154,6 +154,12 @@ export const translations: typeof enTranslations = {
           "Instanz-ID, auf der diese Aufgabe ausgeführt werden soll. Leer lassen oder null setzen für alle Instanzen.",
         placeholder: "z.B. hermes, thea-prod",
       },
+      lastExecutionStatus: {
+        label: "Ausführungsstatus",
+        description:
+          "Letzten Ausführungsstatus überschreiben. Verwenden zum Zurücksetzen einer feststeckenden 'laufenden' Aufgabe.",
+        placeholder: "Status auswählen",
+      },
     },
     response: {
       task: {

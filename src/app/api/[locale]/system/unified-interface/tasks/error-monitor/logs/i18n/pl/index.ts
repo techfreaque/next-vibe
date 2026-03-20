@@ -65,6 +65,9 @@ export const translations: typeof en = {
       hasMore: {
         title: "Jest więcej",
       },
+      unresolvedCount: {
+        title: "Nierozwiązane błędy",
+      },
     },
     success: {
       title: "Logi pobrane",

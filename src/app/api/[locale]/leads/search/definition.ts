@@ -25,7 +25,12 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { Countries, Languages } from "@/i18n/core/config";
 
 import { dateSchema } from "../../shared/types/common.schema";
-import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
+import {
+  EmailCampaignStage,
+  LeadSource,
+  LeadStatus,
+  LeadStatusDB,
+} from "../enum";
 import { scopedTranslation } from "./i18n";
 import { LeadsSearchContainer } from "./widget";
 
@@ -89,6 +94,14 @@ const { GET } = createEndpoint({
         columns: 6,
         placeholder: "get.search.placeholder",
         schema: z.string().optional(),
+      }),
+      status: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.status.label",
+        description: "get.status.description",
+        columns: 6,
+        schema: z.enum(LeadStatusDB).optional(),
       }),
       limit: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

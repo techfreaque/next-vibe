@@ -39,14 +39,6 @@ interface WidgetProps {
   } & (typeof definition.GET)["fields"];
 }
 
-// ─── Campaign task IDs to highlight ──────────────────────────────────────────
-
-const CAMPAIGN_TASK_IDS = [
-  "campaign-starter",
-  "email-campaigns",
-  "bounce-processor",
-];
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(s: string | null | undefined): string {
@@ -350,13 +342,8 @@ export function CronDashboardContainer({
     [navigate],
   );
 
-  const campaignTasks = useMemo(
-    () =>
-      (data?.tasks ?? []).filter((task) => CAMPAIGN_TASK_IDS.includes(task.id)),
-    [data?.tasks],
-  );
-
-  const allTasks = useMemo(() => data?.tasks ?? [], [data?.tasks]);
+  const campaignTasks = data?.campaignTasks ?? [];
+  const allTasks = data?.tasks ?? [];
   const alerts: Alert[] = useMemo(() => data?.alerts ?? [], [data?.alerts]);
   const stats: Stats | null = data?.stats ?? null;
 
@@ -470,11 +457,9 @@ export function CronDashboardContainer({
           ) : (
             /* Fallback: show all tasks if campaign-specific ones not present */
             <Div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {allTasks
-                .filter((task) => !task.hidden)
-                .map((task) => (
-                  <TaskCard key={task.id} task={task} t={t} onRun={handleRun} />
-                ))}
+              {allTasks.map((task) => (
+                <TaskCard key={task.id} task={task} t={t} onRun={handleRun} />
+              ))}
             </Div>
           )}
         </Div>

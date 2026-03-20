@@ -18,11 +18,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { defaultLocale } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../config";
-import type { MemoriesListResponseOutput } from "./definition";
-import type { MemoryAddResponseOutput } from "./create/definition";
 import type { MemoryUpdateResponseOutput } from "./[id]/definition";
 import type { MemoryByIdT } from "./[id]/i18n";
+import type { MemoryAddResponseOutput } from "./create/definition";
 import { memories, type Memory } from "./db";
+import type { MemoriesListResponseOutput } from "./definition";
 import { formatMemorySummary } from "./formatter";
 
 export class MemoriesRepository {
@@ -92,14 +92,35 @@ export class MemoriesRepository {
     userId: string;
     logger: EndpointLogger;
     rootFolderId: DefaultFolderId;
+    search: string | undefined;
+    tag: string | undefined;
   }): Promise<ResponseType<MemoriesListResponseOutput>> {
-    const { userId, logger, rootFolderId } = params;
+    const { userId, logger, rootFolderId, search, tag } = params;
 
-    const result = await MemoriesRepository.getMemoriesList({
-      userId,
-      logger,
-      rootFolderId,
-    });
+    const baseConditions = [
+      eq(memories.userId, userId),
+      eq(memories.isArchived, false),
+    ];
+    const publicOnly =
+      rootFolderId === DefaultFolderId.PUBLIC ||
+      rootFolderId === DefaultFolderId.SHARED;
+    if (publicOnly) {
+      baseConditions.push(eq(memories.isPublic, true));
+    }
+    if (search) {
+      baseConditions.push(ilike(memories.content, `%${search}%`));
+    }
+    if (tag) {
+      baseConditions.push(
+        sql`${memories.tags} @> ${JSON.stringify([tag])}::jsonb`,
+      );
+    }
+
+    const result = await db
+      .select()
+      .from(memories)
+      .where(and(...baseConditions))
+      .orderBy(desc(memories.priority), memories.id);
 
     logger.info("Retrieved memories", {
       userId,

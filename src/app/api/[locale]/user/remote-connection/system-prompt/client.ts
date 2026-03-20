@@ -61,7 +61,6 @@ export function useRemoteInstancesData(
     }
 
     const remoteConnections = active.map((c) => ({
-      friendlyName: c.friendlyName,
       instanceId: c.instanceId,
     }));
 

@@ -11,6 +11,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import endpoints from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
+import { useMemo } from "react";
 
 /**
  * Hook for fetching task execution history
@@ -20,8 +21,20 @@ export function useTaskHistory(
 ): EndpointReturn<typeof endpoints> {
   const { locale } = useTranslation();
   const logger = createEndpointLogger(false, Date.now(), locale);
+  const endpointOptions = useMemo(
+    () => ({
+      read: {
+        formOptions: {
+          autoSubmit: true,
+          debounceMs: 300,
+          persistForm: true,
+        },
+      },
+    }),
+    [],
+  );
 
-  return useEndpoint(endpoints, undefined, logger, user);
+  return useEndpoint(endpoints, endpointOptions, logger, user);
 }
 
 export type CronHistoryEndpointReturn = EndpointReturn<typeof endpoints>;

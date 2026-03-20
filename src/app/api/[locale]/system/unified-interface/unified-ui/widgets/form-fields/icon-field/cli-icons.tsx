@@ -315,6 +315,8 @@ export const CLI_ICONS: Record<IconKey, string> = {
   "si-googlegemini": "✨",
   "si-mistralai": "🌪️",
   "si-x": "✕",
+  "si-xiaomi": "📱",
+  "si-minimax": "〽️",
   "si-zendesk": "💬",
   "si-alibabadotcom": "🛒",
   "freedom-gpt-logo": "🦅",

@@ -14,8 +14,8 @@ import definitions from "./definition";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ user, logger, locale }) =>
-      VibeSenseRepository.listGraphs(user, logger, locale),
+    handler: ({ data, user, logger, locale }) =>
+      VibeSenseRepository.listGraphs(user, logger, locale, data.search),
   },
   [Methods.POST]: {
     handler: ({ data, user, logger, locale }) =>

@@ -106,6 +106,11 @@ const { GET } = createEndpoint({
         content: "get.response.tasks.title",
         schema: z.array(dashboardTaskSchema),
       }),
+      campaignTasks: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.campaignTasks.title",
+        schema: z.array(dashboardTaskSchema),
+      }),
       alerts: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.alerts.title",
@@ -173,6 +178,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         tasks: [],
+        campaignTasks: [],
         alerts: [],
         stats: {
           totalTasks: 5,

@@ -23,20 +23,6 @@ export const translations = {
     title: "Connect to Remote Account",
     description:
       "Connect your account to a remote instance to sync memories and use AI tools from anywhere",
-    instanceId: {
-      label: "Instance ID",
-      description:
-        "A short unique ID for this machine (letters, numbers, hyphens only)",
-      placeholder: "hermes",
-      validation: {
-        invalid: "Use only lowercase letters, numbers, and hyphens",
-      },
-    },
-    friendlyName: {
-      label: "Display Name",
-      description: "A friendly name shown in the UI (e.g. My Work Laptop)",
-      placeholder: "My Work Laptop",
-    },
     remoteUrl: {
       label: "Remote URL",
       description:

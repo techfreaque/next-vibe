@@ -243,6 +243,7 @@ function renderToolListCli(
   matchedCount: number,
   currentPage?: number,
   totalPages?: number,
+  hint?: string,
 ): string {
   const lines: string[] = [];
 
@@ -291,8 +292,8 @@ function renderToolListCli(
     );
   }
 
-  // Footer
-  lines.push(chalk.dim(`Use: vibe help <name> for full details`));
+  // Footer — use server hint if available, fallback to default
+  lines.push(chalk.dim(hint ?? `Use: vibe help <name> for full details`));
 
   return lines.join("\n");
 }
@@ -347,11 +348,24 @@ export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
       categories,
       currentPage,
       totalPages,
+      hint,
     } = value;
 
-    // Mode 1: Detail (single tool)
+    // Mode 1: Detail — single tool OR multiple tools with full schemas (≤5 auto-expand)
+    const hasFullSchemas =
+      tools.length > 0 &&
+      tools.every(
+        (t) => t.parameters !== undefined || t.examples !== undefined,
+      );
     if (tools.length === 1 && matchedCount === 1) {
       return isMcp ? renderDetailMcp(tools[0]) : renderDetailCli(tools[0]);
+    }
+    if (hasFullSchemas && tools.length > 1) {
+      const sections = tools.map((t) =>
+        isMcp ? renderDetailMcp(t) : renderDetailCli(t),
+      );
+      const sep = isMcp ? "\n---\n" : `\n${chalk.dim("─".repeat(60))}\n`;
+      return sections.join(sep);
     }
 
     // Mode 2: Category overview (no tools, categories present)
@@ -365,7 +379,7 @@ export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
     if (tools.length > 0) {
       return isMcp
         ? renderToolListMcp(tools, matchedCount, currentPage, totalPages)
-        : renderToolListCli(tools, matchedCount, currentPage, totalPages);
+        : renderToolListCli(tools, matchedCount, currentPage, totalPages, hint);
     }
 
     return isMcp ? "No tools found." : chalk.dim("No tools found.");

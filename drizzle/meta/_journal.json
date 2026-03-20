@@ -513,6 +513,13 @@
       "when": 1773922615973,
       "tag": "20260319121655_chunky_raider",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1773965868248,
+      "tag": "20260320001748_old_wendigo",
+      "breakpoints": true
     }
   ]
 }

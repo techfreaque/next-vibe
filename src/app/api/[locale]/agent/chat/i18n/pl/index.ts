@@ -483,6 +483,8 @@ export const translations: typeof enTranslations = {
       claudeHaiku45:
         "Claude Haiku 4.5 - Szybki i wydajny model Claude zoptymalizowany pod kątem szybkości i opłacalności",
       glm5: "GLM-5 - flagowy model open-source Z.AI zaprojektowany do projektowania złożonych systemów i długoterminowych przepływów agentów, dorównujący wiodącym modelom zamkniętym",
+      glm5Turbo:
+        "GLM-5 Turbo - model nowej generacji Z.AI głęboko zoptymalizowany dla środowisk agentycznych z szybką inferencją, ulepszoną dekompozycją instrukcji i stabilnością długich zadań",
       glm46:
         "GLM-4 6B - Wydajny dwujęzyczny model AI chińsko-angielski z silnymi ogólnymi możliwościami",
       glm47:
@@ -505,6 +507,8 @@ export const translations: typeof enTranslations = {
         "Grok 4 - Flagowy model rozumowania xAI z możliwościami wizji i wyszukiwania w sieci",
       grok4Fast:
         "Grok 4 Fast - Szybki model xAI z kontekstem 2M tokenów zoptymalizowany dla szybkich odpowiedzi",
+      grok420Beta:
+        "Grok 4.20 Beta - Najnowszy flagowy model xAI z wiodącą szybkością, agentycznym wywoływaniem narzędzi, najniższym wskaźnikiem halucynacji i kontekstem 2M tokenów",
       gpt5Pro:
         "GPT-5 Pro - Premium model OpenAI z najwyższym poziomem rozumowania i zaawansowanymi możliwościami kodowania",
       gpt5Codex:
@@ -514,6 +518,10 @@ export const translations: typeof enTranslations = {
       gpt51:
         "GPT 5.1 - Wydajny model ogólnego przeznaczenia OpenAI z silnym rozumowaniem i analizą",
       gpt5: "GPT-5 - Flagowy model OpenAI z szeroką inteligencją i wszechstronnymi możliwościami",
+      gpt54Mini:
+        "GPT-5.4 Mini - Wydajny wariant GPT-5.4 OpenAI zoptymalizowany dla dużej przepustowości z silnym rozumowaniem, kodowaniem i użyciem narzędzi przy niższym koszcie",
+      gpt54Nano:
+        "GPT-5.4 Nano - Najlżejszy i najbardziej ekonomiczny model OpenAI zoptymalizowany dla krytycznych pod względem szybkości zadań takich jak klasyfikacja, ekstrakcja danych i wykonywanie sub-agentów",
       gpt5Mini: "GPT-5 Mini - Lekki szybki model OpenAI do codziennych zadań",
       gpt5Nano:
         "GPT-5 Nano - Najmniejszy i najbardziej przystępny cenowo model OpenAI do prostych rozmów",
@@ -521,6 +529,10 @@ export const translations: typeof enTranslations = {
         "GPT-OSS 120B - Model open-source OpenAI z 120B parametrami z silnymi możliwościami kodowania",
       kimiK2Thinking:
         "Kimi K2 Thinking - Model Kimi skoncentrowany na rozumowaniu z ulepszoną analizą krok po kroku",
+      minimaxM27:
+        "MiniMax M2.7 - Agentyczny model nowej generacji MiniMax przeznaczony do autonomicznej produktywności, współpracy wielu agentów i przepływów produkcyjnych w tym debugowania kodu, modelowania finansowego i generowania dokumentów",
+      mimoV2Pro:
+        "MiMo V2 Pro - Flagowy model Xiaomi z 1T+ parametrami i kontekstem 1M, głęboko zoptymalizowany do orkiestracji agentów, automatyzacji złożonych przepływów i zadań inżynieryjnych",
       glm45Air:
         "GLM 4.5 AIR - Ultraszybki lekki model Z.AI do szybkich interakcji konwersacyjnych",
       glm45v:

@@ -374,6 +374,7 @@ export class LoginRepository {
         [leadId, ...linkedLeadIds],
         logger,
         creditsT,
+        locale,
       );
       if (!mergeResult.success) {
         logger.error("Failed to merge lead wallet during login", {

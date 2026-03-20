@@ -174,6 +174,7 @@ export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
       refetch: () => Promise<void>;
       isLoading?: boolean;
       isLoadingFresh?: boolean;
+      isFetching?: boolean;
     };
   };
   /**

@@ -8,6 +8,12 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Połączenia zdalne",
     description: "Wylistuj wszystkie połączenia zdalne dla swojego konta",
+    fields: {
+      activeOnly: {
+        label: "Tylko aktywne",
+        description: "Zwróć tylko aktywne połączenia",
+      },
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",
@@ -66,7 +72,6 @@ export const translations: typeof enTranslations = {
     connectButtonLocal: "Połącz z chmurą",
     inactiveBadge: "Nieaktywna",
     instanceId: "ID instancji",
-    friendlyName: "Nazwa",
     remoteUrl: "Zdalny URL",
     viewButton: "Podgląd",
     editButton: "Zmień nazwę",

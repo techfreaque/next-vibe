@@ -26,7 +26,6 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
@@ -227,8 +226,9 @@ export function LeadsSearchContainer({
   const locale = useWidgetLocale();
   const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm<typeof definition.GET>();
-  const onSubmit = useWidgetOnSubmit();
-  const isLoading = endpointMutations?.read?.isLoading ?? false;
+  const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
+  const isFetching = endpointMutations?.read?.isFetching ?? false;
+  const isLoading = isLoadingFresh;
 
   const t = useWidgetTranslation<typeof definition.GET>();
 
@@ -236,9 +236,7 @@ export function LeadsSearchContainer({
   const total = data?.response?.total ?? 0;
   const hasMore = data?.response?.hasMore ?? false;
 
-  // Track which status values are currently active as client-side filter chips.
-  // An empty set means "show all".
-  const [activeStatuses, setActiveStatuses] = useState<Set<string>>(new Set());
+  const activeStatus = form?.watch("status") ?? undefined;
 
   // ── Navigation helpers ────────────────────────────────────────────────────
 
@@ -296,40 +294,26 @@ export function LeadsSearchContainer({
     const currentOffset = form.getValues("offset") ?? 0;
     const currentLimit = form.getValues("limit") ?? 10;
     form.setValue("offset", currentOffset + currentLimit);
-    // Trigger re-submission
-    if (typeof onSubmit === "function") {
-      onSubmit();
-    }
-  }, [form, onSubmit]);
+  }, [form]);
 
   // ── Status filter chip toggles ────────────────────────────────────────────
 
-  const toggleStatus = useCallback((status: string): void => {
-    setActiveStatuses((prev) => {
-      const next = new Set(prev);
-      if (next.has(status)) {
-        next.delete(status);
-      } else {
-        next.add(status);
-      }
-      return next;
-    });
-  }, []);
+  const toggleStatus = useCallback(
+    (status: string): void => {
+      const current = form?.getValues("status");
+      form?.setValue(
+        "status",
+        current === status
+          ? undefined
+          : (status as (typeof LeadStatus)[keyof typeof LeadStatus]),
+      );
+    },
+    [form],
+  );
 
   const clearStatusFilter = useCallback((): void => {
-    setActiveStatuses(new Set());
-  }, []);
-
-  // ── Derive visible statuses present in current result set ─────────────────
-
-  const presentStatuses = [...new Set(leads.map((l) => l.status))];
-
-  // ── Apply client-side status filter ──────────────────────────────────────
-
-  const filteredLeads =
-    activeStatuses.size === 0
-      ? leads
-      : leads.filter((l) => l.status && activeStatuses.has(l.status));
+    form?.setValue("status", undefined);
+  }, [form]);
 
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -348,7 +332,7 @@ export function LeadsSearchContainer({
             </Span>
           )}
         </Div>
-        {isLoading && (
+        {isFetching && (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
         )}
       </Div>
@@ -371,46 +355,44 @@ export function LeadsSearchContainer({
 
       {/* ── Results ── */}
       <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-260px))]">
-        {/* Status filter chips – only shown when results are present */}
-        {presentStatuses.length > 1 && (
-          <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">
-            <Span className="text-xs text-muted-foreground mr-0.5">
-              {t("widget.filterLabel")}
-            </Span>
-            {presentStatuses.map((status) => {
-              const isActive = activeStatuses.has(status);
-              return (
-                <Button
-                  key={status}
-                  type="button"
-                  onClick={() => {
-                    toggleStatus(status);
-                  }}
-                  className={cn(
-                    "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border transition-all",
-                    isActive
-                      ? `${STATUS_COLORS[status] ?? "bg-primary text-primary-foreground"} border-transparent`
-                      : "bg-transparent border-border text-muted-foreground hover:border-foreground/40",
-                  )}
-                >
-                  {STATUS_LABEL_KEYS[status]
-                    ? t(STATUS_LABEL_KEYS[status])
-                    : status.replace(/_/g, " ")}
-                  {isActive && <X className="h-2.5 w-2.5" />}
-                </Button>
-              );
-            })}
-            {activeStatuses.size > 0 && (
+        {/* Status filter chips */}
+        <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">
+          <Span className="text-xs text-muted-foreground mr-0.5">
+            {t("widget.filterLabel")}
+          </Span>
+          {Object.values(LeadStatus).map((status) => {
+            const isActive = activeStatus === status;
+            return (
               <Button
+                key={status}
                 type="button"
-                onClick={clearStatusFilter}
-                className="text-xs text-muted-foreground hover:text-foreground underline ml-1"
+                onClick={() => {
+                  toggleStatus(status);
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border transition-all",
+                  isActive
+                    ? `${STATUS_COLORS[status] ?? "bg-primary text-primary-foreground"} border-transparent`
+                    : "bg-transparent border-border text-muted-foreground hover:border-foreground/40",
+                )}
               >
-                {t("widget.clearFilter")}
+                {STATUS_LABEL_KEYS[status]
+                  ? t(STATUS_LABEL_KEYS[status])
+                  : status.replace(/_/g, " ")}
+                {isActive && <X className="h-2.5 w-2.5" />}
               </Button>
-            )}
-          </Div>
-        )}
+            );
+          })}
+          {activeStatus && (
+            <Button
+              type="button"
+              onClick={clearStatusFilter}
+              className="text-xs text-muted-foreground hover:text-foreground underline ml-1"
+            >
+              {t("widget.clearFilter")}
+            </Button>
+          )}
+        </Div>
 
         {/* Loading skeleton */}
         {isLoading && leads.length === 0 && (
@@ -448,24 +430,15 @@ export function LeadsSearchContainer({
           </Div>
         )}
 
-        {/* No results after client-side filter */}
-        {!isLoading && leads.length > 0 && filteredLeads.length === 0 && (
-          <Div className="text-center text-muted-foreground py-8 text-sm">
-            {t("widget.noLeadsMatchFilter")}{" "}
-            <Button
-              type="button"
-              className="underline"
-              onClick={clearStatusFilter}
-            >
-              {t("widget.clearFilters")}
-            </Button>
-          </Div>
-        )}
-
         {/* Result rows */}
-        {filteredLeads.length > 0 && (
-          <Div className="flex flex-col gap-2 pt-2">
-            {filteredLeads.map((lead) => {
+        {leads.length > 0 && (
+          <Div
+            className={cn(
+              "flex flex-col gap-2 pt-2",
+              isFetching && !isLoadingFresh && "opacity-50 pointer-events-none",
+            )}
+          >
+            {leads.map((lead) => {
               const openRate =
                 lead.emailsSent !== null &&
                 lead.emailsOpened !== null &&

@@ -14,7 +14,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger }) =>
-      RemoteConnectionListRepository.listRemoteConnections(user, logger),
+    handler: ({ user, data, logger }) =>
+      RemoteConnectionListRepository.listRemoteConnections(
+        user,
+        logger,
+        data.activeOnly ?? false,
+      ),
   },
 });

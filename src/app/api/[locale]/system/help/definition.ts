@@ -25,8 +25,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { cliRequestDataSchema } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { Platform } from "../unified-interface/shared/types/platform";
 import { TOOL_HELP_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -164,6 +164,7 @@ const { GET } = createEndpoint({
         description: "get.fields.platform.description" as const,
         columns: 3,
         schema: z.enum(Platform).optional(),
+        userRoles: [UserRole.ADMIN],
       }),
 
       includeProdOnly: requestField(scopedTranslation, {
@@ -173,6 +174,7 @@ const { GET } = createEndpoint({
         description: "get.fields.includeProdOnly.description" as const,
         columns: 3,
         schema: z.boolean().optional(),
+        userRoles: [UserRole.ADMIN],
       }),
 
       instanceId: requestField(scopedTranslation, {
@@ -182,6 +184,7 @@ const { GET } = createEndpoint({
         description: "get.fields.instanceId.description" as const,
         columns: 4,
         schema: z.string().optional(),
+        userRoles: [UserRole.CUSTOMER, UserRole.ADMIN],
       }),
 
       statsFilter: requestField(scopedTranslation, {
@@ -233,18 +236,26 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get.fields.platform.label" as const,
         schema: z.string().optional(),
+        userRoles: [UserRole.ADMIN],
       }),
 
       currentEnv: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.fields.platform.label" as const,
         schema: z.enum(["development", "production"]).optional(),
+        userRoles: [UserRole.ADMIN],
       }),
 
-      isAdmin: responseField(scopedTranslation, {
+      pinnedCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "get.fields.platform.label" as const,
-        schema: z.boolean().optional(),
+        content: "get.fields.pinnedCount.title" as const,
+        schema: z.number().optional(),
+      }),
+
+      allowedCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.allowedCount.title" as const,
+        schema: z.number().optional(),
       }),
 
       currentPage: responseField(scopedTranslation, {

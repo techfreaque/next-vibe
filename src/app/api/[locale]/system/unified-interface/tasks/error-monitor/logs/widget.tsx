@@ -228,7 +228,7 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
   const totalCount = value?.totalCount ?? 0;
   const logs = value?.logs ?? [];
 
-  const activeCount = logs.filter((l) => !l.resolved).length;
+  const activeCount = value?.unresolvedCount ?? 0;
 
   const offset = form.watch("offset") ?? 0;
   const fingerprintFilter = form.watch("fingerprint");

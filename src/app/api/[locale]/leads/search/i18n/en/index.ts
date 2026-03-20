@@ -17,6 +17,10 @@ export const translations = {
         "Search term to filter leads by email, business name, or notes",
       placeholder: "Enter search term...",
     },
+    status: {
+      label: "Status Filter",
+      description: "Filter leads by status",
+    },
     limit: {
       label: "Results Limit",
       description: "Maximum number of results to return (1-100)",

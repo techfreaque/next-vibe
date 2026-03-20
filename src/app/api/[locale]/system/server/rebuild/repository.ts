@@ -24,6 +24,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { VibeCheckRepository } from "@/app/api/[locale]/system/check/vibe-check/repository";
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
+import { GenerateAllRepository } from "@/app/api/[locale]/system/generators/generate-all/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -66,18 +67,26 @@ export class RebuildRepository {
 
     try {
       // Step 1: Code generation
-      // IMPORTANT: Generators use dynamic import(variable) to scan definition.ts files.
-      // This MUST run in a separate Bun subprocess — not inside the Next.js server process,
-      // where the bundler intercepts import() and fails with "expression is too dynamic".
-      const codegenOk = await runStep(t("post.steps.codegen"), () => {
-        const generatorScript = `${process.cwd()}/src/app/api/[locale]/system/generators/generate-all/repository.ts`;
+      const codegenOk = await runStep(t("post.steps.codegen"), async () => {
         try {
-          execSync(`bun run ${generatorScript}`, {
-            stdio: "inherit",
-            cwd: process.cwd(),
-            env: { ...process.env },
-          });
-          return null;
+          const generateResult = await GenerateAllRepository.generateAll(
+            {
+              outputDir: "src/app/api/[locale]/system/generated",
+              verbose: false,
+              skipEndpoints: false,
+              skipSeeds: false,
+              skipTaskIndex: false,
+              enableTrpc: false,
+              skipTanstack: true,
+            },
+            logger,
+            locale,
+          );
+          return generateResult.success
+            ? null
+            : t("post.steps.codegenFailed", {
+                error: generateResult.message ?? "Generation failed",
+              });
         } catch (error) {
           return t("post.steps.codegenFailed", {
             error: parseError(error).message,

@@ -64,6 +64,9 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       if (data.targetInstance !== undefined) {
         updates.targetInstance = data.targetInstance;
       }
+      if (data.lastExecutionStatus !== undefined) {
+        updates.lastExecutionStatus = data.lastExecutionStatus;
+      }
       return await CronTasksRepository.updateTask(
         urlPathParams.id,
         updates,

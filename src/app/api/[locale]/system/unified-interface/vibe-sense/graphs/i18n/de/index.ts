@@ -10,6 +10,13 @@ export const translations: typeof enTranslations = {
     title: "Pipeline-Graphen",
     description:
       "Alle fuer den aktuellen Benutzer sichtbaren Graphen auflisten",
+    fields: {
+      search: {
+        label: "Suche",
+        description: "Graphen nach Name oder Slug filtern",
+        placeholder: "Graphen suchen...",
+      },
+    },
     container: {
       title: "Graphen",
       description: "Alle Pipeline-Graphen",

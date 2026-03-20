@@ -52,6 +52,12 @@ export const translations: typeof enTranslations = {
       hint: {
         title: "Verwendungshinweis",
       },
+      pinnedCount: {
+        title: "Angeheftete Tools",
+      },
+      allowedCount: {
+        title: "Erlaubte Tools",
+      },
       currentPage: {
         title: "Aktuelle Seite",
       },
@@ -87,6 +93,11 @@ export const translations: typeof enTranslations = {
         label: "Instanz-ID",
         description:
           "Filter auf Tools einer bestimmten Remote-Instanz. Gibt Tools aus dem gespeicherten Capability-Snapshot zurück.",
+      },
+      pinnedToolIds: {
+        label: "Angeheftete Tool-IDs",
+        description:
+          "Optionale Liste von Tool-IDs, die der Benutzer angeheftet hat. Der Server filtert auf diese Tools, gibt aber weiterhin die vollständige Gesamtanzahl zurück.",
       },
       statsFilter: {
         label: "Tool-Filter",
@@ -304,6 +315,7 @@ export const translations: typeof enTranslations = {
       deselectAll: "Alle abwählen",
       selectAll: "Alle auswählen",
       resetToDefault: "Auf Standard zurücksetzen",
+      loading: "Lädt...",
       noToolsFound: "Keine Tools gefunden",
       noToolsAvailable: "Keine KI-Tools verfügbar",
       legendActive: "Immer im Kontext (angeheftet)",

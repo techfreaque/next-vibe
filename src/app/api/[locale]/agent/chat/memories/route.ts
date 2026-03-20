@@ -14,11 +14,13 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger, streamContext }) => {
+    handler: async ({ data, user, logger, streamContext }) => {
       return MemoriesRepository.getMemories({
         userId: user.id,
         logger,
         rootFolderId: streamContext.rootFolderId ?? DefaultFolderId.PRIVATE,
+        search: data.search,
+        tag: data.tag,
       });
     },
   },

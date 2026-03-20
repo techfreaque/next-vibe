@@ -7,6 +7,13 @@ export const translations = {
   list: {
     title: "Pipeline Graphs",
     description: "List all graphs visible to the current user",
+    fields: {
+      search: {
+        label: "Search",
+        description: "Filter graphs by name or slug",
+        placeholder: "Search graphs...",
+      },
+    },
     container: {
       title: "Graphs",
       description: "All pipeline graphs",

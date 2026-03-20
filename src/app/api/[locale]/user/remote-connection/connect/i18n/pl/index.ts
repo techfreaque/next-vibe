@@ -21,19 +21,6 @@ export const translations = {
     title: "Połącz z kontem zdalnym",
     description:
       "Połącz swoje konto ze zdalną instancją, aby synchronizować wspomnienia",
-    instanceId: {
-      label: "ID instancji",
-      description: "Krótki unikalny identyfikator tej maszyny",
-      placeholder: "hermes",
-      validation: {
-        invalid: "Używaj tylko małych liter, cyfr i myślników",
-      },
-    },
-    friendlyName: {
-      label: "Nazwa wyświetlana",
-      description: "Przyjazna nazwa wyświetlana w interfejsie",
-      placeholder: "Mój laptop",
-    },
     remoteUrl: {
       label: "Zdalny URL",
       description:

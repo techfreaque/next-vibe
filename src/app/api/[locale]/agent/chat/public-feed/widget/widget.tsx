@@ -201,22 +201,8 @@ function PublicFeedView({
   const { locale } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
 
-  const filtered = items.filter((item) =>
-    searchQuery
-      ? item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      : true,
-  );
-
-  const sorted = [...filtered].toSorted((a, b) => {
-    if (sortMode === FeedSortMode.HOT) {
-      const hoursA =
-        (Date.now() - new Date(a.createdAt).getTime()) / (1000 * 60 * 60) + 2;
-      const hoursB =
-        (Date.now() - new Date(b.createdAt).getTime()) / (1000 * 60 * 60) + 2;
-      return b.score / Math.pow(hoursB, 1.5) - a.score / Math.pow(hoursA, 1.5);
-    }
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
+  // Filtering and sorting are handled server-side via requestField params.
+  // Never filter/sort response data on the client.
 
   return (
     <Div className="h-full flex flex-col overflow-hidden">
@@ -288,14 +274,14 @@ function PublicFeedView({
 
           {/* Thread List */}
           <Div className="flex flex-col gap-2">
-            {sorted.length === 0 ? (
+            {items.length === 0 ? (
               <Div className="text-center py-12 text-muted-foreground">
                 <Span className="text-lg">
                   {t("get.errors.notFound.title")}
                 </Span>
               </Div>
             ) : (
-              sorted.map((item) => <FeedThreadRow key={item.id} item={item} />)
+              items.map((item) => <FeedThreadRow key={item.id} item={item} />)
             )}
           </Div>
         </Div>

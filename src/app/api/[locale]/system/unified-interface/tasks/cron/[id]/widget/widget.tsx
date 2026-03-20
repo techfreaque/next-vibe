@@ -8,6 +8,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Form } from "next-vibe-ui/ui/form/form";
 import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
@@ -21,8 +22,6 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import type { FieldValues } from "react-hook-form";
-import { useForm } from "react-hook-form";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
@@ -32,11 +31,13 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
@@ -51,10 +52,7 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 
 import { CronTaskPriority, CronTaskStatus } from "../../../enum";
 import type endpoints from "../definition";
-import type {
-  CronTaskGetResponseOutput,
-  CronTaskPutRequestOutput,
-} from "../definition";
+import type { CronTaskGetResponseOutput } from "../definition";
 import { ScheduleAutocomplete } from "./schedule-autocomplete";
 
 // ---------------------------------------------------------------------------
@@ -337,10 +335,9 @@ function TaskInputEditSection({
 }): React.JSX.Element {
   const locale = useWidgetLocale();
   const user = useWidgetUser();
-  const parentForm = useWidgetForm<typeof endpoints.PUT>();
   const response = useWidgetResponse();
 
-  // Get routeId from GET response (available via prefillFromGet)
+  // Get routeId and taskInput from GET response (via prefillFromGet)
   const responseData = response?.success === true ? response.data : undefined;
   const routeId =
     responseData &&
@@ -350,42 +347,24 @@ function TaskInputEditSection({
       ? (responseData as { task?: { routeId?: string } }).task?.routeId
       : undefined;
 
+  const taskInput =
+    responseData &&
+    typeof responseData === "object" &&
+    !Array.isArray(responseData) &&
+    "task" in responseData
+      ? (responseData as { task?: { taskInput?: Record<string, WidgetData> } })
+          .task?.taskInput
+      : undefined;
+
   const { definition, isLoading, error } = useResolvedEndpoint(routeId);
 
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
-
-  // Get current taskInput value from parent form
-  const currentTaskInput = parentForm?.watch("taskInput");
-
-  // Create inner form for editing the endpoint's fields
-  const innerForm = useForm<FieldValues>({
-    defaultValues: currentTaskInput ?? {},
-  });
-
-  // Watch inner form changes and propagate back to parent taskInput
-  useEffect(() => {
-    if (!parentForm || !definition) {
-      return undefined;
-    }
-
-    const subscription = innerForm.watch((values) => {
-      parentForm.setValue(
-        "taskInput",
-        values as CronTaskPutRequestOutput["taskInput"],
-        {
-          shouldDirty: true,
-          shouldTouch: true,
-        },
-      );
-    });
-
-    return (): void => {
-      subscription.unsubscribe();
-    };
-  }, [innerForm, parentForm, definition]);
+  const method = definition?.method as
+    | "GET"
+    | "POST"
+    | "PUT"
+    | "PATCH"
+    | "DELETE"
+    | undefined;
 
   if (!routeId) {
     return <></>;
@@ -402,7 +381,7 @@ function TaskInputEditSection({
     );
   }
 
-  if (error || !definition) {
+  if (error || !definition || !method) {
     return (
       <Div className="rounded-lg border p-4 text-sm text-muted-foreground">
         {t("widget.taskInput.notFound")}
@@ -415,19 +394,18 @@ function TaskInputEditSection({
       <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
         {t("widget.taskInput.editTitle")}
       </Div>
-      <Div className="text-xs text-muted-foreground">
-        {t("widget.taskInput.editDescription")}
-      </Div>
-      <NavigationStackProvider>
-        <EndpointRenderer
-          endpoint={definition}
-          locale={locale}
-          data={currentTaskInput}
-          form={innerForm as never}
-          logger={logger}
-          user={user}
-        />
-      </NavigationStackProvider>
+      <EndpointsPage
+        endpoint={{ [method]: definition }}
+        locale={locale}
+        user={user}
+        endpointOptions={
+          taskInput && Object.keys(taskInput).length > 0
+            ? method === "GET"
+              ? { read: { urlPathParams: taskInput as never } }
+              : { create: { autoPrefillData: taskInput as never } }
+            : undefined
+        }
+      />
     </Div>
   );
 }
@@ -499,75 +477,79 @@ export function CronTaskEditContainer({
 }: EditWidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.PUT>();
   const children = field.children;
+  const form = useWidgetForm<typeof endpoints.PUT>();
+  const onSubmit = useWidgetOnSubmit();
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Actions bar: back + submit */}
-      <Div className="flex items-center gap-2">
-        <NavigateButtonWidget field={children.actions.children.backButton} />
-        <SubmitButtonWidget<typeof endpoints.PUT>
-          field={children.actions.children.submitButton}
-        />
-      </Div>
+    <Form form={form} onSubmit={onSubmit}>
+      <Div className="flex flex-col gap-4 p-4">
+        {/* Actions bar: back + submit */}
+        <Div className="flex items-center gap-2">
+          <NavigateButtonWidget field={children.actions.children.backButton} />
+          <SubmitButtonWidget<typeof endpoints.PUT>
+            field={children.actions.children.submitButton}
+          />
+        </Div>
 
-      {/* Form fields in a grid */}
-      <Div className="grid grid-cols-12 gap-4">
-        <Div className="col-span-12">
-          <TextFieldWidget
-            field={children.displayName}
-            fieldName="displayName"
-          />
+        {/* Form fields in a grid */}
+        <Div className="grid grid-cols-12 gap-4">
+          <Div className="col-span-12">
+            <TextFieldWidget
+              field={children.displayName}
+              fieldName="displayName"
+            />
+          </Div>
+          <Div className="col-span-12">
+            <TextareaFieldWidget
+              field={children.description}
+              fieldName="description"
+            />
+          </Div>
+          <Div className="col-span-6">
+            <ScheduleField field={children.schedule} />
+          </Div>
+          <Div className="col-span-6">
+            <BooleanFieldWidget field={children.enabled} fieldName="enabled" />
+          </Div>
+          <Div className="col-span-6">
+            <SelectFieldWidget field={children.priority} fieldName="priority" />
+          </Div>
+          <Div className="col-span-6">
+            <SelectFieldWidget
+              field={children.outputMode}
+              fieldName="outputMode"
+            />
+          </Div>
+          <Div className="col-span-6">
+            <NumberFieldWidget field={children.timeout} fieldName="timeout" />
+          </Div>
+          <Div className="col-span-6">
+            <NumberFieldWidget field={children.retries} fieldName="retries" />
+          </Div>
+          <Div className="col-span-6">
+            <NumberFieldWidget
+              field={children.retryDelay}
+              fieldName="retryDelay"
+            />
+          </Div>
+          <Div className="col-span-6">
+            <BooleanFieldWidget field={children.hidden} fieldName="hidden" />
+          </Div>
+          <Div className="col-span-6">
+            <BooleanFieldWidget field={children.runOnce} fieldName="runOnce" />
+          </Div>
+          <Div className="col-span-6">
+            <TextFieldWidget
+              field={children.targetInstance}
+              fieldName="targetInstance"
+            />
+          </Div>
         </Div>
-        <Div className="col-span-12">
-          <TextareaFieldWidget
-            field={children.description}
-            fieldName="description"
-          />
-        </Div>
-        <Div className="col-span-6">
-          <ScheduleField field={children.schedule} />
-        </Div>
-        <Div className="col-span-6">
-          <BooleanFieldWidget field={children.enabled} fieldName="enabled" />
-        </Div>
-        <Div className="col-span-6">
-          <SelectFieldWidget field={children.priority} fieldName="priority" />
-        </Div>
-        <Div className="col-span-6">
-          <SelectFieldWidget
-            field={children.outputMode}
-            fieldName="outputMode"
-          />
-        </Div>
-        <Div className="col-span-6">
-          <NumberFieldWidget field={children.timeout} fieldName="timeout" />
-        </Div>
-        <Div className="col-span-6">
-          <NumberFieldWidget field={children.retries} fieldName="retries" />
-        </Div>
-        <Div className="col-span-6">
-          <NumberFieldWidget
-            field={children.retryDelay}
-            fieldName="retryDelay"
-          />
-        </Div>
-        <Div className="col-span-6">
-          <BooleanFieldWidget field={children.hidden} fieldName="hidden" />
-        </Div>
-        <Div className="col-span-6">
-          <BooleanFieldWidget field={children.runOnce} fieldName="runOnce" />
-        </Div>
-        <Div className="col-span-6">
-          <TextFieldWidget
-            field={children.targetInstance}
-            fieldName="targetInstance"
-          />
-        </Div>
-      </Div>
 
-      {/* Dynamic task input section */}
-      <TaskInputEditSection t={t} />
-    </Div>
+        {/* Dynamic task input section */}
+        <TaskInputEditSection t={t} />
+      </Div>
+    </Form>
   );
 }
 

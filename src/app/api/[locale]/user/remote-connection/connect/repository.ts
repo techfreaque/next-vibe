@@ -109,7 +109,6 @@ export class RemoteConnectionConnectRepository {
     leadId: string;
     instanceId: string;
     locale: CountryLanguage;
-    friendlyName?: string;
     reverseToken?: string;
     reverseLeadId?: string;
     logger: EndpointLogger;
@@ -117,7 +116,6 @@ export class RemoteConnectionConnectRepository {
     ok: boolean;
     conflict: boolean;
     remoteInstanceId: string | null;
-    remoteFriendlyName: string | null;
   }> {
     const {
       remoteUrl,
@@ -125,7 +123,6 @@ export class RemoteConnectionConnectRepository {
       leadId,
       instanceId,
       locale,
-      friendlyName,
       reverseToken,
       reverseLeadId,
       logger,
@@ -148,7 +145,6 @@ export class RemoteConnectionConnectRepository {
         body: JSON.stringify({
           instanceId,
           localUrl,
-          friendlyName,
           ...(reverseToken ? { reverseToken } : {}),
           ...(reverseLeadId ? { reverseLeadId } : {}),
         }),
@@ -163,7 +159,6 @@ export class RemoteConnectionConnectRepository {
           ok: false,
           conflict: true,
           remoteInstanceId: null,
-          remoteFriendlyName: null,
         };
       }
 
@@ -176,18 +171,16 @@ export class RemoteConnectionConnectRepository {
           ok: false,
           conflict: false,
           remoteInstanceId: null,
-          remoteFriendlyName: null,
         };
       }
 
       const body = (await response.json()) as {
-        data?: { remoteInstanceId?: string; remoteFriendlyName?: string };
+        data?: { remoteInstanceId?: string };
       };
       return {
         ok: true,
         conflict: false,
         remoteInstanceId: body.data?.remoteInstanceId ?? null,
-        remoteFriendlyName: body.data?.remoteFriendlyName ?? null,
       };
     } catch (error) {
       logger.error(`[CONNECT] Remote registration error: ${String(error)}`);
@@ -195,7 +188,6 @@ export class RemoteConnectionConnectRepository {
         ok: false,
         conflict: false,
         remoteInstanceId: null,
-        remoteFriendlyName: null,
       };
     }
   }
@@ -220,9 +212,8 @@ export class RemoteConnectionConnectRepository {
     t: RemoteConnectT,
     locale: CountryLanguage,
   ): Promise<ResponseType<RemoteConnectPostResponseOutput>> {
-    const { email, password, friendlyName } = data;
+    const { email, password } = data;
     const remoteUrl = data.remoteUrl ?? "";
-    const instanceId = data.instanceId ?? "";
 
     // ── Step 1: SSRF guard — reject private/loopback URLs ──────────────────────
     const urlError =
@@ -333,11 +324,58 @@ export class RemoteConnectionConnectRepository {
 
     // ── Step 3: Local collision check ──────────────────────────────────────────
 
-    // 3a: Derive our self-identity (used later in step 5b)
-    const selfInstanceId =
-      RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+    const selfInstanceId = await RemoteConnectionRepository.getLocalInstanceId(
+      user.id,
+    );
 
-    // 3b: Reject if instanceId already used for another connection
+    // ── Step 3b: Generate reverse token for bidirectional auth ───────────────
+    // The remote needs a JWT signed by OUR secret to call our /report endpoint.
+    // This enables the remote to push task completion status back to us.
+    let reverseToken: string | undefined;
+    const reverseTokenResult = await AuthRepository.signJwt(
+      user,
+      logger,
+      locale,
+    );
+    if (reverseTokenResult.success) {
+      reverseToken = reverseTokenResult.data;
+    } else {
+      logger.warn(
+        "[CONNECT] Failed to generate reverse token, continuing without it",
+      );
+    }
+
+    // ── Step 4: Register this instance on the remote ───────────────────────────
+    // Send our self-identity so the remote knows us by our actual instanceId.
+    // `instanceId` is the name WE give the remote in OUR DB (derived from its URL);
+    // the remote should see us as `selfInstanceId`.
+    const registerResult =
+      await RemoteConnectionConnectRepository.registerOnRemote({
+        remoteUrl,
+        token,
+        leadId: effectiveLeadId,
+        instanceId: selfInstanceId,
+        locale,
+        reverseToken,
+        reverseLeadId: user.leadId,
+        logger,
+      });
+
+    if (!registerResult.ok) {
+      return fail({
+        message: registerResult.conflict
+          ? t("post.errors.conflict.title")
+          : t("post.errors.server.title"),
+        errorType: registerResult.conflict
+          ? ErrorResponseTypes.CONFLICT
+          : ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    // instanceId = what the remote calls itself (its self-identity)
+    const instanceId = registerResult.remoteInstanceId ?? selfInstanceId;
+
+    // ── Step 4b: Local collision check — reject if this instanceId already exists ──
     const [localExisting] = await db
       .select({ id: remoteConnections.id })
       .from(remoteConnections)
@@ -360,47 +398,6 @@ export class RemoteConnectionConnectRepository {
       });
     }
 
-    // ── Step 3c: Generate reverse token for bidirectional auth ────────────────
-    // The remote needs a JWT signed by OUR secret to call our /report endpoint.
-    // This enables the remote to push task completion status back to us.
-    let reverseToken: string | undefined;
-    const reverseTokenResult = await AuthRepository.signJwt(
-      user,
-      logger,
-      locale,
-    );
-    if (reverseTokenResult.success) {
-      reverseToken = reverseTokenResult.data;
-    } else {
-      logger.warn(
-        "[CONNECT] Failed to generate reverse token, continuing without it",
-      );
-    }
-
-    // ── Step 4: Register this instance on the remote ───────────────────────────
-    // Send our self-identity (not the local connection name) so the remote knows
-    // us by our actual instanceId. The form's `instanceId` is the name WE give
-    // the remote in OUR DB; the remote should see us as `selfInstanceId`.
-    const registerResult =
-      await RemoteConnectionConnectRepository.registerOnRemote({
-        remoteUrl,
-        token,
-        leadId: effectiveLeadId,
-        instanceId: selfInstanceId,
-        locale,
-        friendlyName: friendlyName ?? selfInstanceId,
-        reverseToken,
-        reverseLeadId: user.leadId,
-        logger,
-      });
-
-    if (!registerResult.ok) {
-      return fail({
-        message: t("post.errors.server.title"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
     // ── Step 5: Store locally ───────────────────────────────────────────────────
     const storeResult = await RemoteConnectionRepository.upsertRemoteConnection(
       {
@@ -409,9 +406,7 @@ export class RemoteConnectionConnectRepository {
         token,
         leadId: effectiveLeadId,
         instanceId,
-        friendlyName: friendlyName ?? instanceId,
-        remoteFriendlyName: registerResult.remoteFriendlyName ?? undefined,
-        remoteInstanceId: registerResult.remoteInstanceId ?? undefined,
+        remoteInstanceId: selfInstanceId,
         isDefault: true,
         logger,
       },
@@ -431,12 +426,8 @@ export class RemoteConnectionConnectRepository {
     await RemoteConnectionRepository.upsertInstanceIdentity({
       userId: user.id,
       instanceId: selfInstanceId,
-      friendlyName: selfInstanceId,
       isDefault: true,
     });
-
-    // Invalidate cache AFTER upsert so pulse/task-sync pick up the new identity
-    RemoteConnectionRepository.invalidateInstanceIdCache();
 
     // ── Step 6: Write default remote tools to user's availableTools setting ───────
     try {
@@ -497,6 +488,29 @@ export class RemoteConnectionConnectRepository {
       instanceId,
     });
 
-    return success({ remoteUrlResult: remoteUrl, isConnected: true });
+    // ── Step 7: Immediate bidirectional capability sync ────────────────────────
+    // Fire-and-forget: sends our capabilities to the remote and pulls theirs back.
+    // This populates both sides without waiting for the next cron pulse (~1 min).
+    void (async (): Promise<void> => {
+      try {
+        const { TaskSyncRepository } =
+          await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/repository");
+        await TaskSyncRepository.pullFromRemote(logger, locale);
+        logger.info("[CONNECT] Initial capability sync completed", {
+          instanceId,
+        });
+      } catch (syncError) {
+        // Non-fatal — capabilities will sync on the next cron pulse
+        logger.warn("[CONNECT] Initial capability sync failed (non-fatal)", {
+          error: String(syncError),
+        });
+      }
+    })();
+
+    return success({
+      remoteUrlResult: remoteUrl,
+      instanceId,
+      isConnected: true,
+    });
   }
 }

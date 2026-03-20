@@ -69,12 +69,6 @@ const { POST } = createEndpoint({
           .url({ message: "post.localUrl.validation.invalid" })
           .transform((val) => val.replace(/\/+$/, "")),
       }),
-      friendlyName: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        columns: 6,
-        schema: z.string().max(64).optional(),
-      }),
       reverseToken: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -108,11 +102,6 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),
-      }),
-      remoteFriendlyName: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        hidden: true,
-        schema: z.string().nullable(),
       }),
     },
   }),
@@ -166,14 +155,12 @@ const { POST } = createEndpoint({
       default: {
         instanceId: "hermes",
         localUrl: "http://localhost:3000",
-        friendlyName: "Hermes Dev",
       },
     },
     responses: {
       default: {
         registered: true,
         remoteInstanceId: "thea",
-        remoteFriendlyName: "Thea Cloud",
       },
     },
   },

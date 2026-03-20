@@ -3,6 +3,8 @@
  * Server-side preview generation with client-side test email sending
  */
 
+export const dynamic = "force-dynamic";
+
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";

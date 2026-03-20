@@ -233,10 +233,18 @@ export class RouteDelegationHandler {
           PlatformMarker.CLI_AUTH_BYPASS,
         );
 
-      if (isCliAuthBypass && options.platform !== Platform.MCP) {
+      if (
+        isCliAuthBypass &&
+        options.platform !== Platform.MCP &&
+        options.cliTarget !== CliTarget.REMOTE
+      ) {
         // CLI / CLI_PACKAGE with CLI_AUTH_BYPASS: never touch the DB
         cliUser = createCliBypassUser();
-      } else if (isCliAuthBypass && options.platform === Platform.MCP) {
+      } else if (
+        isCliAuthBypass &&
+        options.platform === Platform.MCP &&
+        options.cliTarget !== CliTarget.REMOTE
+      ) {
         // MCP with CLI_AUTH_BYPASS: try DB/session for a real user, fall back to bypass
         const cliUserResult = await (
           await loadGetCliUser()

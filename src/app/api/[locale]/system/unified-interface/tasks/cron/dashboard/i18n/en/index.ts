@@ -69,6 +69,7 @@ export const translations = {
     },
     response: {
       tasks: { title: "Tasks with recent executions" },
+      campaignTasks: { title: "Campaign tasks" },
       alerts: { title: "Failure alerts for critical/high priority tasks" },
       stats: { title: "Aggregate statistics" },
     },

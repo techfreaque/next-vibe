@@ -41,7 +41,6 @@ export class RemoteConnectionInstanceRepository {
       });
       return success({
         isConnected: false,
-        friendlyName: null,
         remoteUrl: null,
         isActive: null,
         lastSyncedAt: null,
@@ -50,7 +49,6 @@ export class RemoteConnectionInstanceRepository {
 
     return success({
       isConnected: true,
-      friendlyName: row.friendlyName,
       remoteUrl: row.remoteUrl,
       isActive: row.isActive,
       lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,

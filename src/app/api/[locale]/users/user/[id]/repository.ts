@@ -265,6 +265,13 @@ export class UserByIdRepository {
         });
       }
 
+      // Delete user roles first to satisfy FK constraint
+      await UserRolesRepository.deleteByUserId(
+        urlPathParams.id,
+        logger,
+        locale,
+      );
+
       // Delete user
       await db.delete(users).where(eq(users.id, urlPathParams.id));
 

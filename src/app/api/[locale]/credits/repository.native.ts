@@ -251,6 +251,8 @@ export class CreditRepository {
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars -- required for type compatibility
     _t: CreditsT,
+    // oxlint-disable-next-line no-unused-vars -- required for type compatibility
+    _locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("mergePendingLeadWallets is not implemented on native");

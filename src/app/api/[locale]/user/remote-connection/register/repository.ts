@@ -25,6 +25,7 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { instanceIdentities, remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
@@ -40,12 +41,13 @@ export class RemoteConnectionRegisterRepository {
   static async checkDirectAccessibility(
     localUrl: string | null | undefined,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<boolean> {
     if (!localUrl) {
       return false;
     }
     try {
-      const healthUrl = `${localUrl.replace(/\/$/, "")}/api/health`;
+      const healthUrl = `${localUrl.replace(/\/$/, "")}/api/${locale}/user/private/me`;
       const resp = await fetch(healthUrl, {
         method: "GET",
         signal: AbortSignal.timeout(5000),
@@ -66,20 +68,22 @@ export class RemoteConnectionRegisterRepository {
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
     t: RemoteRegisterT,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       registered: boolean;
       remoteInstanceId: string;
-      remoteFriendlyName: string | null;
     }>
   > {
     const { instanceId, localUrl, reverseToken, reverseLeadId } = data;
 
-    // Reject if the remote's instanceId collides with our own self-identity.
-    const selfInstanceId =
-      RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+    const selfInstanceId = await RemoteConnectionRepository.getLocalInstanceId(
+      user.id,
+    );
+
+    // Reject if the connecting instance's ID collides with our own self-identity.
     if (instanceId === selfInstanceId) {
-      logger.warn("[REGISTER] Instance ID collides with cloud self-identity", {
+      logger.warn("[REGISTER] Instance ID collides with self-identity", {
         userId: user.id,
         instanceId,
         selfInstanceId,
@@ -105,8 +109,6 @@ export class RemoteConnectionRegisterRepository {
       .values({
         userId: user.id,
         instanceId,
-        friendlyName: data.friendlyName ?? instanceId,
-        remoteFriendlyName: data.friendlyName ?? null,
         remoteUrl: localUrl, // from cloud's perspective, the local IS the remote
         localUrl,
         token: encryptedReverseToken,
@@ -120,7 +122,6 @@ export class RemoteConnectionRegisterRepository {
         set: {
           localUrl,
           remoteUrl: localUrl,
-          remoteFriendlyName: data.friendlyName ?? null,
           isActive: true,
           remoteInstanceId: instanceId,
           ...(encryptedReverseToken ? { token: encryptedReverseToken } : {}),
@@ -144,6 +145,7 @@ export class RemoteConnectionRegisterRepository {
         await RemoteConnectionRegisterRepository.checkDirectAccessibility(
           localUrl,
           logger,
+          locale,
         );
       if (isDirectlyAccessible) {
         try {
@@ -185,40 +187,19 @@ export class RemoteConnectionRegisterRepository {
 
     // ── Also set the cloud's own self-identity record (if not already set) ──
     // Reuses selfInstanceId from the collision check above.
-    const [selfIdentity] = await db
+    await db
       .insert(instanceIdentities)
       .values({
         userId: user.id,
         instanceId: selfInstanceId,
-        friendlyName: selfInstanceId,
         isDefault: true,
         updatedAt: new Date(),
       })
-      .onConflictDoNothing()
-      .returning({ friendlyName: instanceIdentities.friendlyName });
-
-    // If onConflictDoNothing fired (record exists), fetch the existing name
-    let selfFriendlyName = selfIdentity?.friendlyName ?? null;
-    if (!selfFriendlyName) {
-      const [existing] = await db
-        .select({ friendlyName: instanceIdentities.friendlyName })
-        .from(instanceIdentities)
-        .where(
-          and(
-            eq(instanceIdentities.userId, user.id),
-            eq(instanceIdentities.instanceId, selfInstanceId),
-          ),
-        )
-        .limit(1);
-      selfFriendlyName = existing?.friendlyName ?? selfInstanceId;
-    }
-
-    RemoteConnectionRepository.invalidateInstanceIdCache();
+      .onConflictDoNothing();
 
     return success({
       registered: true,
       remoteInstanceId: selfInstanceId,
-      remoteFriendlyName: selfFriendlyName,
     });
   }
 }

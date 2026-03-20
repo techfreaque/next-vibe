@@ -25,11 +25,6 @@ import { envClient } from "@/config/env-client";
 import type { RemoteConnectionsListResponseOutput } from "../list/definition";
 import { scopedTranslation } from "./i18n";
 import { RemoteConnectWidget } from "./widget";
-import { Environment } from "../../../shared/utils";
-
-// Default instanceId: "thea" on production, "hermes" on local/dev
-const defaultInstanceId =
-  envClient.NODE_ENV === Environment.PRODUCTION ? "thea" : "hermes";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -51,33 +46,6 @@ const { POST } = createEndpoint({
     children: {
       backButton: backButton(scopedTranslation, {
         usage: { request: "data" },
-      }),
-      instanceId: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.instanceId.label" as const,
-        description: "post.instanceId.description" as const,
-        placeholder: "post.instanceId.placeholder" as const,
-        columns: 6,
-        theme: { style: "none" },
-        schema: z
-          .string()
-          .min(1)
-          .max(32)
-          .regex(/^[a-z0-9-]+$/, {
-            message: "post.instanceId.validation.invalid",
-          })
-          .default(defaultInstanceId),
-      }),
-      friendlyName: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "post.friendlyName.label" as const,
-        description: "post.friendlyName.description" as const,
-        placeholder: "post.friendlyName.placeholder" as const,
-        columns: 6,
-        theme: { style: "none" },
-        schema: z.string().min(1).max(64).default(defaultInstanceId),
       }),
       remoteUrl: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -137,6 +105,11 @@ const { POST } = createEndpoint({
         usage: { request: "data" },
       }),
       remoteUrlResult: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string(),
+      }),
+      instanceId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),
@@ -206,12 +179,12 @@ const { POST } = createEndpoint({
             if (!prev?.success) {
               return undefined;
             }
+            const instanceId = data.responseData.instanceId;
             const newConn: RemoteConnectionsListResponseOutput["connections"][number] =
               {
-                instanceId: data.requestData.instanceId,
-                friendlyName: data.requestData.friendlyName,
-                remoteFriendlyName: null,
+                instanceId,
                 remoteUrl: data.requestData.remoteUrl,
+                localUrl: null,
                 isActive: true,
                 lastSyncedAt: new Date().toISOString(),
                 hasToken: true,
@@ -241,8 +214,6 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        instanceId: defaultInstanceId,
-        friendlyName: "My Laptop",
         remoteUrl: envClient.NEXT_PUBLIC_PROJECT_URL,
         email: "you@example.com",
         password: "your-password",
@@ -251,6 +222,7 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         remoteUrlResult: "https://unbottled.ai",
+        instanceId: "thea",
         isConnected: true,
       },
     },

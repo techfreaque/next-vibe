@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, eq, isNull, or, sql } from "drizzle-orm";
+import { and, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -21,6 +21,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { pipelineDatapoints, pipelineGraphs } from "./db";
 import { runBacktest } from "./engine/backtest";
 import { runGraph } from "./engine/runner";
@@ -36,10 +37,12 @@ import type {
   GraphsGetResponseOutput,
   GraphsPostResponseOutput,
 } from "./graphs/definition";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { VibeSenseT } from "./i18n";
 import { scopedTranslation } from "./i18n";
+import { evictExpiredSnapshots } from "./store/cache";
+import { runAllRetentionCleanup } from "./store/datapoints";
+import { cleanupOldSignals } from "./store/signals";
 
 // ─── Private Input/Response Types ────────────────────────────────────────────
 
@@ -109,9 +112,6 @@ interface CleanupResponse {
   graphsChecked: number;
   graphsExecuted: number;
 }
-import { evictExpiredSnapshots } from "./store/cache";
-import { runAllRetentionCleanup } from "./store/datapoints";
-import { cleanupOldSignals } from "./store/signals";
 
 /**
  * Downsample a raw (typically 1-minute) series into buckets of `bucketMs` width.
@@ -200,22 +200,30 @@ export class VibeSenseRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    search: string | undefined,
   ): Promise<ResponseType<GraphsGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
+      const conditions = [
+        eq(pipelineGraphs.isActive, true),
+        isNull(pipelineGraphs.archivedAt),
+        or(
+          eq(pipelineGraphs.ownerType, "system"),
+          eq(pipelineGraphs.ownerId, user.id!),
+        ),
+      ];
+      if (search) {
+        conditions.push(
+          or(
+            ilike(pipelineGraphs.name, `%${search}%`),
+            ilike(pipelineGraphs.slug, `%${search}%`),
+          )!,
+        );
+      }
       const rows = await db
         .select()
         .from(pipelineGraphs)
-        .where(
-          and(
-            eq(pipelineGraphs.isActive, true),
-            isNull(pipelineGraphs.archivedAt),
-            or(
-              eq(pipelineGraphs.ownerType, "system"),
-              eq(pipelineGraphs.ownerId, user.id!),
-            ),
-          ),
-        )
+        .where(and(...conditions))
         .orderBy(pipelineGraphs.createdAt);
 
       const graphs: GraphSummary[] = rows.map((r) => ({

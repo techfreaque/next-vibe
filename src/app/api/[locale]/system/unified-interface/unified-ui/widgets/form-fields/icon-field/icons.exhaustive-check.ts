@@ -273,6 +273,7 @@ const {
   SiGooglegemini,
   SiJavascript,
   SiLinux,
+  SiMinimax,
   SiMistralai,
   SiNextdotjs,
   SiNodedotjs,
@@ -283,6 +284,7 @@ const {
   SiRust,
   SiTypescript,
   SiX,
+  SiXiaomi,
   SiZendesk,
   VeniceAILogo,
   ...exhaustiveCheck

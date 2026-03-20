@@ -15,6 +15,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
+  createNextjsFormatter,
   formatActionCommand,
   formatCommand,
   formatConfig,
@@ -22,7 +23,6 @@ import {
   formatDuration,
   formatError,
   formatHint,
-  createNextjsFormatter,
   formatSkip,
   formatStartup,
   formatTask,
@@ -934,7 +934,7 @@ export class DevRepository {
         addPidToFile(VIBE_DEV_PID_FILE, nextProcess.pid);
       }
 
-      const formatNextjs = createNextjsFormatter();
+      const formatNextjs = createNextjsFormatter(nextPort, port);
       if (!disableProxy) {
         const rewritePort = (chunk: Buffer): void => {
           process.stdout.write(

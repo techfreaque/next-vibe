@@ -156,6 +156,7 @@ export class CreditRepository {
     userId: string,
     logger: EndpointLogger,
     t: CreditsT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
     try {
       // Get user wallet
@@ -176,13 +177,33 @@ export class CreditRepository {
 
       const linkedLeadIds = linkedLeads.map((l) => l.leadId);
 
-      const leadWallets =
+      let leadWallets =
         linkedLeadIds.length > 0
           ? await db
               .select()
               .from(creditWallets)
               .where(inArray(creditWallets.leadId, linkedLeadIds))
           : [];
+
+      // Auto-create missing lead wallets (can happen when a lead is linked at login/signup
+      // but no wallet was ever created for it via the IP-tracking flow)
+      if (linkedLeadIds.length > 0 && leadWallets.length === 0) {
+        const primaryLeadId = linkedLeadIds[0];
+        const walletResult = await CreditRepository.getOrCreateLeadWallet(
+          primaryLeadId,
+          logger,
+          t,
+          locale,
+        );
+        if (walletResult.success) {
+          leadWallets = [walletResult.data];
+        } else {
+          logger.warn("Failed to auto-create missing lead wallet", {
+            userId,
+            leadId: primaryLeadId,
+          });
+        }
+      }
 
       return success({
         userWallet: userWalletResult.data,
@@ -322,7 +343,7 @@ export class CreditRepository {
 
       if (userLink) {
         // Lead is linked to user -> return user's pool
-        return CreditRepository.getUserPool(userLink.userId, logger, t);
+        return CreditRepository.getUserPool(userLink.userId, logger, t, locale);
       }
 
       // Lead is not linked to user -> find lead-to-lead pool
@@ -1308,6 +1329,7 @@ export class CreditRepository {
           identifier.userId,
           logger,
           t,
+          locale,
         );
       } else if (identifier.leadId) {
         poolResult = await CreditRepository.getLeadPool(
@@ -1426,7 +1448,12 @@ export class CreditRepository {
           locale,
         );
       } else {
-        poolResult = await CreditRepository.getUserPool(user.id, logger, t);
+        poolResult = await CreditRepository.getUserPool(
+          user.id,
+          logger,
+          t,
+          locale,
+        );
       }
 
       if (!poolResult.success) {
@@ -1890,6 +1917,7 @@ export class CreditRepository {
           identifier.userId,
           logger,
           t,
+          locale,
         );
         // For authenticated users, we need to know which lead is current
         // Get the leadId from identifier or fetch primary lead
@@ -3476,15 +3504,21 @@ export class CreditRepository {
     leadIds: string[],
     logger: EndpointLogger,
     t: CreditsT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Linking lead wallets to user during signup/login", {
         userId,
-        leadIds,
+        leadIds: leadIds.length,
       });
 
       // Get user pool (this will create user wallet if it doesn't exist)
-      const poolResult = await CreditRepository.getUserPool(userId, logger, t);
+      const poolResult = await CreditRepository.getUserPool(
+        userId,
+        logger,
+        t,
+        locale,
+      );
       if (!poolResult.success) {
         logger.error("Failed to get user pool during signup", {
           userId,
@@ -3496,7 +3530,6 @@ export class CreditRepository {
       logger.debug("Lead wallets linked to user pool", {
         userId,
         poolLeadCount: poolResult.data.leadWallets.length,
-        leadWalletIds: poolResult.data.leadWallets.map((w) => w.id),
       });
 
       return success();

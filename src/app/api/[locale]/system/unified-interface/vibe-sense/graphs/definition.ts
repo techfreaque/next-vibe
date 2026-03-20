@@ -40,8 +40,17 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: GraphListContainer,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      search: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "list.fields.search.label",
+        description: "list.fields.search.description",
+        placeholder: "list.fields.search.placeholder",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
       graphs: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: objectField(scopedTranslation, {
@@ -136,7 +145,10 @@ const { GET } = createEndpoint({
     title: "list.success.title",
     description: "list.success.description",
   },
-  examples: { responses: { default: { graphs: [] } } },
+  examples: {
+    requests: { default: {} },
+    responses: { default: { graphs: [] } },
+  },
 });
 
 // ─── Graph Create (POST) ─────────────────────────────────────────────────────

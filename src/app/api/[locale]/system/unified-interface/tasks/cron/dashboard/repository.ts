@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { count, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -87,14 +87,22 @@ export class CronDashboardRepository {
       const now = new Date();
       const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-      const ownerFilter = isAdmin ? undefined : eq(cronTasks.userId, userId);
+      const CAMPAIGN_TASK_IDS = [
+        "campaign-starter",
+        "email-campaigns",
+        "bounce-processor",
+      ];
+
+      const taskFilter = isAdmin
+        ? eq(cronTasks.hidden, false)
+        : and(eq(cronTasks.userId, userId), eq(cronTasks.hidden, false));
 
       const [taskRows, statsResult] = await Promise.all([
-        // Query 1: Tasks
+        // Query 1: Tasks (hidden excluded at DB level)
         db
           .select()
           .from(cronTasks)
-          .where(ownerFilter)
+          .where(taskFilter)
           .orderBy(desc(cronTasks.updatedAt))
           .limit(taskLimit),
 
@@ -239,8 +247,13 @@ export class CronDashboardRepository {
         systemHealth,
       });
 
+      const campaignTasks = formattedTasks.filter((task) =>
+        CAMPAIGN_TASK_IDS.includes(task.id),
+      );
+
       return success({
         tasks: formattedTasks,
+        campaignTasks,
         alerts,
         stats: {
           totalTasks,

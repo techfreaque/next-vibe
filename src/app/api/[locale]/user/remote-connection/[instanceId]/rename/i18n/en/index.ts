@@ -11,10 +11,10 @@ export const translations = {
       description: "The instance to rename",
       placeholder: "hermes",
     },
-    friendlyName: {
-      label: "Friendly Name",
-      description: "A human-readable name for this connection",
-      placeholder: "My Laptop",
+    newInstanceId: {
+      label: "New Instance ID",
+      description: "The new identifier for this connection",
+      placeholder: "hermes-work",
     },
     errors: {
       validation: {

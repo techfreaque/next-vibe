@@ -9,6 +9,13 @@ export const translations: typeof enTranslations = {
   list: {
     title: "Grafy potokow",
     description: "Lista wszystkich grafow widocznych dla biezacego uzytkownika",
+    fields: {
+      search: {
+        label: "Szukaj",
+        description: "Filtruj grafy po nazwie lub slugu",
+        placeholder: "Szukaj grafow...",
+      },
+    },
     container: {
       title: "Grafy",
       description: "Wszystkie grafy potokow",

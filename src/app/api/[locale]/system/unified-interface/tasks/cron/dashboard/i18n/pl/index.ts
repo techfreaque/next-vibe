@@ -71,6 +71,7 @@ export const translations: typeof enTranslations = {
     },
     response: {
       tasks: { title: "Zadania z ostatnimi wykonaniami" },
+      campaignTasks: { title: "Zadania kampanii" },
       alerts: {
         title: "Alerty awarii dla zadań o krytycznym/wysokim priorytecie",
       },

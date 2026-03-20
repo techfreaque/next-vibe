@@ -53,13 +53,6 @@ const { POST } = createEndpoint({
         // The local instance's instanceId — used to look up the connection record on cloud
         schema: z.string().optional(),
       }),
-      friendlyName: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        columns: 12,
-        // The local instance's friendly name — synced bidirectionally
-        schema: z.string().max(64).optional(),
-      }),
       memoriesHash: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -128,11 +121,6 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      remoteFriendlyName: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        // The remote instance's friendly name — for display on the local side
-        schema: z.string().nullable(),
-      }),
       serverTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         // Remote server's DB time at sync — use as cursor to avoid JS/container timezone skew
@@ -189,7 +177,6 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         instanceId: "hermes",
-        friendlyName: "Hermes Dev",
         memoriesHash: "sha256:abc123",
         capabilitiesVersion: "519b91e8edbf",
         taskCursor: "2026-01-01T00:00:00.000Z",
@@ -203,7 +190,6 @@ const { POST } = createEndpoint({
         capabilities: null,
         tasks: "[]",
         memoriesSynced: 0,
-        remoteFriendlyName: "Thea Cloud",
         serverTime: "2026-01-01T00:00:00.000Z",
       },
     },

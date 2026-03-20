@@ -23,19 +23,6 @@ export const translations = {
     title: "Mit Remote-Konto verbinden",
     description:
       "Verbinde dein Konto mit einer Remote-Instanz, um Erinnerungen zu synchronisieren",
-    instanceId: {
-      label: "Instanz-ID",
-      description: "Eine kurze eindeutige ID für diese Maschine",
-      placeholder: "hermes",
-      validation: {
-        invalid: "Nur Kleinbuchstaben, Zahlen und Bindestriche erlaubt",
-      },
-    },
-    friendlyName: {
-      label: "Anzeigename",
-      description: "Ein freundlicher Name für die Anzeige",
-      placeholder: "Mein Laptop",
-    },
     remoteUrl: {
       label: "Remote-URL",
       description:

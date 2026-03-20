@@ -148,7 +148,6 @@ const { DELETE } = createEndpoint({
               success: true,
               data: {
                 isConnected: false,
-                friendlyName: null,
                 remoteUrl: null,
                 isActive: null,
                 lastSyncedAt: null,

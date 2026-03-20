@@ -18,11 +18,11 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { MessageStatus } from "../../../../messenger/messages/enum";
 import {
   CampaignType,
   type CampaignTypeValue,
 } from "../../../../messenger/accounts/enum";
+import { MessageStatus } from "../../../../messenger/messages/enum";
 import { emailCampaigns, leads } from "../../../db";
 import type {
   EmailCampaignStageValues,
@@ -265,7 +265,7 @@ export class CampaignSchedulerService {
         .limit(1);
 
       if (existingCampaign.length > 0) {
-        logger.info("campaign.schedule.email.already.scheduled", {
+        logger.debug("Campaign already scheduled", {
           leadId,
           campaignType,
           stage,

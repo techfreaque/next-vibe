@@ -15,7 +15,12 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { LeadSortField, SortOrder } from "../enum";
+import {
+  LeadSortField,
+  LeadStatus,
+  LeadStatusFilter,
+  SortOrder,
+} from "../enum";
 import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type { LeadSearchGetResponseOutput } from "./definition";
@@ -27,6 +32,7 @@ import type { LeadsSearchT } from "./i18n";
  */
 interface SearchRequestType {
   search?: string;
+  status?: string;
   limit: number;
   offset: number;
 }
@@ -46,6 +52,7 @@ export class LeadSearchRepository {
   ): Promise<ResponseType<LeadSearchGetResponseOutput>> {
     logger.debug("Searching leads", {
       searchTerm: data.search,
+      status: data.status,
       limit: data.limit,
       offset: data.offset,
     });
@@ -56,12 +63,26 @@ export class LeadSearchRepository {
 
     const leadsT: LeadsT = leadsScopedTranslation.scopedT(locale).t;
 
+    // Map LeadStatus value → LeadStatusFilter value (same keys, different i18n paths)
+    const statusFilterValue:
+      | (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter][]
+      | undefined = data.status
+      ? (() => {
+          const key = Object.keys(LeadStatus).find(
+            (k) => LeadStatus[k as keyof typeof LeadStatus] === data.status,
+          ) as keyof typeof LeadStatusFilter | undefined;
+          return key && LeadStatusFilter[key]
+            ? [LeadStatusFilter[key]]
+            : undefined;
+        })()
+      : undefined;
+
     // Use the existing listLeads method with search filter
     const searchResult = await LeadsRepository.listLeads(
       {
         statusFilters: {
           search: data.search ?? undefined,
-          status: undefined, // Search all statuses
+          status: statusFilterValue,
           currentCampaignStage: undefined,
           source: undefined,
         },

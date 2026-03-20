@@ -75,6 +75,9 @@ const { POST } = createEndpoint({
   },
   icon: "sparkles",
   category: "app.endpointCategories.ai",
+  cli: {
+    firstCliArgKey: "prompt",
+  },
   tags: ["tags.ai", "tags.chat"],
 
   // No events — run emits to the messages channel directly.

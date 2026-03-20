@@ -12,6 +12,7 @@ import {
   desc,
   eq,
   gte,
+  ilike,
   inArray,
   lte,
   or,
@@ -61,20 +62,20 @@ export class CronHistoryRepository {
         data?.limit && Number(data.limit) > 0 ? Number(data.limit) : 50;
       const offset = data?.offset ? Number(data.offset) : 0;
 
-      // Build conditions
-      const conditions = [];
+      // Base conditions (applied to all queries including status counts)
+      const baseConditions = [];
 
       // Filter executions to only those belonging to the user's tasks (unless admin)
       // Use correlated subqueries to avoid referencing the joined table in WHERE,
       // which causes Drizzle to drop the LEFT JOIN from count/stats queries.
       if (!isAdmin) {
         if (userId) {
-          conditions.push(
+          baseConditions.push(
             sql`EXISTS (SELECT 1 FROM ${cronTasks} WHERE ${cronTasks.id} = ${cronTaskExecutions.taskId} AND ${cronTasks.userId} = ${userId})`,
           );
         } else {
           // Public users see nothing
-          conditions.push(
+          baseConditions.push(
             eq(cronTaskExecutions.id, "00000000-0000-0000-0000-000000000000"),
           );
         }
@@ -83,7 +84,7 @@ export class CronHistoryRepository {
       // Hidden tasks are excluded from history, UNLESS they failed (so errors are never silently hidden)
       // Use a correlated subquery to avoid referencing the joined table in WHERE,
       // which causes Drizzle to drop the LEFT JOIN from count/stats queries.
-      conditions.push(
+      baseConditions.push(
         or(
           sql`EXISTS (SELECT 1 FROM ${cronTasks} WHERE ${cronTasks.id} = ${cronTaskExecutions.taskId} AND ${cronTasks.hidden} = false)`,
           inArray(cronTaskExecutions.status, [
@@ -95,8 +96,39 @@ export class CronHistoryRepository {
       );
 
       if (data?.taskId) {
-        conditions.push(eq(cronTaskExecutions.taskId, data.taskId));
+        baseConditions.push(eq(cronTaskExecutions.taskId, data.taskId));
       }
+
+      if (data?.taskName) {
+        baseConditions.push(ilike(cronTasks.routeId, `%${data.taskName}%`));
+      }
+
+      if (data?.priority) {
+        const priorityStrings = data.priority.split(",").map((p) => p.trim());
+        if (priorityStrings.length > 0) {
+          baseConditions.push(
+            inArray(
+              cronTasks.priority,
+              priorityStrings as (typeof CronTaskPriority)[keyof typeof CronTaskPriority][],
+            ),
+          );
+        }
+      }
+
+      if (data?.startDate) {
+        baseConditions.push(
+          gte(cronTaskExecutions.startedAt, new Date(data.startDate)),
+        );
+      }
+
+      if (data?.endDate) {
+        baseConditions.push(
+          lte(cronTaskExecutions.startedAt, new Date(data.endDate)),
+        );
+      }
+
+      // Full conditions including status filter (for executions list + count + stats)
+      const conditions = [...baseConditions];
 
       if (data?.status) {
         // Handle string status filter
@@ -115,18 +147,6 @@ export class CronHistoryRepository {
         if (validStatuses.length > 0) {
           conditions.push(inArray(cronTaskExecutions.status, validStatuses));
         }
-      }
-
-      if (data?.startDate) {
-        conditions.push(
-          gte(cronTaskExecutions.startedAt, new Date(data.startDate)),
-        );
-      }
-
-      if (data?.endDate) {
-        conditions.push(
-          lte(cronTaskExecutions.startedAt, new Date(data.endDate)),
-        );
       }
 
       // Query executions with task info
@@ -152,28 +172,7 @@ export class CronHistoryRepository {
         .limit(limit)
         .offset(offset);
 
-      // Filter by task name if provided
-      let executions = await executionsQuery;
-      if (data?.taskName) {
-        executions = executions.filter((exec) =>
-          exec.taskName?.toLowerCase().includes(data.taskName!.toLowerCase()),
-        );
-      }
-
-      // Filter by priority if provided
-      if (data?.priority) {
-        // Handle string priority filter
-        // Data is already validated through Zod schema, so strings are valid enum values
-        const priorityStrings = data.priority.split(",").map((p) => p.trim());
-        if (priorityStrings.length > 0) {
-          executions = executions.filter((exec) => {
-            if (!exec.priority) {
-              return false;
-            }
-            return priorityStrings.includes(String(exec.priority));
-          });
-        }
-      }
+      const executions = await executionsQuery;
 
       // Get total count
       const [countResult] = await db
@@ -183,7 +182,7 @@ export class CronHistoryRepository {
 
       const totalCount = countResult?.count ?? 0;
 
-      // Calculate summary statistics
+      // Calculate summary statistics (against full conditions including status filter)
       const [statsResult] = await db
         .select({
           totalExecutions: count(),
@@ -196,7 +195,32 @@ export class CronHistoryRepository {
           averageDuration: avg(cronTaskExecutions.durationMs),
         })
         .from(cronTaskExecutions)
+        .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
         .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+      // Status counts against base conditions (no status filter) for accurate chip counts
+      const [statusCountsResult] = await db
+        .select({
+          all: count(),
+          running: count(
+            sql`CASE WHEN ${cronTaskExecutions.status} = ${CronTaskStatus.RUNNING} THEN 1 END`,
+          ),
+          completed: count(
+            sql`CASE WHEN ${cronTaskExecutions.status} = ${CronTaskStatus.COMPLETED} THEN 1 END`,
+          ),
+          failed: count(
+            sql`CASE WHEN ${cronTaskExecutions.status} IN (${CronTaskStatus.FAILED}, ${CronTaskStatus.ERROR}) THEN 1 END`,
+          ),
+          timeout: count(
+            sql`CASE WHEN ${cronTaskExecutions.status} = ${CronTaskStatus.TIMEOUT} THEN 1 END`,
+          ),
+          cancelled: count(
+            sql`CASE WHEN ${cronTaskExecutions.status} = ${CronTaskStatus.CANCELLED} THEN 1 END`,
+          ),
+        })
+        .from(cronTaskExecutions)
+        .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
+        .where(baseConditions.length > 0 ? and(...baseConditions) : undefined);
 
       const successRate =
         statsResult && statsResult.totalExecutions > 0
@@ -240,6 +264,14 @@ export class CronHistoryRepository {
         }),
         totalCount,
         hasMore: totalCount > offset + limit,
+        statusCounts: {
+          all: Number(statusCountsResult?.all ?? 0),
+          running: Number(statusCountsResult?.running ?? 0),
+          completed: Number(statusCountsResult?.completed ?? 0),
+          failed: Number(statusCountsResult?.failed ?? 0),
+          timeout: Number(statusCountsResult?.timeout ?? 0),
+          cancelled: Number(statusCountsResult?.cancelled ?? 0),
+        },
         summary: {
           totalExecutions: Number(statsResult?.totalExecutions ?? 0),
           successfulExecutions: Number(statsResult?.successfulExecutions ?? 0),

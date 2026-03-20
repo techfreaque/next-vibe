@@ -87,6 +87,9 @@ export const translations: typeof enTranslations = {
       hasMore: {
         title: "Więcej wyników dostępnych",
       },
+      statusCounts: {
+        title: "Liczba statusów",
+      },
       summary: {
         title: "Podsumowanie wykonań",
       },

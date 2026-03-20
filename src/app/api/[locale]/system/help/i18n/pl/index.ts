@@ -52,6 +52,12 @@ export const translations: typeof enTranslations = {
       hint: {
         title: "Wskazówka użycia",
       },
+      pinnedCount: {
+        title: "Przypięte narzędzia",
+      },
+      allowedCount: {
+        title: "Dozwolone narzędzia",
+      },
       currentPage: {
         title: "Bieżąca strona",
       },
@@ -87,6 +93,11 @@ export const translations: typeof enTranslations = {
         label: "ID instancji",
         description:
           "Filtruj do narzędzi z określonej zdalnej instancji. Zwraca narzędzia z przechowywanego snapshotu możliwości.",
+      },
+      pinnedToolIds: {
+        label: "ID przypiętych narzędzi",
+        description:
+          "Opcjonalna lista ID narzędzi przypiętych przez użytkownika. Serwer filtruje do tych narzędzi, ale zwraca pełną łączną liczbę.",
       },
       statsFilter: {
         label: "Filtr narzędzi",
@@ -303,6 +314,7 @@ export const translations: typeof enTranslations = {
       deselectAll: "Odznacz wszystkie",
       selectAll: "Zaznacz wszystkie",
       resetToDefault: "Przywróć domyślne",
+      loading: "Ładowanie...",
       noToolsFound: "Nie znaleziono narzędzi",
       noToolsAvailable: "Brak dostępnych narzędzi AI",
       legendActive: "Zawsze w kontekście (przypięte)",

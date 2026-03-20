@@ -55,7 +55,6 @@ export async function loadRemoteInstancesData(
     }
 
     const remoteConnections = connections.map((c) => ({
-      friendlyName: c.friendlyName,
       instanceId: c.remoteInstanceId ?? c.instanceId,
     }));
     const knownInstanceIds = remoteConnections.map((c) => c.instanceId);

@@ -59,16 +59,25 @@ export class RemoteConnectionDisconnectRepository {
         ),
       );
 
-    RemoteConnectionRepository.invalidateInstanceIdCache();
     logger.info("Disconnected remote connection locally", {
       userId: user.id,
       instanceId,
     });
 
-    // Fire-and-forget: notify cloud to remove the registration record too
+    // Fire-and-forget: notify remote to remove its record of us too.
+    // The remote stores us under our self-identity (remoteInstanceId), not under
+    // the local label we use for them (instanceId).
     if (row.token && row.remoteUrl) {
       const plainToken = RemoteConnectionRepository.decryptToken(row.token);
-      const remoteDeleteUrl = `${row.remoteUrl}/api/${locale}/user/remote-connection/${instanceId}/disconnect`;
+      const selfId = row.remoteInstanceId;
+      if (!selfId) {
+        logger.warn(
+          "No remoteInstanceId on connection — skipping remote disconnect",
+          { instanceId },
+        );
+        return success({ disconnected: true });
+      }
+      const remoteDeleteUrl = `${row.remoteUrl}/api/${locale}/user/remote-connection/${selfId}/disconnect`;
       fetch(remoteDeleteUrl, {
         method: "DELETE",
         headers: {

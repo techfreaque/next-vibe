@@ -6,8 +6,8 @@
 
 import "server-only";
 
-import Imap from "imap";
 import { and, eq, isNull, like, or, sql } from "drizzle-orm";
+import Imap from "imap";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -16,10 +16,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { imapFolders } from "@/app/api/[locale]/messenger/providers/email/imap-client/db";
 import { messengerAccounts as imapAccounts } from "@/app/api/[locale]/messenger/accounts/db";
-import { ImapSpecialUseType } from "@/app/api/[locale]/messenger/providers/email/imap-client/enum";
 import { emails } from "@/app/api/[locale]/messenger/messages/db";
+import { imapFolders } from "@/app/api/[locale]/messenger/providers/email/imap-client/db";
+import { ImapSpecialUseType } from "@/app/api/[locale]/messenger/providers/email/imap-client/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -224,7 +224,7 @@ export class BounceProcessorRepository {
     try {
       const { dryRun, batchSize } = data;
 
-      logger.info("bounce.processor.start", { dryRun, batchSize });
+      logger.debug("Bounce processor starting", { dryRun, batchSize });
 
       // Find unprocessed bounce emails synced from IMAP
       // We use a metadata flag to track which bounces have been processed
@@ -388,7 +388,7 @@ export class BounceProcessorRepository {
         }
       }
 
-      logger.info("bounce.processor.done", {
+      logger.debug("Bounce processor completed", {
         bouncesFound,
         leadsUpdated,
         campaignsCancelled,

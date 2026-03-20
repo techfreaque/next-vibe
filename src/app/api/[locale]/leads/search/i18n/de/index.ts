@@ -19,6 +19,10 @@ export const translations: typeof enTranslations = {
         "Suchbegriff um Leads nach E-Mail, Firmenname oder Notizen zu filtern",
       placeholder: "Suchbegriff eingeben...",
     },
+    status: {
+      label: "Status-Filter",
+      description: "Leads nach Status filtern",
+    },
     limit: {
       label: "Ergebnislimit",
       description: "Maximale Anzahl der zurückzugebenden Ergebnisse (1-100)",

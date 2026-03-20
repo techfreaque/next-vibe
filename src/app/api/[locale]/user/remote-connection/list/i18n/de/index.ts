@@ -8,6 +8,12 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Fernverbindungen",
     description: "Alle Fernverbindungen für dein Konto auflisten",
+    fields: {
+      activeOnly: {
+        label: "Nur aktive",
+        description: "Nur aktive Verbindungen zurückgeben",
+      },
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",
@@ -66,7 +72,6 @@ export const translations: typeof enTranslations = {
     connectButtonLocal: "Mit Cloud verbinden",
     inactiveBadge: "Inaktiv",
     instanceId: "Instanz-ID",
-    friendlyName: "Name",
     remoteUrl: "Remote-URL",
     viewButton: "Ansehen",
     editButton: "Umbenennen",

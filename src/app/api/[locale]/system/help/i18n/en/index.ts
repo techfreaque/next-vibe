@@ -52,6 +52,12 @@ export const translations = {
       hint: {
         title: "Usage hint",
       },
+      pinnedCount: {
+        title: "Pinned tool count",
+      },
+      allowedCount: {
+        title: "Allowed tool count",
+      },
       currentPage: {
         title: "Current page",
       },
@@ -87,6 +93,11 @@ export const translations = {
         label: "Instance ID",
         description:
           "Filter to tools from a specific remote instance. Returns tools from the stored capability snapshot for that instance.",
+      },
+      pinnedToolIds: {
+        label: "Pinned Tool IDs",
+        description:
+          "Optional list of tool IDs the user has pinned. When provided, server filters to these tools only but still returns the full totalCount.",
       },
       statsFilter: {
         label: "Tool Filter",
@@ -302,6 +313,7 @@ export const translations = {
       deselectAll: "Deselect All",
       selectAll: "Select All",
       resetToDefault: "Reset to Default",
+      loading: "Loading...",
       noToolsFound: "No tools match your search",
       noToolsAvailable: "No AI tools available",
       legendActive: "Always in context (pinned)",

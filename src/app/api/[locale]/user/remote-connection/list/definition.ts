@@ -9,10 +9,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
+  requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -35,16 +37,24 @@ export const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: RemoteConnectionsListContainer,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      activeOnly: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.fields.activeOnly.label",
+        description: "get.fields.activeOnly.description",
+        hidden: true,
+        schema: z.boolean().optional(),
+      }),
       connections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
           z.object({
             instanceId: z.string(),
-            friendlyName: z.string(),
-            remoteFriendlyName: z.string().nullable(),
             remoteUrl: z.string(),
+            /** Local instance URL — set on cloud-side records for direct embedding via vibe-frame */
+            localUrl: z.string().nullable(),
             isActive: z.boolean(),
             lastSyncedAt: z.string().nullable(),
             hasToken: z.boolean(),
@@ -58,10 +68,6 @@ export const { GET } = createEndpoint({
         ),
       }),
       selfInstanceId: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        schema: z.string().nullable(),
-      }),
-      selfFriendlyName: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().nullable(),
       }),
@@ -116,14 +122,14 @@ export const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: { default: {} },
     responses: {
       default: {
         connections: [
           {
             instanceId: "hermes",
-            friendlyName: "My Laptop",
-            remoteFriendlyName: "Thea Cloud",
             remoteUrl: "https://unbottled.ai",
+            localUrl: null,
             isActive: true,
             lastSyncedAt: "2026-03-01T12:00:00.000Z",
             hasToken: true,
@@ -131,7 +137,6 @@ export const { GET } = createEndpoint({
           },
         ],
         selfInstanceId: "hermes-dev",
-        selfFriendlyName: "hermes-dev",
         syncEnabled: false,
       },
     },

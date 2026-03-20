@@ -146,6 +146,8 @@ export function createEndpointLogger(
   locale: CountryLanguage,
 ): EndpointLogger {
   const isProduction = process.env["NODE_ENV"] === "production";
+  // Next.js server runtime prefixes timestamps to piped output already
+  const noTimePrefix = !!process.env["NEXT_RUNTIME"];
 
   const getTimePrefix = (): string => {
     if (isProduction) {
@@ -157,7 +159,8 @@ export function createEndpointLogger(
   const { t } = simpleT(locale);
 
   const formatMessage = (message: string): string => {
-    return `[${getTimePrefix()}] ${t(message as TranslationKey)}`;
+    const text = t(message as TranslationKey);
+    return noTimePrefix ? text : `[${getTimePrefix()}] ${text}`;
   };
 
   return {
@@ -213,8 +216,9 @@ export function createEndpointLogger(
         writeToFile(`[VIBE] [${getTimePrefix()}] ${message}`, metadataObj);
       } else {
         // Special vibe formatting - messages are plain strings
+        const vibePrefix = noTimePrefix ? "" : `[${getTimePrefix()}] `;
         // oxlint-disable-next-line no-console
-        console.log(`[${getTimePrefix()}] ${message}`, ...metadata);
+        console.log(`${vibePrefix}${message}`, ...metadata);
       }
     },
 
@@ -227,7 +231,10 @@ export function createEndpointLogger(
         } else {
           const meta = serializeDebugMeta(metadata);
           const text = `${t(message as TranslationKey)}${meta}`;
-          const line = `${colors.dim}[${getTimePrefix()}]${colors.reset} ${maybeColorize(text, semantic.debug)}`;
+          const timeTag = noTimePrefix
+            ? ""
+            : `${colors.dim}[${getTimePrefix()}]${colors.reset} `;
+          const line = `${timeTag}${maybeColorize(text, semantic.debug)}`;
           // oxlint-disable-next-line no-console
           console.log(line);
         }

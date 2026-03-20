@@ -14,10 +14,26 @@ import "server-only";
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
 // Fragment objects — from each module's system-prompt/prompt.ts
-import { bootstrapFragment, extraInstructionsFragment, folderContextFragment, formattingFragment, guestContextFragment, headlessContextFragment, identityFragment, languageFragment, messageMetadataFragment, platformOverviewFragment, toolExecutionControlFragment, userNameFragment } from "@/app/api/[locale]/agent/ai-stream/system-prompt/prompt";
+import {
+  bootstrapFragment,
+  extraInstructionsFragment,
+  folderContextFragment,
+  formattingFragment,
+  guestContextFragment,
+  headlessContextFragment,
+  identityFragment,
+  languageFragment,
+  messageMetadataFragment,
+  platformOverviewFragment,
+  toolExecutionControlFragment,
+  userNameFragment,
+} from "@/app/api/[locale]/agent/ai-stream/system-prompt/prompt";
 import { favoritesFragment } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
 import { memoriesFragment } from "@/app/api/[locale]/agent/chat/memories/system-prompt/prompt";
-import { remoteInstancesFragment, systemContextFragment } from "@/app/api/[locale]/user/remote-connection/system-prompt/prompt";
+import {
+  remoteInstancesFragment,
+  systemContextFragment,
+} from "@/app/api/[locale]/user/remote-connection/system-prompt/prompt";
 import { skillFragment } from "@/app/api/[locale]/agent/chat/skills/system-prompt/prompt";
 import { tasksFragment } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
 
@@ -41,7 +57,14 @@ export async function loadAllPromptFragments(
   trailing: Array<{ id: string; priority: number; str: string }>;
   byId: Record<string, string | null>;
 }> {
-  const [promptContextDataResult, favoritesDataResult, memoriesDataResult, remoteInstancesDataResult, skillDataResult, tasksDataResult] = await Promise.allSettled([
+  const [
+    promptContextDataResult,
+    favoritesDataResult,
+    memoriesDataResult,
+    remoteInstancesDataResult,
+    skillDataResult,
+    tasksDataResult,
+  ] = await Promise.allSettled([
     loadPromptContextData(params),
     loadFavoritesData(params),
     loadMemoriesData(params),
@@ -49,70 +72,296 @@ export async function loadAllPromptFragments(
     loadSkillData(params),
     loadTasksData(params),
   ]);
-  const promptContextData = promptContextDataResult.status === "fulfilled" ? promptContextDataResult.value : undefined;
-  const favoritesData = favoritesDataResult.status === "fulfilled" ? favoritesDataResult.value : undefined;
-  const memoriesData = memoriesDataResult.status === "fulfilled" ? memoriesDataResult.value : undefined;
-  const remoteInstancesData = remoteInstancesDataResult.status === "fulfilled" ? remoteInstancesDataResult.value : undefined;
-  const skillData = skillDataResult.status === "fulfilled" ? skillDataResult.value : undefined;
-  const tasksData = tasksDataResult.status === "fulfilled" ? tasksDataResult.value : undefined;
-  const bootstrapBuilt = promptContextData && (bootstrapFragment.condition ? bootstrapFragment.condition(promptContextData) : true) ? bootstrapFragment.build(promptContextData) : null;
-  const extraInstructionsBuilt = promptContextData && (extraInstructionsFragment.condition ? extraInstructionsFragment.condition(promptContextData) : true) ? extraInstructionsFragment.build(promptContextData) : null;
-  const favoritesBuilt = favoritesData && (favoritesFragment.condition ? favoritesFragment.condition(favoritesData) : true) ? favoritesFragment.build(favoritesData) : null;
-  const folderContextBuilt = promptContextData && (folderContextFragment.condition ? folderContextFragment.condition(promptContextData) : true) ? folderContextFragment.build(promptContextData) : null;
-  const formattingBuilt = promptContextData && (formattingFragment.condition ? formattingFragment.condition(promptContextData) : true) ? formattingFragment.build(promptContextData) : null;
-  const guestContextBuilt = promptContextData && (guestContextFragment.condition ? guestContextFragment.condition(promptContextData) : true) ? guestContextFragment.build(promptContextData) : null;
-  const headlessContextBuilt = promptContextData && (headlessContextFragment.condition ? headlessContextFragment.condition(promptContextData) : true) ? headlessContextFragment.build(promptContextData) : null;
-  const identityBuilt = promptContextData && (identityFragment.condition ? identityFragment.condition(promptContextData) : true) ? identityFragment.build(promptContextData) : null;
-  const languageBuilt = promptContextData && (languageFragment.condition ? languageFragment.condition(promptContextData) : true) ? languageFragment.build(promptContextData) : null;
-  const memoriesBuilt = memoriesData && (memoriesFragment.condition ? memoriesFragment.condition(memoriesData) : true) ? memoriesFragment.build(memoriesData) : null;
-  const messageMetadataBuilt = promptContextData && (messageMetadataFragment.condition ? messageMetadataFragment.condition(promptContextData) : true) ? messageMetadataFragment.build(promptContextData) : null;
-  const platformOverviewBuilt = promptContextData && (platformOverviewFragment.condition ? platformOverviewFragment.condition(promptContextData) : true) ? platformOverviewFragment.build(promptContextData) : null;
-  const remoteInstancesBuilt = remoteInstancesData && (remoteInstancesFragment.condition ? remoteInstancesFragment.condition(remoteInstancesData) : true) ? remoteInstancesFragment.build(remoteInstancesData) : null;
-  const skillBuilt = skillData && (skillFragment.condition ? skillFragment.condition(skillData) : true) ? skillFragment.build(skillData) : null;
-  const systemContextBuilt = remoteInstancesData && (systemContextFragment.condition ? systemContextFragment.condition(remoteInstancesData) : true) ? systemContextFragment.build(remoteInstancesData) : null;
-  const tasksBuilt = tasksData && (tasksFragment.condition ? tasksFragment.condition(tasksData) : true) ? tasksFragment.build(tasksData) : null;
-  const toolExecutionControlBuilt = promptContextData && (toolExecutionControlFragment.condition ? toolExecutionControlFragment.condition(promptContextData) : true) ? toolExecutionControlFragment.build(promptContextData) : null;
-  const userNameBuilt = promptContextData && (userNameFragment.condition ? userNameFragment.condition(promptContextData) : true) ? userNameFragment.build(promptContextData) : null;
+  const promptContextData =
+    promptContextDataResult.status === "fulfilled"
+      ? promptContextDataResult.value
+      : undefined;
+  const favoritesData =
+    favoritesDataResult.status === "fulfilled"
+      ? favoritesDataResult.value
+      : undefined;
+  const memoriesData =
+    memoriesDataResult.status === "fulfilled"
+      ? memoriesDataResult.value
+      : undefined;
+  const remoteInstancesData =
+    remoteInstancesDataResult.status === "fulfilled"
+      ? remoteInstancesDataResult.value
+      : undefined;
+  const skillData =
+    skillDataResult.status === "fulfilled" ? skillDataResult.value : undefined;
+  const tasksData =
+    tasksDataResult.status === "fulfilled" ? tasksDataResult.value : undefined;
+  const bootstrapBuilt =
+    promptContextData &&
+    (bootstrapFragment.condition
+      ? bootstrapFragment.condition(promptContextData)
+      : true)
+      ? bootstrapFragment.build(promptContextData)
+      : null;
+  const extraInstructionsBuilt =
+    promptContextData &&
+    (extraInstructionsFragment.condition
+      ? extraInstructionsFragment.condition(promptContextData)
+      : true)
+      ? extraInstructionsFragment.build(promptContextData)
+      : null;
+  const favoritesBuilt =
+    favoritesData &&
+    (favoritesFragment.condition
+      ? favoritesFragment.condition(favoritesData)
+      : true)
+      ? favoritesFragment.build(favoritesData)
+      : null;
+  const folderContextBuilt =
+    promptContextData &&
+    (folderContextFragment.condition
+      ? folderContextFragment.condition(promptContextData)
+      : true)
+      ? folderContextFragment.build(promptContextData)
+      : null;
+  const formattingBuilt =
+    promptContextData &&
+    (formattingFragment.condition
+      ? formattingFragment.condition(promptContextData)
+      : true)
+      ? formattingFragment.build(promptContextData)
+      : null;
+  const guestContextBuilt =
+    promptContextData &&
+    (guestContextFragment.condition
+      ? guestContextFragment.condition(promptContextData)
+      : true)
+      ? guestContextFragment.build(promptContextData)
+      : null;
+  const headlessContextBuilt =
+    promptContextData &&
+    (headlessContextFragment.condition
+      ? headlessContextFragment.condition(promptContextData)
+      : true)
+      ? headlessContextFragment.build(promptContextData)
+      : null;
+  const identityBuilt =
+    promptContextData &&
+    (identityFragment.condition
+      ? identityFragment.condition(promptContextData)
+      : true)
+      ? identityFragment.build(promptContextData)
+      : null;
+  const languageBuilt =
+    promptContextData &&
+    (languageFragment.condition
+      ? languageFragment.condition(promptContextData)
+      : true)
+      ? languageFragment.build(promptContextData)
+      : null;
+  const memoriesBuilt =
+    memoriesData &&
+    (memoriesFragment.condition
+      ? memoriesFragment.condition(memoriesData)
+      : true)
+      ? memoriesFragment.build(memoriesData)
+      : null;
+  const messageMetadataBuilt =
+    promptContextData &&
+    (messageMetadataFragment.condition
+      ? messageMetadataFragment.condition(promptContextData)
+      : true)
+      ? messageMetadataFragment.build(promptContextData)
+      : null;
+  const platformOverviewBuilt =
+    promptContextData &&
+    (platformOverviewFragment.condition
+      ? platformOverviewFragment.condition(promptContextData)
+      : true)
+      ? platformOverviewFragment.build(promptContextData)
+      : null;
+  const remoteInstancesBuilt =
+    remoteInstancesData &&
+    (remoteInstancesFragment.condition
+      ? remoteInstancesFragment.condition(remoteInstancesData)
+      : true)
+      ? remoteInstancesFragment.build(remoteInstancesData)
+      : null;
+  const skillBuilt =
+    skillData &&
+    (skillFragment.condition ? skillFragment.condition(skillData) : true)
+      ? skillFragment.build(skillData)
+      : null;
+  const systemContextBuilt =
+    remoteInstancesData &&
+    (systemContextFragment.condition
+      ? systemContextFragment.condition(remoteInstancesData)
+      : true)
+      ? systemContextFragment.build(remoteInstancesData)
+      : null;
+  const tasksBuilt =
+    tasksData &&
+    (tasksFragment.condition ? tasksFragment.condition(tasksData) : true)
+      ? tasksFragment.build(tasksData)
+      : null;
+  const toolExecutionControlBuilt =
+    promptContextData &&
+    (toolExecutionControlFragment.condition
+      ? toolExecutionControlFragment.condition(promptContextData)
+      : true)
+      ? toolExecutionControlFragment.build(promptContextData)
+      : null;
+  const userNameBuilt =
+    promptContextData &&
+    (userNameFragment.condition
+      ? userNameFragment.condition(promptContextData)
+      : true)
+      ? userNameFragment.build(promptContextData)
+      : null;
   const byId: Record<string, string | null> = {
-    "bootstrap": bootstrapBuilt,
+    bootstrap: bootstrapBuilt,
     "extra-instructions": extraInstructionsBuilt,
-    "favorites": favoritesBuilt,
+    favorites: favoritesBuilt,
     "folder-context": folderContextBuilt,
-    "formatting": formattingBuilt,
+    formatting: formattingBuilt,
     "guest-context": guestContextBuilt,
     "headless-context": headlessContextBuilt,
-    "identity": identityBuilt,
-    "language": languageBuilt,
-    "memories": memoriesBuilt,
+    identity: identityBuilt,
+    language: languageBuilt,
+    memories: memoriesBuilt,
     "message-metadata": messageMetadataBuilt,
     "platform-overview": platformOverviewBuilt,
     "remote-instances": remoteInstancesBuilt,
-    "skill": skillBuilt,
+    skill: skillBuilt,
     "system-context": systemContextBuilt,
-    "tasks": tasksBuilt,
+    tasks: tasksBuilt,
     "tool-execution-control": toolExecutionControlBuilt,
     "user-name": userNameBuilt,
   };
   const leading: Array<{ id: string; priority: number; str: string }> = [];
   const trailing: Array<{ id: string; priority: number; str: string }> = [];
-  if (bootstrapBuilt) { leading.push({ id: "bootstrap", priority: bootstrapFragment.priority, str: bootstrapBuilt }); }
-  if (extraInstructionsBuilt) { leading.push({ id: "extra-instructions", priority: extraInstructionsFragment.priority, str: extraInstructionsBuilt }); }
-  if (favoritesBuilt) { trailing.push({ id: "favorites", priority: favoritesFragment.priority, str: favoritesBuilt }); }
-  if (folderContextBuilt) { leading.push({ id: "folder-context", priority: folderContextFragment.priority, str: folderContextBuilt }); }
-  if (formattingBuilt) { leading.push({ id: "formatting", priority: formattingFragment.priority, str: formattingBuilt }); }
-  if (guestContextBuilt) { leading.push({ id: "guest-context", priority: guestContextFragment.priority, str: guestContextBuilt }); }
-  if (headlessContextBuilt) { leading.push({ id: "headless-context", priority: headlessContextFragment.priority, str: headlessContextBuilt }); }
-  if (identityBuilt) { leading.push({ id: "identity", priority: identityFragment.priority, str: identityBuilt }); }
-  if (languageBuilt) { leading.push({ id: "language", priority: languageFragment.priority, str: languageBuilt }); }
-  if (memoriesBuilt) { trailing.push({ id: "memories", priority: memoriesFragment.priority, str: memoriesBuilt }); }
-  if (messageMetadataBuilt) { leading.push({ id: "message-metadata", priority: messageMetadataFragment.priority, str: messageMetadataBuilt }); }
-  if (platformOverviewBuilt) { leading.push({ id: "platform-overview", priority: platformOverviewFragment.priority, str: platformOverviewBuilt }); }
-  if (remoteInstancesBuilt) { trailing.push({ id: "remote-instances", priority: remoteInstancesFragment.priority, str: remoteInstancesBuilt }); }
-  if (skillBuilt) { leading.push({ id: "skill", priority: skillFragment.priority, str: skillBuilt }); }
-  if (systemContextBuilt) { leading.push({ id: "system-context", priority: systemContextFragment.priority, str: systemContextBuilt }); }
-  if (tasksBuilt) { trailing.push({ id: "tasks", priority: tasksFragment.priority, str: tasksBuilt }); }
-  if (toolExecutionControlBuilt) { leading.push({ id: "tool-execution-control", priority: toolExecutionControlFragment.priority, str: toolExecutionControlBuilt }); }
-  if (userNameBuilt) { leading.push({ id: "user-name", priority: userNameFragment.priority, str: userNameBuilt }); }
+  if (bootstrapBuilt) {
+    leading.push({
+      id: "bootstrap",
+      priority: bootstrapFragment.priority,
+      str: bootstrapBuilt,
+    });
+  }
+  if (extraInstructionsBuilt) {
+    leading.push({
+      id: "extra-instructions",
+      priority: extraInstructionsFragment.priority,
+      str: extraInstructionsBuilt,
+    });
+  }
+  if (favoritesBuilt) {
+    trailing.push({
+      id: "favorites",
+      priority: favoritesFragment.priority,
+      str: favoritesBuilt,
+    });
+  }
+  if (folderContextBuilt) {
+    leading.push({
+      id: "folder-context",
+      priority: folderContextFragment.priority,
+      str: folderContextBuilt,
+    });
+  }
+  if (formattingBuilt) {
+    leading.push({
+      id: "formatting",
+      priority: formattingFragment.priority,
+      str: formattingBuilt,
+    });
+  }
+  if (guestContextBuilt) {
+    leading.push({
+      id: "guest-context",
+      priority: guestContextFragment.priority,
+      str: guestContextBuilt,
+    });
+  }
+  if (headlessContextBuilt) {
+    leading.push({
+      id: "headless-context",
+      priority: headlessContextFragment.priority,
+      str: headlessContextBuilt,
+    });
+  }
+  if (identityBuilt) {
+    leading.push({
+      id: "identity",
+      priority: identityFragment.priority,
+      str: identityBuilt,
+    });
+  }
+  if (languageBuilt) {
+    leading.push({
+      id: "language",
+      priority: languageFragment.priority,
+      str: languageBuilt,
+    });
+  }
+  if (memoriesBuilt) {
+    trailing.push({
+      id: "memories",
+      priority: memoriesFragment.priority,
+      str: memoriesBuilt,
+    });
+  }
+  if (messageMetadataBuilt) {
+    leading.push({
+      id: "message-metadata",
+      priority: messageMetadataFragment.priority,
+      str: messageMetadataBuilt,
+    });
+  }
+  if (platformOverviewBuilt) {
+    leading.push({
+      id: "platform-overview",
+      priority: platformOverviewFragment.priority,
+      str: platformOverviewBuilt,
+    });
+  }
+  if (remoteInstancesBuilt) {
+    trailing.push({
+      id: "remote-instances",
+      priority: remoteInstancesFragment.priority,
+      str: remoteInstancesBuilt,
+    });
+  }
+  if (skillBuilt) {
+    leading.push({
+      id: "skill",
+      priority: skillFragment.priority,
+      str: skillBuilt,
+    });
+  }
+  if (systemContextBuilt) {
+    leading.push({
+      id: "system-context",
+      priority: systemContextFragment.priority,
+      str: systemContextBuilt,
+    });
+  }
+  if (tasksBuilt) {
+    trailing.push({
+      id: "tasks",
+      priority: tasksFragment.priority,
+      str: tasksBuilt,
+    });
+  }
+  if (toolExecutionControlBuilt) {
+    leading.push({
+      id: "tool-execution-control",
+      priority: toolExecutionControlFragment.priority,
+      str: toolExecutionControlBuilt,
+    });
+  }
+  if (userNameBuilt) {
+    leading.push({
+      id: "user-name",
+      priority: userNameFragment.priority,
+      str: userNameBuilt,
+    });
+  }
   leading.sort((a, b) => a.priority - b.priority);
   trailing.sort((a, b) => a.priority - b.priority);
   return { leading, trailing, byId };

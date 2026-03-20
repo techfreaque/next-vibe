@@ -16,7 +16,7 @@ import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cro
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { instanceIdentities, remoteConnections } from "../db";
+import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import type { RemoteConnectionsListResponseOutput } from "./definition";
 
@@ -25,14 +25,22 @@ export class RemoteConnectionListRepository {
   static async listRemoteConnections(
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    activeOnly: boolean,
   ): Promise<ResponseType<RemoteConnectionsListResponseOutput>> {
     const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
 
-    const [rows, syncRow, selfInstanceId, selfIdentityRow] = await Promise.all([
+    const [rows, syncRow, selfInstanceId] = await Promise.all([
       db
         .select()
         .from(remoteConnections)
-        .where(eq(remoteConnections.userId, user.id))
+        .where(
+          activeOnly
+            ? and(
+                eq(remoteConnections.userId, user.id),
+                eq(remoteConnections.isActive, true),
+              )
+            : eq(remoteConnections.userId, user.id),
+        )
         .orderBy(remoteConnections.updatedAt),
       isAdmin
         ? db
@@ -47,16 +55,6 @@ export class RemoteConnectionListRepository {
             .limit(1)
         : Promise.resolve(null),
       RemoteConnectionRepository.getLocalInstanceId(user.id),
-      db
-        .select({ friendlyName: instanceIdentities.friendlyName })
-        .from(instanceIdentities)
-        .where(
-          and(
-            eq(instanceIdentities.userId, user.id),
-            eq(instanceIdentities.isDefault, true),
-          ),
-        )
-        .limit(1),
     ]);
 
     logger.debug("Listed remote connections", {
@@ -71,16 +69,14 @@ export class RemoteConnectionListRepository {
     return success({
       connections: rows.map((r) => ({
         instanceId: r.instanceId,
-        friendlyName: r.friendlyName,
-        remoteFriendlyName: r.remoteFriendlyName,
         remoteUrl: r.remoteUrl,
+        localUrl: r.localUrl ?? null,
         isActive: r.isActive,
         lastSyncedAt: r.lastSyncedAt?.toISOString() ?? null,
         hasToken: !!r.token,
         healthStatus: RemoteConnectionRepository.getConnectionHealth(r),
       })),
       selfInstanceId,
-      selfFriendlyName: selfIdentityRow[0]?.friendlyName ?? selfInstanceId,
       syncEnabled,
     });
   }

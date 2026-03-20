@@ -148,7 +148,9 @@ export function MemoriesListContainer({
   const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const endpointMutations = useWidgetEndpointMutations();
-  const isLoading = endpointMutations?.read?.isLoading ?? false;
+  const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
+  const isFetching = endpointMutations?.read?.isFetching ?? false;
+  const isLoading = isLoadingFresh;
 
   const form = useWidgetForm<typeof definition.GET>();
   const searchQuery = form.watch("search") ?? "";
@@ -159,17 +161,7 @@ export function MemoriesListContainer({
     [field.value?.memories],
   );
 
-  // Sort memories by priority (descending) and then by memoryNumber (ascending)
-  const sortedMemories = useMemo(() => {
-    return [...memories].toSorted((a, b) => {
-      if (a.priority !== b.priority) {
-        return b.priority - a.priority;
-      }
-      return a.id - b.id;
-    });
-  }, [memories]);
-
-  // Get all unique tags
+  // Get all unique tags from current result set (for filter chip UI)
   const allTags = useMemo(() => {
     const tagsSet = new Set<string>();
     memories.forEach((memory) => {
@@ -178,23 +170,7 @@ export function MemoriesListContainer({
     return [...tagsSet].toSorted();
   }, [memories]);
 
-  // Filter memories based on search and selected tag
-  const filteredMemories = useMemo(() => {
-    return sortedMemories.filter((memory) => {
-      const matchesSearch =
-        !searchQuery ||
-        memory.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        memory.tags?.some((tag) =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-
-      const matchesTag = !selectedTag || memory.tags?.includes(selectedTag);
-
-      return matchesSearch && matchesTag;
-    });
-  }, [sortedMemories, searchQuery, selectedTag]);
-
-  // Calculate statistics
+  // Calculate statistics from current result set
   const stats = useMemo(() => {
     const totalChars = memories.reduce((sum, m) => sum + m.content.length, 0);
     const highPriority = memories.filter((m) => m.priority >= 50).length;
@@ -228,6 +204,9 @@ export function MemoriesListContainer({
           <Span className="text-sm font-semibold flex-1">
             {t("get.stats.title")}
           </Span>
+          {isFetching && !isLoadingFresh && (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          )}
         </Div>
 
         {/* Stats bar */}
@@ -349,7 +328,7 @@ export function MemoriesListContainer({
         {(searchQuery || selectedTag) && (
           <Span className="text-sm text-muted-foreground">
             {t("showing", {
-              count: filteredMemories.length,
+              count: memories.length,
               total: memories.length,
             })}
           </Span>
@@ -357,7 +336,12 @@ export function MemoriesListContainer({
       </Div>
 
       {/* Memories list */}
-      <Div className="px-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
+      <Div
+        className={cn(
+          "px-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]",
+          isFetching && !isLoadingFresh && "opacity-50 pointer-events-none",
+        )}
+      >
         {isLoading ? (
           <Div className="space-y-3 pt-4">
             <Div className="p-4 rounded-lg border border-border bg-card animate-pulse">
@@ -397,7 +381,7 @@ export function MemoriesListContainer({
               </Div>
             </Div>
           </Div>
-        ) : filteredMemories.length === 0 ? (
+        ) : memories.length === 0 ? (
           <Div className="text-center text-muted-foreground py-8">
             {searchQuery || selectedTag
               ? t("get.emptySearch")
@@ -405,8 +389,7 @@ export function MemoriesListContainer({
           </Div>
         ) : (
           <Div className="space-y-3 pt-4">
-            {filteredMemories.map((memory) => {
-              const originalIndex = sortedMemories.indexOf(memory);
+            {memories.map((memory, originalIndex) => {
               return (
                 <Div
                   key={memory.id}

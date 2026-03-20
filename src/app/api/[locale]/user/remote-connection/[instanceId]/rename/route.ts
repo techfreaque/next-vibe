@@ -15,13 +15,15 @@ export const { PATCH, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ user, logger, t, data, urlPathParams }) =>
+    handler: ({ user, logger, t, data, urlPathParams, locale }) =>
       RemoteConnectionRenameRepository.renameConnection(
         user,
         logger,
         t,
         urlPathParams.instanceId,
-        data.friendlyName,
+        data.newInstanceId,
+        locale,
+        data.propagate ?? true,
       ),
   },
 });

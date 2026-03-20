@@ -110,7 +110,7 @@ export class ElectronBuildRepository {
       // clean dir with an empty dependencies object, we bypass that entirely.
       output.push("");
       output.push("3️⃣  Preparing staging directory...");
-      const stageDir = path.resolve(process.cwd(), ElectronBuildRepository.STAGE_DIR);
+      const stageDir = path.join(process.cwd(), ElectronBuildRepository.STAGE_DIR);
       const stageElectronDir = path.join(stageDir, "dist", "electron");
       mkdirSync(stageElectronDir, { recursive: true });
 

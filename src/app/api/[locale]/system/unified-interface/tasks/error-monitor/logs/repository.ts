@@ -90,6 +90,13 @@ export class ErrorLogsRepository {
 
       const totalCount = countResult?.count ?? 0;
 
+      const [unresolvedResult] = await db
+        .select({ count: count() })
+        .from(errorLogs)
+        .where(eq(errorLogs.resolved, false));
+
+      const unresolvedCount = unresolvedResult?.count ?? 0;
+
       logger.debug(`Fetched ${rows.length.toString()} error log entries`);
 
       const response: ErrorLogsResponseOutput = {
@@ -98,7 +105,11 @@ export class ErrorLogsRepository {
           message: row.message,
           errorType: row.errorType,
           stackTrace: row.stackTrace,
-          metadata: row.metadata,
+          metadata: Array.isArray(row.metadata)
+            ? row.metadata
+            : row.metadata !== null && row.metadata !== undefined
+              ? [row.metadata]
+              : null,
           fingerprint: row.fingerprint,
           occurrences: row.occurrences,
           resolved: row.resolved,
@@ -108,6 +119,7 @@ export class ErrorLogsRepository {
         })),
         totalCount,
         hasMore: totalCount > offset + limit,
+        unresolvedCount,
       };
 
       return success(response);

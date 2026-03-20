@@ -115,6 +115,11 @@ const { GET } = createEndpoint({
         layoutType: LayoutType.STACKED,
         usage: { response: true },
         children: {
+          statusCounts: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "status.get.response.statusCounts",
+            schema: z.record(z.string(), z.number()),
+          }),
           items: responseArrayField(scopedTranslation, {
             type: WidgetType.CONTAINER,
             groupBy: "status",
@@ -289,6 +294,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         jobs: {
+          statusCounts: {},
           items: [
             {
               id: "123e4567-e89b-12d3-a456-426614174000",
@@ -314,6 +320,7 @@ const { GET } = createEndpoint({
       },
       all: {
         jobs: {
+          statusCounts: {},
           items: [
             {
               id: "123e4567-e89b-12d3-a456-426614174000",
