@@ -65,7 +65,10 @@ import { uncensoredWriterSkill } from "../../agent/chat/skills/default-skills/un
 import { vibeCoderSkill } from "../../agent/chat/skills/default-skills/vibe-coder/skill";
 import { writerSkill } from "../../agent/chat/skills/default-skills/writer/skill";
 
-export const COMPANION_SKILLS: Skill[] = [theaSkill, hermesSkill];
+export const COMPANION_SKILLS: Skill[] = [
+  theaSkill,
+  hermesSkill,
+];
 
 export const DEFAULT_SKILL_IDS = [
   "thea",
