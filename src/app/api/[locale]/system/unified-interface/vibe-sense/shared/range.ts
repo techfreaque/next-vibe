@@ -4,6 +4,7 @@
  * Handles time series range extension, trimming, and resolution scaling.
  */
 
+import { GraphResolution } from "../enum";
 import type { DataPoint, Resolution, TimeRange } from "./fields";
 import { RESOLUTION_MS } from "./fields";
 
@@ -167,25 +168,104 @@ export function needsScaleDown(
 
 /**
  * Fill gaps in a sparse time series with zero-valued datapoints.
+ *
+ * For weekly/monthly resolutions, uses calendar-aware stepping to match
+ * PostgreSQL's date_trunc('week'/'month') bucket boundaries.
  */
 export function fillGaps(
   points: DataPoint[],
   range: TimeRange,
   resolution: Resolution,
 ): DataPoint[] {
-  const periodMs = RESOLUTION_MS[resolution];
   const existing = new Map<number, DataPoint>();
   for (const p of points) {
     existing.set(p.timestamp.getTime(), p);
   }
 
-  const alignedFrom = Math.floor(range.from.getTime() / periodMs) * periodMs;
-  const alignedTo = Math.floor(range.to.getTime() / periodMs) * periodMs;
+  const buckets = buildBucketTimestamps(range, resolution);
+  return buckets.map(
+    (ts) => existing.get(ts) ?? { timestamp: new Date(ts), value: 0 },
+  );
+}
 
-  const result: DataPoint[] = [];
-  for (let ts = alignedFrom; ts <= alignedTo; ts += periodMs) {
-    result.push(existing.get(ts) ?? { timestamp: new Date(ts), value: 0 });
+/**
+ * Generate the series of bucket timestamps for a given range + resolution.
+ * Matches PostgreSQL date_trunc / date_bin anchor logic used in resolutionBucketExpr.
+ */
+function buildBucketTimestamps(
+  range: TimeRange,
+  resolution: Resolution,
+): number[] {
+  if (resolution === GraphResolution.ONE_MONTH) {
+    return buildMonthBuckets(range);
+  }
+  if (resolution === GraphResolution.ONE_WEEK) {
+    return buildWeekBuckets(range);
   }
 
+  // Fixed-interval resolutions: align to the same 2000-01-01 UTC anchor used by date_bin
+  const periodMs = RESOLUTION_MS[resolution];
+  const anchor = new Date("2000-01-01T00:00:00Z").getTime();
+  const alignedFrom =
+    Math.floor((range.from.getTime() - anchor) / periodMs) * periodMs + anchor;
+  const alignedTo =
+    Math.floor((range.to.getTime() - anchor) / periodMs) * periodMs + anchor;
+
+  const result: number[] = [];
+  for (let ts = alignedFrom; ts <= alignedTo; ts += periodMs) {
+    result.push(ts);
+  }
+  return result;
+}
+
+/**
+ * Calendar-aware monthly bucket timestamps.
+ * Matches date_trunc('month', ...) — always the 1st of each month at 00:00 UTC.
+ */
+function buildMonthBuckets(range: TimeRange): number[] {
+  const result: number[] = [];
+  const from = new Date(range.from);
+  const to = new Date(range.to);
+
+  let year = from.getUTCFullYear();
+  let month = from.getUTCMonth(); // truncate to month start
+
+  while (true) {
+    const ts = Date.UTC(year, month, 1);
+    if (ts > to.getTime()) {
+      break;
+    }
+    result.push(ts);
+    month++;
+    if (month > 11) {
+      month = 0;
+      year++;
+    }
+  }
+  return result;
+}
+
+/**
+ * Calendar-aware weekly bucket timestamps.
+ * Matches date_trunc('week', ...) — ISO weeks start on Monday at 00:00 UTC.
+ */
+function buildWeekBuckets(range: TimeRange): number[] {
+  const MS_PER_WEEK = 7 * 86_400_000;
+  const toTime = range.to.getTime();
+
+  // Find the Monday of the week containing range.from
+  const fromDate = new Date(range.from);
+  const dayOfWeek = fromDate.getUTCDay(); // 0=Sun, 1=Mon..6=Sat
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const startMonday = Date.UTC(
+    fromDate.getUTCFullYear(),
+    fromDate.getUTCMonth(),
+    fromDate.getUTCDate() - daysToMonday,
+  );
+
+  const result: number[] = [];
+  for (let ts = startMonday; ts <= toTime; ts += MS_PER_WEEK) {
+    result.push(ts);
+  }
   return result;
 }

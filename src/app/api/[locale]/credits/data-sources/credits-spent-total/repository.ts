@@ -14,7 +14,7 @@ import {
 import { and, eq, gte, lte, sql, sum } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { resolutionToTrunc } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
+import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
 import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
@@ -35,13 +35,12 @@ export class QueryCreditsSpentTotalRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const trunc = resolutionToTrunc(resolution);
     const rows = await db
       .select({
-        bucket:
-          sql<string>`date_trunc(${trunc}, ${creditTransactions.createdAt})`.as(
-            "bucket",
-          ),
+        bucket: resolutionBucketExpr(
+          resolution,
+          creditTransactions.createdAt,
+        ).as("bucket"),
         total: sum(creditTransactions.amount),
       })
       .from(creditTransactions)

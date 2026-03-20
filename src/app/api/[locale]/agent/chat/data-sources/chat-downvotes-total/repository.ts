@@ -19,7 +19,7 @@ import type {
   TimeRange,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
-import { resolutionToTrunc } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
+import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
 
 import { chatMessages } from "../../db";
 
@@ -35,10 +35,9 @@ export class QueryChatDownvotesTotalRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const trunc = resolutionToTrunc(resolution);
     const rows = await db
       .select({
-        bucket: sql<string>`date_trunc(${trunc}, ${chatMessages.createdAt})`.as(
+        bucket: resolutionBucketExpr(resolution, chatMessages.createdAt).as(
           "bucket",
         ),
         total: sum(chatMessages.downvotes),

@@ -14,7 +14,7 @@ import {
 import { and, count, gte, isNotNull, lte, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { resolutionToTrunc } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
+import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
 import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
@@ -34,12 +34,9 @@ export class QueryMessengerClickedRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
-    const trunc = resolutionToTrunc(resolution);
     const rows = await db
       .select({
-        bucket: sql<string>`date_trunc(${trunc}, ${emails.clickedAt})`.as(
-          "bucket",
-        ),
+        bucket: resolutionBucketExpr(resolution, emails.clickedAt).as("bucket"),
         cnt: count(),
       })
       .from(emails)

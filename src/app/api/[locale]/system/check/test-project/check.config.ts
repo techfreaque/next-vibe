@@ -27,8 +27,12 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   skipOxlint: false,
   skipTypecheck: false,
   timeout: 3600,
-  limit: 200,
+  limit: 20000,
+  mcpLimit: 20, // Compact limit for MCP platform
   editorUriScheme: "vscode://file/", // URI scheme for clickable file links
+  // Extensive mode: when false (default), test and generated files are excluded.
+  // use "vibe check --extensive" for release validation to catch issues in all files.
+  extensive: false,
 };
 
 // ============================================================
@@ -55,6 +59,21 @@ const features = {
 } as const;
 
 // ============================================================
+// Non-extensive ignore patterns (test + generated files)
+// These are excluded by default; pass --extensive to include them.
+// ============================================================
+
+const nonExtensivePatterns = [
+  "**/generated/**",
+  "**/*.test.ts",
+  "**/*.test.tsx",
+];
+const {
+  oxlintIgnores: oxlintNonExtensiveIgnores,
+  eslintIgnores: eslintNonExtensiveIgnores,
+} = formatIgnorePatterns(nonExtensivePatterns);
+
+// ============================================================
 // Shared Ignores (files, folders, globs - mixed)
 // ============================================================
 
@@ -62,7 +81,12 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   // Directories
   "dist",
   ".dist",
+  ".dist-tanstack",
   ".next",
+  ".next-prod",
+  ".next-rebuild",
+  ".next-prod",
+  ".next-old",
   ".tmp",
   "node_modules",
   ".git",
@@ -79,6 +103,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "build",
   "test-files",
   "test-project",
+  "public/vibe-frame/**",
   // Files
   ".DS_Store",
   "thumbs.db",
@@ -100,6 +125,7 @@ const typecheck = {
   enabled: true as const,
   cachePath: ".tmp/typecheck-cache",
   useTsgo: features.tsgo,
+  nonExtensiveIgnorePatterns: nonExtensivePatterns,
 };
 
 // --------------------------------------------------------
@@ -112,6 +138,7 @@ const oxlint: CheckConfig["oxlint"] = {
   lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
   $schema: "./node_modules/oxlint/configuration_schema.json",
   ignorePatterns: oxlintIgnores,
+  nonExtensiveIgnorePatterns: oxlintNonExtensiveIgnores,
   plugins: [
     "typescript",
     "oxc",
@@ -124,12 +151,12 @@ const oxlint: CheckConfig["oxlint"] = {
   ],
   jsPlugins: [
     ...(features.restrictedSyntax
-      ? ["@next-vibe/checker/oxlint-plugins/restricted-syntax.js"]
+      ? ["@next-vibe/checker/oxlint-plugins/restricted-syntax.ts"]
       : []),
     ...(features.jsxCapitalization
-      ? ["@next-vibe/checker/oxlint-plugins/jsx-capitalization.js"]
+      ? ["@next-vibe/checker/oxlint-plugins/jsx-capitalization.ts"]
       : []),
-    ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.js"] : []),
+    ...(features.i18n ? ["@next-vibe/checker/oxlint-plugins/i18n.ts"] : []),
   ],
   categories: {
     correctness: "error",
@@ -536,6 +563,11 @@ const oxlint: CheckConfig["oxlint"] = {
                   "aria-describedby",
                   "title",
                   "placeholder",
+                  // HTML meta attributes — values are not user-facing text
+                  "content",
+                  "charSet",
+                  "name",
+                  "lang",
                 ],
               },
               "object-properties": {
@@ -635,6 +667,7 @@ const oxlint: CheckConfig["oxlint"] = {
 const prettier: CheckConfig["prettier"] = {
   enabled: true,
   configPath: ".tmp/.oxfmtrc.json",
+  ignoreFilePath: ".tmp/.prettierignore",
   semi: true,
   singleQuote: false,
   trailingComma: "all",
@@ -718,11 +751,12 @@ const config = (): CheckConfig => {
   // ESLint Configuration (for rules oxlint doesn't support)
   // --------------------------------------------------------
   const eslint: CheckConfig["eslint"] = {
-    enabled: true,
+    enabled: !vibeCheck.skipEslint,
     configPath: ".tmp/eslint.config.mjs",
     cachePath: ".tmp/eslint-cache",
     lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
     ignores: oxlintIgnores,
+    nonExtensiveIgnorePatterns: eslintNonExtensiveIgnores,
     // Build flatConfig with plugins (called from eslint.config.mjs which loads plugins)
     buildFlatConfig(
       reactCompilerPlugin: EslintPluginLike,
@@ -961,8 +995,13 @@ export function createEslintStub(rules: string[]): EslintStubPlugin {
  */
 export function formatIgnorePatterns(patterns: string[]): IgnoreFormats {
   const eslintPatterns = patterns.map((pattern) => {
-    // Already a glob pattern - keep as-is
-    if (pattern.includes("*")) {
+    // Already a glob pattern or regex - keep as-is
+    if (
+      pattern.includes("*") ||
+      pattern.includes("$") ||
+      pattern.includes("^") ||
+      pattern.includes("\\")
+    ) {
       return pattern;
     }
     // File with extension (but not dotfile) - wrap with **/ prefix only
