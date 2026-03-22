@@ -72,7 +72,8 @@ function isJsonObject(value: JsonValue): value is JsonObject {
     typeof value === "object" &&
     !Array.isArray(value) &&
     !(value instanceof File) &&
-    !(value instanceof Blob)
+    !(value instanceof Blob) &&
+    !(value instanceof Date)
   );
 }
 
