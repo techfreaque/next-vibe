@@ -149,7 +149,7 @@ export class RebuildRepository {
 
         try {
           execSync("bunx next build", {
-            stdio: ["ignore", "pipe", "pipe"],
+            stdio: "inherit",
             cwd,
             env: {
               ...process.env,
@@ -160,16 +160,23 @@ export class RebuildRepository {
         } catch (error) {
           const parsedError = parseError(error);
           const spawnError = error as {
-            stdout?: Buffer | string;
-            stderr?: Buffer | string;
+            status?: number | null;
+            signal?: string | null;
           };
-          const stderrText = spawnError.stderr?.toString().trim() ?? "";
-          const stdoutText = spawnError.stdout?.toString().trim() ?? "";
-          const detail = stderrText || stdoutText || parsedError.message;
+          const exitCode = spawnError.status ?? null;
+          const exitSignal = spawnError.signal ?? null;
+          const isOom =
+            exitSignal === "SIGKILL" ||
+            exitCode === 137 ||
+            exitCode === 134;
+          const detail = isOom
+            ? `Next.js build killed by OS (OOM) — exit signal: ${exitSignal ?? exitCode}`
+            : parsedError.message;
           logger.error("Next.js rebuild failed", {
             message: parsedError.message,
-            stderr: stderrText,
-            stdout: stdoutText,
+            exitCode,
+            exitSignal,
+            isOom,
           });
           return t("post.steps.buildFailed", { error: detail });
         }

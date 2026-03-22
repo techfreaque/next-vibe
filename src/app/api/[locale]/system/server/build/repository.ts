@@ -193,7 +193,7 @@ export class BuildRepository {
         const { execSync } = await import("node:child_process");
         try {
           execSync("bunx next build", {
-            stdio: ["ignore", "pipe", "pipe"],
+            stdio: "inherit",
             cwd: process.cwd(),
             env: {
               ...process.env,
@@ -206,22 +206,26 @@ export class BuildRepository {
         } catch (buildError) {
           const parsedError = parseError(buildError);
           const spawnError = buildError as {
-            stdout?: Buffer | string;
-            stderr?: Buffer | string;
+            status?: number | null;
+            signal?: string | null;
           };
-          const stdoutText =
-            spawnError.stdout?.toString().trim() ?? "";
-          const stderrText =
-            spawnError.stderr?.toString().trim() ?? "";
-          const detail =
-            stderrText || stdoutText || parsedError.message;
+          const exitCode = spawnError.status ?? null;
+          const exitSignal = spawnError.signal ?? null;
+          const isOom =
+            exitSignal === "SIGKILL" ||
+            exitCode === 137 ||
+            exitCode === 134;
+          const detail = isOom
+            ? `Next.js build killed by OS (OOM) — exit signal: ${exitSignal ?? exitCode}`
+            : parsedError.message;
           const errorMsg = `${t("post.repository.messages.nextjsBuildFailed")}: ${detail}`;
           steps.push({ label: "Next.js", ok: false, skipped: false });
           errors.push(errorMsg);
           logger.error("Next.js build failed", {
             message: parsedError.message,
-            stderr: stderrText,
-            stdout: stdoutText,
+            exitCode,
+            exitSignal,
+            isOom,
           });
 
           if (!data.force) {
