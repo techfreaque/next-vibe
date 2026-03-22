@@ -105,6 +105,7 @@ export const messengerAccounts = pgTable(
     imapIsConnected: boolean("imap_is_connected").default(false),
 
     // ── Email routing (EMAIL channel only) ───────────────────────────────────
+    emailDomain: text("email_domain"), // Custom domain for email links (e.g. https://mail.unbottled.ai)
     campaignTypes: jsonb("campaign_types")
       .$type<(typeof CampaignType)[keyof typeof CampaignType][]>()
       .default([]),

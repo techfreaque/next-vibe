@@ -21,7 +21,7 @@ import { createEndpointLogger } from "../../unified-interface/shared/logger/endp
 import { frameExchangeTokens } from "../../unified-interface/vibe-frame/db";
 import { shouldSkipPath } from "../utils";
 
-const UUID_REGEX =
+export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 enum LeadIdCheckResult {

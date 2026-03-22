@@ -354,7 +354,7 @@ const { GET } = createEndpoint({
       }),
 
       // === REQUEST FIELDS (Query Parameters) ===
-      id: requestField(scopedTranslation, {
+      leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
         label: "get.id.label",
@@ -503,7 +503,7 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {
-        id: "123e4567-e89b-12d3-a456-426614174000",
+        leadId: "123e4567-e89b-12d3-a456-426614174000",
         campaignId: "456e7890-e89b-12d3-a456-426614174001",
         stage: EmailCampaignStage.NOT_STARTED,
         source: LeadSource.EMAIL_CAMPAIGN,

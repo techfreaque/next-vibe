@@ -986,7 +986,7 @@ export class LeadTrackingRepository {
   ): Promise<ResponseType<ClickTrackingResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const { id: trackingLeadId, campaignId, url, ref } = data;
+      const { leadId: trackingLeadId, campaignId, url, ref } = data;
       const isLoggedIn = !user.isPublic;
       const currentLeadId = user.leadId;
       let engagementRecorded = false;

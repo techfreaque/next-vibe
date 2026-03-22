@@ -22,9 +22,11 @@ import {
   checkLeadId,
   createLeadId,
   getLeadIdFromRequest,
+  isLeadIdValid,
   LeadIdCheckResult,
   redeemExchangeToken,
   updateLeadLocale,
+  UUID_REGEX,
 } from "./lead-id";
 import { extractLocaleFromPath, shouldSkipPath } from "./utils";
 
@@ -274,6 +276,30 @@ export async function middleware(
           },
         },
       );
+    }
+
+    // For page routes: check if a valid leadId is provided in the URL query params.
+    // This allows email links (e.g. unsubscribe) to restore the lead session
+    // without creating a new lead. The leadId must be a valid UUID that exists in DB.
+    const urlLeadId = request.nextUrl.searchParams.get("id");
+    if (
+      urlLeadId &&
+      UUID_REGEX.test(urlLeadId) &&
+      (await isLeadIdValid(urlLeadId))
+    ) {
+      const urlLeadResp = NextResponseClass.next();
+      urlLeadResp.cookies.set({
+        name: LEAD_ID_COOKIE_NAME,
+        value: urlLeadId,
+        httpOnly: true,
+        path: "/",
+        secure: env.NODE_ENV === Environment.PRODUCTION,
+        sameSite: "lax" as const,
+        maxAge: 365 * 24 * 60 * 60 * 10,
+      });
+      stampCsrfCookie(request, urlLeadResp);
+      addCorsHeaders(request, urlLeadResp, path);
+      return urlLeadResp;
     }
 
     // For page routes (including /frame/ without valid et), create a new leadId.

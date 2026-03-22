@@ -59,7 +59,7 @@ export function generateTrackingLinkUrl(
   url.searchParams.set("url", originalUrl);
 
   if (leadId) {
-    url.searchParams.set("id", leadId);
+    url.searchParams.set("leadId", leadId);
   }
   if (userId) {
     url.searchParams.set("userId", userId);
@@ -134,7 +134,7 @@ export function generateEngagementTrackingApiUrl(
   baseUrl: string,
   locale: CountryLanguage,
   params: {
-    id: string;
+    leadId: string;
     campaignId?: string;
     stage?: string;
     source?: string;
@@ -144,7 +144,7 @@ export function generateEngagementTrackingApiUrl(
 ): string {
   const apiUrl = new URL(`/api/${locale}/leads/tracking/engagement`, baseUrl);
 
-  apiUrl.searchParams.set("id", params.id);
+  apiUrl.searchParams.set("leadId", params.leadId);
   if (params.campaignId) {
     apiUrl.searchParams.set("campaignId", params.campaignId);
   }

@@ -179,6 +179,7 @@ export class EmailRendererService {
       campaignId: string;
       unsubscribeUrl: string;
       trackingUrl: string;
+      baseUrl: string;
     },
     logger: EndpointLogger,
   ): Promise<EmailTemplateResult | null> {
@@ -236,6 +237,7 @@ export class EmailRendererService {
         lead.id,
         lead.convertedUserId || undefined,
         context.campaignId,
+        context.baseUrl,
       );
 
       // Ensure we have a valid tracking context
@@ -488,6 +490,7 @@ export class EmailRendererService {
         campaignId: t("emailJourneys.components.defaults.previewCampaignId"),
         unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
         trackingUrl: `${env.NEXT_PUBLIC_APP_URL}/track?preview=true`,
+        baseUrl: env.NEXT_PUBLIC_APP_URL,
       },
       createNoOpLogger(),
     );

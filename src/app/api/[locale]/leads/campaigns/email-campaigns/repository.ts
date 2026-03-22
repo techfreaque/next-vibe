@@ -6,7 +6,7 @@
 import "server-only";
 
 import { render } from "@react-email/render";
-import { and, eq, isNotNull, isNull } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,8 +17,8 @@ import { parseError } from "next-vibe/shared/utils";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
+import { messengerAccounts } from "@/app/api/[locale]/messenger/accounts/db";
 import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
-import { emailJourneyVariants } from "../../db";
 import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
 import { db } from "@/app/api/[locale]/system/db";
@@ -36,7 +36,7 @@ import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
-import { leads } from "../../db";
+import { emailJourneyVariants, leads } from "../../db";
 import type { EmailCampaignStageValue } from "../../enum";
 import {
   EmailCampaignStage as EmailCampaignStageEnum,
@@ -49,9 +49,9 @@ import { campaignSchedulerService } from "../emails/services/scheduler";
 import type {
   EmailCampaignsConfigGetResponseOutput,
   EmailCampaignsPostRequestOutput,
+  EmailCampaignsPostResponseOutput,
 } from "./definition";
 import type { EmailCampaignsT } from "./i18n";
-import type { EmailCampaignsPostResponseOutput } from "./definition";
 
 const STAGE_PRIORITIES: Record<string, number> = {
   [EmailCampaignStageEnum.NOT_STARTED]: 0,
@@ -475,6 +475,15 @@ export class EmailCampaignsRepository {
             .where(eq(emailJourneyVariants.variantKey, campaign.journeyVariant))
             .limit(1);
 
+          // Look up the messenger account configured for this journey variant to get custom email domain
+          const [accountRow] = await db
+            .select({ emailDomain: messengerAccounts.emailDomain })
+            .from(messengerAccounts)
+            .where(
+              sql`${messengerAccounts.emailJourneyVariants} @> ${JSON.stringify([campaign.journeyVariant])}`,
+            )
+            .limit(1);
+
           const variantSenderName =
             variantRow?.senderName ?? simpleLocalT("config.appName");
           const variantCompanyName =
@@ -482,6 +491,8 @@ export class EmailCampaignsRepository {
           const variantCompanyEmail =
             variantRow?.companyEmail ??
             contactClientRepository.getSupportEmail(leadLocale);
+          const emailBaseUrl =
+            accountRow?.emailDomain ?? env.NEXT_PUBLIC_APP_URL;
 
           const rendered = await emailRendererService.renderEmail(
             leadWithEmail,
@@ -492,8 +503,9 @@ export class EmailCampaignsRepository {
               companyName: variantCompanyName,
               companyEmail: variantCompanyEmail,
               campaignId: campaign.id,
-              unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/${leadLocale}/newsletter/unsubscribe?email=${encodeURIComponent(fullLead.email ?? "")}`,
-              trackingUrl: env.NEXT_PUBLIC_APP_URL,
+              unsubscribeUrl: `${emailBaseUrl}/${leadLocale}/story/newsletter/unsubscribe/${encodeURIComponent(fullLead.email ?? "")}?id=${encodeURIComponent(campaign.leadId)}`,
+              trackingUrl: emailBaseUrl,
+              baseUrl: emailBaseUrl,
             },
             logger,
           );

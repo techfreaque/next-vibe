@@ -27,7 +27,7 @@ export default function TrackPage({
   const searchParams = useSearchParams();
   const { t } = simpleT(locale);
 
-  const id = searchParams.get("id") ?? undefined;
+  const leadId = searchParams.get("leadId") ?? undefined;
   const url = searchParams.get("url") ?? undefined;
   const ref = searchParams.get("ref") ?? undefined;
   const campaignId = searchParams.get("campaignId") ?? undefined;
@@ -41,7 +41,7 @@ export default function TrackPage({
   useApiQuery({
     endpoint: trackingEndpoints.GET,
     requestData: {
-      id,
+      leadId,
       url: url ?? `/${locale}`,
       source: LeadSource.EMAIL_CAMPAIGN,
       campaignId,

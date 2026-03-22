@@ -1,0 +1,1 @@
+ALTER TABLE "messenger_accounts" ADD COLUMN "email_domain" text;
