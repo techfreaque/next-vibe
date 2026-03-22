@@ -9,6 +9,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Server } from "next-vibe-ui/ui/icons/Server";
@@ -222,6 +223,16 @@ export function MessengerAccountsListContainer({
     endpointMutations?.read?.refetch?.();
   }, [endpointMutations]);
 
+  const handleGraphs = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const graphsDef =
+        await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition");
+      navigate(graphsDef.default.GET, {
+        data: { search: "messenger" },
+      });
+    })();
+  }, [navigate]);
+
   const handleChannelTab = useCallback(
     (value: string): void => {
       form.setValue("channel", value);
@@ -255,6 +266,17 @@ export function MessengerAccountsListContainer({
           )}
         </Span>
         <Div className="flex-1" />
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleGraphs}
+          title={t("widget.graphs")}
+          className="gap-1"
+        >
+          <GitBranch className="h-4 w-4" />
+          <Span className="hidden sm:inline text-xs">{t("widget.graphs")}</Span>
+        </Button>
         <Button
           type="button"
           variant="ghost"

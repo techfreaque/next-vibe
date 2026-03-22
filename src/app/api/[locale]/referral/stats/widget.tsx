@@ -25,6 +25,11 @@ interface CustomWidgetProps {
   } & (typeof definition.GET)["fields"];
 }
 
+/** Format credit cents as dollars: 100 credits = $1 */
+function formatDollars(credits: number): string {
+  return `$${(credits / 100).toFixed(2)}`;
+}
+
 /**
  * Stat card component with modern design
  */
@@ -36,6 +41,7 @@ function StatCard({
   value,
   valueColorClassName: valueColor,
   description,
+  formatAsDollars = false,
 }: {
   title: string;
   IconComponent: React.ComponentType<{ className?: string }>;
@@ -44,6 +50,7 @@ function StatCard({
   value: number;
   valueColorClassName: string;
   description: string;
+  formatAsDollars?: boolean;
 }): React.JSX.Element {
   const valueClassName = `text-2xl font-bold tabular-nums tracking-tight ${valueColor}`;
   const iconContainerClassName = `flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${iconBg}`;
@@ -57,7 +64,9 @@ function StatCard({
             <Div className="text-sm font-medium text-muted-foreground">
               {title}
             </Div>
-            <Div className={valueClassName}>{value.toLocaleString()}</Div>
+            <Div className={valueClassName}>
+              {formatAsDollars ? formatDollars(value) : value.toLocaleString()}
+            </Div>
             <Div className="text-xs text-muted-foreground">{description}</Div>
           </Div>
           <Div className={iconContainerClassName}>
@@ -102,6 +111,7 @@ export function ReferralStatsContainer({
         value={stats.totalRevenueValue}
         valueColorClassName={"text-emerald-600 dark:text-emerald-400"}
         description={t(stats.totalRevenueDescription)}
+        formatAsDollars
       />
 
       <StatCard
@@ -112,16 +122,30 @@ export function ReferralStatsContainer({
         value={stats.totalEarnedValue}
         valueColorClassName={"text-blue-600 dark:text-blue-400"}
         description={t(stats.totalEarnedDescription)}
+        formatAsDollars
       />
 
       <StatCard
         title={t(stats.availableCreditsTitle)}
         IconComponent={Wallet}
-        iconColorClassName={"text-violet-700 dark:text-violet-300"}
-        iconBgClassName={"bg-violet-100 dark:bg-violet-900/30"}
+        iconColorClassName={
+          stats.availableCreditsReadyForPayout
+            ? "text-violet-700 dark:text-violet-300"
+            : "text-amber-700 dark:text-amber-300"
+        }
+        iconBgClassName={
+          stats.availableCreditsReadyForPayout
+            ? "bg-violet-100 dark:bg-violet-900/30"
+            : "bg-amber-100 dark:bg-amber-900/30"
+        }
         value={stats.availableCreditsValue}
-        valueColorClassName={"text-violet-600 dark:text-violet-400"}
+        valueColorClassName={
+          stats.availableCreditsReadyForPayout
+            ? "text-violet-600 dark:text-violet-400"
+            : "text-amber-600 dark:text-amber-400"
+        }
         description={t(stats.availableCreditsDescription)}
+        formatAsDollars
       />
     </Div>
   );

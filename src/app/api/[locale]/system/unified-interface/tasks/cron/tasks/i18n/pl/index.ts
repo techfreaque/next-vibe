@@ -296,6 +296,7 @@ export const translations: typeof enTranslations = {
     loading: "Ładowanie zadań...",
     header: {
       stats: "Statystyki",
+      graphs: "Wykresy",
       history: "Historia",
       queue: "Kolejka",
       refresh: "Odśwież",

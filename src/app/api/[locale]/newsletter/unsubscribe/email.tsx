@@ -10,12 +10,10 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
-import React from "react";
 import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -25,14 +23,12 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "../../messenger/providers/email/smtp-client/components/tracking_context.email";
-import type {
-  UnsubscribePostRequestOutput as NewsletterUnsubscribeType,
-  UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
-} from "./definition";
+import type definition from "./definition";
 import {
-  type NewsletterUnsubscribeTranslationKey,
-  scopedTranslation,
-} from "./i18n";
+  type UnsubscribePostResponseOutput as NewsletterUnsubscribeResponseType,
+  type UnsubscribePostRequestOutput as NewsletterUnsubscribeType,
+} from "./definition";
+import { scopedTranslation } from "./i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -137,9 +133,13 @@ function NewsletterUnsubscribeEmail({
 }
 
 // Template Definition Export
-const newsletterUnsubscribeTemplate: EmailTemplateDefinition<
+export const newsletterUnsubscribeEmailTemplate: EmailTemplateDefinition<
   NewsletterUnsubscribeProps,
-  typeof scopedTranslation
+  typeof scopedTranslation,
+  NewsletterUnsubscribeType,
+  NewsletterUnsubscribeResponseType,
+  never,
+  typeof definition.POST.allowedRoles
 > = {
   meta: {
     id: "newsletter-unsubscribe",
@@ -165,9 +165,29 @@ const newsletterUnsubscribeTemplate: EmailTemplateDefinition<
   exampleProps: {
     email: "max@example.com",
   },
+  render: ({ requestData, locale, t, user }) => {
+    try {
+      return success({
+        toEmail: requestData.email,
+        toName: requestData.email,
+        subject: t("email.unsubscribe.subject"),
+        leadId: user.leadId,
+        jsx: newsletterUnsubscribeEmailTemplate.component({
+          props: { email: requestData.email },
+          t,
+          locale,
+          recipientEmail: requestData.email,
+          tracking: createTrackingContext(locale),
+        }),
+      });
+    } catch {
+      return fail({
+        message: t("errors.email_generation_failed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
 };
-
-export default newsletterUnsubscribeTemplate;
 
 // ============================================================================
 // ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
@@ -260,71 +280,74 @@ function AdminUnsubscribeNotificationEmailContent({
 }
 
 // ============================================================================
-// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ADMIN NOTIFICATION TEMPLATE
 // ============================================================================
 
-/**
- * Unsubscribe Confirmation Email Adapter
- * Maps unsubscribe request to confirmation template props
- */
-export const renderUnsubscribeConfirmationMail: EmailFunctionType<
+const adminNewsletterUnsubscribePropsSchema = z.object({
+  unsubscribedEmail: z.string().email(),
+});
+
+type AdminNewsletterUnsubscribeProps = z.infer<
+  typeof adminNewsletterUnsubscribePropsSchema
+>;
+
+export const adminNewsletterUnsubscribeEmailTemplate: EmailTemplateDefinition<
+  AdminNewsletterUnsubscribeProps,
+  typeof scopedTranslation,
   NewsletterUnsubscribeType,
   NewsletterUnsubscribeResponseType,
   never,
-  NewsletterUnsubscribeTranslationKey
-> = ({ requestData, locale, t }) => {
-  try {
-    const templateProps: NewsletterUnsubscribeProps = {
-      email: requestData.email,
-    };
-
-    return success({
-      toEmail: requestData.email,
-      toName: requestData.email,
-      subject: t("email.unsubscribe.subject"),
-      jsx: newsletterUnsubscribeTemplate.component({
-        props: templateProps,
-        t,
-        locale,
-        recipientEmail: requestData.email,
-        tracking: createTrackingContext(locale),
-      }),
-    });
-  } catch {
-    return fail({
-      message: t("errors.email_generation_failed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-};
-
-/**
- * Admin Unsubscribe Notification Email Adapter
- * Sends notification to admin when user unsubscribes
- */
-export const renderAdminUnsubscribeNotificationMail: EmailFunctionType<
-  NewsletterUnsubscribeType,
-  NewsletterUnsubscribeResponseType,
-  never,
-  NewsletterUnsubscribeTranslationKey
-> = ({ requestData, locale, t }) => {
-  const { t: globalT } = simpleT(locale);
-  try {
-    return success({
-      toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: globalT("config.appName"),
-      subject: t("email.unsubscribe.admin_unsubscribe_notification.subject"),
-      jsx: AdminUnsubscribeNotificationEmailContent({
-        requestData,
-        t,
-        locale,
-        recipientEmail: contactClientRepository.getSupportEmail(locale),
-      }),
-    });
-  } catch {
-    return fail({
-      message: t("errors.email_generation_failed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
+  typeof definition.POST.allowedRoles
+> = {
+  meta: {
+    id: "newsletter-unsubscribe-admin",
+    version: "1.0.0",
+    name: "emailTemplates.unsubscribe.name",
+    description: "emailTemplates.unsubscribe.description",
+    category: "emailTemplates.unsubscribe.category",
+    path: "/newsletter/unsubscribe/email.tsx",
+    defaultSubject: "email.unsubscribe.admin_unsubscribe_notification.subject",
+    previewFields: {
+      unsubscribedEmail: {
+        type: "email",
+        label: "emailTemplates.unsubscribe.preview.email.label",
+        defaultValue: "unsubscribed@example.com",
+        required: true,
+      },
+    },
+  },
+  scopedTranslation,
+  schema: adminNewsletterUnsubscribePropsSchema,
+  component: ({ props, t, locale, recipientEmail }) =>
+    AdminUnsubscribeNotificationEmailContent({
+      requestData: { email: props.unsubscribedEmail },
+      t,
+      locale,
+      recipientEmail,
+    }),
+  exampleProps: {
+    unsubscribedEmail: "unsubscribed@example.com",
+  },
+  render: ({ requestData, locale, t, user }) => {
+    const { t: globalT } = simpleT(locale);
+    try {
+      return success({
+        toEmail: contactClientRepository.getSupportEmail(locale),
+        toName: globalT("config.appName"),
+        subject: t("email.unsubscribe.admin_unsubscribe_notification.subject"),
+        leadId: user.leadId,
+        jsx: AdminUnsubscribeNotificationEmailContent({
+          requestData,
+          t,
+          locale,
+          recipientEmail: contactClientRepository.getSupportEmail(locale),
+        }),
+      });
+    } catch {
+      return fail({
+        message: t("errors.email_generation_failed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
 };

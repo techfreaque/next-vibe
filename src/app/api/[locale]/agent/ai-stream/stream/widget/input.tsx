@@ -33,6 +33,7 @@ import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hoo
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
@@ -318,7 +319,9 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     requestData: { rootFolderId: currentRootFolderId },
     logger,
     user,
-    options: { enabled: !!activeThreadId },
+    options: {
+      enabled: !!activeThreadId && activeThreadId !== NEW_MESSAGE_ID,
+    },
   });
   const backgroundTasks = messagesQuery.data?.backgroundTasks ?? [];
 

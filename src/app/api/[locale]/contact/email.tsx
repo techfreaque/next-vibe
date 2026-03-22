@@ -19,7 +19,6 @@ import type { ReactElement } from "react";
 import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -29,12 +28,12 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
-import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
+import type definition from "./definition";
 import {
-  type ContactT,
-  type ContactTranslationKey,
-  scopedTranslation,
-} from "./i18n";
+  type ContactRequestOutput,
+  type ContactResponseOutput,
+} from "./definition";
+import { type ContactT, scopedTranslation } from "./i18n";
 import { contactClientRepository } from "./repository-client";
 
 // ============================================================================
@@ -279,9 +278,13 @@ function ContactFormEmail({
 }
 
 // Template Definition Export
-const contactFormTemplate: EmailTemplateDefinition<
+export const contactFormEmailTemplate: EmailTemplateDefinition<
   ContactFormProps,
-  typeof scopedTranslation
+  typeof scopedTranslation,
+  ContactRequestOutput,
+  ContactResponseOutput,
+  never,
+  typeof definition.POST.allowedRoles
 > = {
   scopedTranslation,
   meta: {
@@ -369,9 +372,44 @@ const contactFormTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
     leadId: "example-lead-id-456",
   },
-};
+  render: ({ requestData, locale, user }) => {
+    const { t: contactT } = scopedTranslation.scopedT(locale);
+    const { t: globalT } = simpleT(locale);
+    try {
+      const templateProps: ContactFormProps = {
+        name: requestData.name,
+        email: requestData.email,
+        subject: requestData.subject,
+        priority: requestData.priority,
+        message: requestData.message,
+        isForCompany: true,
+      };
 
-export default contactFormTemplate;
+      return success({
+        toEmail: contactClientRepository.getSupportEmail(locale),
+        toName: globalT("config.appName"),
+        subject: contactT("email.partner.subject", {
+          subject: requestData.subject,
+        }),
+        replyToEmail: requestData.email,
+        replyToName: requestData.name,
+        leadId: user.leadId,
+        jsx: contactFormEmailTemplate.component({
+          props: templateProps,
+          t: contactT,
+          locale,
+          recipientEmail: contactClientRepository.getSupportEmail(locale),
+          tracking: createTrackingContext(locale),
+        }),
+      });
+    } catch {
+      return fail({
+        message: contactT("errors.email_generation_failed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
+};
 
 // Admin contact notification template — same component, isForCompany forced true
 const adminContactPropsSchema = z.object({
@@ -387,9 +425,13 @@ const adminContactPropsSchema = z.object({
 
 type AdminContactProps = z.infer<typeof adminContactPropsSchema>;
 
-export const adminContactFormTemplate: EmailTemplateDefinition<
+export const adminContactFormEmailTemplate: EmailTemplateDefinition<
   AdminContactProps,
-  typeof scopedTranslation
+  typeof scopedTranslation,
+  ContactRequestOutput,
+  ContactResponseOutput,
+  never,
+  typeof definition.POST.allowedRoles
 > = {
   scopedTranslation,
   meta: {
@@ -467,102 +509,43 @@ export const adminContactFormTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
     leadId: "example-lead-id-456",
   },
-};
-
-// ============================================================================
-// ADAPTERS (Business Logic - Maps endpoint data to template props)
-// ============================================================================
-
-/**
- * Company Team Email Adapter
- * Maps contact form data to template props for company email
- */
-export const renderCompanyMail: EmailFunctionType<
-  ContactRequestOutput,
-  ContactResponseOutput,
-  never,
-  ContactTranslationKey
-> = ({ requestData, locale }) => {
-  const { t: contactT } = scopedTranslation.scopedT(locale);
-  const { t: globalT } = simpleT(locale);
-  try {
-    const templateProps: ContactFormProps = {
-      name: requestData.name,
-      email: requestData.email,
-      subject: requestData.subject,
-      priority: requestData.priority,
-      message: requestData.message,
-      isForCompany: true,
-    };
-
-    return success({
-      toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: globalT("config.appName"),
-      subject: contactT("email.partner.subject", {
+  render: ({ requestData, locale, user }) => {
+    const { t: contactT } = scopedTranslation.scopedT(locale);
+    try {
+      const templateProps: ContactFormProps = {
+        name: requestData.name,
+        email: requestData.email,
         subject: requestData.subject,
-      }),
-      replyToEmail: requestData.email,
-      replyToName: requestData.name,
-      jsx: contactFormTemplate.component({
-        props: templateProps,
-        t: contactT,
-        locale,
-        recipientEmail: contactClientRepository.getSupportEmail(locale),
-        tracking: createTrackingContext(locale),
-      }),
-    });
-  } catch {
-    return fail({
-      message: contactT("errors.email_generation_failed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-};
+        priority: requestData.priority,
+        message: requestData.message,
+        isForCompany: false,
+        userId: user?.id,
+        leadId: user?.leadId,
+      };
+      const { t: globalT } = simpleT(locale);
 
-/**
- * Partner/Customer Email Adapter
- * Maps contact form data to template props for customer confirmation email
- */
-export const renderPartnerMail: EmailFunctionType<
-  ContactRequestOutput,
-  ContactResponseOutput,
-  never,
-  ContactTranslationKey
-> = ({ requestData, locale, user }) => {
-  const { t: contactT } = scopedTranslation.scopedT(locale);
-  try {
-    const templateProps: ContactFormProps = {
-      name: requestData.name,
-      email: requestData.email,
-      subject: requestData.subject,
-      priority: requestData.priority,
-      message: requestData.message,
-      isForCompany: false,
-      userId: user?.id,
-      leadId: user?.leadId,
-    };
-    const { t: globalT } = simpleT(locale);
-
-    return success({
-      toEmail: requestData.email,
-      toName: requestData.name,
-      subject: contactT("email.partner.subject", {
-        subject: requestData.subject,
-      }),
-      replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: globalT("config.appName"),
-      jsx: contactFormTemplate.component({
-        props: templateProps,
-        t: contactT,
-        locale,
-        recipientEmail: requestData.email,
-        tracking: createTrackingContext(locale, user?.leadId, user?.id),
-      }),
-    });
-  } catch {
-    return fail({
-      message: contactT("errors.email_generation_failed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
+      return success({
+        toEmail: requestData.email,
+        toName: requestData.name,
+        subject: contactT("email.partner.subject", {
+          subject: requestData.subject,
+        }),
+        replyToEmail: contactClientRepository.getSupportEmail(locale),
+        replyToName: globalT("config.appName"),
+        leadId: user.leadId,
+        jsx: contactFormEmailTemplate.component({
+          props: templateProps,
+          t: contactT,
+          locale,
+          recipientEmail: requestData.email,
+          tracking: createTrackingContext(locale, user?.leadId, user?.id),
+        }),
+      });
+    } catch {
+      return fail({
+        message: contactT("errors.email_generation_failed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
 };

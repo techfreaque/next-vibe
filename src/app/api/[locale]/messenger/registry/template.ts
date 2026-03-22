@@ -2,10 +2,19 @@
  * Email Template Registry Types
  */
 
-import type { ReactElement } from "react";
+import type { JSX, ReactElement } from "react";
 import type { z } from "zod";
 
+import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
+import type {
+  ErrorResponseType,
+  SuccessResponseType,
+} from "next-vibe/shared/types/response.schema";
 
 import type { TrackingContext } from "../providers/email/smtp-client/components/tracking_context.email";
 
@@ -90,22 +99,72 @@ export interface TemplateMetadata<TKey extends string> {
 }
 
 /**
+ * Resolved email data returned by a render function.
+ * The render function builds the JSX and all routing metadata.
+ */
+export interface EmailResolvedData {
+  toEmail: string;
+  toName: string;
+  subject: string;
+  jsx: JSX.Element;
+  replyToEmail?: string;
+  replyToName?: string;
+  senderName?: string;
+  leadId: string;
+  unsubscribeUrl?: string;
+}
+
+/**
+ * Props passed to the render function on a template.
+ * TRequest/TResponse/TUrlVariables come from the endpoint; TScopedTranslationKey from the template.
+ */
+export interface EmailRenderProps<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string,
+  TUserRoles extends readonly UserRoleValue[],
+> {
+  requestData: TRequest;
+  urlPathParams: TUrlVariables;
+  responseData: TResponse;
+  user: InferJwtPayloadTypeFromRoles<TUserRoles>;
+  // Method shorthand — bivariant under strictFunctionTypes.
+  // Allows a template with render(props: EmailRenderProps<..., NarrowKey>) to be
+  // assigned to EmailHandler.template which expects EmailRenderProps<..., TranslationKey>.
+  t(key: TScopedTranslationKey, params?: TParams): TranslatedKeyType;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  tracking: TrackingContext;
+}
+
+/**
+ * Minimum interface for the object returned by scopedT.
+ * Declaring `t` with method shorthand enables bivariant checking under strictFunctionTypes,
+ * so concrete templates with `t: (key: OwnKey) => TranslatedKeyType` satisfy this constraint.
+ */
+export interface ScopedTResult {
+  t(key: string, params?: TParams): TranslatedKeyType;
+}
+
+/**
  * Full template definition (lazy-loaded)
  * TProps: the props type for the email component
  * TScopedTranslation: the createScopedTranslation result for this template's module
  */
 export interface EmailTemplateDefinition<
-  TProps = never,
-  // TScopedTranslation must have scopedT that returns an object with t.
-  // We use { t: (...args: never[]) => string } to avoid contravariance issues
-  // with specific key unions — the actual type flows through ReturnType inference.
+  TProps,
+  // TScopedTranslation: the createScopedTranslation result for this template.
+  // The constraint uses ScopedTResult (method shorthand for `t`) so TypeScript checks `t`
+  // bivariantly — allowing concrete templates with narrower key unions to satisfy it.
   TScopedTranslation extends {
-    scopedT: (locale: CountryLanguage) => { t: (...args: never[]) => string };
-  } = {
-    scopedT: (locale: CountryLanguage) => {
-      t: (key: string, params?: Record<string, string | number>) => string;
-    };
+    scopedT: (locale: CountryLanguage) => ScopedTResult;
   },
+  // TRequest, TResponse, TUrlVariables — the endpoint types this template's render handles.
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TUserRoles extends readonly UserRoleValue[],
 > {
   scopedTranslation: TScopedTranslation;
   meta: TemplateMetadata<
@@ -120,13 +179,59 @@ export interface EmailTemplateDefinition<
     tracking: TrackingContext;
   }) => ReactElement;
   exampleProps: TProps;
+  /**
+   * Render function — business logic that maps endpoint context to EmailResolvedData.
+   * Lives here so email.tsx files only export EmailTemplateDefinition objects.
+   * Routes reference it as: email: [{ template: xEmailTemplate, ignoreErrors: true }]
+   */
+  render: (
+    props: EmailRenderProps<
+      TRequest,
+      TResponse,
+      TUrlVariables,
+      Parameters<ReturnType<TScopedTranslation["scopedT"]>["t"]>[0],
+      TUserRoles
+    >,
+  ) =>
+    | Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType>
+    | SuccessResponseType<EmailResolvedData>
+    | ErrorResponseType;
 }
+
+/**
+ * Escape-hatch type for generator/registry code that handles templates of unknown shape.
+ * Only use in: generated.ts, generators/email-templates/repository.ts,
+ * renderTemplateComponent, getTemplateSubject, translatePreviewFields.
+ * All other code must use fully-typed EmailTemplateDefinition<TProps, TScopedTranslation, TRequest, TResponse, TUrlVariables>.
+ */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type EmailTemplateDefinitionAny = EmailTemplateDefinition<
+  any,
+  any,
+  any,
+  any,
+  any,
+  any
+>;
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
  * Template default export structure
  */
-export interface TemplateExport<TProps = never> {
-  default: EmailTemplateDefinition<TProps>;
+export interface TemplateExport<
+  TProps,
+  TScopedTranslation extends {
+    scopedT: (locale: CountryLanguage) => ScopedTResult;
+  },
+> {
+  default: EmailTemplateDefinition<
+    TProps,
+    TScopedTranslation,
+    never,
+    never,
+    never,
+    readonly UserRoleValue[]
+  >;
 }
 
 /**
@@ -141,18 +246,12 @@ export interface TemplateExport<TProps = never> {
  * assertions of their own.
  */
 
-export type AnyTemplateConstraint = EmailTemplateDefinition<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any,
-  { scopedT: (locale: CountryLanguage) => { t: (...args: never[]) => string } }
->;
-
 /**
  * Parse rawProps with the template's own schema, invoke template.component
  * with the matched t function, and return the ReactElement.
  */
 export function renderTemplateComponent(
-  template: AnyTemplateConstraint,
+  template: EmailTemplateDefinitionAny,
   params: {
     rawProps: Record<string, string | number | boolean>;
     locale: CountryLanguage;
@@ -169,7 +268,7 @@ export function renderTemplateComponent(
  * Get the translated subject line for a template using its own t function.
  */
 export function getTemplateSubject(
-  template: AnyTemplateConstraint,
+  template: EmailTemplateDefinitionAny,
   locale: CountryLanguage,
 ): string {
   const { t } = template.scopedTranslation.scopedT(locale);

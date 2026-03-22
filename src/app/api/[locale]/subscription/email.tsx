@@ -19,20 +19,42 @@ import {
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
+import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-import { contactClientRepository } from "../contact/repository-client";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
 import { EmailTemplate } from "../messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
 } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
-import { SubscriptionPlan, SubscriptionStatus } from "./enum";
+
+import { contactClientRepository } from "../contact/repository-client";
 import {
   scopedTranslation as subscriptionScopedTranslation,
   type SubscriptionT,
 } from "./i18n";
+
+// ============================================================================
+// REQUEST TYPE (shared by both render functions)
+// ============================================================================
+
+interface SubscriptionEmailRequest {
+  user?: {
+    privateName: string;
+    publicName: string;
+    email: string;
+    leadId: string;
+    id: string;
+  };
+  planName?: string;
+  statusName?: string;
+}
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -379,9 +401,13 @@ function SubscriptionSuccessEmail({
 }
 
 // Template Definition Export
-const subscriptionSuccessTemplate: EmailTemplateDefinition<
+export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
   SubscriptionSuccessProps,
-  typeof subscriptionScopedTranslation
+  typeof subscriptionScopedTranslation,
+  SubscriptionEmailRequest,
+  never,
+  never,
+  readonly [typeof UserRole.CUSTOMER, typeof UserRole.ADMIN]
 > = {
   scopedTranslation: subscriptionScopedTranslation,
   meta: {
@@ -431,9 +457,41 @@ const subscriptionSuccessTemplate: EmailTemplateDefinition<
     leadId: "example-lead-id-456",
     planName: "Premium Plan",
   },
+  render: ({ user, requestData, locale }) => {
+    const { t } = subscriptionScopedTranslation.scopedT(locale);
+    try {
+      const templateProps: SubscriptionSuccessProps = {
+        privateName: requestData.user?.privateName ?? "",
+        userId: requestData.user?.id ?? user.id,
+        leadId: requestData.user?.leadId ?? user.leadId,
+        planName: requestData.planName ?? "",
+      };
+      const tracking = createTrackingContext(
+        locale,
+        templateProps.leadId,
+        templateProps.userId,
+      );
+      return success({
+        toEmail: requestData.user?.email ?? "",
+        toName: templateProps.privateName,
+        subject: t("email.success.subject"),
+        leadId: templateProps.leadId,
+        jsx: subscriptionSuccessEmailTemplate.component({
+          props: templateProps,
+          t,
+          locale,
+          recipientEmail: requestData.user?.email ?? "",
+          tracking,
+        }),
+      });
+    } catch {
+      return fail({
+        message: t("email.success.subject"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
 };
-
-export default subscriptionSuccessTemplate;
 
 // ============================================================================
 // ADMIN NOTIFICATION TEMPLATE
@@ -652,9 +710,13 @@ function AdminSubscriptionNotificationEmailContent({
 }
 
 // Admin notification template definition (for preview registry)
-export const adminSubscriptionNotificationTemplate: EmailTemplateDefinition<
+export const adminSubscriptionNotificationEmailTemplate: EmailTemplateDefinition<
   AdminSubscriptionProps,
-  typeof subscriptionScopedTranslation
+  typeof subscriptionScopedTranslation,
+  SubscriptionEmailRequest,
+  never,
+  never,
+  readonly [typeof UserRole.CUSTOMER, typeof UserRole.ADMIN]
 > = {
   scopedTranslation: subscriptionScopedTranslation,
   meta: {
@@ -719,162 +781,35 @@ export const adminSubscriptionNotificationTemplate: EmailTemplateDefinition<
     planName: "Premium Plan",
     statusName: "Active",
   },
-};
-
-// ============================================================================
-// ADAPTERS (Business Logic - Maps custom data to template props)
-// ============================================================================
-
-/**
- * Email function type for subscription success notifications
- */
-interface SubscriptionSuccessEmailParams {
-  user: {
-    id: string;
-    email: string;
-    privateName: string;
-    publicName: string;
-    leadId: string;
-  };
-  subscription: {
-    id: string;
-    planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan];
-    status: (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
-    stripeSubscriptionId: string | null;
-  };
-  locale: CountryLanguage;
-}
-
-/**
- * Helper function to get plan name from subscription plan ID
- */
-function getPlanName(
-  planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan],
-  t: SubscriptionT,
-): string {
-  switch (planId) {
-    case SubscriptionPlan.SUBSCRIPTION:
-      return t("enums.plan.subscription");
-    default:
-      return t("enums.plan.subscription");
-  }
-}
-
-/**
- * Helper function to get status name from subscription status
- */
-function getStatusName(
-  status: (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus],
-  t: SubscriptionT,
-): string {
-  switch (status) {
-    case SubscriptionStatus.ACTIVE:
-      return t("enums.status.active");
-    case SubscriptionStatus.TRIALING:
-      return t("enums.status.trialing");
-    case SubscriptionStatus.PAST_DUE:
-      return t("enums.status.pastDue");
-    case SubscriptionStatus.CANCELED:
-      return t("enums.status.canceled");
-    case SubscriptionStatus.INCOMPLETE:
-      return t("enums.status.incomplete");
-    case SubscriptionStatus.INCOMPLETE_EXPIRED:
-      return t("enums.status.incompleteExpired");
-    case SubscriptionStatus.UNPAID:
-      return t("enums.status.unpaid");
-    case SubscriptionStatus.PAUSED:
-      return t("enums.status.paused");
-    default:
-      return t("enums.status.incomplete");
-  }
-}
-
-/**
- * Subscription Success Email Adapter
- * Maps subscription data to success template props
- */
-export const renderSubscriptionSuccessEmail = ({
-  user,
-  subscription,
-  locale,
-}: SubscriptionSuccessEmailParams): {
-  success: boolean;
-  data: {
-    toEmail: string;
-    toName: string;
-    subject: string;
-    jsx: ReactElement;
-  };
-} => {
-  const { t } = subscriptionScopedTranslation.scopedT(locale);
-  const planName = getPlanName(subscription.planId, t);
-
-  const templateProps: SubscriptionSuccessProps = {
-    privateName: user.privateName,
-    userId: user.id,
-    leadId: user.leadId,
-    planName,
-  };
-  const { t: globalT } = simpleT(locale);
-
-  return {
-    success: true,
-    data: {
-      toEmail: user.email,
-      toName: user.privateName,
-      subject: t("email.success.subject", {
-        appName: globalT("config.appName"),
-        planName,
-      }),
-      jsx: subscriptionSuccessTemplate.component({
-        props: templateProps,
-        t,
-        locale,
-        recipientEmail: user.email,
-        tracking: createTrackingContext(locale, user.leadId, user.id),
-      }),
-    },
-  };
-};
-
-/**
- * Admin Subscription Notification Adapter
- * Sends admin notification when subscription is created
- */
-export const renderAdminSubscriptionNotification = ({
-  user,
-  subscription,
-  locale,
-}: SubscriptionSuccessEmailParams): {
-  success: boolean;
-  data: {
-    toEmail: string;
-    toName: string;
-    subject: string;
-    jsx: ReactElement;
-  };
-} => {
-  const { t } = subscriptionScopedTranslation.scopedT(locale);
-  const planName = getPlanName(subscription.planId, t);
-  const statusName = getStatusName(subscription.status, t);
-  const { t: globalT } = simpleT(locale);
-  return {
-    success: true,
-    data: {
-      toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: globalT("config.appName"),
-      subject: t("email.admin_notification.subject", {
-        userName: user.privateName,
-        planName,
-      }),
-      jsx: AdminSubscriptionNotificationEmailContent({
-        user,
-        planName,
-        statusName,
-        t,
-        locale,
-        recipientEmail: contactClientRepository.getSupportEmail(locale),
-      }),
-    },
-  };
+  render: ({ user, requestData, locale }) => {
+    const { t } = subscriptionScopedTranslation.scopedT(locale);
+    try {
+      const adminEmail = contactClientRepository.getSupportEmail(locale);
+      const templateProps: AdminSubscriptionProps = {
+        privateName: requestData.user?.privateName ?? "",
+        publicName: requestData.user?.publicName ?? "",
+        email: requestData.user?.email ?? "",
+        planName: requestData.planName ?? "",
+        statusName: requestData.statusName ?? "",
+      };
+      return success({
+        toEmail: adminEmail,
+        toName: adminEmail,
+        subject: t("email.admin_notification.subject"),
+        leadId: requestData.user?.leadId ?? user.leadId,
+        jsx: adminSubscriptionNotificationEmailTemplate.component({
+          props: templateProps,
+          t,
+          locale,
+          recipientEmail: adminEmail,
+          tracking: createTrackingContext(locale),
+        }),
+      });
+    } catch {
+      return fail({
+        message: t("email.admin_notification.subject"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
 };

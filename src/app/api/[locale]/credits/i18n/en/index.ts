@@ -498,4 +498,26 @@ export const translations = {
       },
     },
   },
+  email: {
+    creditPack: {
+      user: {
+        subject: "Your credit pack is ready — {{appName}}",
+        title: "Credits added to your account",
+        previewText: "{{credits}} credits have been added to your account",
+        greeting: "Hi {{privateName}},",
+        body: "Your credit pack purchase was successful. {{credits}} permanent credits have been added to your account and are ready to use.",
+        cta: "Start using your credits",
+        signoff: "Thank you for your purchase!\n\nThe {{appName}} Team",
+      },
+      admin: {
+        subject: "[{{appName}}] Credit pack purchased — {{credits}} credits",
+        title: "Credit Pack Purchase",
+        preview: "A user purchased a credit pack",
+        body: "A user has purchased a credit pack.",
+        labelUser: "User",
+        labelCredits: "Credits",
+        footer: "Automated notification from {{appName}}",
+      },
+    },
+  },
 };

@@ -48,7 +48,7 @@ export class LeadsImportProcessRepository {
         .where(
           and(
             eq(csvImportJobs.status, CsvImportJobStatus.PENDING),
-            sql`${csvImportJobs.retryCount} < ${maxRetriesPerJob}`,
+            sql`${csvImportJobs.retryCount} <= ${maxRetriesPerJob}`,
           ),
         )
         .limit(maxJobsPerRun);
@@ -105,19 +105,13 @@ export class LeadsImportProcessRepository {
         }
       }
 
-      // Self-delete this task, and re-create if more pending jobs remain
+      // Re-create next task if more pending jobs remain (the current task has runOnce:true
+      // so Pulse will disable it after execution; no explicit self-delete needed)
       if (!dryRun) {
         const { cronTasks } =
           await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
         const { CronTaskPriority, TaskCategory, TaskOutputMode } =
           await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
-
-        if (data.selfTaskId) {
-          await db.delete(cronTasks).where(eq(cronTasks.id, data.selfTaskId));
-          logger.info("tasks.csv_processor.self_deleted", {
-            taskId: data.selfTaskId,
-          });
-        }
 
         const [summaryStats] = await db
           .select({

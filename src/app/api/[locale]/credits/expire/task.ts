@@ -30,6 +30,7 @@ const creditExpirationTask = createCronTask(
     schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,
     category: TaskCategory.MAINTENANCE,
     enabled: true,
+    hidden: true,
     priority: CronTaskPriority.MEDIUM,
     timeout: TASK_TIMEOUTS.SHORT,
     taskInput: undefined,

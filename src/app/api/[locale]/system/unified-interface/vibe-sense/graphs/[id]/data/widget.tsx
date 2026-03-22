@@ -68,7 +68,7 @@ import type {
   UTCTimestamp,
 } from "lightweight-charts";
 
-import { GraphResolution } from "../../../enum";
+import { GraphOwnerType, GraphResolution } from "../../../enum";
 import {
   RESOLUTION_MS,
   type Resolution,
@@ -2310,7 +2310,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
             <Edit className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">{t("get.widget.edit")}</Span>
           </Button>
-          {graph?.ownerType !== "system" && (
+          {graph?.ownerType !== GraphOwnerType.SYSTEM && (
             <>
               <Button
                 variant="ghost"

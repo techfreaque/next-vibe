@@ -432,4 +432,26 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  email: {
+    creditPack: {
+      user: {
+        subject: "Ihr Guthaben-Paket ist bereit — {{appName}}",
+        title: "Credits wurden Ihrem Konto hinzugefügt",
+        previewText: "{{credits}} Credits wurden Ihrem Konto hinzugefügt",
+        greeting: "Hallo {{privateName}},",
+        body: "Ihr Kauf eines Guthaben-Pakets war erfolgreich. {{credits}} permanente Credits wurden Ihrem Konto hinzugefügt und sind einsatzbereit.",
+        cta: "Credits jetzt nutzen",
+        signoff: "Vielen Dank für Ihren Kauf!\n\nDas {{appName}}-Team",
+      },
+      admin: {
+        subject: "[{{appName}}] Guthaben-Paket gekauft — {{credits}} Credits",
+        title: "Guthaben-Paket-Kauf",
+        preview: "Ein Benutzer hat ein Guthaben-Paket gekauft",
+        body: "Ein Benutzer hat ein Guthaben-Paket gekauft.",
+        labelUser: "Benutzer",
+        labelCredits: "Credits",
+        footer: "Automatische Benachrichtigung von {{appName}}",
+      },
+    },
+  },
 };

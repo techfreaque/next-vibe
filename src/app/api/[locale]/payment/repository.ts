@@ -32,8 +32,8 @@ import type {
   PaymentPostResponseOutput,
 } from "./definition";
 import { CheckoutMode, PaymentProvider, PaymentStatus } from "./enum";
-import { scopedTranslation } from "./i18n";
 import type { PaymentT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
@@ -106,7 +106,7 @@ export class PaymentRepository {
 
       // Get or create Stripe customer (handles invalid test IDs)
       const { getPaymentProvider } = await import("./providers/index");
-      const paymentProvider = getPaymentProvider("stripe");
+      const paymentProvider = getPaymentProvider(PaymentProvider.STRIPE);
 
       const customerResult = await paymentProvider.ensureCustomer(
         user.id,
@@ -373,7 +373,9 @@ export class PaymentRepository {
     signature: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    provider: "stripe" | "nowpayments" = "stripe",
+    provider:
+      | typeof PaymentProvider.STRIPE
+      | typeof PaymentProvider.NOWPAYMENTS = PaymentProvider.STRIPE,
   ): Promise<ResponseType<{ received: boolean }>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -784,7 +786,7 @@ export class PaymentRepository {
       // The renewalSessionKey is based on subscription ID + period end
       const { getPaymentProvider } = await import("./providers");
 
-      const provider = getPaymentProvider("stripe");
+      const provider = getPaymentProvider(PaymentProvider.STRIPE);
       const subResult = await provider.retrieveSubscription(
         subscriptionId,
         logger,

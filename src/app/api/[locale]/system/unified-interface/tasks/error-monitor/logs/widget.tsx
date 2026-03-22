@@ -27,11 +27,12 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
-  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { DateFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 
 import type endpoints from "./definition";
@@ -218,7 +219,6 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const form = useWidgetForm();
-  const onSubmit = useWidgetOnSubmit();
   const user = useWidgetUser();
   const locale = useWidgetLocale();
   const logger = useWidgetLogger();
@@ -248,13 +248,8 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
   const handlePageChange = useCallback(
     (newOffset: number): void => {
       form.setValue("offset", newOffset);
-      if (onSubmit) {
-        onSubmit();
-      } else {
-        endpointMutations?.read?.refetch?.();
-      }
     },
-    [form, onSubmit, endpointMutations],
+    [form],
   );
 
   const handleToggle = useCallback(
@@ -328,9 +323,21 @@ export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
       </Div>
 
       {/* -- Filters -- */}
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
-        <Div className="w-48">
+      <Div className="flex flex-wrap items-end gap-3 px-4 py-3 border-b">
+        <Div className="w-40">
           <SelectFieldWidget fieldName={"status"} field={children.status} />
+        </Div>
+        <Div className="w-56">
+          <TextFieldWidget fieldName={"search"} field={children.search} />
+        </Div>
+        <Div className="w-44">
+          <TextFieldWidget fieldName={"errorType"} field={children.errorType} />
+        </Div>
+        <Div className="w-40">
+          <DateFieldWidget fieldName={"startDate"} field={children.startDate} />
+        </Div>
+        <Div className="w-40">
+          <DateFieldWidget fieldName={"endDate"} field={children.endDate} />
         </Div>
       </Div>
 

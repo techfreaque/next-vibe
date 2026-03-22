@@ -21,6 +21,7 @@ import {
   formatSense,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
+import { RunStatus } from "../enum";
 import { pipelineGraphs } from "../db";
 import { getLatestRun } from "../store/runs";
 import { runGraph } from "./runner";
@@ -123,7 +124,7 @@ function checkIfDue(
   }
 
   // If last run is still running, skip
-  if (lastRun.status === "running") {
+  if (lastRun.status === RunStatus.RUNNING) {
     return false;
   }
 

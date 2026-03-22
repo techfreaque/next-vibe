@@ -1,6 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
+import { useMemo } from "react";
 
 import errorLogsDefinition from "@/app/api/[locale]/system/unified-interface/tasks/error-monitor/logs/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -14,11 +15,24 @@ export function ErrorMonitorPageClient({
   locale: CountryLanguage;
   user: JwtPayloadType;
 }): JSX.Element {
+  const endpointOptions = useMemo(
+    () => ({
+      read: {
+        formOptions: {
+          autoSubmit: true,
+          debounceMs: 300,
+          persistForm: true,
+        },
+      },
+    }),
+    [],
+  );
   return (
     <EndpointsPage
       endpoint={{ GET: errorLogsDefinition.GET }}
       locale={locale}
       user={user}
+      endpointOptions={endpointOptions}
     />
   );
 }

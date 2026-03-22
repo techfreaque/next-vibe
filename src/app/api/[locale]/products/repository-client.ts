@@ -14,6 +14,7 @@ import type {
 } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
+import type { PaymentInterval } from "../payment/providers/types";
 import type { ProductsTranslationKey } from "./i18n";
 
 /**
@@ -158,8 +159,6 @@ export const FEATURE_COSTS = {
    */
   TTS: TTS_COST_PER_CHARACTER,
 } as const;
-
-export type PaymentInterval = "month" | "year" | "one_time";
 
 /**
  * Product definition with pricing per country

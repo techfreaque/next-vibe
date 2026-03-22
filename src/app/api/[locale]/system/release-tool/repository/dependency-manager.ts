@@ -16,7 +16,11 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import type { PackageJson, SecurityScanResult } from "../definition";
+import type {
+  PackageJson,
+  PackageManager,
+  SecurityScanResult,
+} from "../definition";
 import { scopedTranslation } from "../i18n";
 import { MESSAGES, TIMEOUTS } from "./constants";
 import { toCatchError } from "./utils";
@@ -81,7 +85,7 @@ export class DependencyManager {
 
   updateDependencies(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     packageJson: PackageJson,
     logger: EndpointLogger,
     dryRun: boolean,
@@ -163,7 +167,7 @@ export class DependencyManager {
 
   private updateWithPackageManager(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): ResponseType<void> {
@@ -206,7 +210,7 @@ export class DependencyManager {
   checkOutdated(
     cwd: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for interface consistency
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
   ): ResponseType<OutdatedResult> {
     logger.debug(MESSAGES.DEPS_CHECKING_OUTDATED);
@@ -286,7 +290,7 @@ export class DependencyManager {
 
   runAudit(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     locale: CountryLanguage,
     fix = false,
@@ -392,7 +396,7 @@ export class DependencyManager {
 
   deduplicate(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): ResponseType<void> {
@@ -436,7 +440,7 @@ export class DependencyManager {
 
   prune(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
   ): ResponseType<void> {
     logger.info("Pruning unused dependencies...");

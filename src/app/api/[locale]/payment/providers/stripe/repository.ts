@@ -49,7 +49,7 @@ export class StripeProvider implements PaymentProvider {
   static getStripe(): Stripe | null {
     return StripeProvider._stripe;
   }
-  name = "stripe";
+  name = PaymentProviderEnum.STRIPE;
 
   async ensureCustomer(
     userId: string,

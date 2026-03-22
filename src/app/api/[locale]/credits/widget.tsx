@@ -18,7 +18,6 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
 import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Gift } from "next-vibe-ui/ui/icons/Gift";
-import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
@@ -29,11 +28,7 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import {
-  useWidgetTranslation,
-  useWidgetUser,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
@@ -69,10 +64,6 @@ export function CreditsBalanceContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const credits = field.value;
   const { locale } = useTranslation();
-  const user = useWidgetUser();
-
-  const isAdmin =
-    !user.isPublic && (user.roles?.includes(UserRole.ADMIN) ?? false);
 
   const subscriptionProduct = productsRepository.getProduct(
     ProductIds.SUBSCRIPTION,
@@ -97,14 +88,12 @@ export function CreditsBalanceContainer({
                 <Div className="p-2 rounded-lg bg-primary/10">
                   <Coins className="h-6 w-6 text-primary" />
                 </Div>
-                {isAdmin ? t("get.balance.adminTitle") : t("get.balance.title")}
+                {t("get.balance.title")}
               </CardTitle>
               <CardDescription>
-                {isAdmin
-                  ? t("get.balance.adminDescription")
-                  : t("get.balance.description", {
-                      modelCount: TOTAL_MODEL_COUNT,
-                    })}
+                {t("get.balance.description", {
+                  modelCount: TOTAL_MODEL_COUNT,
+                })}
               </CardDescription>
             </Div>
             <Badge className="text-lg font-bold px-4 py-2">
@@ -131,11 +120,9 @@ export function CreditsBalanceContainer({
                 {formatCredits(credits?.expiring ?? 0)}
               </Div>
               <Div className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                {isAdmin
-                  ? t("get.balance.expiring.adminDescription")
-                  : t("get.balance.expiring.description", {
-                      subCredits: subscriptionProduct.credits,
-                    })}
+                {t("get.balance.expiring.description", {
+                  subCredits: subscriptionProduct.credits,
+                })}
               </Div>
             </Div>
 
@@ -149,9 +136,7 @@ export function CreditsBalanceContainer({
                 {formatCredits(credits?.permanent ?? 0)}
               </Div>
               <Div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                {isAdmin
-                  ? t("get.balance.permanent.adminDescription")
-                  : t("get.balance.permanent.description")}
+                {t("get.balance.permanent.description")}
               </Div>
             </Div>
 
@@ -165,46 +150,27 @@ export function CreditsBalanceContainer({
                 {formatCredits(credits?.free ?? 0)}
               </Div>
               <Div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                {isAdmin
-                  ? t("get.balance.free.adminDescription", {
-                      count: freeProduct.credits,
-                    })
-                  : t("get.balance.free.description", {
-                      count: freeProduct.credits,
-                    })}
+                {t("get.balance.free.description", {
+                  count: freeProduct.credits,
+                })}
               </Div>
             </Div>
 
-            {/* Earned Credits (from referrals) — hide for admin */}
-            {isAdmin ? (
-              <Div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800">
-                <Div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 mb-2">
-                  <Settings className="h-4 w-4" />
-                  {t("get.balance.spending.title")}
+            {/* Earned Credits (from referrals) */}
+            <Link href={`/${locale}/user/referral`} className="block">
+              <Div className="p-4 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors cursor-pointer h-full">
+                <Div className="flex items-center gap-2 text-sm text-violet-700 dark:text-violet-300 mb-2">
+                  <Gift className="h-4 w-4" />
+                  {t("get.balance.earned.title")}
                 </Div>
-                <Div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                <Div className="text-2xl font-bold text-violet-900 dark:text-violet-100">
                   {formatCredits(credits?.earned ?? 0)}
                 </Div>
-                <Div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                  {t("get.balance.spending.adminDescription")}
+                <Div className="text-xs text-violet-600 dark:text-violet-400 mt-1">
+                  {t("get.balance.earned.description")}
                 </Div>
               </Div>
-            ) : (
-              <Link href={`/${locale}/user/referral`} className="block">
-                <Div className="p-4 rounded-lg bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-colors cursor-pointer h-full">
-                  <Div className="flex items-center gap-2 text-sm text-violet-700 dark:text-violet-300 mb-2">
-                    <Gift className="h-4 w-4" />
-                    {t("get.balance.earned.title")}
-                  </Div>
-                  <Div className="text-2xl font-bold text-violet-900 dark:text-violet-100">
-                    {formatCredits(credits?.earned ?? 0)}
-                  </Div>
-                  <Div className="text-xs text-violet-600 dark:text-violet-400 mt-1">
-                    {t("get.balance.earned.description")}
-                  </Div>
-                </Div>
-              </Link>
-            )}
+            </Link>
           </Div>
         </CardContent>
       </Card>

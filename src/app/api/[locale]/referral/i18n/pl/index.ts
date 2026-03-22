@@ -162,6 +162,8 @@ export const translations: typeof enTranslations = {
       totalEarnedDescription: "Całkowita prowizja zarobiona z poleceń",
       availableBalance: "Dostępne saldo",
       availableBalanceDescription: "Dostępne saldo gotowe do wypłaty",
+      availableBalanceDescriptionLow:
+        "Wydawaj na czaty AI — inne kredyty używane są najpierw. Zarobić $40, aby odblokować wypłatę.",
       totalRevenueCredits: "Łączny przychód (Kredyty)",
       totalEarnedCredits: "Łącznie zarobione (Kredyty)",
       totalPaidOutCredits: "Łącznie wypłacone (Kredyty)",
@@ -254,8 +256,141 @@ export const translations: typeof enTranslations = {
     message: "Wiadomość",
   },
 
-  // Payout errors
+  // Admin payout management
+  admin: {
+    payouts: {
+      get: {
+        title: "Żądania wypłat",
+        description: "Zarządzaj żądaniami wypłat poleceń",
+      },
+      post: {
+        title: "Przetwórz wypłatę",
+        description: "Zatwierdź, odrzuć lub zakończ żądanie wypłaty",
+      },
+      fields: {
+        status: {
+          label: "Filtr statusu",
+          description: "Filtruj według statusu wypłaty",
+        },
+        requestId: {
+          label: "ID żądania",
+          description: "Identyfikator żądania wypłaty",
+        },
+        action: {
+          label: "Akcja",
+          description: "Akcja do wykonania na żądaniu wypłaty",
+        },
+        adminNotes: {
+          label: "Notatki admina",
+          description: "Opcjonalne notatki dla tej akcji",
+        },
+        rejectionReason: {
+          label: "Powód odrzucenia",
+          description: "Powód odrzucenia żądania wypłaty",
+        },
+      },
+      widget: {
+        empty: "Nie znaleziono żądań wypłat",
+        approve: "Zatwierdź",
+        reject: "Odrzuć",
+        complete: "Zakończ",
+        credits: "kredytów",
+      },
+    },
+  },
+
+  // Payout endpoint + errors
   payout: {
+    get: {
+      title: "Twoje zarobki",
+      description: "Wyświetl zarobki z poleceń i historię wypłat",
+    },
+    post: {
+      title: "Poproś o wypłatę",
+      description: "Wypłać swoje zarobki z poleceń",
+    },
+    fields: {
+      amountCents: {
+        label: "Kwota (kredyty)",
+        description: "Kwota do wypłaty w kredytach",
+        placeholder: "np. 5000",
+      },
+      currency: {
+        label: "Metoda wypłaty",
+        description: "Jak chcesz otrzymać swoje zarobki",
+      },
+      walletAddress: {
+        label: "Adres portfela",
+        description: "Wymagany dla wypłat BTC lub USDC",
+        placeholder: "Twój adres portfela",
+      },
+    },
+    widget: {
+      totalEarned: "Łącznie zarobione",
+      available: "Dostępne",
+      locked: "Zablokowane",
+      credits: "kredytów",
+      readyForPayout: "gotowe do wypłaty",
+      moreToUnlock: "więcej potrzeba",
+      pendingConfirmation: "oczekuje na potwierdzenie",
+      requestPayout: "Poproś o wypłatę",
+      payoutHistory: "Historia wypłat",
+      noPayout: "Brak żądań wypłaty",
+      howItWorksTitle: "Jak to działa",
+      step1Title: "Utwórz kody polecające",
+      step1Body:
+        "Generuj unikalne kody dla różnych grup – znajomych, mediów społecznościowych lub kampanii.",
+      step2Title: "Udostępnij swój link",
+      step2Body:
+        "Gdy ktoś zarejestruje się przez Twój link i zasubskrybuje, zarabiasz prowizję.",
+      step3Title: "Otrzymaj płatność",
+      step3Body:
+        "Zarobki są natychmiastowe. Użyj ich jako kredytów do czatów lub wypłać w krypto.",
+      withdrawTitle: "Wypłać zarobki",
+      withdrawDescription: "Wiele sposobów na wykorzystanie zarobków z poleceń",
+      useAsCredits: "Użyj jako kredyty czatu",
+      useAsCreditsDesc: "Natychmiast zamień zarobki na kredyty do rozmów AI.",
+      cryptoPayout: "Wypłata w krypto",
+      cryptoPayoutDesc:
+        "Poproś o wypłatę w BTC lub USDC na swój adres portfela.",
+      minimumNote:
+        "Minimalna wypłata: 40 $. Wypłaty krypto są przetwarzane w ciągu 48 godzin po zatwierdzeniu.",
+      progressLabel: "Postęp do wypłaty",
+      unlockedOf: "odblokowano z",
+      viewHistory: "Zobacz historię",
+    },
+    email: {
+      user: {
+        subjectCrypto: "Żądanie wypłaty otrzymane",
+        subjectCredits: "Kredyty przeliczone",
+        titleCrypto: "Twoje żądanie wypłaty",
+        titleCredits: "Kredyty przeliczone",
+        previewCrypto: "Twoje żądanie wypłaty jest przetwarzane",
+        previewCredits: "Twoje kredyty zostały przeliczone",
+        bodyCrypto:
+          "Otrzymaliśmy Twoje żądanie wypłaty. Wypłaty krypto są przetwarzane w ciągu 48 godzin po zatwierdzeniu przez administratora.",
+        bodyCredits:
+          "Twoje zarobki z poleceń zostały natychmiast przeliczone na kredyty czatu i dodane do Twojego konta.",
+        followUpCrypto:
+          "Otrzymasz kolejny e-mail, gdy Twoja wypłata zostanie przetworzona.",
+        labelAmount: "Kwota",
+        labelMethod: "Metoda",
+        labelWallet: "Portfel",
+        credits: "kredytów",
+      },
+      admin: {
+        subject: "Nowe żądanie wypłaty",
+        title: "Nowe żądanie wypłaty",
+        preview: "Złożono żądanie wypłaty",
+        body: "Użytkownik złożył żądanie wypłaty.",
+        footer: "Proszę przejrzeć i przetworzyć to żądanie w panelu admina.",
+        labelUser: "Użytkownik",
+        labelAmount: "Kwota",
+        labelCurrency: "Waluta",
+        labelWallet: "Portfel",
+        credits: "kredytów",
+      },
+    },
     errors: {
       minimumAmount: "Minimalna kwota wypłaty to $40",
       walletRequired: "Adres portfela wymagany dla wypłat krypto",

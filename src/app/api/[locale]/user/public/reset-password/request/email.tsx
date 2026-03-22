@@ -4,7 +4,6 @@
  */
 
 import { Button, Section, Text } from "@react-email/components";
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   fail,
   success,
@@ -16,10 +15,9 @@ import React from "react";
 import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
+import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
-import { translations as configTranslations } from "@/config/i18n/en";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { UserDetailLevel } from "../../../enum";
@@ -28,15 +26,13 @@ import {
   scopedTranslation as requestScopedTranslation,
   type ResetPasswordRequestT,
 } from "./i18n";
-import {
-  scopedTranslation as resetPasswordScopedTranslation,
-  type ResetPasswordTranslationKey,
-} from "../i18n";
+import { scopedTranslation as resetPasswordScopedTranslation } from "../i18n";
 import { PasswordRepository } from "../repository";
 import type {
   ResetPasswordRequestPostRequestOutput,
   ResetPasswordRequestPostResponseOutput,
 } from "./definition";
+import definition from "./definition";
 import {
   createTrackingContext,
   type TrackingContext,
@@ -159,9 +155,13 @@ function PasswordResetRequestEmail({
 }
 
 // Template Definition Export
-const passwordResetRequestTemplate: EmailTemplateDefinition<
+export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
   PasswordResetRequestProps,
-  typeof requestScopedTranslation
+  typeof requestScopedTranslation,
+  ResetPasswordRequestPostRequestOutput,
+  ResetPasswordRequestPostResponseOutput,
+  never,
+  typeof definition.POST.allowedRoles
 > = {
   scopedTranslation: requestScopedTranslation,
   meta: {
@@ -204,107 +204,86 @@ const passwordResetRequestTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
     passwordResetUrl: "https://example.com/user/reset-password/token123",
   },
-};
+  render: async ({ requestData, locale, logger }) => {
+    logger.debug("Rendering password reset email", {
+      email: requestData.email,
+    });
 
-export default passwordResetRequestTemplate;
+    const { t } = requestScopedTranslation.scopedT(locale);
+    const { t: resetT } = resetPasswordScopedTranslation.scopedT(locale);
 
-// ============================================================================
-// ADAPTERS (Business Logic - Maps endpoint data to template props)
-// ============================================================================
+    try {
+      const userResponse = await UserRepository.getUserByEmail(
+        requestData.email,
+        UserDetailLevel.STANDARD,
+        locale,
+        logger,
+      );
+      if (!userResponse.success) {
+        // will not get sent to the user as ignoreError is true
+        return fail({
+          message: t("errors.no_email"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+          messageParams: { email: requestData.email },
+          cause: userResponse,
+        });
+      }
 
-/**
- * Password Reset Email Adapter
- * Maps password reset request to template props
- *
- * This function:
- * 1. Verifies the user exists in the database
- * 2. Creates a password reset token
- * 3. Constructs a personalized email with a reset link
- * 4. Returns the email content and recipient information
- */
-export const renderResetPasswordMail: EmailFunctionType<
-  ResetPasswordRequestPostRequestOutput,
-  ResetPasswordRequestPostResponseOutput,
-  UndefinedType,
-  ResetPasswordTranslationKey
-> = async ({ requestData, locale, logger }) => {
-  logger.debug("Rendering password reset email", {
-    email: requestData.email,
-  });
+      const user = userResponse.data;
 
-  const { t } = requestScopedTranslation.scopedT(locale);
-  const { t: resetT } = resetPasswordScopedTranslation.scopedT(locale);
+      // Create a reset token
+      const tokenResponse = await PasswordRepository.createResetToken(
+        requestData.email,
+        locale,
+        logger,
+        resetT,
+      );
+      if (!tokenResponse.success) {
+        return fail({
+          message: t("errors.email_generation_failed"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { email: requestData.email },
+          cause: tokenResponse,
+        });
+      }
 
-  try {
-    const userResponse = await UserRepository.getUserByEmail(
-      requestData.email,
-      UserDetailLevel.STANDARD,
-      locale,
-      logger,
-    );
-    if (!userResponse.success) {
-      // will not get sent to the user as ignoreError is true
-      return fail({
-        message: t("errors.no_email"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { email: requestData.email },
-        cause: userResponse,
+      const token = tokenResponse.data;
+      const passwordResetUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password/${token}`;
+
+      const templateProps: PasswordResetRequestProps = {
+        publicName: user.publicName,
+        userId: user.id,
+        passwordResetUrl,
+      };
+
+      const { t: globalT } = simpleT(locale);
+
+      return success({
+        toEmail: requestData.email,
+        toName: user.publicName,
+        subject: t("email.subject", {
+          appName: globalT("config.appName"),
+        }),
+        leadId: user.leadId,
+        jsx: passwordResetRequestEmailTemplate.component({
+          props: templateProps,
+          t,
+          locale,
+          recipientEmail: requestData.email,
+          tracking: createTrackingContext(locale, user.leadId, user.id),
+        }),
       });
-    }
-
-    const user = userResponse.data;
-
-    // Create a reset token
-    const tokenResponse = await PasswordRepository.createResetToken(
-      requestData.email,
-      locale,
-      logger,
-      resetT,
-    );
-    if (!tokenResponse.success) {
+    } catch (error) {
+      logger.error("Error generating password reset email", parseError(error));
+      const parsedError = parseError(error);
       return fail({
         message: t("errors.email_generation_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { email: requestData.email },
-        cause: tokenResponse,
+        messageParams: {
+          email: requestData.email,
+          errorMessage: parsedError.message,
+        },
       });
     }
-
-    const token = tokenResponse.data;
-    const passwordResetUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/user/reset-password/${token}`;
-
-    const templateProps: PasswordResetRequestProps = {
-      publicName: user.publicName,
-      userId: user.id,
-      passwordResetUrl,
-    };
-
-    const { t: globalT } = simpleT(locale);
-
-    return success({
-      toEmail: requestData.email,
-      toName: user.publicName,
-      subject: t("email.subject", {
-        appName: globalT("config.appName"),
-      }),
-      jsx: passwordResetRequestTemplate.component({
-        props: templateProps,
-        t,
-        locale,
-        recipientEmail: requestData.email,
-        tracking: createTrackingContext(locale, undefined, user.id),
-      }),
-    });
-  } catch (error) {
-    logger.error("Error generating password reset email", parseError(error));
-    const parsedError = parseError(error);
-    return fail({
-      message: t("errors.email_generation_failed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: {
-        email: requestData.email,
-        errorMessage: parsedError.message,
-      },
-    });
-  }
+  },
 };

@@ -10,6 +10,7 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
+import { BacktestActionMode } from "../enum";
 import { pipelineBacktestResults, pipelineBacktestRuns } from "../db";
 import type {
   TimeRange,
@@ -34,7 +35,7 @@ export async function createBacktestRun(
       rangeFrom: range.from,
       rangeTo: range.to,
       resolution,
-      actionMode: "simulate",
+      actionMode: BacktestActionMode.SIMULATE,
       eligible: null,
     })
     .returning({ id: pipelineBacktestRuns.id });

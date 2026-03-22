@@ -26,7 +26,7 @@ import {
   type SignalEvent,
   type TimeRange,
 } from "../shared/fields";
-import { needsScaleUp, scaleUpSeries, trimSeries } from "../shared/range";
+import { needsScaleUp, scaleUpSeries } from "../shared/range";
 import { readDatapoints, writeDatapoints } from "../store/datapoints";
 import { writeSignals } from "../store/signals";
 
@@ -227,8 +227,11 @@ export async function executeNode(
     if (!readOnly && persist === "always") {
       await writeDatapoints(nodeId, graphId, points);
     }
-    const trimmed = trimSeries(points, requestedRange);
-    ctx.resolvedSeries.set(nodeId, maybeScaleUp(trimmed, resolution, ctx));
+    // Store the full (extended) series in resolvedSeries so downstream nodes
+    // (indicators, transformers) see warm-up data even when requestedRange is
+    // shorter than one resolution period (e.g. 6h cron with 1d resolution).
+    // Trimming to requestedRange is only needed for display/UI, not pipeline use.
+    ctx.resolvedSeries.set(nodeId, maybeScaleUp(points, resolution, ctx));
   } else if (nodeConfig.outputField !== undefined) {
     // Scalar output — store single datapoint at range end
     const scalar = response[nodeConfig.outputField];
@@ -265,10 +268,9 @@ export async function executeNode(
       return r.success ? [r.data] : [];
     });
     if (parsed.length > 0) {
-      const trimmed = trimSeries(parsed, requestedRange);
       ctx.resolvedSeries.set(
         `${nodeId}:${fieldName}`,
-        maybeScaleUp(trimmed, resolution, ctx),
+        maybeScaleUp(parsed, resolution, ctx),
       );
     }
   }

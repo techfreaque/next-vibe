@@ -5,55 +5,57 @@
 
 import { Button, Column, Row, Section, Text } from "@react-email/components";
 import {
+  ErrorResponseTypes,
   fail,
   success,
-  ErrorResponseTypes,
 } from "next-vibe/shared/types/response.schema";
 import type { ReactElement } from "react";
 import React from "react";
 import { z } from "zod";
 
-import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type {
-  EmailFunctionType,
-  EmailTemplateReturnType,
-} from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
-import type {
-  ErrorResponseType,
-  SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { env } from "@/config/env";
 import {
   FEATURED_MODELS,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
-import { translations as configTranslations } from "@/config/i18n/en";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
+import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import type {
+  EmailResolvedData,
+  EmailTemplateDefinition,
+} from "@/app/api/[locale]/messenger/registry/template";
+import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type {
+  ErrorResponseType,
+  SuccessResponseType,
+} from "next-vibe/shared/types/response.schema";
 
 import { scopedTranslation as userScopedTranslation } from "../../i18n";
 import {
   scopedTranslation as signupScopedTranslation,
   type SignupT,
-  type SignupTranslationKey,
 } from "./i18n";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { simpleT } from "@/i18n/core/shared";
 import { contactClientRepository } from "../../../contact/repository-client";
-import { UserDetailLevel } from "../../enum";
-import { UserRepository } from "../../repository";
-import {
-  type SignupPostRequestOutput,
-  type SignupPostResponseOutput,
-} from "./definition";
+import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
 import {
   createTrackingContext,
   type TrackingContext,
 } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
-import { EmailTemplate } from "../../../messenger/providers/email/smtp-client/components/template.email";
-import { simpleT } from "@/i18n/core/shared";
+import { UserDetailLevel } from "../../enum";
+import { UserRepository } from "../../repository";
+import signupDefinition, {
+  type SignupPostRequestOutput,
+  type SignupPostResponseOutput,
+} from "./definition";
+import userCreateDefinition, {
+  type UserCreateRequestOutput,
+  type UserCreateResponseOutput,
+} from "../../../users/create/definition";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -365,9 +367,13 @@ function SignupWelcomeEmail({
 }
 
 // Template Definition Export
-const signupWelcomeTemplate: EmailTemplateDefinition<
+export const signupWelcomeEmailTemplate: EmailTemplateDefinition<
   SignupWelcomeProps,
-  typeof signupScopedTranslation
+  typeof signupScopedTranslation,
+  SignupPostRequestOutput,
+  SignupPostResponseOutput,
+  never,
+  typeof signupDefinition.POST.allowedRoles
 > = {
   scopedTranslation: signupScopedTranslation,
   meta: {
@@ -409,29 +415,24 @@ const signupWelcomeTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
     leadId: "example-lead-id-456",
   },
+  render: ({ requestData, locale, logger }) =>
+    renderWelcomeEmailByEmail(requestData.email, locale, undefined, logger),
 };
-
-export default signupWelcomeTemplate;
 
 // ============================================================================
 // ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
 // ============================================================================
 
 // ============================================================================
-// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// SHARED RENDER LOGIC (Private helpers — not exported)
 // ============================================================================
 
-/**
- * Core welcome email logic — looks up user by email and renders the welcome template.
- * Export for use by other routes (e.g. admin user-create) that share the same template.
- * Called by the typed wrappers below for signup and admin user-create contexts.
- */
-export async function renderWelcomeEmailByEmail(
+async function renderWelcomeEmailByEmail(
   email: string,
   locale: CountryLanguage,
   _t: unknown,
   logger: EndpointLogger,
-): Promise<SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType> {
+): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
   const { t: tUser } = userScopedTranslation.scopedT(locale);
   const { t: signupT } = signupScopedTranslation.scopedT(locale);
   const userResponse = await UserRepository.getUserByEmail(
@@ -463,7 +464,8 @@ export async function renderWelcomeEmailByEmail(
     subject: signupT("email.subject", {
       appName: globalT("config.appName"),
     }),
-    jsx: signupWelcomeTemplate.component({
+    leadId: user.leadId,
+    jsx: signupWelcomeEmailTemplate.component({
       props: templateProps,
       t: signupT,
       locale,
@@ -472,18 +474,6 @@ export async function renderWelcomeEmailByEmail(
     }),
   });
 }
-
-/**
- * Signup Welcome Email — typed for SignupPostRequestOutput.
- * Used by the public signup route.
- */
-export const renderRegisterMail: EmailFunctionType<
-  SignupPostRequestOutput,
-  SignupPostResponseOutput,
-  never,
-  SignupTranslationKey
-> = ({ requestData, locale, t, logger }) =>
-  renderWelcomeEmailByEmail(requestData.email, locale, t, logger);
 
 function renderAdminNotificationEmailContent(
   t: SignupT,
@@ -842,9 +832,13 @@ const adminSignupPropsSchema = z.object({
 
 type AdminSignupProps = z.infer<typeof adminSignupPropsSchema>;
 
-export const adminSignupNotificationTemplate: EmailTemplateDefinition<
+export const adminSignupNotificationEmailTemplate: EmailTemplateDefinition<
   AdminSignupProps,
-  typeof signupScopedTranslation
+  typeof signupScopedTranslation,
+  SignupPostRequestOutput,
+  SignupPostResponseOutput,
+  never,
+  typeof signupDefinition.POST.allowedRoles
 > = {
   scopedTranslation: signupScopedTranslation,
   meta: {
@@ -910,19 +904,23 @@ export const adminSignupNotificationTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
     subscribeToNewsletter: false,
   },
+  render: ({ requestData, locale, logger }) =>
+    renderAdminNotificationByEmail(
+      requestData.email,
+      requestData.subscribeToNewsletter,
+      locale,
+      undefined,
+      logger,
+    ),
 };
 
-/**
- * Core admin notification logic — fetches full user + credit balance and renders the admin email.
- * Called by the typed wrappers below for signup and admin user-create contexts.
- */
-export async function renderAdminNotificationByEmail(
+async function renderAdminNotificationByEmail(
   email: string,
   subscribeToNewsletter: boolean | null | undefined,
   locale: CountryLanguage,
   _t: unknown,
   logger: EndpointLogger,
-): Promise<SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType> {
+): Promise<SuccessResponseType<EmailResolvedData> | ErrorResponseType> {
   const { t: tUser } = userScopedTranslation.scopedT(locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
   const { t: signupT } = signupScopedTranslation.scopedT(locale);
@@ -962,6 +960,7 @@ export async function renderAdminNotificationByEmail(
     subject: signupT("admin_notification.subject", {
       privateName: user.privateName,
     }),
+    leadId: user.leadId,
     jsx: renderAdminNotificationEmailContent(
       signupT,
       locale,
@@ -980,20 +979,47 @@ export async function renderAdminNotificationByEmail(
   });
 }
 
-/**
- * Admin Notification Email — typed for SignupPostRequestOutput.
- * Used by the public signup route.
- */
-export const renderAdminSignupNotification: EmailFunctionType<
-  SignupPostRequestOutput,
-  SignupPostResponseOutput,
+export const userCreateWelcomeEmailTemplate: EmailTemplateDefinition<
+  SignupWelcomeProps,
+  typeof signupScopedTranslation,
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
   never,
-  SignupTranslationKey
-> = ({ requestData, locale, t, logger }) =>
-  renderAdminNotificationByEmail(
-    requestData.email,
-    requestData.subscribeToNewsletter,
-    locale,
-    t,
-    logger,
-  );
+  typeof userCreateDefinition.POST.allowedRoles
+> = {
+  ...signupWelcomeEmailTemplate,
+  meta: {
+    ...signupWelcomeEmailTemplate.meta,
+    id: "user-create-welcome",
+  },
+  render: ({ requestData, locale, logger }) =>
+    renderWelcomeEmailByEmail(
+      requestData.basicInfo.email,
+      locale,
+      undefined,
+      logger,
+    ),
+};
+
+export const userCreateAdminNotificationEmailTemplate: EmailTemplateDefinition<
+  AdminSignupProps,
+  typeof signupScopedTranslation,
+  UserCreateRequestOutput,
+  UserCreateResponseOutput,
+  never,
+  typeof userCreateDefinition.POST.allowedRoles
+> = {
+  ...adminSignupNotificationEmailTemplate,
+  meta: {
+    ...adminSignupNotificationEmailTemplate.meta,
+    id: "user-create-admin-notification",
+  },
+  render: ({ requestData, locale, logger }) =>
+    renderAdminNotificationByEmail(
+      requestData.basicInfo.email,
+      null,
+      locale,
+      undefined,
+      logger,
+    ),
+};

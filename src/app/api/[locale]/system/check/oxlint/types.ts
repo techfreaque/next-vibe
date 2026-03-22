@@ -1,9 +1,8 @@
 /**
  * Oxlint Configuration Types
- * Moved from root config for better organization
  */
 
-export type Severity = "off" | "warn" | "error" | "allow" | "deny";
+import type { Severity } from "../config/types";
 
 /**
  * Oxlint AST Node Types

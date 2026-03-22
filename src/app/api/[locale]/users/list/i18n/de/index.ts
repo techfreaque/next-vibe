@@ -265,6 +265,7 @@ export const translations: typeof enTranslations = {
     edit: "Bearbeiten",
     delete: "L\u00f6schen",
     stats: "Statistiken",
+    graphs: "Graphen",
     newUser: "Neuer Benutzer",
     searchPlaceholder: "Nach Name oder E-Mail suchen\u2026 (Strg+F)",
     roleFilterLabel: "Rolle",

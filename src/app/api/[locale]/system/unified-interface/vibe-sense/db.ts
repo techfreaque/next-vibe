@@ -26,11 +26,13 @@ import { users } from "@/app/api/[locale]/user/db";
 import type { GraphConfig } from "./graph/types";
 import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { ResolutionValues } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-
-// ─── Enums ────────────────────────────────────────────────────────────────────
-
-export const GraphOwnerTypeDB = ["system", "admin", "user"] as const;
-export type GraphOwnerTypeDB = (typeof GraphOwnerTypeDB)[number];
+import {
+  BacktestActionMode,
+  BacktestActionModeDB,
+  GraphOwnerTypeDB,
+  RunStatus,
+  RunStatusDB,
+} from "./enum";
 
 // ─── Graphs ───────────────────────────────────────────────────────────────────
 
@@ -166,10 +168,10 @@ export const pipelineBacktestRuns = pgTable(
     resolution: text("resolution", { enum: ResolutionValues }).notNull(),
     /** simulate = actions recorded not executed */
     actionMode: text("action_mode", {
-      enum: ["simulate", "execute"],
+      enum: BacktestActionModeDB,
     })
       .notNull()
-      .default("simulate"),
+      .default(BacktestActionMode.SIMULATE),
     /** Whether all source data was available — null until run completes */
     eligible: boolean("eligible"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -236,12 +238,11 @@ export const pipelineRuns = pgTable(
       .references(() => pipelineGraphs.id, { onDelete: "cascade" }),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     finishedAt: timestamp("finished_at"),
-    /** "running", "completed", "failed" */
     status: text("status", {
-      enum: ["running", "completed", "failed"],
+      enum: RunStatusDB,
     })
       .notNull()
-      .default("running"),
+      .default(RunStatus.RUNNING),
     errorCount: integer("error_count").notNull().default(0),
     nodeCount: integer("node_count").notNull().default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),

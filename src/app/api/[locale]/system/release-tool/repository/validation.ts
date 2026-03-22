@@ -16,7 +16,7 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
-import type { GitInfo, ReleaseConfig } from "../definition";
+import type { GitInfo, PackageManager, ReleaseConfig } from "../definition";
 import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 
@@ -99,7 +99,7 @@ export class ValidationService {
    */
   verifyLockfile(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): ResponseType<void> {
@@ -181,7 +181,7 @@ export class ValidationService {
     config: ReleaseConfig,
     gitInfo: GitInfo,
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): ResponseType<void> {
@@ -226,7 +226,7 @@ export class ValidationService {
   runBasicValidations(
     config: ReleaseConfig,
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): ResponseType<void> {

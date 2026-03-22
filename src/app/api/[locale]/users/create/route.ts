@@ -5,17 +5,11 @@
 
 import "server-only";
 
-import type {
-  ErrorResponseType,
-  SuccessResponseType,
-} from "next-vibe/shared/types/response.schema";
-
-import type { EmailTemplateReturnType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  renderAdminNotificationByEmail,
-  renderWelcomeEmailByEmail,
+  userCreateAdminNotificationEmailTemplate,
+  userCreateWelcomeEmailTemplate,
 } from "@/app/api/[locale]/user/public/signup/email";
 
 import definitions from "./definition";
@@ -26,38 +20,11 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: [
       {
-        render: ({
-          requestData,
-          locale,
-          t,
-          logger,
-        }): Promise<
-          SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType
-        > =>
-          renderWelcomeEmailByEmail(
-            requestData.basicInfo.email,
-            locale,
-            t,
-            logger,
-          ),
+        template: userCreateWelcomeEmailTemplate,
         ignoreErrors: false,
       },
       {
-        render: ({
-          requestData,
-          locale,
-          t,
-          logger,
-        }): Promise<
-          SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType
-        > =>
-          renderAdminNotificationByEmail(
-            requestData.basicInfo.email,
-            null,
-            locale,
-            t,
-            logger,
-          ),
+        template: userCreateAdminNotificationEmailTemplate,
         ignoreErrors: true,
       },
     ],

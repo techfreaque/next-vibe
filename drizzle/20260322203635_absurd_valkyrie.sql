@@ -1,0 +1,2 @@
+ALTER TABLE "pipeline_backtest_runs" ALTER COLUMN "action_mode" SET DEFAULT 'enums.backtestActionMode.simulate';--> statement-breakpoint
+ALTER TABLE "pipeline_runs" ALTER COLUMN "status" SET DEFAULT 'enums.runStatus.running';

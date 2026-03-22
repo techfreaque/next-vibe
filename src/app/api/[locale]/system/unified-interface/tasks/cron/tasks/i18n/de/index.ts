@@ -302,6 +302,7 @@ export const translations: typeof enTranslations = {
     loading: "Aufgaben werden geladen...",
     header: {
       stats: "Statistiken",
+      graphs: "Graphen",
       history: "Verlauf",
       queue: "Warteschlange",
       refresh: "Aktualisieren",

@@ -7,7 +7,10 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import endpoints from "./definition";
-import { renderAdminNotificationMail, renderWelcomeMail } from "./email";
+import {
+  adminNewsletterSubscribeEmailTemplate,
+  newsletterWelcomeEmailTemplate,
+} from "./email";
 import { NewsletterSubscribeRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
@@ -15,11 +18,11 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: [
       {
-        render: renderWelcomeMail,
+        template: newsletterWelcomeEmailTemplate,
         ignoreErrors: false,
       },
       {
-        render: renderAdminNotificationMail,
+        template: adminNewsletterSubscribeEmailTemplate,
         ignoreErrors: false,
       },
     ],

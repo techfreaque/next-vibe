@@ -16,7 +16,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EnvExample } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
+import type {
+  EnvExample,
+  EnvFieldType,
+} from "@/app/api/[locale]/system/unified-interface/shared/env/define-env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatCount,
@@ -43,13 +46,6 @@ interface EnvKeysResponseType {
   duration: number;
   outputFile?: string;
 }
-
-/**
- * Serializable metadata for a single env key.
- * This type must stay free of server-only imports so the generated file
- * can be imported by definition files (which run in client context too).
- */
-type EnvFieldType = "text" | "boolean" | "number" | "select" | "url" | "email";
 
 interface EnvKeyMeta {
   key: string;

@@ -19,9 +19,11 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { MessageStatus, MessageType } from "../../../../messages/enum";
+import { createTrackingContext } from "../components/tracking_context.email";
 import { EmailMetadataRepository } from "../email-metadata/repository";
 import { EmailSendingRepository } from "../email-sending/repository";
 import { scopedTranslation } from "../i18n";
+import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type {
   EmailHandleRequestOutput,
   EmailHandleResponseOutput,
@@ -36,12 +38,14 @@ export class EmailHandlingRepository {
     TResponse,
     TUrlVariables,
     TScopedTranslationKey extends string,
+    TUserRoles extends readonly UserRoleValue[],
   >(
     data: EmailHandleRequestOutput<
       TRequest,
       TResponse,
       TUrlVariables,
-      TScopedTranslationKey
+      TScopedTranslationKey,
+      TUserRoles
     >,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailHandleResponseOutput>> {
@@ -53,17 +57,26 @@ export class EmailHandlingRepository {
           data.email.afterHandlerEmails.map(async (emailData) => {
             const { t: smtpT } = scopedTranslation.scopedT(data.locale);
             try {
-              const emailMessage = await emailData.render({
+              const tracking = createTrackingContext(
+                data.locale,
+                data.user.isPublic ? undefined : data.user.leadId,
+                data.user.isPublic ? undefined : data.user.id,
+              );
+
+              const { t: templateT } =
+                emailData.template.scopedTranslation.scopedT(data.locale);
+              const resolved = await emailData.template.render({
                 user: data.user,
                 urlPathParams: data.urlPathParams,
                 requestData: data.requestData,
                 responseData: data.responseData,
-                t: data.t,
+                t: templateT,
                 locale: data.locale,
                 logger,
+                tracking,
               });
 
-              if (!emailMessage.success) {
+              if (!resolved.success) {
                 if (!emailData.ignoreErrors) {
                   errors.push(
                     fail({
@@ -71,31 +84,40 @@ export class EmailHandlingRepository {
                         "emailHandling.email.errors.rendering_failed",
                       ),
                       errorType: ErrorResponseTypes.EMAIL_ERROR,
-                      messageParams: { error: emailMessage.message },
+                      messageParams: { error: resolved.message },
                     }),
                   );
                 }
                 return;
               }
 
-              const templateData = emailMessage.data;
+              const {
+                jsx,
+                toEmail,
+                toName,
+                subject,
+                replyToEmail,
+                replyToName,
+                senderName,
+                leadId,
+                unsubscribeUrl,
+              } = resolved.data;
 
               // Build comprehensive email data with all template information
               const emailSendResult = await EmailSendingRepository.sendEmail(
                 {
-                  jsx: templateData.jsx,
-                  subject: templateData.subject,
-                  toEmail: templateData.toEmail,
-                  toName: templateData.toName,
+                  jsx,
+                  subject,
+                  toEmail,
+                  toName,
                   locale: data.locale,
-                  senderName: templateData.senderName,
-                  campaignType: templateData.campaignType,
-                  emailJourneyVariant: templateData.emailJourneyVariant ?? null,
-                  emailCampaignStage: templateData.emailCampaignStage ?? null,
-                  replyToEmail: templateData.replyToEmail,
-                  replyToName: templateData.replyToName,
-                  unsubscribeUrl: templateData.unsubscribeUrl,
-                  selectionCriteriaOverride: templateData.smtpSelectionCriteria,
+                  senderName,
+                  emailJourneyVariant: null,
+                  emailCampaignStage: null,
+                  replyToEmail,
+                  replyToName,
+                  unsubscribeUrl,
+                  leadId,
                 },
                 logger,
                 data.locale,
@@ -103,16 +125,16 @@ export class EmailHandlingRepository {
 
               if (emailSendResult.success && emailSendResult.data) {
                 logger.debug("Email sent successfully", {
-                  recipient: templateData.toEmail,
-                  subject: templateData.subject,
+                  recipient: toEmail,
+                  subject,
                   messageId: String(
                     emailSendResult.data.result.messageId ?? "",
                   ),
                 });
               } else {
                 logger.error("Failed to send email", {
-                  recipient: templateData.toEmail,
-                  subject: templateData.subject,
+                  recipient: toEmail,
+                  subject,
                   error: emailSendResult.message,
                 });
               }

@@ -289,7 +289,8 @@ export function ChatMessages({
     if (
       !activeThreadId ||
       activeThreadId === NEW_MESSAGE_ID ||
-      activeThreadId === bootInitialThreadId
+      activeThreadId === bootInitialThreadId ||
+      messagesEndpoint.read?.data !== undefined
     ) {
       return;
     }
@@ -368,6 +369,7 @@ export function ChatMessages({
     logger,
     user,
     setLeafMessageId,
+    messagesEndpoint.read?.data,
   ]);
 
   // Abort in-flight history requests when thread changes
@@ -625,7 +627,7 @@ export function ChatMessages({
    */
   const invalidateThread = useCallback(
     (tid: string): void => {
-      if (tid === activeThreadId) {
+      if (tid === activeThreadId && activeThreadId !== NEW_MESSAGE_ID) {
         void messagesEndpoint.read?.refetch();
       }
     },
@@ -671,7 +673,7 @@ export function ChatMessages({
 
   // Always-on WS subscription for all stream events on this thread
   useMessagesSubscription(
-    activeThreadId,
+    activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null,
     currentRootFolderId,
     currentSubFolderId,
     logger,

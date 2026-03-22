@@ -137,7 +137,13 @@ import { defaultLocale } from "@/i18n/core/config";
 
 import { envValidationLogger } from "./validation-logger";
 
-type EnvFieldType = "text" | "boolean" | "number" | "select" | "url" | "email";
+export type EnvFieldType =
+  | "text"
+  | "boolean"
+  | "number"
+  | "select"
+  | "url"
+  | "email";
 
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   schema: T;

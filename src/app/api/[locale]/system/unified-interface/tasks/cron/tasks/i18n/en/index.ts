@@ -292,6 +292,7 @@ export const translations = {
     loading: "Loading tasks...",
     header: {
       stats: "Stats",
+      graphs: "Graphs",
       history: "History",
       queue: "Queue",
       refresh: "Refresh",

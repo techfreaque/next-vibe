@@ -175,6 +175,7 @@ export const translations: typeof enTranslations = {
     openRate: "{{percent}}% Öffnungsrate",
     clicks: "{{count}} Klicks",
     stats: "Statistiken",
+    graphs: "Graphen",
     search: "Suche",
     export: "Exportieren",
     import: "Importieren",

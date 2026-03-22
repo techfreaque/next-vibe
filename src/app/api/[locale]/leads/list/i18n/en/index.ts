@@ -173,6 +173,7 @@ export const translations = {
     openRate: "{{percent}}% open rate",
     clicks: "{{count}} clicks",
     stats: "Stats",
+    graphs: "Graphs",
     search: "Search",
     export: "Export",
     import: "Import",

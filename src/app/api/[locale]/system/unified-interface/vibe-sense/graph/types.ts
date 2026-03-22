@@ -5,6 +5,7 @@
  * All nodes are endpoint nodes — dispatched via RouteExecutionExecutor.
  */
 
+import type { BacktestActionModeType } from "../enum";
 import type { Resolution } from "../shared/fields";
 import type { GraphConfigInferred } from "./schema";
 
@@ -54,22 +55,14 @@ export type TriggerConfig =
   | { type: "manual" };
 
 /** The full graph config stored in the DB — derived from graphConfigSchema */
-export type { GraphConfigInferred as GraphConfig } from "./schema";
-
-// ─── Graph Ownership ──────────────────────────────────────────────────────────
-
-export type GraphOwnerType = "system" | "admin" | "user";
-
-// ─── Backtest ─────────────────────────────────────────────────────────────────
-
-export type BacktestActionMode = "simulate" | "execute";
+export type GraphConfig = GraphConfigInferred;
 
 export interface BacktestConfig {
   graphId: string;
   graphVersionId: string;
   range: { from: Date; to: Date };
   resolution: Resolution;
-  actionMode: BacktestActionMode;
+  actionMode: BacktestActionModeType;
 }
 
 // ─── Graph Seeds ───────────────────────────────────────────────────────────────

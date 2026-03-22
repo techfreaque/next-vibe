@@ -367,5 +367,10 @@ export const translations = {
       failed: "Failed",
       requiresLocation: "Requires Location",
     },
+    paymentInterval: {
+      month: "Monthly",
+      year: "Yearly",
+      one_time: "One-time",
+    },
   },
 };

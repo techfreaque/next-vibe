@@ -27,6 +27,7 @@ const ipMatchLinkingTask = createCronTask(definitions.POST, tools.POST, {
   schedule: CRON_SCHEDULES.DAILY_6AM,
   category: TaskCategory.MAINTENANCE,
   enabled: true,
+  hidden: true,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.MEDIUM,
   taskInput: { dryRun: false, windowDays: 30 },

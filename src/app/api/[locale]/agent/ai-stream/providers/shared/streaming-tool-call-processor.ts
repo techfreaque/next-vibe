@@ -288,10 +288,15 @@ export async function processStreamingResponseWithToolCalls(
           }
         }
       } catch (error) {
-        logger.error(
-          `[${providerName}] Error processing stream`,
-          parseError(error),
-        );
+        if (error instanceof Error && error.name === "AbortError") {
+          logger.debug(`[${providerName}] Stream closed by client`);
+        } else {
+          logger.error(
+            `[${providerName}] Error processing stream`,
+            parseError(error),
+          );
+          controller.error(error);
+        }
       } finally {
         controller.close();
       }

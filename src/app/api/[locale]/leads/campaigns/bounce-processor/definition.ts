@@ -72,7 +72,7 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "put.schedule.label",
         description: "put.schedule.description",
-        schema: z.string().min(1),
+        schema: z.string().min(1).default("*/15 * * * *"),
       }),
       priority: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

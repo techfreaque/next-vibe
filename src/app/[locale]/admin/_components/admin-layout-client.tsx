@@ -15,6 +15,7 @@ import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Frame } from "next-vibe-ui/ui/icons/Frame";
 import { Home } from "next-vibe-ui/ui/icons/Home";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Menu } from "next-vibe-ui/ui/icons/Menu";
@@ -164,6 +165,13 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/skills-moderation` as const,
       icon: Shield,
       current: pathname.startsWith(`/${locale}/admin/skills-moderation`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.referralPayouts"),
+      href: `/${locale}/admin/referral` as const,
+      icon: Coins,
+      current: pathname.startsWith(`/${locale}/admin/referral`),
       hidden: false,
     },
     {

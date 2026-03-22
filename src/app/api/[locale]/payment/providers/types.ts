@@ -10,6 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
 
 import type { ProductIds } from "../../products/repository-client";
+import type { PaymentProviderValue } from "../enum";
 
 export type PaymentInterval = "month" | "year" | "one_time";
 
@@ -90,7 +91,7 @@ export interface WebhookEvent<T extends WebhookData = WebhookData> {
 }
 
 export interface PaymentProvider {
-  name: string;
+  name: typeof PaymentProviderValue;
 
   ensureCustomer(
     userId: string,

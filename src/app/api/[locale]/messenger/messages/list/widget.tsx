@@ -9,6 +9,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
@@ -253,6 +254,16 @@ export function EmailsListContainer({
     })();
   }, [navigate]);
 
+  const handleGraphs = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const graphsDef =
+        await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition");
+      navigate(graphsDef.default.GET, {
+        data: { search: "messenger" },
+      });
+    })();
+  }, [navigate]);
+
   const handleStatusTab = useCallback(
     (
       status: (typeof MessageStatusFilter)[keyof typeof MessageStatusFilter],
@@ -350,6 +361,17 @@ export function EmailsListContainer({
           className="gap-1"
         >
           <Span className="hidden sm:inline">{t("widget.stats")}</Span>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleGraphs}
+          title={t("widget.graphs")}
+          className="gap-1"
+        >
+          <GitBranch className="h-4 w-4" />
+          <Span className="hidden sm:inline">{t("widget.graphs")}</Span>
         </Button>
         <Button
           type="button"

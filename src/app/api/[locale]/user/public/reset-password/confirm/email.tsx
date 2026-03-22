@@ -4,7 +4,6 @@
  */
 
 import { Section, Text } from "@react-email/components";
-import type { UndefinedType } from "next-vibe/shared/types/common.schema";
 import {
   fail,
   success,
@@ -15,18 +14,17 @@ import { z } from "zod";
 
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
-import { translations as configTranslations } from "@/config/i18n/en";
+import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
 import { scopedTranslation as confirmScopedTranslation } from "./i18n";
-import { type ResetPasswordTranslationKey } from "../i18n";
 import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
 } from "./definition";
+import definition from "./definition";
 import {
   createTrackingContext,
   type TrackingContext,
@@ -145,9 +143,13 @@ function PasswordResetConfirmEmail({
 }
 
 // Template Definition Export
-const passwordResetConfirmTemplate: EmailTemplateDefinition<
+export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
   PasswordResetConfirmProps,
-  typeof confirmScopedTranslation
+  typeof confirmScopedTranslation,
+  ResetPasswordConfirmPostRequestOutput,
+  ResetPasswordConfirmPostResponseOutput,
+  never,
+  typeof definition.POST.allowedRoles
 > = {
   scopedTranslation: confirmScopedTranslation,
   meta: {
@@ -181,66 +183,46 @@ const passwordResetConfirmTemplate: EmailTemplateDefinition<
     publicName: "Max Mustermann",
     userId: "example-user-id-123",
   },
-};
-
-export default passwordResetConfirmTemplate;
-
-// ============================================================================
-// ADAPTERS (Business Logic - Maps endpoint data to template props)
-// ============================================================================
-
-/**
- * Password Reset Confirmation Email Adapter
- * Maps password reset confirmation to template props
- *
- * This function:
- * 1. Verifies the user exists in the database
- * 2. Constructs a personalized confirmation email
- * 3. Returns the email content and recipient information
- */
-export const renderResetPasswordConfirmMail: EmailFunctionType<
-  ResetPasswordConfirmPostRequestOutput,
-  ResetPasswordConfirmPostResponseOutput,
-  UndefinedType,
-  ResetPasswordTranslationKey
-> = async ({ requestData, locale, logger }) => {
-  logger.debug("Rendering password reset confirmation email", {
-    email: requestData.email,
-  });
-
-  const { t } = confirmScopedTranslation.scopedT(locale);
-
-  const userResponse = await UserRepository.getUserByEmail(
-    requestData.email,
-    UserDetailLevel.STANDARD,
-    locale,
-    logger,
-  );
-  if (!userResponse.success) {
-    return fail({
-      message: t("errors.no_email"),
-      errorType: ErrorResponseTypes.NOT_FOUND,
-      cause: userResponse,
+  render: async ({ requestData, locale, logger }) => {
+    logger.debug("Rendering password reset confirmation email", {
+      email: requestData.email,
     });
-  }
 
-  const user = userResponse.data;
+    const { t } = confirmScopedTranslation.scopedT(locale);
 
-  const templateProps: PasswordResetConfirmProps = {
-    publicName: user.publicName,
-    userId: user.id,
-  };
-
-  return success({
-    toEmail: requestData.email,
-    toName: user.publicName,
-    subject: t("email.subject"),
-    jsx: passwordResetConfirmTemplate.component({
-      props: templateProps,
-      t,
+    const userResponse = await UserRepository.getUserByEmail(
+      requestData.email,
+      UserDetailLevel.STANDARD,
       locale,
-      recipientEmail: requestData.email,
-      tracking: createTrackingContext(locale, undefined, user.id),
-    }),
-  });
+      logger,
+    );
+    if (!userResponse.success) {
+      return fail({
+        message: t("errors.no_email"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+        cause: userResponse,
+      });
+    }
+
+    const user = userResponse.data;
+
+    const templateProps: PasswordResetConfirmProps = {
+      publicName: user.publicName,
+      userId: user.id,
+    };
+
+    return success({
+      toEmail: requestData.email,
+      toName: user.publicName,
+      subject: t("email.subject"),
+      leadId: user.leadId,
+      jsx: passwordResetConfirmEmailTemplate.component({
+        props: templateProps,
+        t,
+        locale,
+        recipientEmail: requestData.email,
+        tracking: createTrackingContext(locale, user.leadId, user.id),
+      }),
+    });
+  },
 };

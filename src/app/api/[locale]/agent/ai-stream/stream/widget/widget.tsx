@@ -90,7 +90,8 @@ function AiStreamChatArea(): JSX.Element {
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null;
 
   // Prefer initialMessagesData (full messages list); fall back to initialPathData messages.
-  // Both apply only to the boot thread — navigated-to threads must fetch fresh.
+  // Both apply only to the boot thread — navigated-to threads fetch fresh
+  // (or use the pre-seeded cache for optimistically created threads).
   const messagesInitialData = useMemo(() => {
     if (!threadIdToRender || threadIdToRender !== initialThreadId) {
       return null;

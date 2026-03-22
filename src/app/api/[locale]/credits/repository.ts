@@ -3406,6 +3406,108 @@ export class CreditRepository {
           userId,
           totalCredits,
         });
+
+        // Send confirmation emails (user + admin)
+        try {
+          const { users: usersTable } = await import("../user/db");
+          const [fullUser] = await db
+            .select({
+              email: usersTable.email,
+              privateName: usersTable.privateName,
+              locale: usersTable.locale,
+            })
+            .from(usersTable)
+            .where(eq(usersTable.id, userId))
+            .limit(1);
+
+          const [leadLink] = await db
+            .select({ leadId: userLeadLinks.leadId })
+            .from(userLeadLinks)
+            .where(eq(userLeadLinks.userId, userId))
+            .limit(1);
+
+          if (fullUser) {
+            const userLocale = fullUser.locale;
+            const { scopedTranslation: creditsScopedTranslation } =
+              await import("./i18n");
+            const { t: emailT } = creditsScopedTranslation.scopedT(userLocale);
+
+            const {
+              creditPackUserEmailTemplate,
+              creditPackAdminEmailTemplate,
+            } = await import("./email");
+            const { EmailSendingRepository } =
+              await import("../messenger/providers/email/smtp-client/email-sending/repository");
+            const { contactClientRepository } =
+              await import("../contact/repository-client");
+            const { simpleT } = await import("@/i18n/core/shared");
+            const { createTrackingContext } =
+              await import("../messenger/providers/email/smtp-client/components/tracking_context.email");
+            const { t: globalT } = simpleT(userLocale);
+            const appName = globalT("config.appName");
+            const leadId = leadLink?.leadId ?? userId;
+
+            const userJsx = creditPackUserEmailTemplate.component({
+              props: {
+                privateName: fullUser.privateName,
+                userId,
+                leadId,
+                credits: totalCredits,
+                userEmail: fullUser.email,
+              },
+              t: emailT,
+              locale: userLocale,
+              recipientEmail: fullUser.email,
+              tracking: createTrackingContext(userLocale, leadId, userId),
+            });
+            await EmailSendingRepository.sendEmail(
+              {
+                jsx: userJsx,
+                subject: emailT("email.creditPack.user.subject", { appName }),
+                toEmail: fullUser.email,
+                toName: fullUser.privateName,
+                locale: userLocale,
+              },
+              logger,
+              userLocale,
+            );
+
+            const adminEmail =
+              contactClientRepository.getSupportEmail(userLocale);
+            const adminJsx = creditPackAdminEmailTemplate.component({
+              props: {
+                userEmail: fullUser.email,
+                credits: totalCredits,
+              },
+              t: emailT,
+              locale: userLocale,
+              recipientEmail: adminEmail,
+              tracking: createTrackingContext(userLocale),
+            });
+            await EmailSendingRepository.sendEmail(
+              {
+                jsx: adminJsx,
+                subject: emailT("email.creditPack.admin.subject", {
+                  appName,
+                  credits: totalCredits.toLocaleString(),
+                }),
+                toEmail: adminEmail,
+                toName: appName,
+                locale: userLocale,
+              },
+              logger,
+              userLocale,
+            );
+
+            logger.info("Sent credit pack confirmation emails", { userId });
+          }
+        } catch (emailError) {
+          logger.error("Failed to send credit pack emails", {
+            error: parseError(emailError),
+            sessionId: session.id,
+            userId,
+          });
+        }
       }
     } catch (error) {
       logger.error("Failed to handle credit pack purchase", {

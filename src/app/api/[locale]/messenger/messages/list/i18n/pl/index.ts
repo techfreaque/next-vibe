@@ -228,6 +228,7 @@ export const translations: typeof enTranslations = {
     opened: "Otwarte",
     clicked: "Kliknięte",
     stats: "Statystyki",
+    graphs: "Wykresy",
     refresh: "Odśwież",
     searchPlaceholder: "Szukaj e-maili...",
     clearSearch: "Wyczyść",

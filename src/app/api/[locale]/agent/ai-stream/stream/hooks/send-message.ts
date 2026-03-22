@@ -11,6 +11,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
+import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
@@ -18,8 +19,6 @@ import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-
-import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 
 import { createAndSendUserMessage } from "./shared";
 import type { StartStreamFn } from "./shared";
@@ -180,12 +179,36 @@ export async function sendMessage(
       createdThreadIdForNewThread = crypto.randomUUID();
       const newThreadId: string = createdThreadIdForNewThread;
 
-      // Mark thread as pending create so path/messages queries don't fire until
-      // the thread is persisted in DB (i.e., after STREAM_FINISHED).
+      // Pre-seed both caches with empty data so queries find existing cache
+      // entries on mount and staleTime prevents an immediate refetch.
       if (currentRootFolderId !== DefaultFolderId.INCOGNITO) {
-        useChatStore
-          .getState()
-          .markThreadPendingCreate(createdThreadIdForNewThread);
+        apiClient.updateEndpointData(
+          messagesDefinition.GET,
+          logger,
+          (old) => old ?? success({ backgroundTasks: [], messages: [] }),
+          {
+            urlPathParams: { threadId: newThreadId },
+            requestData: { rootFolderId: currentRootFolderId },
+          },
+        );
+        apiClient.updateEndpointData(
+          pathDefinitions.GET,
+          logger,
+          (old) =>
+            old ??
+            success({
+              messages: [],
+              hasOlderHistory: false,
+              hasNewerMessages: false,
+              resolvedLeafMessageId: null,
+              oldestLoadedMessageId: null,
+              compactionBoundaryId: null,
+              newerChunkAnchorId: null,
+            }),
+          {
+            urlPathParams: { threadId: newThreadId },
+          },
+        );
       }
 
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {

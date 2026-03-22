@@ -28,10 +28,8 @@ import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 
 import type { RemoteConnectionDisconnectT } from "./[instanceId]/disconnect/i18n";
-import type { RemoteToolCapability } from "./db";
+import type { ConnectionHealth, RemoteToolCapability } from "./db";
 import { instanceIdentities, remoteConnections } from "./db";
-
-type ConnectionHealth = "healthy" | "warning" | "critical" | "disconnected";
 
 interface ConnectToRemoteResult {
   remoteUrl: string;

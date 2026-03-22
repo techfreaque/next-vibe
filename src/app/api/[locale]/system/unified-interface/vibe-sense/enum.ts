@@ -37,3 +37,66 @@ export const GraphResolutionDB = [
   GraphResolution.ONE_WEEK,
   GraphResolution.ONE_MONTH,
 ] as const;
+
+export const {
+  enum: RunStatus,
+  options: RunStatusOptions,
+  Value: RunStatusValue,
+} = createEnumOptions(scopedTranslation, {
+  RUNNING: "enums.runStatus.running",
+  COMPLETED: "enums.runStatus.completed",
+  FAILED: "enums.runStatus.failed",
+} as const);
+
+export type RunStatusType = typeof RunStatusValue;
+
+export const RunStatusDB = [
+  RunStatus.RUNNING,
+  RunStatus.COMPLETED,
+  RunStatus.FAILED,
+] as const;
+
+export const {
+  enum: BacktestActionMode,
+  options: BacktestActionModeOptions,
+  Value: BacktestActionModeValue,
+} = createEnumOptions(scopedTranslation, {
+  SIMULATE: "enums.backtestActionMode.simulate",
+  EXECUTE: "enums.backtestActionMode.execute",
+} as const);
+
+export type BacktestActionModeType = typeof BacktestActionModeValue;
+
+export const BacktestActionModeDB = [
+  BacktestActionMode.SIMULATE,
+  BacktestActionMode.EXECUTE,
+] as const;
+
+export const {
+  enum: GraphOwnerType,
+  options: GraphOwnerTypeOptions,
+  Value: GraphOwnerTypeValue,
+} = createEnumOptions(scopedTranslation, {
+  SYSTEM: "enums.graphOwnerType.system",
+  ADMIN: "enums.graphOwnerType.admin",
+  USER: "enums.graphOwnerType.user",
+} as const);
+
+export type GraphOwnerTypeType = typeof GraphOwnerTypeValue;
+
+export const GraphOwnerTypeDB = [
+  GraphOwnerType.SYSTEM,
+  GraphOwnerType.ADMIN,
+  GraphOwnerType.USER,
+] as const;
+
+export const {
+  enum: TriggerType,
+  options: TriggerTypeOptions,
+  Value: TriggerTypeValue,
+} = createEnumOptions(scopedTranslation, {
+  MANUAL: "enums.triggerType.manual",
+  CRON: "enums.triggerType.cron",
+} as const);
+
+export type TriggerTypeType = typeof TriggerTypeValue;

@@ -55,10 +55,20 @@ export class ErrorLogsRepository {
         conditions.push(ilike(errorLogs.errorType, `%${data.errorType}%`));
       }
       if (data?.startDate) {
-        conditions.push(gte(errorLogs.createdAt, new Date(data.startDate)));
+        const startDate =
+          data.startDate instanceof Date
+            ? data.startDate
+            : new Date(data.startDate);
+        if (!isNaN(startDate.getTime())) {
+          conditions.push(gte(errorLogs.createdAt, startDate));
+        }
       }
       if (data?.endDate) {
-        conditions.push(lte(errorLogs.createdAt, new Date(data.endDate)));
+        const endDate =
+          data.endDate instanceof Date ? data.endDate : new Date(data.endDate);
+        if (!isNaN(endDate.getTime())) {
+          conditions.push(lte(errorLogs.createdAt, endDate));
+        }
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;

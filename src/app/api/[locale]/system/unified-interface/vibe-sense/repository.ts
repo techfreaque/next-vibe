@@ -22,6 +22,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { GraphOwnerType } from "./enum";
 import { pipelineDatapoints, pipelineGraphs } from "./db";
 import { runBacktest } from "./engine/backtest";
 import { runGraph } from "./engine/runner";
@@ -208,7 +209,7 @@ export class VibeSenseRepository {
         eq(pipelineGraphs.isActive, true),
         isNull(pipelineGraphs.archivedAt),
         or(
-          eq(pipelineGraphs.ownerType, "system"),
+          eq(pipelineGraphs.ownerType, GraphOwnerType.SYSTEM),
           eq(pipelineGraphs.ownerId, user.id!),
         ),
       ];
@@ -294,7 +295,7 @@ export class VibeSenseRepository {
           slug: data.slug,
           name: data.name,
           description: data.description ?? null,
-          ownerType: "admin",
+          ownerType: GraphOwnerType.ADMIN,
           ownerId: user.id!,
           parentVersionId: null,
           config: data.config,
@@ -346,7 +347,7 @@ export class VibeSenseRepository {
       }
 
       // Access check: system graphs visible to all admins, others only to owner
-      if (row.ownerType !== "system" && row.ownerId !== user.id) {
+      if (row.ownerType !== GraphOwnerType.SYSTEM && row.ownerId !== user.id) {
         return fail({
           message: t("graphs.get.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -430,7 +431,10 @@ export class VibeSenseRepository {
 
       // System graphs are read-only — cannot branch from system directly
       // Admins can branch from any graph they can see
-      if (parent.ownerType !== "system" && parent.ownerId !== user.id) {
+      if (
+        parent.ownerType !== GraphOwnerType.SYSTEM &&
+        parent.ownerId !== user.id
+      ) {
         return fail({
           message: t("graphs.edit.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -440,7 +444,7 @@ export class VibeSenseRepository {
       const newSlug = data.slug ?? parent.slug;
 
       // Deactivate old active version for this slug+owner (if same owner)
-      if (parent.ownerType !== "system") {
+      if (parent.ownerType !== GraphOwnerType.SYSTEM) {
         await db
           .update(pipelineGraphs)
           .set({ isActive: false })
@@ -473,7 +477,7 @@ export class VibeSenseRepository {
           slug: newSlug,
           name: data.name ?? parent.name,
           description: data.description ?? parent.description,
-          ownerType: "admin",
+          ownerType: GraphOwnerType.ADMIN,
           ownerId: user.id!,
           parentVersionId: parent.id,
           config: data.config,
@@ -567,7 +571,10 @@ export class VibeSenseRepository {
         }
 
         // Authorization: admin can see system graphs and their own graphs
-        if (row.ownerType !== "system" && row.ownerId !== user.id) {
+        if (
+          row.ownerType !== GraphOwnerType.SYSTEM &&
+          row.ownerId !== user.id
+        ) {
           break;
         }
 
@@ -627,7 +634,7 @@ export class VibeSenseRepository {
         .where(
           and(
             eq(pipelineGraphs.slug, graph.slug),
-            eq(pipelineGraphs.ownerType, "system"),
+            eq(pipelineGraphs.ownerType, GraphOwnerType.SYSTEM),
             eq(pipelineGraphs.isActive, true),
           ),
         );
@@ -635,7 +642,7 @@ export class VibeSenseRepository {
       // Promote this version to system
       await db
         .update(pipelineGraphs)
-        .set({ ownerType: "system", ownerId: null })
+        .set({ ownerType: GraphOwnerType.SYSTEM, ownerId: null })
         .where(eq(pipelineGraphs.id, id));
 
       logger.info(`[vibe-sense] Promoted graph ${id} to system`);
@@ -674,7 +681,10 @@ export class VibeSenseRepository {
         });
       }
 
-      if (graph.ownerType !== "system" && graph.ownerId !== user.id) {
+      if (
+        graph.ownerType !== GraphOwnerType.SYSTEM &&
+        graph.ownerId !== user.id
+      ) {
         return fail({
           message: t("graphs.trigger.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -727,7 +737,10 @@ export class VibeSenseRepository {
         });
       }
 
-      if (graph.ownerType !== "system" && graph.ownerId !== user.id) {
+      if (
+        graph.ownerType !== GraphOwnerType.SYSTEM &&
+        graph.ownerId !== user.id
+      ) {
         return fail({
           message: t("graphs.backtest.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -786,7 +799,10 @@ export class VibeSenseRepository {
         });
       }
 
-      if (graph.ownerType !== "system" && graph.ownerId !== user.id) {
+      if (
+        graph.ownerType !== GraphOwnerType.SYSTEM &&
+        graph.ownerId !== user.id
+      ) {
         return fail({
           message: t("graphs.data.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -859,7 +875,7 @@ export class VibeSenseRepository {
         });
       }
 
-      if (graph.ownerType === "system") {
+      if (graph.ownerType === GraphOwnerType.SYSTEM) {
         return fail({
           message: t("graphs.edit.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
@@ -913,7 +929,7 @@ export class VibeSenseRepository {
         });
       }
 
-      if (graph.ownerType === "system") {
+      if (graph.ownerType === GraphOwnerType.SYSTEM) {
         return fail({
           message: t("graphs.edit.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,

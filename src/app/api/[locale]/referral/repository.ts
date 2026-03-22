@@ -602,7 +602,12 @@ export class ReferralRepository {
 
         availableCreditsTitle: "stats.fields.availableBalance",
         availableCreditsValue: availableCredits,
-        availableCreditsDescription: "stats.fields.availableBalanceDescription",
+        availableCreditsDescription:
+          availableCredits >= ReferralRepository.MIN_PAYOUT_CENTS
+            ? "stats.fields.availableBalanceDescription"
+            : "stats.fields.availableBalanceDescriptionLow",
+        availableCreditsReadyForPayout:
+          availableCredits >= ReferralRepository.MIN_PAYOUT_CENTS,
       });
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));

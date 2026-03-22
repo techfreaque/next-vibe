@@ -22,6 +22,10 @@ import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 import type { EmailsT } from "../../i18n";
 import { getTemplate } from "../../registry/generated";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
+import {
+  getTemplateSubject,
+  renderTemplateComponent,
+} from "../../registry/template";
 
 // Type definitions
 interface SendTestRequestType {
@@ -74,18 +78,11 @@ export class EmailPreviewSendTestRepository {
         data.country,
       );
 
-      // Get scoped t for this template's own module scope
-      const { t: templateT } = template.scopedTranslation.scopedT(locale);
-
       // Validate and render the email component
-      // TypeScript can't verify the props match because EmailTemplateDefinition uses generics
-      // But we know they match because we validate with template.schema
       let jsx;
       try {
-        const validatedProps = template.schema.parse(data.props);
-        jsx = template.component({
-          props: validatedProps as never,
-          t: templateT as never,
+        jsx = renderTemplateComponent(template, {
+          rawProps: data.props,
           locale,
           recipientEmail: data.recipientEmail,
           tracking: createTrackingContext(locale),
@@ -106,7 +103,7 @@ export class EmailPreviewSendTestRepository {
       }
 
       // Get subject
-      const subject = templateT(template.meta.defaultSubject as never);
+      const subject = getTemplateSubject(template, locale);
 
       // Send email using existing email sending infrastructure
       const sendResult = await EmailSendingRepository.sendEmail(

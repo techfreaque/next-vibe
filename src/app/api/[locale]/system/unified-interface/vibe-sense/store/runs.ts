@@ -11,11 +11,8 @@ import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
+import { RunStatus, type RunStatusType } from "../enum";
 import { pipelineRuns } from "../db";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-export type RunStatus = "running" | "completed" | "failed";
 
 // ─── Write ───────────────────────────────────────────────────────────────────
 
@@ -32,7 +29,7 @@ export async function createRun(
     .values({
       graphId,
       graphVersionId,
-      status: "running",
+      status: RunStatus.RUNNING,
     })
     .returning({ id: pipelineRuns.id });
 
@@ -46,7 +43,7 @@ export async function createRun(
  */
 export async function completeRun(
   runId: string,
-  status: "completed" | "failed",
+  status: RunStatusType,
   errorCount: number,
   nodeCount: number,
 ): Promise<void> {

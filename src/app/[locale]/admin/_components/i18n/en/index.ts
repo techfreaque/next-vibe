@@ -14,6 +14,7 @@ export const translations = {
     memories: "Memories",
     errorMonitor: "Error Monitor",
     skillsModeration: "Skills Moderation",
+    referralPayouts: "Referral Payouts",
     settings: "Settings",
     admin: "Admin",
     adminPanel: "Admin Panel",

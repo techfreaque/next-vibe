@@ -18,7 +18,7 @@ import type { GraphConfig } from "../graph/types";
 import type { GraphNodeConfig } from "../graph/schema";
 import type { DataPoint, Resolution, TimeRange } from "../shared/fields";
 import { RESOLUTION_MS } from "../shared/fields";
-import { GraphResolution } from "../enum";
+import { GraphResolution, RunStatus } from "../enum";
 import { resolveExecutionOrder, getSinkReachableNodeIds } from "./walker";
 import { executeNode, type ExecutionContext } from "./executor";
 import type { SignalEvent } from "../store/signals";
@@ -175,7 +175,7 @@ export async function runGraph(
 
   if (cycleNodes.length > 0) {
     if (runId) {
-      await completeRun(runId, "failed", 1, 0).catch(() => undefined);
+      await completeRun(runId, RunStatus.FAILED, 1, 0).catch(() => undefined);
     }
     return {
       series: ctx.resolvedSeries,
@@ -226,7 +226,7 @@ export async function runGraph(
 
   // Complete the run record
   if (runId) {
-    const status = errors.length > 0 ? "failed" : "completed";
+    const status = errors.length > 0 ? RunStatus.FAILED : RunStatus.COMPLETED;
     await completeRun(runId, status, errors.length, nodeCount).catch(
       () => undefined,
     );

@@ -25,7 +25,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { graphConfigSchema } from "../../../graph/schema";
-import { GraphResolution, GraphResolutionDB } from "../../../enum";
+import {
+  GraphOwnerType,
+  GraphResolution,
+  GraphResolutionDB,
+} from "../../../enum";
 
 import React from "react";
 
@@ -252,7 +256,7 @@ const { GET } = createEndpoint({
           slug: "lead-funnel",
           name: "Lead Funnel",
           description: null,
-          ownerType: "system",
+          ownerType: GraphOwnerType.SYSTEM,
           isActive: true,
           createdAt: "2026-01-01T00:00:00Z",
           config: { nodes: {}, edges: [], trigger: { type: "manual" } },

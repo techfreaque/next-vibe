@@ -159,6 +159,8 @@ export const translations = {
       totalEarnedDescription: "Total commission earned from referrals",
       availableBalance: "Available Balance",
       availableBalanceDescription: "Available balance ready for payout",
+      availableBalanceDescriptionLow:
+        "Spend on AI chats — other credits used first. Earn $40 to unlock withdrawal.",
       totalRevenueCredits: "Total Revenue (Credits)",
       totalEarnedCredits: "Total Earned (Credits)",
       totalPaidOutCredits: "Total Paid Out (Credits)",
@@ -251,8 +253,141 @@ export const translations = {
     message: "Message",
   },
 
-  // Payout errors
+  // Admin payout management
+  admin: {
+    payouts: {
+      get: {
+        title: "Payout Requests",
+        description: "Manage referral payout requests",
+      },
+      post: {
+        title: "Process Payout",
+        description: "Approve, reject, or complete a payout request",
+      },
+      fields: {
+        status: {
+          label: "Status Filter",
+          description: "Filter by payout status",
+        },
+        requestId: {
+          label: "Request ID",
+          description: "Payout request identifier",
+        },
+        action: {
+          label: "Action",
+          description: "Action to perform on the payout request",
+        },
+        adminNotes: {
+          label: "Admin Notes",
+          description: "Optional notes for this action",
+        },
+        rejectionReason: {
+          label: "Rejection Reason",
+          description: "Reason for rejecting the payout request",
+        },
+      },
+      widget: {
+        empty: "No payout requests found",
+        approve: "Approve",
+        reject: "Reject",
+        complete: "Complete",
+        credits: "credits",
+      },
+    },
+  },
+
+  // Payout endpoint + errors
   payout: {
+    get: {
+      title: "Your Earnings",
+      description: "View your referral earnings and payout history",
+    },
+    post: {
+      title: "Request Payout",
+      description: "Withdraw your referral earnings",
+    },
+    fields: {
+      amountCents: {
+        label: "Amount (credits)",
+        description: "Amount to withdraw in credits",
+        placeholder: "e.g. 5000",
+      },
+      currency: {
+        label: "Payout Method",
+        description: "How you want to receive your earnings",
+      },
+      walletAddress: {
+        label: "Wallet Address",
+        description: "Required for BTC or USDC payouts",
+        placeholder: "Your wallet address",
+      },
+    },
+    widget: {
+      totalEarned: "Total Earned",
+      available: "Available",
+      locked: "Locked",
+      credits: "credits",
+      readyForPayout: "ready for payout",
+      moreToUnlock: "more to unlock",
+      pendingConfirmation: "pending confirmation",
+      requestPayout: "Request Payout",
+      payoutHistory: "Payout History",
+      noPayout: "No payout requests yet",
+      howItWorksTitle: "How It Works",
+      step1Title: "Create referral codes",
+      step1Body:
+        "Generate unique codes for different audiences - friends, social media, or campaigns.",
+      step2Title: "Share your link",
+      step2Body:
+        "When someone signs up using your link and subscribes, you earn commission.",
+      step3Title: "Get paid",
+      step3Body:
+        "Earnings are instant. Use them as chat credits or withdraw to crypto.",
+      withdrawTitle: "Withdraw Your Earnings",
+      withdrawDescription: "Multiple ways to use your referral earnings",
+      useAsCredits: "Use as Chat Credits",
+      useAsCreditsDesc:
+        "Instantly convert earnings to chat credits for AI conversations.",
+      cryptoPayout: "Withdraw to Crypto",
+      cryptoPayoutDesc: "Request payout in BTC or USDC to your wallet address.",
+      minimumNote:
+        "Minimum payout: $40. Crypto payouts are processed within 48 hours after approval.",
+      progressLabel: "Progress to payout",
+      unlockedOf: "unlocked of",
+      viewHistory: "View History",
+    },
+    email: {
+      user: {
+        subjectCrypto: "Payout request received",
+        subjectCredits: "Credits converted",
+        titleCrypto: "Your Payout Request",
+        titleCredits: "Credits Converted",
+        previewCrypto: "Your payout request is being processed",
+        previewCredits: "Your credits have been converted",
+        bodyCrypto:
+          "We have received your payout request. Crypto payouts are processed within 48 hours after admin approval.",
+        bodyCredits:
+          "Your referral earnings have been instantly converted to chat credits and added to your account.",
+        followUpCrypto:
+          "You will receive another email once your payout has been processed.",
+        labelAmount: "Amount",
+        labelMethod: "Method",
+        labelWallet: "Wallet",
+        credits: "credits",
+      },
+      admin: {
+        subject: "New payout request",
+        title: "New Payout Request",
+        preview: "Payout request submitted",
+        body: "A user has submitted a payout request.",
+        footer: "Please review and process this request in the admin panel.",
+        labelUser: "User",
+        labelAmount: "Amount",
+        labelCurrency: "Currency",
+        labelWallet: "Wallet",
+        credits: "credits",
+      },
+    },
     errors: {
       minimumAmount: "Minimum payout amount is $40",
       walletRequired: "Wallet address is required for crypto payouts",

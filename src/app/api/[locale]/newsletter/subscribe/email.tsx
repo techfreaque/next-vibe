@@ -15,7 +15,6 @@ import { z } from "zod";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
-import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -25,14 +24,12 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "../../messenger/providers/email/smtp-client/components/tracking_context.email";
-import type {
-  SubscribePostRequestOutput as NewsletterSubscriptionType,
-  SubscribePostResponseOutput as NewsletterSubscriptionResponseType,
-} from "./definition";
+import type definition from "./definition";
 import {
-  type NewsletterSubscribeTranslationKey,
-  scopedTranslation,
-} from "./i18n";
+  type SubscribePostRequestOutput as NewsletterSubscriptionType,
+  type SubscribePostResponseOutput as NewsletterSubscriptionResponseType,
+} from "./definition";
+import { scopedTranslation } from "./i18n";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -170,9 +167,13 @@ function NewsletterWelcomeEmail({
 }
 
 // Template Definition Export
-const newsletterWelcomeTemplate: EmailTemplateDefinition<
+export const newsletterWelcomeEmailTemplate: EmailTemplateDefinition<
   NewsletterWelcomeProps,
-  typeof scopedTranslation
+  typeof scopedTranslation,
+  NewsletterSubscriptionType,
+  NewsletterSubscriptionResponseType,
+  never,
+  typeof definition.POST.allowedRoles
 > = {
   meta: {
     id: "newsletter-welcome",
@@ -219,9 +220,40 @@ const newsletterWelcomeTemplate: EmailTemplateDefinition<
     leadId: "example-lead-id-456",
     userId: "example-user-id-123",
   },
-};
+  render: ({ requestData, responseData, locale, t }) => {
+    try {
+      const templateProps: NewsletterWelcomeProps = {
+        email: requestData.email,
+        name: requestData.name,
+        leadId: responseData.leadId,
+        userId: responseData.userId,
+      };
 
-export default newsletterWelcomeTemplate;
+      return success({
+        toEmail: requestData.email,
+        toName: requestData.name || requestData.email,
+        subject: t("emailTemplate.welcome.subject"),
+        leadId: responseData.leadId,
+        jsx: newsletterWelcomeEmailTemplate.component({
+          props: templateProps,
+          t,
+          locale,
+          recipientEmail: requestData.email,
+          tracking: createTrackingContext(
+            locale,
+            responseData.leadId,
+            responseData.userId,
+          ),
+        }),
+      });
+    } catch {
+      return fail({
+        message: t("errors.email_generation_failed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
+};
 
 // ============================================================================
 // ADMIN NOTIFICATION TEMPLATE (Component - Not Registered)
@@ -346,78 +378,81 @@ function AdminNotificationEmailContent({
 }
 
 // ============================================================================
-// ADAPTERS (Business Logic - Maps endpoint data to template props)
+// ADMIN NOTIFICATION TEMPLATE
 // ============================================================================
 
-/**
- * Newsletter Welcome Email Adapter
- * Maps newsletter subscription to welcome template props
- */
-export const renderWelcomeMail: EmailFunctionType<
+const adminNewsletterSubscribePropsSchema = z.object({
+  subscriberEmail: z.string().email(),
+  subscriberName: z.string().optional(),
+});
+
+type AdminNewsletterSubscribeProps = z.infer<
+  typeof adminNewsletterSubscribePropsSchema
+>;
+
+export const adminNewsletterSubscribeEmailTemplate: EmailTemplateDefinition<
+  AdminNewsletterSubscribeProps,
+  typeof scopedTranslation,
   NewsletterSubscriptionType,
   NewsletterSubscriptionResponseType,
   never,
-  NewsletterSubscribeTranslationKey
-> = ({ requestData, responseData, locale, t }) => {
-  try {
-    const templateProps: NewsletterWelcomeProps = {
-      email: requestData.email,
-      name: requestData.name,
-      leadId: responseData.leadId,
-      userId: responseData.userId,
-    };
-
-    return success({
-      toEmail: requestData.email,
-      toName: requestData.name || requestData.email,
-      subject: t("emailTemplate.welcome.subject"),
-      jsx: newsletterWelcomeTemplate.component({
-        props: templateProps,
-        t,
-        locale,
-        recipientEmail: requestData.email,
-        tracking: createTrackingContext(
+  typeof definition.POST.allowedRoles
+> = {
+  meta: {
+    id: "newsletter-subscribe-admin",
+    version: "1.0.0",
+    name: "emailTemplates.welcome.name",
+    description: "emailTemplates.welcome.description",
+    category: "emailTemplates.welcome.category",
+    path: "/newsletter/subscribe/email.tsx",
+    defaultSubject: "emailTemplate.admin_notification.subject",
+    previewFields: {
+      subscriberEmail: {
+        type: "email",
+        label: "emailTemplates.welcome.preview.email.label",
+        defaultValue: "subscriber@example.com",
+        required: true,
+      },
+      subscriberName: {
+        type: "text",
+        label: "emailTemplates.welcome.preview.name.label",
+        defaultValue: "Max Mustermann",
+      },
+    },
+  },
+  scopedTranslation,
+  schema: adminNewsletterSubscribePropsSchema,
+  component: ({ props, t, locale, recipientEmail }) =>
+    AdminNotificationEmailContent({
+      requestData: { email: props.subscriberEmail, name: props.subscriberName },
+      t,
+      locale,
+      recipientEmail,
+    }),
+  exampleProps: {
+    subscriberEmail: "subscriber@example.com",
+    subscriberName: "Max Mustermann",
+  },
+  render: ({ requestData, locale, t, user }) => {
+    const { t: globalT } = simpleT(locale);
+    try {
+      return success({
+        toEmail: contactClientRepository.getSupportEmail(locale),
+        toName: globalT("config.appName"),
+        subject: t("emailTemplate.admin_notification.subject"),
+        leadId: user.leadId,
+        jsx: AdminNotificationEmailContent({
+          requestData,
+          t,
           locale,
-          responseData.leadId,
-          responseData.userId,
-        ),
-      }),
-    });
-  } catch {
-    return fail({
-      message: t("errors.email_generation_failed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-};
-
-/**
- * Admin Newsletter Subscription Notification Adapter
- * Sends notification to admin when new subscriber joins
- */
-export const renderAdminNotificationMail: EmailFunctionType<
-  NewsletterSubscriptionType,
-  NewsletterSubscriptionResponseType,
-  never,
-  NewsletterSubscribeTranslationKey
-> = ({ requestData, locale, t }) => {
-  const { t: globalT } = simpleT(locale);
-  try {
-    return success({
-      toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: globalT("config.appName"),
-      subject: t("emailTemplate.admin_notification.subject"),
-      jsx: AdminNotificationEmailContent({
-        requestData,
-        t,
-        locale,
-        recipientEmail: contactClientRepository.getSupportEmail(locale),
-      }),
-    });
-  } catch {
-    return fail({
-      message: t("errors.email_generation_failed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
+          recipientEmail: contactClientRepository.getSupportEmail(locale),
+        }),
+      });
+    } catch {
+      return fail({
+        message: t("errors.email_generation_failed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  },
 };

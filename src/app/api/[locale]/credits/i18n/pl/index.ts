@@ -426,4 +426,27 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  email: {
+    creditPack: {
+      user: {
+        subject: "Twój pakiet kredytów jest gotowy — {{appName}}",
+        title: "Kredyty zostały dodane do Twojego konta",
+        previewText: "{{credits}} kredytów zostało dodanych do Twojego konta",
+        greeting: "Cześć {{privateName}},",
+        body: "Zakup pakietu kredytów zakończył się sukcesem. {{credits}} stałych kredytów zostało dodanych do Twojego konta i jest gotowych do użycia.",
+        cta: "Zacznij używać kredytów",
+        signoff: "Dziękujemy za zakup!\n\nZespół {{appName}}",
+      },
+      admin: {
+        subject:
+          "[{{appName}}] Zakupiono pakiet kredytów — {{credits}} kredytów",
+        title: "Zakup pakietu kredytów",
+        preview: "Użytkownik zakupił pakiet kredytów",
+        body: "Użytkownik zakupił pakiet kredytów.",
+        labelUser: "Użytkownik",
+        labelCredits: "Kredyty",
+        footer: "Automatyczne powiadomienie od {{appName}}",
+      },
+    },
+  },
 };

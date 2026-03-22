@@ -21,6 +21,7 @@ import {
   formatSense,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
+import { GraphOwnerType } from "./enum";
 import { pipelineGraphs } from "./db";
 
 /**
@@ -37,7 +38,7 @@ async function ensureSeedGraphs(logger: EndpointLogger): Promise<void> {
         .where(
           and(
             eq(pipelineGraphs.slug, seed.slug),
-            eq(pipelineGraphs.ownerType, "system"),
+            eq(pipelineGraphs.ownerType, GraphOwnerType.SYSTEM),
           ),
         )
         .limit(1);
@@ -58,7 +59,7 @@ async function ensureSeedGraphs(logger: EndpointLogger): Promise<void> {
         slug: seed.slug,
         name: seed.name,
         description: seed.description,
-        ownerType: "system",
+        ownerType: GraphOwnerType.SYSTEM,
         ownerId: null,
         parentVersionId: null,
         config: seed.config,

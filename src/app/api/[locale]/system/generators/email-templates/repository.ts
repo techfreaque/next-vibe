@@ -21,6 +21,10 @@ import {
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
+import type {
+  EmailTemplateDefinitionAny,
+  TemplateCachedMetadata,
+} from "@/app/api/[locale]/messenger/registry/template";
 import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,
@@ -28,7 +32,6 @@ import {
   writeGeneratedFile,
 } from "../shared/utils";
 import type { GeneratorsEmailTemplatesT } from "./i18n";
-import type { TemplateCachedMetadata } from "@/app/api/[locale]/messenger/registry/template";
 
 // Type definitions
 interface EmailTemplateRequestType {
@@ -48,6 +51,8 @@ interface EmailTemplateResponseType {
 interface TemplateInfo {
   id: string;
   importPath: string;
+  /** The export name within the module (e.g. "default", "adminContactFormTemplate") */
+  exportName: string;
   metadata: TemplateCachedMetadata<string>;
 }
 
@@ -158,26 +163,86 @@ export class EmailTemplateGeneratorRepository {
   }
 
   /**
-   * Load templates and extract metadata
+   * Check if an export value is an EmailTemplateDefinition (duck-typing).
+   * Required fields: meta.id, meta.version, meta.name, meta.description,
+   * meta.category, meta.path, meta.defaultSubject, schema, component, exampleProps
+   */
+  private static isTemplateDef(
+    value: EmailTemplateDefinitionAny | null,
+    exportName: string,
+    file: string,
+    logger: EndpointLogger,
+  ): value is EmailTemplateDefinitionAny {
+    if (!value || typeof value !== "object") {
+      return false;
+    }
+
+    // Quick rejection: no meta at all → not a template
+    if (!value.meta || typeof value.meta !== "object") {
+      return false;
+    }
+
+    const meta: Partial<EmailTemplateDefinitionAny["meta"]> = value.meta;
+
+    // Check all required fields and collect missing ones for warnings
+    const missingFields: string[] = [];
+    const requiredMetaFields = [
+      "id",
+      "version",
+      "name",
+      "description",
+      "category",
+      "path",
+      "defaultSubject",
+    ] as const;
+    for (const field of requiredMetaFields) {
+      if (!meta[field]) {
+        missingFields.push(`meta.${field}`);
+      }
+    }
+    if (!value.schema) {
+      missingFields.push("schema");
+    }
+    if (typeof value.component !== "function") {
+      missingFields.push("component");
+    }
+    if (!value.exampleProps || typeof value.exampleProps !== "object") {
+      missingFields.push("exampleProps");
+    }
+    if (!value.scopedTranslation) {
+      missingFields.push("scopedTranslation");
+    }
+
+    if (missingFields.length > 0) {
+      logger.warn(
+        formatWarning(
+          `Export "${exportName}" in ${file} looks like a template but is missing: ${missingFields.join(", ")}`,
+        ),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Load templates and extract metadata.
+   *
+   * Enforced format: email.tsx files MUST export named consts ending in
+   * "EmailTemplate" (e.g. contactFormEmailTemplate). No default export allowed.
+   * Any other exports are warned and ignored.
    */
   private static async loadTemplates(
     templateFiles: string[],
     logger: EndpointLogger,
   ): Promise<TemplateInfo[]> {
     const templates: TemplateInfo[] = [];
+    const seenIds = new Set<string>();
 
     for (const file of templateFiles) {
       try {
-        // Load template module
         const templateModule = await import(file);
-        const templateDef = templateModule.default;
 
-        if (!templateDef?.meta) {
-          logger.warn(formatWarning(`Template missing metadata: ${file}`));
-          continue;
-        }
-
-        // Generate absolute import path for email template
         const nestedPath = file
           .replace(process.cwd(), "")
           .replace(/^\//, "")
@@ -186,19 +251,120 @@ export class EmailTemplateGeneratorRepository {
           .replace(/\/.+\.email\.tsx$/, "");
         const importPath = `@/app/api/[locale]/${nestedPath}/email`;
 
-        templates.push({
-          id: templateDef.meta.id,
-          importPath,
-          metadata: {
-            id: templateDef.meta.id,
-            version: templateDef.meta.version,
-            name: templateDef.meta.name,
-            description: templateDef.meta.description,
-            category: templateDef.meta.category,
-            path: file.replace(process.cwd(), ""),
-            exampleProps: templateDef.exampleProps || {},
-          },
-        });
+        const allExports = Object.entries(
+          templateModule as Record<string, EmailTemplateDefinitionAny | null>,
+        );
+
+        // Warn on default export — not allowed
+        if ("default" in templateModule) {
+          logger.warn(
+            formatWarning(
+              `${nestedPath}/email.tsx has a default export — not allowed. Use named exports ending in "EmailTemplate" instead. Default export ignored.`,
+            ),
+          );
+        }
+
+        // Warn on named exports that look like template definitions but don't follow the naming convention
+        for (const [name, value] of allExports) {
+          if (
+            name !== "default" &&
+            !name.endsWith("EmailTemplate") &&
+            value &&
+            typeof value === "object" &&
+            "meta" in value &&
+            value.meta &&
+            typeof value.meta === "object"
+          ) {
+            logger.warn(
+              formatWarning(
+                `${nestedPath}/email.tsx exports "${name}" which looks like an EmailTemplateDefinition but does not end in "EmailTemplate" — rename it to "${name}EmailTemplate".`,
+              ),
+            );
+          }
+        }
+
+        // Only process exports ending in "EmailTemplate"
+        const templateExports = allExports.filter(([name]) =>
+          name.endsWith("EmailTemplate"),
+        );
+
+        let fileTemplateCount = 0;
+
+        for (const [exportName, value] of templateExports) {
+          if (
+            !EmailTemplateGeneratorRepository.isTemplateDef(
+              value,
+              exportName,
+              file,
+              logger,
+            )
+          ) {
+            continue;
+          }
+
+          const templateDef = value;
+          const id = templateDef.meta.id;
+
+          if (seenIds.has(id)) {
+            logger.warn(
+              formatWarning(
+                `Duplicate template id "${id}" in ${nestedPath}/email.tsx (export: ${exportName}) — skipping`,
+              ),
+            );
+            continue;
+          }
+          seenIds.add(id);
+          fileTemplateCount++;
+
+          // Validate exampleProps — only string | number | boolean allowed
+          const rawProps = templateDef.exampleProps ?? {};
+          const validProps: Record<string, string | number | boolean> = {};
+          for (const [k, v] of Object.entries(rawProps)) {
+            if (
+              typeof v === "string" ||
+              typeof v === "number" ||
+              typeof v === "boolean"
+            ) {
+              validProps[k] = v;
+            } else {
+              logger.warn(
+                formatWarning(
+                  `${nestedPath}/email.tsx "${exportName}" exampleProps.${k} has invalid type "${v === null ? "null" : typeof v}" — must be string | number | boolean. Field skipped.`,
+                ),
+              );
+            }
+          }
+
+          templates.push({
+            id,
+            importPath,
+            exportName,
+            metadata: {
+              id,
+              version: templateDef.meta.version,
+              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
+              name: templateDef.meta.name as string,
+              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
+              description: templateDef.meta.description as string,
+              // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- meta fields are string keys; any/unknown from EmailTemplateDefinitionAny
+              category: templateDef.meta.category as string,
+              path: file.replace(process.cwd(), ""),
+              exampleProps: validProps,
+            },
+          });
+        }
+
+        if (fileTemplateCount === 0) {
+          logger.warn(
+            formatWarning(
+              `${nestedPath}/email.tsx has no exports ending in "EmailTemplate" — no templates registered from this file.`,
+            ),
+          );
+        } else {
+          logger.debug(
+            `Found ${fileTemplateCount} template(s) in ${nestedPath}/email`,
+          );
+        }
       } catch (error) {
         logger.warn(
           formatWarning(
@@ -215,45 +381,33 @@ export class EmailTemplateGeneratorRepository {
    * Generate server-side registry content with lazy imports and metadata cache
    */
   private static generateServerContent(templates: TemplateInfo[]): string {
-    // Sort templates by import path for consistent import order
-    const templatesByPath = templates.toSorted((a, b) =>
-      a.importPath.localeCompare(b.importPath),
-    );
-    // Sort templates by ID for loader and metadata order
+    // Sort templates by ID for consistent output order
     const templatesById = templates.toSorted((a, b) =>
       a.id.localeCompare(b.id),
     );
 
-    // Generate individual type imports for each template (sorted by path)
-    const importStatements = templatesByPath
-      .map((t, index) => {
-        const varName = `emailTemplate${index}`;
-        // eslint-disable-next-line i18next/no-literal-string
-        return `import type ${varName} from "${t.importPath}";`;
-      })
-      .join("\n");
-
-    // Generate union type using typeof the imported values (path order)
-    const templateTypeUnion = Array.from({ length: templatesByPath.length })
-
-      // oxlint-disable-next-line no-unused-vars
-      .map((_, index) => `  | typeof emailTemplate${index}`)
-      .join("\n");
+    // All loaders return EmailTemplateDefinition — no per-template type imports needed
 
     // Generate template loaders (with trailing commas) - sorted by ID
     const loaderEntries = templatesById
       .map((t) => {
-        const singleLine = `  "${t.id}": async () => (await import("${t.importPath}")).default,`;
+        // Build the accessor: .default for default export, [exportName] for named
+        const accessor =
+          t.exportName === "default" ? ".default" : `["${t.exportName}"]`;
+        // Cast to EmailTemplateDefinitionAny — TScopedTranslation is invariant so
+        // concrete templates can't assign to the any-typed loader type without a cast.
+        const cast = " as EmailTemplateDefinitionAny";
+        const singleLine = `  "${t.id}": async () => (await import("${t.importPath}"))${accessor}${cast},`;
         // Wrap long lines (80+ chars, prettier printWidth)
         if (singleLine.length >= 80) {
           // Check if even the split version is too long
-          const splitLine = `    (await import("${t.importPath}")).default,`;
+          const splitLine = `    (await import("${t.importPath}"))${accessor}${cast},`;
           if (splitLine.length > 80) {
             // eslint-disable-next-line i18next/no-literal-string
-            return `  "${t.id}": async () =>\n    (\n      await import("${t.importPath}")\n    ).default,`;
+            return `  "${t.id}": async () =>\n    (\n      await import("${t.importPath}")\n    )${accessor}${cast},`;
           }
           // eslint-disable-next-line i18next/no-literal-string
-          return `  "${t.id}": async () =>\n    (await import("${t.importPath}")).default,`;
+          return `  "${t.id}": async () =>\n    (await import("${t.importPath}"))${accessor}${cast},`;
         }
         return singleLine;
       })
@@ -330,26 +484,18 @@ ${descriptionStr}
     // eslint-disable-next-line i18next/no-literal-string
     return `${header}
 
-${importStatements}
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
-  AnyTemplateConstraint,
+  EmailTemplateDefinitionAny,
   TemplateCachedMetadata,
   TranslatedPreviewFieldConfig,
 } from "./template";
 
 /**
- * Union type of all email template definitions
- * Each template has its own specific props type
- */
-type AnyEmailTemplate =
-${templateTypeUnion};
-
-/**
  * Lazy-loaded template registry with dynamic imports
  */
-const templateLoaders: Record<string, () => Promise<AnyEmailTemplate>> = {
+const templateLoaders: Record<string, () => Promise<EmailTemplateDefinitionAny>> = {
 ${loaderEntries}
 };
 
@@ -371,7 +517,7 @@ ${metadataEntries}
  */
 export async function getTemplate(
   id: string,
-): Promise<AnyEmailTemplate | undefined> {
+): Promise<EmailTemplateDefinitionAny | undefined> {
   const loader = templateLoaders[id];
   if (!loader) {
     return undefined;
@@ -445,16 +591,15 @@ export async function getTranslatedTemplateMetadata(
   if (!cached) {
     return undefined;
   }
-  const asConstraint = template as AnyTemplateConstraint;
-  const { t } = asConstraint.scopedTranslation.scopedT(locale);
+  const { t } = template.scopedTranslation.scopedT(locale);
   return {
     ...cached,
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
-    name: t(asConstraint.meta.name as never),
+    name: t(template.meta.name as never),
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
-    description: t(asConstraint.meta.description as never),
+    description: t(template.meta.description as never),
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
-    category: t(asConstraint.meta.category as never),
+    category: t(template.meta.category as never),
   };
 }
 
@@ -463,15 +608,14 @@ export async function getTranslatedTemplateMetadata(
  * Returns configs with plain label/description strings.
  */
 export function translatePreviewFields(
-  template: AnyEmailTemplate,
+  template: EmailTemplateDefinitionAny,
   locale: CountryLanguage,
 ): Record<string, TranslatedPreviewFieldConfig> | undefined {
-  const asConstraint = template as AnyTemplateConstraint;
-  const fields = asConstraint.meta.previewFields;
+  const fields = template.meta.previewFields;
   if (!fields) {
     return undefined;
   }
-  const { t } = asConstraint.scopedTranslation.scopedT(locale);
+  const { t } = template.scopedTranslation.scopedT(locale);
   const result: Record<string, TranslatedPreviewFieldConfig> = {};
   for (const [key, field] of Object.entries(fields)) {
     result[key] = {

@@ -161,6 +161,8 @@ export const translations: typeof enTranslations = {
       totalEarnedDescription: "Gesamte Provision aus Empfehlungen",
       availableBalance: "Verfügbares Guthaben",
       availableBalanceDescription: "Verfügbares Guthaben für Auszahlung",
+      availableBalanceDescriptionLow:
+        "Für KI-Chats ausgeben – andere Credits werden zuerst verwendet. 40 $ verdienen, um Abhebung freizuschalten.",
       totalRevenueCredits: "Gesamtumsatz (Credits)",
       totalEarnedCredits: "Gesamt verdient (Credits)",
       totalPaidOutCredits: "Gesamt ausgezahlt (Credits)",
@@ -253,8 +255,144 @@ export const translations: typeof enTranslations = {
     message: "Nachricht",
   },
 
-  // Payout errors
+  // Admin payout management
+  admin: {
+    payouts: {
+      get: {
+        title: "Auszahlungsanfragen",
+        description: "Empfehlungs-Auszahlungsanfragen verwalten",
+      },
+      post: {
+        title: "Auszahlung verarbeiten",
+        description: "Auszahlungsanfrage genehmigen, ablehnen oder abschließen",
+      },
+      fields: {
+        status: {
+          label: "Statusfilter",
+          description: "Nach Auszahlungsstatus filtern",
+        },
+        requestId: {
+          label: "Anfrage-ID",
+          description: "Kennung der Auszahlungsanfrage",
+        },
+        action: {
+          label: "Aktion",
+          description: "Aktion für die Auszahlungsanfrage",
+        },
+        adminNotes: {
+          label: "Admin-Notizen",
+          description: "Optionale Notizen für diese Aktion",
+        },
+        rejectionReason: {
+          label: "Ablehnungsgrund",
+          description: "Grund für die Ablehnung der Auszahlungsanfrage",
+        },
+      },
+      widget: {
+        empty: "Keine Auszahlungsanfragen gefunden",
+        approve: "Genehmigen",
+        reject: "Ablehnen",
+        complete: "Abschließen",
+        credits: "Credits",
+      },
+    },
+  },
+
+  // Payout endpoint + errors
   payout: {
+    get: {
+      title: "Ihre Einnahmen",
+      description: "Ihre Empfehlungseinnahmen und Auszahlungshistorie anzeigen",
+    },
+    post: {
+      title: "Auszahlung beantragen",
+      description: "Ihre Empfehlungseinnahmen auszahlen",
+    },
+    fields: {
+      amountCents: {
+        label: "Betrag (Credits)",
+        description: "Auszuzahlender Betrag in Credits",
+        placeholder: "z.B. 5000",
+      },
+      currency: {
+        label: "Auszahlungsmethode",
+        description: "Wie Sie Ihre Einnahmen erhalten möchten",
+      },
+      walletAddress: {
+        label: "Wallet-Adresse",
+        description: "Erforderlich für BTC- oder USDC-Auszahlungen",
+        placeholder: "Ihre Wallet-Adresse",
+      },
+    },
+    widget: {
+      totalEarned: "Gesamt verdient",
+      available: "Verfügbar",
+      locked: "Gesperrt",
+      credits: "Credits",
+      readyForPayout: "bereit für Auszahlung",
+      moreToUnlock: "mehr benötigt",
+      pendingConfirmation: "ausstehende Bestätigung",
+      requestPayout: "Auszahlung beantragen",
+      payoutHistory: "Auszahlungshistorie",
+      noPayout: "Noch keine Auszahlungsanfragen",
+      howItWorksTitle: "So funktioniert es",
+      step1Title: "Empfehlungscodes erstellen",
+      step1Body:
+        "Einzigartige Codes für verschiedene Zielgruppen generieren – Freunde, soziale Medien oder Kampagnen.",
+      step2Title: "Link teilen",
+      step2Body:
+        "Wenn jemand über Ihren Link anmeldet und abonniert, verdienen Sie Provision.",
+      step3Title: "Bezahlt werden",
+      step3Body:
+        "Einnahmen sind sofort verfügbar. Als Chat-Credits nutzen oder in Krypto auszahlen.",
+      withdrawTitle: "Einnahmen auszahlen",
+      withdrawDescription:
+        "Mehrere Möglichkeiten, Ihre Empfehlungseinnahmen zu nutzen",
+      useAsCredits: "Als Chat-Credits verwenden",
+      useAsCreditsDesc:
+        "Einnahmen sofort in Chat-Credits für KI-Gespräche umwandeln.",
+      cryptoPayout: "In Krypto auszahlen",
+      cryptoPayoutDesc:
+        "Auszahlung in BTC oder USDC an Ihre Wallet-Adresse beantragen.",
+      minimumNote:
+        "Mindestbetrag: 40 $. Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Genehmigung bearbeitet.",
+      progressLabel: "Fortschritt bis zur Auszahlung",
+      unlockedOf: "freigeschaltet von",
+      viewHistory: "Verlauf anzeigen",
+    },
+    email: {
+      user: {
+        subjectCrypto: "Auszahlungsanfrage eingegangen",
+        subjectCredits: "Credits umgewandelt",
+        titleCrypto: "Ihre Auszahlungsanfrage",
+        titleCredits: "Credits umgewandelt",
+        previewCrypto: "Ihre Auszahlungsanfrage wird bearbeitet",
+        previewCredits: "Ihre Credits wurden umgewandelt",
+        bodyCrypto:
+          "Wir haben Ihre Auszahlungsanfrage erhalten. Krypto-Auszahlungen werden innerhalb von 48 Stunden nach Admin-Genehmigung bearbeitet.",
+        bodyCredits:
+          "Ihre Empfehlungseinnahmen wurden sofort in Chat-Credits umgewandelt und Ihrem Konto gutgeschrieben.",
+        followUpCrypto:
+          "Sie erhalten eine weitere E-Mail, sobald Ihre Auszahlung bearbeitet wurde.",
+        labelAmount: "Betrag",
+        labelMethod: "Methode",
+        labelWallet: "Wallet",
+        credits: "Credits",
+      },
+      admin: {
+        subject: "Neue Auszahlungsanfrage",
+        title: "Neue Auszahlungsanfrage",
+        preview: "Auszahlungsanfrage eingereicht",
+        body: "Ein Benutzer hat eine Auszahlungsanfrage eingereicht.",
+        footer:
+          "Bitte überprüfen und bearbeiten Sie diese Anfrage im Admin-Panel.",
+        labelUser: "Benutzer",
+        labelAmount: "Betrag",
+        labelCurrency: "Währung",
+        labelWallet: "Wallet",
+        credits: "Credits",
+      },
+    },
     errors: {
       minimumAmount: "Mindestauszahlungsbetrag ist $40",
       walletRequired: "Wallet-Adresse für Krypto-Auszahlungen erforderlich",

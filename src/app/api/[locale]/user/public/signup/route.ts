@@ -2,7 +2,10 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import signupEndpoints from "./definition";
-import { renderAdminSignupNotification, renderRegisterMail } from "./email";
+import {
+  adminSignupNotificationEmailTemplate,
+  signupWelcomeEmailTemplate,
+} from "./email";
 import { SignupRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
@@ -10,11 +13,11 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: [
       {
-        render: renderRegisterMail,
+        template: signupWelcomeEmailTemplate,
         ignoreErrors: false,
       },
       {
-        render: renderAdminSignupNotification,
+        template: adminSignupNotificationEmailTemplate,
         ignoreErrors: true, // Don't fail signup if admin notification fails
       },
     ],

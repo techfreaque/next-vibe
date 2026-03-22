@@ -15,6 +15,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { PaymentProvider } from "../../../enum";
 import { PaymentRepository } from "../../../repository";
 
 // Constants
@@ -62,7 +63,7 @@ export async function POST(
       signature,
       locale,
       logger,
-      "nowpayments",
+      PaymentProvider.NOWPAYMENTS,
     );
 
     if (!result.success) {

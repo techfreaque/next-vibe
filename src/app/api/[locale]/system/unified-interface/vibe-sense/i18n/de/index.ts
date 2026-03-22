@@ -15,6 +15,24 @@ export const translations: typeof enTranslations = {
       "1w": "1 Woche",
       "1M": "1 Monat",
     },
+    runStatus: {
+      running: "Läuft",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+    },
+    backtestActionMode: {
+      simulate: "Simulieren",
+      execute: "Ausführen",
+    },
+    graphOwnerType: {
+      system: "System",
+      admin: "Admin",
+      user: "Benutzer",
+    },
+    triggerType: {
+      manual: "Manuell",
+      cron: "Geplant",
+    },
   },
   fields: {
     source: { label: "Quelle", description: "Eingabe-Zeitreihe" },

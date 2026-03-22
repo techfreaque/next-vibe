@@ -356,7 +356,7 @@ const { GET } = createEndpoint({
         schema: z.record(
           z.string(),
           z.object({
-            leadsPerWeek: z.coerce.number().min(1),
+            leadsPerWeek: z.coerce.number().min(0),
             enabledDays: z.array(z.coerce.number().min(1).max(7)),
             enabledHours: z.object({
               start: z.coerce.number().min(0).max(23),

@@ -7,7 +7,10 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import contactEndpoints from "./definition";
-import { renderCompanyMail, renderPartnerMail } from "./email";
+import {
+  adminContactFormEmailTemplate,
+  contactFormEmailTemplate,
+} from "./email";
 import { ContactRepository } from "./repository";
 
 export const { POST, tools } = endpointsHandler({
@@ -15,11 +18,11 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: [
       {
-        render: renderCompanyMail,
+        template: contactFormEmailTemplate,
         ignoreErrors: false,
       },
       {
-        render: renderPartnerMail,
+        template: adminContactFormEmailTemplate,
         ignoreErrors: false,
       },
     ],

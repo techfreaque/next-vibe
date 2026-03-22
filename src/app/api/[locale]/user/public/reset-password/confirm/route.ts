@@ -10,14 +10,14 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import { PasswordRepository } from "../repository";
 import resetPasswordConfirmEndpoints from "./definition";
-import { renderResetPasswordConfirmMail } from "./email";
+import { passwordResetConfirmEmailTemplate } from "./email";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: resetPasswordConfirmEndpoints,
   [Methods.POST]: {
     email: [
       {
-        render: renderResetPasswordConfirmMail,
+        template: passwordResetConfirmEmailTemplate,
         // Ignore email errors to avoid blocking the API response
         ignoreErrors: true,
       },

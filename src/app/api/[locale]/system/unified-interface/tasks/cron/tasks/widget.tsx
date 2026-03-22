@@ -20,6 +20,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Circle } from "next-vibe-ui/ui/icons/Circle";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
@@ -967,6 +968,16 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     })();
   }, [navigate]);
 
+  const handleNavigateGraphs = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const graphsDef =
+        await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition");
+      navigate(graphsDef.default.GET, {
+        data: { search: "cron" },
+      });
+    })();
+  }, [navigate]);
+
   const handleNavigateHistory = useCallback((): void => {
     void (async (): Promise<void> => {
       const m = await import("../history/definition");
@@ -1159,6 +1170,19 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           >
             <BarChart3 className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">{t("widget.header.stats")}</Span>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2.5 gap-1.5 text-xs"
+            onClick={handleNavigateGraphs}
+            title={t("widget.header.graphs")}
+          >
+            <GitBranch className="h-3.5 w-3.5" />
+            <Span className="hidden sm:inline">
+              {t("widget.header.graphs")}
+            </Span>
           </Button>
           <Button
             type="button"

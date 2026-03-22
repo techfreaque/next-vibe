@@ -6,6 +6,8 @@
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
+
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -177,12 +179,12 @@ const { GET } = createEndpoint({
             createdAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.createdAt.content" as const,
-              schema: z.date(),
+              schema: dateSchema,
             }),
             updatedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.items.item.updatedAt.content" as const,
-              schema: z.date(),
+              schema: dateSchema,
             }),
           },
         }),

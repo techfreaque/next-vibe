@@ -34,7 +34,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
-import { GraphResolution } from "../enum";
+import { GraphOwnerType, GraphResolution } from "../enum";
 import type definition from "./definition";
 
 type GraphListResponseOutput = typeof definition.GET.types.ResponseOutput;
@@ -94,8 +94,8 @@ function GraphCard({
   onClick: () => void;
   onArchive: () => void;
 }): React.JSX.Element {
-  const isSystem = graph.ownerType === "system";
-  const isAdmin = graph.ownerType === "admin";
+  const isSystem = graph.ownerType === GraphOwnerType.SYSTEM;
+  const isAdmin = graph.ownerType === GraphOwnerType.ADMIN;
 
   return (
     <Div
@@ -290,8 +290,12 @@ export function GraphListContainer({
   const stats = useMemo(() => {
     const total = graphs.length;
     const active = graphs.filter((g) => g.isActive).length;
-    const system = graphs.filter((g) => g.ownerType === "system").length;
-    const admin = graphs.filter((g) => g.ownerType === "admin").length;
+    const system = graphs.filter(
+      (g) => g.ownerType === GraphOwnerType.SYSTEM,
+    ).length;
+    const admin = graphs.filter(
+      (g) => g.ownerType === GraphOwnerType.ADMIN,
+    ).length;
     return { total, active, system, admin };
   }, [graphs]);
 

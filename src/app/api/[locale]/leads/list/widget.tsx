@@ -8,6 +8,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Download } from "next-vibe-ui/ui/icons/Download";
@@ -574,6 +575,16 @@ export function LeadsListContainer({
     })();
   }, [navigation]);
 
+  const handleGraphs = useCallback((): void => {
+    void (async (): Promise<void> => {
+      const graphsDef =
+        await import("@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/definition");
+      navigation.push(graphsDef.default.GET, {
+        data: { search: "lead" },
+      });
+    })();
+  }, [navigation]);
+
   const handleSearch = useCallback((): void => {
     void (async (): Promise<void> => {
       const searchDef =
@@ -647,6 +658,17 @@ export function LeadsListContainer({
         >
           <BarChart3 className="h-4 w-4" />
           <Span className="hidden sm:inline">{t("widget.stats")}</Span>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleGraphs}
+          title={t("widget.graphs")}
+          className="gap-1"
+        >
+          <GitBranch className="h-4 w-4" />
+          <Span className="hidden sm:inline">{t("widget.graphs")}</Span>
         </Button>
         <Button
           type="button"

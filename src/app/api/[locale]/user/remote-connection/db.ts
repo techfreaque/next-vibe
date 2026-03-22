@@ -57,6 +57,14 @@ export interface RemoteToolCapability {
   credits?: number;
 }
 
+// ─── Shared Types ─────────────────────────────────────────────────────────────
+
+export type ConnectionHealth =
+  | "healthy"
+  | "warning"
+  | "critical"
+  | "disconnected";
+
 // ─── Instance Identities ──────────────────────────────────────────────────────
 // Per-user self-identity records. Replaces the old token="self" pattern.
 // Each user can have their own instance identities (e.g. "hermes", "thea").

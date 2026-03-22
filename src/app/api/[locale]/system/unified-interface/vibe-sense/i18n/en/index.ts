@@ -13,6 +13,24 @@ export const translations = {
       "1w": "1 Week",
       "1M": "1 Month",
     },
+    runStatus: {
+      running: "Running",
+      completed: "Completed",
+      failed: "Failed",
+    },
+    backtestActionMode: {
+      simulate: "Simulate",
+      execute: "Execute",
+    },
+    graphOwnerType: {
+      system: "System",
+      admin: "Admin",
+      user: "User",
+    },
+    triggerType: {
+      manual: "Manual",
+      cron: "Scheduled",
+    },
   },
   // Standard vibe-sense field labels (used by shared/fields.ts helpers)
   fields: {

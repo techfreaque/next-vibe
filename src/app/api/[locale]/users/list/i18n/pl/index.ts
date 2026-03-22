@@ -263,6 +263,7 @@ export const translations: typeof enTranslations = {
     edit: "Edytuj",
     delete: "Usu\u0144",
     stats: "Statystyki",
+    graphs: "Wykresy",
     newUser: "Nowy u\u017cytkownik",
     searchPlaceholder: "Szukaj po nazwie lub e-mailu\u2026 (Ctrl+F)",
     roleFilterLabel: "Rola",

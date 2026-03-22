@@ -19,6 +19,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { createTrackingContext } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";
 import { SubscriptionCheckoutRepository } from "../payment/checkout/repository";
 import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
@@ -613,7 +614,7 @@ export class SubscriptionRepository {
 
       // If has provider subscription ID, cancel with provider
       if (subscription.providerSubscriptionId) {
-        const provider = getPaymentProvider(subscription.provider || "stripe");
+        const provider = getPaymentProvider(subscription.provider);
         const cancelResult = await provider.cancelSubscription(
           subscription.providerSubscriptionId,
           logger,
@@ -729,7 +730,7 @@ export class SubscriptionRepository {
           return;
         }
 
-        const provider = getPaymentProvider("stripe");
+        const provider = getPaymentProvider(PaymentProvider.STRIPE);
         const subscriptionResult = await provider.retrieveSubscription(
           providerSubscriptionId,
           logger,
@@ -857,6 +858,116 @@ export class SubscriptionRepository {
         });
       }
 
+      // Send confirmation emails (user + admin)
+      try {
+        const { users: usersTable } = await import("../user/db");
+        const { userLeadLinks } = await import("../leads/db");
+        const [fullUser] = await db
+          .select({
+            email: usersTable.email,
+            privateName: usersTable.privateName,
+            publicName: usersTable.publicName,
+          })
+          .from(usersTable)
+          .where(eq(usersTable.id, userId))
+          .limit(1);
+
+        const [leadLink] = await db
+          .select({ leadId: userLeadLinks.leadId })
+          .from(userLeadLinks)
+          .where(eq(userLeadLinks.userId, userId))
+          .limit(1);
+
+        if (fullUser) {
+          const {
+            subscriptionSuccessEmailTemplate,
+            adminSubscriptionNotificationEmailTemplate,
+          } = await import("./email");
+          const { EmailSendingRepository } =
+            await import("../messenger/providers/email/smtp-client/email-sending/repository");
+
+          // Get inserted/updated subscription record for email
+          const [subRecord] = await db
+            .select()
+            .from(subscriptions)
+            .where(eq(subscriptions.userId, userId))
+            .limit(1);
+
+          if (subRecord) {
+            const leadId = leadLink?.leadId ?? userId;
+            const { t } =
+              subscriptionSuccessEmailTemplate.scopedTranslation.scopedT(
+                userLocale,
+              );
+            const tracking = createTrackingContext(userLocale, leadId, userId);
+            const { contactClientRepository } =
+              await import("../contact/repository-client");
+            const adminEmail =
+              contactClientRepository.getSupportEmail(userLocale);
+
+            await EmailSendingRepository.sendEmail(
+              {
+                jsx: subscriptionSuccessEmailTemplate.component({
+                  props: {
+                    privateName: fullUser.privateName,
+                    userId,
+                    leadId,
+                    planName: subRecord.planId,
+                  },
+                  t,
+                  locale: userLocale,
+                  recipientEmail: fullUser.email,
+                  tracking,
+                }),
+                subject: t("email.success.subject"),
+                toEmail: fullUser.email,
+                toName: fullUser.privateName,
+                leadId,
+                locale: userLocale,
+              },
+              logger,
+              userLocale,
+            );
+
+            const { t: adminT } =
+              adminSubscriptionNotificationEmailTemplate.scopedTranslation.scopedT(
+                userLocale,
+              );
+            await EmailSendingRepository.sendEmail(
+              {
+                jsx: adminSubscriptionNotificationEmailTemplate.component({
+                  props: {
+                    privateName: fullUser.privateName,
+                    publicName: fullUser.publicName,
+                    email: fullUser.email,
+                    planName: subRecord.planId,
+                    statusName: subRecord.status,
+                  },
+                  t: adminT,
+                  locale: userLocale,
+                  recipientEmail: adminEmail,
+                  tracking: createTrackingContext(userLocale),
+                }),
+                subject: adminT("email.admin_notification.subject"),
+                toEmail: adminEmail,
+                toName: adminEmail,
+                leadId,
+                locale: userLocale,
+              },
+              logger,
+              userLocale,
+            );
+
+            logger.info("Sent subscription confirmation emails", { userId });
+          }
+        }
+      } catch (emailError) {
+        logger.error("Failed to send subscription emails", {
+          error: parseError(emailError),
+          userId,
+        });
+      }
+
       logger.debug("Subscription checkout processed successfully", {
         userId,
         providerSubscriptionId,
@@ -937,7 +1048,7 @@ export class SubscriptionRepository {
         return;
       }
 
-      const providerName = subscription.provider || "stripe";
+      const providerName = subscription.provider;
       const provider = getPaymentProvider(providerName);
       const subscriptionResult = await provider.retrieveSubscription(
         subscriptionId,
@@ -1110,7 +1221,7 @@ export class SubscriptionRepository {
         isLatePayment,
       });
 
-      const providerName = subscription.provider || "stripe";
+      const providerName = subscription.provider;
       const provider = getPaymentProvider(providerName);
       const subscriptionResult = await provider.retrieveSubscription(
         subscriptionId,

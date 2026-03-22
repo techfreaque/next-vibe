@@ -47,6 +47,7 @@ export const translations = {
   },
   widget: {
     create: "Dodaj konto",
+    graphs: "Wykresy",
     refresh: "Odśwież",
     emptyState: "Brak skonfigurowanych kont messenger",
     searchPlaceholder: "Szukaj kont...",

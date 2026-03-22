@@ -59,14 +59,9 @@ export class SubscriptionCheckoutRepository {
 
       // Get payment provider from request data or default to stripe
       logger.debug("Step 3: Getting payment provider");
-      const providerKey =
-        data.provider === PaymentProvider.NOWPAYMENTS
-          ? "nowpayments"
-          : "stripe";
-      const provider = getPaymentProvider(providerKey);
+      const provider = getPaymentProvider(data.provider);
       logger.debug("Step 4: Payment provider retrieved", {
         providerName: provider.name,
-        providerKey,
         requestedProvider: data.provider,
       });
 

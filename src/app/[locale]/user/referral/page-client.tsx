@@ -11,21 +11,18 @@ import {
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
-import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
-import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Gift } from "next-vibe-ui/ui/icons/Gift";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
-import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
 import referralCodesListDefinition from "@/app/api/[locale]/referral/codes/list/definition";
 import referralDefinition from "@/app/api/[locale]/referral/definition";
+import referralPayoutDefinition from "@/app/api/[locale]/referral/payout/definition";
 import referralStatsDefinition from "@/app/api/[locale]/referral/stats/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -74,107 +71,28 @@ export function ReferralPageClient({
           </P>
         </Div>
 
-        {/* Stats Section - Only for authenticated users */}
+        {/* Stats + How It Works + Withdraw info (authenticated only) */}
         {isAuthenticated && (
-          <Div className="mb-12">
-            <H2 className="text-xl font-semibold mb-4">
-              {t("overview.title")}
-            </H2>
-            <EndpointsPage
-              endpoint={referralStatsDefinition}
-              user={user}
-              locale={locale}
-            />
-          </Div>
+          <>
+            <Div className="mb-12">
+              <H2 className="text-xl font-semibold mb-4">
+                {t("overview.title")}
+              </H2>
+              <EndpointsPage
+                endpoint={referralStatsDefinition}
+                user={user}
+                locale={locale}
+              />
+            </Div>
+            <Div className="mb-12">
+              <EndpointsPage
+                endpoint={referralPayoutDefinition}
+                user={user}
+                locale={locale}
+              />
+            </Div>
+          </>
         )}
-
-        {/* How It Works + Payout Info */}
-        <Div className="grid gap-6 lg:grid-cols-2 mb-12">
-          {/* How It Works */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-violet-500" />
-                {t("howItWorks.title")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Div className="flex gap-4">
-                <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-                  1
-                </Div>
-                <Div>
-                  <P className="font-medium">{t("howItWorks.step1Title")}</P>
-                  <P className="text-sm text-muted-foreground">
-                    {t("howItWorks.step1Body")}
-                  </P>
-                </Div>
-              </Div>
-              <Div className="flex gap-4">
-                <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-                  2
-                </Div>
-                <Div>
-                  <P className="font-medium">{t("howItWorks.step2Title")}</P>
-                  <P className="text-sm text-muted-foreground">
-                    {t("howItWorks.step2Body")}
-                  </P>
-                </Div>
-              </Div>
-              <Div className="flex gap-4">
-                <Div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-sm font-bold">
-                  3
-                </Div>
-                <Div>
-                  <P className="font-medium">{t("howItWorks.step3Title")}</P>
-                  <P className="text-sm text-muted-foreground">
-                    {t("howItWorks.step3Body")}
-                  </P>
-                </Div>
-              </Div>
-            </CardContent>
-          </Card>
-
-          {/* Payout Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wallet className="h-5 w-5 text-emerald-500" />
-                {t("payout.title")}
-              </CardTitle>
-              <CardDescription>{t("payout.description")}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                <Coins className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
-                <Div>
-                  <P className="font-medium text-sm">
-                    {t("payout.useAsCredits")}
-                  </P>
-                  <P className="text-xs text-muted-foreground">
-                    {t("payout.useAsCreditsDesc")}
-                  </P>
-                </Div>
-              </Div>
-              <Div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                <Bitcoin className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
-                <Div>
-                  <P className="font-medium text-sm">
-                    {t("payout.cryptoPayout")}
-                  </P>
-                  <P className="text-xs text-muted-foreground">
-                    {t("payout.cryptoPayoutDesc")}
-                  </P>
-                </Div>
-              </Div>
-              <Div className="pt-2 border-t">
-                <P className="text-xs text-muted-foreground">
-                  {t("payout.minimumNote")}
-                </P>
-              </Div>
-            </CardContent>
-          </Card>
-        </Div>
 
         {/* Authenticated: Show Create Code + Codes List */}
         {isAuthenticated ? (

@@ -16,6 +16,7 @@ export const translations: typeof enTranslations = {
     memories: "Erinnerungen",
     errorMonitor: "Fehlerüberwachung",
     skillsModeration: "Skills-Moderation",
+    referralPayouts: "Empfehlungsauszahlungen",
     settings: "Einstellungen",
     admin: "Admin",
     adminPanel: "Admin-Panel",

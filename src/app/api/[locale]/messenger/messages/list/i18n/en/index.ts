@@ -191,6 +191,7 @@ export const translations = {
     opened: "Opened",
     clicked: "Clicked",
     stats: "Stats",
+    graphs: "Graphs",
     refresh: "Refresh",
     searchPlaceholder: "Search emails...",
     clearSearch: "Clear",

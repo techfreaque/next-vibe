@@ -8,8 +8,8 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import endpoints from "./definition";
 import {
-  renderAdminUnsubscribeNotificationMail,
-  renderUnsubscribeConfirmationMail,
+  adminNewsletterUnsubscribeEmailTemplate,
+  newsletterUnsubscribeEmailTemplate,
 } from "./email";
 import { NewsletterUnsubscribeRepository } from "./repository";
 
@@ -18,11 +18,11 @@ export const { POST, tools } = endpointsHandler({
   [Methods.POST]: {
     email: [
       {
-        render: renderUnsubscribeConfirmationMail,
+        template: newsletterUnsubscribeEmailTemplate,
         ignoreErrors: false,
       },
       {
-        render: renderAdminUnsubscribeNotificationMail,
+        template: adminNewsletterUnsubscribeEmailTemplate,
         ignoreErrors: true,
       },
     ],

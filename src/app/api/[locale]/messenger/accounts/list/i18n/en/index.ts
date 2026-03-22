@@ -71,6 +71,7 @@ export const translations = {
 
   widget: {
     create: "Add Account",
+    graphs: "Graphs",
     refresh: "Refresh",
     emptyState: "No messenger accounts configured",
     searchPlaceholder: "Search accounts...",

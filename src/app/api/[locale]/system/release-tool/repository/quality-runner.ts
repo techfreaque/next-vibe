@@ -24,6 +24,7 @@ import {
   formatSkip,
   formatSuccess,
 } from "../../unified-interface/shared/logger/formatters";
+import type { PackageManager } from "../definition";
 import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 import {
@@ -43,7 +44,7 @@ export interface IQualityRunner {
    */
   runLint(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -55,7 +56,7 @@ export interface IQualityRunner {
    */
   runTypecheck(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -67,7 +68,7 @@ export interface IQualityRunner {
    */
   runBuild(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -79,7 +80,7 @@ export interface IQualityRunner {
    */
   runTests(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -91,7 +92,7 @@ export interface IQualityRunner {
    */
   runInstall(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -103,7 +104,7 @@ export interface IQualityRunner {
    */
   runClean(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -118,7 +119,7 @@ export interface IQualityRunner {
 export class QualityRunner implements IQualityRunner {
   runLint(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -190,7 +191,7 @@ export class QualityRunner implements IQualityRunner {
 
   runTypecheck(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -245,7 +246,7 @@ export class QualityRunner implements IQualityRunner {
 
   runBuild(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -284,7 +285,7 @@ export class QualityRunner implements IQualityRunner {
 
   runTests(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -335,7 +336,7 @@ export class QualityRunner implements IQualityRunner {
 
   runInstall(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,
@@ -371,7 +372,7 @@ export class QualityRunner implements IQualityRunner {
 
   runClean(
     cwd: string,
-    packageManager: string,
+    packageManager: PackageManager,
     logger: EndpointLogger,
     dryRun: boolean,
     locale: CountryLanguage,

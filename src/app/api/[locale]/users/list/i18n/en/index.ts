@@ -261,6 +261,7 @@ export const translations = {
     edit: "Edit",
     delete: "Delete",
     stats: "Stats",
+    graphs: "Graphs",
     newUser: "New User",
     searchPlaceholder: "Search by name or email\u2026 (Ctrl+F)",
     roleFilterLabel: "Role",

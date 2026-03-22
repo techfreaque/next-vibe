@@ -7,14 +7,14 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import { PasswordRepository } from "../repository";
 import resetPasswordRequestEndpoint from "./definition";
-import { renderResetPasswordMail } from "./email";
+import { passwordResetRequestEmailTemplate } from "./email";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: resetPasswordRequestEndpoint,
   [Methods.POST]: {
     email: [
       {
-        render: renderResetPasswordMail,
+        template: passwordResetRequestEmailTemplate,
         ignoreErrors: true,
       },
     ],

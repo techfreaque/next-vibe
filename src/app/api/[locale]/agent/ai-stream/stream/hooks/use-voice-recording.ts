@@ -11,8 +11,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-/** Voice input mode - determines what happens after recording stops */
-type VoiceInputMode = "toInput" | "directSubmit";
+/** Recording submit mode - determines what happens after recording stops */
+type RecordingSubmitMode = "toInput" | "directSubmit";
 
 interface UseVoiceRecordingOptions {
   /** Current input value */
@@ -75,7 +75,7 @@ export function useVoiceRecording({
   locale,
 }: UseVoiceRecordingOptions): UseVoiceRecordingReturn {
   // Track which voice mode was used when starting recording
-  const voiceModeRef = useRef<VoiceInputMode>("toInput");
+  const voiceModeRef = useRef<RecordingSubmitMode>("toInput");
 
   // Stable ref for currentValue — avoids onTranscript depending on it
   const currentValueRef = useRef(currentValue);

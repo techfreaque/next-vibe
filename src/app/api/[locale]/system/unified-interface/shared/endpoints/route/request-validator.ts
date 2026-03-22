@@ -21,11 +21,7 @@ import { CountryLanguageValues } from "@/i18n/core/config";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Methods } from "../../types/enums";
-import {
-  isAgentPlatform,
-  isCliPlatform,
-  type Platform,
-} from "../../types/platform";
+import { isAgentPlatform, isCliPlatform, Platform } from "../../types/platform";
 import type { WidgetData } from "../../widgets/widget-data";
 
 /**
@@ -165,7 +161,7 @@ export function validateHandlerRequestData<
     );
     if (!urlValidation.success) {
       const logUrl =
-        isCliPlatform(platform) || isAgentPlatform(platform)
+        isCliPlatform(platform) || platform === Platform.MCP
           ? logger.debug.bind(logger)
           : logger.error.bind(logger);
       logUrl("URL validation failed", {

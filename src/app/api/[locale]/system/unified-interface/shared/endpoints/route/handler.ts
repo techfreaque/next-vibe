@@ -11,8 +11,10 @@ import type { z } from "zod";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import type { EmailHandleRequestOutput } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
-import type { EmailFunctionType } from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
+import type {
+  EmailHandler,
+  EmailHandleRequestOutput,
+} from "@/app/api/[locale]/messenger/providers/email/smtp-client/email-handling/handler";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import {
   ErrorResponseTypes,
@@ -27,17 +29,19 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "@/app/api/[locale]/user/auth/types";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
-import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type {
+  UserRole,
+  UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
+import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
+import { generateRoleFilteredRequestSchema } from "../../field/utils";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
-import { generateRoleFilteredRequestSchema } from "../../field/utils";
-import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import { permissionsRegistry } from "../permissions/registry";
 import {
   validateHandlerRequestData,
@@ -104,24 +108,6 @@ export type InferJwtPayloadTypeFromRoles<
         > extends never
       ? JwtPrivatePayloadType
       : JwtPayloadType;
-
-/**
- * Email handler configuration
- */
-export interface EmailHandler<
-  TRequest,
-  TResponse,
-  TUrlVariables,
-  TScopedTranslationKey extends string = TranslationKey,
-> {
-  readonly ignoreErrors?: boolean;
-  readonly render: EmailFunctionType<
-    TRequest,
-    TResponse,
-    TUrlVariables,
-    TScopedTranslationKey
-  >;
-}
 
 /**
  * SMS handler configuration
@@ -239,7 +225,7 @@ export interface MethodHandlerConfig<
     TRequestOutput,
     TResponseOutput,
     TUrlVariablesOutput,
-    TScopedTranslationKey
+    TUserRoleValue
   >[];
   sms?: SMSHandler<
     TRequestOutput,
@@ -273,7 +259,7 @@ export interface ApiHandlerOptions<
           TRequestOutput,
           TResponseOutput,
           TUrlVariablesOutput,
-          TScopedTranslationKey
+          TUserRoleValue
         >[];
       }
     | undefined;
@@ -541,7 +527,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         T["types"]["RequestOutput"],
         T["types"]["ResponseOutput"],
         T["types"]["UrlVariablesOutput"],
-        T["types"]["ScopedTranslationKey"]
+        T["types"]["ScopedTranslationKey"],
+        T["allowedRoles"]
       >(
         {
           email,
@@ -557,7 +544,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
           T["types"]["RequestOutput"],
           T["types"]["ResponseOutput"],
           T["types"]["UrlVariablesOutput"],
-          T["types"]["ScopedTranslationKey"]
+          T["types"]["ScopedTranslationKey"],
+          T["allowedRoles"]
         >,
         logger,
       );

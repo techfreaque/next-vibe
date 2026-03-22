@@ -220,3 +220,25 @@ export const TaxStatusDB = [
   TaxStatus.FAILED,
   TaxStatus.REQUIRES_LOCATION,
 ] as const;
+
+/**
+ * Payment interval enum
+ * Billing frequency for subscription and one-time payments
+ */
+export const {
+  enum: PaymentInterval,
+  options: PaymentIntervalOptions,
+  Value: PaymentIntervalValue,
+} = createEnumOptions(scopedTranslation, {
+  MONTH: "enums.paymentInterval.month",
+  YEAR: "enums.paymentInterval.year",
+  ONE_TIME: "enums.paymentInterval.one_time",
+} as const);
+
+export type PaymentIntervalType = typeof PaymentIntervalValue;
+
+export const PaymentIntervalDB = [
+  PaymentInterval.MONTH,
+  PaymentInterval.YEAR,
+  PaymentInterval.ONE_TIME,
+] as const;

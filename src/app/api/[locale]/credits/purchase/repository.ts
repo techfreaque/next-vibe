@@ -20,7 +20,6 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { PaymentProvider } from "../../payment/enum";
 import { getPaymentProvider } from "../../payment/providers";
 import { ProductIds } from "../../products/repository-client";
 import { SubscriptionStatus } from "../../subscription/enum";
@@ -118,15 +117,10 @@ export class CreditPurchaseRepository {
         });
       }
 
-      // Get payment provider from request data or default to stripe
-      const providerKey =
-        data.provider === PaymentProvider.NOWPAYMENTS
-          ? "nowpayments"
-          : "stripe";
-      const provider = getPaymentProvider(providerKey);
+      const provider = getPaymentProvider(data.provider);
 
       logger.debug("Using payment provider", {
-        providerKey,
+        providerKey: data.provider,
         providerName: provider.name,
         requestedProvider: data.provider,
       });

@@ -369,5 +369,10 @@ export const translations: typeof enTranslations = {
       failed: "Fehlgeschlagen",
       requiresLocation: "Standort erforderlich",
     },
+    paymentInterval: {
+      month: "Monatlich",
+      year: "Jährlich",
+      one_time: "Einmalig",
+    },
   },
 };

@@ -231,6 +231,7 @@ export const translations: typeof enTranslations = {
     opened: "Geöffnet",
     clicked: "Geklickt",
     stats: "Statistiken",
+    graphs: "Graphen",
     refresh: "Aktualisieren",
     searchPlaceholder: "E-Mails suchen...",
     clearSearch: "Löschen",

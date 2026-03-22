@@ -153,7 +153,7 @@ interface NOWPaymentsIPNPayload {
 }
 
 export class NOWPaymentsProvider implements PaymentProvider {
-  name = "nowpayments";
+  name = PaymentProviderEnum.NOWPAYMENTS;
   private apiUrl: string;
 
   constructor() {

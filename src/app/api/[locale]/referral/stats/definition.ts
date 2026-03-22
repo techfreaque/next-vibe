@@ -96,6 +96,10 @@ export const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         schema: z.string() as z.ZodType<ReferralTranslationKey>,
       }),
+      availableCreditsReadyForPayout: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.boolean(),
+      }),
     },
   }),
 
@@ -117,6 +121,7 @@ export const { GET } = createEndpoint({
         availableCreditsTitle: "fields.availableBalance",
         availableCreditsValue: 1600,
         availableCreditsDescription: "fields.availableBalanceDescription",
+        availableCreditsReadyForPayout: false,
       },
     },
   },
