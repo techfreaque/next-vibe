@@ -190,39 +190,33 @@ export class BuildRepository {
         output.push(t("post.repository.messages.buildingNextjs"));
 
         // Run Next.js build command using bun (works in both dev and Docker)
-        const { execSync } = await import("node:child_process");
-        try {
-          execSync("bunx next build", {
-            stdio: "inherit",
-            cwd: process.cwd(),
-            env: {
-              ...process.env,
-              NODE_ENV: "production",
-              NEXT_DIST_DIR: ".next-prod",
-            },
-          });
+        const { spawnSync } = await import("node:child_process");
+        const buildResult = spawnSync("bunx", ["next", "build"], {
+          stdio: "inherit",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            NODE_ENV: "production",
+            NEXT_DIST_DIR: ".next-prod",
+          },
+        });
+        if (buildResult.status === 0) {
           output.push(t("post.repository.messages.nextjsBuildSuccess"));
           steps.push({ label: "Next.js", ok: true, skipped: false });
-        } catch (buildError) {
-          const parsedError = parseError(buildError);
-          const spawnError = buildError as {
-            status?: number | null;
-            signal?: string | null;
-          };
-          const exitCode = spawnError.status ?? null;
-          const exitSignal = spawnError.signal ?? null;
+        } else {
+          const exitCode = buildResult.status ?? null;
+          const exitSignal = buildResult.signal ?? null;
           const isOom =
             exitSignal === "SIGKILL" ||
             exitCode === 137 ||
             exitCode === 134;
           const detail = isOom
-            ? `Next.js build killed by OS (OOM) — exit signal: ${exitSignal ?? exitCode}`
-            : parsedError.message;
+            ? `Next.js build killed by OS (likely OOM) — signal: ${exitSignal ?? exitCode}`
+            : `Next.js build exited with code ${exitCode ?? "unknown"}`;
           const errorMsg = `${t("post.repository.messages.nextjsBuildFailed")}: ${detail}`;
           steps.push({ label: "Next.js", ok: false, skipped: false });
           errors.push(errorMsg);
           logger.error("Next.js build failed", {
-            message: parsedError.message,
             exitCode,
             exitSignal,
             isOom,

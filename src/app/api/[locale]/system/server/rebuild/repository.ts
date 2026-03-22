@@ -11,7 +11,7 @@
  * 6. Hot-restart via SIGUSR1
  */
 
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, renameSync, rmSync } from "node:fs";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -147,33 +147,26 @@ export class RebuildRepository {
           rmSync(stagingPath, { recursive: true, force: true });
         }
 
-        try {
-          execSync("bunx next build", {
-            stdio: "inherit",
-            cwd,
-            env: {
-              ...process.env,
-              NODE_ENV: "production",
-              NEXT_DIST_DIR: stagingDir,
-            },
-          });
-        } catch (error) {
-          const parsedError = parseError(error);
-          const spawnError = error as {
-            status?: number | null;
-            signal?: string | null;
-          };
-          const exitCode = spawnError.status ?? null;
-          const exitSignal = spawnError.signal ?? null;
+        const buildResult = spawnSync("bunx", ["next", "build"], {
+          stdio: "inherit",
+          cwd,
+          env: {
+            ...process.env,
+            NODE_ENV: "production",
+            NEXT_DIST_DIR: stagingDir,
+          },
+        });
+        if (buildResult.status !== 0) {
+          const exitCode = buildResult.status ?? null;
+          const exitSignal = buildResult.signal ?? null;
           const isOom =
             exitSignal === "SIGKILL" ||
             exitCode === 137 ||
             exitCode === 134;
           const detail = isOom
-            ? `Next.js build killed by OS (OOM) — exit signal: ${exitSignal ?? exitCode}`
-            : parsedError.message;
+            ? `Next.js build killed by OS (likely OOM) — signal: ${exitSignal ?? exitCode}`
+            : `Next.js build exited with code ${exitCode ?? "unknown"}`;
           logger.error("Next.js rebuild failed", {
-            message: parsedError.message,
             exitCode,
             exitSignal,
             isOom,
