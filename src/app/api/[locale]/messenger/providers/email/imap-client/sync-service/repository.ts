@@ -17,23 +17,50 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { NewEmail } from "@/app/api/[locale]/messenger/messages/db";
-import { emails } from "@/app/api/[locale]/messenger/messages/db";
+import type {
+  NewEmail,
+  NewMessengerFolder,
+} from "@/app/api/[locale]/messenger/messages/db";
+import {
+  emails,
+  messengerFolders,
+} from "@/app/api/[locale]/messenger/messages/db";
+import type { MessengerFolder } from "@/app/api/[locale]/messenger/messages/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { MessageType } from "../../../../messages/enum";
+import { MessageType, SpecialFolderType } from "../../../../messages/enum";
+import type { SpecialFolderTypeValue } from "../../../../messages/enum";
 import { messengerAccounts } from "../../../../accounts/db";
 import { MessengerAccountStatus } from "../../../../accounts/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { MessageChannel } from "../../../../accounts/enum";
 import { ImapConnectionRepository } from "../connection/repository";
-import type { ImapAccountShape, ImapFolder, NewImapFolder } from "../db";
-import { imapFolders, toImapShape } from "../db";
-import { ImapSyncStatus } from "../enum";
+import type { ImapAccountShape } from "../db";
+import { toImapShape } from "../db";
+import { ImapSpecialUseType, ImapSyncStatus } from "../enum";
 import { scopedTranslation } from "../i18n";
+
+/**
+ * Map IMAP-specific special use type to the channel-agnostic SpecialFolderType.
+ * IMAP uses JUNK; messenger_folders uses SPAM for the same concept.
+ */
+function toSpecialFolderType(
+  imapType:
+    | (typeof ImapSpecialUseType)[keyof typeof ImapSpecialUseType]
+    | undefined,
+): typeof SpecialFolderTypeValue | null {
+  if (!imapType) {
+    return null;
+  }
+  if (imapType === ImapSpecialUseType.JUNK) {
+    return SpecialFolderType.SPAM;
+  }
+  // INBOX, SENT, DRAFTS, TRASH, ARCHIVE map 1:1
+  return imapType as typeof SpecialFolderTypeValue;
+}
 
 interface SyncResult {
   success: boolean;
@@ -286,8 +313,8 @@ export class ImapSyncRepository {
 
       const folders = await db
         .select()
-        .from(imapFolders)
-        .where(eq(imapFolders.accountId, account.id));
+        .from(messengerFolders)
+        .where(eq(messengerFolders.accountId, account.id));
 
       for (const folder of folders) {
         try {
@@ -402,21 +429,22 @@ export class ImapSyncRepository {
           // Check if folder exists in database
           const [existingFolder] = await db
             .select()
-            .from(imapFolders)
-            .where(eq(imapFolders.path, remoteFolder.path))
+            .from(messengerFolders)
+            .where(eq(messengerFolders.path, remoteFolder.path))
             .limit(1);
 
           if (existingFolder) {
             // Update existing folder
             await db
-              .update(imapFolders)
+              .update(messengerFolders)
               .set({
                 displayName: remoteFolder.displayName,
                 delimiter: remoteFolder.delimiter,
                 isSelectable: remoteFolder.isSelectable,
                 hasChildren: remoteFolder.hasChildren,
-                isSpecialUse: remoteFolder.isSpecialUse,
-                specialUseType: remoteFolder.specialUseType,
+                specialUseType: toSpecialFolderType(
+                  remoteFolder.specialUseType,
+                ),
                 uidValidity: remoteFolder.uidValidity,
                 uidNext: remoteFolder.uidNext,
                 messageCount: remoteFolder.messageCount,
@@ -426,21 +454,20 @@ export class ImapSyncRepository {
                 lastSyncAt: new Date(),
                 updatedAt: new Date(),
               })
-              .where(eq(imapFolders.id, existingFolder.id));
+              .where(eq(messengerFolders.id, existingFolder.id));
 
             foldersUpdated++;
             logger.debug(`Updated folder: ${remoteFolder.name}`);
           } else {
             // Create new folder
-            const newFolder: NewImapFolder = {
+            const newFolder: NewMessengerFolder = {
               name: remoteFolder.name,
               displayName: remoteFolder.displayName,
               path: remoteFolder.path,
               delimiter: remoteFolder.delimiter,
               isSelectable: remoteFolder.isSelectable,
               hasChildren: remoteFolder.hasChildren,
-              isSpecialUse: remoteFolder.isSpecialUse,
-              specialUseType: remoteFolder.specialUseType,
+              specialUseType: toSpecialFolderType(remoteFolder.specialUseType),
               uidValidity: remoteFolder.uidValidity,
               uidNext: remoteFolder.uidNext,
               messageCount: remoteFolder.messageCount,
@@ -451,7 +478,7 @@ export class ImapSyncRepository {
               lastSyncAt: new Date(),
             };
 
-            await db.insert(imapFolders).values(newFolder);
+            await db.insert(messengerFolders).values(newFolder);
             foldersAdded++;
             logger.debug(`Added folder: ${remoteFolder.name}`);
           }
@@ -511,7 +538,7 @@ export class ImapSyncRepository {
 
   static async syncFolderMessages(
     account: ImapAccountShape,
-    folder: ImapFolder,
+    folder: MessengerFolder,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<ImapSyncResult>> {

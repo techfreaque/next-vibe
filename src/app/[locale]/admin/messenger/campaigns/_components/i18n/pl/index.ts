@@ -14,8 +14,6 @@ export const translations: typeof enTranslations = {
     abTesting_description: "Konfiguruj warianty testów A/B",
     settings: "Ustawienia",
     settings_description: "Konfiguruj harmonogram kampanii",
-    monitoring: "Monitoring",
-    monitoring_description: "Stan zadań cron i historia wykonań",
   },
   quickActions: "Szybkie akcje",
   quickActionTabs: {

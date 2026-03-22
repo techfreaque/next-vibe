@@ -16,11 +16,11 @@ import type React from "react";
 
 import { EmailPreviewClient } from "@/app/[locale]/admin/messenger/campaigns/journeys/_components/email-preview-client";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import type { EmailTemplateResult } from "@/app/api/[locale]/leads/campaigns/emails";
+import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import type {
-  EmailCampaignStageValues,
-  EmailJourneyVariantValues,
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
 } from "@/app/api/[locale]/leads/enum";
 import {
   EmailCampaignStage,
@@ -28,16 +28,16 @@ import {
 } from "@/app/api/[locale]/leads/enum";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { isValidEnumValue } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
-import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 interface EmailPreviewPageProps {
   params: Promise<{
     locale: CountryLanguage;
-    journeyVariant: typeof EmailJourneyVariantValues;
-    stage: typeof EmailCampaignStageValues;
+    journeyVariant: typeof EmailJourneyVariantValue;
+    stage: typeof EmailCampaignStageValue;
   }>;
 }
 
@@ -51,8 +51,8 @@ interface JourneyEntry {
 export interface EmailPreviewPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
-  journeyVariant: typeof EmailJourneyVariantValues;
-  stage: typeof EmailCampaignStageValues;
+  journeyVariant: typeof EmailJourneyVariantValue;
+  stage: typeof EmailCampaignStageValue;
   emailPreview: EmailTemplateResult;
   journeyName: string;
   allJourneyEntries: JourneyEntry[];

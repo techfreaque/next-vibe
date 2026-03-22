@@ -6,6 +6,8 @@
 
 import { z } from "zod";
 
+import type { CronTaskRecentExecution } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
+
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -790,5 +792,24 @@ export type CronTaskCreateResponseOutput = typeof POST.types.ResponseOutput;
 
 // Individual task type — derived from canonical schema (includes all fields)
 export type CronTaskResponseType = z.infer<typeof cronTaskResponseSchema>;
+
+export type CronTaskItem = Pick<
+  CronTaskResponseType,
+  | "shortId"
+  | "enabled"
+  | "displayName"
+  | "description"
+  | "schedule"
+  | "lastExecutedAt"
+  | "lastExecutionStatus"
+  | "lastExecutionDuration"
+  | "errorCount"
+  | "routeId"
+  | "priority"
+  | "consecutiveFailures"
+> & {
+  lastResultSummary: string | null;
+  recentExecutions: CronTaskRecentExecution[] | null;
+};
 
 export default endpoints;

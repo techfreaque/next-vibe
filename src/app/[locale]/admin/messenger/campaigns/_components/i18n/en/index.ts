@@ -12,8 +12,6 @@ export const translations = {
     abTesting_description: "Configure A/B testing variants",
     settings: "Settings",
     settings_description: "Configure campaign scheduler settings",
-    monitoring: "Monitoring",
-    monitoring_description: "Cron task health and execution history",
   },
   quickActions: "Quick Actions",
   quickActionTabs: {

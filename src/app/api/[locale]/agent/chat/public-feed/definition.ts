@@ -210,6 +210,13 @@ const { GET } = createEndpoint({
     },
   }),
 
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
+
   successTypes: {
     title: "get.success.title" as const,
     description: "get.success.description" as const,

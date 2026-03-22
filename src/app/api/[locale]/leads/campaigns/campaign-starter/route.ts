@@ -1,6 +1,6 @@
 /**
  * Campaign Starter Route Handler
- * Called by cron to start campaigns for new leads
+ * POST: save config + run, GET: read config
  */
 
 import "server-only";
@@ -11,11 +11,16 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import definitions from "./definition";
 import { CampaignStarterRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { POST, GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger, locale }) =>
-      CampaignStarterRepository.run(data, logger, locale),
+    handler: ({ data, user, t, logger }) =>
+      CampaignStarterRepository.run(data, user, t, logger),
+  },
+  [Methods.GET]: {
+    email: undefined,
+    handler: ({ user, t, logger }) =>
+      CampaignStarterRepository.getConfig(user, t, logger),
   },
 });

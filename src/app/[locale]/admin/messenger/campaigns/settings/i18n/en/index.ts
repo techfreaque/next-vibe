@@ -4,6 +4,7 @@ export const translations = {
     campaignStarter: "Campaign Starter",
     emailCampaigns: "Email Campaigns",
     bounceProcessor: "Bounce Processor",
+    haltAll: "Halt All",
   },
   post: {
     title: "Campaign Starter",

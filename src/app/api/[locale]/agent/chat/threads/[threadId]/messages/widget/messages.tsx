@@ -1,11 +1,11 @@
 "use client";
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
+import { success } from "next-vibe/shared/types/response.schema";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import {
   useCallback,
@@ -30,12 +30,12 @@ import {
 } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
-import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
+import characterDefinitions from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import { parseError } from "next-vibe/shared/utils";
 
@@ -50,22 +50,22 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { platform } from "@/config/env-client";
 
-import folderContentsDefinition from "../../../../folder-contents/[rootFolderId]/definition";
 import type { MessageMetadata } from "../../../../db";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
+import folderContentsDefinition from "../../../../folder-contents/[rootFolderId]/definition";
 import messagesDefinition from "../definition";
 import { loadMessageAttachments } from "../hooks/load-message-attachments";
+import { patchMessage, upsertMessage } from "../hooks/update-messages";
 import { useBranchManagement } from "../hooks/use-branch-management";
 import { useCollapseState } from "../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../hooks/use-message-editor-store";
 import { useMessagesSubscription } from "../hooks/use-messages-subscription";
 import { useMessageOperations } from "../hooks/use-operations";
-import pathDefinitions from "../path/definition";
-import { patchMessage, upsertMessage } from "../hooks/update-messages";
 import { scopedTranslation } from "../i18n";
+import pathDefinitions from "../path/definition";
 import { FlatMessageView } from "./flat-view/view";
-import { DebugLinearMessageView } from "./linear-view/view-debug";
 import { LinearMessageView } from "./linear-view/view";
+import { DebugLinearMessageView } from "./linear-view/view-debug";
 import { groupMessagesBySequence } from "./message-grouping";
 import { ThreadedMessage } from "./threaded-view/view";
 

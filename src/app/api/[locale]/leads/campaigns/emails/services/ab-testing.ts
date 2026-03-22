@@ -23,35 +23,9 @@ import type { ABTestConfig } from "../types";
 import { scopedTranslation } from "./i18n";
 
 /**
- * A/B Test Constants
- */
-const AB_TEST_CONSTANTS = {
-  CHARACTERS: {
-    SARAH: {
-      name: "Sarah",
-      title: "Social Media Strategist",
-      avatar: "S",
-      personality: "warm and consultative",
-    },
-    MARCUS: {
-      name: "Marcus",
-      title: "Growth Analytics Manager",
-      avatar: "M",
-      personality: "data-driven and results-oriented",
-    },
-    ALEX: {
-      name: "Alex",
-      title: "Business Development Director",
-      avatar: "A",
-      personality: "direct and action-focused",
-    },
-  },
-} as const;
-
-/**
  * Journey Variant Static Metadata (non-translatable parts)
  */
-const JOURNEY_VARIANT_STATIC_METADATA: Partial<
+const JOURNEY_VARIANT_METADATA: Partial<
   Record<
     (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
     {
@@ -95,9 +69,6 @@ const JOURNEY_VARIANT_STATIC_METADATA: Partial<
     ] as const,
   },
 };
-
-// Keep old metadata export for backwards compat (used in external exports)
-const JOURNEY_VARIANT_METADATA = JOURNEY_VARIANT_STATIC_METADATA;
 
 /**
  * Default A/B Test Configuration
@@ -277,6 +248,9 @@ export function validateABTestConfig(
 
   // Check if all variants have positive weights
   for (const [variant, variantConfig] of Object.entries(config.variants)) {
+    if (!variantConfig) {
+      continue;
+    }
     if (variantConfig.weight <= 0) {
       errors.push(
         fail({
@@ -331,7 +305,7 @@ export function getABTestSummary(
     enabled: config.isActive,
     totalVariants: Object.keys(config.variants).length,
     variants: variants.map(([key, variant]) => {
-      const staticMeta = JOURNEY_VARIANT_STATIC_METADATA[key];
+      const staticMeta = JOURNEY_VARIANT_METADATA[key];
 
       let name: string;
       let description: string;
@@ -379,8 +353,3 @@ export function getABTestSummary(
     isValid: validation.isValid,
   };
 }
-
-/**
- * Export constants and metadata for external use
- */
-export { AB_TEST_CONSTANTS, DEFAULT_AB_TEST_CONFIG, JOURNEY_VARIANT_METADATA };

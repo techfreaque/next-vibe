@@ -20,6 +20,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import {
+  CronTaskPriorityDB,
+  CronTaskStatusDB,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
@@ -187,6 +191,241 @@ const { GET } = createEndpoint({
         }),
       }),
 
+      quotaProgress: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.quotaProgress",
+        description: "get.response.quotaProgress",
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            locale: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.quotaProgress",
+              schema: z.string(),
+            }),
+            weeklyQuota: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.total",
+              schema: z.number(),
+            }),
+            startedThisWeek: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.sent",
+              schema: z.number(),
+            }),
+            remaining: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.pending",
+              schema: z.number(),
+            }),
+          },
+        }),
+      }),
+
+      campaignTasks: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.campaignTasks",
+        description: "get.response.campaignTasks",
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            id: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string(),
+            }),
+            shortId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string(),
+            }),
+            routeId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string(),
+            }),
+            displayName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string(),
+            }),
+            schedule: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string(),
+            }),
+            enabled: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.boolean(),
+            }),
+            priority: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.enum(CronTaskPriorityDB),
+            }),
+            lastExecutedAt: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string().nullable(),
+            }),
+            nextExecutionAt: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string().nullable(),
+            }),
+            executionCount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.number(),
+            }),
+            successCount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.number(),
+            }),
+            averageExecutionTime: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.number().nullable(),
+            }),
+            lastResultSummary: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.campaignTasks",
+              schema: z.string().nullable(),
+            }),
+            recentExecutions: responseArrayField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "get.response.campaignTasks",
+              description: "get.response.campaignTasks",
+              child: objectField(scopedTranslation, {
+                type: WidgetType.CONTAINER,
+                layoutType: LayoutType.GRID,
+                columns: 12,
+                usage: { response: true },
+                children: {
+                  status: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    content: "get.response.campaignTasks",
+                    schema: z.enum(CronTaskStatusDB),
+                  }),
+                  completedAt: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    content: "get.response.campaignTasks",
+                    schema: z.string().nullable(),
+                  }),
+                  durationMs: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    content: "get.response.campaignTasks",
+                    schema: z.number().nullable(),
+                  }),
+                  resultSnippet: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    content: "get.response.campaignTasks",
+                    schema: z.string().nullable(),
+                  }),
+                  errorSnippet: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    content: "get.response.campaignTasks",
+                    schema: z.string().nullable(),
+                  }),
+                },
+              }),
+            }),
+          },
+        }),
+      }),
+
+      alerts: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.alerts",
+        description: "get.response.alerts",
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            taskId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.alerts",
+              schema: z.string(),
+            }),
+            taskName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.alerts",
+              schema: z.string(),
+            }),
+            priority: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.alerts",
+              schema: z.enum(CronTaskPriorityDB),
+            }),
+            consecutiveFailures: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.alerts",
+              schema: z.number(),
+            }),
+            lastError: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.alerts",
+              schema: z.string().nullable(),
+            }),
+            lastFailedAt: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.alerts",
+              schema: z.string().nullable(),
+            }),
+          },
+        }),
+      }),
+
+      taskStats: objectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          totalTasks: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.taskStats",
+            schema: z.number(),
+          }),
+          enabledTasks: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.taskStats",
+            schema: z.number(),
+          }),
+          disabledTasks: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.taskStats",
+            schema: z.number(),
+          }),
+          successRate24h: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.taskStats",
+            schema: z.number().nullable(),
+          }),
+          failedTasks24h: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.taskStats",
+            schema: z.number(),
+          }),
+          // eslint-disable-next-line i18next/no-literal-string
+          systemHealth: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "get.response.taskStats",
+            schema: z.enum(["healthy", "warning", "critical"]),
+          }),
+        },
+      }),
+
       byJourneyVariant: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.response.byJourneyVariant",
@@ -294,6 +533,17 @@ const { GET } = createEndpoint({
         emailsScheduledToday: 0,
         byStage: [],
         byJourneyVariant: [],
+        quotaProgress: [],
+        campaignTasks: [],
+        alerts: [],
+        taskStats: {
+          totalTasks: 0,
+          enabledTasks: 0,
+          disabledTasks: 0,
+          successRate24h: null,
+          failedTasks24h: 0,
+          systemHealth: "healthy" as const,
+        },
       },
     },
   },

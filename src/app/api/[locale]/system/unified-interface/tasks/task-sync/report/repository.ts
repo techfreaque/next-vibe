@@ -12,17 +12,18 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { fail, success } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { NewCronTask } from "../../cron/db";
 import { cronTaskExecutions, cronTasks } from "../../cron/db";
 import { CronTaskStatus } from "../../enum";
-import { handleTaskCompletion } from "../../task-completion-handler";
-import type { ReportRequestOutput, ReportResponseOutput } from "./definition";
 import { scopedTranslation } from "../../i18n";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { handleTaskCompletion } from "../../task-completion-handler";
+import type { JsonValue } from "../../unified-runner/types";
+import type { ReportRequestOutput, ReportResponseOutput } from "./definition";
 
 export class TaskReportRepository {
   static async processReport(
@@ -78,7 +79,9 @@ export class TaskReportRepository {
                 ? CronTaskStatus.TIMEOUT
                 : CronTaskStatus.FAILED;
 
-        const updates: Partial<NewCronTask> & { updatedAt: Date } = {
+        const updates: Partial<NewCronTask<Record<string, JsonValue>>> & {
+          updatedAt: Date;
+        } = {
           lastExecutedAt: now,
           lastExecutionStatus: finalStatus,
           lastExecutionDuration: data.durationMs ?? null,

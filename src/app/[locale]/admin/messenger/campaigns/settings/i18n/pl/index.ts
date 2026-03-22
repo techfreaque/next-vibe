@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     campaignStarter: "Starter kampanii",
     emailCampaigns: "Kampanie e-mailowe",
     bounceProcessor: "Przetwarzanie zwrotów",
+    haltAll: "Zatrzymaj wszystko",
   },
   post: {
     title: "Tytuł",

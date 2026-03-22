@@ -1,6 +1,7 @@
 /**
  * Campaign Starter Repository
  * Handles business logic for campaign starter operations
+ * Includes config management (get, update, ensureExists) merged from campaign-starter-config
  */
 
 import "server-only";
@@ -13,11 +14,20 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
+import {
+  cronTasks,
+  type NewCronTask,
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
@@ -30,28 +40,293 @@ import {
   isStatusTransitionAllowed,
   LeadStatus,
 } from "../../enum";
-import { CampaignStarterConfigRepository } from "./campaign-starter-config/repository";
+import { type CampaignStarterConfig, campaignStarterConfigs } from "./db";
 import type {
+  CampaignStarterConfigGetResponseOutput,
   CampaignStarterPostRequestOutput,
   CampaignStarterPostResponseOutput,
 } from "./definition";
-import { scopedTranslation } from "./i18n";
 import type { CampaignsCampaignStarterT } from "./i18n";
-import type {
-  CampaignStarterConfigType,
-  CampaignStarterResultType,
-} from "./types";
 
-/**
- * Campaign Starter Repository Implementation
- */
+// ─── Default config helpers ───────────────────────────────────────────────────
+
+function getDefaultLocaleEntry(): {
+  leadsPerWeek: number;
+  enabledDays: number[];
+  enabledHours: { start: number; end: number };
+} {
+  return {
+    leadsPerWeek: 0,
+    enabledDays: [1, 2, 3, 4, 5],
+    enabledHours: { start: 7, end: 15 },
+  };
+}
+
+function getDefaultCampaignConfig(): CampaignStarterConfigGetResponseOutput {
+  const isProduction = env.NODE_ENV === Environment.PRODUCTION;
+  return {
+    dryRun: false,
+    minAgeHours: 0,
+    localeConfig: {
+      "en-GLOBAL": getDefaultLocaleEntry(),
+      "de-DE": getDefaultLocaleEntry(),
+      "pl-PL": getDefaultLocaleEntry(),
+    },
+    // eslint-disable-next-line i18next/no-literal-string
+    schedule: isProduction ? "*/5 * * * *" : "*/1 * * * *",
+    enabled: false,
+    priority: isProduction ? CronTaskPriority.MEDIUM : CronTaskPriority.LOW,
+    timeout: isProduction ? 300000 : 180000,
+    retries: isProduction ? 3 : 2,
+    retryDelay: isProduction ? 30000 : 15000,
+  };
+}
+
+// ─── Repository ───────────────────────────────────────────────────────────────
+
 export class CampaignStarterRepository {
+  private static getCurrentEnvironment(): Environment {
+    return env.NODE_ENV === Environment.PRODUCTION
+      ? Environment.PRODUCTION
+      : Environment.DEVELOPMENT;
+  }
+
+  private static async formatConfigResponse(
+    dbConfig: CampaignStarterConfig,
+  ): Promise<CampaignStarterConfigGetResponseOutput> {
+    const defaults = getDefaultCampaignConfig();
+    const [cronTask] = await db
+      .select()
+      .from(cronTasks)
+      .where(eq(cronTasks.routeId, "campaign-starter"))
+      .limit(1);
+
+    if (!cronTask) {
+      return {
+        dryRun: dbConfig.dryRun === 1,
+        minAgeHours: dbConfig.minAgeHours,
+        localeConfig: dbConfig.localeConfig,
+        schedule: defaults.schedule,
+        enabled: defaults.enabled,
+        priority: defaults.priority,
+        timeout: defaults.timeout,
+        retries: defaults.retries,
+        retryDelay: defaults.retryDelay,
+      };
+    }
+
+    return {
+      dryRun: dbConfig.dryRun === 1,
+      minAgeHours: dbConfig.minAgeHours,
+      localeConfig: dbConfig.localeConfig,
+      schedule: cronTask.schedule,
+      enabled: cronTask.enabled ?? false,
+      priority: cronTask.priority,
+      timeout: cronTask.timeout ?? defaults.timeout,
+      retries: cronTask.retries ?? defaults.retries,
+      retryDelay: cronTask.retryDelay ?? defaults.retryDelay,
+    };
+  }
+
+  private static async saveCronTaskSettings(
+    config: CampaignStarterConfigGetResponseOutput,
+  ): Promise<void> {
+    const [existingCronTask] = await db
+      .select()
+      .from(cronTasks)
+      .where(eq(cronTasks.routeId, "campaign-starter"))
+      .limit(1);
+
+    const taskInput: CampaignStarterPostRequestOutput = {
+      dryRun: config.dryRun,
+      force: false,
+      minAgeHours: config.minAgeHours,
+      localeConfig: config.localeConfig,
+      schedule: config.schedule,
+      enabled: config.enabled,
+      priority: config.priority,
+      timeout: config.timeout,
+      retries: config.retries,
+      retryDelay: config.retryDelay,
+    };
+
+    const cronData: NewCronTask<CampaignStarterPostRequestOutput> = {
+      id: "campaign-starter",
+      shortId: "campaign-starter",
+      routeId: "campaign-starter",
+      displayName: "campaign-starter",
+      version: "1.0.0",
+      category: TaskCategory.LEAD_MANAGEMENT,
+      // eslint-disable-next-line i18next/no-literal-string
+      description: "Campaign starter cron task",
+      schedule: config.schedule,
+      enabled: config.enabled,
+      priority: config.priority,
+      timeout: config.timeout,
+      retries: config.retries,
+      retryDelay: config.retryDelay,
+      taskInput,
+      updatedAt: new Date(),
+    };
+
+    if (existingCronTask) {
+      await db
+        .update(cronTasks)
+        .set(cronData)
+        .where(eq(cronTasks.routeId, "campaign-starter"));
+    } else {
+      await db.insert(cronTasks).values(cronData);
+    }
+  }
+
+  private static formatConfigForDb(
+    config: CampaignStarterConfigGetResponseOutput,
+    environment: string,
+  ): CampaignStarterConfig {
+    return {
+      id: crypto.randomUUID(),
+      environment,
+      dryRun: config.dryRun ? 1 : 0,
+      minAgeHours: config.minAgeHours,
+      localeConfig: config.localeConfig,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
+  static async getConfig(
+    user: { id: string },
+    t: CampaignsCampaignStarterT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
+    try {
+      const environment = CampaignStarterRepository.getCurrentEnvironment();
+      logger.info("Fetching campaign starter config", {
+        environment,
+        userId: user.id,
+      });
+
+      const [existingConfig] = await db
+        .select()
+        .from(campaignStarterConfigs)
+        .where(eq(campaignStarterConfigs.environment, environment))
+        .limit(1);
+
+      if (existingConfig) {
+        const config =
+          await CampaignStarterRepository.formatConfigResponse(existingConfig);
+        return success(config);
+      }
+
+      return success(getDefaultCampaignConfig());
+    } catch (error) {
+      logger.error("Error fetching campaign starter config", parseError(error));
+      return fail({
+        message: t("get.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  static async updateConfig(
+    data: CampaignStarterConfigGetResponseOutput,
+    user: { id: string },
+    t: CampaignsCampaignStarterT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<void>> {
+    try {
+      const environment = CampaignStarterRepository.getCurrentEnvironment();
+      logger.info("Updating campaign starter config", {
+        environment,
+        userId: user.id,
+        dryRun: data.dryRun,
+        enabled: data.enabled,
+      });
+
+      const dbConfig = CampaignStarterRepository.formatConfigForDb(
+        data,
+        environment,
+      );
+
+      const [existingConfig] = await db
+        .select()
+        .from(campaignStarterConfigs)
+        .where(eq(campaignStarterConfigs.environment, environment))
+        .limit(1);
+
+      if (existingConfig) {
+        await db
+          .update(campaignStarterConfigs)
+          .set(dbConfig)
+          .where(eq(campaignStarterConfigs.environment, environment));
+      } else {
+        await db.insert(campaignStarterConfigs).values({
+          ...dbConfig,
+          createdAt: new Date(),
+        });
+      }
+
+      await CampaignStarterRepository.saveCronTaskSettings(data);
+
+      return success();
+    } catch (error) {
+      logger.error("Error updating campaign starter config", parseError(error));
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  static async ensureConfigExists(
+    user: { id: string },
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
+    try {
+      const environment = CampaignStarterRepository.getCurrentEnvironment();
+      logger.info("Ensuring config exists", {
+        environment,
+        userId: user.id,
+        locale,
+      });
+
+      const [existingConfig] = await db
+        .select()
+        .from(campaignStarterConfigs)
+        .where(eq(campaignStarterConfigs.environment, environment))
+        .limit(1);
+
+      if (existingConfig) {
+        const config =
+          await CampaignStarterRepository.formatConfigResponse(existingConfig);
+        return success(config);
+      }
+
+      const defaultConfig = getDefaultCampaignConfig();
+      const dbConfig = CampaignStarterRepository.formatConfigForDb(
+        defaultConfig,
+        environment,
+      );
+
+      await db.insert(campaignStarterConfigs).values({
+        ...dbConfig,
+        createdAt: new Date(),
+      });
+
+      return success(defaultConfig);
+    } catch (error) {
+      logger.error("Error ensuring config exists", parseError(error));
+      return success(getDefaultCampaignConfig());
+    }
+  }
+
   static async processLocaleLeads(
     locale: CountryLanguage,
     leadsPerRun: number | undefined,
     minAgeDate: Date,
-    config: CampaignStarterConfigType,
-    result: CampaignStarterResultType,
+    config: CampaignStarterConfigGetResponseOutput,
+    result: CampaignStarterPostResponseOutput,
     logger: EndpointLogger,
     t: CampaignsCampaignStarterT,
   ): Promise<ResponseType<void>> {
@@ -65,8 +340,6 @@ export class CampaignStarterRepository {
 
       const languageCode = getLanguageFromLocale(locale);
 
-      // Get current SMTP sending capacity to determine optimal queue size
-      // Use system/public user context for cron job
       const SYSTEM_LEAD_ID = "00000000-0000-0000-0000-000000000000";
       const smtpT = smtpScopedTranslation.scopedT(locale).t;
       const capacityResult = await SmtpRepository.getTotalSendingCapacity(
@@ -74,17 +347,15 @@ export class CampaignStarterRepository {
         {
           isPublic: true,
           leadId: SYSTEM_LEAD_ID,
-          roles: [UserPermissionRole.PUBLIC],
+          roles: [],
         },
         smtpT,
         logger,
       );
       const totalRemainingCapacity = capacityResult.success
         ? capacityResult.data.remainingCapacity
-        : 100; // Fallback
+        : 100;
 
-      // Check how many PENDING leads already exist globally (not per locale)
-      // Queue management should be global since SMTP accounts are shared
       const [globalPendingCount] = await db
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(leads)
@@ -94,26 +365,20 @@ export class CampaignStarterRepository {
 
       const existingGlobalPending = globalPendingCount?.count || 0;
 
-      // Calculate intelligent queue size based on SMTP capacity
-      // Queue should be 2-3x the hourly sending capacity to ensure smooth processing
-      const optimalQueueSize = Math.max(totalRemainingCapacity * 2, 100); // At least 100 for small setups
+      const optimalQueueSize = Math.max(totalRemainingCapacity * 2, 100);
       const globalAvailableSlots = Math.max(
         0,
         optimalQueueSize - existingGlobalPending,
       );
 
-      // Calculate this locale's fair share of available slots
-      // This ensures fair distribution across locales while respecting global capacity
       const totalConfiguredLocales = Object.keys(
-        config.leadsPerWeek || {},
+        config.localeConfig || {},
       ).length;
       const localeShare =
         totalConfiguredLocales > 0
           ? Math.ceil(globalAvailableSlots / totalConfiguredLocales)
           : globalAvailableSlots;
 
-      // Final adjustment: don't exceed requested amount or available queue slots
-      // Note: We don't limit by totalRemainingCapacity because queue is for future processing
       const adjustedLeadsPerRun = Math.min(leadsPerRun || 0, localeShare);
 
       logger.debug("Intelligent campaign starter queue management", {
@@ -145,9 +410,7 @@ export class CampaignStarterRepository {
         return success();
       }
 
-      // Query for NEW leads in this locale that are old enough to start campaigns
-      // Only process leads with email addresses since campaigns require emails
-      const query = db
+      const localeLeads = await db
         .select()
         .from(leads)
         .where(
@@ -156,24 +419,21 @@ export class CampaignStarterRepository {
             eq(leads.language, languageCode),
             lt(leads.createdAt, minAgeDate),
             isNull(leads.lastEmailSentAt),
-            isNotNull(leads.email), // Only process leads with email addresses
+            isNotNull(leads.email),
           ),
         )
-        .orderBy(leads.createdAt); // Process oldest leads first
-
-      const localeLeads = await query.limit(adjustedLeadsPerRun);
+        .orderBy(leads.createdAt)
+        .limit(adjustedLeadsPerRun);
 
       if (localeLeads.length === 0) {
         return success();
       }
 
-      // Process each lead
       for (const lead of localeLeads) {
         try {
           if (config.dryRun) {
             result.leadsStarted++;
           } else {
-            // Validate status transition before updating
             if (
               !isStatusTransitionAllowed(
                 lead.status,
@@ -188,7 +448,6 @@ export class CampaignStarterRepository {
               continue;
             }
 
-            // Update lead status to PENDING so email campaign can pick it up
             const now = new Date();
             await db
               .update(leads)
@@ -208,7 +467,7 @@ export class CampaignStarterRepository {
           const errorMessage = parseError(error).message;
           result.errors.push({
             leadId: lead.id,
-            email: lead.email!, // Email is guaranteed to exist since we filtered in the database query
+            email: lead.email!,
             error: errorMessage,
           });
 
@@ -242,26 +501,21 @@ export class CampaignStarterRepository {
     try {
       logger.debug("Getting failed leads count for rebalancing", { locale });
 
-      // Extract language code from locale (e.g., "en-GLOBAL" -> "en")
       const languageCode = getLanguageFromLocale(locale);
 
-      // Define failed states that should trigger rebalancing
       const failedStates = [
         LeadStatus.BOUNCED,
         LeadStatus.INVALID,
-        LeadStatus.UNSUBSCRIBED, // Optional: include unsubscribed if you want to rebalance them too
+        LeadStatus.UNSUBSCRIBED,
       ];
 
-      // Get the start of current week (Monday 00:00 UTC)
       const now = new Date();
       const currentDay = now.getUTCDay();
-      const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1; // Sunday = 0, so 6 days from Monday
+      const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1;
       const startOfWeek = new Date(now);
       startOfWeek.setUTCDate(now.getUTCDate() - daysFromMonday);
       startOfWeek.setUTCHours(0, 0, 0, 0);
 
-      // Count leads that were updated to failed states this week
-      // but haven't been rebalanced yet
       const failedLeads = await db
         .select({ count: sql<number>`count(*)` })
         .from(leads)
@@ -270,7 +524,6 @@ export class CampaignStarterRepository {
             eq(leads.language, languageCode),
             inArray(leads.status, failedStates),
             gte(leads.updatedAt, startOfWeek),
-            // Only count leads that haven't been marked as rebalanced yet
             sql`NOT (COALESCE(${leads.metadata}, '{}')::jsonb ? 'rebalanced')`,
           ),
         );
@@ -310,17 +563,14 @@ export class CampaignStarterRepository {
         locale,
       });
 
-      // Extract language code from locale (e.g., "en-GLOBAL" -> "en")
       const languageCode = getLanguageFromLocale(locale);
 
-      // Define failed states that should trigger rebalancing
       const failedStates = [
         LeadStatus.BOUNCED,
         LeadStatus.INVALID,
         LeadStatus.UNSUBSCRIBED,
       ];
 
-      // Get the start of current week (Monday 00:00 UTC)
       const now = new Date();
       const currentDay = now.getUTCDay();
       const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1;
@@ -328,8 +578,6 @@ export class CampaignStarterRepository {
       startOfWeek.setUTCDate(now.getUTCDate() - daysFromMonday);
       startOfWeek.setUTCHours(0, 0, 0, 0);
 
-      // Update failed leads to mark them as processed for rebalancing
-      // We add a special metadata flag to track this
       await db
         .update(leads)
         .set({
@@ -341,7 +589,6 @@ export class CampaignStarterRepository {
             eq(leads.language, languageCode),
             inArray(leads.status, failedStates),
             gte(leads.updatedAt, startOfWeek),
-            // Only update leads that haven't been marked as rebalanced yet
             sql`NOT (COALESCE(${leads.metadata}, '{}')::jsonb ? 'rebalanced')`,
           ),
         );
@@ -365,10 +612,6 @@ export class CampaignStarterRepository {
     }
   }
 
-  /**
-   * Count leads that have been started into campaigns this week for a given locale.
-   * Uses campaignStartedAt to track when campaign-starter transitioned a lead to PENDING.
-   */
   static async getLeadsStartedThisWeek(
     locale: CountryLanguage,
     startOfWeek: Date,
@@ -397,25 +640,54 @@ export class CampaignStarterRepository {
     }
   }
 
+  private static calculatePerRunBudget(
+    weeklyQuota: number,
+    schedule: string,
+    enabledDays: number[],
+    enabledHours: { start: number; end: number },
+    logger: EndpointLogger,
+  ): { perRunBudget: number; totalRunsPerWeek: number } {
+    const frequencyMinutes = getCronFrequencyMinutes(schedule, logger);
+    const runsPerHour = 60 / frequencyMinutes;
+    const enabledHoursCount = Math.max(
+      0,
+      enabledHours.end - enabledHours.start,
+    );
+    const enabledDaysCount = enabledDays.length;
+    const totalRunsPerWeek = runsPerHour * enabledHoursCount * enabledDaysCount;
+    if (totalRunsPerWeek <= 0) {
+      return { perRunBudget: 0, totalRunsPerWeek: 0 };
+    }
+    return {
+      perRunBudget: Math.floor(weeklyQuota / totalRunsPerWeek),
+      totalRunsPerWeek,
+    };
+  }
+
   static async run(
     data: CampaignStarterPostRequestOutput,
+    user: { id: string },
+    t: CampaignsCampaignStarterT,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<ResponseType<CampaignStarterPostResponseOutput>> {
-    const { t } = scopedTranslation.scopedT(locale);
-    const systemUser: JwtPrivatePayloadType = {
-      id: "00000000-0000-0000-0000-000000000001",
-      leadId: "00000000-0000-0000-0000-000000000000",
-      isPublic: false,
-      roles: [UserPermissionRole.ADMIN],
-    };
+    const saveResult = await CampaignStarterRepository.updateConfig(
+      data,
+      user,
+      t,
+      logger,
+    );
+    if (!saveResult.success) {
+      return saveResult as never;
+    }
 
-    const configResult =
-      await CampaignStarterConfigRepository.ensureConfigExists(
-        systemUser,
-        locale,
-        logger,
-      );
+    const locale = (Object.keys(data.localeConfig)[0] ??
+      "en-GLOBAL") as CountryLanguage;
+
+    const configResult = await CampaignStarterRepository.ensureConfigExists(
+      user,
+      locale,
+      logger,
+    );
 
     if (!configResult.success || !configResult.data) {
       return fail({
@@ -424,7 +696,6 @@ export class CampaignStarterRepository {
       });
     }
 
-    // Allow request dryRun to override config dryRun
     const config = { ...configResult.data, dryRun: data.dryRun };
 
     if (!config.enabled) {
@@ -434,53 +705,23 @@ export class CampaignStarterRepository {
         leadsStarted: 0,
         leadsSkipped: 0,
         executionTimeMs: 0,
+        errors: [],
+        quotaDetails: [],
       });
     }
 
     const startTime = Date.now();
     const now = new Date();
+    const currentDay = now.getUTCDay() || 7;
+    const currentHour = now.getUTCHours();
 
-    // Skip day/hour checks when force=true (manual UI trigger)
-    if (!data.force) {
-      const currentDay = now.getUTCDay() || 7;
-      const currentHour = now.getUTCHours();
-
-      if (!config.enabledDays.includes(currentDay)) {
-        logger.debug("Campaign starter skipped: not an enabled day", {
-          currentDay,
-          enabledDays: config.enabledDays,
-        });
-        return success({
-          leadsProcessed: 0,
-          leadsStarted: 0,
-          leadsSkipped: 0,
-          executionTimeMs: Date.now() - startTime,
-        });
-      }
-
-      if (
-        currentHour < config.enabledHours.start ||
-        currentHour > config.enabledHours.end
-      ) {
-        logger.debug("Campaign starter skipped: outside enabled hours", {
-          currentHour,
-          enabledHours: config.enabledHours,
-        });
-        return success({
-          leadsProcessed: 0,
-          leadsStarted: 0,
-          leadsSkipped: 0,
-          executionTimeMs: Date.now() - startTime,
-        });
-      }
-    }
-
-    const result: CampaignStarterResultType = {
+    const result: CampaignStarterPostResponseOutput = {
       leadsProcessed: 0,
       leadsStarted: 0,
       leadsSkipped: 0,
       executionTimeMs: 0,
       errors: [],
+      quotaDetails: [],
     };
 
     const minAgeDate = new Date();
@@ -492,11 +733,44 @@ export class CampaignStarterRepository {
     startOfWeek.setUTCHours(0, 0, 0, 0);
 
     for (const localeValue of Object.values(CountryLanguageValues)) {
-      const weeklyQuota = config.leadsPerWeek[localeValue];
-      if (weeklyQuota === undefined) {
+      const localeEntry = config.localeConfig[localeValue];
+      if (localeEntry === undefined) {
         continue;
       }
+      const {
+        leadsPerWeek: weeklyQuota,
+        enabledDays,
+        enabledHours,
+      } = localeEntry;
       const weeklyQuotaNum = typeof weeklyQuota === "number" ? weeklyQuota : 0;
+
+      if (!data.force) {
+        if (!enabledDays.includes(currentDay)) {
+          logger.debug("Campaign starter skipped locale: not an enabled day", {
+            locale: localeValue,
+            currentDay,
+            enabledDays,
+          });
+          result.leadsSkipped++;
+          continue;
+        }
+
+        if (
+          currentHour < enabledHours.start ||
+          currentHour > enabledHours.end
+        ) {
+          logger.debug(
+            "Campaign starter skipped locale: outside enabled hours",
+            {
+              locale: localeValue,
+              currentHour,
+              enabledHours,
+            },
+          );
+          result.leadsSkipped++;
+          continue;
+        }
+      }
 
       const startedThisWeek =
         await CampaignStarterRepository.getLeadsStartedThisWeek(
@@ -510,6 +784,26 @@ export class CampaignStarterRepository {
         continue;
       }
 
+      const { perRunBudget, totalRunsPerWeek } =
+        CampaignStarterRepository.calculatePerRunBudget(
+          weeklyQuotaNum,
+          config.schedule,
+          enabledDays,
+          enabledHours,
+          logger,
+        );
+
+      if (perRunBudget <= 0) {
+        logger.debug("Campaign starter skipped locale: per-run budget is 0", {
+          locale: localeValue,
+          weeklyQuota: weeklyQuotaNum,
+          totalRunsPerWeek,
+        });
+        continue;
+      }
+
+      const leadsThisRun = Math.min(perRunBudget, remainingQuota);
+
       const failedLeadsCountResult =
         await CampaignStarterRepository.getFailedLeadsCount(
           localeValue,
@@ -520,7 +814,9 @@ export class CampaignStarterRepository {
         ? failedLeadsCountResult.data
         : 0;
 
-      const adjustedLeadsPerRun = remainingQuota + failedLeadsCount;
+      const adjustedLeadsPerRun = leadsThisRun + failedLeadsCount;
+
+      const leadsStartedBefore = result.leadsStarted;
 
       await CampaignStarterRepository.processLocaleLeads(
         localeValue,
@@ -531,6 +827,21 @@ export class CampaignStarterRepository {
         logger,
         t,
       );
+
+      const dispatched = result.leadsStarted - leadsStartedBefore;
+
+      const quotaDetail: NonNullable<
+        CampaignStarterPostResponseOutput["quotaDetails"]
+      >[number] = {
+        locale: localeValue,
+        weeklyQuota: weeklyQuotaNum,
+        leadsStartedThisWeek: startedThisWeek,
+        remainingQuota,
+        totalRunsPerWeek,
+        perRunBudget,
+        dispatched,
+      };
+      result.quotaDetails = [...(result.quotaDetails ?? []), quotaDetail];
 
       if (failedLeadsCount > 0) {
         await CampaignStarterRepository.markFailedLeadsAsProcessed(
@@ -548,6 +859,8 @@ export class CampaignStarterRepository {
       leadsStarted: result.leadsStarted,
       leadsSkipped: result.leadsSkipped,
       executionTimeMs: result.executionTimeMs,
+      errors: result.errors,
+      quotaDetails: result.quotaDetails,
     });
   }
 }

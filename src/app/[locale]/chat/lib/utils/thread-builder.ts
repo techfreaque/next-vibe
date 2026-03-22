@@ -2,16 +2,26 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { BRANCH_INDEX_KEY } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-branch-management";
 
 /**
- * Returns true if the given siblings represent actual user-facing branches
- * (i.e. they have at least two distinct sequenceIds).
+ * Returns true if the given siblings represent actual user-facing branches.
  *
- * Parallel tool calls from a single AI step all share the same sequenceId —
- * they should NOT trigger the branch navigator. Only branches created by
- * retrying / editing messages (each gets a new sequenceId) are real branches.
+ * Parallel tool calls from a single AI step all share the same non-null sequenceId —
+ * they should NOT trigger the branch navigator.
+ * User messages always have sequenceId=null, so multiple user-message siblings are
+ * always real branches (retry/edit creates a new sibling user message).
  */
 function isRealBranch(siblings: ChatMessage[]): boolean {
+  if (siblings.length <= 1) {
+    return false;
+  }
   const seqs = new Set(siblings.map((s) => s.sequenceId));
-  return seqs.size > 1;
+  // If all siblings share the same non-null sequenceId → parallel tool calls, not a real branch
+  if (seqs.size === 1) {
+    const [onlySeq] = seqs;
+    if (onlySeq !== null) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**

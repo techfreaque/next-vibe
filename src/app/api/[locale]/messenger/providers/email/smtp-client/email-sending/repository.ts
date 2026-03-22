@@ -21,11 +21,11 @@ import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type {
-  EmailCampaignStageValues,
-  EmailJourneyVariantValues,
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
 } from "@/app/api/[locale]/leads/enum";
-import { CampaignType } from "../../../../accounts/enum";
 import type { CampaignTypeValue } from "../../../../accounts/enum";
+import { CampaignType } from "../../../../accounts/enum";
 import { scopedTranslation } from "../i18n";
 import type { SmtpSelectionCriteria, SmtpSendResult } from "../repository";
 import { SmtpSendingRepository } from "../sending/repository";
@@ -38,8 +38,8 @@ interface SendEmailParams {
   locale: CountryLanguage;
   senderName?: string;
   campaignType?: typeof CampaignTypeValue;
-  emailJourneyVariant?: typeof EmailJourneyVariantValues | null;
-  emailCampaignStage?: typeof EmailCampaignStageValues | null;
+  emailJourneyVariant?: typeof EmailJourneyVariantValue | null;
+  emailCampaignStage?: typeof EmailCampaignStageValue | null;
   replyToEmail?: string;
   replyToName?: string;
   unsubscribeUrl?: string;

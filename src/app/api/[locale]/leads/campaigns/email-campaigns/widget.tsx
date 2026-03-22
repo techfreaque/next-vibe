@@ -1,112 +1,198 @@
 /**
- * Email Campaigns Widget
- * Action card for manually running the email campaigns processor
+ * Email Campaigns Config Widget
+ * Form organized into card sections for configuring the email campaigns cron task
  */
 
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons/Check";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
 import React from "react";
 
+import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 import {
   useWidgetContext,
+  useWidgetForm,
+  useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
+import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type definition from "./definition";
 
-type PostResponseOutput = typeof definition.POST.types.ResponseOutput;
+type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
 
-interface EmailCampaignsWidgetProps {
+interface CustomWidgetProps {
   field: {
-    value: PostResponseOutput | null | undefined;
+    value: GetResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
 }
 
-export function EmailCampaignsWidget({
+export function EmailCampaignsConfigWidget({
   field,
-}: EmailCampaignsWidgetProps): React.JSX.Element {
+}: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const t = useWidgetTranslation<typeof definition.POST>();
-  const isSubmitting = endpointMutations?.create?.isSubmitting;
-  const response = field.value;
+  const locale = useWidgetLocale();
+  const form = useWidgetForm<typeof definition.POST>();
+
+  const savedData = field.value;
+  const hasBeenSaved = savedData !== null && savedData !== undefined;
+  const isPending = endpointMutations?.update?.isSubmitting;
 
   return (
-    <Div className="flex flex-col gap-3 p-4">
+    <Div className="flex flex-col gap-5 p-4">
       {/* Header */}
-      <Div className="flex items-center gap-2">
-        <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-        <Span className="font-semibold text-sm">{t("widget.title")}</Span>
-        {isSubmitting && (
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-auto" />
+      <Div className="flex items-center gap-2 pb-2 border-b">
+        <NavigateButtonWidget field={children.backButton} />
+        <Div className="flex items-center gap-2 mr-auto">
+          {hasBeenSaved ? (
+            <CheckCircle className="h-5 w-5 text-green-500" />
+          ) : (
+            <Mail className="h-5 w-5 text-muted-foreground" />
+          )}
+          <Span className="font-semibold text-base">
+            {hasBeenSaved ? t("widget.titleSaved") : t("widget.title")}
+          </Span>
+        </Div>
+        {isPending && (
+          <Span className="text-xs text-muted-foreground animate-pulse">
+            {t("widget.saving")}
+          </Span>
         )}
       </Div>
 
-      <P className="text-xs text-muted-foreground">{t("widget.description")}</P>
-
-      <FormAlertWidget field={{}} />
-
-      <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
-      <NumberFieldWidget fieldName="batchSize" field={children.batchSize} />
-      <NumberFieldWidget
-        fieldName="maxEmailsPerRun"
-        field={children.maxEmailsPerRun}
-      />
-
-      <SubmitButtonWidget<typeof definition.POST>
-        field={{
-          text: "widget.runButton",
-          loadingText: "widget.running",
-          icon: "mail",
-          variant: "primary",
-        }}
-      />
-
-      {/* Result */}
-      {response && (
-        <Div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3 flex flex-col gap-1">
-          <Div className="flex items-center gap-1 text-blue-700 dark:text-blue-300 text-xs font-medium">
-            <Check className="h-3 w-3" />
-            <Span>{t("widget.done")}</Span>
-          </Div>
-          <Div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-            <Span className="text-muted-foreground">
-              {t("post.response.emailsScheduled")}
-            </Span>
-            <Span className="font-mono font-medium">
-              {response.emailsScheduled}
-            </Span>
-            <Span className="text-muted-foreground">
-              {t("post.response.emailsSent")}
-            </Span>
-            <Span className="font-mono font-medium text-blue-600 dark:text-blue-400">
-              {response.emailsSent}
-            </Span>
-            <Span className="text-muted-foreground">
-              {t("post.response.emailsFailed")}
-            </Span>
-            <Span className="font-mono font-medium text-red-600 dark:text-red-400">
-              {response.emailsFailed}
-            </Span>
-            <Span className="text-muted-foreground">
-              {t("post.response.leadsProcessed")}
-            </Span>
-            <Span className="font-mono font-medium">
-              {response.leadsProcessed}
-            </Span>
+      {/* Guidance — shown before first save */}
+      {!hasBeenSaved && !isPending && (
+        <Div className="rounded-lg border border-dashed bg-muted/30 p-5 flex flex-col gap-3">
+          <Div className="flex items-start gap-3">
+            <Zap className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <Div className="flex flex-col gap-1">
+              <Span className="text-sm font-medium">
+                {t("widget.guidanceTitle")}
+              </Span>
+              <Span className="text-xs text-muted-foreground">
+                {t("widget.guidanceDescription")}
+              </Span>
+            </Div>
           </Div>
         </Div>
       )}
+
+      <FormAlertWidget field={{}} />
+
+      {/* Section 1 — General */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Settings className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.general")}
+          </CardTitle>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.sections.generalDescription")}
+          </Span>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <BooleanFieldWidget fieldName="enabled" field={children.enabled} />
+          <BooleanFieldWidget fieldName="dryRun" field={children.dryRun} />
+        </CardContent>
+      </Card>
+
+      {/* Section 2 — Schedule */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.schedule")}
+          </CardTitle>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.sections.scheduleDescription")}
+          </Span>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <Div className="flex flex-col gap-1.5">
+            <Span className="text-sm font-medium">
+              {t("put.schedule.label")}
+            </Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("put.schedule.description")}
+            </Span>
+            <ScheduleAutocomplete
+              value={form.watch("schedule") ?? ""}
+              onChange={(value) => form.setValue("schedule", value)}
+              onBlur={() => {
+                void form.trigger("schedule");
+              }}
+              locale={locale}
+            />
+          </Div>
+        </CardContent>
+      </Card>
+
+      {/* Section 3 — Processing */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Mail className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.processing")}
+          </CardTitle>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.sections.processingDescription")}
+          </Span>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <NumberFieldWidget fieldName="batchSize" field={children.batchSize} />
+          <NumberFieldWidget
+            fieldName="maxEmailsPerRun"
+            field={children.maxEmailsPerRun}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Section 4 — Advanced */}
+      <Card className="border-dashed">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-muted-foreground" />
+            {t("widget.sections.advanced")}
+          </CardTitle>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.sections.advancedDescription")}
+          </Span>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <SelectFieldWidget fieldName="priority" field={children.priority} />
+          <NumberFieldWidget fieldName="timeout" field={children.timeout} />
+          <NumberFieldWidget fieldName="retries" field={children.retries} />
+          <NumberFieldWidget
+            fieldName="retryDelay"
+            field={children.retryDelay}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Submit */}
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{
+          text: "widget.save",
+          loadingText: "widget.saving",
+          icon: "save",
+          variant: "primary",
+        }}
+      />
     </Div>
   );
 }

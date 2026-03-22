@@ -25,8 +25,8 @@ import { useEffect, useState } from "react";
 
 import type { EmailTemplateResult } from "@/app/api/[locale]/leads/campaigns/emails";
 import type {
-  EmailCampaignStageValues,
-  EmailJourneyVariantValues,
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
 } from "@/app/api/[locale]/leads/enum";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -36,8 +36,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { TestEmailForm } from "./test-email-form";
 
 interface EmailPreviewClientProps {
-  journeyVariant: typeof EmailJourneyVariantValues;
-  stage: typeof EmailCampaignStageValues;
+  journeyVariant: typeof EmailJourneyVariantValue;
+  stage: typeof EmailCampaignStageValue;
   emailPreview: EmailTemplateResult;
   companyName: string;
   companyEmail: string;

@@ -30,6 +30,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { leads } from "@/app/api/[locale]/leads/db";
+
 import { DefaultFolderId } from "../config";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
 import { ThreadStatus } from "../enum";
@@ -322,10 +324,25 @@ export class ThreadsRepository {
       }
     }
 
+    let resolvedLeadId: string | null = leadId ?? null;
+    if (resolvedLeadId) {
+      const [leadExists] = await db
+        .select({ id: leads.id })
+        .from(leads)
+        .where(eq(leads.id, resolvedLeadId))
+        .limit(1);
+      if (!leadExists) {
+        logger.warn("leadId from JWT not found in leads table, ignoring", {
+          leadId: resolvedLeadId,
+        });
+        resolvedLeadId = null;
+      }
+    }
+
     await db.insert(chatThreads).values({
       id: threadId,
       userId: userId ?? null,
-      leadId: leadId ?? null,
+      leadId: resolvedLeadId,
       title,
       rootFolderId,
       folderId: subFolderId ?? null,

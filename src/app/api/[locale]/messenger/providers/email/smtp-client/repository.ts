@@ -24,31 +24,31 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type {
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
+} from "@/app/api/[locale]/leads/enum";
+import type { Countries, Languages } from "@/i18n/core/config";
 import type { MessengerAccount } from "../../../accounts/db";
 import { messengerAccounts } from "../../../accounts/db";
+import type { CampaignTypeValue } from "../../../accounts/enum";
 import {
+  CampaignType,
+  MessageChannel,
   MessengerAccountStatus,
   MessengerHealthStatus,
   MessengerProvider,
 } from "../../../accounts/enum";
 import { emails } from "../../../messages/db";
 import { MessageStatus, MessageType } from "../../../messages/enum";
-import { SMTP_ERROR_MESSAGES } from "./constants";
-import { CampaignType } from "../../../accounts/enum";
-import type { CampaignTypeValue } from "../../../accounts/enum";
 import { EmailSecurityType } from "../enum";
+import { SMTP_ERROR_MESSAGES } from "./constants";
 import type { SmtpClientT } from "./i18n";
-import { MessageChannel } from "../../../accounts/enum";
-import type {
-  EmailCampaignStageValues,
-  EmailJourneyVariantValues,
-} from "@/app/api/[locale]/leads/enum";
-import type { Countries, Languages } from "@/i18n/core/config";
 
 export interface SmtpSelectionCriteria {
   campaignType: typeof CampaignTypeValue;
-  emailJourneyVariant: typeof EmailJourneyVariantValues | null;
-  emailCampaignStage: typeof EmailCampaignStageValues | null;
+  emailJourneyVariant: typeof EmailJourneyVariantValue | null;
+  emailCampaignStage: typeof EmailCampaignStageValue | null;
   country: Countries;
   language: Languages;
 }

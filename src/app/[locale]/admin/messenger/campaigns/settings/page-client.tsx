@@ -8,9 +8,10 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { JSX } from "react";
 
-import bounceProcessorConfigDefinitions from "@/app/api/[locale]/leads/campaigns/bounce-processor/bounce-processor-config/definition";
-import campaignStarterConfigDefinitions from "@/app/api/[locale]/leads/campaigns/campaign-starter/campaign-starter-config/definition";
-import emailCampaignsConfigDefinitions from "@/app/api/[locale]/leads/campaigns/email-campaigns/email-campaigns-config/definition";
+import bounceProcessorDefinitions from "@/app/api/[locale]/leads/campaigns/bounce-processor/definition";
+import campaignStarterDefinitions from "@/app/api/[locale]/leads/campaigns/campaign-starter/definition";
+import emailCampaignsDefinitions from "@/app/api/[locale]/leads/campaigns/email-campaigns/definition";
+import haltAllDefinitions from "@/app/api/[locale]/leads/campaigns/halt-all/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -40,7 +41,7 @@ export function CampaignStarterPageClient({
   return (
     <Div className="flex flex-col gap-8 w-full">
       <Tabs defaultValue="campaign-starter" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="campaign-starter">
             {t("tabs.campaignStarter")}
           </TabsTrigger>
@@ -50,35 +51,50 @@ export function CampaignStarterPageClient({
           <TabsTrigger value="bounce-processor">
             {t("tabs.bounceProcessor")}
           </TabsTrigger>
+          <TabsTrigger value="halt-all">{t("tabs.haltAll")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="campaign-starter">
-          <EndpointsPage
-            endpoint={campaignStarterConfigDefinitions}
-            locale={locale}
-            user={user}
-            forceMethod="PUT"
-            endpointOptions={readOptions}
-          />
+          <Div className="flex flex-col gap-6">
+            <EndpointsPage
+              endpoint={campaignStarterDefinitions}
+              locale={locale}
+              user={user}
+              forceMethod="POST"
+              endpointOptions={readOptions}
+            />
+          </Div>
         </TabsContent>
 
         <TabsContent value="email-campaigns">
-          <EndpointsPage
-            endpoint={emailCampaignsConfigDefinitions}
-            locale={locale}
-            user={user}
-            forceMethod="PUT"
-            endpointOptions={readOptions}
-          />
+          <Div className="flex flex-col gap-6">
+            <EndpointsPage
+              endpoint={emailCampaignsDefinitions}
+              locale={locale}
+              user={user}
+              forceMethod="POST"
+              endpointOptions={readOptions}
+            />
+          </Div>
         </TabsContent>
 
         <TabsContent value="bounce-processor">
+          <Div className="flex flex-col gap-6">
+            <EndpointsPage
+              endpoint={bounceProcessorDefinitions}
+              locale={locale}
+              user={user}
+              forceMethod="POST"
+              endpointOptions={readOptions}
+            />
+          </Div>
+        </TabsContent>
+
+        <TabsContent value="halt-all">
           <EndpointsPage
-            endpoint={bounceProcessorConfigDefinitions}
+            endpoint={haltAllDefinitions}
             locale={locale}
             user={user}
-            forceMethod="PUT"
-            endpointOptions={readOptions}
           />
         </TabsContent>
       </Tabs>

@@ -286,5 +286,13 @@ export type CronHistoryResponseOutput = typeof GET.types.ResponseOutput;
 export type CronHistoryExecution =
   CronHistoryResponseOutput["executions"][number];
 
+export type CronTaskRecentExecution = Pick<
+  CronHistoryExecution,
+  "status" | "completedAt" | "durationMs"
+> & {
+  resultSnippet: string | null;
+  errorSnippet: string | null;
+};
+
 const endpoints = { GET };
 export default endpoints;

@@ -10,41 +10,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TrackingContext } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
 import type {
-  EmailCampaignStageValues,
-  EmailJourneyVariantValues,
-  LeadSourceValues,
-  LeadStatusValues,
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
 } from "../../enum";
-
-// Local type definition to avoid deprecated schema.ts imports
-interface LeadWithEmailType {
-  id: string;
-  email: string; // Guaranteed to be present
-  businessName: string;
-  contactName?: string | null;
-  phone?: string | null;
-  website?: string | null;
-  country: string;
-  language: string;
-  status: typeof LeadStatusValues;
-  source: typeof LeadSourceValues | null;
-  notes?: string | null;
-  convertedUserId?: string | null;
-  convertedAt?: Date | null;
-  signedUpAt?: Date | null;
-  subscriptionConfirmedAt?: Date | null;
-  currentCampaignStage?: string | null;
-  emailJourneyVariant?: typeof EmailJourneyVariantValues | null;
-  emailsSent: number;
-  lastEmailSentAt?: Date | null;
-  unsubscribedAt?: Date | null;
-  emailsOpened: number;
-  emailsClicked: number;
-  lastEngagementAt?: Date | null;
-  metadata?: Record<string, string | number | boolean | null>;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { LeadWithEmailType } from "../../types";
 
 /**
  * Email Template Data Interface
@@ -59,8 +28,8 @@ export interface EmailTemplateData {
   companyEmail: string;
   campaign: {
     id: string;
-    stage: typeof EmailCampaignStageValues;
-    journeyVariant: typeof EmailJourneyVariantValues;
+    stage: typeof EmailCampaignStageValue;
+    journeyVariant: typeof EmailJourneyVariantValue;
   };
 }
 
@@ -105,7 +74,7 @@ export interface ABTestConfig {
   endDate?: Date;
   variants: Partial<
     Record<
-      typeof EmailJourneyVariantValues,
+      typeof EmailJourneyVariantValue,
       {
         weight: number;
         description: string;
@@ -121,8 +90,8 @@ export interface ABTestConfig {
  * Email Performance Metrics
  */
 export interface EmailPerformanceMetrics {
-  journeyVariant: typeof EmailJourneyVariantValues;
-  stage: typeof EmailCampaignStageValues;
+  journeyVariant: typeof EmailJourneyVariantValue;
+  stage: typeof EmailCampaignStageValue;
   sent: number;
   delivered: number;
   opened: number;
@@ -143,8 +112,8 @@ export interface EmailPerformanceMetrics {
 export interface CampaignSchedulingOptions {
   leadId: string;
   campaignType: typeof CampaignTypeValue;
-  journeyVariant: typeof EmailJourneyVariantValues;
-  stage: typeof EmailCampaignStageValues;
+  journeyVariant: typeof EmailJourneyVariantValue;
+  stage: typeof EmailCampaignStageValue;
   scheduledAt: Date;
   metadata?: Record<string, string | number | boolean>;
 }

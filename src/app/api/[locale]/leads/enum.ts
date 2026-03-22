@@ -10,7 +10,7 @@ import { scopedTranslation } from "./i18n";
 export const {
   enum: EngagementTypes,
   options: EngagementTypesOptions,
-  Value: EngagementTypesValues,
+  Value: EngagementTypesValue,
 } = createEnumOptions(scopedTranslation, {
   EMAIL_OPEN: "enums.engagementTypes.emailOpen",
   EMAIL_CLICK: "enums.engagementTypes.emailClick",
@@ -26,7 +26,7 @@ export const {
 export const {
   enum: LeadStatus,
   options: LeadStatusOptions,
-  Value: LeadStatusValues,
+  Value: LeadStatusValue,
 } = createEnumOptions(scopedTranslation, {
   NEW: "enums.leadStatus.new",
   PENDING: "enums.leadStatus.pending",
@@ -48,7 +48,7 @@ export const {
 export const {
   enum: EmailCampaignStage,
   options: EmailCampaignStageOptions,
-  Value: EmailCampaignStageValues,
+  Value: EmailCampaignStageValue,
 } = createEnumOptions(scopedTranslation, {
   NOT_STARTED: "enums.emailCampaignStage.notStarted",
   INITIAL: "enums.emailCampaignStage.initial",
@@ -66,7 +66,7 @@ export const {
 export const {
   enum: EmailJourneyVariant,
   options: EmailJourneyVariantOptions,
-  Value: EmailJourneyVariantValues,
+  Value: EmailJourneyVariantValue,
 } = createEnumOptions(scopedTranslation, {
   UNCENSORED_CONVERT: "enums.emailJourneyVariant.uncensoredConvert",
   SIDE_HUSTLE: "enums.emailJourneyVariant.sideHustle",
@@ -80,7 +80,7 @@ export const {
 export const {
   enum: EmailJourneyVariantFilter,
   options: EmailJourneyVariantFilterOptions,
-  Value: EmailJourneyVariantFilterValues,
+  Value: EmailJourneyVariantFilterValue,
 } = createEnumOptions(scopedTranslation, {
   ALL: "enums.emailJourneyVariantFilter.all",
   UNCENSORED_CONVERT: "enums.emailJourneyVariantFilter.uncensoredConvert",
@@ -98,7 +98,7 @@ export const {
 export const {
   enum: EmailProvider,
   options: EmailProviderOptions,
-  Value: EmailProviderValues,
+  Value: EmailProviderValue,
 } = createEnumOptions(scopedTranslation, {
   RESEND: "enums.emailProvider.resend",
   SENDGRID: "enums.emailProvider.sendgrid",
@@ -117,7 +117,7 @@ export const {
 export const {
   enum: SortOrder,
   options: SortOrderOptions,
-  Value: SortOrderValues,
+  Value: SortOrderValue,
 } = createEnumOptions(scopedTranslation, {
   ASC: "enums.sortOrder.asc",
   DESC: "enums.sortOrder.desc",
@@ -130,7 +130,7 @@ export const {
 export const {
   enum: LeadSortField,
   options: LeadSortFieldOptions,
-  Value: LeadSortFieldValues,
+  Value: LeadSortFieldValue,
 } = createEnumOptions(scopedTranslation, {
   EMAIL: "enums.leadSortField.email",
   BUSINESS_NAME: "enums.leadSortField.businessName",
@@ -146,7 +146,7 @@ export const {
 export const {
   enum: ExportFormat,
   options: ExportFormatOptions,
-  Value: ExportFormatValues,
+  Value: ExportFormatValue,
 } = createEnumOptions(scopedTranslation, {
   CSV: "enums.exportFormat.csv",
   XLSX: "enums.exportFormat.xlsx",
@@ -159,7 +159,7 @@ export const {
 export const {
   enum: MimeType,
   options: MimeTypeOptions,
-  Value: MimeTypeValues,
+  Value: MimeTypeValue,
 } = createEnumOptions(scopedTranslation, {
   CSV: "enums.mimeType.csv",
   XLSX: "enums.mimeType.xlsx",
@@ -172,7 +172,7 @@ export const {
 export const {
   enum: ActivityType,
   options: ActivityTypeOptions,
-  Value: ActivityTypeValues,
+  Value: ActivityTypeValue,
 } = createEnumOptions(scopedTranslation, {
   LEAD_CREATED: "enums.activityType.leadCreated",
   LEAD_UPDATED: "enums.activityType.leadUpdated",
@@ -190,7 +190,7 @@ export const {
 export const {
   enum: UserAssociation,
   options: UserAssociationOptions,
-  Value: UserAssociationValues,
+  Value: UserAssociationValue,
 } = createEnumOptions(scopedTranslation, {
   WITH_USER: "enums.userAssociation.withUser",
   WITH_LEAD: "enums.userAssociation.withLead",
@@ -205,7 +205,7 @@ export const {
 export const {
   enum: DeviceType,
   options: DeviceTypeOptions,
-  Value: DeviceTypeValues,
+  Value: DeviceTypeValue,
 } = createEnumOptions(scopedTranslation, {
   DESKTOP: "enums.deviceType.desktop",
   MOBILE: "enums.deviceType.mobile",
@@ -221,7 +221,7 @@ export const {
 export const {
   enum: LeadSource,
   options: LeadSourceOptions,
-  Value: LeadSourceValues,
+  Value: LeadSourceValue,
 } = createEnumOptions(scopedTranslation, {
   WEBSITE: "enums.leadSource.website",
   SOCIAL_MEDIA: "enums.leadSource.socialMedia",
@@ -242,7 +242,7 @@ export const {
 export const {
   enum: LeadStatusFilter,
   options: LeadStatusFilterOptions,
-  Value: LeadStatusFilterValues,
+  Value: LeadStatusFilterValue,
 } = createEnumOptions(scopedTranslation, {
   ALL: "enums.leadStatusFilter.all",
   NEW: "enums.leadStatusFilter.new",
@@ -265,7 +265,7 @@ export const {
 export const {
   enum: EmailCampaignStageFilter,
   options: EmailCampaignStageFilterOptions,
-  Value: EmailCampaignStageFilterValues,
+  Value: EmailCampaignStageFilterValue,
 } = createEnumOptions(scopedTranslation, {
   ALL: "enums.emailCampaignStageFilter.all",
   NOT_STARTED: "enums.emailCampaignStage.notStarted",
@@ -284,7 +284,7 @@ export const {
 export const {
   enum: LeadSourceFilter,
   options: LeadSourceFilterOptions,
-  Value: LeadSourceFilterValues,
+  Value: LeadSourceFilterValue,
 } = createEnumOptions(scopedTranslation, {
   ALL: "enums.leadSourceFilter.all",
   WEBSITE: "enums.leadSource.website",
@@ -301,7 +301,7 @@ export const {
 export const {
   enum: BatchOperationScope,
   options: BatchOperationScopeOptions,
-  Value: BatchOperationScopeValues,
+  Value: BatchOperationScopeValue,
 } = createEnumOptions(scopedTranslation, {
   CURRENT_PAGE: "enums.batchOperationScope.currentPage",
   ALL_PAGES: "enums.batchOperationScope.allPages",

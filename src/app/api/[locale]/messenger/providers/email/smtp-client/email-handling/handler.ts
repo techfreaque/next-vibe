@@ -12,8 +12,8 @@ import type {
 import type { JSX } from "react";
 
 import type {
-  EmailCampaignStageValues,
-  EmailJourneyVariantValues,
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
 } from "@/app/api/[locale]/leads/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -21,8 +21,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
-import type { MessageType } from "../../../../messages/enum";
 import type { CampaignType } from "../../../../accounts/enum";
+import type { MessageType } from "../../../../messages/enum";
 import type { SmtpSelectionCriteria } from "../repository";
 
 /**
@@ -39,8 +39,8 @@ export interface EmailTemplateReturnType {
   replyToName?: string;
   // Campaign context for proper SMTP selection and metadata
   campaignType?: (typeof CampaignType)[keyof typeof CampaignType];
-  emailJourneyVariant?: typeof EmailJourneyVariantValues;
-  emailCampaignStage?: typeof EmailCampaignStageValues;
+  emailJourneyVariant?: typeof EmailJourneyVariantValue;
+  emailCampaignStage?: typeof EmailCampaignStageValue;
   // Email metadata
   templateName?: string;
   emailType?: (typeof MessageType)[keyof typeof MessageType];

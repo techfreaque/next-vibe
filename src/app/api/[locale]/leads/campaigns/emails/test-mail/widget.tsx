@@ -48,9 +48,8 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
 
   const handleGoToConfig = (): void => {
     void (async (): Promise<void> => {
-      const configDefs =
-        await import("../../campaign-starter/campaign-starter-config/definition");
-      navigation.push(configDefs.default.PUT, {});
+      const configDefs = await import("../../campaign-starter/definition");
+      navigation.push(configDefs.default.POST, {});
     })();
   };
 

@@ -3,7 +3,6 @@
 import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Div } from "next-vibe-ui/ui/div";
-import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
 import { List } from "next-vibe-ui/ui/icons/List";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
@@ -62,13 +61,6 @@ export function EmailCampaignsNav({
       icon: Settings,
       label: t("tabs.settings"),
       description: t("tabs.settings_description"),
-      exact: false,
-    },
-    {
-      href: `/${locale}/admin/messenger/campaigns/monitoring` as const,
-      icon: Activity,
-      label: t("tabs.monitoring"),
-      description: t("tabs.monitoring_description"),
       exact: false,
     },
   ] as const;

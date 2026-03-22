@@ -16,6 +16,7 @@ import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interfac
 import type { NewCronTask } from "./cron/db";
 import { cronTasks } from "./cron/db";
 import { CronTaskPriority } from "./enum";
+import type { JsonValue } from "./unified-runner/types";
 
 /**
  * Upsert all cron tasks from the task registry into the DB.
@@ -39,29 +40,31 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     `Upserting ${cronTaskDefs.length} cron task definitions into DB`,
   );
 
-  const taskRows: NewCronTask[] = cronTaskDefs.map((task) => ({
-    // id: stable identity — multiple tasks can share the same routeId (endpoint)
-    id: task.id,
-    // shortId: system tasks mirror their id (already a short slug like "db-health")
-    shortId: task.id,
-    // routeId: which endpoint to call — first alias or canonical path
-    routeId: getPreferredToolName(task.definition),
-    displayName: task.name,
-    description: task.description,
-    category: task.category,
-    schedule: task.schedule,
-    enabled: task.enabled,
-    priority: task.priority ?? CronTaskPriority.MEDIUM,
-    timeout: task.timeout ?? 300000,
-    // taskInput is a flat merge of all inputs the task executes with.
-    // splitTaskArgs() splits by schema at execution time.
-    taskInput: task.taskInput ?? {},
-    runOnce: task.runOnce ?? false,
-    historyInterval: task.historyInterval ?? null,
-    hidden: task.hidden ?? false,
-    // System tasks have no user owner (null userId)
-    userId: null,
-  }));
+  const taskRows: NewCronTask<Record<string, JsonValue>>[] = cronTaskDefs.map(
+    (task) => ({
+      // id: stable identity — multiple tasks can share the same routeId (endpoint)
+      id: task.id,
+      // shortId: system tasks mirror their id (already a short slug like "db-health")
+      shortId: task.id,
+      // routeId: which endpoint to call — first alias or canonical path
+      routeId: getPreferredToolName(task.definition),
+      displayName: task.name,
+      description: task.description,
+      category: task.category,
+      schedule: task.schedule,
+      enabled: task.enabled,
+      priority: task.priority ?? CronTaskPriority.MEDIUM,
+      timeout: task.timeout ?? 300000,
+      // taskInput is a flat merge of all inputs the task executes with.
+      // splitTaskArgs() splits by schema at execution time.
+      taskInput: task.taskInput ?? {},
+      runOnce: task.runOnce ?? false,
+      historyInterval: task.historyInterval ?? null,
+      hidden: task.hidden ?? false,
+      // System tasks have no user owner (null userId)
+      userId: null,
+    }),
+  );
 
   // Upsert by id (primary key).
   // Do NOT overwrite enabled/schedule/priority/timeout/taskInput — those are user-overridable.

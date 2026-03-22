@@ -6,7 +6,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { useCronTasksList } from "./tasks/hooks";
-import { formatTasksSummary, type TaskSummaryItem } from "./tasks-formatter";
+import type { CronTaskItem } from "./tasks/definition";
+import { formatTasksSummary } from "./system-prompt/prompt";
 
 /**
  * Hook to fetch user cron tasks ONLY when needed (conditional)
@@ -20,7 +21,7 @@ export function useTasksSummary(params: {
   user: JwtPayloadType;
   logger: EndpointLogger;
 }): {
-  tasks: TaskSummaryItem[];
+  tasks: CronTaskItem[];
   tasksSummary: string;
   isLoading: boolean;
   error: string | null;
@@ -30,26 +31,13 @@ export function useTasksSummary(params: {
   const shouldFetch = enabled && !user.isPublic;
   const tasksEndpoint = useCronTasksList(user, logger);
 
-  const taskItems = useMemo((): TaskSummaryItem[] => {
+  const taskItems = useMemo((): CronTaskItem[] => {
     if (!shouldFetch || !tasksEndpoint.read?.response?.success) {
       return [];
     }
     return (tasksEndpoint.read.response.data?.tasks ?? []).map((t) => ({
-      id: t.id,
-      shortId: t.shortId,
-      displayName: t.displayName,
-      description: t.description,
-      schedule: t.schedule,
-      enabled: t.enabled,
-      lastExecutionStatus: t.lastExecutionStatus,
-      lastExecutedAt: t.lastExecutedAt,
-      errorCount: t.errorCount,
-      routeId: t.routeId,
-      // Enriched fields — not available client-side, graceful defaults
-      priority: t.priority ?? null,
-      lastExecutionDuration: t.lastExecutionDuration ?? null,
+      ...t,
       lastResultSummary: null,
-      consecutiveFailures: t.consecutiveFailures ?? 0,
       recentExecutions: null,
     }));
   }, [shouldFetch, tasksEndpoint.read?.response]);

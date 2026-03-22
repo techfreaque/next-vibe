@@ -223,7 +223,9 @@ export const selectCronTaskExecutionSchema =
  * .insert().returning() unify to the same types without casts.
  */
 export type CronTaskRow = typeof cronTasks.$inferSelect;
-export type NewCronTask = typeof cronTasks.$inferInsert;
+export type NewCronTask<TTaskInput> = typeof cronTasks.$inferInsert & {
+  taskInput: TTaskInput;
+};
 
 export type CronTaskExecution = typeof cronTaskExecutions.$inferSelect;
 export type NewCronTaskExecution = typeof cronTaskExecutions.$inferInsert;

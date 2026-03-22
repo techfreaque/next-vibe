@@ -50,5 +50,5 @@ export function HumanText({
   children,
   variant = "body",
 }: HumanTextProps): React.JSX.Element {
-  return <span style={TEXT_STYLES[variant]}>{children}</span>;
+  return <div style={TEXT_STYLES[variant]}>{children}</div>;
 }

@@ -422,7 +422,7 @@ function configToFlow(
 
   const nodes: VibeNode[] = Object.entries(config.nodes).map(
     ([nodeId, nodeConfig]) => {
-      const info = infoMap.get(nodeConfig.endpointPath) ?? DEFAULT_INFO;
+      const info = infoMap.get(nodeConfig.endpointPath ?? "") ?? DEFAULT_INFO;
       return {
         id: nodeId,
         type: "vibeNode",
@@ -430,7 +430,7 @@ function configToFlow(
         data: {
           nodeId,
           nodeConfig,
-          label: nodeConfig.endpointPath,
+          label: nodeConfig.endpointPath ?? "",
           handles: info.handles,
           category: info.category,
         },
@@ -446,14 +446,18 @@ function configToFlow(
 
     if (!sourceHandle) {
       const srcNode = config.nodes[e.from];
-      const srcInfo = srcNode ? infoMap.get(srcNode.endpointPath) : undefined;
+      const srcInfo = srcNode
+        ? infoMap.get(srcNode.endpointPath ?? "")
+        : undefined;
       if (srcInfo && srcInfo.handles.outputs.length === 1) {
         sourceHandle = srcInfo.handles.outputs[0];
       }
     }
     if (!targetHandle) {
       const tgtNode = config.nodes[e.to];
-      const tgtInfo = tgtNode ? infoMap.get(tgtNode.endpointPath) : undefined;
+      const tgtInfo = tgtNode
+        ? infoMap.get(tgtNode.endpointPath ?? "")
+        : undefined;
       if (tgtInfo && tgtInfo.handles.inputs.length === 1) {
         targetHandle = tgtInfo.handles.inputs[0];
       }
@@ -939,7 +943,7 @@ const NodeInspector = React.memo(function NodeInspector({
           <Div className="flex flex-col gap-1.5">
             <InspectorField
               label={t("widget.inspector.endpoint")}
-              value={nodeConfig.endpointPath}
+              value={nodeConfig.endpointPath ?? ""}
             />
             <InspectorField
               label={t("widget.inspector.method")}
@@ -949,7 +953,7 @@ const NodeInspector = React.memo(function NodeInspector({
               variant="outline"
               size="sm"
               className="h-6 text-[10px] w-full gap-1"
-              onClick={() => onOpenEndpoint(nodeConfig.endpointPath)}
+              onClick={() => onOpenEndpoint(nodeConfig.endpointPath ?? "")}
             >
               <Globe className="h-2.5 w-2.5" />
               {t("widget.inspector.openEndpoint")}
@@ -1593,7 +1597,10 @@ function EditFormInner({
 
   // ── Endpoint node info (handles + categories) ──
   const endpointPaths = useMemo(
-    () => Object.values(workingNodes).map((n) => n.endpointPath),
+    () =>
+      Object.values(workingNodes)
+        .map((n) => n.endpointPath)
+        .filter((p): p is string => p !== undefined),
     [workingNodes],
   );
   const endpointInfoMap = useEndpointNodeInfo(endpointPaths);
@@ -1850,7 +1857,7 @@ function EditFormInner({
                 data: {
                   ...n.data,
                   nodeConfig: updated as GraphConfig["nodes"][string],
-                  label: updated.endpointPath,
+                  label: updated.endpointPath ?? "",
                 },
               }
             : n,
@@ -2143,7 +2150,7 @@ function EditFormInner({
               nodeId={selectedNodeId}
               nodeConfig={selectedNodeConfig}
               category={
-                endpointInfoMap.get(selectedNodeConfig.endpointPath)
+                endpointInfoMap.get(selectedNodeConfig.endpointPath ?? "")
                   ?.category ?? "other"
               }
               onUpdate={updateNodeConfig}

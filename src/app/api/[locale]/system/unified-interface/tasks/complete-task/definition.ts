@@ -27,8 +27,8 @@ import {
 import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "../i18n";
 import { envClient } from "@/config/env-client";
+import { scopedTranslation } from "../i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -147,7 +147,10 @@ const { POST } = createEndpoint({
 
 export const endpoints = { POST };
 
-export type CompleteTaskRequestOutput = typeof POST.types.RequestOutput;
+export type CompleteTaskRequestOutput<TaskOutput> =
+  typeof POST.types.RequestOutput & {
+    response: TaskOutput;
+  };
 export type CompleteTaskResponseOutput = typeof POST.types.ResponseOutput;
 
 export default endpoints;

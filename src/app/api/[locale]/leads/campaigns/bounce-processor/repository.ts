@@ -2,6 +2,7 @@
  * Bounce Processor Repository
  * Scans IMAP-synced emails for DSN bounce notifications and
  * updates lead status + halts campaigns for hard bounces.
+ * Also manages bounce processor cron task configuration.
  */
 
 import "server-only";
@@ -17,20 +18,46 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { messengerAccounts as imapAccounts } from "@/app/api/[locale]/messenger/accounts/db";
-import { emails } from "@/app/api/[locale]/messenger/messages/db";
-import { imapFolders } from "@/app/api/[locale]/messenger/providers/email/imap-client/db";
-import { ImapSpecialUseType } from "@/app/api/[locale]/messenger/providers/email/imap-client/enum";
+import {
+  emails,
+  messengerFolders as imapFolders,
+} from "@/app/api/[locale]/messenger/messages/db";
+import { SpecialFolderType as ImapSpecialUseType } from "@/app/api/[locale]/messenger/messages/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import {
+  cronTasks,
+  type NewCronTask,
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 
+import type { JwtPayloadType } from "../../../user/auth/types";
 import { leads } from "../../db";
 import { LeadStatus } from "../../enum";
 import { campaignSchedulerService } from "../emails/services/scheduler";
+import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
 import type {
+  BounceProcessorConfigGetResponseOutput,
   BounceProcessorPostRequestOutput,
   BounceProcessorPostResponseOutput,
 } from "./definition";
 import type { BounceProcessorT } from "./i18n";
+
+function getDefaultConfig(): BounceProcessorConfigGetResponseOutput {
+  return {
+    enabled: false,
+    dryRun: false,
+    batchSize: 100,
+    schedule: "*/15 * * * *",
+    priority: CronTaskPriority.MEDIUM,
+    timeout: 300000,
+    retries: 3,
+    retryDelay: 30000,
+  };
+}
 
 export class BounceProcessorRepository {
   /**
@@ -61,6 +88,127 @@ export class BounceProcessorRepository {
     "Undeliverable",
   ];
 
+  static async getConfig(
+    user: JwtPayloadType,
+    t: BounceProcessorT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<BounceProcessorConfigGetResponseOutput>> {
+    try {
+      logger.info("Fetching bounce processor config", { userId: user.id });
+
+      const [existing] = await db
+        .select()
+        .from(cronTasks)
+        .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS))
+        .limit(1);
+
+      if (!existing) {
+        return success(getDefaultConfig());
+      }
+
+      const defaults = getDefaultConfig();
+      const taskInput = existing.taskInput;
+
+      return success({
+        enabled: existing.enabled,
+        dryRun:
+          typeof taskInput?.dryRun === "boolean"
+            ? taskInput.dryRun
+            : defaults.dryRun,
+        batchSize:
+          typeof taskInput?.batchSize === "number"
+            ? taskInput.batchSize
+            : defaults.batchSize,
+        schedule: existing.schedule,
+        priority: existing.priority ?? defaults.priority,
+        timeout: existing.timeout ?? defaults.timeout,
+        retries: existing.retries ?? defaults.retries,
+        retryDelay: existing.retryDelay ?? defaults.retryDelay,
+      });
+    } catch (error) {
+      logger.error("Error fetching bounce processor config", parseError(error));
+      return fail({
+        message: t("get.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
+  static async updateConfig(
+    data: BounceProcessorPostRequestOutput,
+    user: JwtPayloadType,
+    t: BounceProcessorT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<BounceProcessorPostRequestOutput>> {
+    try {
+      logger.info("Updating bounce processor config", {
+        userId: user.id,
+        enabled: data.enabled,
+        dryRun: data.dryRun,
+      });
+
+      if (!data.enabled) {
+        await db
+          .delete(cronTasks)
+          .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS));
+        logger.debug("Removed bounce-processor cron task (disabled)");
+        return success();
+      }
+
+      const cronData: NewCronTask<BounceProcessorPostRequestOutput> = {
+        id: BOUNCE_PROCESSOR_ALIAS,
+        shortId: BOUNCE_PROCESSOR_ALIAS,
+        routeId: BOUNCE_PROCESSOR_ALIAS,
+        displayName: "Bounce Processor",
+        description:
+          "Scan IMAP for bounce notifications and update lead status",
+        version: "1.0.0",
+        category: TaskCategory.LEAD_MANAGEMENT,
+        schedule: data.schedule,
+        enabled: true,
+        priority: data.priority,
+        timeout: data.timeout,
+        retries: data.retries,
+        retryDelay: data.retryDelay,
+        taskInput: {
+          enabled: data.enabled,
+          dryRun: data.dryRun,
+          batchSize: data.batchSize,
+          schedule: data.schedule,
+          priority: data.priority,
+          timeout: data.timeout,
+          retries: data.retries,
+          retryDelay: data.retryDelay,
+        },
+        updatedAt: new Date(),
+      };
+
+      const [existing] = await db
+        .select({ id: cronTasks.id })
+        .from(cronTasks)
+        .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS))
+        .limit(1);
+
+      if (existing) {
+        await db
+          .update(cronTasks)
+          .set(cronData)
+          .where(eq(cronTasks.id, BOUNCE_PROCESSOR_ALIAS));
+      } else {
+        await db.insert(cronTasks).values(cronData);
+      }
+
+      logger.debug("Saved bounce-processor cron task");
+      return success();
+    } catch (error) {
+      logger.error("Error updating bounce processor config", parseError(error));
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
   /**
    * Extract email addresses from text using RFC 5321 compliant regex
    */
@@ -81,7 +229,6 @@ export class BounceProcessorRepository {
     imapAccountId: string | null | undefined,
     logger: EndpointLogger,
   ): Promise<void> {
-    // Always clean up DB record at the end
     const deleteFromDb = async (): Promise<void> => {
       await db.delete(emails).where(eq(emails.id, emailId));
     };
@@ -92,7 +239,6 @@ export class BounceProcessorRepository {
     }
 
     try {
-      // Look up account credentials and source folder path
       const [account] = await db
         .select()
         .from(imapAccounts)
@@ -218,16 +364,25 @@ export class BounceProcessorRepository {
 
   static async run(
     data: BounceProcessorPostRequestOutput,
+    user: JwtPayloadType,
     logger: EndpointLogger,
     t: BounceProcessorT,
   ): Promise<ResponseType<BounceProcessorPostResponseOutput>> {
     try {
+      const saveResult = await BounceProcessorRepository.updateConfig(
+        data,
+        user,
+        t,
+        logger,
+      );
+      if (!saveResult.success) {
+        return saveResult;
+      }
+
       const { dryRun, batchSize } = data;
 
       logger.debug("Bounce processor starting", { dryRun, batchSize });
 
-      // Find unprocessed bounce emails synced from IMAP
-      // We use a metadata flag to track which bounces have been processed
       const bounceMessages = await db
         .select({
           id: emails.id,
@@ -242,9 +397,7 @@ export class BounceProcessorRepository {
         .from(emails)
         .where(
           and(
-            // Not yet processed as bounce
             isNull(emails.bouncedAt),
-            // Only IMAP-synced inbound messages (have accountId)
             sql`${emails.accountId} IS NOT NULL`,
             or(
               ...BounceProcessorRepository.BOUNCE_SENDER_PATTERNS.map(
@@ -255,7 +408,6 @@ export class BounceProcessorRepository {
         )
         .limit(batchSize);
 
-      // Also check by subject keywords for bounces that don't match sender pattern
       const subjectBounces = await db
         .select({
           id: emails.id,
@@ -282,7 +434,6 @@ export class BounceProcessorRepository {
         )
         .limit(batchSize);
 
-      // Deduplicate by id
       const allMessages = [
         ...bounceMessages,
         ...subjectBounces.filter(
@@ -308,7 +459,6 @@ export class BounceProcessorRepository {
           continue;
         }
 
-        // Extract all email addresses from the bounce body
         const bodyEmails = BounceProcessorRepository.extractEmailsFromText(
           msg.bodyText ?? "",
         );
@@ -329,7 +479,6 @@ export class BounceProcessorRepository {
           continue;
         }
 
-        // Move bounce email to IMAP trash, then delete from DB
         await BounceProcessorRepository.moveToImapTrash(
           msg.id,
           msg.uid,
@@ -338,7 +487,6 @@ export class BounceProcessorRepository {
           logger,
         );
 
-        // Find leads matching any of the extracted emails
         for (const bouncedEmail of candidateEmails) {
           const [lead] = await db
             .select({ id: leads.id, status: leads.status, email: leads.email })
@@ -350,7 +498,6 @@ export class BounceProcessorRepository {
             continue;
           }
 
-          // Skip leads already in a terminal suppressed state
           if (
             lead.status === LeadStatus.BOUNCED ||
             lead.status === LeadStatus.INVALID ||
@@ -365,7 +512,6 @@ export class BounceProcessorRepository {
             messageId: msg.id,
           });
 
-          // Update lead status to BOUNCED
           await db
             .update(leads)
             .set({
@@ -377,7 +523,6 @@ export class BounceProcessorRepository {
 
           leadsUpdated++;
 
-          // Halt all pending campaigns for this lead
           const cancelled = await campaignSchedulerService.haltCampaign(
             lead.id,
             logger,

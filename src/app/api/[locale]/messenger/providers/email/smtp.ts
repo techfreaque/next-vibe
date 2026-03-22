@@ -23,7 +23,8 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { imapFolders, toImapShape } from "./imap-client/db";
+import { toImapShape } from "./imap-client/db";
+import { messengerFolders } from "../../messages/db";
 import { messengerAccounts } from "../../accounts/db";
 import { emails } from "../../messages/db";
 import { CampaignType } from "../../accounts/enum";
@@ -153,9 +154,9 @@ export class SmtpMessengerProvider implements MessengerProvider {
       const folderMap = new Map<string, string>();
       if (rows.some((r) => r.folderId)) {
         await db
-          .select({ id: imapFolders.id, path: imapFolders.path })
-          .from(imapFolders)
-          .where(eq(imapFolders.accountId, accountId))
+          .select({ id: messengerFolders.id, path: messengerFolders.path })
+          .from(messengerFolders)
+          .where(eq(messengerFolders.accountId, accountId))
           .then((folders) =>
             folders.forEach((f) => folderMap.set(f.id, f.path)),
           );
@@ -209,8 +210,8 @@ export class SmtpMessengerProvider implements MessengerProvider {
     try {
       const rows = await db
         .select()
-        .from(imapFolders)
-        .where(eq(imapFolders.accountId, accountId));
+        .from(messengerFolders)
+        .where(eq(messengerFolders.accountId, accountId));
 
       const folders: InboxFolder[] = rows.map((f) => ({
         id: f.id,

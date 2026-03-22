@@ -36,8 +36,8 @@ import type {
 } from "./definition";
 
 export class CompleteTaskRepository {
-  static async completeTask(
-    data: CompleteTaskRequestOutput,
+  static async completeTask<TRequest, TResponse>(
+    data: CompleteTaskRequestOutput<TResponse>,
     logger: EndpointLogger,
     t: TasksT,
     user: JwtPayloadType,
@@ -71,7 +71,7 @@ export class CompleteTaskRepository {
 
     // Update task in local DB
     try {
-      const updates: Partial<NewCronTask> & { updatedAt: Date } = {
+      const updates: Partial<NewCronTask<TRequest>> & { updatedAt: Date } = {
         lastExecutedAt: now,
         lastExecutionStatus: status,
         lastExecutionDuration: null,

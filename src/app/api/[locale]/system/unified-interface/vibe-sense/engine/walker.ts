@@ -113,6 +113,9 @@ export function collectSharedEndpointPaths(
   for (const { graphId, config } of graphs) {
     for (const node of Object.values(config.nodes)) {
       const endpointPath = node.endpointPath;
+      if (!endpointPath) {
+        continue;
+      }
       const existing = shared.get(endpointPath) ?? [];
       existing.push({ endpointPath, graphId });
       shared.set(endpointPath, existing);
@@ -166,7 +169,7 @@ export function getSinkReachableNodeIds(config: GraphConfig): Set<string> {
   const queue: string[] = [];
 
   for (const [nodeId, nodeConfig] of Object.entries(config.nodes)) {
-    if (nodeConfig.endpointPath.includes("evaluator")) {
+    if ((nodeConfig.endpointPath ?? "").includes("evaluator")) {
       queue.push(nodeId);
       reachable.add(nodeId);
     }

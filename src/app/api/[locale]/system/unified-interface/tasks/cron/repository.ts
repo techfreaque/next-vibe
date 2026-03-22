@@ -17,11 +17,9 @@ import { db } from "@/app/api/[locale]/system/db";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
-import type {
-  RecentExecution,
-  TaskSummaryItem,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
-import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
+import type { CronTaskRecentExecution } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
+import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
+import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -316,8 +314,8 @@ export class CronTasksRepository {
     }
   }
 
-  static async createTask(
-    task: NewCronTask,
+  static async createTask<TTaskInput>(
+    task: NewCronTask<TTaskInput>,
     t: TasksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow>> {
@@ -598,7 +596,7 @@ export class CronTasksRepository {
     }
   }
 
-  static async getRecentExecutions(
+  static async getCronTaskRecentExecutions(
     limit = 100,
     t: TasksT,
     logger: EndpointLogger,
@@ -705,7 +703,7 @@ export class CronTasksRepository {
   static async loadTaskItems(params: {
     userId: string;
     logger: EndpointLogger;
-  }): Promise<TaskSummaryItem[]> {
+  }): Promise<CronTaskItem[]> {
     const { userId, logger } = params;
 
     try {
@@ -781,7 +779,7 @@ export class CronTasksRepository {
         }
       }
 
-      // Shape into TaskSummaryItem[] with enriched fields
+      // Shape into TaskItem[] with enriched fields
       const summaryItems = tasks.map((t) => {
         const taskExecs = execsByTask.get(t.id) ?? [];
 
@@ -794,17 +792,19 @@ export class CronTasksRepository {
           : null;
 
         // Map recent executions
-        const recentExecutions: RecentExecution[] = taskExecs.map((e) => ({
-          status: e.status,
-          completedAt: e.completedAt?.toISOString() ?? null,
-          durationMs: e.durationMs,
-          resultSnippet: e.result
-            ? CronTasksRepository.summariseResult(e.result)
-            : null,
-          errorSnippet: e.error?.message
-            ? CronTasksRepository.truncate(e.error.message, 60)
-            : null,
-        }));
+        const recentExecutions: CronTaskRecentExecution[] = taskExecs.map(
+          (e) => ({
+            status: e.status,
+            completedAt: e.completedAt?.toISOString() ?? null,
+            durationMs: e.durationMs,
+            resultSnippet: e.result
+              ? CronTasksRepository.summariseResult(e.result)
+              : null,
+            errorSnippet: e.error?.message
+              ? CronTasksRepository.truncate(e.error.message, 60)
+              : null,
+          }),
+        );
 
         return {
           id: t.id,
@@ -814,7 +814,7 @@ export class CronTasksRepository {
           schedule: t.schedule,
           enabled: t.enabled,
           lastExecutionStatus: t.lastExecutionStatus,
-          lastExecutedAt: t.lastExecutedAt,
+          lastExecutedAt: t.lastExecutedAt?.toISOString() ?? null,
           lastExecutionDuration: t.lastExecutionDuration,
           errorCount: t.errorCount,
           routeId: t.routeId,

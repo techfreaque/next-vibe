@@ -1,8 +1,6 @@
 import "server-only";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
-import type { TaskSummaryItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
-
 import type { TasksData } from "./prompt";
 
 export async function loadTasksData(
@@ -18,7 +16,7 @@ export async function loadTasksData(
   try {
     const { CronTasksRepository } =
       await import("@/app/api/[locale]/system/unified-interface/tasks/cron/repository");
-    const tasks: TaskSummaryItem[] = await CronTasksRepository.loadTaskItems({
+    const tasks = await CronTasksRepository.loadTaskItems({
       userId,
       logger,
     });

@@ -29,7 +29,7 @@ const displayFields = {
 
 const graphNodeSchema = z.object({
   /** Alias or dot-joined path identifying the endpoint */
-  endpointPath: z.string().min(1),
+  endpointPath: z.string().min(1).optional(),
   method: z.enum(["GET", "POST", "PUT", "DELETE"]).optional(),
   resolution: resolutionSchema.optional(),
   lookback: z.number().int().min(0).optional(),

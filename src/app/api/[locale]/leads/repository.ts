@@ -33,23 +33,17 @@ import type { BatchUpdateRequestOutput } from "./batch/definition";
 import type { LeadCreateRequestTypeOutput } from "./create/definition";
 import {
   emailCampaigns,
-  type Lead,
   leadEngagements,
   leadLeadLinks,
   leads,
   userLeadLinks,
+  type Lead,
 } from "./db";
 import type {
-  BatchOperationScopeValues,
-  EmailCampaignStageFilterValues,
-  EmailCampaignStageValues,
-  EngagementTypesValues,
-  LeadSortFieldValues,
-  LeadSourceFilterValues,
-  LeadSourceValues,
-  LeadStatusFilterValues,
-  LeadStatusValues,
-  SortOrderValues,
+  BatchOperationScopeValue,
+  LeadSortFieldValue,
+  LeadSourceFilterValue,
+  SortOrderValue,
 } from "./enum";
 import {
   BatchOperationScope,
@@ -65,13 +59,19 @@ import {
   mapStatusFilter,
   MimeType,
   SortOrder,
+  type EmailCampaignStageFilterValue,
+  type EmailCampaignStageValue,
+  type EngagementTypesValue,
+  type LeadSourceValue,
+  type LeadStatusFilterValue,
+  type LeadStatusValue,
 } from "./enum";
 import type {
   LeadExportRequestOutput,
   LeadExportResponseOutput,
 } from "./export/definition";
-import { scopedTranslation } from "./i18n";
 import type { LeadsT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import type { LeadListGetRequestTypeOutput } from "./list/definition";
 import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
 import type {
@@ -88,33 +88,14 @@ import type {
  */
 export class LeadsRepository {
   /**
-   * Utility function to ensure a lead has an email
-   * Returns the lead if it has an email, otherwise returns null
-   * @deprecated Use LeadsRepository.leadHasEmail type guard instead and handle null case
-   */
-  static ensureLeadHasEmail(lead: LeadResponseType): LeadWithEmailType | null {
-    if (!LeadsRepository.leadHasEmail(lead)) {
-      return null;
-    }
-    return lead;
-  }
-
-  /**
    * Type guard to check if a lead has an email
    */
-  static leadHasEmail(lead: LeadResponseType): lead is LeadWithEmailType {
+  private static leadHasEmail(
+    lead: LeadResponseType,
+  ): lead is LeadWithEmailType {
     return Boolean(lead.email);
   }
 
-  /**
-   * Filter leads to only include those with email addresses
-   * Returns an array of LeadWithEmailType
-   */
-  static filterLeadsWithEmail(
-    leadList: LeadResponseType[],
-  ): LeadWithEmailType[] {
-    return leadList.filter(LeadsRepository.leadHasEmail);
-  }
   /**
    * Create a new lead with business logic
    */
@@ -129,7 +110,7 @@ export class LeadsRepository {
           id: string;
           businessName: string;
           email: string | null;
-          status: typeof LeadStatusValues;
+          status: typeof LeadStatusValue;
         };
         contactDetails: {
           phone: string | null;
@@ -138,7 +119,7 @@ export class LeadsRepository {
           language: string;
         };
         trackingInfo: {
-          source: typeof LeadSourceValues | null;
+          source: typeof LeadSourceValue | null;
           emailsSent: number;
           currentCampaignStage: string | null;
         };
@@ -446,7 +427,7 @@ export class LeadsRepository {
         const mappedStatuses = statusFilters
           .map((filter) => mapStatusFilter(filter))
           .filter(
-            (status): status is typeof LeadStatusValues => status !== null,
+            (status): status is typeof LeadStatusValue => status !== null,
           );
         if (mappedStatuses.length > 0) {
           conditions.push(
@@ -460,7 +441,7 @@ export class LeadsRepository {
         const mappedStages = campaignStageFilters
           .map((filter) => mapCampaignStageFilter(filter))
           .filter(
-            (stage): stage is typeof EmailCampaignStageValues => stage !== null,
+            (stage): stage is typeof EmailCampaignStageValue => stage !== null,
           );
         if (mappedStages.length > 0) {
           conditions.push(
@@ -478,7 +459,7 @@ export class LeadsRepository {
         const mappedSources = sourceFilters
           .map((filter) => mapSourceFilter(filter))
           .filter(
-            (source): source is typeof LeadSourceValues => source !== null,
+            (source): source is typeof LeadSourceValue => source !== null,
           );
         if (mappedSources.length > 0) {
           conditions.push(
@@ -533,7 +514,7 @@ export class LeadsRepository {
         const mappedStages = campaignStageFilters
           .map((filter) => mapCampaignStageFilter(filter))
           .filter(
-            (stage): stage is typeof EmailCampaignStageValues => stage !== null,
+            (stage): stage is typeof EmailCampaignStageValue => stage !== null,
           );
         if (mappedStages.length > 0) {
           baseConditions.push(
@@ -549,7 +530,7 @@ export class LeadsRepository {
         const mappedSources = sourceFilters
           .map((filter) => mapSourceFilter(filter))
           .filter(
-            (source): source is typeof LeadSourceValues => source !== null,
+            (source): source is typeof LeadSourceValue => source !== null,
           );
         if (mappedSources.length > 0) {
           baseConditions.push(
@@ -1464,7 +1445,7 @@ export class LeadsRepository {
   static async recordEngagementInternal(
     data: {
       leadId: string;
-      engagementType: typeof EngagementTypesValues;
+      engagementType: typeof EngagementTypesValue;
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
       ipAddress?: string;
@@ -1590,7 +1571,7 @@ export class LeadsRepository {
   static async recordEngagement(
     data: {
       leadId: string;
-      engagementType: typeof EngagementTypesValues;
+      engagementType: typeof EngagementTypesValue;
       campaignId?: string;
       metadata?: Record<string, string | number | boolean>;
       ipAddress?: string;
@@ -1841,8 +1822,8 @@ export class LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: typeof LeadStatusValues;
-        currentCampaignStage: typeof EmailCampaignStageValues | null;
+        currentStatus: typeof LeadStatusValue;
+        currentCampaignStage: typeof EmailCampaignStageValue | null;
       }> | null;
     }>
   > {
@@ -1875,7 +1856,7 @@ export class LeadsRepository {
       // Handle status filters (can be array)
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
-          .map((filter: typeof LeadStatusFilterValues) =>
+          .map((filter: typeof LeadStatusFilterValue) =>
             mapStatusFilter(filter),
           )
           .filter(
@@ -1901,7 +1882,7 @@ export class LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter: typeof EmailCampaignStageFilterValues) =>
+          .map((filter: typeof EmailCampaignStageFilterValue) =>
             mapCampaignStageFilter(filter),
           )
           .filter(
@@ -1923,7 +1904,7 @@ export class LeadsRepository {
       // Handle source filters (can be array)
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
-          .map((filter: typeof LeadSourceFilterValues) =>
+          .map((filter: typeof LeadSourceFilterValue) =>
             mapSourceFilter(filter),
           )
           .filter(
@@ -2095,20 +2076,16 @@ export class LeadsRepository {
   static async batchDeleteLeads(
     data: {
       search?: string;
-      status?:
-        | typeof LeadStatusFilterValues
-        | (typeof LeadStatusFilterValues)[];
+      status?: typeof LeadStatusFilterValue | (typeof LeadStatusFilterValue)[];
       currentCampaignStage?:
-        | typeof EmailCampaignStageFilterValues
-        | (typeof EmailCampaignStageFilterValues)[];
+        | typeof EmailCampaignStageFilterValue
+        | (typeof EmailCampaignStageFilterValue)[];
       country?: CountryFilter;
       language?: LanguageFilter;
-      source?:
-        | typeof LeadSourceFilterValues
-        | (typeof LeadSourceFilterValues)[];
-      sortBy?: (typeof LeadSortFieldValues)[];
-      sortOrder?: (typeof SortOrderValues)[];
-      scope?: typeof BatchOperationScopeValues;
+      source?: typeof LeadSourceFilterValue | (typeof LeadSourceFilterValue)[];
+      sortBy?: (typeof LeadSortFieldValue)[];
+      sortOrder?: (typeof SortOrderValue)[];
+      scope?: typeof BatchOperationScopeValue;
       page?: number;
       pageSize?: number;
       confirmDelete: boolean;
@@ -2128,8 +2105,8 @@ export class LeadsRepository {
         id: string;
         email: string | null;
         businessName: string;
-        currentStatus: typeof LeadStatusValues;
-        currentCampaignStage: typeof EmailCampaignStageValues | null;
+        currentStatus: typeof LeadStatusValue;
+        currentCampaignStage: typeof EmailCampaignStageValue | null;
       }> | null;
     }>
   > {
@@ -2194,7 +2171,7 @@ export class LeadsRepository {
       // Handle status filters (can be array)
       if (status && Array.isArray(status) && status.length > 0) {
         const mappedStatuses = status
-          .map((filter: typeof LeadStatusFilterValues) =>
+          .map((filter: typeof LeadStatusFilterValue) =>
             mapStatusFilter(filter),
           )
           .filter(
@@ -2220,7 +2197,7 @@ export class LeadsRepository {
         currentCampaignStage.length > 0
       ) {
         const mappedStages = currentCampaignStage
-          .map((filter: typeof EmailCampaignStageFilterValues) =>
+          .map((filter: typeof EmailCampaignStageFilterValue) =>
             mapCampaignStageFilter(filter),
           )
           .filter(
@@ -2242,7 +2219,7 @@ export class LeadsRepository {
       // Handle source filters (can be array)
       if (source && Array.isArray(source) && source.length > 0) {
         const mappedSources = source
-          .map((filter: typeof LeadSourceFilterValues) =>
+          .map((filter: typeof LeadSourceFilterValue) =>
             mapSourceFilter(filter),
           )
           .filter(
@@ -2516,7 +2493,7 @@ export class LeadsRepository {
       linkedAt: Date;
       email: string | null;
       businessName: string;
-      status: typeof LeadStatusValues;
+      status: typeof LeadStatusValue;
       ipAddress: string | null;
       userAgent: string | null;
       createdAt: Date;
@@ -2530,7 +2507,7 @@ export class LeadsRepository {
           linkedAt: leadLeadLinks.linkedAt,
           email: leads.email,
           businessName: leads.businessName,
-          status: sql<typeof LeadStatusValues>`${leads.status}`,
+          status: sql<typeof LeadStatusValue>`${leads.status}`,
           ipAddress: leads.ipAddress,
           userAgent: leads.userAgent,
           createdAt: leads.createdAt,

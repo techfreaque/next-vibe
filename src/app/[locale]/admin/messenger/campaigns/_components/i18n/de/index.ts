@@ -14,8 +14,6 @@ export const translations: typeof enTranslations = {
     abTesting_description: "A/B-Testvarianten konfigurieren",
     settings: "Einstellungen",
     settings_description: "Kampagnen-Scheduler konfigurieren",
-    monitoring: "Monitoring",
-    monitoring_description: "Cron-Task-Status und Ausführungshistorie",
   },
   quickActions: "Schnellaktionen",
   quickActionTabs: {

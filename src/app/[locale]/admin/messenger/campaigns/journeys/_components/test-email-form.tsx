@@ -6,14 +6,14 @@
 
 import type { JSX } from "react";
 
-import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
 import testEmailDefinitions from "@/app/api/[locale]/leads/campaigns/emails/test-mail/definition";
 import {
-  type EmailCampaignStageValues,
-  type EmailJourneyVariantValues,
+  type EmailCampaignStageValue,
+  type EmailJourneyVariantValue,
   LeadSource,
   LeadStatus,
 } from "@/app/api/[locale]/leads/enum";
+import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -25,8 +25,8 @@ import {
 interface TestEmailFormProps {
   user: JwtPayloadType;
   locale: CountryLanguage;
-  emailJourneyVariant: typeof EmailJourneyVariantValues;
-  emailCampaignStage: typeof EmailCampaignStageValues;
+  emailJourneyVariant: typeof EmailJourneyVariantValue;
+  emailCampaignStage: typeof EmailCampaignStageValue;
 }
 
 export function TestEmailForm({

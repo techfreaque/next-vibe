@@ -31,16 +31,16 @@ import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 import type { JwtPrivatePayloadType } from "../../user/auth/types";
 import { leads, type NewLead } from "../db";
 import type {
-  EmailCampaignStageValues,
-  LeadSourceValues,
-  LeadStatusValues,
+  EmailCampaignStageValue,
+  LeadSourceValue,
+  LeadStatusValue,
 } from "../enum";
 import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
+import { csvImportJobs, importBatches, type CsvImportJob } from "./db";
 import type {
   LeadsImportRequestOutput,
   LeadsImportResponseOutput,
 } from "./definition";
-import { csvImportJobs, importBatches, type CsvImportJob } from "./db";
 import type { CsvImportJobStatus, CsvImportJobStatusValue } from "./enum";
 import { CsvImportJobStatus as CsvImportJobStatusEnum } from "./enum";
 import type { ImportT } from "./i18n";
@@ -54,9 +54,9 @@ interface CsvImportConfig {
   updateExisting: boolean;
   defaultCountry: Countries;
   defaultLanguage: Languages;
-  defaultStatus: typeof LeadStatusValues;
-  defaultCampaignStage: typeof EmailCampaignStageValues;
-  defaultSource: typeof LeadSourceValues;
+  defaultStatus: typeof LeadStatusValue;
+  defaultCampaignStage: typeof EmailCampaignStageValue;
+  defaultSource: typeof LeadSourceValue;
   useChunkedProcessing: boolean;
   batchSize: number;
 }
@@ -75,9 +75,9 @@ interface LeadRecord {
   website?: string | null;
   country: Countries;
   language: Languages;
-  source: typeof LeadSourceValues;
-  status: typeof LeadStatusValues;
-  currentCampaignStage: typeof EmailCampaignStageValues;
+  source: typeof LeadSourceValue;
+  status: typeof LeadStatusValue;
+  currentCampaignStage: typeof EmailCampaignStageValue;
 }
 
 /**
@@ -919,10 +919,10 @@ export class LeadsImportRepository {
         updateExisting: job.updateExisting,
         defaultCountry: job.defaultCountry as Countries,
         defaultLanguage: job.defaultLanguage as Languages,
-        defaultStatus: job.defaultStatus as typeof LeadStatusValues,
+        defaultStatus: job.defaultStatus as typeof LeadStatusValue,
         defaultCampaignStage:
-          job.defaultCampaignStage as typeof EmailCampaignStageValues,
-        defaultSource: job.defaultSource as typeof LeadSourceValues,
+          job.defaultCampaignStage as typeof EmailCampaignStageValue,
+        defaultSource: job.defaultSource as typeof LeadSourceValue,
         useChunkedProcessing: true,
         batchSize: job.batchSize,
       };
@@ -1219,6 +1219,3 @@ export class LeadsImportRepository {
     }
   }
 }
-
-// Export alias for backward-compatibility with route files
-export { LeadsImportRepository as ImportRepository };

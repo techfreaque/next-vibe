@@ -704,7 +704,13 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
   );
 }
 
-const ENABLED = true;
+/**
+ * Controls what gets seeded in the dev environment:
+ * - "none"           — only journey variants; no lead data
+ * - "random"         — random leads with mixed statuses/stages (like it was before)
+ * - "campaign_ready" — imported leads in NEW status / NOT_STARTED stage, ready to run a campaign
+ */
+const SEED_MODE: "none" | "random" | "campaign_ready" = "random";
 
 /**
  * Locales to seed campaign leads for
@@ -765,35 +771,40 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   // Always seed journey variants so admin UI shows them
   await seedJourneyVariants(logger);
 
-  // Always seed campaign-ready imported leads for flow testing
-  logger.debug(
-    `🌱 Seeding ${CAMPAIGN_LEADS_PER_LOCALE} imported leads per locale...`,
-  );
-
-  // Clear previous imported seed leads to avoid duplicates on re-seed
-  await db
-    .delete(leads)
-    .where(
-      sql`${leads.metadata}->>'imported' = 'true' AND ${leads.metadata}->>'generated' = 'true'`,
-    );
-
-  for (const { language, country } of CAMPAIGN_SEED_LOCALES) {
-    const localeLeads: NewLead[] = [];
-    for (let i = 0; i < CAMPAIGN_LEADS_PER_LOCALE; i++) {
-      localeLeads.push(generateImportedLead(i, language, country));
-    }
-    // Insert in batches of 100 to avoid query size limits
-    for (let i = 0; i < localeLeads.length; i += 100) {
-      await db.insert(leads).values(localeLeads.slice(i, i + 100));
-    }
-    logger.debug(
-      `✅ Seeded ${CAMPAIGN_LEADS_PER_LOCALE} imported leads for ${language}-${country}`,
-    );
-  }
-
-  if (!ENABLED) {
+  if (SEED_MODE === "none") {
+    logger.debug("⏭️ SEED_MODE=none — skipping lead seeding");
     return;
   }
+
+  if (SEED_MODE === "campaign_ready") {
+    logger.debug(
+      `🌱 Seeding ${CAMPAIGN_LEADS_PER_LOCALE} campaign-ready imported leads per locale...`,
+    );
+
+    // Clear previous imported seed leads to avoid duplicates on re-seed
+    await db
+      .delete(leads)
+      .where(
+        sql`${leads.metadata}->>'imported' = 'true' AND ${leads.metadata}->>'generated' = 'true'`,
+      );
+
+    for (const { language, country } of CAMPAIGN_SEED_LOCALES) {
+      const localeLeads: NewLead[] = [];
+      for (let i = 0; i < CAMPAIGN_LEADS_PER_LOCALE; i++) {
+        localeLeads.push(generateImportedLead(i, language, country));
+      }
+      // Insert in batches of 100 to avoid query size limits
+      for (let i = 0; i < localeLeads.length; i += 100) {
+        await db.insert(leads).values(localeLeads.slice(i, i + 100));
+      }
+      logger.debug(
+        `✅ Seeded ${CAMPAIGN_LEADS_PER_LOCALE} imported leads for ${language}-${country}`,
+      );
+    }
+    return;
+  }
+
+  // SEED_MODE === "random"
   logger.debug("🌱 Seeding random development leads...");
 
   // Clear existing random development leads to avoid duplicates

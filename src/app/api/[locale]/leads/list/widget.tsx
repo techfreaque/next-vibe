@@ -49,10 +49,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type {
-  LeadSortFieldValues,
-  LeadSourceFilterValues,
-  LeadStatusFilterValues,
-  SortOrderValues,
+  LeadSortFieldValue,
+  LeadSourceFilterValue,
+  LeadStatusFilterValue,
+  SortOrderValue,
 } from "../enum";
 import {
   LeadSortField,
@@ -327,14 +327,14 @@ export function LeadsListContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const navigation = useWidgetNavigation();
 
-  const activeStatuses: (typeof LeadStatusFilterValues)[] =
+  const activeStatuses: (typeof LeadStatusFilterValue)[] =
     form.watch("statusFilters.status") ?? [];
-  const activeSources: (typeof LeadSourceFilterValues)[] =
+  const activeSources: (typeof LeadSourceFilterValue)[] =
     form.watch("statusFilters.source") ?? [];
   const searchValue = form.watch("statusFilters.search") ?? "";
-  const sortBy: typeof LeadSortFieldValues =
+  const sortBy: typeof LeadSortFieldValue =
     form.watch("sortingOptions.sortBy") ?? LeadSortField.CREATED_AT;
-  const sortOrder: typeof SortOrderValues =
+  const sortOrder: typeof SortOrderValue =
     form.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
 
   const leads = useMemo(

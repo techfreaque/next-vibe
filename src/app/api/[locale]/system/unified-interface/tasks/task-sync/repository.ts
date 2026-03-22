@@ -191,7 +191,9 @@ export class TaskSyncRepository {
         // Build update payload from fields actually present in the remote payload.
         // Old remotes may not send newer fields — skip undefined to avoid
         // overwriting local values with null/defaults.
-        const definitionFields: Partial<NewCronTask> & { updatedAt: Date } = {
+        const definitionFields: Partial<
+          NewCronTask<Record<string, JsonValue>>
+        > & { updatedAt: Date } = {
           displayName: remoteTask.displayName,
           description: remoteTask.description,
           category: remoteTask.category,

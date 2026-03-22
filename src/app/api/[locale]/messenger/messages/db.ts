@@ -60,6 +60,7 @@ export const messengerFolders = pgTable(
     uidValidity: integer("uid_validity"),
     uidNext: integer("uid_next"),
     messageCount: integer("message_count").default(0),
+    recentCount: integer("recent_count").default(0),
     unseenCount: integer("unseen_count").default(0),
 
     // Account association

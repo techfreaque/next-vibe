@@ -25,7 +25,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { messengerAccounts } from "../../../../accounts/db";
-import { imapFolders, toImapShape } from "../db";
+import { messengerFolders } from "../../../../messages/db";
+import { toImapShape } from "../db";
 import { smtpProvider } from "../../../../providers/email/smtp";
 import {
   ImapAccountFilter,
@@ -365,10 +366,10 @@ export class ImapMessagesRepository {
       const messagesWithFolders = await db
         .select({
           email: emails,
-          folderName: imapFolders.name,
+          folderName: messengerFolders.name,
         })
         .from(emails)
-        .leftJoin(imapFolders, eq(emails.folderId, imapFolders.id))
+        .leftJoin(messengerFolders, eq(emails.folderId, messengerFolders.id))
         .where(whereClause)
         .orderBy(orderByClause)
         .limit(safeLimit)
@@ -412,9 +413,9 @@ export class ImapMessagesRepository {
       logger.debug("Getting IMAP message by ID", { id: data.id });
 
       const [row] = await db
-        .select({ email: emails, folderName: imapFolders.name })
+        .select({ email: emails, folderName: messengerFolders.name })
         .from(emails)
-        .leftJoin(imapFolders, eq(emails.folderId, imapFolders.id))
+        .leftJoin(messengerFolders, eq(emails.folderId, messengerFolders.id))
         .where(eq(emails.id, data.id))
         .limit(1);
 
@@ -764,9 +765,9 @@ export class ImapMessagesRepository {
       // Sync to IMAP via provider if we have IMAP metadata
       if (existing?.accountId && existing.uid && existing.folderId) {
         const [folder] = await db
-          .select({ path: imapFolders.path })
-          .from(imapFolders)
-          .where(eq(imapFolders.id, existing.folderId))
+          .select({ path: messengerFolders.path })
+          .from(messengerFolders)
+          .where(eq(messengerFolders.id, existing.folderId))
           .limit(1);
 
         if (folder) {

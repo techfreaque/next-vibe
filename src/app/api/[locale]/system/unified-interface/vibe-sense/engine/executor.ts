@@ -157,6 +157,9 @@ export async function executeNode(
     }
   }
 
+  if (!nodeConfig.endpointPath) {
+    return;
+  }
   const response = await callEndpoint(nodeConfig.endpointPath, inputs);
   if (response === null) {
     return;
@@ -292,7 +295,7 @@ function isGatedByEvaluator(
       return false;
     }
     // Evaluator endpoints have path containing "evaluators"
-    return src.endpointPath.includes("evaluator");
+    return (src.endpointPath ?? "").includes("evaluator");
   });
 }
 

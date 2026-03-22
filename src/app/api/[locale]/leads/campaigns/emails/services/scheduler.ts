@@ -25,9 +25,9 @@ import {
 import { MessageStatus } from "../../../../messenger/messages/enum";
 import { emailCampaigns, leads } from "../../../db";
 import type {
-  EmailCampaignStageValues,
-  EmailJourneyVariantValues,
-  EmailProviderValues,
+  EmailCampaignStageValue,
+  EmailJourneyVariantValue,
+  EmailProviderValue,
 } from "../../../enum";
 import {
   EmailCampaignStage,
@@ -42,7 +42,7 @@ import { abTestingService } from "./ab-testing";
  * Defines timing between email stages
  */
 type SchedulableStage = Exclude<
-  typeof EmailCampaignStageValues,
+  typeof EmailCampaignStageValue,
   (typeof EmailCampaignStage)["NOT_STARTED"]
 >;
 
@@ -130,7 +130,7 @@ export class CampaignSchedulerService {
     leadId: string,
     options: {
       campaignType?: typeof CampaignTypeValue;
-      journeyVariant?: typeof EmailJourneyVariantValues;
+      journeyVariant?: typeof EmailJourneyVariantValue;
       priority?: "low" | "normal" | "high";
       metadata?: Record<string, string | number | boolean>;
     } = {},
@@ -303,10 +303,10 @@ export class CampaignSchedulerService {
     leadId: string,
     campaignType: typeof CampaignTypeValue,
     currentStage: Exclude<
-      typeof EmailCampaignStageValues,
+      typeof EmailCampaignStageValue,
       (typeof EmailCampaignStage)["NOT_STARTED"]
     >,
-    journeyVariant: typeof EmailJourneyVariantValues,
+    journeyVariant: typeof EmailJourneyVariantValue,
     logger: EndpointLogger,
   ): Promise<string | null> {
     try {
@@ -357,8 +357,8 @@ export class CampaignSchedulerService {
       id: string;
       leadId: string;
       campaignType: typeof CampaignTypeValue;
-      stage: typeof EmailCampaignStageValues;
-      journeyVariant: typeof EmailJourneyVariantValues;
+      stage: typeof EmailCampaignStageValue;
+      journeyVariant: typeof EmailJourneyVariantValue;
       scheduledAt: Date;
       retryCount: number;
       lead: {
@@ -434,7 +434,7 @@ export class CampaignSchedulerService {
   async markEmailAsSent(
     campaignId: string,
     logger: EndpointLogger,
-    emailProvider: typeof EmailProviderValues,
+    emailProvider: typeof EmailProviderValue,
     externalId: string | null = null,
     smtpAccountId: string | null = null,
   ): Promise<boolean> {
@@ -699,7 +699,7 @@ export class CampaignSchedulerService {
    */
   async getCampaignStats(
     logger: EndpointLogger,
-    journeyVariant: typeof EmailJourneyVariantValues | null = null,
+    journeyVariant: typeof EmailJourneyVariantValue | null = null,
   ): Promise<{
     total: number;
     pending: number;
@@ -738,7 +738,7 @@ export class CampaignSchedulerService {
         failed: 0,
       };
 
-      logger.info("campaign.stats.retrieved", {
+      logger.debug("Campaign stats retrieved", {
         journeyVariant,
         ...result,
       });

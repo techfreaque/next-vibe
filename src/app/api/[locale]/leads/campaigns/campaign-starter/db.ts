@@ -24,13 +24,18 @@ export const campaignStarterConfigs = pgTable("campaign_starter_configs", {
   // Configuration settings
   dryRun: integer("dry_run").notNull().default(0), // 0 = false, 1 = true (boolean as integer)
   minAgeHours: integer("min_age_hours").notNull().default(0),
-  enabledDays: jsonb("enabled_days").$type<number[]>().notNull(), // Array of days (1-7)
-  enabledHours: jsonb("enabled_hours")
-    .$type<{ start: number; end: number }>()
-    .notNull(),
-  leadsPerWeek: jsonb("leads_per_week")
-    .$type<Record<string, number>>()
-    .notNull(), // Locale -> leads per week
+  localeConfig: jsonb("locale_config")
+    .$type<
+      Record<
+        string,
+        {
+          leadsPerWeek: number;
+          enabledDays: number[];
+          enabledHours: { start: number; end: number };
+        }
+      >
+    >()
+    .notNull(), // locale -> { leadsPerWeek, enabledDays, enabledHours }
 
   // Metadata
   createdAt: timestamp("created_at").defaultNow().notNull(),
