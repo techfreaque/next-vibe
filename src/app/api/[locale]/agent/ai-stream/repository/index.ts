@@ -561,7 +561,7 @@ export class AiStreamRepository {
             messages.push(...truncated);
           }
 
-          logger.info(
+          logger.debug(
             "[AI Stream] Calling StreamExecutionHandler.executeStream",
             {
               messageCount: messages.length,

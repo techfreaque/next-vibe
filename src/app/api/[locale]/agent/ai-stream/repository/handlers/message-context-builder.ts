@@ -537,7 +537,7 @@ export class MessageContextBuilder {
       }
 
       branchMessages.reverse(); // Oldest first
-      logger.info("[fetchBranchMessages] Incognito branch messages fetched", {
+      logger.debug("[fetchBranchMessages] Incognito branch messages fetched", {
         count: branchMessages.length,
         parentMessageId,
       });
@@ -638,7 +638,7 @@ export class MessageContextBuilder {
       logger,
     });
 
-    logger.info("[Compacting] Fetched branch messages", {
+    logger.debug("[Compacting] Fetched branch messages", {
       branchMessageCount: branchMessages.length,
       isIncognito,
     });

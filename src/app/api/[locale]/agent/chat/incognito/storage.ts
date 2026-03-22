@@ -356,19 +356,46 @@ export async function getFoldersForRoot(
 }
 
 /**
- * Parse message from storage - convert string dates to Date objects
+ * Parse message from storage - convert string dates to Date objects and
+ * sanitize any stale object-typed fields from old storage formats.
  */
 function parseMessage(message: ChatMessage): ChatMessage {
+  const now = new Date();
+  const rawCreatedAt = message.createdAt as Date | string | number | null;
+  const rawUpdatedAt = message.updatedAt as Date | string | number | null;
+  const createdAt =
+    rawCreatedAt instanceof Date
+      ? rawCreatedAt
+      : typeof rawCreatedAt === "string" && rawCreatedAt.length > 0
+        ? new Date(rawCreatedAt)
+        : typeof rawCreatedAt === "number"
+          ? new Date(rawCreatedAt)
+          : now;
+  const updatedAt =
+    rawUpdatedAt instanceof Date
+      ? rawUpdatedAt
+      : typeof rawUpdatedAt === "string" && rawUpdatedAt.length > 0
+        ? new Date(rawUpdatedAt)
+        : typeof rawUpdatedAt === "number"
+          ? new Date(rawUpdatedAt)
+          : now;
+  const rawContent = message.content as string | Record<string, string> | null;
+  const rawErrorMessage = message.errorMessage as
+    | string
+    | Record<string, string>
+    | null;
   return {
     ...message,
-    createdAt:
-      typeof message.createdAt === "string"
-        ? new Date(message.createdAt)
-        : message.createdAt,
-    updatedAt:
-      typeof message.updatedAt === "string"
-        ? new Date(message.updatedAt)
-        : message.updatedAt,
+    createdAt,
+    updatedAt,
+    content:
+      rawContent === null || typeof rawContent === "string"
+        ? rawContent
+        : JSON.stringify(rawContent),
+    errorMessage:
+      rawErrorMessage === null || typeof rawErrorMessage === "string"
+        ? rawErrorMessage
+        : JSON.stringify(rawErrorMessage),
   };
 }
 

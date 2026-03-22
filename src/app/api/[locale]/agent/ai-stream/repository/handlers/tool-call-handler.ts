@@ -120,7 +120,7 @@ export class ToolCallHandler {
         dbWriter.emitClosingDelta(currentAssistantMessageId, thinkCloseTag);
         _newIsInReasoningBlock = false;
 
-        logger.info(
+        logger.debug(
           "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
           {
             messageId: currentAssistantMessageId,
