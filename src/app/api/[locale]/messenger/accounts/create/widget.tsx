@@ -4,6 +4,7 @@
 
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
@@ -36,6 +37,71 @@ interface CustomWidgetProps {
   } & (typeof definition.POST)["fields"];
 }
 
+function SectionCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}): React.JSX.Element {
+  return (
+    <Div className="rounded-lg border border-border bg-card p-4 flex flex-col gap-3">
+      <Div className="flex flex-col gap-0.5">
+        <Span className="text-sm font-semibold">{title}</Span>
+        {subtitle && (
+          <Span className="text-xs text-muted-foreground">{subtitle}</Span>
+        )}
+      </Div>
+      {children}
+    </Div>
+  );
+}
+
+function CollapsibleSection({
+  title,
+  subtitle,
+  toggleShow,
+  toggleHide,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  subtitle?: string;
+  toggleShow: string;
+  toggleHide: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}): React.JSX.Element {
+  const [open, setOpen] = React.useState(defaultOpen);
+  return (
+    <Div className="rounded-lg border border-border bg-card flex flex-col">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center justify-between p-4 h-auto text-left hover:bg-accent/50 transition-colors rounded-lg w-full"
+      >
+        <Div className="flex flex-col gap-0.5 items-start">
+          <Span className="text-sm font-semibold">{title}</Span>
+          {subtitle && (
+            <Span className="text-xs text-muted-foreground">{subtitle}</Span>
+          )}
+        </Div>
+        <Span className="text-muted-foreground text-xs ml-4">
+          {open ? toggleHide : toggleShow}
+        </Span>
+      </Button>
+      {open && (
+        <Div className="px-4 pb-4 flex flex-col gap-3 border-t border-border pt-4">
+          {children}
+        </Div>
+      )}
+    </Div>
+  );
+}
+
 export function MessengerAccountCreateContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
@@ -52,9 +118,13 @@ export function MessengerAccountCreateContainer({
   }, [createdId, navigate]);
 
   const channel = form.watch("channel") ?? "";
+  const provider = form.watch("provider") ?? "";
   const isEmail = channel === MessageChannel.EMAIL;
-  const isSmtp = isEmail && form.watch("provider") === "enums.provider.smtp";
-  const isApiProvider = !isSmtp && channel !== "";
+  const isSms = channel === MessageChannel.SMS;
+  const isWhatsapp = channel === MessageChannel.WHATSAPP;
+  const isTelegram = channel === MessageChannel.TELEGRAM;
+  const isSmtp = isEmail && provider === "enums.provider.smtp";
+  const isApiProvider = channel !== "" && !isSmtp;
 
   const validProviders = channel ? CHANNEL_TO_PROVIDERS[channel] : undefined;
   const filteredProviderOptions = validProviders
@@ -63,6 +133,22 @@ export function MessengerAccountCreateContainer({
       )
     : MessengerProviderOptions;
 
+  // Per-channel section labels via i18n
+  const apiSectionTitle = isTelegram
+    ? t("sections.apiTitleTelegram")
+    : isWhatsapp
+      ? t("sections.apiTitleWhatsapp")
+      : isSms
+        ? t("sections.apiTitleSms")
+        : t("sections.api");
+  const apiSectionSubtitle = isTelegram
+    ? t("sections.apiSubtitleTelegram")
+    : isWhatsapp
+      ? t("sections.apiSubtitleWhatsapp")
+      : isSms
+        ? t("sections.apiSubtitleSms")
+        : t("sections.apiSubtitle");
+
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
@@ -70,15 +156,14 @@ export function MessengerAccountCreateContainer({
         <Span className="font-semibold text-base">{t("title")}</Span>
       </Div>
 
-      {/* Form body */}
-      <Div className="p-4 flex flex-col gap-6">
+      <Div className="p-4 flex flex-col gap-4">
         <FormAlertWidget field={{}} />
 
         {/* Identity */}
-        <Div className="flex flex-col gap-3">
-          <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("sections.identity")}
-          </Span>
+        <SectionCard
+          title={t("sections.identity")}
+          subtitle={t("sections.identitySubtitle")}
+        >
           <Div className="grid grid-cols-2 gap-3">
             <TextFieldWidget fieldName={"name"} field={children.name} />
             <SelectFieldWidget fieldName={"status"} field={children.status} />
@@ -99,19 +184,21 @@ export function MessengerAccountCreateContainer({
               fieldName={"priority"}
               field={children.priority}
             />
-            <BooleanFieldWidget
-              fieldName={"isDefault"}
-              field={children.isDefault}
-            />
+            <Div className="flex items-end pb-1">
+              <BooleanFieldWidget
+                fieldName={"isDefault"}
+                field={children.isDefault}
+              />
+            </Div>
           </Div>
-        </Div>
+        </SectionCard>
 
-        {/* SMTP credentials (EMAIL + SMTP provider) */}
+        {/* SMTP credentials */}
         {isSmtp && (
-          <Div className="flex flex-col gap-3">
-            <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("sections.smtp")}
-            </Span>
+          <SectionCard
+            title={t("sections.smtp")}
+            subtitle={t("sections.smtpSubtitle")}
+          >
             <TextFieldWidget fieldName={"smtpHost"} field={children.smtpHost} />
             <Div className="grid grid-cols-2 gap-3">
               <NumberFieldWidget
@@ -151,25 +238,29 @@ export function MessengerAccountCreateContainer({
                 field={children.smtpRateLimitPerHour}
               />
             </Div>
-          </Div>
+          </SectionCard>
         )}
 
-        {/* API credentials (non-SMTP providers) */}
+        {/* API credentials (non-SMTP) */}
         {isApiProvider && (
-          <Div className="flex flex-col gap-3">
-            <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("sections.api")}
-            </Span>
-            <PasswordFieldWidget fieldName={"apiKey"} field={children.apiKey} />
+          <SectionCard title={apiSectionTitle} subtitle={apiSectionSubtitle}>
+            {!isTelegram && (
+              <PasswordFieldWidget
+                fieldName={"apiKey"}
+                field={children.apiKey}
+              />
+            )}
             <Div className="grid grid-cols-2 gap-3">
               <PasswordFieldWidget
                 fieldName={"apiToken"}
                 field={children.apiToken}
               />
-              <PasswordFieldWidget
-                fieldName={"apiSecret"}
-                field={children.apiSecret}
-              />
+              {!isTelegram && (
+                <PasswordFieldWidget
+                  fieldName={"apiSecret"}
+                  field={children.apiSecret}
+                />
+              )}
             </Div>
             <Div className="grid grid-cols-2 gap-3">
               <TextFieldWidget fieldName={"fromId"} field={children.fromId} />
@@ -178,25 +269,30 @@ export function MessengerAccountCreateContainer({
                 field={children.webhookUrl}
               />
             </Div>
-          </Div>
+          </SectionCard>
         )}
 
-        {/* IMAP inbound (EMAIL channel only) */}
-        {isEmail && (
-          <Div className="flex flex-col gap-3">
-            <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("sections.imap")}
-            </Span>
+        {/* IMAP inbound — collapsible, optional */}
+        {isSmtp && (
+          <CollapsibleSection
+            title={t("sections.imap")}
+            subtitle={t("sections.imapSubtitle")}
+            toggleShow={t("sections.toggleShow")}
+            toggleHide={t("sections.toggleHide")}
+            defaultOpen={false}
+          >
             <TextFieldWidget fieldName={"imapHost"} field={children.imapHost} />
             <Div className="grid grid-cols-2 gap-3">
               <NumberFieldWidget
                 fieldName={"imapPort"}
                 field={children.imapPort}
               />
-              <BooleanFieldWidget
-                fieldName={"imapSecure"}
-                field={children.imapSecure}
-              />
+              <Div className="flex items-end pb-1">
+                <BooleanFieldWidget
+                  fieldName={"imapSecure"}
+                  field={children.imapSecure}
+                />
+              </Div>
             </Div>
             <Div className="grid grid-cols-2 gap-3">
               <TextFieldWidget
@@ -226,20 +322,23 @@ export function MessengerAccountCreateContainer({
               fieldName={"imapMaxMessages"}
               field={children.imapMaxMessages}
             />
-          </Div>
+          </CollapsibleSection>
         )}
 
-        {/* Email routing (EMAIL channel only) */}
+        {/* Email routing — collapsible */}
         {isEmail && (
-          <Div className="flex flex-col gap-3">
-            <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("sections.routing")}
-            </Span>
+          <CollapsibleSection
+            title={t("sections.routing")}
+            subtitle={t("sections.routingSubtitle")}
+            toggleShow={t("sections.toggleShow")}
+            toggleHide={t("sections.toggleHide")}
+            defaultOpen={true}
+          >
+            <MultiSelectFieldWidget
+              fieldName={"campaignTypes"}
+              field={children.campaignTypes}
+            />
             <Div className="grid grid-cols-2 gap-3">
-              <MultiSelectFieldWidget
-                fieldName={"campaignTypes"}
-                field={children.campaignTypes}
-              />
               <MultiSelectFieldWidget
                 fieldName={"emailJourneyVariants"}
                 field={children.emailJourneyVariants}
@@ -248,6 +347,8 @@ export function MessengerAccountCreateContainer({
                 fieldName={"emailCampaignStages"}
                 field={children.emailCampaignStages}
               />
+            </Div>
+            <Div className="grid grid-cols-2 gap-3">
               <MultiSelectFieldWidget
                 fieldName={"countries"}
                 field={children.countries}
@@ -272,7 +373,7 @@ export function MessengerAccountCreateContainer({
               fieldName={"failoverPriority"}
               field={children.failoverPriority}
             />
-          </Div>
+          </CollapsibleSection>
         )}
 
         {/* Submit */}

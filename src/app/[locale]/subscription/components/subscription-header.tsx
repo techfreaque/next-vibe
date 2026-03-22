@@ -14,13 +14,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 interface SubscriptionHeaderProps {
   locale: CountryLanguage;
   isAuthenticated: boolean;
-  isAdmin: boolean;
 }
 
 export function SubscriptionHeader({
   locale,
   isAuthenticated,
-  isAdmin,
 }: SubscriptionHeaderProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -64,14 +62,10 @@ export function SubscriptionHeader({
         className="text-center flex flex-col gap-4"
       >
         <H1 className="text-4xl font-bold tracking-tight">
-          {isAdmin
-            ? t("app.subscription.subscription.admin.title")
-            : t("app.subscription.subscription.title")}
+          {t("app.subscription.subscription.title")}
         </H1>
         <P className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          {isAdmin
-            ? t("app.subscription.subscription.admin.description")
-            : t("app.subscription.subscription.description")}
+          {t("app.subscription.subscription.description")}
         </P>
       </MotionDiv>
     </>

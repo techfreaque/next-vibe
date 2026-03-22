@@ -44,13 +44,46 @@ export const translations = {
   },
 
   sections: {
-    identity: "Ustawienia konta",
-    smtp: "Dane SMTP",
+    identity: "Tożsamość konta",
+    identitySubtitle: "Nazwa i podstawowe ustawienia konta",
+    smtp: "Wychodzące SMTP",
+    smtpSubtitle: "Ustawienia serwera do wysyłania e-maili",
     api: "Dane API",
-    imap: "IMAP przychodzący",
+    apiSubtitle: "Klucz API i token dostępu",
+    apiSubtitleSms: "Klucz API i identyfikator nadawcy",
+    apiSubtitleWhatsapp: "Token API WhatsApp Business i identyfikator numeru",
+    apiSubtitleTelegram: "Wpisz token bota z @BotFather",
+    apiTitleSms: "Dane dostawcy SMS",
+    apiTitleWhatsapp: "Dane WhatsApp Business",
+    apiTitleTelegram: "Token bota",
+    imap: "Przychodzące IMAP",
+    imapSubtitle:
+      "Konfiguracja odbierania i synchronizacji przychodzących e-maili (opcjonalne)",
     routing: "Routing e-mail",
+    routingSubtitle: "Kontrola kampanii i podróży dla tego konta",
+    toggleHide: "Ukryj",
+    toggleShow: "Pokaż",
   },
 
+  delete: {
+    title: "Usuń konto",
+    description: "Trwale usuń to konto messenger",
+    container: {
+      title: "Usuń konto",
+      description:
+        "Czy na pewno chcesz trwale usunąć to konto messenger? Tej operacji nie można cofnąć.",
+    },
+    backButton: {
+      label: "Anuluj",
+    },
+    deleteButton: {
+      label: "Usuń konto",
+    },
+    success: {
+      title: "Konto usunięte",
+      description: "Konto messenger zostało trwale usunięte",
+    },
+  },
   put: {
     title: "Edytuj konto Messenger",
     description: "Zaktualizuj ustawienia konta messenger",

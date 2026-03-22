@@ -23,8 +23,12 @@ import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
 import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
-import portalEndpoints from "@/app/api/[locale]/payment/portal/definition";
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useCustomerPortal } from "@/app/api/[locale]/payment/portal/hooks";
+import {
+  useWidgetLogger,
+  useWidgetTranslation,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
@@ -56,6 +60,9 @@ export function SubscriptionOverviewContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const subscription = field.value;
   const { locale } = useTranslation();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+  const portal = useCustomerPortal(logger, user);
 
   if (!subscription) {
     return <Div />;
@@ -84,30 +91,22 @@ export function SubscriptionOverviewContainer({
       return;
     }
 
-    try {
-      const response = await fetch(
-        `/api/${locale}/${portalEndpoints.POST.path.join("/")}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            returnUrl: `${window.location.origin}/${locale}/subscription`,
-          }),
-        },
-      );
-
-      const result = await response.json();
-
-      if (result.success && result.data?.customerPortalUrl) {
-        window.location.href = result.data.customerPortalUrl;
-      } else if (result.data?.message) {
-        alert(result.data.message);
-      } else {
-        alert("Failed to open customer portal. Please try again.");
-      }
-    } catch {
-      alert("Failed to open customer portal. Please try again.");
-    }
+    portal.create.setValue(
+      "returnUrl",
+      `${window.location.origin}/${locale}/subscription`,
+    );
+    await portal.create.submitForm({
+      onSuccess: ({ responseData }) => {
+        if (responseData.customerPortalUrl) {
+          window.location.href = responseData.customerPortalUrl;
+        }
+      },
+      onError: ({ error }) => {
+        alert(
+          error.message ?? "Failed to open customer portal. Please try again.",
+        );
+      },
+    });
   };
 
   return (

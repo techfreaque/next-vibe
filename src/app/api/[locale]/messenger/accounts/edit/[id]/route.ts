@@ -6,7 +6,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import definitions from "./definition";
 import { MessengerAccountEditRepository } from "./repository";
 
-export const { GET, PUT, tools } = endpointsHandler({
+export const { GET, PUT, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
@@ -18,6 +18,16 @@ export const { GET, PUT, tools } = endpointsHandler({
     handler: ({ data, urlPathParams, user, logger, t }) =>
       MessengerAccountEditRepository.updateAccount(
         { ...data, id: urlPathParams.id },
+        user,
+        logger,
+        t,
+      ),
+  },
+  [Methods.DELETE]: {
+    email: undefined,
+    handler: ({ urlPathParams, user, logger, t }) =>
+      MessengerAccountEditRepository.deleteAccount(
+        urlPathParams,
         user,
         logger,
         t,

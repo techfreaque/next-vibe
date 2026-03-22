@@ -42,11 +42,24 @@ export const translations = {
   },
 
   sections: {
-    identity: "Kontoeinstellungen",
-    smtp: "SMTP-Zugangsdaten",
+    identity: "Kontoidentität",
+    identitySubtitle: "Name und grundlegende Einstellungen",
+    smtp: "SMTP-Ausgang",
+    smtpSubtitle: "Servereinstellungen für den E-Mail-Versand",
     api: "API-Zugangsdaten",
+    apiSubtitle: "API-Schlüssel und Zugriffstoken",
+    apiSubtitleSms: "API-Schlüssel und Absender-ID",
+    apiSubtitleWhatsapp: "WhatsApp Business API-Token und Telefonnummern-ID",
+    apiSubtitleTelegram: "Bot-Token von @BotFather eingeben",
+    apiTitleSms: "SMS-Anbieter-Zugangsdaten",
+    apiTitleWhatsapp: "WhatsApp Business-Zugangsdaten",
+    apiTitleTelegram: "Bot-Token",
     imap: "IMAP-Eingang",
+    imapSubtitle: "Eingehende E-Mails empfangen und synchronisieren (optional)",
     routing: "E-Mail-Routing",
+    routingSubtitle: "Kampagnen und Journeys für dieses Konto steuern",
+    toggleHide: "Ausblenden",
+    toggleShow: "Einblenden",
   },
 
   fields: {

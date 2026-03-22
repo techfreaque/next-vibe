@@ -44,13 +44,45 @@ export const translations = {
   },
 
   sections: {
-    identity: "Kontoeinstellungen",
-    smtp: "SMTP-Zugangsdaten",
+    identity: "Kontoidentität",
+    identitySubtitle: "Name und grundlegende Einstellungen",
+    smtp: "SMTP-Ausgang",
+    smtpSubtitle: "Servereinstellungen für den E-Mail-Versand",
     api: "API-Zugangsdaten",
+    apiSubtitle: "API-Schlüssel und Zugriffstoken",
+    apiSubtitleSms: "API-Schlüssel und Absender-ID",
+    apiSubtitleWhatsapp: "WhatsApp Business API-Token und Telefonnummern-ID",
+    apiSubtitleTelegram: "Bot-Token von @BotFather eingeben",
+    apiTitleSms: "SMS-Anbieter-Zugangsdaten",
+    apiTitleWhatsapp: "WhatsApp Business-Zugangsdaten",
+    apiTitleTelegram: "Bot-Token",
     imap: "IMAP-Eingang",
+    imapSubtitle: "Eingehende E-Mails empfangen und synchronisieren (optional)",
     routing: "E-Mail-Routing",
+    routingSubtitle: "Kampagnen und Journeys für dieses Konto steuern",
+    toggleHide: "Ausblenden",
+    toggleShow: "Einblenden",
   },
 
+  delete: {
+    title: "Konto löschen",
+    description: "Dieses Messenger-Konto dauerhaft löschen",
+    container: {
+      title: "Konto löschen",
+      description:
+        "Sind Sie sicher, dass Sie dieses Messenger-Konto dauerhaft löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    },
+    backButton: {
+      label: "Abbrechen",
+    },
+    deleteButton: {
+      label: "Konto löschen",
+    },
+    success: {
+      title: "Konto gelöscht",
+      description: "Messenger-Konto wurde dauerhaft gelöscht",
+    },
+  },
   put: {
     title: "Messenger-Konto bearbeiten",
     description: "Messenger-Konto-Einstellungen aktualisieren",

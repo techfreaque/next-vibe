@@ -9,14 +9,18 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
+  objectField,
   requestField,
   requestResponseField,
+  requestUrlPathParamsField,
   requestUrlPathParamsResponseField,
   responseField,
+  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
+  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -831,6 +835,139 @@ const { PUT } = createEndpoint({
   },
 });
 
+/**
+ * DELETE — remove account by ID
+ */
+const { DELETE } = createEndpoint({
+  scopedTranslation,
+  method: Methods.DELETE,
+  path: ["messenger", "accounts", "edit", "[id]"],
+  title: "delete.title",
+  description: "delete.description",
+  category: "app.endpointCategories.messenger",
+  icon: "message-circle",
+  tags: ["tags.messaging"],
+  allowedRoles: [UserRole.ADMIN],
+  requiresConfirmation: true,
+
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const listDefinition = await import("../../list/definition");
+        apiClient.updateEndpointData(
+          listDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+            return {
+              success: true as const,
+              data: {
+                ...oldData.data,
+                accounts: oldData.data.accounts?.filter(
+                  (acc) => acc.id !== data.pathParams.id,
+                ),
+              },
+            };
+          },
+        );
+      },
+    },
+  },
+
+  fields: objectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "delete.container.title" as const,
+    description: "delete.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    noCard: true,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      id: requestUrlPathParamsField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.id.label",
+        description: "fields.id.description",
+        columns: 12,
+        schema: z.uuid(),
+        hidden: true,
+      }),
+
+      backButton: backButton(scopedTranslation, {
+        label: "delete.backButton.label" as const,
+        usage: { request: "urlPathParams", response: true } as const,
+        inline: true,
+      }),
+
+      deleteButton: submitButton(scopedTranslation, {
+        label: "delete.deleteButton.label" as const,
+        icon: "trash",
+        variant: "destructive",
+        inline: true,
+        usage: { request: "urlPathParams" },
+      }),
+
+      name: accountResponseFields.name,
+      channel: accountResponseFields.channel,
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "errors.validation.title",
+      description: "errors.validation.description",
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "errors.server.title",
+      description: "errors.server.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "errors.networkError.title",
+      description: "errors.networkError.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
+    },
+  },
+  successTypes: {
+    title: "delete.success.title",
+    description: "delete.success.description",
+  },
+  examples: {
+    urlPathParams: { default: { id: "550e8400-e29b-41d4-a716-446655440001" } },
+    responses: {
+      default: {
+        name: "System SMTP Account",
+        channel: MessageChannel.EMAIL,
+      },
+    },
+  },
+});
+
 export type MessengerAccountEditGETRequestInput = typeof GET.types.RequestInput;
 export type MessengerAccountEditGETRequestOutput =
   typeof GET.types.RequestOutput;
@@ -847,5 +984,14 @@ export type MessengerAccountEditPUTResponseInput =
 export type MessengerAccountEditPUTResponseOutput =
   typeof PUT.types.ResponseOutput;
 
-const messengerAccountEditEndpoints = { GET, PUT };
+export type MessengerAccountEditDELETERequestInput =
+  typeof DELETE.types.RequestInput;
+export type MessengerAccountEditDELETERequestOutput =
+  typeof DELETE.types.RequestOutput;
+export type MessengerAccountEditDELETEResponseInput =
+  typeof DELETE.types.ResponseInput;
+export type MessengerAccountEditDELETEResponseOutput =
+  typeof DELETE.types.ResponseOutput;
+
+const messengerAccountEditEndpoints = { GET, PUT, DELETE };
 export default messengerAccountEditEndpoints;

@@ -13,6 +13,7 @@ import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
@@ -75,10 +76,12 @@ const CHANNEL_COLORS: Record<string, string> = {
 function AccountRow({
   account,
   onEdit,
+  onDelete,
   t,
 }: {
   account: MessengerAccount;
   onEdit: (account: MessengerAccount) => void;
+  onDelete: (account: MessengerAccount) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const locale = useWidgetLocale();
@@ -92,15 +95,18 @@ function AccountRow({
     "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
 
   return (
-    <Div
-      className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
-      onClick={() => onEdit(account)}
-    >
-      <Div className="flex-shrink-0 w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+    <Div className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent/50 transition-colors">
+      <Div
+        className="flex-shrink-0 w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer"
+        onClick={() => onEdit(account)}
+      >
         <Server className="h-4 w-4 text-primary" />
       </Div>
 
-      <Div className="flex-1 min-w-0">
+      <Div
+        className="flex-1 min-w-0 cursor-pointer"
+        onClick={() => onEdit(account)}
+      >
         <Div className="flex items-center gap-2 flex-wrap">
           <Span className="font-semibold text-sm">{account.name}</Span>
           <Span
@@ -141,6 +147,20 @@ function AccountRow({
           </Span>
         </Div>
       </Div>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(account);
+        }}
+        className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+        title={t("widget.deleteConfirm")}
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
     </Div>
   );
 }
@@ -178,6 +198,17 @@ export function MessengerAccountsListContainer({
         prefillFromGet: true,
         getEndpoint: messengerAccountEditDefinition.GET,
         popNavigationOnSuccess: 1,
+      });
+    },
+    [navigate],
+  );
+
+  const handleDelete = useCallback(
+    (account: MessengerAccount): void => {
+      navigate(messengerAccountEditDefinition.DELETE, {
+        urlPathParams: { id: account.id },
+        popNavigationOnSuccess: 1,
+        renderInModal: true,
       });
     },
     [navigate],
@@ -300,6 +331,7 @@ export function MessengerAccountsListContainer({
                 key={account.id}
                 account={account}
                 onEdit={handleEdit}
+                onDelete={handleDelete}
                 t={t}
               />
             ))}

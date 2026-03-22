@@ -50,11 +50,7 @@ export function SubscriptionPageClient({
   return (
     <Container className="py-8 flex flex-col gap-8">
       {/* Header - same for all tabs */}
-      <SubscriptionHeader
-        locale={locale}
-        isAuthenticated={isAuthenticated}
-        isAdmin={isAdmin}
-      />
+      <SubscriptionHeader locale={locale} isAuthenticated={isAuthenticated} />
 
       {/* Credit Balance Card */}
       <EndpointsPage
@@ -68,8 +64,8 @@ export function SubscriptionPageClient({
         }}
       />
 
-      {/* Subscription Status Card - only show if subscription exists and not admin */}
-      {initialSubscription && !isAdmin && (
+      {/* Subscription Status Card - show if subscription exists */}
+      {initialSubscription && (
         <EndpointsPage
           endpoint={subscriptionDefinition}
           user={user}

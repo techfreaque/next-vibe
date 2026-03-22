@@ -74,6 +74,9 @@ export const translations = {
     refresh: "Refresh",
     emptyState: "No messenger accounts configured",
     searchPlaceholder: "Search accounts...",
+    deleteConfirm: "Delete this account?",
+    deleteConfirmYes: "Delete",
+    deleteConfirmNo: "Cancel",
   },
 
   errors: {

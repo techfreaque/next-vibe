@@ -52,7 +52,7 @@ export class SpeechToTextRepository {
     // Server-side language configuration - ignore client input
     const language = getLanguageFromLocale(locale);
 
-    logger.info("Starting audio transcription", {
+    logger.debug("Starting audio transcription", {
       provider: this.STT_PROVIDER,
       model: this.STT_MODEL,
       language,
@@ -218,7 +218,7 @@ export class SpeechToTextRepository {
         creditsNeeded = STT_COST_PER_SECOND;
       }
 
-      logger.info("Transcription successful", {
+      logger.debug("Transcription successful", {
         textLength: pollResult.data.text.length,
         provider: this.STT_PROVIDER,
         model: this.STT_MODEL,
@@ -409,7 +409,7 @@ export class SpeechToTextRepository {
           const duration = providerResult?.audio_duration || 0;
           const edenAiCostUsd = providerResult?.cost;
 
-          logger.info("Transcription completed", {
+          logger.debug("Transcription completed", {
             textLength: transcription.length,
             attempts,
             confidence,

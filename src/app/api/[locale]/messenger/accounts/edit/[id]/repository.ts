@@ -19,6 +19,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { messengerAccounts } from "../../db";
 import type {
+  MessengerAccountEditDELETEResponseOutput,
   MessengerAccountEditGETResponseOutput,
   MessengerAccountEditPUTRequestOutput,
   MessengerAccountEditPUTResponseOutput,
@@ -292,6 +293,45 @@ export class MessengerAccountEditRepository {
       return success(MessengerAccountEditRepository.mapAccount(updated));
     } catch (error) {
       logger.error("Error updating messenger account", parseError(error));
+      return fail({
+        message: t("errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  static async deleteAccount(
+    urlPathParams: { id: string },
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    t: MessengerAccountEditT,
+  ): Promise<ResponseType<MessengerAccountEditDELETEResponseOutput>> {
+    try {
+      logger.info("Deleting messenger account", {
+        id: urlPathParams.id,
+        userId: user.id,
+      });
+
+      const [deleted] = await db
+        .delete(messengerAccounts)
+        .where(eq(messengerAccounts.id, urlPathParams.id))
+        .returning();
+
+      if (!deleted) {
+        return fail({
+          message: t("errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      logger.info("Messenger account deleted", { id: urlPathParams.id });
+      return success({
+        name: deleted.name,
+        channel: deleted.channel,
+      });
+    } catch (error) {
+      logger.error("Error deleting messenger account", parseError(error));
       return fail({
         message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

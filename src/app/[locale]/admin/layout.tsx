@@ -25,7 +25,7 @@ export default async function AdminLayout({
   params,
 }: AdminLayoutProps): Promise<React.JSX.Element> {
   const { locale } = await params;
-  const logger = createEndpointLogger(true, Date.now(), locale);
+  const logger = createEndpointLogger(false, Date.now(), locale);
 
   const minimalUser = await requireAdminUser(locale, `/${locale}/admin`);
   const userResponse = await UserByIdRepository.getUserById(

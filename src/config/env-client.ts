@@ -42,8 +42,15 @@ export const {
   },
   NEXT_PUBLIC_APP_URL: {
     schema: createSchema(
-      z.string().url(),
-      z.string().url().default("http://localhost:3000"),
+      z
+        .string()
+        .url()
+        .transform((s) => s.replace(/\/$/, "")),
+      z
+        .string()
+        .url()
+        .default("http://localhost:3000")
+        .transform((s) => s.replace(/\/$/, "")),
     ),
     value: process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",

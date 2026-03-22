@@ -50,4 +50,35 @@ export const {
     example: "your_email_password",
     commented: true,
   },
+  IMAP_HOST: {
+    schema: z.string().optional(),
+    example: "imap.example.com",
+    comment: "System IMAP (inbound) — leave blank if same host as SMTP",
+    commented: true,
+  },
+  IMAP_PORT: {
+    schema: z.coerce.number().optional().default(993),
+    example: "993",
+    commented: true,
+    fieldType: "number",
+  },
+  IMAP_SECURE: {
+    schema: z
+      .string()
+      .optional()
+      .transform((v) => v === "true"),
+    example: "true",
+    commented: true,
+    fieldType: "boolean",
+  },
+  IMAP_USER: {
+    schema: z.string().optional(),
+    example: "your_imap_username",
+    commented: true,
+  },
+  IMAP_PASS: {
+    schema: z.string().optional(),
+    example: "your_imap_password",
+    commented: true,
+  },
 });

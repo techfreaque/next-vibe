@@ -50,4 +50,35 @@ export const {
     example: "leads_email_password",
     commented: true,
   },
+  LEADS_IMAP_HOST: {
+    schema: z.string().optional(),
+    example: "imap.example.com",
+    comment: "Lead campaigns IMAP (inbound) — leave blank if same host as SMTP",
+    commented: true,
+  },
+  LEADS_IMAP_PORT: {
+    schema: z.coerce.number().optional().default(993),
+    example: "993",
+    commented: true,
+    fieldType: "number",
+  },
+  LEADS_IMAP_SECURE: {
+    schema: z
+      .string()
+      .optional()
+      .transform((v) => v === "true"),
+    example: "true",
+    commented: true,
+    fieldType: "boolean",
+  },
+  LEADS_IMAP_USER: {
+    schema: z.string().optional(),
+    example: "leads_imap_username",
+    commented: true,
+  },
+  LEADS_IMAP_PASS: {
+    schema: z.string().optional(),
+    example: "leads_imap_password",
+    commented: true,
+  },
 });

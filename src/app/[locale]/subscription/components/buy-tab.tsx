@@ -1,5 +1,6 @@
 "use client";
 
+import { Div } from "next-vibe-ui/ui/div";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
@@ -24,66 +25,58 @@ export function BuyTab({
   hasPaymentProvider,
   isAdmin,
 }: BuyTabProps): JSX.Element {
-  if (isAdmin) {
-    return (
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="flex flex-col gap-6"
-      >
-        <EndpointsPage
-          endpoint={adminAddDefinitions}
-          user={user}
-          locale={locale}
-          endpointOptions={{
-            create: {
-              formOptions: {
-                defaultValues: {
-                  targetUserId: "id" in user && user.id ? user.id : "",
-                  amount: 100,
-                },
-              },
-            },
-          }}
-        />
-        <EndpointsPage
-          endpoint={publicCapDefinitions}
-          user={user}
-          locale={locale}
-          forceMethod="GET"
-        />
-        <EndpointsPage
-          endpoint={publicCapDefinitions}
-          user={user}
-          locale={locale}
-          forceMethod="POST"
-        />
-      </MotionDiv>
-    );
-  }
-
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      className="flex flex-col gap-6"
     >
       {hasPaymentProvider && (
-        <EndpointsPage
-          endpoint={createSubscriptionDefinition}
-          user={user}
-          locale={locale}
-        />
+        <Div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <EndpointsPage
+            endpoint={createSubscriptionDefinition}
+            user={user}
+            locale={locale}
+          />
+          <EndpointsPage
+            endpoint={purchaseDefinitions}
+            user={user}
+            locale={locale}
+          />
+        </Div>
       )}
 
-      {hasPaymentProvider && (
-        <EndpointsPage
-          endpoint={purchaseDefinitions}
-          user={user}
-          locale={locale}
-        />
+      {isAdmin && (
+        <>
+          <EndpointsPage
+            endpoint={adminAddDefinitions}
+            user={user}
+            locale={locale}
+            endpointOptions={{
+              create: {
+                formOptions: {
+                  defaultValues: {
+                    targetUserId: "id" in user && user.id ? user.id : "",
+                    amount: 100,
+                  },
+                },
+              },
+            }}
+          />
+          <EndpointsPage
+            endpoint={publicCapDefinitions}
+            user={user}
+            locale={locale}
+            forceMethod="GET"
+          />
+          <EndpointsPage
+            endpoint={publicCapDefinitions}
+            user={user}
+            locale={locale}
+            forceMethod="POST"
+          />
+        </>
       )}
     </MotionDiv>
   );

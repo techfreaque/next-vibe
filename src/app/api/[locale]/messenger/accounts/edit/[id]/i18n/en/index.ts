@@ -44,13 +44,45 @@ export const translations = {
   },
 
   sections: {
-    identity: "Account Settings",
-    smtp: "SMTP Credentials",
+    identity: "Account Identity",
+    identitySubtitle: "Name and basic settings for this account",
+    smtp: "SMTP Outbound",
+    smtpSubtitle: "Server settings for sending emails",
     api: "API Credentials",
+    apiSubtitle: "Provider API key and access token",
+    apiSubtitleSms: "Provider API key and sender ID",
+    apiSubtitleWhatsapp: "WhatsApp Business API token and phone number ID",
+    apiSubtitleTelegram: "Enter your Telegram bot token from @BotFather",
+    apiTitleSms: "SMS Provider Credentials",
+    apiTitleWhatsapp: "WhatsApp Business Credentials",
+    apiTitleTelegram: "Bot Token",
     imap: "IMAP Inbound",
+    imapSubtitle: "Configure to receive and sync incoming emails (optional)",
     routing: "Email Routing",
+    routingSubtitle: "Control which campaigns and journeys use this account",
+    toggleHide: "Hide",
+    toggleShow: "Show",
   },
 
+  delete: {
+    title: "Delete Account",
+    description: "Permanently delete this messenger account",
+    container: {
+      title: "Delete Account",
+      description:
+        "Are you sure you want to permanently delete this messenger account? This action cannot be undone.",
+    },
+    backButton: {
+      label: "Cancel",
+    },
+    deleteButton: {
+      label: "Delete Account",
+    },
+    success: {
+      title: "Account Deleted",
+      description: "Messenger account was permanently deleted",
+    },
+  },
   put: {
     title: "Edit Messenger Account",
     description: "Update messenger account settings",

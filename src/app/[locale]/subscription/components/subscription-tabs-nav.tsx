@@ -12,7 +12,6 @@ import Link from "next/link";
 import type { JSX } from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -45,10 +44,7 @@ export function SubscriptionTabsNav({
       value: "buy",
       href: `/${locale}/subscription/buy`,
       icon: ShoppingCart,
-      label:
-        !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN)
-          ? t("app.subscription.subscription.tabs.adminBuy")
-          : t("app.subscription.subscription.tabs.buy"),
+      label: t("app.subscription.subscription.tabs.buy"),
     },
     {
       value: "history",

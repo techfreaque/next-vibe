@@ -47,11 +47,24 @@ export const translations = {
   },
 
   sections: {
-    identity: "Account Settings",
-    smtp: "SMTP Credentials",
+    identity: "Account Identity",
+    identitySubtitle: "Name and basic settings for this account",
+    smtp: "SMTP Outbound",
+    smtpSubtitle: "Server settings for sending emails",
     api: "API Credentials",
+    apiSubtitle: "Provider API key and access token",
+    apiSubtitleSms: "Provider API key and sender ID",
+    apiSubtitleWhatsapp: "WhatsApp Business API token and phone number ID",
+    apiSubtitleTelegram: "Enter your Telegram bot token from @BotFather",
+    apiTitleSms: "SMS Provider Credentials",
+    apiTitleWhatsapp: "WhatsApp Business Credentials",
+    apiTitleTelegram: "Bot Token",
     imap: "IMAP Inbound",
+    imapSubtitle: "Configure to receive and sync incoming emails (optional)",
     routing: "Email Routing",
+    routingSubtitle: "Control which campaigns and journeys use this account",
+    toggleHide: "Hide",
+    toggleShow: "Show",
   },
 
   fields: {

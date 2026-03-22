@@ -24,8 +24,6 @@ export async function getSeedModule(
       return (await import("../../leads/seeds")) as EnvironmentSeeds;
     case "messages":
       return (await import("../../messenger/messages/seeds")) as EnvironmentSeeds;
-    case "imap-client":
-      return (await import("../../messenger/providers/email/imap-client/seeds")) as EnvironmentSeeds;
     case "smtp-client":
       return (await import("../../messenger/providers/email/smtp-client/seeds")) as EnvironmentSeeds;
     case "newsletter":
@@ -56,7 +54,6 @@ export function getAllSeedModuleNames(): string[] {
     "contact",
     "leads",
     "messages",
-    "imap-client",
     "smtp-client",
     "newsletter",
     "subscription",

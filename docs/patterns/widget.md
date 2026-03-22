@@ -165,13 +165,63 @@ const search = form?.watch("search") ?? "";
 
 <Input
   value={search}
-  onChange={(e) => form?.setValue("search", e.target.value, {
-    shouldValidate: true, shouldDirty: true, shouldTouch: true,
-  })}
+  onChange={(e) => form?.setValue("search", e.target.value)}
 />
 ```
 
 `useState` is only appropriate for pure UI state: open/closed dialogs, hover highlights, local loading flags.
+
+### Filter / search refetch — framework handles it, never call refetch manually
+
+When `autoSubmit: true` is configured (set in `page-client.tsx` or `hooks.ts` via `endpointOptions.read.formOptions`), the framework watches every form value change, debounces it, and triggers a refetch automatically. **You must not call `refetch()` after `form.setValue()`** — the value hasn't propagated to the query params yet and the refetch will fire with stale params.
+
+```typescript
+// ✅ Correct — just set the value, framework refetches
+const handleStatusChange = (status: string) => {
+  form.setValue("status", status);
+};
+
+// ❌ Wrong — refetch fires before form value reaches query params
+const handleStatusChange = (status: string) => {
+  form.setValue("status", status);
+  endpointMutations?.read?.refetch?.(); // fires with OLD params
+};
+```
+
+`refetch()` is only appropriate for a **manual refresh button** that re-runs the current query unchanged.
+
+### All filtering must happen server-side (repository), never client-side
+
+There are **no exceptions**. Every filter — search, status, `hidden`, `resolved`, category, ownership, display flags — must be a `requestField`, sent to the server, and applied in `repository.ts` before `LIMIT`/`OFFSET`.
+
+Client-side filtering is always wrong because:
+
+- It produces incorrect counts (you only have the current page)
+- Pagination breaks (filtering a subset of already-paged results)
+- Stats/badges are wrong (counts derived from the page, not the full dataset)
+- It defeats caching (server cache key changes but data is stale)
+
+```typescript
+// ❌ Wrong — any .filter() on response data in a widget
+const visible = tasks.filter((t) => !t.hidden);
+const active = logs.filter((l) => !l.resolved);
+const matching = items.filter((i) => i.name.includes(search));
+
+// ❌ Wrong — filtering in repository AFTER pagination
+let rows = await db.select().limit(50).offset(0);
+if (search) rows = rows.filter((r) => r.name.includes(search));
+
+// ✅ Correct — all conditions in DB before LIMIT/OFFSET
+if (search) conditions.push(ilike(tasks.name, `%${search}%`));
+if (!showHidden) conditions.push(eq(tasks.hidden, false));
+const rows = await db
+  .select()
+  .where(and(...conditions))
+  .limit(50)
+  .offset(0);
+```
+
+If a count badge needs to show a number that differs from the current filter (e.g. "unresolved" badge while viewing all logs), add a separate count field to the response schema and compute it with a second DB query — never derive it from the returned rows.
 
 ### Rendering child fields
 

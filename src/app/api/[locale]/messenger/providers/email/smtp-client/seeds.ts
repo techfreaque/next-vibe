@@ -1,7 +1,11 @@
 /**
  * SMTP Client Seeds
- * Load SMTP accounts from environment variables for development
- * Seeds into the unified messenger_accounts table
+ * Load SMTP accounts from environment variables for development and production.
+ * Seeds into the unified messenger_accounts table.
+ *
+ * Each account can optionally include IMAP inbound config — same account, not a separate row.
+ * - System account: EMAIL_* for SMTP, IMAP_* for inbound (falls back to IMAP_SEED_* legacy vars)
+ * - Leads account:  LEADS_EMAIL_* for SMTP, LEADS_IMAP_* for inbound
  */
 
 import { eq } from "drizzle-orm";
@@ -18,57 +22,86 @@ import { Countries, Languages } from "@/i18n/core/config";
 import { leadsCampaignsEnv } from "../../../../leads/campaigns/env";
 import { messengerAccounts } from "../../../accounts/db";
 import {
+  CampaignType,
+  MessageChannel,
   MessengerAccountStatus,
   MessengerProvider,
 } from "../../../accounts/enum";
-import { EmailSecurityType } from "../enum";
 import { messengerEnv } from "../../../env";
-import { CampaignType } from "../../../accounts/enum";
-import { MessageChannel } from "../../../accounts/enum";
+import { EmailImapAuthMethod, EmailSecurityType } from "../enum";
+import { imapClientEnv } from "../imap-client/env";
+import { ImapSpecialUseType } from "../imap-client/enum";
 
 type NewMessengerAccount = typeof messengerAccounts.$inferInsert;
 
+const DEFAULT_SYNC_FOLDERS = [
+  ImapSpecialUseType.INBOX,
+  ImapSpecialUseType.SENT,
+  ImapSpecialUseType.DRAFTS,
+];
+
 /**
- * Get SMTP account 1 from environment variables (System/General emails)
+ * System SMTP + IMAP account (EMAIL_* / IMAP_* env vars)
+ * Covers system, transactional, and notification campaign types.
  */
-function getSmtpAccount1Config(
+function getSystemAccountConfig(
   logger: EndpointLogger,
 ): NewMessengerAccount | null {
-  const host = messengerEnv.EMAIL_HOST;
-  const port = messengerEnv.EMAIL_PORT;
-  const username = messengerEnv.EMAIL_USER;
-  const password = messengerEnv.EMAIL_PASS;
+  const smtpHost = messengerEnv.EMAIL_HOST;
+  const smtpPort = messengerEnv.EMAIL_PORT;
+  const smtpUsername = messengerEnv.EMAIL_USER;
+  const smtpPassword = messengerEnv.EMAIL_PASS;
   const fromEmail = messengerEnv.EMAIL_FROM_EMAIL;
 
-  if (!host || !username || !password || !fromEmail) {
+  if (!smtpHost || !smtpUsername || !smtpPassword || !fromEmail) {
     logger.debug(
-      "SMTP not configured for account 1 (set EMAIL_* vars to enable)",
-      {
-        host,
-        username,
-        hasPassword: !!password,
-        fromEmail,
-      },
+      "System SMTP not configured (set EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_FROM_EMAIL)",
+      { smtpHost, smtpUsername, hasPassword: !!smtpPassword, fromEmail },
     );
     return null;
   }
 
+  // IMAP: prefer IMAP_* vars, fall back to legacy IMAP_SEED_* vars
+  const imapHost =
+    messengerEnv.IMAP_HOST ?? imapClientEnv.IMAP_SEED_HOST ?? smtpHost;
+  const imapUsername =
+    messengerEnv.IMAP_USER ?? imapClientEnv.IMAP_SEED_USERNAME ?? smtpUsername;
+  const imapPassword =
+    messengerEnv.IMAP_PASS ?? imapClientEnv.IMAP_SEED_PASSWORD ?? smtpPassword;
+  const imapPort = messengerEnv.IMAP_PORT ?? imapClientEnv.IMAP_SEED_PORT;
+  const imapSecure =
+    messengerEnv.IMAP_SECURE ?? imapClientEnv.IMAP_SEED_SECURE ?? true;
+
   return {
     name: "System SMTP Account",
-    description: "System emails (notifications, password resets, etc.)",
+    description: "System emails: notifications, password resets, transactional",
     channel: MessageChannel.EMAIL,
     provider: MessengerProvider.SMTP,
-    smtpHost: host,
-    smtpPort: port || 587,
+    smtpHost,
+    smtpPort: smtpPort ?? 587,
     smtpSecurityType: messengerEnv.EMAIL_SECURE
       ? EmailSecurityType.STARTTLS
       : EmailSecurityType.NONE,
-    smtpUsername: username,
-    smtpPassword: password,
+    smtpUsername,
+    smtpPassword,
     smtpFromEmail: fromEmail,
     smtpConnectionTimeout: 30000,
     smtpMaxConnections: 5,
     smtpRateLimitPerHour: 1000,
+    // IMAP inbound (same account)
+    imapHost,
+    imapPort,
+    imapSecure,
+    imapUsername,
+    imapPassword,
+    imapAuthMethod: EmailImapAuthMethod.PLAIN,
+    imapConnectionTimeout: 30000,
+    imapKeepAlive: true,
+    imapSyncEnabled: true,
+    imapSyncInterval: 180,
+    imapMaxMessages: 1000,
+    imapSyncFolders: DEFAULT_SYNC_FOLDERS,
+    imapIsConnected: false,
     status: MessengerAccountStatus.ACTIVE,
     isDefault: false,
     priority: 90,
@@ -94,57 +127,84 @@ function getSmtpAccount1Config(
 }
 
 /**
- * Get SMTP account 2 from environment variables (Lead campaigns)
+ * Lead campaigns SMTP + IMAP account (LEADS_EMAIL_* / LEADS_IMAP_* env vars)
+ * Covers lead campaigns, newsletter, signup nurture, retention, winback.
  */
-function getSmtpAccount2Config(
+function getLeadsAccountConfig(
   logger: EndpointLogger,
 ): NewMessengerAccount | null {
-  const host = leadsCampaignsEnv.LEADS_EMAIL_HOST;
-  const port = leadsCampaignsEnv.LEADS_EMAIL_PORT;
-  const username = leadsCampaignsEnv.LEADS_EMAIL_USER;
-  const password = leadsCampaignsEnv.LEADS_EMAIL_PASS;
+  const smtpHost = leadsCampaignsEnv.LEADS_EMAIL_HOST;
+  const smtpPort = leadsCampaignsEnv.LEADS_EMAIL_PORT;
+  const smtpUsername = leadsCampaignsEnv.LEADS_EMAIL_USER;
+  const smtpPassword = leadsCampaignsEnv.LEADS_EMAIL_PASS;
   const fromEmail = leadsCampaignsEnv.LEADS_EMAIL_FROM_EMAIL;
 
-  if (!host || !username || !password || !fromEmail) {
+  if (!smtpHost || !smtpUsername || !smtpPassword || !fromEmail) {
     logger.debug(
-      "Leads SMTP not configured for account 2 (set LEADS_EMAIL_* vars to enable)",
-      {
-        host,
-        username,
-        hasPassword: !!password,
-        fromEmail,
-      },
+      "Leads SMTP not configured (set LEADS_EMAIL_HOST, LEADS_EMAIL_USER, LEADS_EMAIL_PASS, LEADS_EMAIL_FROM_EMAIL)",
+      { smtpHost, smtpUsername, hasPassword: !!smtpPassword, fromEmail },
     );
     return null;
   }
 
+  // IMAP: prefer LEADS_IMAP_* vars, fall back to SMTP host/credentials
+  const imapHost = leadsCampaignsEnv.LEADS_IMAP_HOST ?? smtpHost;
+  const imapUsername = leadsCampaignsEnv.LEADS_IMAP_USER ?? smtpUsername;
+  const imapPassword = leadsCampaignsEnv.LEADS_IMAP_PASS ?? smtpPassword;
+  const imapPort = leadsCampaignsEnv.LEADS_IMAP_PORT ?? 993;
+  const imapSecure = leadsCampaignsEnv.LEADS_IMAP_SECURE ?? true;
+
   return {
     name: "Lead Campaigns SMTP Account",
-    description: "Lead campaigns and marketing emails",
+    description:
+      "Lead campaigns, newsletters, signup nurture, retention, winback",
     channel: MessageChannel.EMAIL,
     provider: MessengerProvider.SMTP,
-    smtpHost: host,
-    smtpPort: port || 587,
+    smtpHost,
+    smtpPort: smtpPort ?? 587,
     smtpSecurityType: leadsCampaignsEnv.LEADS_EMAIL_SECURE
       ? EmailSecurityType.STARTTLS
       : EmailSecurityType.NONE,
-    smtpUsername: username,
-    smtpPassword: password,
+    smtpUsername,
+    smtpPassword,
     smtpFromEmail: fromEmail,
     smtpConnectionTimeout: 30000,
     smtpMaxConnections: 5,
     smtpRateLimitPerHour: 1000,
+    // IMAP inbound (same account)
+    imapHost,
+    imapPort,
+    imapSecure,
+    imapUsername,
+    imapPassword,
+    imapAuthMethod: EmailImapAuthMethod.PLAIN,
+    imapConnectionTimeout: 30000,
+    imapKeepAlive: true,
+    imapSyncEnabled: true,
+    imapSyncInterval: 180,
+    imapMaxMessages: 1000,
+    imapSyncFolders: DEFAULT_SYNC_FOLDERS,
+    imapIsConnected: false,
     status: MessengerAccountStatus.ACTIVE,
     isDefault: true,
     priority: 100,
     consecutiveFailures: 0,
     messagesSentToday: 0,
     messagesSentTotal: 0,
-    campaignTypes: [CampaignType.LEAD_CAMPAIGN],
+    campaignTypes: [
+      CampaignType.LEAD_CAMPAIGN,
+      CampaignType.NEWSLETTER,
+      CampaignType.SIGNUP_NURTURE,
+      CampaignType.RETENTION,
+      CampaignType.WINBACK,
+    ],
     emailJourneyVariants: [
       EmailJourneyVariant.UNCENSORED_CONVERT,
       EmailJourneyVariant.SIDE_HUSTLE,
       EmailJourneyVariant.QUIET_RECOMMENDATION,
+      EmailJourneyVariant.SIGNUP_NURTURE,
+      EmailJourneyVariant.RETENTION,
+      EmailJourneyVariant.WINBACK,
     ],
     emailCampaignStages: [
       EmailCampaignStage.INITIAL,
@@ -165,75 +225,95 @@ function getSmtpAccount2Config(
   };
 }
 
-/**
- * Development seed data
- */
-export async function dev(logger: EndpointLogger): Promise<void> {
-  logger.debug("🌱 Seeding development SMTP accounts...");
+async function upsertAccounts(
+  logger: EndpointLogger,
+  label: string,
+): Promise<void> {
+  logger.debug(`🌱 Seeding ${label} messenger accounts...`);
 
-  const account1 = getSmtpAccount1Config(logger);
-  const account2 = getSmtpAccount2Config(logger);
+  const systemAccount = getSystemAccountConfig(logger);
+  const leadsAccount = getLeadsAccountConfig(logger);
 
-  if (!account1 && !account2) {
+  if (!systemAccount && !leadsAccount) {
     logger.debug(
-      "⚠️  SMTP seed environment variables not configured, skipping seeding",
+      "⚠️  No messenger account env vars configured, skipping seeding",
     );
     return;
   }
 
-  try {
-    const accounts = [account1, account2].filter(
-      (account): account is NewMessengerAccount => account !== null,
-    );
+  const accounts = [systemAccount, leadsAccount].filter(
+    (a): a is NewMessengerAccount => a !== null,
+  );
 
+  try {
     for (const account of accounts) {
-      const existingAccount = await db
+      const existing = await db
         .select()
         .from(messengerAccounts)
         .where(eq(messengerAccounts.name, account.name!))
         .limit(1);
 
-      if (existingAccount.length > 0) {
+      if (existing.length > 0) {
         await db
           .update(messengerAccounts)
           .set({
+            description: account.description,
+            smtpHost: account.smtpHost,
+            smtpPort: account.smtpPort,
+            smtpSecurityType: account.smtpSecurityType,
+            smtpUsername: account.smtpUsername,
+            smtpPassword: account.smtpPassword,
+            smtpFromEmail: account.smtpFromEmail,
+            smtpConnectionTimeout: account.smtpConnectionTimeout,
+            smtpMaxConnections: account.smtpMaxConnections,
+            smtpRateLimitPerHour: account.smtpRateLimitPerHour,
+            imapHost: account.imapHost,
+            imapPort: account.imapPort,
+            imapSecure: account.imapSecure,
+            imapUsername: account.imapUsername,
+            imapPassword: account.imapPassword,
+            imapAuthMethod: account.imapAuthMethod,
+            imapConnectionTimeout: account.imapConnectionTimeout,
+            imapKeepAlive: account.imapKeepAlive,
+            imapSyncEnabled: account.imapSyncEnabled,
+            imapSyncInterval: account.imapSyncInterval,
+            imapMaxMessages: account.imapMaxMessages,
+            imapSyncFolders: account.imapSyncFolders,
             campaignTypes: account.campaignTypes,
             emailJourneyVariants: account.emailJourneyVariants,
             emailCampaignStages: account.emailCampaignStages,
             countries: account.countries,
             languages: account.languages,
+            isDefault: account.isDefault,
+            priority: account.priority,
+            weight: account.weight,
+            isExactMatch: account.isExactMatch,
+            isFailover: account.isFailover,
+            failoverPriority: account.failoverPriority,
             updatedAt: new Date(),
           })
           .where(eq(messengerAccounts.name, account.name!));
-        logger.debug(
-          `✅ Updated SMTP account: ${account.name} (${account.smtpFromEmail})`,
-        );
-        continue;
+        logger.debug(`✅ Updated: ${account.name} (${account.smtpFromEmail})`);
+      } else {
+        await db.insert(messengerAccounts).values([account]);
+        logger.debug(`✅ Seeded: ${account.name} (${account.smtpFromEmail})`);
       }
-
-      await db.insert(messengerAccounts).values([account]);
-      logger.debug(
-        `✅ Seeded SMTP account: ${account.name} (${account.smtpFromEmail})`,
-      );
     }
   } catch (error) {
-    logger.error("❌ Failed to seed SMTP accounts:", parseError(error));
+    logger.error("❌ Failed to seed messenger accounts:", parseError(error));
   }
 }
 
-/**
- * Test seed data
- */
-export function test(logger: EndpointLogger): void {
-  logger.debug("🌱 Skipping test SMTP accounts seeding");
+export async function dev(logger: EndpointLogger): Promise<void> {
+  await upsertAccounts(logger, "development");
 }
 
-/**
- * Production seed data — same as dev, upserts SMTP accounts from env vars
- */
+export function test(logger: EndpointLogger): void {
+  logger.debug("🌱 Skipping test messenger account seeding");
+}
+
 export async function prod(logger: EndpointLogger): Promise<void> {
-  logger.debug("🌱 Seeding production SMTP accounts...");
-  await dev(logger);
+  await upsertAccounts(logger, "production");
 }
 
 // Export priority for seed manager
