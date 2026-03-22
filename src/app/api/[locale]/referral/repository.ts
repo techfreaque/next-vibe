@@ -170,6 +170,14 @@ export class ReferralRepository {
               .from(userReferrals)
               .where(eq(userReferrals.referralCodeId, code.id));
 
+            // Count unique visitors: leads linked to this code who have NOT signed up yet
+            const [visitorCount] = await db
+              .select({
+                count: sql<number>`count(distinct ${leadReferrals.leadId})::int`,
+              })
+              .from(leadReferrals)
+              .where(eq(leadReferrals.referralCodeId, code.id));
+
             // Get earnings and revenue for this code from users referred by this code
             // Revenue = total amount paid by referred users (amountCents / POOL_PERCENTAGE)
             // Earnings = commission earned by code owner
@@ -194,7 +202,7 @@ export class ReferralRepository {
             return {
               code: code.code,
               label: code.label,
-              currentUses: code.currentUses,
+              currentVisitors: visitorCount?.count ?? 0,
               totalSignups: signupCount?.count ?? 0,
               totalRevenueCents: stats?.totalRevenue ?? 0,
               totalEarningsCents: stats?.totalEarnings ?? 0,

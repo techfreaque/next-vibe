@@ -34,6 +34,7 @@ import {
   ImapMessageStatusFilter,
   SortOrder,
 } from "../enum";
+import { SpecialFolderType } from "../../../../messages/enum";
 import { scopedTranslation } from "./i18n";
 
 interface ImapMessageResponseType {
@@ -487,6 +488,55 @@ export class ImapMessagesRepository {
 
       if (data.updates.isDeleted !== undefined) {
         updateData.isDeleted = data.updates.isDeleted;
+      }
+
+      // When deleting, move to Trash folder on IMAP (fire-and-forget)
+      if (
+        data.updates.isDeleted === true &&
+        existingMessage.uid &&
+        existingMessage.accountId
+      ) {
+        const [trashFolder] = await db
+          .select({ path: messengerFolders.path })
+          .from(messengerFolders)
+          .where(
+            and(
+              eq(messengerFolders.accountId, existingMessage.accountId),
+              eq(messengerFolders.specialUseType, SpecialFolderType.TRASH),
+            ),
+          )
+          .limit(1);
+
+        const [currentFolder] = existingMessage.folderId
+          ? await db
+              .select({ path: messengerFolders.path })
+              .from(messengerFolders)
+              .where(eq(messengerFolders.id, existingMessage.folderId))
+              .limit(1)
+          : [null];
+
+        if (
+          trashFolder?.path &&
+          currentFolder?.path &&
+          currentFolder.path !== trashFolder.path
+        ) {
+          const fakeLocale = "en-GLOBAL" as CountryLanguage;
+          smtpProvider
+            .moveMessage(
+              existingMessage.accountId,
+              existingMessage.uid,
+              currentFolder.path,
+              trashFolder.path,
+              logger,
+              fakeLocale,
+            )
+            .catch((err) => {
+              logger.warn("IMAP: failed to move message to Trash", {
+                messageId: data.messageId,
+                error: parseError(err).message,
+              });
+            });
+        }
       }
 
       // Update the message

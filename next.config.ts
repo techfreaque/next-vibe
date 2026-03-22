@@ -76,6 +76,9 @@ const nextConfig: NextConfig = {
       "src/app/api/**/translations/reorganize/**": {
         loaders: ["ignore-loader"],
       },
+      "src/app/api/**/electron/build/**": {
+        loaders: ["ignore-loader"],
+      },
       // Generators use dynamic import(variable) for definition scanning — not bundler-safe
       "src/app/api/**/generators/**": {
         loaders: ["ignore-loader"],

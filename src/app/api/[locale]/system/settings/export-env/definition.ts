@@ -18,7 +18,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { ExportEnvWidget } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const ExportEnvWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.ExportEnvWidget })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,

@@ -23,7 +23,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../../enum";
 import { PULSE_HISTORY_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { PulseHistoryContainer } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const PulseHistoryContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.PulseHistoryContainer })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,

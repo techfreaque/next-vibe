@@ -27,7 +27,14 @@ import {
 } from "@/app/api/[locale]/system/generated/env-keys";
 
 import { scopedTranslation } from "./i18n";
-import { SystemSettingsPatchWidget, SystemSettingsWidget } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const SystemSettingsWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.SystemSettingsWidget })),
+);
+const SystemSettingsPatchWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.SystemSettingsPatchWidget })),
+);
 
 // Build one requestField per env key at runtime.
 // EnvKeyName is a union of all literal key strings from the generated ENV_KEYS const.

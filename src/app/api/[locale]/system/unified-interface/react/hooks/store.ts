@@ -285,7 +285,7 @@ export const useApiStore = create<ApiStore>((set, get) => ({
 
   getFormQueryParams: <T>(formId: string): T | undefined => {
     const form = get().forms[formId];
-    return form.queryParams as T | undefined;
+    return form?.queryParams as T | undefined;
   },
 
   /**

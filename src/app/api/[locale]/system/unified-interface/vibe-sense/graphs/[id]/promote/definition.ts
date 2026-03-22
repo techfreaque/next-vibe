@@ -19,7 +19,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { PromoteWidget } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const PromoteWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.PromoteWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

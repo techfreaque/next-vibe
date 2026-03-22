@@ -29,8 +29,8 @@ import {
 } from "../../../accounts/enum";
 import { messengerEnv } from "../../../env";
 import { EmailImapAuthMethod, EmailSecurityType } from "../enum";
-import { imapClientEnv } from "../imap-client/env";
 import { ImapSpecialUseType } from "../imap-client/enum";
+import { imapClientEnv } from "../imap-client/env";
 
 type NewMessengerAccount = typeof messengerAccounts.$inferInsert;
 
@@ -117,7 +117,7 @@ function getSystemAccountConfig(
     ],
     emailJourneyVariants: [],
     emailCampaignStages: [],
-    countries: [Countries.GLOBAL, Countries.DE, Countries.PL],
+    countries: [Countries.GLOBAL, Countries.DE, Countries.PL, Countries.US],
     languages: [Languages.EN, Languages.DE, Languages.PL],
     isExactMatch: false,
     weight: 90,
@@ -211,6 +211,7 @@ function getLeadsAccountConfig(
       EmailJourneyVariant.WINBACK,
     ],
     emailCampaignStages: [
+      EmailCampaignStage.NOT_STARTED,
       EmailCampaignStage.INITIAL,
       EmailCampaignStage.FOLLOWUP_1,
       EmailCampaignStage.FOLLOWUP_2,
@@ -218,7 +219,7 @@ function getLeadsAccountConfig(
       EmailCampaignStage.NURTURE,
       EmailCampaignStage.REACTIVATION,
     ],
-    countries: [Countries.GLOBAL, Countries.DE, Countries.PL],
+    countries: [Countries.GLOBAL, Countries.DE, Countries.PL, Countries.US],
     languages: [Languages.EN, Languages.DE, Languages.PL],
     isExactMatch: false,
     weight: 100,
@@ -251,11 +252,11 @@ async function upsertAccounts(
 
   try {
     for (const account of accounts) {
-      // Match by smtpFromEmail (stable identifier) so renames propagate on reseed
+      // Match by name (stable seed identifier) — fromEmail may be shared across accounts in dev
       const existing = await db
         .select()
         .from(messengerAccounts)
-        .where(eq(messengerAccounts.smtpFromEmail, account.smtpFromEmail!))
+        .where(eq(messengerAccounts.name, account.name))
         .limit(1);
 
       const updateSet = {
@@ -301,7 +302,7 @@ async function upsertAccounts(
         await db
           .update(messengerAccounts)
           .set(updateSet)
-          .where(eq(messengerAccounts.smtpFromEmail, account.smtpFromEmail!));
+          .where(eq(messengerAccounts.name, account.name));
         logger.debug(`✅ Updated: ${account.name} (${account.smtpFromEmail})`);
       } else {
         await db.insert(messengerAccounts).values([account]);

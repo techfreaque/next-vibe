@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, notInArray } from "drizzle-orm";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -547,6 +547,7 @@ export class ImapSyncRepository {
     let messagesProcessed = 0;
     let messagesAdded = 0;
     let messagesUpdated = 0;
+    let messagesDeleted = 0;
     const errors: ErrorResponseType[] = [];
 
     try {
@@ -571,6 +572,9 @@ export class ImapSyncRepository {
         });
       }
       const remoteMessages = remoteMessagesResponse.data.messages;
+
+      // Track which UIDs exist on the server for deletion detection
+      const remoteUids = remoteMessages.map((m) => m.uid);
 
       for (const remoteMessage of remoteMessages) {
         try {
@@ -681,6 +685,63 @@ export class ImapSyncRepository {
         }
       }
 
+      // Handle messages that exist in DB but are no longer on the server.
+      // Only process if we got a non-empty list (guards against partial sync failures).
+      if (remoteUids.length > 0) {
+        try {
+          const isTrash = folder.specialUseType === SpecialFolderType.TRASH;
+
+          if (isTrash) {
+            // Messages missing from Trash were permanently expunged — remove from DB
+            const deleted = await db
+              .delete(emails)
+              .where(
+                and(
+                  eq(emails.accountId, account.id),
+                  eq(emails.folderId, folder.id),
+                  notInArray(emails.uid, remoteUids),
+                ),
+              )
+              .returning({ id: emails.id });
+            messagesDeleted += deleted.length;
+            if (deleted.length > 0) {
+              logger.debug(
+                `Permanently deleted ${deleted.length} messages expunged from Trash`,
+                { folderId: folder.id },
+              );
+            }
+          } else {
+            // Messages missing from a non-Trash folder were moved or soft-deleted
+            const softDeleted = await db
+              .update(emails)
+              .set({ isDeleted: true, updatedAt: new Date() })
+              .where(
+                and(
+                  eq(emails.accountId, account.id),
+                  eq(emails.folderId, folder.id),
+                  notInArray(emails.uid, remoteUids),
+                ),
+              )
+              .returning({ id: emails.id });
+            messagesDeleted += softDeleted.length;
+            if (softDeleted.length > 0) {
+              logger.debug(
+                `Soft-deleted ${softDeleted.length} messages no longer in folder`,
+                { folder: folder.name, folderId: folder.id },
+              );
+            }
+          }
+        } catch (error) {
+          logger.error("Error handling deleted messages", parseError(error));
+          errors.push(
+            fail({
+              message: t("imapErrors.sync.message.failed"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+            }),
+          );
+        }
+      }
+
       const duration = Date.now() - startTime;
       const isSuccessful = errors.length === 0;
 
@@ -698,7 +759,7 @@ export class ImapSyncRepository {
           foldersDeleted: 0,
           messagesAdded,
           messagesUpdated,
-          messagesDeleted: 0,
+          messagesDeleted,
           duration,
           errors,
         },

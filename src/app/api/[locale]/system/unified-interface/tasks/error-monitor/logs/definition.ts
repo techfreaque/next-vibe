@@ -27,7 +27,11 @@ import {
   ErrorLogStatusFilterOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
-import { ErrorLogsContainer } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const ErrorLogsContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.ErrorLogsContainer })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,

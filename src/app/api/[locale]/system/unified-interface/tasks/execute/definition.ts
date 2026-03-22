@@ -24,7 +24,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TASK_EXECUTE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { TaskExecuteContainer } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const TaskExecuteContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.TaskExecuteContainer })),
+);
 
 /**
  * POST /system/unified-interface/tasks/execute

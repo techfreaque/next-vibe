@@ -22,7 +22,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { REBUILD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { RebuildWidget } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const RebuildWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.RebuildWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

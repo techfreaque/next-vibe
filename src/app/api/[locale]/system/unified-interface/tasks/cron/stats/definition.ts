@@ -26,7 +26,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CRON_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { CronStatsContainer } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const CronStatsContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.CronStatsContainer })),
+);
 
 // Stats period enum
 const statsPeriodSchema = z.enum(["hour", "day", "week", "month"]);

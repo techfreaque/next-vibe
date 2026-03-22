@@ -26,7 +26,11 @@ import {
   GraphResolutionOptions,
 } from "../../../enum";
 import { scopedTranslation } from "./i18n";
-import { BacktestWidget } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const BacktestWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.BacktestWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

@@ -35,7 +35,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "./constants";
-import { ExecuteToolWidget } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const ExecuteToolWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.ExecuteToolWidget })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,

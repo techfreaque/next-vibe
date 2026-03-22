@@ -25,7 +25,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
 import { CRON_HISTORY_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { CronHistoryContainer } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const CronHistoryContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.CronHistoryContainer })),
+);
 
 /**
  * GET endpoint definition - Get task execution history

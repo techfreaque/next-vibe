@@ -58,7 +58,7 @@ export const { GET } = createEndpoint({
           z.object({
             code: z.string(),
             label: z.string().nullable(),
-            currentUses: z.coerce.number(),
+            currentVisitors: z.coerce.number(),
             totalSignups: z.coerce.number(),
             totalRevenueCents: z.coerce.number(),
             totalEarningsCents: z.coerce.number(),
@@ -82,7 +82,7 @@ export const { GET } = createEndpoint({
           {
             code: "FRIEND2024",
             label: "Friends & Family",
-            currentUses: 5,
+            currentVisitors: 5,
             totalSignups: 3,
             totalRevenueCents: 50000,
             totalEarningsCents: 5000,

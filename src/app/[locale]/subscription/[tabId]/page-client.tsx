@@ -73,6 +73,9 @@ export function SubscriptionPageClient({
           endpointOptions={{
             read: {
               initialData: initialSubscription,
+              queryOptions: {
+                enabled: isAuthenticated,
+              },
             },
           }}
         />

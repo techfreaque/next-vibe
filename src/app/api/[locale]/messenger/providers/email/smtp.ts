@@ -2,6 +2,9 @@
  * SMTP Provider
  * Wraps the existing SmtpRepository + ImapConnectionRepository to implement
  * the MessengerProvider interface for the EMAIL channel via SMTP/IMAP.
+ *
+ * Extends LocalStateProvider — listInbox and listFolders use DB state.
+ * moveMessage and markRead additionally apply changes on the IMAP server.
  */
 
 import "server-only";
@@ -25,21 +28,17 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { toImapShape } from "./imap-client/db";
 import { messengerFolders } from "../../messages/db";
+import type { SpecialFolderTypeValue } from "../../messages/enum";
+import { SpecialFolderType } from "../../messages/enum";
 import { messengerAccounts } from "../../accounts/db";
-import { emails } from "../../messages/db";
 import { CampaignType } from "../../accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "./smtp-client/i18n";
 import { SmtpRepository } from "./smtp-client/repository";
 import type { SmtpSelectionCriteria } from "./smtp-client/repository";
-import type {
-  InboxFolder,
-  InboxMessage,
-  MessengerProvider,
-  SendMessageInput,
-  SendMessageResult,
-} from "../provider";
+import type { SendMessageInput, SendMessageResult } from "../provider";
 import { MessageChannel } from "../../accounts/enum";
 import { scopedTranslation as providerScopedTranslation } from "../i18n";
+import { LocalStateProvider } from "../local-state-base";
 
 // Well-known system user UUID — used for service-layer sends (not tied to a real user)
 const SYSTEM_UUID = "00000000-0000-0000-0000-000000000001";
@@ -51,9 +50,10 @@ const SERVICE_USER: JwtPrivatePayloadType = {
   roles: [UserPermissionRole.ADMIN],
 };
 
-export class SmtpMessengerProvider implements MessengerProvider {
+export class SmtpMessengerProvider extends LocalStateProvider {
   readonly channel = MessageChannel.EMAIL;
   readonly name = "SMTP";
+  readonly supportsRemoteFolders = true;
 
   async send(
     input: SendMessageInput,
@@ -98,6 +98,25 @@ export class SmtpMessengerProvider implements MessengerProvider {
       });
     }
 
+    // Append to IMAP Sent folder (fire-and-forget — don't fail the send)
+    this.appendToSentFolder(
+      result.data.accountId,
+      {
+        from: `${input.senderName ?? ""} <${result.data.accountName}>`,
+        to: input.toName ? `${input.toName} <${input.to}>` : input.to,
+        subject: input.subject ?? "(no subject)",
+        html: input.html ?? `<p>${input.text}</p>`,
+        text: input.text,
+        messageId: result.data.messageId,
+      },
+      logger,
+    ).catch((err) => {
+      logger.warn("smtp.provider: failed to append to Sent folder", {
+        accountId: result.data.accountId,
+        error: parseError(err).message,
+      });
+    });
+
     return success({
       messageId: result.data.messageId,
       accountId: result.data.accountId,
@@ -108,132 +127,119 @@ export class SmtpMessengerProvider implements MessengerProvider {
     });
   }
 
-  async listInbox(
+  /**
+   * Find the path of a folder by its special use type for a given account.
+   */
+  private async getFolderPath(
     accountId: string,
-    folderPath: string | undefined,
+    specialUseType: typeof SpecialFolderTypeValue,
+  ): Promise<string | null> {
+    const [folder] = await db
+      .select({ path: messengerFolders.path })
+      .from(messengerFolders)
+      .where(
+        and(
+          eq(messengerFolders.accountId, accountId),
+          eq(messengerFolders.specialUseType, specialUseType),
+        ),
+      )
+      .limit(1);
+    return folder?.path ?? null;
+  }
+
+  /**
+   * Append a sent message to the IMAP Sent folder.
+   */
+  private async appendToSentFolder(
+    accountId: string,
+    msg: {
+      from: string;
+      to: string;
+      subject: string;
+      html: string;
+      text?: string;
+      messageId: string;
+    },
     logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<InboxMessage[]>> {
-    const { t } = providerScopedTranslation.scopedT(locale);
-    try {
-      const [rawAccount] = await db
-        .select()
-        .from(messengerAccounts)
-        .where(eq(messengerAccounts.id, accountId))
-        .limit(1);
-
-      if (!rawAccount) {
-        return fail({
-          message: t("providers.errors.smtpAccountNotFound"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      const targetFolder = folderPath ?? "INBOX";
-
-      const rows = await db
-        .select({
-          id: emails.id,
-          uid: emails.uid,
-          subject: emails.subject,
-          senderEmail: emails.senderEmail,
-          recipientEmail: emails.recipientEmail,
-          sentAt: emails.sentAt,
-          bodyText: emails.bodyText,
-          bodyHtml: emails.bodyHtml,
-          isRead: emails.isRead,
-          isFlagged: emails.isFlagged,
-          threadId: emails.threadId,
-          inReplyTo: emails.inReplyTo,
-          folderId: emails.folderId,
-        })
-        .from(emails)
-        .where(and(eq(emails.accountId, accountId)))
-        .limit(100);
-
-      const folderMap = new Map<string, string>();
-      if (rows.some((r) => r.folderId)) {
-        await db
-          .select({ id: messengerFolders.id, path: messengerFolders.path })
-          .from(messengerFolders)
-          .where(eq(messengerFolders.accountId, accountId))
-          .then((folders) =>
-            folders.forEach((f) => folderMap.set(f.id, f.path)),
-          );
-      }
-
-      const messages: InboxMessage[] = rows
-        .filter((r) => {
-          if (!folderPath) {
-            return true;
-          }
-          const path = r.folderId ? folderMap.get(r.folderId) : undefined;
-          return path === targetFolder;
-        })
-        .map((r) => ({
-          uid: r.uid ?? 0,
-          messageId: r.id,
-          subject: r.subject ?? "",
-          from: r.senderEmail ?? "",
-          to: r.recipientEmail ?? "",
-          date: r.sentAt ?? new Date(),
-          bodyText: r.bodyText ?? undefined,
-          bodyHtml: r.bodyHtml ?? undefined,
-          isRead: r.isRead ?? false,
-          isFlagged: r.isFlagged ?? false,
-          folderId: r.folderId ?? undefined,
-          folderPath: r.folderId ? folderMap.get(r.folderId) : undefined,
-          threadId: r.threadId ?? undefined,
-          inReplyTo: r.inReplyTo ?? undefined,
-        }));
-
-      logger.debug("smtp.provider.listInbox", {
+  ): Promise<void> {
+    const sentPath = await this.getFolderPath(
+      accountId,
+      SpecialFolderType.SENT,
+    );
+    if (!sentPath) {
+      logger.debug("smtp.provider: no Sent folder found, skipping append", {
         accountId,
-        count: messages.length,
       });
-      return success(messages);
-    } catch (error) {
-      logger.error("smtp.provider.listInbox.error", parseError(error));
-      return fail({
-        message: t("providers.errors.smtpListInboxFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
+      return;
     }
+
+    const [rawAccount] = await db
+      .select()
+      .from(messengerAccounts)
+      .where(eq(messengerAccounts.id, accountId))
+      .limit(1);
+
+    if (!rawAccount) {
+      return;
+    }
+
+    const account = toImapShape(rawAccount);
+    const date = new Date();
+    const rawMessage = [
+      `From: ${msg.from}`,
+      `To: ${msg.to}`,
+      `Subject: ${msg.subject}`,
+      `Date: ${date.toUTCString()}`,
+      `Message-ID: ${msg.messageId}`,
+      `MIME-Version: 1.0`,
+      `Content-Type: text/html; charset=utf-8`,
+      ``,
+      msg.html,
+    ].join("\r\n");
+
+    const targetMailbox: string = sentPath;
+    await new Promise<void>((resolve, reject) => {
+      const imap = new Imap({
+        user: account.username,
+        password: account.password,
+        host: account.host,
+        port: account.port,
+        tls: account.secure,
+        tlsOptions: { rejectUnauthorized: false },
+        connTimeout: 10000,
+        authTimeout: 5000,
+      });
+
+      imap.once("ready", () => {
+        imap.append(
+          Buffer.from(rawMessage),
+          { mailbox: targetMailbox, flags: ["\\Seen"], date },
+          (err) => {
+            imap.end();
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          },
+        );
+      });
+
+      imap.once("error", (err: Error) => reject(err));
+      imap.connect();
+    });
+
+    logger.debug("smtp.provider: appended message to Sent folder", {
+      accountId,
+      sentPath,
+      messageId: msg.messageId,
+    });
   }
 
-  async listFolders(
-    accountId: string,
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<InboxFolder[]>> {
-    const { t } = providerScopedTranslation.scopedT(locale);
-    try {
-      const rows = await db
-        .select()
-        .from(messengerFolders)
-        .where(eq(messengerFolders.accountId, accountId));
-
-      const folders: InboxFolder[] = rows.map((f) => ({
-        id: f.id,
-        path: f.path,
-        name: f.name,
-        displayName: f.displayName ?? f.name,
-        specialUseType: f.specialUseType ?? undefined,
-        messageCount: f.messageCount ?? 0,
-        unseenCount: f.unseenCount ?? 0,
-      }));
-
-      return success(folders);
-    } catch (error) {
-      logger.error("smtp.provider.listFolders.error", parseError(error));
-      return fail({
-        message: t("providers.errors.smtpListFoldersFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  async moveMessage(
+  /**
+   * Move message on the IMAP server, then update DB via base class.
+   */
+  override async moveMessage(
     accountId: string,
     uid: number,
     fromFolder: string,
@@ -292,13 +298,15 @@ export class SmtpMessengerProvider implements MessengerProvider {
         imap.connect();
       });
 
-      logger.debug("smtp.provider.moveMessage", {
+      // Update DB state via base class
+      return super.moveMessage(
         accountId,
         uid,
         fromFolder,
         toFolder,
-      });
-      return success(undefined);
+        logger,
+        locale,
+      );
     } catch (error) {
       logger.error("smtp.provider.moveMessage.error", parseError(error));
       return fail({
@@ -308,7 +316,10 @@ export class SmtpMessengerProvider implements MessengerProvider {
     }
   }
 
-  async markRead(
+  /**
+   * Mark read/unread on the IMAP server, then update DB via base class.
+   */
+  override async markRead(
     accountId: string,
     uid: number,
     folderPath: string,
@@ -379,14 +390,8 @@ export class SmtpMessengerProvider implements MessengerProvider {
         imap.connect();
       });
 
-      // Sync to DB
-      await db
-        .update(emails)
-        .set({ isRead, updatedAt: new Date() })
-        .where(and(eq(emails.accountId, accountId), eq(emails.uid, uid)));
-
-      logger.debug("smtp.provider.markRead", { accountId, uid, isRead });
-      return success(undefined);
+      // Update DB state via base class
+      return super.markRead(accountId, uid, folderPath, isRead, logger, locale);
     } catch (error) {
       logger.error("smtp.provider.markRead.error", parseError(error));
       return fail({

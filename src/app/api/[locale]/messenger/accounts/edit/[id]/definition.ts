@@ -213,6 +213,51 @@ const accountResponseFields = {
     content: "response.account.imapLastSyncAt",
     schema: dateSchema.nullable(),
   }),
+  campaignTypes: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.campaignTypes",
+    schema: z.array(z.enum(CampaignType)),
+  }),
+  emailJourneyVariants: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.emailJourneyVariants",
+    schema: z.array(z.enum(EmailJourneyVariant)),
+  }),
+  emailCampaignStages: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.emailCampaignStages",
+    schema: z.array(z.enum(EmailCampaignStage)),
+  }),
+  countries: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.countries",
+    schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])),
+  }),
+  languages: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.languages",
+    schema: z.array(z.enum(Languages)),
+  }),
+  isExactMatch: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.isExactMatch",
+    schema: z.boolean(),
+  }),
+  weight: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.weight",
+    schema: z.coerce.number().int(),
+  }),
+  isFailover: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.isFailover",
+    schema: z.boolean(),
+  }),
+  failoverPriority: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.failoverPriority",
+    schema: z.coerce.number().int(),
+  }),
   messagesSentTotal: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     content: "response.account.messagesSentTotal",
@@ -288,6 +333,15 @@ const { GET } = createEndpoint({
       imapSyncInterval: accountResponseFields.imapSyncInterval,
       imapMaxMessages: accountResponseFields.imapMaxMessages,
       imapLastSyncAt: accountResponseFields.imapLastSyncAt,
+      campaignTypes: accountResponseFields.campaignTypes,
+      emailJourneyVariants: accountResponseFields.emailJourneyVariants,
+      emailCampaignStages: accountResponseFields.emailCampaignStages,
+      countries: accountResponseFields.countries,
+      languages: accountResponseFields.languages,
+      isExactMatch: accountResponseFields.isExactMatch,
+      weight: accountResponseFields.weight,
+      isFailover: accountResponseFields.isFailover,
+      failoverPriority: accountResponseFields.failoverPriority,
       messagesSentTotal: accountResponseFields.messagesSentTotal,
       lastUsedAt: accountResponseFields.lastUsedAt,
       createdAt: accountResponseFields.createdAt,
@@ -370,6 +424,15 @@ const { GET } = createEndpoint({
         imapSyncInterval: 60,
         imapMaxMessages: 1000,
         imapLastSyncAt: null,
+        campaignTypes: [CampaignType.SYSTEM, CampaignType.TRANSACTIONAL],
+        emailJourneyVariants: [],
+        emailCampaignStages: [],
+        countries: ["GLOBAL"],
+        languages: ["en"],
+        isExactMatch: false,
+        weight: 90,
+        isFailover: false,
+        failoverPriority: 0,
         messagesSentTotal: 15000,
         lastUsedAt: "2024-01-07T11:45:00.000Z",
         createdAt: "2024-01-01T00:00:00.000Z",
@@ -410,6 +473,7 @@ const { PUT } = createEndpoint({
         schema: z.uuid(),
       }),
 
+      // mapAccount returns: name: string
       name: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -417,9 +481,10 @@ const { PUT } = createEndpoint({
         description: "fields.name.description",
         placeholder: "fields.name.placeholder",
         columns: 6,
-        schema: z.string().min(1).optional(),
+        schema: z.string().min(1),
       }),
 
+      // mapAccount returns: description: string | null
       description: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
@@ -427,9 +492,10 @@ const { PUT } = createEndpoint({
         description: "fields.description.description",
         placeholder: "fields.description.placeholder",
         columns: 12,
-        schema: z.string().nullable().optional(),
+        schema: z.string().nullable(),
       }),
 
+      // mapAccount returns: channel: MessageChannelDB
       channel: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -437,9 +503,10 @@ const { PUT } = createEndpoint({
         description: "fields.channel.description",
         columns: 6,
         options: MessageChannelOptions,
-        schema: z.enum(MessageChannelDB).nullish(),
+        schema: z.enum(MessageChannelDB),
       }),
 
+      // mapAccount returns: provider: MessengerProviderDB
       provider: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -447,9 +514,10 @@ const { PUT } = createEndpoint({
         description: "fields.provider.description",
         columns: 6,
         options: MessengerProviderOptions,
-        schema: z.enum(MessengerProviderDB).nullish(),
+        schema: z.enum(MessengerProviderDB),
       }),
 
+      // mapAccount returns: status: MessengerAccountStatusDB
       status: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -457,62 +525,64 @@ const { PUT } = createEndpoint({
         description: "fields.status.description",
         columns: 6,
         options: MessengerAccountStatusOptions,
-        schema: z.enum(MessengerAccountStatusDB).nullish(),
+        schema: z.enum(MessengerAccountStatusDB),
       }),
 
+      // mapAccount returns: priority: number
       priority: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.priority.label",
         description: "fields.priority.description",
         columns: 6,
-        schema: z.coerce.number().int().min(0).max(100).optional(),
+        schema: z.coerce.number().int().min(0).max(100),
       }),
 
+      // mapAccount returns: isDefault: boolean
       isDefault: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.isDefault.label",
         description: "fields.isDefault.description",
         columns: 6,
-        schema: z.boolean().optional(),
+        schema: z.boolean(),
       }),
 
-      // SMTP
-      smtpHost: requestField(scopedTranslation, {
+      // SMTP — all nullable (mapAccount uses ?? null)
+      smtpHost: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.smtpHost.label",
         description: "fields.smtpHost.description",
         placeholder: "fields.smtpHost.placeholder",
         columns: 6,
-        schema: z.string().nullish(),
+        schema: z.string().nullable(),
       }),
-      smtpPort: requestField(scopedTranslation, {
+      smtpPort: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.smtpPort.label",
         description: "fields.smtpPort.description",
         columns: 3,
-        schema: z.coerce.number().int().min(0).max(65535).optional(),
+        schema: z.coerce.number().int().min(0).max(65535).nullable(),
       }),
-      smtpSecurityType: requestField(scopedTranslation, {
+      smtpSecurityType: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.smtpSecurityType.label",
         description: "fields.smtpSecurityType.description",
         columns: 3,
         options: EmailSecurityTypeOptions,
-        schema: z.enum(EmailSecurityTypeDB).nullish(),
+        schema: z.enum(EmailSecurityTypeDB).nullable(),
       }),
-      smtpUsername: requestField(scopedTranslation, {
+      smtpUsername: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.smtpUsername.label",
         description: "fields.smtpUsername.description",
         placeholder: "fields.smtpUsername.placeholder",
         columns: 6,
-        schema: z.string().nullish(),
+        schema: z.string().nullable(),
       }),
       smtpPassword: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -523,50 +593,50 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.string().nullish(),
       }),
-      smtpFromEmail: requestField(scopedTranslation, {
+      smtpFromEmail: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
         label: "fields.smtpFromEmail.label",
         description: "fields.smtpFromEmail.description",
         placeholder: "fields.smtpFromEmail.placeholder",
         columns: 6,
-        schema: z.email().nullish(),
+        schema: z.email().nullable(),
       }),
-      smtpFromName: requestField(scopedTranslation, {
+      smtpFromName: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.smtpFromName.label",
         description: "fields.smtpFromName.description",
         placeholder: "fields.smtpFromName.placeholder",
         columns: 6,
-        schema: z.string().nullish(),
+        schema: z.string().nullable(),
       }),
-      smtpConnectionTimeout: requestField(scopedTranslation, {
+      smtpConnectionTimeout: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.smtpConnectionTimeout.label",
         description: "fields.smtpConnectionTimeout.description",
         columns: 4,
-        schema: z.coerce.number().int().optional(),
+        schema: z.coerce.number().int().nullable(),
       }),
-      smtpMaxConnections: requestField(scopedTranslation, {
+      smtpMaxConnections: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.smtpMaxConnections.label",
         description: "fields.smtpMaxConnections.description",
         columns: 4,
-        schema: z.coerce.number().int().optional(),
+        schema: z.coerce.number().int().nullable(),
       }),
-      smtpRateLimitPerHour: requestField(scopedTranslation, {
+      smtpRateLimitPerHour: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.smtpRateLimitPerHour.label",
         description: "fields.smtpRateLimitPerHour.description",
         columns: 4,
-        schema: z.coerce.number().int().optional(),
+        schema: z.coerce.number().int().nullable(),
       }),
 
-      // API credentials
+      // API credentials — request-only (passwords never returned)
       apiKey: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
@@ -594,59 +664,60 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.string().nullish(),
       }),
-      fromId: requestField(scopedTranslation, {
+      // mapAccount returns: fromId: string | null
+      fromId: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.fromId.label",
         description: "fields.fromId.description",
         placeholder: "fields.fromId.placeholder",
         columns: 6,
-        schema: z.string().nullish(),
+        schema: z.string().nullable(),
       }),
-      webhookUrl: requestField(scopedTranslation, {
+      webhookUrl: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.webhookUrl.label",
         description: "fields.webhookUrl.description",
         placeholder: "fields.webhookUrl.placeholder",
         columns: 6,
-        schema: z.url().nullish(),
+        schema: z.url().nullable(),
       }),
 
-      // IMAP
-      imapHost: requestField(scopedTranslation, {
+      // IMAP — nullable fields
+      imapHost: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.imapHost.label",
         description: "fields.imapHost.description",
         placeholder: "fields.imapHost.placeholder",
         columns: 6,
-        schema: z.string().nullish(),
+        schema: z.string().nullable(),
       }),
-      imapPort: requestField(scopedTranslation, {
+      imapPort: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.imapPort.label",
         description: "fields.imapPort.description",
         columns: 3,
-        schema: z.coerce.number().int().optional(),
+        schema: z.coerce.number().int().nullable(),
       }),
-      imapSecure: requestField(scopedTranslation, {
+      imapSecure: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.imapSecure.label",
         description: "fields.imapSecure.description",
         columns: 3,
-        schema: z.boolean().optional(),
+        schema: z.boolean().nullable(),
       }),
-      imapUsername: requestField(scopedTranslation, {
+      imapUsername: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "fields.imapUsername.label",
         description: "fields.imapUsername.description",
         placeholder: "fields.imapUsername.placeholder",
         columns: 6,
-        schema: z.string().nullish(),
+        schema: z.string().nullable(),
       }),
       imapPassword: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -657,42 +728,43 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.string().nullish(),
       }),
-      imapAuthMethod: requestField(scopedTranslation, {
+      imapAuthMethod: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "fields.imapAuthMethod.label",
         description: "fields.imapAuthMethod.description",
         columns: 4,
         options: EmailImapAuthMethodOptions,
-        schema: z.enum(EmailImapAuthMethodDB).nullish(),
+        schema: z.enum(EmailImapAuthMethodDB).nullable(),
       }),
-      imapSyncEnabled: requestField(scopedTranslation, {
+      // mapAccount returns: imapSyncEnabled: boolean
+      imapSyncEnabled: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.imapSyncEnabled.label",
         description: "fields.imapSyncEnabled.description",
         columns: 4,
-        schema: z.boolean().optional(),
+        schema: z.boolean(),
       }),
-      imapSyncInterval: requestField(scopedTranslation, {
+      imapSyncInterval: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.imapSyncInterval.label",
         description: "fields.imapSyncInterval.description",
         columns: 4,
-        schema: z.coerce.number().int().optional(),
+        schema: z.coerce.number().int().nullable(),
       }),
-      imapMaxMessages: requestField(scopedTranslation, {
+      imapMaxMessages: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.imapMaxMessages.label",
         description: "fields.imapMaxMessages.description",
         columns: 4,
-        schema: z.coerce.number().int().optional(),
+        schema: z.coerce.number().int().nullable(),
       }),
 
-      // Email routing
-      campaignTypes: requestField(scopedTranslation, {
+      // Email routing — all arrays (mapAccount uses ?? [])
+      campaignTypes: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.campaignTypes.label",
@@ -700,9 +772,9 @@ const { PUT } = createEndpoint({
         placeholder: "fields.campaignTypes.placeholder",
         columns: 6,
         options: CampaignTypeOptions,
-        schema: z.array(z.enum(CampaignType)).optional(),
+        schema: z.array(z.enum(CampaignType)),
       }),
-      emailJourneyVariants: requestField(scopedTranslation, {
+      emailJourneyVariants: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.emailJourneyVariants.label",
@@ -710,9 +782,9 @@ const { PUT } = createEndpoint({
         placeholder: "fields.emailJourneyVariants.placeholder",
         columns: 6,
         options: EmailJourneyVariantOptions,
-        schema: z.array(z.enum(EmailJourneyVariant)).optional(),
+        schema: z.array(z.enum(EmailJourneyVariant)),
       }),
-      emailCampaignStages: requestField(scopedTranslation, {
+      emailCampaignStages: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.emailCampaignStages.label",
@@ -720,9 +792,9 @@ const { PUT } = createEndpoint({
         placeholder: "fields.emailCampaignStages.placeholder",
         columns: 6,
         options: EmailCampaignStageOptions,
-        schema: z.array(z.enum(EmailCampaignStage)).optional(),
+        schema: z.array(z.enum(EmailCampaignStage)),
       }),
-      countries: requestField(scopedTranslation, {
+      countries: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.countries.label",
@@ -730,9 +802,9 @@ const { PUT } = createEndpoint({
         placeholder: "fields.countries.placeholder",
         columns: 6,
         options: CountriesOptions,
-        schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
+        schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])),
       }),
-      languages: requestField(scopedTranslation, {
+      languages: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
         label: "fields.languages.label",
@@ -740,39 +812,43 @@ const { PUT } = createEndpoint({
         placeholder: "fields.languages.placeholder",
         columns: 6,
         options: LanguagesOptions,
-        schema: z.array(z.enum(Languages)).optional(),
+        schema: z.array(z.enum(Languages)),
       }),
-      isExactMatch: requestField(scopedTranslation, {
+      // mapAccount returns: isExactMatch: boolean
+      isExactMatch: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.isExactMatch.label",
         description: "fields.isExactMatch.description",
         columns: 4,
-        schema: z.boolean().optional(),
+        schema: z.boolean(),
       }),
-      weight: requestField(scopedTranslation, {
+      // mapAccount returns: weight: number
+      weight: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.weight.label",
         description: "fields.weight.description",
         columns: 4,
-        schema: z.coerce.number().int().min(0).optional(),
+        schema: z.coerce.number().int().min(0),
       }),
-      isFailover: requestField(scopedTranslation, {
+      // mapAccount returns: isFailover: boolean
+      isFailover: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label: "fields.isFailover.label",
         description: "fields.isFailover.description",
         columns: 4,
-        schema: z.boolean().optional(),
+        schema: z.boolean(),
       }),
-      failoverPriority: requestField(scopedTranslation, {
+      // mapAccount returns: failoverPriority: number
+      failoverPriority: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "fields.failoverPriority.label",
         description: "fields.failoverPriority.description",
         columns: 4,
-        schema: z.coerce.number().int().optional(),
+        schema: z.coerce.number().int(),
       }),
 
       // Response-only fields
@@ -829,7 +905,45 @@ const { PUT } = createEndpoint({
   },
   examples: {
     urlPathParams: { default: { id: "550e8400-e29b-41d4-a716-446655440001" } },
-    requests: { default: { name: "Updated SMTP Account", priority: 15 } },
+    requests: {
+      default: {
+        name: "Updated SMTP Account",
+        description: null,
+        channel: MessageChannel.EMAIL,
+        provider: MessengerProvider.SMTP,
+        status: MessengerAccountStatus.ACTIVE,
+        priority: 15,
+        isDefault: true,
+        smtpHost: null,
+        smtpPort: null,
+        smtpSecurityType: null,
+        smtpUsername: null,
+        smtpFromEmail: null,
+        smtpFromName: null,
+        smtpConnectionTimeout: null,
+        smtpMaxConnections: null,
+        smtpRateLimitPerHour: null,
+        fromId: null,
+        webhookUrl: null,
+        imapHost: null,
+        imapPort: null,
+        imapSecure: null,
+        imapUsername: null,
+        imapAuthMethod: null,
+        imapSyncEnabled: false,
+        imapSyncInterval: null,
+        imapMaxMessages: null,
+        campaignTypes: [],
+        emailJourneyVariants: [],
+        emailCampaignStages: [],
+        countries: [],
+        languages: [],
+        isExactMatch: false,
+        weight: 0,
+        isFailover: false,
+        failoverPriority: 0,
+      },
+    },
     responses: {
       default: {
         id: "550e8400-e29b-41d4-a716-446655440001",
@@ -841,7 +955,35 @@ const { PUT } = createEndpoint({
         healthStatus: MessengerHealthStatus.HEALTHY,
         isDefault: true,
         priority: 15,
+        smtpHost: "smtp.example.com",
+        smtpPort: 587,
+        smtpSecurityType: EmailSecurityType.STARTTLS,
+        smtpUsername: "user@example.com",
+        smtpFromEmail: "noreply@example.com",
+        smtpFromName: "Unbottled",
+        smtpConnectionTimeout: 30000,
+        smtpMaxConnections: 5,
+        smtpRateLimitPerHour: 600,
+        fromId: null,
+        webhookUrl: null,
+        imapHost: "imap.example.com",
+        imapPort: 993,
+        imapSecure: true,
+        imapUsername: "user@example.com",
+        imapAuthMethod: null,
+        imapSyncEnabled: true,
+        imapSyncInterval: 60,
+        imapMaxMessages: 1000,
         imapLastSyncAt: null,
+        campaignTypes: [CampaignType.SYSTEM],
+        emailJourneyVariants: [],
+        emailCampaignStages: [],
+        countries: ["GLOBAL"],
+        languages: ["en"],
+        isExactMatch: false,
+        weight: 90,
+        isFailover: false,
+        failoverPriority: 0,
         messagesSentTotal: 15000,
         lastUsedAt: "2024-01-07T11:45:00.000Z",
         createdAt: "2024-01-01T00:00:00.000Z",

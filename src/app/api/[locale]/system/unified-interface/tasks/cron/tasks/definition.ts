@@ -47,7 +47,11 @@ import {
 import { taskInputSchema } from "../db";
 import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { CronTasksContainer } from "./widget";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
+const CronTasksContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.CronTasksContainer })),
+);
 
 /** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
 export const cronTaskResponseSchema = z.object({

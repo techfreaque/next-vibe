@@ -22,7 +22,6 @@ import type {
   MessengerAccountEditDELETEResponseOutput,
   MessengerAccountEditGETResponseOutput,
   MessengerAccountEditPUTRequestOutput,
-  MessengerAccountEditPUTResponseOutput,
 } from "./definition";
 import type { MessengerAccountEditT } from "./i18n";
 
@@ -62,6 +61,15 @@ export class MessengerAccountEditRepository {
       imapLastSyncAt: account.imapLastSyncAt ?? null,
       messagesSentTotal: account.messagesSentTotal ?? 0,
       lastUsedAt: account.lastUsedAt ?? null,
+      campaignTypes: account.campaignTypes ?? [],
+      emailJourneyVariants: account.emailJourneyVariants ?? [],
+      emailCampaignStages: account.emailCampaignStages ?? [],
+      countries: account.countries ?? [],
+      languages: account.languages ?? [],
+      isExactMatch: account.isExactMatch ?? false,
+      weight: account.weight ?? 0,
+      isFailover: account.isFailover ?? false,
+      failoverPriority: account.failoverPriority ?? 0,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
     };
@@ -107,7 +115,7 @@ export class MessengerAccountEditRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: MessengerAccountEditT,
-  ): Promise<ResponseType<MessengerAccountEditPUTResponseOutput>> {
+  ): Promise<ResponseType<MessengerAccountEditGETResponseOutput>> {
     try {
       logger.info("Updating messenger account", {
         id: data.id,

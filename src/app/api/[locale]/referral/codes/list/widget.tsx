@@ -110,14 +110,14 @@ export function ReferralCodesListContainer({
 
             {/* Stats Grid */}
             <Div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0">
-              {/* Uses */}
+              {/* Visitors */}
               <Div className="p-4 flex flex-col gap-1">
                 <Div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                   <Users className="h-3.5 w-3.5" />
-                  {t("codes.list.widget.uses")}
+                  {t("codes.list.widget.visitors")}
                 </Div>
                 <Div className="text-lg font-semibold tabular-nums">
-                  {code.currentUses}
+                  {code.currentVisitors}
                 </Div>
               </Div>
 

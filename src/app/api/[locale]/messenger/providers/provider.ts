@@ -91,6 +91,11 @@ export interface MessengerProvider {
   readonly channel: typeof MessageChannelValue;
   /** Human-readable provider name, e.g. "SMTP", "Resend", "Twilio" */
   readonly name: string;
+  /**
+   * Whether this provider syncs folders/messages with a remote server (e.g. IMAP).
+   * When false, inbox operations use local DB state only.
+   */
+  readonly supportsRemoteFolders: boolean;
 
   /** Send a message. Returns the send result or a failure. */
   send(

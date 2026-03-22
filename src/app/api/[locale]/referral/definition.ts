@@ -56,7 +56,7 @@ export const { POST } = createEndpoint({
         const newCode: CodesListGetResponseOutput["codes"][number] = {
           code: data.requestData.fieldsGrid.code,
           label: data.requestData.fieldsGrid.label ?? null,
-          currentUses: 0,
+          currentVisitors: 0,
           totalSignups: 0,
           totalRevenueCents: 0,
           totalEarningsCents: 0,
