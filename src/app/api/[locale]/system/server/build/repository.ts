@@ -193,7 +193,7 @@ export class BuildRepository {
         const { execSync } = await import("node:child_process");
         try {
           execSync("bunx next build", {
-            stdio: "inherit",
+            stdio: ["ignore", "pipe", "pipe"],
             cwd: process.cwd(),
             env: {
               ...process.env,
@@ -205,16 +205,31 @@ export class BuildRepository {
           steps.push({ label: "Next.js", ok: true, skipped: false });
         } catch (buildError) {
           const parsedError = parseError(buildError);
-          const errorMsg = `${t("post.repository.messages.nextjsBuildFailed")}: ${parsedError.message}`;
+          const spawnError = buildError as {
+            stdout?: Buffer | string;
+            stderr?: Buffer | string;
+          };
+          const stdoutText =
+            spawnError.stdout?.toString().trim() ?? "";
+          const stderrText =
+            spawnError.stderr?.toString().trim() ?? "";
+          const detail =
+            stderrText || stdoutText || parsedError.message;
+          const errorMsg = `${t("post.repository.messages.nextjsBuildFailed")}: ${detail}`;
           steps.push({ label: "Next.js", ok: false, skipped: false });
           errors.push(errorMsg);
+          logger.error("Next.js build failed", {
+            message: parsedError.message,
+            stderr: stderrText,
+            stdout: stdoutText,
+          });
 
           if (!data.force) {
             return fail({
               message: t("post.errors.server.title"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
               messageParams: {
-                error: parsedError.message,
+                error: detail,
               },
             });
           }

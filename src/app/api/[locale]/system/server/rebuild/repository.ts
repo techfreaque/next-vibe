@@ -149,7 +149,7 @@ export class RebuildRepository {
 
         try {
           execSync("bunx next build", {
-            stdio: "inherit",
+            stdio: ["ignore", "pipe", "pipe"],
             cwd,
             env: {
               ...process.env,
@@ -158,9 +158,20 @@ export class RebuildRepository {
             },
           });
         } catch (error) {
-          return t("post.steps.buildFailed", {
-            error: parseError(error).message,
+          const parsedError = parseError(error);
+          const spawnError = error as {
+            stdout?: Buffer | string;
+            stderr?: Buffer | string;
+          };
+          const stderrText = spawnError.stderr?.toString().trim() ?? "";
+          const stdoutText = spawnError.stdout?.toString().trim() ?? "";
+          const detail = stderrText || stdoutText || parsedError.message;
+          logger.error("Next.js rebuild failed", {
+            message: parsedError.message,
+            stderr: stderrText,
+            stdout: stdoutText,
           });
+          return t("post.steps.buildFailed", { error: detail });
         }
 
         // Atomic swap: .next-prod → .next-old, .next-rebuild → .next-prod
