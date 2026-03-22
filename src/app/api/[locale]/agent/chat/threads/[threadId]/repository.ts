@@ -178,6 +178,18 @@ export class ThreadByIdRepository {
         });
       }
 
+      // Guard against empty updates (Drizzle throws "No values to set" if data is empty)
+      if (Object.keys(data).length === 0) {
+        logger.warn("Empty update request", {
+          threadId,
+          userId: user.id,
+          leadId: user.leadId,
+          isPublic: user.isPublic,
+          rootFolderId: existingThread.rootFolderId,
+        });
+        return success({ updatedAt: existingThread.updatedAt });
+      }
+
       // Update the thread (user ownership already verified)
       const [updatedThread] = await db
         .update(chatThreads)
@@ -193,7 +205,7 @@ export class ThreadByIdRepository {
         updatedAt: updatedThread.updatedAt,
       });
     } catch (error) {
-      logger.error("Error updating thread", parseError(error));
+      logger.error("Error updating thread", parseError(error), { threadId });
       return fail({
         message: t("patch.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

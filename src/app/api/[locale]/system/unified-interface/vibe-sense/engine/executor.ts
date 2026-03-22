@@ -10,7 +10,7 @@ import "server-only";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -158,9 +158,18 @@ export async function executeNode(
   }
 
   if (!nodeConfig.endpointPath) {
+    ctx.logger.debug("[vibe-sense] Node has no endpointPath, skipping", {
+      nodeId,
+      graphId,
+    });
     return;
   }
-  const response = await callEndpoint(nodeConfig.endpointPath, inputs);
+  const response = await callEndpoint(
+    nodeConfig.endpointPath,
+    inputs,
+    nodeId,
+    ctx.logger,
+  );
   if (response === null) {
     return;
   }
@@ -333,11 +342,10 @@ type SerializableValue =
 async function callEndpoint(
   endpointId: string,
   input: Record<string, MappedValue>,
+  nodeId: string,
+  logger: ReturnType<typeof createEndpointLogger>,
 ): Promise<Record<string, SerializableValue> | null> {
-  // Use bare alias — the generated route-handlers switch registers aliases
-  // without method suffix. The method is already encoded in the alias→handler mapping.
   const toolName = endpointId;
-  const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
   const data: Record<string, SerializableValue> = {};
   for (const [k, v] of Object.entries(input)) {
@@ -362,6 +370,7 @@ async function callEndpoint(
 
   logger.error(`[vibe-sense] Endpoint call failed: ${toolName}`, {
     error: result.message,
+    nodeId,
   });
   return null;
 }

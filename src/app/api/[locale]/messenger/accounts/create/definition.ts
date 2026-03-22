@@ -203,6 +203,16 @@ const { POST } = createEndpoint({
         schema: z.email().nullish(),
       }),
 
+      smtpFromName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.smtpFromName.label",
+        description: "fields.smtpFromName.description",
+        placeholder: "fields.smtpFromName.placeholder",
+        columns: 6,
+        schema: z.string().nullish(),
+      }),
+
       smtpConnectionTimeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,

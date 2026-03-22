@@ -188,6 +188,69 @@ export const translations: typeof en = {
     },
   },
 
+  post: {
+    title: "Uruchom skan monitora błędów",
+    description:
+      "Skanuj wiadomości czatu i logi backendu w poszukiwaniu wzorców błędów",
+    tags: {
+      monitoring: "Monitorowanie",
+    },
+    response: {
+      errorsFound: "Znalezione błędy",
+      threadsScanned: "Zeskanowane wątki",
+      scanWindowFrom: "Okno skanu od",
+      scanWindowTo: "Okno skanu do",
+      patterns: "Wzorce błędów",
+    },
+    success: {
+      title: "Skan zakończony",
+      description: "Skan monitora błędów zakończony pomyślnie",
+    },
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowe żądanie",
+      },
+      unauthorized: {
+        title: "Nieautoryzowany",
+        description: "Wymagane uwierzytelnienie",
+      },
+      forbidden: {
+        title: "Zabroniony",
+        description: "Dostęp odmówiony",
+      },
+      notFound: {
+        title: "Nie znaleziono",
+        description: "Zasób nie znaleziony",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Wystąpił błąd sieci",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Nie udało się uruchomić skanu monitora błędów",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt danych",
+      },
+    },
+  },
+
+  errorMonitor: {
+    name: "Monitor błędów",
+    description: "Skanuje w poszukiwaniu wzorców błędów co 3 godziny",
+  },
+
   widget: {
     title: "Logi błędów",
     loading: "Ładowanie logów...",

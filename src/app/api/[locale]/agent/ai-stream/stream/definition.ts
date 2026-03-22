@@ -328,8 +328,25 @@ const { POST } = createEndpoint({
         schema: z
           .array(
             selectChatMessageSchema.extend({
-              createdAt: dateSchema,
-              updatedAt: dateSchema,
+              createdAt: dateSchema.nullable(),
+              updatedAt: dateSchema.nullable(),
+              // Tool messages in incognito mode may send content as an array
+              // (AI SDK multi-part content format). Accept and coerce to JSON string.
+              content: z
+                .union([z.string(), z.array(z.unknown()), z.null()])
+                .transform((v) =>
+                  typeof v === "string" || v === null ? v : JSON.stringify(v),
+                )
+                .optional(),
+              // errorMessage may also be a structured object in some clients
+              errorMessage: z
+                .union([z.string(), z.unknown()])
+                .transform((v) =>
+                  typeof v === "string" || v === null || v === undefined
+                    ? v
+                    : JSON.stringify(v),
+                )
+                .optional(),
             }),
           )
           .optional()

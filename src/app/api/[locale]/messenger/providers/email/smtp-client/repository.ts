@@ -95,6 +95,7 @@ interface SmtpAccountShape {
   username: string;
   password: string;
   fromEmail: string;
+  fromName: MessengerAccount["smtpFromName"];
   connectionTimeout: MessengerAccount["smtpConnectionTimeout"];
   rateLimitPerHour: MessengerAccount["smtpRateLimitPerHour"];
   status: MessengerAccount["status"];
@@ -141,6 +142,7 @@ export class SmtpRepository {
       username: row.smtpUsername ?? "",
       password: row.smtpPassword ?? "",
       fromEmail: row.smtpFromEmail ?? "",
+      fromName: row.smtpFromName,
       connectionTimeout: row.smtpConnectionTimeout,
       rateLimitPerHour: row.smtpRateLimitPerHour,
       status: row.status,
@@ -457,6 +459,14 @@ export class SmtpRepository {
         if (isLeadCampaign) {
           logger.error(
             "No SMTP accounts match lead campaign criteria - strict matching required",
+            {
+              campaignType: selectionCriteria.campaignType,
+              emailJourneyVariant:
+                selectionCriteria.emailJourneyVariant ?? null,
+              emailCampaignStage: selectionCriteria.emailCampaignStage ?? null,
+              country: selectionCriteria.country ?? null,
+              language: selectionCriteria.language ?? null,
+            },
           );
           return null;
         }
@@ -466,7 +476,12 @@ export class SmtpRepository {
         const fallbackRows = await db
           .select()
           .from(messengerAccounts)
-          .where(and(...SmtpRepository.SMTP_ACTIVE_CONDITIONS))
+          .where(
+            and(
+              ...SmtpRepository.SMTP_ACTIVE_CONDITIONS,
+              eq(messengerAccounts.isExactMatch, false),
+            ),
+          )
           .orderBy(
             desc(messengerAccounts.isDefault),
             desc(messengerAccounts.priority),
@@ -474,7 +489,13 @@ export class SmtpRepository {
           .limit(1);
 
         if (fallbackRows.length === 0) {
-          logger.error("No active SMTP messenger accounts available");
+          logger.error("No active SMTP messenger accounts available", {
+            campaignType: selectionCriteria.campaignType ?? null,
+            emailJourneyVariant: selectionCriteria.emailJourneyVariant ?? null,
+            emailCampaignStage: selectionCriteria.emailCampaignStage ?? null,
+            country: selectionCriteria.country ?? null,
+            language: selectionCriteria.language ?? null,
+          });
           return null;
         }
 
@@ -763,8 +784,9 @@ export class SmtpRepository {
         headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
       }
 
+      const resolvedSenderName = account.fromName ?? params.senderName;
       const result = await transport.sendMail({
-        from: `${params.senderName} <${account.fromEmail}>`,
+        from: `${resolvedSenderName} <${account.fromEmail}>`,
         to: params.toName ? `${params.toName} <${params.to}>` : params.to,
         replyTo: params.replyTo,
         subject: params.subject,
@@ -815,7 +837,7 @@ export class SmtpRepository {
             recipientEmail: params.to,
             recipientName: params.toName,
             senderEmail: account.fromEmail,
-            senderName: params.senderName,
+            senderName: resolvedSenderName,
             accountId: account.id,
             messageId: result.messageId,
             campaignType: params.selectionCriteria?.campaignType,

@@ -42,6 +42,7 @@ export function validateLocale(
     logger,
     locale,
     platform,
+    "locale-validation",
   );
   const validatedLocale = localeValidation.success
     ? localeValidation.data
@@ -72,6 +73,8 @@ export interface HandlerValidationContext<TRequestData, TUrlParameters> {
   urlParameters: TUrlParameters;
   /** Locale for error messages */
   locale: CountryLanguage;
+  /** Endpoint path for logging context (optional) */
+  endpointPath: string;
 }
 
 /**
@@ -158,6 +161,7 @@ export function validateHandlerRequestData<
       logger,
       context.locale,
       platform,
+      `${context.endpointPath}/url-params`,
     );
     if (!urlValidation.success) {
       const logUrl =
@@ -165,8 +169,9 @@ export function validateHandlerRequestData<
           ? logger.debug.bind(logger)
           : logger.error.bind(logger);
       logUrl("URL validation failed", {
+        endpoint: context.endpointPath,
         error: urlValidation.message,
-        messageParams: urlValidation.messageParams,
+        urlParams: JSON.stringify(context.urlParameters),
       });
       return urlValidation;
     }
@@ -184,6 +189,7 @@ export function validateHandlerRequestData<
       logger,
       context.locale,
       platform,
+      context.endpointPath,
     );
     if (!requestValidation.success) {
       const logReq =
@@ -191,8 +197,8 @@ export function validateHandlerRequestData<
           ? logger.debug.bind(logger)
           : logger.error.bind(logger);
       logReq("Request validation failed", {
+        endpoint: context.endpointPath,
         error: requestValidation.message,
-        messageParams: requestValidation.messageParams,
       });
       return requestValidation;
     }
@@ -206,7 +212,9 @@ export function validateHandlerRequestData<
       },
     };
   } catch (error) {
-    logger.error("Request validation failed", parseError(error));
+    logger.error("Request validation failed", parseError(error), {
+      endpoint: context.endpointPath,
+    });
     const { t } = sharedScopedTranslation.scopedT(context.locale);
     return {
       success: false,
@@ -230,14 +238,23 @@ export function validateResponseData<TResponseOutput>(
   logger: EndpointLogger,
   locale: CountryLanguage,
   platform: Platform,
+  endpointPath: string,
 ): ResponseType<TResponseOutput> {
   const { t } = sharedScopedTranslation.scopedT(locale);
-  const validation = validateData(data, schema, logger, locale, platform);
+  const validation = validateData(
+    data,
+    schema,
+    logger,
+    locale,
+    platform,
+    endpointPath,
+  );
 
   if (!validation.success) {
     logger.error("[Request Validator] Response validation failed", {
       error: validation.message,
       messageParams: validation.messageParams,
+      endpoint: endpointPath,
     });
     return {
       success: false,

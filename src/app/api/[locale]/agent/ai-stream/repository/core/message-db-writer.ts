@@ -275,6 +275,8 @@ export class MessageDbWriter {
       this.logger.error("[MessageDbWriter] Failed to deduct credits", {
         amount: params.amount,
         feature: params.feature,
+        model: params.type === "model" ? params.model : (params.model ?? null),
+        error: deductResult.message,
       });
     }
   }

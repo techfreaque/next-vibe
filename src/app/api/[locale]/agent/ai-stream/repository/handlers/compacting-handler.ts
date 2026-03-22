@@ -254,11 +254,33 @@ export class CompactingHandler {
             errorMessage: errorObj.message,
           });
 
+          const isContextLimit =
+            errorObj.message.toLowerCase().includes("context length") ||
+            errorObj.message.toLowerCase().includes("context window") ||
+            errorObj.message.toLowerCase().includes("maximum context") ||
+            errorObj.message.toLowerCase().includes("input tokens") ||
+            errorObj.message.toLowerCase().includes("token limit");
+
+          const tokenMatch = /(\d[\d,]+)\s*(?:input\s*)?tokens/i.exec(
+            errorObj.message,
+          );
+          const tokenCount = tokenMatch
+            ? tokenMatch[1].replace(/,/g, "")
+            : null;
+          const isExpensive =
+            isContextLimit &&
+            tokenCount !== null &&
+            parseInt(tokenCount, 10) > 100_000;
+
+          const userMessage = isExpensive
+            ? t("errors.compactingStreamErrorExpensive", {
+                tokens: tokenCount ?? "unknown",
+              })
+            : t("errors.compactingStreamError");
+
           ctx.dbWriter.emitError(
             fail({
-              message: t("errors.compactingStreamError", {
-                error: errorObj.message,
-              }),
+              message: userMessage,
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             }),
           );
@@ -278,9 +300,7 @@ export class CompactingHandler {
 
       ctx.dbWriter.emitError(
         fail({
-          message: t("errors.compactingException", {
-            error: errorObj.message,
-          }),
+          message: t("errors.compactingException"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         }),
       );

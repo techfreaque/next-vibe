@@ -35,8 +35,12 @@ import {
   requestDataArrayOptionalField,
   responseArrayOptionalField,
 } from "../unified-interface/shared/field/utils";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { scopedTranslation } from "./i18n";
-import { ReleaseResultWidget } from "./widget";
+
+const ReleaseResultWidget = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.ReleaseResultWidget })),
+);
 
 // ============================================================================
 // Shared Enums/Schemas (minimal - used only for select options)

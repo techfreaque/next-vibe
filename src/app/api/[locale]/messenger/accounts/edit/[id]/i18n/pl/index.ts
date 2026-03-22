@@ -144,6 +144,11 @@ export const translations = {
       description: "Adres e-mail nadawcy",
       placeholder: "noreply@example.com",
     },
+    smtpFromName: {
+      label: "Nazwa nadawcy",
+      description: "Wyświetlana nazwa nadawcy w klientach poczty",
+      placeholder: "Unbottled",
+    },
     smtpConnectionTimeout: {
       label: "Timeout połączenia",
       description: "Timeout w ms",
@@ -265,6 +270,7 @@ export const translations = {
       isDefault: "Domyślny",
       priority: "Priorytet",
       smtpFromEmail: "Od e-mail",
+      smtpFromName: "Nazwa nadawcy",
       fromId: "Od ID",
       smtpHost: "Host SMTP",
       smtpPort: "Port SMTP",

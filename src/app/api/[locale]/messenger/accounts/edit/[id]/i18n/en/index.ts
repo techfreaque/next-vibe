@@ -143,6 +143,11 @@ export const translations = {
       description: "Sender email address",
       placeholder: "noreply@example.com",
     },
+    smtpFromName: {
+      label: "From Name",
+      description: "Sender display name shown in email clients",
+      placeholder: "Unbottled",
+    },
     smtpConnectionTimeout: {
       label: "Connection Timeout",
       description: "Timeout in milliseconds",
@@ -264,6 +269,7 @@ export const translations = {
       isDefault: "Default",
       priority: "Priority",
       smtpFromEmail: "From Email",
+      smtpFromName: "From Name",
       fromId: "From ID",
       smtpHost: "SMTP Host",
       smtpPort: "SMTP Port",

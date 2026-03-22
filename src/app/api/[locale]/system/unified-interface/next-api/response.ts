@@ -105,6 +105,7 @@ export function wrapErrorResponse(
     logger,
     locale,
     Platform.NEXT_API,
+    "error-response-schema",
   );
 
   // Handle validation errors in the error response itself

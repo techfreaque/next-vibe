@@ -95,7 +95,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
-        schema: z.string().optional(),
+        schema: z.string().nullable().optional(),
       }),
       output: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

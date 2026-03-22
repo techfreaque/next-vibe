@@ -118,11 +118,6 @@ export class EmailHandlingRepository {
               }
 
               if (!emailData.ignoreErrors && !emailSendResult.success) {
-                logger.error(
-                  "Email send error",
-                  emailSendResult.message,
-                  emailSendResult.messageParams,
-                );
                 errors.push(
                   fail({
                     message: smtpT("emailHandling.email.errors.send_failed"),
@@ -213,7 +208,7 @@ export class EmailHandlingRepository {
 
     if (errors.length > 0) {
       const { t: outerSmtpT } = scopedTranslation.scopedT(data.locale);
-      logger.error("Email errors");
+      logger.error("Email errors", errors);
       return fail({
         message: outerSmtpT("emailHandling.email.errors.batch_send_failed"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,

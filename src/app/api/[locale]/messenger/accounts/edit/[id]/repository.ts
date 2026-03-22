@@ -45,6 +45,7 @@ export class MessengerAccountEditRepository {
       smtpSecurityType: account.smtpSecurityType ?? null,
       smtpUsername: account.smtpUsername ?? null,
       smtpFromEmail: account.smtpFromEmail ?? null,
+      smtpFromName: account.smtpFromName ?? null,
       smtpConnectionTimeout: account.smtpConnectionTimeout ?? null,
       smtpMaxConnections: account.smtpMaxConnections ?? null,
       smtpRateLimitPerHour: account.smtpRateLimitPerHour ?? null,
@@ -72,7 +73,7 @@ export class MessengerAccountEditRepository {
     t: MessengerAccountEditT,
   ): Promise<ResponseType<MessengerAccountEditGETResponseOutput>> {
     try {
-      logger.info("Getting messenger account", {
+      logger.debug("Getting messenger account", {
         id: urlPathParams.id,
         userId: user.id,
       });
@@ -193,6 +194,9 @@ export class MessengerAccountEditRepository {
       }
       if (data.smtpFromEmail !== undefined) {
         updateValues.smtpFromEmail = data.smtpFromEmail ?? null;
+      }
+      if (data.smtpFromName !== undefined) {
+        updateValues.smtpFromName = data.smtpFromName ?? null;
       }
       if (data.smtpConnectionTimeout !== undefined) {
         updateValues.smtpConnectionTimeout = data.smtpConnectionTimeout;

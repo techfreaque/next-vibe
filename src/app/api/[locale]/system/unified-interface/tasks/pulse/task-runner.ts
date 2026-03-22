@@ -77,12 +77,14 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
           const failureCount = summary.tasksFailed.length;
           const duration = summary.totalExecutionTimeMs;
 
-          logger.info(
-            formatTask(
-              `Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed in ${formatDuration(duration)}`,
-              "💓",
-            ),
-          );
+          if (env.NODE_ENV !== "production") {
+            logger.info(
+              formatTask(
+                `Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed in ${formatDuration(duration)}`,
+                "💓",
+              ),
+            );
+          }
         } else {
           logger.error(
             `Pulse #${pulseCount} failed`,

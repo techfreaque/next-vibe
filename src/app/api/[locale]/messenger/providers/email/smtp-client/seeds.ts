@@ -52,6 +52,7 @@ function getSystemAccountConfig(
   const smtpUsername = messengerEnv.EMAIL_USER;
   const smtpPassword = messengerEnv.EMAIL_PASS;
   const fromEmail = messengerEnv.EMAIL_FROM_EMAIL;
+  const fromName = messengerEnv.EMAIL_FROM_NAME ?? "Unbottled";
 
   if (!smtpHost || !smtpUsername || !smtpPassword || !fromEmail) {
     logger.debug(
@@ -73,7 +74,7 @@ function getSystemAccountConfig(
     messengerEnv.IMAP_SECURE ?? imapClientEnv.IMAP_SEED_SECURE ?? true;
 
   return {
-    name: "System SMTP Account",
+    name: "System Email",
     description: "System emails: notifications, password resets, transactional",
     channel: MessageChannel.EMAIL,
     provider: MessengerProvider.SMTP,
@@ -85,6 +86,7 @@ function getSystemAccountConfig(
     smtpUsername,
     smtpPassword,
     smtpFromEmail: fromEmail,
+    smtpFromName: fromName,
     smtpConnectionTimeout: 30000,
     smtpMaxConnections: 5,
     smtpRateLimitPerHour: 1000,
@@ -138,6 +140,7 @@ function getLeadsAccountConfig(
   const smtpUsername = leadsCampaignsEnv.LEADS_EMAIL_USER;
   const smtpPassword = leadsCampaignsEnv.LEADS_EMAIL_PASS;
   const fromEmail = leadsCampaignsEnv.LEADS_EMAIL_FROM_EMAIL;
+  const fromName = leadsCampaignsEnv.LEADS_EMAIL_FROM_NAME ?? "Unbottled Team";
 
   if (!smtpHost || !smtpUsername || !smtpPassword || !fromEmail) {
     logger.debug(
@@ -155,7 +158,7 @@ function getLeadsAccountConfig(
   const imapSecure = leadsCampaignsEnv.LEADS_IMAP_SECURE ?? true;
 
   return {
-    name: "Lead Campaigns SMTP Account",
+    name: "Lead Campaigns Email",
     description:
       "Lead campaigns, newsletters, signup nurture, retention, winback",
     channel: MessageChannel.EMAIL,
@@ -168,6 +171,7 @@ function getLeadsAccountConfig(
     smtpUsername,
     smtpPassword,
     smtpFromEmail: fromEmail,
+    smtpFromName: fromName,
     smtpConnectionTimeout: 30000,
     smtpMaxConnections: 5,
     smtpRateLimitPerHour: 1000,
@@ -247,52 +251,57 @@ async function upsertAccounts(
 
   try {
     for (const account of accounts) {
+      // Match by smtpFromEmail (stable identifier) so renames propagate on reseed
       const existing = await db
         .select()
         .from(messengerAccounts)
-        .where(eq(messengerAccounts.name, account.name!))
+        .where(eq(messengerAccounts.smtpFromEmail, account.smtpFromEmail!))
         .limit(1);
+
+      const updateSet = {
+        name: account.name,
+        description: account.description,
+        smtpHost: account.smtpHost,
+        smtpPort: account.smtpPort,
+        smtpSecurityType: account.smtpSecurityType,
+        smtpUsername: account.smtpUsername,
+        smtpPassword: account.smtpPassword,
+        smtpFromEmail: account.smtpFromEmail,
+        smtpFromName: account.smtpFromName,
+        smtpConnectionTimeout: account.smtpConnectionTimeout,
+        smtpMaxConnections: account.smtpMaxConnections,
+        smtpRateLimitPerHour: account.smtpRateLimitPerHour,
+        imapHost: account.imapHost,
+        imapPort: account.imapPort,
+        imapSecure: account.imapSecure,
+        imapUsername: account.imapUsername,
+        imapPassword: account.imapPassword,
+        imapAuthMethod: account.imapAuthMethod,
+        imapConnectionTimeout: account.imapConnectionTimeout,
+        imapKeepAlive: account.imapKeepAlive,
+        imapSyncEnabled: account.imapSyncEnabled,
+        imapSyncInterval: account.imapSyncInterval,
+        imapMaxMessages: account.imapMaxMessages,
+        imapSyncFolders: account.imapSyncFolders,
+        campaignTypes: account.campaignTypes,
+        emailJourneyVariants: account.emailJourneyVariants,
+        emailCampaignStages: account.emailCampaignStages,
+        countries: account.countries,
+        languages: account.languages,
+        isDefault: account.isDefault,
+        priority: account.priority,
+        weight: account.weight,
+        isExactMatch: account.isExactMatch,
+        isFailover: account.isFailover,
+        failoverPriority: account.failoverPriority,
+        updatedAt: new Date(),
+      };
 
       if (existing.length > 0) {
         await db
           .update(messengerAccounts)
-          .set({
-            description: account.description,
-            smtpHost: account.smtpHost,
-            smtpPort: account.smtpPort,
-            smtpSecurityType: account.smtpSecurityType,
-            smtpUsername: account.smtpUsername,
-            smtpPassword: account.smtpPassword,
-            smtpFromEmail: account.smtpFromEmail,
-            smtpConnectionTimeout: account.smtpConnectionTimeout,
-            smtpMaxConnections: account.smtpMaxConnections,
-            smtpRateLimitPerHour: account.smtpRateLimitPerHour,
-            imapHost: account.imapHost,
-            imapPort: account.imapPort,
-            imapSecure: account.imapSecure,
-            imapUsername: account.imapUsername,
-            imapPassword: account.imapPassword,
-            imapAuthMethod: account.imapAuthMethod,
-            imapConnectionTimeout: account.imapConnectionTimeout,
-            imapKeepAlive: account.imapKeepAlive,
-            imapSyncEnabled: account.imapSyncEnabled,
-            imapSyncInterval: account.imapSyncInterval,
-            imapMaxMessages: account.imapMaxMessages,
-            imapSyncFolders: account.imapSyncFolders,
-            campaignTypes: account.campaignTypes,
-            emailJourneyVariants: account.emailJourneyVariants,
-            emailCampaignStages: account.emailCampaignStages,
-            countries: account.countries,
-            languages: account.languages,
-            isDefault: account.isDefault,
-            priority: account.priority,
-            weight: account.weight,
-            isExactMatch: account.isExactMatch,
-            isFailover: account.isFailover,
-            failoverPriority: account.failoverPriority,
-            updatedAt: new Date(),
-          })
-          .where(eq(messengerAccounts.name, account.name!));
+          .set(updateSet)
+          .where(eq(messengerAccounts.smtpFromEmail, account.smtpFromEmail!));
         logger.debug(`✅ Updated: ${account.name} (${account.smtpFromEmail})`);
       } else {
         await db.insert(messengerAccounts).values([account]);

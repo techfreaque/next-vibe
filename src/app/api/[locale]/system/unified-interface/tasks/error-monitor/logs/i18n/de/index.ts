@@ -190,6 +190,69 @@ export const translations: typeof en = {
     },
   },
 
+  post: {
+    title: "Fehlermonitor-Scan ausführen",
+    description:
+      "Chat-Nachrichten und Backend-Protokolle auf Fehlermuster scannen",
+    tags: {
+      monitoring: "Überwachung",
+    },
+    response: {
+      errorsFound: "Fehler gefunden",
+      threadsScanned: "Threads gescannt",
+      scanWindowFrom: "Scan-Fenster von",
+      scanWindowTo: "Scan-Fenster bis",
+      patterns: "Fehlermuster",
+    },
+    success: {
+      title: "Scan abgeschlossen",
+      description: "Fehlermonitor-Scan erfolgreich abgeschlossen",
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrage",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff verweigert",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Ressource nicht gefunden",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Netzwerkfehler aufgetreten",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Fehlermonitor-Scan fehlgeschlagen",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Datenkonflikt aufgetreten",
+      },
+    },
+  },
+
+  errorMonitor: {
+    name: "Fehlermonitor",
+    description: "Scannt alle 3 Stunden nach Fehlermustern",
+  },
+
   widget: {
     title: "Fehlerprotokolle",
     loading: "Protokolle werden geladen...",

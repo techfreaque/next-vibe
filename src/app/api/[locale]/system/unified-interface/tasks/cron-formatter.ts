@@ -48,7 +48,9 @@ export function formatCronSchedule(
       locale,
     );
   } catch (error) {
-    logger.error("Failed to parse cron schedule", parseError(error));
+    logger.error("Failed to parse cron schedule", parseError(error), {
+      schedule,
+    });
     // If parsing fails, try to generate a basic description anyway
     const parts = schedule.trim().split(/\s+/);
     if (parts.length >= 5) {
@@ -382,7 +384,9 @@ export function getCronFrequencyMinutes(
     // Ensure we return a reasonable minimum (1 minute)
     return Math.max(diffMinutes, 1);
   } catch (error) {
-    logger.error("Failed to parse cron frequency", parseError(error));
+    logger.error("Failed to parse cron frequency", parseError(error), {
+      schedule,
+    });
     return 60; // Default to hourly on error
   }
 }
@@ -454,7 +458,9 @@ export function formatCronScheduleShort(
 
     return fullDescription;
   } catch (error) {
-    logger.error("Failed to parse cron schedule", parseError(error));
+    logger.error("Failed to parse cron schedule", parseError(error), {
+      schedule,
+    });
     return schedule;
   }
 }
@@ -475,7 +481,10 @@ export function calculateNextExecutionTime(
     });
     return interval.next().toDate();
   } catch (error) {
-    logger.error("Failed to parse cron schedule", parseError(error));
+    logger.error("Failed to parse cron schedule", parseError(error), {
+      schedule,
+      timezone,
+    });
     return null;
   }
 }
@@ -522,7 +531,9 @@ export function isCronTaskDue(
     const timeDiff = now.getTime() - prevExecution.getTime();
     return timeDiff >= 0 && timeDiff < 60000; // Within 1 minute
   } catch (error) {
-    logger.error("Failed to check if cron task is due", parseError(error));
+    logger.error("Failed to check if cron task is due", parseError(error), {
+      schedule,
+    });
     return false;
   }
 }
@@ -543,7 +554,10 @@ export function parseCronExpression(
       currentDate: currentDate || new Date(),
     });
   } catch (error) {
-    logger.error("Failed to parse cron expression", parseError(error));
+    logger.error("Failed to parse cron expression", parseError(error), {
+      schedule,
+      timezone,
+    });
     return null;
   }
 }

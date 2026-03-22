@@ -53,6 +53,7 @@ async function handler(
     logger,
     rawLocale,
     Platform.NEXT_API,
+    "trpc/locale",
   ) as ResponseType<CountryLanguage>;
   const locale = localeValidation.success
     ? localeValidation.data

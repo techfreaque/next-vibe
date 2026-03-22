@@ -77,13 +77,31 @@ function extractMessage(
   return truncate(fullMessage, MAX_MESSAGE_LENGTH);
 }
 
+/**
+ * Serialize metadata to a stable string for fingerprinting.
+ * Uses the full metadata content so errors with different context
+ * (different endpoint, feature, schedule, etc.) get separate rows.
+ */
+function serializeMetaForFingerprint(allMeta: LoggerMetadata[]): string {
+  if (allMeta.length === 0) {
+    return "";
+  }
+  try {
+    return JSON.stringify(allMeta);
+  } catch {
+    return String(allMeta.length);
+  }
+}
+
 /** Compute a deterministic fingerprint for error grouping/deduplication */
 function computeFingerprint(
   level: ErrorLogLevel,
   errorType: string | null | undefined,
   message: string,
+  allMeta: LoggerMetadata[],
 ): string {
-  const key = `${level}:${errorType ?? "unknown"}:${message.slice(0, 100)}`;
+  const metaStr = serializeMetaForFingerprint(allMeta);
+  const key = `${level}:${errorType ?? "unknown"}:${message.slice(0, 100)}:${metaStr}`;
   return Bun.hash(key).toString(36);
 }
 
@@ -107,17 +125,37 @@ export function persistErrorLog(
 
       const errorType = extractErrorType(error) ?? null;
       const truncatedMessage = extractMessage(message, error);
+
+      // Collect all metadata: include the error object itself when it's a plain
+      // object (not an Error instance) so structured context isn't lost.
+      // Error instances are captured via stackTrace/message — no need to duplicate.
+      const allMeta: LoggerMetadata[] = [];
+      if (
+        error !== null &&
+        error !== undefined &&
+        !(error instanceof Error) &&
+        typeof error === "object" &&
+        !(error instanceof Date) &&
+        !Array.isArray(error)
+      ) {
+        allMeta.push(error);
+      }
+      allMeta.push(...extraMeta);
+
+      // Fingerprint now includes stable context from metadata so the same error
+      // from different code paths (e.g. different endpoints) gets separate rows.
       const fingerprint = computeFingerprint(
         level,
         errorType,
         truncatedMessage,
+        allMeta,
       );
 
       const row: NewErrorLog = {
         message: truncatedMessage,
         errorType,
         stackTrace: extractStack(error) ?? null,
-        metadata: extraMeta,
+        metadata: allMeta,
         fingerprint,
         occurrences: 1,
         resolved: false,
@@ -133,7 +171,7 @@ export function persistErrorLog(
           set: {
             occurrences: sql`${errorLogs.occurrences} + 1`,
             stackTrace: row.stackTrace,
-            metadata: extraMeta,
+            metadata: allMeta,
             resolved: false,
             createdAt: sql`now()`,
           },

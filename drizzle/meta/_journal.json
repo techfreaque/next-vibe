@@ -527,6 +527,20 @@
       "when": 1774138830239,
       "tag": "20260322002030_polite_enchantress",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1774186988801,
+      "tag": "20260322134308_wooden_rattler",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1774189882882,
+      "tag": "20260322143122_marvelous_mad_thinker",
+      "breakpoints": true
     }
   ]
 }

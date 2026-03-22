@@ -626,6 +626,9 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
     description: string;
     weight: number;
     campaignType: typeof CampaignTypeValue | null;
+    senderName: string | null;
+    companyName: string | null;
+    companyEmail: string | null;
   }> = [
     {
       variantKey: EmailJourneyVariant.UNCENSORED_CONVERT,
@@ -634,6 +637,9 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
         "Enthusiast persona sharing a genuine discovery with affiliate transparency",
       weight: 34,
       campaignType: null,
+      senderName: "Alex from Unbottled",
+      companyName: "Unbottled",
+      companyEmail: null,
     },
     {
       variantKey: EmailJourneyVariant.SIDE_HUSTLE,
@@ -642,6 +648,9 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
         "Transparent affiliate marketer sharing real weekly use cases",
       weight: 33,
       campaignType: null,
+      senderName: "Jordan @ Unbottled",
+      companyName: "Unbottled",
+      companyEmail: null,
     },
     {
       variantKey: EmailJourneyVariant.QUIET_RECOMMENDATION,
@@ -649,6 +658,9 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
       description: "Low-key professional passing along a tool tested for weeks",
       weight: 33,
       campaignType: null,
+      senderName: "Sam from Unbottled",
+      companyName: "Unbottled",
+      companyEmail: null,
     },
     {
       variantKey: EmailJourneyVariant.SIGNUP_NURTURE,
@@ -656,6 +668,9 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
       description: "Post-signup nurture sequence for new users",
       weight: 100,
       campaignType: CampaignType.SIGNUP_NURTURE,
+      senderName: "Unbottled Team",
+      companyName: "Unbottled",
+      companyEmail: null,
     },
     {
       variantKey: EmailJourneyVariant.RETENTION,
@@ -663,6 +678,9 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
       description: "Retention emails for active subscribers",
       weight: 100,
       campaignType: CampaignType.RETENTION,
+      senderName: "Unbottled Team",
+      companyName: "Unbottled",
+      companyEmail: null,
     },
     {
       variantKey: EmailJourneyVariant.WINBACK,
@@ -670,11 +688,14 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
       description: "Win-back emails for churned subscribers",
       weight: 100,
       campaignType: CampaignType.WINBACK,
+      senderName: "Unbottled Team",
+      companyName: "Unbottled",
+      companyEmail: null,
     },
   ];
 
   let created = 0;
-  let skipped = 0;
+  let updated = 0;
 
   for (const v of variants) {
     const [existing] = await db
@@ -683,7 +704,20 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
       .where(eq(emailJourneyVariants.variantKey, v.variantKey));
 
     if (existing) {
-      skipped++;
+      await db
+        .update(emailJourneyVariants)
+        .set({
+          displayName: v.displayName,
+          description: v.description,
+          weight: v.weight,
+          campaignType: v.campaignType,
+          senderName: v.senderName,
+          companyName: v.companyName,
+          companyEmail: v.companyEmail,
+          updatedAt: new Date(),
+        })
+        .where(eq(emailJourneyVariants.variantKey, v.variantKey));
+      updated++;
       continue;
     }
 
@@ -694,14 +728,15 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
       weight: v.weight,
       active: true,
       campaignType: v.campaignType,
+      senderName: v.senderName,
+      companyName: v.companyName,
+      companyEmail: v.companyEmail,
       checkErrors: [],
     });
     created++;
   }
 
-  logger.debug(
-    `✅ Journey variants: ${created} created, ${skipped} already existed`,
-  );
+  logger.debug(`✅ Journey variants: ${created} created, ${updated} updated`);
 }
 
 /**

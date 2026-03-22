@@ -29,6 +29,7 @@ export function validateData<TSchema extends z.ZodType>(
   logger: EndpointLogger,
   locale: CountryLanguage,
   platform: Platform,
+  endpointPath: string,
 ): ResponseType<z.infer<TSchema>> {
   const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
   if (isEmptyObjectSchema(schema)) {
@@ -52,7 +53,15 @@ export function validateData<TSchema extends z.ZodType>(
       const logValidationDetails = isQuietPlatform
         ? logger.debug.bind(logger)
         : logger.error.bind(logger);
+      let truncatedPayload: string | null = null;
+      try {
+        const raw = JSON.stringify(data);
+        truncatedPayload = raw.length > 500 ? `${raw.slice(0, 497)}...` : raw;
+      } catch {
+        // not serializable
+      }
       logValidationDetails("Validation error details", {
+        endpoint: endpointPath,
         errorCount,
         errors: result.error.issues?.slice(0, 3).map((e: ZodIssue) => ({
           path: e.path.join("."),
@@ -60,6 +69,7 @@ export function validateData<TSchema extends z.ZodType>(
           code: e.code,
         })),
         formattedErrors,
+        payload: truncatedPayload,
       });
       return fail({
         message: sharedT("errorTypes.validation_error"),

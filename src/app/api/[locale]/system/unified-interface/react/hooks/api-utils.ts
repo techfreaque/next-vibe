@@ -332,6 +332,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         logger,
         locale,
         Platform.NEXT_API,
+        `${endpoint.path.join("/")}/${endpoint.method}`,
       );
 
       if (!validationResponse.success) {

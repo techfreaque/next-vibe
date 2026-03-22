@@ -185,6 +185,68 @@ export const translations = {
     },
   },
 
+  post: {
+    title: "Run Error Monitor Scan",
+    description: "Scan chat messages and backend logs for error patterns",
+    tags: {
+      monitoring: "Monitoring",
+    },
+    response: {
+      errorsFound: "Errors Found",
+      threadsScanned: "Threads Scanned",
+      scanWindowFrom: "Scan Window From",
+      scanWindowTo: "Scan Window To",
+      patterns: "Error Patterns",
+    },
+    success: {
+      title: "Scan Complete",
+      description: "Error monitor scan completed successfully",
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "Invalid request",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Access denied",
+      },
+      notFound: {
+        title: "Not Found",
+        description: "Resource not found",
+      },
+      network: {
+        title: "Network Error",
+        description: "Network error occurred",
+      },
+      server: {
+        title: "Server Error",
+        description: "Failed to run error monitor scan",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "Data conflict occurred",
+      },
+    },
+  },
+
+  errorMonitor: {
+    name: "Error Monitor",
+    description: "Scans for error patterns every 3 hours",
+  },
+
   widget: {
     title: "Error Logs",
     loading: "Loading logs...",

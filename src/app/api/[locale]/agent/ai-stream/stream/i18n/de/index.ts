@@ -522,11 +522,13 @@ export const translations: typeof enTranslations = {
     invalidRequest:
       "Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
     compactingStreamError:
-      "Fehler beim Komprimieren der Verlauf: {{error}}. Ihre Konversation wurde nicht komprimiert.",
+      "Kontextlimit erreicht — die Konversation ist zu lang für automatisches Komprimieren. Versuchen Sie, von einer früheren Nachricht zu verzweigen, ein Modell mit größerem Kontextfenster zu wählen oder das Kontextfenster in Ihren Favoriten-Einstellungen anzupassen.",
+    compactingStreamErrorExpensive:
+      "Kontextlimit erreicht ({{tokens}} Token). Das Erweitern des Kontextfensters ist möglich, kann aber teuer sein. Versuchen Sie zunächst, von einer früheren Nachricht zu verzweigen oder das Modell zu wechseln.",
     compactingException:
-      "Fehler beim Komprimieren des Konversationsverlaufs: {{error}}. Bitte versuchen Sie es erneut.",
+      "Komprimierung des Konversationsverlaufs fehlgeschlagen. Versuchen Sie, von einem früheren Punkt zu verzweigen oder ein anderes Modell zu verwenden.",
     compactingRebuildFailed:
-      "Fehler beim Wiederherstellen der Konversation nach dem Komprimieren. Bitte versuchen Sie es erneut.",
+      "Konversation nach dem Komprimieren konnte nicht wiederhergestellt werden. Versuchen Sie, von einer früheren Nachricht zu verzweigen.",
     unexpectedError:
       "Ein unerwarteter Fehler ist aufgetreten: {{error}}. Bitte versuchen Sie es erneut.",
   },

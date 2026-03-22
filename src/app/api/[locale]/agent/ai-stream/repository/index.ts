@@ -436,7 +436,7 @@ export class AiStreamRepository {
           }
 
           if (compactingCheck.shouldCompact) {
-            logger.info("[Compacting] Starting compacting operation", {
+            logger.debug("[Compacting] Starting compacting operation", {
               isRetry: !!compactingCheck.failedCompactingMessage,
               failedCompactingMessageId:
                 compactingCheck.failedCompactingMessage?.id ?? null,
@@ -480,6 +480,8 @@ export class AiStreamRepository {
             if (!compactingResult.success) {
               logger.error("[AI Stream] Compacting failed, stopping stream", {
                 compactingMessageId: compactingResult.compactingMessageId,
+                threadId: threadResultThreadId,
+                model: data.model,
               });
 
               // STOP - don't continue with broken state

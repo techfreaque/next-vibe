@@ -49,6 +49,7 @@ export function validateEnv<TSchema extends z.ZodType>(
     logger,
     locale,
     Platform.NEXT_API,
+    "env-validation",
   );
   if (!validationResult.success) {
     const errors = validationResult.messageParams?.["error"] as

@@ -39,7 +39,7 @@ export class MessengerAccountsListRepository {
     t: MessengerAccountsListT,
   ): Promise<ResponseType<MessengerAccountsListGETResponseOutput>> {
     try {
-      logger.info("Getting messenger accounts", { data, userId: user.id });
+      logger.debug("Getting messenger accounts", { data, userId: user.id });
 
       const whereConditions = [];
 
@@ -135,7 +135,7 @@ export class MessengerAccountsListRepository {
       const total = totalResult[0]?.count ?? 0;
       const totalPages = Math.ceil(total / limit);
 
-      logger.info("Messenger accounts retrieved", {
+      logger.debug("Messenger accounts retrieved", {
         count: accounts.length,
         total,
         page,

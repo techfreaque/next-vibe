@@ -419,6 +419,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
           typeof endpoint.requestUrlPathParamsSchema
         >,
         locale,
+        endpointPath: `${endpoint.path.join("/")}/${endpoint.method}`,
       },
       logger,
       platform,
@@ -520,7 +521,14 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     // 7. Validate response data using request validator
     const responseValidation = validateResponseData<
       T["types"]["ResponseOutput"]
-    >(result.data, endpoint.responseSchema, logger, locale, platform);
+    >(
+      result.data,
+      endpoint.responseSchema,
+      logger,
+      locale,
+      platform,
+      `${endpoint.path.join("/")}/${endpoint.method}`,
+    );
 
     if (!responseValidation.success) {
       return responseValidation;

@@ -320,14 +320,10 @@ export const { PATCH } = createEndpoint({
   },
 });
 
-export type ErrorLogsRequestInput = typeof GET.types.RequestInput;
 export type ErrorLogsRequestOutput = typeof GET.types.RequestOutput;
-export type ErrorLogsResponseInput = typeof GET.types.ResponseInput;
 export type ErrorLogsResponseOutput = typeof GET.types.ResponseOutput;
 
-export type ErrorLogsPatchRequestInput = typeof PATCH.types.RequestInput;
 export type ErrorLogsPatchRequestOutput = typeof PATCH.types.RequestOutput;
-export type ErrorLogsPatchResponseInput = typeof PATCH.types.ResponseInput;
 export type ErrorLogsPatchResponseOutput = typeof PATCH.types.ResponseOutput;
 
 const endpoints = { GET, PATCH };

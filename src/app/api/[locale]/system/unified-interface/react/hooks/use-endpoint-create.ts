@@ -162,26 +162,44 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
   }, [prefillKey, formResult?.form]);
   /* eslint-enable react-compiler/react-compiler */
 
-  // If no URL parameters are needed, return the form result as-is
-  if (!options.urlPathParams) {
-    return formResult;
-  }
+  // Stable ref for the latest urlPathParams value so wrappedSubmitForm
+  // doesn't need urlPathParams in its dep array (avoids new function on every render).
+  const urlPathParamsRef = useRef(options.urlPathParams);
+  urlPathParamsRef.current = options.urlPathParams;
 
-  // If URL parameters are provided, wrap the submitForm function to automatically include them
-  if (formResult) {
-    const originalSubmitForm = formResult.submitForm;
-
-    const wrappedSubmitForm = (): Promise<void> | void => {
-      return originalSubmitForm({
-        urlParamVariables: options.urlPathParams,
+  // Stable wrapped submit that reads urlPathParams from ref at call time.
+  // useRef + useCallback pattern avoids recreating the function when urlPathParams changes.
+  const wrappedSubmitFormRef = useRef<(() => Promise<void> | void) | null>(
+    null,
+  );
+  if (formResult && !wrappedSubmitFormRef.current) {
+    wrappedSubmitFormRef.current = (): Promise<void> | void => {
+      return formResult.submitForm({
+        urlParamVariables: urlPathParamsRef.current,
       });
     };
-
-    return {
-      ...formResult,
-      submitForm: wrappedSubmitForm,
-    };
   }
 
-  return formResult;
+  // Memoize the wrapped result so we don't return a new object spread every render.
+  // Deps: formResult (stable via useApiForm memoization) + wrappedSubmitForm (stable ref).
+  /* eslint-disable react-compiler/react-compiler */
+  const wrappedFormResult = useMemo(() => {
+    if (!formResult || !options.urlPathParams) {
+      return formResult;
+    }
+    // Update the submit function reference to point at the latest formResult.submitForm
+    wrappedSubmitFormRef.current = (): Promise<void> | void => {
+      return formResult.submitForm({
+        urlParamVariables: urlPathParamsRef.current,
+      });
+    };
+    return {
+      ...formResult,
+      submitForm: wrappedSubmitFormRef.current,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- urlPathParamsKey used for stable comparison
+  }, [formResult, !!options.urlPathParams]);
+  /* eslint-enable react-compiler/react-compiler */
+
+  return wrappedFormResult;
 }

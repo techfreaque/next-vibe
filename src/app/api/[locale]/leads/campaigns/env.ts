@@ -20,6 +20,12 @@ export const {
     commented: true,
     fieldType: "email",
   },
+  LEADS_EMAIL_FROM_NAME: {
+    schema: z.string().optional(),
+    example: "Unbottled Team",
+    comment: "Display name in the From header for lead campaign emails",
+    commented: true,
+  },
   LEADS_EMAIL_HOST: {
     schema: z.string().optional(),
     example: "smtp.example.com",

@@ -70,6 +70,7 @@ export class MessengerAccountCreateRepository {
           smtpUsername: data.smtpUsername,
           smtpPassword: data.smtpPassword,
           smtpFromEmail: data.smtpFromEmail,
+          smtpFromName: data.smtpFromName,
           smtpConnectionTimeout: data.smtpConnectionTimeout,
           smtpMaxConnections: data.smtpMaxConnections,
           smtpRateLimitPerHour: data.smtpRateLimitPerHour,

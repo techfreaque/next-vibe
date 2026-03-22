@@ -103,13 +103,17 @@ function ErrorLogCard({
           <Span className="text-sm font-medium break-words">{log.message}</Span>
           <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground font-mono">
             <Span>
-              {t("widget.col.firstSeen")}: {formatDate(log.firstSeen)}
+              {t("widget.col.firstSeen")}:{" "}
+              {formatDate(
+                log.firstSeen < log.createdAt ? log.firstSeen : log.createdAt,
+              )}
             </Span>
-            {log.firstSeen !== log.createdAt && (
-              <Span>
-                {t("widget.col.createdAt")}: {formatDate(log.createdAt)}
-              </Span>
-            )}
+            <Span>
+              {t("widget.col.createdAt")}:{" "}
+              {formatDate(
+                log.createdAt > log.firstSeen ? log.createdAt : log.firstSeen,
+              )}
+            </Span>
             {log.level === "warn" && (
               <Span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 px-1 rounded">
                 {"WARN"}

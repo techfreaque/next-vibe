@@ -531,11 +531,13 @@ export const translations = {
       "Failed to connect to the AI service. Please check your connection and try again.",
     invalidRequest: "Invalid request. Please check your input and try again.",
     compactingStreamError:
-      "Error during history compacting: {{error}}. Your conversation was not compacted.",
+      "Context limit reached — your conversation is too long for automatic compacting. Try branching from an earlier message, switching to a model with a larger context window, or adjusting the context window in your favorite settings.",
+    compactingStreamErrorExpensive:
+      "Context limit reached ({{tokens}} tokens). Expanding the context window is possible but may be expensive. Try branching from an earlier message or switching models first.",
     compactingException:
-      "Failed to compact conversation history: {{error}}. Please try again.",
+      "Failed to compact conversation history. Try branching from an earlier point in the conversation or switching to a different model.",
     compactingRebuildFailed:
-      "Failed to rebuild conversation after compacting. Please try again.",
+      "Failed to rebuild conversation after compacting. Try branching from an earlier message.",
     unexpectedError:
       "An unexpected error occurred: {{error}}. Please try again.",
   },

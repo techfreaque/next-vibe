@@ -28,6 +28,9 @@ export function MessengerAccountEditPageClient({
         create: {
           urlPathParams: { id },
         },
+        delete: {
+          urlPathParams: { id },
+        },
       }}
     />
   );

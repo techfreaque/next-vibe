@@ -45,8 +45,10 @@ export class StreamErrorHandler {
 
     logger.error("Stream error", {
       error: errorMessage,
-      stack: errorStack,
       errorType: errorName,
+      threadId,
+      userId: userId ?? null,
+      stack: errorStack,
     });
 
     let translationKey: AiStreamTranslationKey;

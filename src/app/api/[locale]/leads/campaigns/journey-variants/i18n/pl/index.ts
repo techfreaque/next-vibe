@@ -13,6 +13,9 @@ export const translations = {
       active: "Aktywny",
       campaignType: "Typ kampanii",
       sourceFilePath: "Ścieżka pliku źródłowego",
+      senderName: "Nazwa nadawcy",
+      companyName: "Nazwa firmy",
+      companyEmail: "E-mail firmy",
       checkErrors: "Błędy sprawdzania",
       createdAt: "Data utworzenia",
       updatedAt: "Data aktualizacji",
@@ -79,6 +82,19 @@ export const translations = {
         label: "Ścieżka pliku źródłowego",
         description: "Względna ścieżka do pliku .email.tsx",
       },
+      senderName: {
+        label: "Nazwa nadawcy",
+        description:
+          "Nazwa wyświetlana w kliencie poczty (np. Alex z Unbottled)",
+      },
+      companyName: {
+        label: "Nazwa firmy",
+        description: "Nazwa firmy w stopce/szablonie e-mail",
+      },
+      companyEmail: {
+        label: "E-mail firmy",
+        description: "Kontaktowy e-mail firmy w stopce/szablonie e-mail",
+      },
     },
     errors: {
       unauthorized: {
@@ -140,6 +156,18 @@ export const translations = {
       description: {
         label: "Opis",
         description: "Czym jest ta journey",
+      },
+      senderName: {
+        label: "Nazwa nadawcy",
+        description: "Nazwa wyświetlana w kliencie poczty",
+      },
+      companyName: {
+        label: "Nazwa firmy",
+        description: "Nazwa firmy w stopce/szablonie e-mail",
+      },
+      companyEmail: {
+        label: "E-mail firmy",
+        description: "Kontaktowy e-mail firmy w stopce/szablonie e-mail",
       },
     },
     errors: {

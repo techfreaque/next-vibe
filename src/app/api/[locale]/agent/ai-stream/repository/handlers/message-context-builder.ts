@@ -833,7 +833,7 @@ export class MessageContextBuilder {
       },
     );
 
-    logger.info("[Compacting] Rebuilding history", {
+    logger.debug("[Compacting] Rebuilding history", {
       compactedSummaryLength: compactedSummary.length,
       messagesAfterCompacting: messagesAfterCompacting.length,
       hasCurrentUserMessage: !!currentUserMessage,

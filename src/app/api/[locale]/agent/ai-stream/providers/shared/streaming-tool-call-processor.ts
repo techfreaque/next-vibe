@@ -84,7 +84,7 @@ export async function processStreamingResponseWithToolCalls(
     }
     hasSentFinalChunks = true;
 
-    logger.info(`[${providerName}] Sending final chunks`, {
+    logger.debug(`[${providerName}] Sending final chunks`, {
       hasContent: !!accumulatedContent,
       contentLength: accumulatedContent.length,
       hasUsage: !!usage,

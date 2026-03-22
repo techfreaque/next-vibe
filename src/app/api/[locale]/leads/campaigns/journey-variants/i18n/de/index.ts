@@ -13,6 +13,9 @@ export const translations = {
       active: "Aktiv",
       campaignType: "Kampagnentyp",
       sourceFilePath: "Quelldateipfad",
+      senderName: "Absendername",
+      companyName: "Firmenname",
+      companyEmail: "Firmen-E-Mail",
       checkErrors: "Prüffehler",
       createdAt: "Erstellt am",
       updatedAt: "Aktualisiert am",
@@ -80,6 +83,18 @@ export const translations = {
         label: "Quelldateipfad",
         description: "Relativer Pfad zur .email.tsx-Datei",
       },
+      senderName: {
+        label: "Absendername",
+        description: "Anzeigename im E-Mail-Client (z.B. Alex von Unbottled)",
+      },
+      companyName: {
+        label: "Firmenname",
+        description: "Firmenname in E-Mail-Fußzeile/Template",
+      },
+      companyEmail: {
+        label: "Firmen-E-Mail",
+        description: "Kontakt-E-Mail der Firma in E-Mail-Fußzeile/Template",
+      },
     },
     errors: {
       unauthorized: {
@@ -141,6 +156,18 @@ export const translations = {
       description: {
         label: "Beschreibung",
         description: "Worum es bei dieser Journey geht",
+      },
+      senderName: {
+        label: "Absendername",
+        description: "Anzeigename im E-Mail-Client",
+      },
+      companyName: {
+        label: "Firmenname",
+        description: "Firmenname in E-Mail-Fußzeile/Template",
+      },
+      companyEmail: {
+        label: "Firmen-E-Mail",
+        description: "Kontakt-E-Mail der Firma in E-Mail-Fußzeile/Template",
       },
     },
     errors: {

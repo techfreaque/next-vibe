@@ -1,0 +1,1 @@
+ALTER TABLE "messenger_accounts" ADD COLUMN "smtp_from_name" text;

@@ -58,6 +58,9 @@ export class JourneyVariantsRepository {
         active: r.active,
         campaignType: r.campaignType ?? null,
         sourceFilePath: r.sourceFilePath ?? null,
+        senderName: r.senderName ?? null,
+        companyName: r.companyName ?? null,
+        companyEmail: r.companyEmail ?? null,
         checkErrors: r.checkErrors ?? [],
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
@@ -112,6 +115,9 @@ export class JourneyVariantsRepository {
           active: true,
           campaignType: data.campaignType ?? null,
           sourceFilePath: data.sourceFilePath ?? null,
+          senderName: data.senderName ?? null,
+          companyName: data.companyName ?? null,
+          companyEmail: data.companyEmail ?? null,
           checkErrors: [],
         })
         .returning();
@@ -135,6 +141,9 @@ export class JourneyVariantsRepository {
         weight: created.weight,
         campaignType: created.campaignType ?? null,
         sourceFilePath: created.sourceFilePath ?? null,
+        senderName: created.senderName ?? null,
+        companyName: created.companyName ?? null,
+        companyEmail: created.companyEmail ?? null,
         id: created.id,
         active: created.active,
         checkErrors: created.checkErrors ?? [],
@@ -183,6 +192,15 @@ export class JourneyVariantsRepository {
       }
       if (data.description !== undefined) {
         updates.description = data.description;
+      }
+      if (data.senderName !== undefined) {
+        updates.senderName = data.senderName ?? null;
+      }
+      if (data.companyName !== undefined) {
+        updates.companyName = data.companyName ?? null;
+      }
+      if (data.companyEmail !== undefined) {
+        updates.companyEmail = data.companyEmail ?? null;
       }
 
       const [updated] = await db

@@ -18,6 +18,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { CampaignType } from "@/app/api/[locale]/messenger/accounts/enum";
+import { emailJourneyVariants } from "../../db";
 import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/messenger/providers/email/smtp-client/sending/repository";
 import { db } from "@/app/api/[locale]/system/db";
@@ -463,14 +464,33 @@ export class EmailCampaignsRepository {
             hasLinkedUser: false,
           };
 
+          // Look up journey variant for sender/company branding
+          const [variantRow] = await db
+            .select({
+              senderName: emailJourneyVariants.senderName,
+              companyName: emailJourneyVariants.companyName,
+              companyEmail: emailJourneyVariants.companyEmail,
+            })
+            .from(emailJourneyVariants)
+            .where(eq(emailJourneyVariants.variantKey, campaign.journeyVariant))
+            .limit(1);
+
+          const variantSenderName =
+            variantRow?.senderName ?? simpleLocalT("config.appName");
+          const variantCompanyName =
+            variantRow?.companyName ?? simpleLocalT("config.appName");
+          const variantCompanyEmail =
+            variantRow?.companyEmail ??
+            contactClientRepository.getSupportEmail(leadLocale);
+
           const rendered = await emailRendererService.renderEmail(
             leadWithEmail,
             campaign.journeyVariant,
             campaign.stage,
             {
               locale: leadLocale,
-              companyName: "",
-              companyEmail: "",
+              companyName: variantCompanyName,
+              companyEmail: variantCompanyEmail,
               campaignId: campaign.id,
               unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/${leadLocale}/newsletter/unsubscribe?email=${encodeURIComponent(fullLead.email ?? "")}`,
               trackingUrl: env.NEXT_PUBLIC_APP_URL,
@@ -499,7 +519,7 @@ export class EmailCampaignsRepository {
               subject: rendered.subject,
               html,
               text: rendered.text,
-              senderName: simpleLocalT("config.appName"),
+              senderName: variantSenderName,
               replyTo: contactClientRepository.getSupportEmail(leadLocale),
               selectionCriteria: {
                 campaignType: CampaignType.LEAD_CAMPAIGN,

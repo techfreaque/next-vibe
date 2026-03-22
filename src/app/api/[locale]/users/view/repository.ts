@@ -139,7 +139,9 @@ export class UserViewRepository {
         modelUsageStats: modelUsageStatsResult,
       });
     } catch (error) {
-      logger.error("Error fetching user view data", parseError(error));
+      logger.error("Error fetching user view data", parseError(error), {
+        userId,
+      });
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
         message: t("errors.serverError.title"),

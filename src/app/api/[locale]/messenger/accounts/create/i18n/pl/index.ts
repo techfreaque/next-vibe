@@ -114,6 +114,11 @@ export const translations = {
       description: "Adres e-mail nadawcy",
       placeholder: "noreply@example.com",
     },
+    smtpFromName: {
+      label: "Nazwa nadawcy",
+      description: "Wyświetlana nazwa nadawcy w klientach poczty",
+      placeholder: "Unbottled",
+    },
     smtpConnectionTimeout: {
       label: "Timeout połączenia",
       description: "Timeout w milisekundach",

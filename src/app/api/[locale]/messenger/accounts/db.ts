@@ -69,6 +69,7 @@ export const messengerAccounts = pgTable(
     smtpUsername: text("smtp_username"),
     smtpPassword: text("smtp_password"),
     smtpFromEmail: text("smtp_from_email"),
+    smtpFromName: text("smtp_from_name"),
     smtpConnectionTimeout: integer("smtp_connection_timeout"),
     smtpMaxConnections: integer("smtp_max_connections"),
     smtpRateLimitPerHour: integer("smtp_rate_limit_per_hour"),

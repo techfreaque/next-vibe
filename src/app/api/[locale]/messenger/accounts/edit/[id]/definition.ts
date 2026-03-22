@@ -138,6 +138,11 @@ const accountResponseFields = {
     content: "response.account.smtpFromEmail",
     schema: z.string().nullable(),
   }),
+  smtpFromName: responseField(scopedTranslation, {
+    type: WidgetType.TEXT,
+    content: "response.account.smtpFromName",
+    schema: z.string().nullable(),
+  }),
   smtpConnectionTimeout: responseField(scopedTranslation, {
     type: WidgetType.TEXT,
     content: "response.account.smtpFromEmail",
@@ -268,6 +273,7 @@ const { GET } = createEndpoint({
       smtpSecurityType: accountResponseFields.smtpSecurityType,
       smtpUsername: accountResponseFields.smtpUsername,
       smtpFromEmail: accountResponseFields.smtpFromEmail,
+      smtpFromName: accountResponseFields.smtpFromName,
       smtpConnectionTimeout: accountResponseFields.smtpConnectionTimeout,
       smtpMaxConnections: accountResponseFields.smtpMaxConnections,
       smtpRateLimitPerHour: accountResponseFields.smtpRateLimitPerHour,
@@ -349,6 +355,7 @@ const { GET } = createEndpoint({
         smtpSecurityType: EmailSecurityType.STARTTLS,
         smtpUsername: "user@example.com",
         smtpFromEmail: "noreply@example.com",
+        smtpFromName: "Unbottled",
         smtpConnectionTimeout: 30000,
         smtpMaxConnections: 5,
         smtpRateLimitPerHour: 600,
@@ -524,6 +531,15 @@ const { PUT } = createEndpoint({
         placeholder: "fields.smtpFromEmail.placeholder",
         columns: 6,
         schema: z.email().nullish(),
+      }),
+      smtpFromName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "fields.smtpFromName.label",
+        description: "fields.smtpFromName.description",
+        placeholder: "fields.smtpFromName.placeholder",
+        columns: 6,
+        schema: z.string().nullish(),
       }),
       smtpConnectionTimeout: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

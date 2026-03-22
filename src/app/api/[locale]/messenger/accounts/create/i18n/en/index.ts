@@ -128,6 +128,11 @@ export const translations = {
       description: "Sender email address",
       placeholder: "noreply@example.com",
     },
+    smtpFromName: {
+      label: "From Name",
+      description: "Sender display name shown in email clients",
+      placeholder: "Unbottled",
+    },
     smtpConnectionTimeout: {
       label: "Connection Timeout",
       description: "Connection timeout in milliseconds",

@@ -13,6 +13,9 @@ export const translations = {
       active: "Active",
       campaignType: "Campaign Type",
       sourceFilePath: "Source File Path",
+      senderName: "Sender Name",
+      companyName: "Company Name",
+      companyEmail: "Company Email",
       checkErrors: "Check Errors",
       createdAt: "Created At",
       updatedAt: "Updated At",
@@ -78,6 +81,19 @@ export const translations = {
         description:
           "Relative path to the .email.tsx file (e.g. journeys/my-variant.email)",
       },
+      senderName: {
+        label: "Sender Name",
+        description:
+          "From name shown in email client (e.g. Alex from Unbottled)",
+      },
+      companyName: {
+        label: "Company Name",
+        description: "Company name shown in email footer/template",
+      },
+      companyEmail: {
+        label: "Company Email",
+        description: "Company contact email shown in email footer/template",
+      },
     },
     errors: {
       unauthorized: { title: "Unauthorized", description: "Must be admin" },
@@ -136,6 +152,18 @@ export const translations = {
       description: {
         label: "Description",
         description: "What this journey is about",
+      },
+      senderName: {
+        label: "Sender Name",
+        description: "From name shown in email client",
+      },
+      companyName: {
+        label: "Company Name",
+        description: "Company name shown in email footer/template",
+      },
+      companyEmail: {
+        label: "Company Email",
+        description: "Company contact email shown in email footer/template",
       },
     },
     errors: {

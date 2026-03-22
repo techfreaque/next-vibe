@@ -20,6 +20,12 @@ export const {
     commented: true,
     fieldType: "email",
   },
+  EMAIL_FROM_NAME: {
+    schema: z.string().optional(),
+    example: "Unbottled",
+    comment: "Display name in the From header for system emails",
+    commented: true,
+  },
   EMAIL_HOST: {
     schema: z.string().optional(),
     example: "smtp.example.com",

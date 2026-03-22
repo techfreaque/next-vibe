@@ -77,6 +77,21 @@ const variantItemSchema = objectField(scopedTranslation, {
       content: "get.response.sourceFilePath",
       schema: z.string().nullable(),
     }),
+    senderName: responseField(scopedTranslation, {
+      type: WidgetType.TEXT,
+      content: "get.response.senderName",
+      schema: z.string().nullable(),
+    }),
+    companyName: responseField(scopedTranslation, {
+      type: WidgetType.TEXT,
+      content: "get.response.companyName",
+      schema: z.string().nullable(),
+    }),
+    companyEmail: responseField(scopedTranslation, {
+      type: WidgetType.TEXT,
+      content: "get.response.companyEmail",
+      schema: z.string().nullable(),
+    }),
     checkErrors: responseField(scopedTranslation, {
       type: WidgetType.TEXT,
       content: "get.response.checkErrors",
@@ -256,6 +271,30 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.string().max(500).optional(),
       }),
+      senderName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.senderName.label",
+        description: "post.fields.senderName.description",
+        columns: 4,
+        schema: z.string().max(200).optional(),
+      }),
+      companyName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.companyName.label",
+        description: "post.fields.companyName.description",
+        columns: 4,
+        schema: z.string().max(200).optional(),
+      }),
+      companyEmail: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.companyEmail.label",
+        description: "post.fields.companyEmail.description",
+        columns: 4,
+        schema: z.string().email().optional(),
+      }),
 
       // Response — the created record
       id: responseField(scopedTranslation, {
@@ -402,6 +441,30 @@ const { PATCH } = createEndpoint({
         description: "patch.fields.description.description",
         columns: 12,
         schema: z.string().max(500).optional(),
+      }),
+      senderName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.fields.senderName.label",
+        description: "patch.fields.senderName.description",
+        columns: 4,
+        schema: z.string().max(200).optional().nullable(),
+      }),
+      companyName: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.fields.companyName.label",
+        description: "patch.fields.companyName.description",
+        columns: 4,
+        schema: z.string().max(200).optional().nullable(),
+      }),
+      companyEmail: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.fields.companyEmail.label",
+        description: "patch.fields.companyEmail.description",
+        columns: 4,
+        schema: z.string().email().optional().nullable(),
       }),
 
       // Response

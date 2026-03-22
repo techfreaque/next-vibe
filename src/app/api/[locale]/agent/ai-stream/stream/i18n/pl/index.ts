@@ -514,11 +514,13 @@ export const translations: typeof enTranslations = {
     invalidRequest:
       "Nieprawidłowe żądanie. Sprawdź swoje dane i spróbuj ponownie.",
     compactingStreamError:
-      "Błąd podczas kompresji historii: {{error}}. Twoja rozmowa nie została skompresowana.",
+      "Osiągnięto limit kontekstu — rozmowa jest zbyt długa do automatycznej kompresji. Spróbuj rozgałęzić się od wcześniejszej wiadomości, wybrać model z większym oknem kontekstowym lub dostosować okno kontekstowe w ustawieniach ulubionych.",
+    compactingStreamErrorExpensive:
+      "Osiągnięto limit kontekstu ({{tokens}} tokenów). Rozszerzenie okna kontekstowego jest możliwe, ale może być kosztowne. Najpierw spróbuj rozgałęzić się od wcześniejszej wiadomości lub zmienić model.",
     compactingException:
-      "Nie udało się skompresować historii rozmowy: {{error}}. Spróbuj ponownie.",
+      "Nie udało się skompresować historii rozmowy. Spróbuj rozgałęzić się od wcześniejszego punktu w rozmowie lub przełącz na inny model.",
     compactingRebuildFailed:
-      "Nie udało się odbudować rozmowy po kompresji. Spróbuj ponownie.",
+      "Nie udało się odbudować rozmowy po kompresji. Spróbuj rozgałęzić się od wcześniejszej wiadomości.",
     unexpectedError:
       "Wystąpił nieoczekiwany błąd: {{error}}. Spróbuj ponownie.",
   },
