@@ -7,34 +7,17 @@ export const translations: typeof enTranslations = {
   description: "Potwierdź resetowanie hasła nowym hasłem",
   tag: "Resetowanie hasła",
   email: {
-    title: "Twoje hasło {{appName}} zostało zresetowane",
+    title: "Hasło zostało zresetowane",
     subject: "Hasło pomyślnie zresetowane - {{appName}}",
     previewText:
-      "Twoje hasło zostało pomyślnie zresetowane. Możesz się teraz zalogować i kontynuować rozmowy z {{modelCount}} modelami AI.",
-    greeting: "Witaj,",
-    confirmationMessage:
-      "Twoje hasło {{appName}} zostało pomyślnie zresetowane.",
+      "Hasło {{appName}} zostało zresetowane. Zaloguj się i zacznij rozmawiać z {{modelCount}} modelami AI.",
+    greeting: "Hej {{name}},",
     successMessage:
-      "Resetowanie hasła zakończone! Możesz teraz zalogować się do swojego konta przy użyciu nowego hasła i kontynuować odkrywanie niecenzurowanych rozmów z AI.",
-    loginInstructions:
-      "Możesz się teraz zalogować przy użyciu nowego hasła i uzyskać dostęp do wszystkich {{modelCount}} modeli AI.",
+      "Twoje hasło zostało zresetowane. Wszystko gotowe — zaloguj się i kontynuuj od miejsca, w którym skończyłeś.",
     loginButton: "Zaloguj się do {{appName}}",
-    securityInfo:
-      "Ta zmiana hasła została dokonana z {{ipAddress}} dnia {{resetTime}}.",
+    promoText: "{{modelCount}} modeli AI. Bez filtrów. Bez cenzury.",
     securityWarning:
-      "Jeśli nie dokonałeś tej zmiany, Twoje konto może być zagrożone. Skontaktuj się natychmiast z naszym zespołem wsparcia.",
-    securityTip:
-      "Dla Twojego bezpieczeństwa zalecamy używanie silnego, unikalnego hasła i włączenie uwierzytelniania dwuskładnikowego.",
-    didntMakeChange: "Nie dokonałeś tej zmiany?",
-    didntMakeChangeInfo:
-      "Jeśli nie zresetowałeś swojego hasła, skontaktuj się natychmiast z naszym zespołem wsparcia pod adresem {{supportEmail}}. Bezpieczeństwo Twojego konta jest naszym priorytetem.",
-    securityBestPractices: "Najlepsze praktyki bezpieczeństwa",
-    bestPractice1: "Używaj unikalnego hasła dla {{appName}}",
-    bestPractice2: "Włącz uwierzytelnianie dwuskładnikowe",
-    bestPractice3: "Nigdy nie udostępniaj swojego hasła innym",
-    bestPractice4: "Regularnie aktualizuj swoje hasło",
-    signoff: "Bądź bezpieczny,\nZespół {{appName}}",
-    footer: "To jest automatyczne powiadomienie bezpieczeństwa z {{appName}}",
+      "Nie resetowałeś hasła? Skontaktuj się natychmiast ze wsparciem — Twoje konto może być zagrożone.",
   },
   groups: {
     verification: {

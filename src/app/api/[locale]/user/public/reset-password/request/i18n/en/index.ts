@@ -17,26 +17,15 @@ export const translations = {
     title: "Reset Your {{appName}} Password",
     subject: "Password Reset Request - {{appName}}",
     previewText:
-      "Reset your password to regain access to your {{appName}} account and continue chatting with {{modelCount}} AI models.",
-    greeting: "Hello,",
+      "Reset your {{appName}} password — link valid for {{hours}} hours.",
+    greeting: "Hey {{name}},",
     requestInfo:
-      "We received a request to reset the password for your {{appName}} account.",
-    instructions:
-      "Click the button below to create a new password. This link is valid for {{hours}} hours and can only be used once.",
+      "Someone requested a password reset for your {{appName}} account. If that was you, click the button below.",
     buttonText: "Reset My Password",
     expirationInfo:
-      "This secure link expires in {{hours}} hours for your protection.",
-    securityInfo:
-      "For your security, this password reset was requested from {{ipAddress}} on {{requestTime}}.",
-    didntRequest: "Didn't Request This?",
-    didntRequestInfo:
-      "If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged, and your account is secure.",
-    needHelp: "Need Help?",
-    needHelpInfo:
-      "If you're having trouble resetting your password or accessing your account, our support team is here to help.",
-    supportButton: "Contact Support",
-    signoff: "Stay secure,\nThe {{appName}} Team",
-    footer: "This is an automated security notification from {{appName}}",
+      "Link expires in {{hours}} hours. If you didn't request this, ignore this email — your password is unchanged.",
+    signoff: "— The {{appName}} Team",
+    promoText: "{{modelCount}} AI models. No filters. No lectures.",
   },
   groups: {
     emailInput: {

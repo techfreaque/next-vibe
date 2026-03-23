@@ -175,7 +175,7 @@ export const getTourSteps = (
         </Div>
       ),
       placement: TOUR_PLACEMENTS.CENTER,
-      disableBeacon: true,
+      skipBeacon: true,
     },
     // Step 2: AI Companion Selector - clicking opens the selector with its own onboarding
     {
@@ -195,7 +195,7 @@ export const getTourSteps = (
       ),
       placement: TOUR_PLACEMENTS.TOP,
       // Allow user to click the selector to open it
-      spotlightClicks: true,
+      blockTargetInteraction: false,
     },
     // NOTE: Selector internal steps removed - the unified selector now has its own
     // built-in onboarding ("Meet Your AI Companion") that handles companion selection.
@@ -499,7 +499,7 @@ export const getAuthContinuationSteps = (
       </Div>
     ),
     placement: TOUR_PLACEMENTS.RIGHT,
-    disableBeacon: true,
+    skipBeacon: true,
   },
   {
     target: getTourSelector(TOUR_DATA_ATTRS.SHARED_FOLDER),

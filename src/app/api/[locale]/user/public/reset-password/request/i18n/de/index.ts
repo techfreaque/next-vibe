@@ -16,30 +16,18 @@ export const translations: typeof enTranslations = {
     submitting: "Senden...",
   },
   email: {
-    title: "Setzen Sie Ihr {{appName}}-Passwort zurück",
+    title: "Ihr {{appName}}-Passwort zurücksetzen",
     subject: "Anfrage zur Passwortzurücksetzung - {{appName}}",
     previewText:
-      "Setzen Sie Ihr Passwort zurück, um wieder Zugriff auf Ihr {{appName}}-Konto zu erhalten und mit {{modelCount}} KI-Modellen zu chatten.",
-    greeting: "Hallo,",
+      "Ihr {{appName}}-Passwort zurücksetzen — Link gültig für {{hours}} Stunden.",
+    greeting: "Hey {{name}},",
     requestInfo:
-      "Wir haben eine Anfrage zur Zurücksetzung des Passworts für Ihr {{appName}}-Konto erhalten.",
-    instructions:
-      "Klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu erstellen. Dieser Link ist {{hours}} Stunden gültig und kann nur einmal verwendet werden.",
+      "Jemand hat eine Passwortzurücksetzung für Ihr {{appName}}-Konto angefordert. Falls Sie das waren, klicken Sie auf den Button unten.",
     buttonText: "Mein Passwort zurücksetzen",
     expirationInfo:
-      "Dieser sichere Link läuft in {{hours}} Stunden zu Ihrem Schutz ab.",
-    securityInfo:
-      "Zu Ihrer Sicherheit wurde diese Passwortzurücksetzung von {{ipAddress}} am {{requestTime}} angefordert.",
-    didntRequest: "Nicht angefordert?",
-    didntRequestInfo:
-      "Wenn Sie keine Passwortzurücksetzung angefordert haben, können Sie diese E-Mail einfach ignorieren. Ihr Passwort bleibt unverändert und Ihr Konto ist sicher.",
-    needHelp: "Brauchen Sie Hilfe?",
-    needHelpInfo:
-      "Wenn Sie Probleme beim Zurücksetzen Ihres Passworts oder beim Zugriff auf Ihr Konto haben, steht Ihnen unser Support-Team zur Verfügung.",
-    supportButton: "Support kontaktieren",
-    signoff: "Bleiben Sie sicher,\nDas {{appName}} Team",
-    footer:
-      "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
+      "Link läuft in {{hours}} Stunden ab. Falls Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail — Ihr Passwort bleibt unverändert.",
+    signoff: "— Das {{appName}} Team",
+    promoText: "{{modelCount}} KI-Modelle. Keine Filter. Keine Lektionen.",
   },
   groups: {
     emailInput: {

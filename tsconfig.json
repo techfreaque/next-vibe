@@ -38,19 +38,19 @@
     }
   },
   "include": [
-    "next-env.d.ts",
     "types/**/*.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "*.ts",
-    "*.tsx",
     ".next/types/**/*.ts",
-    "nativewind-env.d.ts",
     ".next/dev/types/**/*.ts",
-    ".next-prod/types/**/*.ts",
-    ".next-prod/dev/types/**/*.ts",
-    ".next-rebuild/types/**/*.ts",
-    ".next-rebuild/dev/types/**/*.ts"
+    "build.config.ts",
+    "check.config.ts",
+    "drizzle.config.ts",
+    "global.d.ts",
+    "nativewind-env.d.ts",
+    "next-env.d.ts",
+    "next.config.ts",
+    "release.config.ts"
   ],
   "exclude": [
     "node_modules",

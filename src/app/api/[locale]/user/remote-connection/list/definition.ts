@@ -19,6 +19,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { ConnectionHealthSchema } from "@/app/api/[locale]/user/remote-connection/db";
 
 import { scopedTranslation } from "./i18n";
 import { RemoteConnectionsListContainer } from "./widget";
@@ -58,12 +59,7 @@ export const { GET } = createEndpoint({
             isActive: z.boolean(),
             lastSyncedAt: z.string().nullable(),
             hasToken: z.boolean(),
-            healthStatus: z.enum([
-              "healthy",
-              "warning",
-              "critical",
-              "disconnected",
-            ]),
+            healthStatus: ConnectionHealthSchema,
           }),
         ),
       }),

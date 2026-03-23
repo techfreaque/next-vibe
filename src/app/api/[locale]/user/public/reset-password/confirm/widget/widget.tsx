@@ -24,6 +24,7 @@ import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/widget/password-strength-indicator";
 
 import type definition from "../definition";
@@ -75,6 +76,13 @@ export function ResetPasswordConfirmContainer({
           />
         </Div>
 
+        <AlertWidget
+          fieldName="message"
+          field={withValue(children.message, field.value?.message, null)}
+        />
+
+        <FormAlertWidget field={{}} />
+
         {/* Action Buttons */}
         <Div className="flex gap-2">
           {navigation?.canGoBack && (
@@ -99,11 +107,6 @@ export function ResetPasswordConfirmContainer({
             }}
           />
         </Div>
-
-        <AlertWidget
-          fieldName="message"
-          field={withValue(children.message, field.value?.message, null)}
-        />
       </CardContent>
     </Card>
   );

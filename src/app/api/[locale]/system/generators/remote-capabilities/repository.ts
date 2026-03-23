@@ -36,10 +36,7 @@ import {
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type {
-  JsonObject,
-  RemoteToolCapability,
-} from "@/app/api/[locale]/user/remote-connection/db";
+import type { RemoteToolCapability } from "@/app/api/[locale]/user/remote-connection/db";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import {
   filterUserPermissionRoles,
@@ -432,7 +429,9 @@ export class RemoteCapabilitiesGeneratorRepository {
         // then walk the result and resolve all translatable string values.
         const fields =
           RemoteCapabilitiesGeneratorRepository.translateFieldStrings(
-            JSON.parse(JSON.stringify(definition.fields ?? {})) as JsonObject,
+            JSON.parse(
+              JSON.stringify(definition.fields ?? {}),
+            ) as RemoteToolCapability["fields"],
             t,
           );
 
@@ -466,9 +465,9 @@ export class RemoteCapabilitiesGeneratorRepository {
    *                    content, title, hint
    */
   private static translateFieldStrings(
-    obj: JsonObject,
+    obj: RemoteToolCapability["fields"],
     t: (key: string) => string,
-  ): JsonObject {
+  ): RemoteToolCapability["fields"] {
     const TRANSLATABLE_KEYS = new Set([
       "label",
       "description",
@@ -479,8 +478,10 @@ export class RemoteCapabilitiesGeneratorRepository {
       "hint",
     ]);
 
-    const walk = (value: JsonObject): JsonObject => {
-      const out: JsonObject = {};
+    const walk = (
+      value: RemoteToolCapability["fields"],
+    ): RemoteToolCapability["fields"] => {
+      const out: RemoteToolCapability["fields"] = {};
       for (const [key, val] of Object.entries(value)) {
         if (
           TRANSLATABLE_KEYS.has(key) &&
@@ -497,7 +498,7 @@ export class RemoteCapabilitiesGeneratorRepository {
           typeof val === "object" &&
           !Array.isArray(val)
         ) {
-          out[key] = walk(val as JsonObject);
+          out[key] = walk(val as RemoteToolCapability["fields"]);
         } else {
           out[key] = val;
         }

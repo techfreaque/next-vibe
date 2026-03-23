@@ -2,8 +2,8 @@
 /* eslint-disable react-compiler/react-compiler -- Complex mount-only effect requires intentional dependency exclusion */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { CallBackProps } from "react-joyride";
-import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
+import { ACTIONS, EVENTS, Joyride, STATUS } from "react-joyride";
+import type { EventData } from "react-joyride";
 
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -281,7 +281,7 @@ export function WelcomeTour({
   );
 
   const handleJoyrideCallback = useCallback(
-    (data: CallBackProps) => {
+    (data: EventData) => {
       const { status, type, action, index } = data;
 
       // Handle STEP_BEFORE - prepare for the step
@@ -517,22 +517,21 @@ export function WelcomeTour({
       steps={steps}
       run={run}
       stepIndex={stepIndex}
-      callback={handleJoyrideCallback}
+      onEvent={handleJoyrideCallback}
       continuous
-      showProgress
-      showSkipButton
-      disableScrolling={false}
-      disableOverlayClose
-      spotlightClicks
+      options={{
+        showProgress: true,
+        buttons: ["back", "primary", "skip"],
+        skipScroll: false,
+        overlayClickAction: false,
+        blockTargetInteraction: true,
+        primaryColor: TOUR_COLORS.PRIMARY,
+        zIndex: TOUR_SPACING.Z_INDEX,
+        overlayColor: TOUR_COLORS.BACKGROUND,
+        backgroundColor: TOUR_COLORS.BACKGROUND,
+        textColor: TOUR_COLORS.TEXT,
+      }}
       styles={{
-        options: {
-          primaryColor: TOUR_COLORS.PRIMARY,
-          zIndex: TOUR_SPACING.Z_INDEX,
-          arrowColor: TOUR_COLORS.BACKGROUND,
-          backgroundColor: TOUR_COLORS.BACKGROUND,
-          textColor: TOUR_COLORS.TEXT,
-          width: "unset",
-        },
         overlay: {},
         tooltip: {
           borderRadius: TOUR_SPACING.TOOLTIP_BORDER_RADIUS,
@@ -543,7 +542,7 @@ export function WelcomeTour({
         tooltipContainer: {
           textAlign: TOUR_TEXT_ALIGN.LEFT,
         },
-        buttonNext: {
+        buttonPrimary: {
           backgroundColor: TOUR_COLORS.PRIMARY,
           borderRadius: TOUR_SPACING.BUTTON_BORDER_RADIUS,
           padding: TOUR_SPACING.BUTTON_PADDING,

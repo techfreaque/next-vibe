@@ -17,53 +17,73 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 
 import { users } from "@/app/api/[locale]/user/db";
 
-/** Recursive JSON-serializable value — used for opaque jsonb blobs */
-type JsonPrimitive = string | number | boolean | null;
+/** Recursive JSON-serializable Zod schemas */
+const JsonPrimitiveSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.null(),
+]);
+type JsonPrimitive = z.infer<typeof JsonPrimitiveSchema>;
+
+export const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
+  z.union([JsonPrimitiveSchema, JsonObjectSchema, JsonArraySchema]),
+);
+export const JsonObjectSchema: z.ZodType<JsonObject> = z.lazy(() =>
+  z.record(z.string(), JsonValueSchema),
+);
+const JsonArraySchema: z.ZodType<JsonArray> = z.lazy(() =>
+  z.array(JsonValueSchema),
+);
+
 export interface JsonObject {
   [key: string]: JsonValue;
 }
 type JsonArray = JsonValue[];
-type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
 /**
- * Serialized tool manifest entry — one per tool on the remote instance.
+ * Zod schema for a serialized tool manifest entry — one per tool on the remote instance.
  * Stored in the capabilities jsonb column.
+ *
+ * `fields` is the serialized definition fields (render refs stripped, all translatable
+ * strings pre-resolved for the target locale).
+ * `instanceId` is tagged by the receiving side at sync time — not set by the generator.
  */
-export interface RemoteToolCapability {
-  toolName: string;
-  title: string;
-  description: string;
-  /**
-   * Serialized definition fields (render refs stripped, all translatable strings
-   * pre-resolved for the target locale). inputSchema is derivable from fields
-   * via generateSchemaForUsage — not stored separately.
-   */
-  fields: JsonObject;
-  executionMode: "via-execute-route";
-  isAsync: true;
-  /** Tagged by the receiving side at sync time — not set by the generator */
-  instanceId: string;
+export const RemoteToolCapabilitySchema = z.object({
+  toolName: z.string(),
+  title: z.string(),
+  description: z.string(),
+  fields: JsonObjectSchema,
+  executionMode: z.literal("via-execute-route"),
+  isAsync: z.literal(true),
+  instanceId: z.string(),
   /** Pre-translated category label (e.g. "Chat", "System") */
-  category?: string;
+  category: z.string().optional(),
   /** Pre-translated tag labels */
-  tags?: string[];
+  tags: z.array(z.string()).optional(),
   /** Tool aliases (e.g. ["web-search"]) — first alias is preferred name */
-  aliases?: string[];
+  aliases: z.array(z.string()).optional(),
   /** Credit cost per invocation (0 = free). Defaults to 0 when absent. */
-  credits?: number;
-}
+  credits: z.number().optional(),
+});
+
+/** Inferred type from schema — single source of truth */
+export type RemoteToolCapability = z.infer<typeof RemoteToolCapabilitySchema>;
 
 // ─── Shared Types ─────────────────────────────────────────────────────────────
 
-export type ConnectionHealth =
-  | "healthy"
-  | "warning"
-  | "critical"
-  | "disconnected";
+export const ConnectionHealthSchema = z.enum([
+  "healthy",
+  "warning",
+  "critical",
+  "disconnected",
+]);
+export type ConnectionHealth = z.infer<typeof ConnectionHealthSchema>;
 
 // ─── Instance Identities ──────────────────────────────────────────────────────
 // Per-user self-identity records. Replaces the old token="self" pattern.

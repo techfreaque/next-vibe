@@ -13,7 +13,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { OutputOptions, RollupOptions } from "rollup";
+import type { OutputOptions, RolldownOptions } from "rolldown";
 import type { BuildOptions, InlineConfig, Plugin, PluginOption } from "vite";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -135,7 +135,7 @@ export class ViteCompiler {
 
     // Extract build options with proper typing
     const buildOpts = (viteOpts.build || {}) as BuildOptions & {
-      rollupOptions?: RollupOptions & { output?: OutputOptions };
+      rollupOptions?: RolldownOptions;
     };
     const { rollupOptions: rollupOpts = {}, ...buildOptionsOverride } =
       buildOpts;
@@ -157,7 +157,7 @@ export class ViteCompiler {
       ...buildOptionsOverride,
     };
 
-    const rollupOptions: RollupOptions = {};
+    const rollupOptions: RolldownOptions = {};
     const outputOptions: OutputOptions = {};
 
     // Configure plugins based on build type
@@ -310,7 +310,7 @@ export class ViteCompiler {
         ]),
       ];
 
-      rollupOptions.external = (id): boolean =>
+      rollupOptions.external = (id: string): boolean =>
         modulesToExternalize.includes(id) || id.startsWith("node:");
     } else {
       // IIFE build for browser
@@ -332,7 +332,10 @@ export class ViteCompiler {
         rollupOptions: {
           ...rollupOptions,
           ...rollupOptionsOverride,
-          output: { ...outputOptions, ...outputOverride },
+          output: {
+            ...outputOptions,
+            ...(Array.isArray(outputOverride) ? {} : outputOverride),
+          } satisfies OutputOptions,
         },
       },
     };

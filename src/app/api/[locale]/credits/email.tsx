@@ -242,6 +242,7 @@ export const creditPackUserEmailTemplate: EmailTemplateDefinition<
   },
   render: async ({ requestData, locale, logger }) => {
     const { t } = scopedTranslation.scopedT(locale);
+    const { t: globalT } = simpleT(locale);
     try {
       const [userRow] = await db
         .select({ email: users.email, privateName: users.privateName })
@@ -273,7 +274,9 @@ export const creditPackUserEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: templateProps.userEmail,
         toName: templateProps.privateName,
-        subject: t("email.creditPack.user.subject"),
+        subject: t("email.creditPack.user.subject", {
+          appName: globalT("config.appName"),
+        }),
         leadId,
         jsx: creditPackUserEmailTemplate.component({
           props: templateProps,
@@ -447,6 +450,7 @@ export const creditPackAdminEmailTemplate: EmailTemplateDefinition<
   },
   render: async ({ requestData, locale, user, logger }) => {
     const { t } = scopedTranslation.scopedT(locale);
+    const { t: globalT } = simpleT(locale);
     const adminEmail = contactClientRepository.getSupportEmail(locale);
     try {
       const [userRow] = await db
@@ -460,7 +464,10 @@ export const creditPackAdminEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: adminEmail,
         toName: adminEmail,
-        subject: t("email.creditPack.admin.subject"),
+        subject: t("email.creditPack.admin.subject", {
+          appName: globalT("config.appName"),
+          credits: requestData.amount,
+        }),
         leadId: user.leadId,
         jsx: creditPackAdminEmailTemplate.component({
           props: templateProps,

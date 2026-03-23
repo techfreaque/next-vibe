@@ -9,6 +9,7 @@ import "server-only";
 import { nanoid } from "nanoid";
 
 import { and, eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -23,6 +24,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { RemoteToolCapability } from "@/app/api/[locale]/user/remote-connection/db";
+import { RemoteToolCapabilitySchema } from "@/app/api/[locale]/user/remote-connection/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
@@ -408,17 +410,12 @@ export class TaskSyncRepository {
                     );
             if (capFileImport) {
               // Tag each capability with the local instanceId
-              const tagged = (
-                (
-                  capFileImport as {
-                    default?: RemoteToolCapability[];
-                  }
-                ).default ?? []
-              ).map((c: RemoteToolCapability) => ({
-                ...c,
-                instanceId: localInstanceId,
-              }));
-              capabilitiesJson = JSON.stringify(tagged);
+              const parsed = z
+                .array(RemoteToolCapabilitySchema)
+                .parse(capFileImport.default);
+              capabilitiesJson = JSON.stringify(
+                parsed.map((c) => ({ ...c, instanceId: localInstanceId })),
+              );
             }
           }
 
@@ -1081,7 +1078,7 @@ export class TaskSyncRepository {
               );
       if (capFileImport) {
         capabilitiesPayload = JSON.stringify(
-          (capFileImport as { default?: RemoteToolCapability[] }).default ?? [],
+          z.array(RemoteToolCapabilitySchema).parse(capFileImport.default),
         );
       }
     }

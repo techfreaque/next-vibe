@@ -4,6 +4,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
+import { useRouter } from "next-vibe-ui/hooks";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
@@ -29,6 +30,7 @@ export default function ResetPasswordConfirmForm({
   user,
 }: ResetPasswordConfirmFormProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const router = useRouter();
   // Extract token validation status
   const tokenValid = tokenValidationResponse.success
     ? tokenValidationResponse.data?.response?.valid
@@ -79,6 +81,11 @@ export default function ResetPasswordConfirmForm({
             initialState: {
               token,
               email: "",
+            },
+            mutationOptions: {
+              onSuccess: () => {
+                router.push(`/${locale}/user/login`);
+              },
             },
           },
         }}

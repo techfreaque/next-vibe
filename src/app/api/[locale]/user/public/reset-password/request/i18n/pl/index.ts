@@ -19,26 +19,15 @@ export const translations: typeof enTranslations = {
     title: "Zresetuj swoje hasło {{appName}}",
     subject: "Żądanie resetowania hasła - {{appName}}",
     previewText:
-      "Zresetuj swoje hasło, aby odzyskać dostęp do swojego konta {{appName}} i kontynuować rozmowy z {{modelCount}} modelami AI.",
-    greeting: "Witaj,",
+      "Zresetuj hasło {{appName}} — link ważny przez {{hours}} godziny.",
+    greeting: "Hej {{name}},",
     requestInfo:
-      "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta {{appName}}.",
-    instructions:
-      "Kliknij przycisk poniżej, aby utworzyć nowe hasło. Ten link jest ważny przez {{hours}} godziny i może być użyty tylko raz.",
+      "Ktoś poprosił o zresetowanie hasła do Twojego konta {{appName}}. Jeśli to byłeś Ty, kliknij przycisk poniżej.",
     buttonText: "Zresetuj moje hasło",
     expirationInfo:
-      "Ten bezpieczny link wygasa za {{hours}} godziny dla Twojego bezpieczeństwa.",
-    securityInfo:
-      "Dla Twojego bezpieczeństwa, to resetowanie hasła zostało zażądane z {{ipAddress}} dnia {{requestTime}}.",
-    didntRequest: "Nie żądałeś tego?",
-    didntRequestInfo:
-      "Jeśli nie żądałeś resetowania hasła, możesz bezpiecznie zignorować ten e-mail. Twoje hasło pozostanie niezmienione, a Twoje konto jest bezpieczne.",
-    needHelp: "Potrzebujesz pomocy?",
-    needHelpInfo:
-      "Jeśli masz problemy z resetowaniem hasła lub dostępem do swojego konta, nasz zespół wsparcia jest tutaj, aby pomóc.",
-    supportButton: "Skontaktuj się ze wsparciem",
-    signoff: "Bądź bezpieczny,\nZespół {{appName}}",
-    footer: "To jest automatyczne powiadomienie bezpieczeństwa z {{appName}}",
+      "Link wygasa za {{hours}} godziny. Jeśli nie prosiłeś o reset, zignoruj tę wiadomość — hasło pozostaje bez zmian.",
+    signoff: "— Zespół {{appName}}",
+    promoText: "{{modelCount}} modeli AI. Bez filtrów. Bez cenzury.",
   },
   groups: {
     emailInput: {

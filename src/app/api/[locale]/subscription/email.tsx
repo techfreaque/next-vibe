@@ -459,6 +459,7 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
   },
   render: ({ user, requestData, locale }) => {
     const { t } = subscriptionScopedTranslation.scopedT(locale);
+    const { t: globalT } = simpleT(locale);
     try {
       const templateProps: SubscriptionSuccessProps = {
         privateName: requestData.user?.privateName ?? "",
@@ -474,7 +475,9 @@ export const subscriptionSuccessEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: requestData.user?.email ?? "",
         toName: templateProps.privateName,
-        subject: t("email.success.subject"),
+        subject: t("email.success.subject", {
+          appName: globalT("config.appName"),
+        }),
         leadId: templateProps.leadId,
         jsx: subscriptionSuccessEmailTemplate.component({
           props: templateProps,
@@ -795,7 +798,9 @@ export const adminSubscriptionNotificationEmailTemplate: EmailTemplateDefinition
       return success({
         toEmail: adminEmail,
         toName: adminEmail,
-        subject: t("email.admin_notification.subject"),
+        subject: t("email.admin_notification.subject", {
+          planName: templateProps.planName,
+        }),
         leadId: requestData.user?.leadId ?? user.leadId,
         jsx: adminSubscriptionNotificationEmailTemplate.component({
           props: templateProps,

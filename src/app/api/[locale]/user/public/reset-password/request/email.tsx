@@ -1,6 +1,5 @@
 /**
- * Password Reset Request Email Templates
- * Refactored to separate template from business logic
+ * Password Reset Request Email Template
  */
 
 import { Button, Section, Text } from "@react-email/components";
@@ -11,7 +10,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import type { ReactElement } from "react";
-import React from "react";
 import { z } from "zod";
 
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/messenger/registry/template";
@@ -41,7 +39,7 @@ import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp
 import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================
-// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// SCHEMA
 // ============================================================================
 
 const passwordResetRequestPropsSchema = z.object({
@@ -54,6 +52,12 @@ type PasswordResetRequestProps = z.infer<
   typeof passwordResetRequestPropsSchema
 >;
 
+type ScopedT = ResetPasswordRequestT;
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 function PasswordResetRequestEmail({
   props,
   t,
@@ -62,23 +66,21 @@ function PasswordResetRequestEmail({
   tracking,
 }: {
   props: PasswordResetRequestProps;
-  t: ResetPasswordRequestT;
+  t: ScopedT;
   locale: CountryLanguage;
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
   const { t: globalT } = simpleT(locale);
-  const translatedAppName = globalT("config.appName");
+  const appName = globalT("config.appName");
 
   return (
     <EmailTemplate
       locale={locale}
-      title={t("email.title", {
-        appName: translatedAppName,
-      })}
+      title={t("email.title", { appName })}
       previewText={t("email.previewText", {
-        appName: translatedAppName,
-        modelCount: TOTAL_MODEL_COUNT,
+        appName,
+        hours: RESET_TOKEN_EXPIRY,
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -88,12 +90,10 @@ function PasswordResetRequestEmail({
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "16px",
+          marginBottom: "8px",
         }}
       >
-        {t("email.greeting", {
-          name: props.publicName,
-        })}
+        {t("email.greeting", { name: props.publicName })}
       </Text>
 
       <Text
@@ -101,28 +101,13 @@ function PasswordResetRequestEmail({
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "16px",
+          marginBottom: "28px",
         }}
       >
-        {t("email.requestInfo", {
-          appName: translatedAppName,
-        })}
+        {t("email.requestInfo", { appName })}
       </Text>
 
-      <Text
-        style={{
-          fontSize: "16px",
-          lineHeight: "1.6",
-          color: "#374151",
-          marginBottom: "16px",
-        }}
-      >
-        {t("email.instructions", {
-          hours: RESET_TOKEN_EXPIRY,
-        })}
-      </Text>
-
-      <Section style={{ textAlign: "center", marginTop: "32px" }}>
+      <Section style={{ textAlign: "center", marginBottom: "28px" }}>
         <Button
           href={props.passwordResetUrl}
           style={{
@@ -130,7 +115,8 @@ function PasswordResetRequestEmail({
             borderRadius: "6px",
             color: "#ffffff",
             fontSize: "16px",
-            padding: "12px 24px",
+            fontWeight: "600",
+            padding: "14px 32px",
             textDecoration: "none",
           }}
         >
@@ -140,21 +126,47 @@ function PasswordResetRequestEmail({
 
       <Text
         style={{
-          fontSize: "14px",
+          fontSize: "13px",
           lineHeight: "1.5",
-          color: "#6B7280",
-          marginTop: "24px",
+          color: "#9ca3af",
+          marginBottom: "24px",
+          fontStyle: "italic",
         }}
       >
-        {t("email.expirationInfo", {
-          hours: RESET_TOKEN_EXPIRY,
-        })}
+        {t("email.expirationInfo", { hours: RESET_TOKEN_EXPIRY })}
+      </Text>
+
+      <Text
+        style={{
+          fontSize: "14px",
+          lineHeight: "1.5",
+          color: "#6b7280",
+          marginTop: "8px",
+          borderTop: "1px solid #e5e7eb",
+          paddingTop: "20px",
+        }}
+      >
+        {t("email.promoText", { modelCount: TOTAL_MODEL_COUNT })}
+      </Text>
+
+      <Text
+        style={{
+          fontSize: "14px",
+          lineHeight: "1.5",
+          color: "#9ca3af",
+          marginTop: "8px",
+        }}
+      >
+        {t("email.signoff", { appName })}
       </Text>
     </EmailTemplate>
   );
 }
 
-// Template Definition Export
+// ============================================================================
+// TEMPLATE DEFINITION
+// ============================================================================
+
 export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
   PasswordResetRequestProps,
   typeof requestScopedTranslation,
@@ -211,6 +223,7 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
 
     const { t } = requestScopedTranslation.scopedT(locale);
     const { t: resetT } = resetPasswordScopedTranslation.scopedT(locale);
+    const { t: globalT } = simpleT(locale);
 
     try {
       const userResponse = await UserRepository.getUserByEmail(
@@ -231,7 +244,6 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
 
       const user = userResponse.data;
 
-      // Create a reset token
       const tokenResponse = await PasswordRepository.createResetToken(
         requestData.email,
         locale,
@@ -256,14 +268,10 @@ export const passwordResetRequestEmailTemplate: EmailTemplateDefinition<
         passwordResetUrl,
       };
 
-      const { t: globalT } = simpleT(locale);
-
       return success({
         toEmail: requestData.email,
         toName: user.publicName,
-        subject: t("email.subject", {
-          appName: globalT("config.appName"),
-        }),
+        subject: t("email.subject", { appName: globalT("config.appName") }),
         leadId: user.leadId,
         jsx: passwordResetRequestEmailTemplate.component({
           props: templateProps,

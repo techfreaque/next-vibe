@@ -21,6 +21,7 @@ import type {
 import { useFrameBridge } from "@/app/api/[locale]/system/unified-interface/vibe-frame/use-bridge";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { Div } from "next-vibe-ui/ui/div";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -149,7 +150,7 @@ export function VibeFramePageClient({
 
   if (loading) {
     return (
-      <div // eslint-disable-next-line oxlint-plugin-jsx-capitalization/jsx-capitalization -- Isolated iframe page, no platform components needed
+      <Div
         ref={rootRef}
         style={{
           padding: "32px",
@@ -159,13 +160,13 @@ export function VibeFramePageClient({
         }}
       >
         Loading...
-      </div>
+      </Div>
     );
   }
 
   if (error || !endpointDef) {
     return (
-      <div // eslint-disable-next-line oxlint-plugin-jsx-capitalization/jsx-capitalization -- Isolated iframe page
+      <Div
         ref={rootRef}
         style={{
           padding: "16px",
@@ -176,7 +177,7 @@ export function VibeFramePageClient({
         }}
       >
         {error ?? "Failed to load endpoint"}
-      </div>
+      </Div>
     );
   }
 
@@ -190,10 +191,8 @@ export function VibeFramePageClient({
   } = { [endpointDef.method]: endpointDef };
 
   return (
-    <div // eslint-disable-next-line oxlint-plugin-jsx-capitalization/jsx-capitalization -- Isolated iframe page
-      ref={rootRef}
-    >
+    <Div ref={rootRef}>
       <EndpointsPage endpoint={wrappedEndpoint} locale={locale} user={user} />
-    </div>
+    </Div>
   );
 }

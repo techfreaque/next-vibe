@@ -7,35 +7,17 @@ export const translations: typeof enTranslations = {
   description: "Bestätigen Sie Ihr Passwort-Reset mit einem neuen Passwort",
   tag: "Passwort-Reset",
   email: {
-    title: "Ihr {{appName}}-Passwort wurde zurückgesetzt",
+    title: "Passwort erfolgreich zurückgesetzt",
     subject: "Passwort erfolgreich zurückgesetzt - {{appName}}",
     previewText:
-      "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt anmelden und mit {{modelCount}} KI-Modellen chatten.",
-    greeting: "Hallo,",
-    confirmationMessage:
-      "Ihr {{appName}}-Passwort wurde erfolgreich zurückgesetzt.",
+      "Ihr {{appName}}-Passwort wurde zurückgesetzt. Melden Sie sich an und chatten Sie mit {{modelCount}} KI-Modellen.",
+    greeting: "Hey {{name}},",
     successMessage:
-      "Ihr Passwort-Reset ist abgeschlossen! Sie können sich jetzt mit Ihrem neuen Passwort in Ihr Konto einloggen und weiter unzensierte KI-Gespräche führen.",
-    loginInstructions:
-      "Sie können sich jetzt mit Ihrem neuen Passwort anmelden und auf alle {{modelCount}} KI-Modelle zugreifen.",
+      "Ihr Passwort wurde zurückgesetzt. Alles erledigt — melden Sie sich an und machen Sie dort weiter, wo Sie aufgehört haben.",
     loginButton: "Bei {{appName}} anmelden",
-    securityInfo:
-      "Diese Passwortänderung wurde von {{ipAddress}} am {{resetTime}} abgeschlossen.",
+    promoText: "{{modelCount}} KI-Modelle. Keine Filter. Keine Lektionen.",
     securityWarning:
-      "Wenn Sie diese Änderung nicht vorgenommen haben, könnte Ihr Konto kompromittiert sein. Bitte kontaktieren Sie sofort unser Support-Team.",
-    securityTip:
-      "Zu Ihrer Sicherheit empfehlen wir die Verwendung eines starken, eindeutigen Passworts und die Aktivierung der Zwei-Faktor-Authentifizierung.",
-    didntMakeChange: "Diese Änderung nicht vorgenommen?",
-    didntMakeChangeInfo:
-      "Wenn Sie Ihr Passwort nicht zurückgesetzt haben, kontaktieren Sie sofort unser Support-Team unter {{supportEmail}}. Die Sicherheit Ihres Kontos hat für uns oberste Priorität.",
-    securityBestPractices: "Sicherheits-Best-Practices",
-    bestPractice1: "Verwenden Sie ein eindeutiges Passwort für {{appName}}",
-    bestPractice2: "Aktivieren Sie die Zwei-Faktor-Authentifizierung",
-    bestPractice3: "Teilen Sie Ihr Passwort niemals mit anderen",
-    bestPractice4: "Aktualisieren Sie Ihr Passwort regelmäßig",
-    signoff: "Bleiben Sie sicher,\nDas {{appName}} Team",
-    footer:
-      "Dies ist eine automatische Sicherheitsbenachrichtigung von {{appName}}",
+      "Passwort nicht zurückgesetzt? Kontaktieren Sie sofort den Support — Ihr Konto könnte gefährdet sein.",
   },
   groups: {
     verification: {

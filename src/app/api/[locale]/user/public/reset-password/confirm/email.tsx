@@ -1,9 +1,8 @@
 /**
- * Password Reset Confirmation Email Templates
- * Refactored to separate template from business logic
+ * Password Reset Confirmation Email Template
  */
 
-import { Section, Text } from "@react-email/components";
+import { Button, Section, Text } from "@react-email/components";
 import {
   fail,
   success,
@@ -31,9 +30,10 @@ import {
 } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/messenger/providers/email/smtp-client/components/template.email";
 import { simpleT } from "@/i18n/core/shared";
+import { env } from "@/config/env";
 
 // ============================================================================
-// TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
+// SCHEMA
 // ============================================================================
 
 const passwordResetConfirmPropsSchema = z.object({
@@ -46,6 +46,10 @@ type PasswordResetConfirmProps = z.infer<
 >;
 
 type ScopedT = ReturnType<typeof confirmScopedTranslation.scopedT>["t"];
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
 function PasswordResetConfirmEmail({
   props,
@@ -62,13 +66,12 @@ function PasswordResetConfirmEmail({
 }): ReactElement {
   const { t: globalT } = simpleT(locale);
   const appName = globalT("config.appName");
+  const loginUrl = `${env.NEXT_PUBLIC_APP_URL}/${locale}/threads`;
 
   return (
     <EmailTemplate
       locale={locale}
-      title={t("email.title", {
-        appName,
-      })}
+      title={t("email.title")}
       previewText={t("email.previewText", {
         appName,
         modelCount: TOTAL_MODEL_COUNT,
@@ -81,12 +84,10 @@ function PasswordResetConfirmEmail({
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "16px",
+          marginBottom: "8px",
         }}
       >
-        {t("email.greeting", {
-          name: props.publicName,
-        })}
+        {t("email.greeting", { name: props.publicName })}
       </Text>
 
       <Text
@@ -94,55 +95,60 @@ function PasswordResetConfirmEmail({
           fontSize: "16px",
           lineHeight: "1.6",
           color: "#374151",
-          marginBottom: "16px",
+          marginBottom: "28px",
         }}
       >
-        {t("email.successMessage", {
-          appName,
-        })}
+        {t("email.successMessage")}
       </Text>
 
-      <Text
-        style={{
-          fontSize: "16px",
-          lineHeight: "1.6",
-          color: "#374151",
-          marginBottom: "16px",
-        }}
-      >
-        {t("email.loginInstructions", {
-          modelCount: TOTAL_MODEL_COUNT,
-        })}
-      </Text>
-
-      <Section style={{ marginTop: "32px" }}>
-        <Text
+      <Section style={{ textAlign: "center", marginBottom: "28px" }}>
+        <Button
+          href={loginUrl}
           style={{
+            backgroundColor: "#4f46e5",
+            borderRadius: "6px",
+            color: "#ffffff",
             fontSize: "16px",
-            lineHeight: "1.6",
-            color: "#374151",
-            marginBottom: "16px",
+            fontWeight: "600",
+            padding: "14px 32px",
+            textDecoration: "none",
           }}
         >
-          {t("email.securityWarning")}
-        </Text>
+          {t("email.loginButton", { appName })}
+        </Button>
       </Section>
 
       <Text
         style={{
           fontSize: "14px",
           lineHeight: "1.5",
-          color: "#6B7280",
-          marginTop: "24px",
+          color: "#6b7280",
+          borderTop: "1px solid #e5e7eb",
+          paddingTop: "20px",
+          marginBottom: "8px",
         }}
       >
-        {t("email.securityTip")}
+        {t("email.promoText", { modelCount: TOTAL_MODEL_COUNT })}
+      </Text>
+
+      <Text
+        style={{
+          fontSize: "13px",
+          lineHeight: "1.5",
+          color: "#9ca3af",
+          fontStyle: "italic",
+        }}
+      >
+        {t("email.securityWarning")}
       </Text>
     </EmailTemplate>
   );
 }
 
-// Template Definition Export
+// ============================================================================
+// TEMPLATE DEFINITION
+// ============================================================================
+
 export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
   PasswordResetConfirmProps,
   typeof confirmScopedTranslation,
@@ -189,6 +195,8 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     });
 
     const { t } = confirmScopedTranslation.scopedT(locale);
+    const { t: globalT } = simpleT(locale);
+    const appName = globalT("config.appName");
 
     const userResponse = await UserRepository.getUserByEmail(
       requestData.email,
@@ -214,7 +222,7 @@ export const passwordResetConfirmEmailTemplate: EmailTemplateDefinition<
     return success({
       toEmail: requestData.email,
       toName: user.publicName,
-      subject: t("email.subject"),
+      subject: t("email.subject", { appName }),
       leadId: user.leadId,
       jsx: passwordResetConfirmEmailTemplate.component({
         props: templateProps,
