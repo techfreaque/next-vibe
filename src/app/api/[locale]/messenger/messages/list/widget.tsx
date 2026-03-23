@@ -13,21 +13,14 @@ import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
-import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Send } from "next-vibe-ui/ui/icons/Send";
-import { Input } from "next-vibe-ui/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
 
 import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/messenger/messages/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -43,21 +36,12 @@ import {
   MessengerChannelFilter,
   MessengerChannelFilterOptions,
 } from "../../accounts/enum";
-import type {
-  MessageSortFieldValue,
-  MessageStatusFilterValue,
-  MessageTypeFilterValue,
-  SortOrderValue,
-} from "../enum";
+import type { MessageStatusFilterValue, MessageTypeFilterValue } from "../enum";
 import {
-  MessageSortField,
-  MessageSortFieldOptions,
   MessageStatus,
   MessageStatusFilter,
   MessageTypeFilter,
   MessageTypeFilterOptions,
-  SortOrder,
-  SortOrderOptions,
 } from "../enum";
 import type definition from "./definition";
 import type { EmailsListResponseOutput } from "./definition";
@@ -286,26 +270,6 @@ export function EmailsListContainer({
     [form, onSubmit],
   );
 
-  const handleSortByChange = useCallback(
-    (value: string): void => {
-      form.setValue("displayOptions.sortBy", value);
-      if (onSubmit) {
-        onSubmit();
-      }
-    },
-    [form, onSubmit],
-  );
-
-  const handleSortOrderChange = useCallback(
-    (value: string): void => {
-      form.setValue("displayOptions.sortOrder", value);
-      if (onSubmit) {
-        onSubmit();
-      }
-    },
-    [form, onSubmit],
-  );
-
   const handleTypeFilter = useCallback(
     (value: string): void => {
       form.setValue("filters.type", value);
@@ -329,10 +293,6 @@ export function EmailsListContainer({
   const activeChannel: typeof MessengerChannelFilterValue =
     form.watch("filters.channel") ?? MessengerChannelFilter.ANY;
 
-  const sortBy: typeof MessageSortFieldValue =
-    form.watch("displayOptions.sortBy") ?? MessageSortField.CREATED_AT;
-  const sortOrder: typeof SortOrderValue =
-    form.watch("displayOptions.sortOrder") ?? SortOrder.DESC;
   const activeType: typeof MessageTypeFilterValue =
     form.watch("filters.type") ?? MessageTypeFilter.ANY;
 
@@ -473,45 +433,19 @@ export function EmailsListContainer({
       </Div>
 
       {/* Search + sort */}
-      <Div className="px-4 pt-2 pb-2 flex items-center gap-2 border-b">
-        <Div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            value={form.watch("filters.search") ?? ""}
-            onChange={(e) => {
-              form.setValue("filters.search", e.target.value);
-              if (onSubmit) {
-                onSubmit();
-              }
-            }}
-            placeholder={t("widget.searchPlaceholder")}
-            className="pl-9 h-9"
-          />
-        </Div>
-        <Select value={sortBy} onValueChange={handleSortByChange}>
-          <SelectTrigger className="h-9 w-[140px] flex-shrink-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {MessageSortFieldOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {messagesT(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-          <SelectTrigger className="h-9 w-[110px] flex-shrink-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SortOrderOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {messagesT(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <Div className="px-4 pt-2 pb-2 grid grid-cols-1 sm:grid-cols-3 gap-2 border-b">
+        <TextFieldWidget
+          fieldName="filters.search"
+          field={field.children.filters.children.search}
+        />
+        <SelectFieldWidget
+          fieldName="displayOptions.sortBy"
+          field={field.children.displayOptions.children.sortBy}
+        />
+        <SelectFieldWidget
+          fieldName="displayOptions.sortOrder"
+          field={field.children.displayOptions.children.sortOrder}
+        />
       </Div>
 
       {/* Email list */}

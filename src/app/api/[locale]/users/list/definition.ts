@@ -123,10 +123,7 @@ const { GET } = createEndpoint({
             placeholder: "get.sortBy.placeholder" as const,
             options: UserSortFieldOptions,
             columns: 6,
-            schema: z
-              .enum(UserSortField)
-              .optional()
-              .default(UserSortField.CREATED_AT),
+            schema: z.enum(UserSortField).default(UserSortField.CREATED_AT),
           }),
           sortOrder: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -136,7 +133,7 @@ const { GET } = createEndpoint({
             placeholder: "get.sortOrder.placeholder" as const,
             options: SortOrderOptions,
             columns: 6,
-            schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
+            schema: z.enum(SortOrder).default(SortOrder.DESC),
           }),
         },
       }),

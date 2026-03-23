@@ -127,7 +127,7 @@ export const leadsSortingFields = {
     description: "filters.sortBy.description",
     placeholder: "filters.sortBy.placeholder",
     options: LeadSortFieldOptions,
-    schema: z.enum(LeadSortField).optional().default(LeadSortField.CREATED_AT),
+    schema: z.enum(LeadSortField).default(LeadSortField.CREATED_AT),
   }),
 
   sortOrder: requestField(scopedTranslation, {
@@ -137,7 +137,7 @@ export const leadsSortingFields = {
     description: "filters.sortOrder.description",
     placeholder: "filters.sortOrder.placeholder",
     options: SortOrderOptions,
-    schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
+    schema: z.enum(SortOrder).default(SortOrder.DESC),
   }),
 } as const;
 

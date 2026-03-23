@@ -709,7 +709,6 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
         .set({
           displayName: v.displayName,
           description: v.description,
-          weight: v.weight,
           campaignType: v.campaignType,
           senderName: v.senderName,
           companyName: v.companyName,

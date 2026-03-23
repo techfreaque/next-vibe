@@ -18,13 +18,6 @@ import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
@@ -37,6 +30,7 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
@@ -44,17 +38,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import {
-  SortOrder,
-  SortOrderOptions,
-  type SortOrderValue,
   UserRoleFilter,
-  UserSortField,
-  UserSortFieldOptions,
-  type UserSortFieldValue,
   UserStatusFilter,
   type UserStatusFilterValue,
 } from "../enum";
-import { scopedTranslation as usersScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { UserListResponseOutput } from "./definition";
 import type { UsersListT } from "./i18n";
@@ -192,7 +179,6 @@ export function UsersListContainer({
   const isTouch = useTouchDevice();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const usersT = usersScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
 
@@ -200,11 +186,6 @@ export function UsersListContainer({
     form.watch("searchFilters.status") ?? [];
   const activeRoles: (typeof UserRoleFilter)[keyof typeof UserRoleFilter][] =
     form.watch("searchFilters.role") ?? [];
-  const sortBy: typeof UserSortFieldValue =
-    form.watch("sortingOptions.sortBy") ?? UserSortField.CREATED_AT;
-  const sortOrder: typeof SortOrderValue =
-    form.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
-
   const users = field.value?.response?.users ?? [];
   const isLoading = field.value === null || field.value === undefined;
 
@@ -252,26 +233,6 @@ export function UsersListContainer({
       onSubmit();
     }
   }, [form, onSubmit]);
-
-  const handleSortByChange = useCallback(
-    (value: typeof UserSortFieldValue): void => {
-      form.setValue("sortingOptions.sortBy", value);
-      if (onSubmit) {
-        onSubmit();
-      }
-    },
-    [form, onSubmit],
-  );
-
-  const handleSortOrderChange = useCallback(
-    (value: typeof SortOrderValue): void => {
-      form.setValue("sortingOptions.sortOrder", value);
-      if (onSubmit) {
-        onSubmit();
-      }
-    },
-    [form, onSubmit],
-  );
 
   const handlePageChange = useCallback(
     (page: number): void => {
@@ -511,43 +472,29 @@ export function UsersListContainer({
       </Div>
 
       {/* Sort */}
-      <Div className="px-4 pb-2 flex items-center gap-2 flex-wrap">
-        <Select value={sortBy} onValueChange={handleSortByChange}>
-          <SelectTrigger className="h-8 text-xs w-auto min-w-[120px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {UserSortFieldOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {usersT(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-          <SelectTrigger className="h-8 text-xs w-auto min-w-[80px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SortOrderOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {usersT(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {hasActiveFilters && (
+      <Div className="px-4 pb-2 grid grid-cols-2 gap-2">
+        <SelectFieldWidget
+          fieldName="sortingOptions.sortBy"
+          field={children.sortingOptions.children.sortBy}
+        />
+        <SelectFieldWidget
+          fieldName="sortingOptions.sortOrder"
+          field={children.sortingOptions.children.sortOrder}
+        />
+      </Div>
+      {hasActiveFilters && (
+        <Div className="px-4 pb-2">
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="ml-auto text-xs underline underline-offset-2 hover:text-foreground"
+            className="text-xs underline underline-offset-2 hover:text-foreground"
             onClick={handleClearFilters}
           >
             {t("widget.clearFilters")}
           </Button>
-        )}
-      </Div>
+        </Div>
+      )}
 
       {/* User list */}
       <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-340px))]">

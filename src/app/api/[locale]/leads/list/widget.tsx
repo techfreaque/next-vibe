@@ -21,14 +21,6 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Users } from "next-vibe-ui/ui/icons/Users";
-import { Input } from "next-vibe-ui/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
 
@@ -42,28 +34,18 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { MultiSelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
-import type {
-  LeadSortFieldValue,
-  LeadSourceFilterValue,
-  LeadStatusFilterValue,
-  SortOrderValue,
-} from "../enum";
-import {
-  LeadSortField,
-  LeadSortFieldOptions,
-  LeadSourceFilter,
-  LeadSourceFilterOptions,
-  type LeadStatusFilter,
-  SortOrder,
-  SortOrderOptions,
-} from "../enum";
+import { type LeadStatusFilter, type LeadStatusFilterValue } from "../enum";
 import type definition from "./definition";
 import type { LeadListGetResponseTypeOutput } from "./definition";
 
@@ -143,8 +125,6 @@ const STATUS_TAB_VALUES = [
     value: "enums.leadStatusFilter.bounced",
   },
 ] as const;
-
-const SOURCE_ALL = LeadSourceFilter.ALL;
 
 function LeadRow({
   lead,
@@ -328,15 +308,10 @@ export function LeadsListContainer({
   const form = useWidgetForm<typeof definition.GET>();
   const navigation = useWidgetNavigation();
 
+  const onSubmit = useWidgetOnSubmit();
+
   const activeStatuses: (typeof LeadStatusFilterValue)[] =
     form.watch("statusFilters.status") ?? [];
-  const activeSources: (typeof LeadSourceFilterValue)[] =
-    form.watch("statusFilters.source") ?? [];
-  const searchValue = form.watch("statusFilters.search") ?? "";
-  const sortBy: typeof LeadSortFieldValue =
-    form.watch("sortingOptions.sortBy") ?? LeadSortField.CREATED_AT;
-  const sortOrder: typeof SortOrderValue =
-    form.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
 
   const leads = useMemo(
     () => field.value?.response?.leads ?? [],
@@ -389,69 +364,13 @@ export function LeadsListContainer({
       const next = current.includes(typed)
         ? current.filter((s) => s !== typed)
         : [...current, typed];
-      form.setValue("statusFilters.status", next, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-      form.setValue("paginationInfo.page", 1, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    },
-    [form],
-  );
-
-  const handleSourceChange = useCallback(
-    (value: string): void => {
-      const typed =
-        value as (typeof LeadSourceFilter)[keyof typeof LeadSourceFilter];
-      if (value === SOURCE_ALL) {
-        form.setValue("statusFilters.source", [], {
-          shouldDirty: true,
-          shouldTouch: true,
-        });
-      } else {
-        form.setValue("statusFilters.source", [typed], {
-          shouldDirty: true,
-          shouldTouch: true,
-        });
+      form.setValue("statusFilters.status", next);
+      form.setValue("paginationInfo.page", 1);
+      if (onSubmit) {
+        onSubmit();
       }
-      form.setValue("paginationInfo.page", 1, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
     },
-    [form],
-  );
-
-  const handleSortByChange = useCallback(
-    (value: string): void => {
-      form.setValue(
-        "sortingOptions.sortBy",
-        value as (typeof LeadSortField)[keyof typeof LeadSortField],
-        { shouldDirty: true, shouldTouch: true },
-      );
-      form.setValue("paginationInfo.page", 1, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    },
-    [form],
-  );
-
-  const handleSortOrderChange = useCallback(
-    (value: string): void => {
-      form.setValue(
-        "sortingOptions.sortOrder",
-        value as (typeof SortOrder)[keyof typeof SortOrder],
-        { shouldDirty: true, shouldTouch: true },
-      );
-      form.setValue("paginationInfo.page", 1, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    },
-    [form],
+    [form, onSubmit],
   );
 
   const handleView = useCallback(
@@ -593,20 +512,6 @@ export function LeadsListContainer({
     })();
   }, [navigation]);
 
-  const handleSearchChange = useCallback(
-    (text: string): void => {
-      form.setValue("statusFilters.search", text, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-      form.setValue("paginationInfo.page", 1, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    },
-    [form],
-  );
-
   // Pagination
   const currentPage = form.watch("paginationInfo.page") ?? 1;
   const totalCount = paginationInfo?.totalCount ?? 0;
@@ -615,15 +520,15 @@ export function LeadsListContainer({
 
   const handlePageChange = useCallback(
     (newPage: number): void => {
-      form.setValue("paginationInfo.page", newPage, {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
+      form.setValue("paginationInfo.page", newPage);
+      if (onSubmit) {
+        onSubmit();
+      }
     },
-    [form],
+    [form, onSubmit],
   );
 
-  const activeSource = activeSources[0] ?? SOURCE_ALL;
+  const activeSources = form.watch("statusFilters.source") ?? [];
   const hasActiveFilters =
     activeStatuses.length > 0 || activeSources.length > 0;
 
@@ -752,14 +657,11 @@ export function LeadsListContainer({
               size="sm"
               onClick={() => {
                 if (tab.value === null) {
-                  form.setValue("statusFilters.status", [], {
-                    shouldDirty: true,
-                    shouldTouch: true,
-                  });
-                  form.setValue("paginationInfo.page", 1, {
-                    shouldDirty: true,
-                    shouldTouch: true,
-                  });
+                  form.setValue("statusFilters.status", []);
+                  form.setValue("paginationInfo.page", 1);
+                  if (onSubmit) {
+                    onSubmit();
+                  }
                 } else {
                   handleToggleStatus(tab.value);
                 }
@@ -790,59 +692,35 @@ export function LeadsListContainer({
       </Div>
 
       {/* Search + Filters row */}
-      <Div className="px-4 pt-2 pb-2 flex items-center gap-2 flex-wrap">
-        {/* Text search */}
-        <Div className="relative flex-1 min-w-[160px]">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            className="h-9 pl-8"
-            placeholder={t("widget.search")}
-            value={searchValue}
-            onChangeText={handleSearchChange}
-          />
-        </Div>
-
-        {/* Source filter */}
-        <Select value={activeSource} onValueChange={handleSourceChange}>
-          <SelectTrigger className="h-9 min-w-[120px]">
-            <SelectValue placeholder={t("widget.allSources")} />
-          </SelectTrigger>
-          <SelectContent>
-            {LeadSourceFilterOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {leadsT(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Sort by */}
-        <Select value={sortBy} onValueChange={handleSortByChange}>
-          <SelectTrigger className="h-9 min-w-[120px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {LeadSortFieldOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {leadsT(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Sort order */}
-        <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-          <SelectTrigger className="h-9 min-w-[80px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SortOrderOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {leadsT(opt.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <Div className="px-4 pt-2 pb-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+        <TextFieldWidget
+          fieldName="statusFilters.search"
+          field={children.statusFilters.children.search}
+        />
+        <MultiSelectFieldWidget
+          fieldName="statusFilters.source"
+          field={children.statusFilters.children.source}
+        />
+        <MultiSelectFieldWidget
+          fieldName="statusFilters.currentCampaignStage"
+          field={children.statusFilters.children.currentCampaignStage}
+        />
+        <MultiSelectFieldWidget
+          fieldName="locationFilters.country"
+          field={children.locationFilters.children.country}
+        />
+        <MultiSelectFieldWidget
+          fieldName="locationFilters.language"
+          field={children.locationFilters.children.language}
+        />
+        <SelectFieldWidget
+          fieldName="sortingOptions.sortBy"
+          field={children.sortingOptions.children.sortBy}
+        />
+        <SelectFieldWidget
+          fieldName="sortingOptions.sortOrder"
+          field={children.sortingOptions.children.sortOrder}
+        />
       </Div>
 
       {/* Status breakdown subtitle */}
