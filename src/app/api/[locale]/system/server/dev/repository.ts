@@ -77,7 +77,7 @@ export class DevRepository {
 
   /**
    * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
-   * Only patches localhost URLs — production URLs are left untouched.
+   * Only patches localhost URLs - production URLs are left untouched.
    * Child processes inherit process.env so they automatically get the correct URL.
    */
   private static patchPublicUrlPort(port: number): void {
@@ -97,7 +97,7 @@ export class DevRepository {
         Object.assign(process.env, { NEXT_PUBLIC_APP_URL: parsed.toString() });
       }
     } catch {
-      // Not a valid URL — leave it as-is
+      // Not a valid URL - leave it as-is
     }
   }
 
@@ -110,7 +110,7 @@ export class DevRepository {
   }
 
   private static setupExitHandlers(): void {
-    // Swallow crashes in dev — log and continue rather than killing the whole server
+    // Swallow crashes in dev - log and continue rather than killing the whole server
 
     // Handle uncaught exceptions
     process.on("uncaughtException", (error) => {
@@ -118,7 +118,7 @@ export class DevRepository {
       process.stderr.write(
         `\n⚠️  Uncaught exception (dev server continuing): ${error.message}\n${error.stack || ""}\n`,
       );
-      // Do NOT exit — dev server should survive transient errors
+      // Do NOT exit - dev server should survive transient errors
     });
 
     // Handle unhandled promise rejections
@@ -130,7 +130,7 @@ export class DevRepository {
       process.stderr.write(
         `\n⚠️  Unhandled promise rejection (dev server continuing): ${errorMsg}\n${stack || ""}\n`,
       );
-      // Do NOT exit — dev server should survive transient errors
+      // Do NOT exit - dev server should survive transient errors
     });
   }
 
@@ -515,7 +515,7 @@ export class DevRepository {
         }
       }
 
-      // Deploy db-functions (idempotent — runs after every migration)
+      // Deploy db-functions (idempotent - runs after every migration)
       const { deployDbFunctions } =
         await import("@/app/api/[locale]/system/db/db-functions/deploy");
       await deployDbFunctions(logger);
@@ -703,11 +703,11 @@ export class DevRepository {
     const wsPort = disableProxy ? port + WS_SIDECAR_OFFSET : port;
 
     // Kill stale processes on all used ports.
-    // TanStack mode: Vite runs on nextPort (internal), proxy on wsPort (public) — same offsets as Next.js.
+    // TanStack mode: Vite runs on nextPort (internal), proxy on wsPort (public) - same offsets as Next.js.
     DevRepository.killProcessOnPort(nextPort, logger);
     DevRepository.killProcessOnPort(wsPort, logger);
 
-    // --- Start WS server (once — outlives Next.js restarts) ---
+    // --- Start WS server (once - outlives Next.js restarts) ---
     const wsHandle = startWebSocketServer({ port: wsPort, logger });
 
     const restoreTty = (): void => {
@@ -783,7 +783,7 @@ export class DevRepository {
         process.stdin.resume();
         process.stdin.setEncoding("utf8");
         process.stdin.on("data", (key: string) => {
-          // Ctrl+C in raw mode — honour it
+          // Ctrl+C in raw mode - honour it
           if (key === "\u0003") {
             sigintHandler();
             return;
@@ -828,7 +828,7 @@ export class DevRepository {
                 } else {
                   process.stdout.write(
                     // eslint-disable-next-line i18next/no-literal-string
-                    "⚠️  No .cpuprofile found — try running with --profile again\n",
+                    "⚠️  No .cpuprofile found - try running with --profile again\n",
                   );
                 }
 
@@ -893,7 +893,7 @@ export class DevRepository {
         logger.error(devResult.message ?? "TanStack Start dev server failed");
         process.exit(1);
       }
-      // Keep the process alive — the Vite/Nitro server runs until SIGINT/SIGTERM
+      // Keep the process alive - the Vite/Nitro server runs until SIGINT/SIGTERM
       // oxlint-disable-next-line no-empty-function -- intentional infinite wait; server runs until SIGINT/SIGTERM
       return new Promise<never>(() => {
         /* intentional: keep alive until signal */
@@ -978,11 +978,11 @@ export class DevRepository {
         DevRepository.runningProcesses.delete("next");
 
         if (DevRepository.shuttingDown) {
-          return; // Intentional shutdown — don't restart
+          return; // Intentional shutdown - don't restart
         }
 
         if (code === 0) {
-          // Clean exit (e.g. intentional stop) — don't restart
+          // Clean exit (e.g. intentional stop) - don't restart
           logger.info("Next.js exited cleanly");
           return;
         }
@@ -991,7 +991,7 @@ export class DevRepository {
         if (restartCount > MAX_RESTARTS) {
           process.stderr.write(
             // eslint-disable-next-line i18next/no-literal-string
-            `\n❌ Next.js crashed ${String(MAX_RESTARTS)} times — giving up\n`,
+            `\n❌ Next.js crashed ${String(MAX_RESTARTS)} times - giving up\n`,
           );
           shutdown(1);
           return;
@@ -1140,7 +1140,7 @@ export class DevRepository {
         pidOnPort = parsed;
       }
     } catch {
-      // No process on port — nothing to do
+      // No process on port - nothing to do
       return;
     }
 
@@ -1166,7 +1166,7 @@ export class DevRepository {
 
     if (!ourPids.has(pidOnPort)) {
       logger.debug(
-        `Port ${port} in use by PID ${pidOnPort} (not ours — leaving it alone)`,
+        `Port ${port} in use by PID ${pidOnPort} (not ours - leaving it alone)`,
       );
       return;
     }

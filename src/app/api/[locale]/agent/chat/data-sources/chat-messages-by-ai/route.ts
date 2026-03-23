@@ -1,5 +1,5 @@
 /**
- * Chat Messages By Ai — Route
+ * Chat Messages By Ai - Route
  * Server-only.
  */
 

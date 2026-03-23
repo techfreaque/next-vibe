@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Edit (Branch) Route
+ * Vibe Sense - Graph Edit (Branch) Route
  */
 
 import "server-only";

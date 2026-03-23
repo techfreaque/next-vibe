@@ -1,5 +1,5 @@
 /**
- * Users Two Fa Enabled — Route
+ * Users Two Fa Enabled - Route
  * Server-only.
  */
 

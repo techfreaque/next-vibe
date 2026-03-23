@@ -134,7 +134,7 @@ export class PackageEndpointGeneratorRepository {
   // Content generation (mirrors endpoint/repository.ts logic)
   // ============================================================================
 
-  // Build import path for a definition file — same @/app/api/[locale]/... format
+  // Build import path for a definition file - same @/app/api/[locale]/... format
   private static toImportPath(filePath: string): string {
     const marker = "[locale]/";
     const idx = filePath.indexOf(marker);

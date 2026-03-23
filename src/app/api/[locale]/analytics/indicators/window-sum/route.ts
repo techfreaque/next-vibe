@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Window Sum Route
+ * Vibe Sense - Window Sum Route
  * Server-only.
  */
 

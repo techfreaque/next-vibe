@@ -1,6 +1,6 @@
 /**
  * Remote Connection Disconnect
- * DELETE — remove the connection record
+ * DELETE - remove the connection record
  */
 
 import { z } from "zod";
@@ -136,7 +136,7 @@ const { DELETE } = createEndpoint({
             };
           },
         );
-        // Clear [instanceId] GET cache — mark as not connected
+        // Clear [instanceId] GET cache - mark as not connected
         apiClient.updateEndpointData(
           statusDefinition.default.GET,
           data.logger,

@@ -18,7 +18,6 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import {
   Collapsible,
@@ -33,6 +32,7 @@ import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
@@ -44,11 +44,11 @@ import type {
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import {
   Icon,
@@ -358,7 +358,7 @@ export function ToolCallRenderer({
   // status="failed" counts as an error even with no result (e.g. remote task failed with no output)
   const statusIsError = toolCall.status === "failed";
   const hasError = Boolean(toolCall.error) || resultIsError || statusIsError;
-  // status="completed" or "failed" means the tool finished — don't show loading even if result is null
+  // status="completed" or "failed" means the tool finished - don't show loading even if result is null
   // (remote async tasks may complete with no result payload)
   const isTerminalStatus =
     toolCall.status === "completed" || toolCall.status === "failed";
@@ -401,7 +401,7 @@ export function ToolCallRenderer({
       );
     }
     // Fallback: toolCall.result is an ErrorResponseType (tool returned fail() without throwing).
-    // Display the raw message string — it may be a translation key but ToolCallResult
+    // Display the raw message string - it may be a translation key but ToolCallResult
     // doesn't carry TranslationKey typing, so we display as-is.
     if (
       resultIsError &&
@@ -503,7 +503,7 @@ export function ToolCallRenderer({
   };
 
   // dynamicTitle is fully typed at each definition site; here we call it via CreateApiEndpointAny
-  // which erases the concrete field types — cast the function to accept ToolCall data
+  // which erases the concrete field types - cast the function to accept ToolCall data
   type DynamicTitleFn = (data: {
     request?: ToolCall["args"];
     response?: ToolCall["result"];
@@ -656,7 +656,7 @@ export function ToolCallRenderer({
 
             {/* Status Badge */}
             <Div className="flex items-center gap-2">
-              {/* Copy JSON button — when expanded and any data is available */}
+              {/* Copy JSON button - when expanded and any data is available */}
               {isOpen && (hasResult || hasError || toolCall.args) && (
                 <Div
                   className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
@@ -877,7 +877,7 @@ export function ToolCallRenderer({
                         resultObj = parsed;
                       }
                     } catch {
-                      // Not valid JSON string — leave empty
+                      // Not valid JSON string - leave empty
                     }
                   }
                 }
@@ -963,7 +963,7 @@ export function ToolCallRenderer({
 
                 // For GET endpoints in confirmation mode: use EndpointsPage so the endpoint
                 // can auto-fetch its data (respecting its own queryOptions defaults).
-                // We render our own Confirm/Cancel buttons — do NOT pass them to EndpointsPage
+                // We render our own Confirm/Cancel buttons - do NOT pass them to EndpointsPage
                 // to avoid triggering an actual API mutation on confirm.
                 const isGetConfirmation =
                   needsConfirmation && definition.method === "GET";
@@ -996,7 +996,7 @@ export function ToolCallRenderer({
                       </Div>
                     )}
 
-                    {/* Show waiting for confirmation banner (no decision yet) — includes Confirm/Cancel buttons */}
+                    {/* Show waiting for confirmation banner (no decision yet) - includes Confirm/Cancel buttons */}
                     {isWaitingForConfirmation &&
                       !isDeclined &&
                       !hasPendingDecision && (
@@ -1044,7 +1044,7 @@ export function ToolCallRenderer({
 
                     {/* GET endpoints: use EndpointsPage so auto-fetch works.
                         Widget submit is also wired to handleConfirmFromForm via onSubmit override.
-                        Real API is NOT called — confirm goes through sendMessage. */}
+                        Real API is NOT called - confirm goes through sendMessage. */}
                     {isGetConfirmation ? (
                       <EndpointsPage
                         endpoint={{ GET: definition }}
@@ -1058,7 +1058,7 @@ export function ToolCallRenderer({
                       />
                     ) : (
                       /* POST/PATCH/PUT/DELETE and completed/declined: EndpointRenderer with
-                         confirmationForm — submit calls handleConfirm (sendMessage), not real API */
+                         confirmationForm - submit calls handleConfirm (sendMessage), not real API */
                       <NavigationStackProvider>
                         <EndpointRenderer
                           user={user}

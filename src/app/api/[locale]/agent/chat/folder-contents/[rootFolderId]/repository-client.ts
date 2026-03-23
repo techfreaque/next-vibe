@@ -91,7 +91,7 @@ export class FolderContentsRepositoryClient {
           rolesModerate: [],
           rolesAdmin: [],
           pinned: f.pinned ?? false,
-          // Thread-only fields — null for folders
+          // Thread-only fields - null for folders
           title: null,
           folderId: null,
           status: null,
@@ -131,7 +131,7 @@ export class FolderContentsRepositoryClient {
           rolesPost: thread.rolesPost ?? null,
           rolesModerate: thread.rolesModerate ?? null,
           rolesAdmin: thread.rolesAdmin ?? null,
-          // Folder-only fields — null for threads
+          // Folder-only fields - null for threads
           name: null,
           icon: null,
           color: null,

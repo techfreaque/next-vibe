@@ -529,7 +529,7 @@ export async function prod(
 ): Promise<void> {
   logger.debug("🌱 Seeding auth data for production environment");
 
-  // Create admin user — use env email if set, fallback to support email
+  // Create admin user - use env email if set, fallback to support email
   const adminUser = createUserSeed(locale, {
     email:
       env.VIBE_ADMIN_USER_EMAIL ??

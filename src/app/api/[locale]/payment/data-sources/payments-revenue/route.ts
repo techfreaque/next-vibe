@@ -1,5 +1,5 @@
 /**
- * Payments Revenue — Route
+ * Payments Revenue - Route
  * Server-only.
  */
 

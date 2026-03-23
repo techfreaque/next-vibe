@@ -9,7 +9,6 @@ import "server-only";
 import { nanoid } from "nanoid";
 
 import { and, eq, sql } from "drizzle-orm";
-import { z } from "zod";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,6 +16,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { z } from "zod";
 
 import { memories } from "@/app/api/[locale]/agent/chat/memories/db";
 import { db } from "@/app/api/[locale]/system/db";
@@ -148,8 +148,8 @@ export class TaskSyncRepository {
 
   /**
    * Upsert cron tasks from a remote instance.
-   * Match by id — every task has a unique, stable string identity.
-   * routeId is NOT used for identity — multiple tasks can call the same endpoint.
+   * Match by id - every task has a unique, stable string identity.
+   * routeId is NOT used for identity - multiple tasks can call the same endpoint.
    */
   static async upsertRemoteTasks(params: {
     tasks: SyncedCronTask[];
@@ -171,7 +171,7 @@ export class TaskSyncRepository {
         const resolvedPath = getFullPath(remoteTask.routeId);
         if (resolvedPath === null) {
           logger.warn(
-            "Rejecting remote task — routeId not recognised locally",
+            "Rejecting remote task - routeId not recognised locally",
             {
               id: remoteTask.id,
               routeId: remoteTask.routeId,
@@ -180,7 +180,7 @@ export class TaskSyncRepository {
           continue;
         }
 
-        // Match by id — stable, human-readable task identity
+        // Match by id - stable, human-readable task identity
         const [existing] = await db
           .select({
             id: cronTasks.id,
@@ -191,7 +191,7 @@ export class TaskSyncRepository {
           .limit(1);
 
         // Build update payload from fields actually present in the remote payload.
-        // Old remotes may not send newer fields — skip undefined to avoid
+        // Old remotes may not send newer fields - skip undefined to avoid
         // overwriting local values with null/defaults.
         const definitionFields: Partial<
           NewCronTask<Record<string, JsonValue>>
@@ -234,7 +234,7 @@ export class TaskSyncRepository {
         }
 
         if (existing) {
-          // Skip update if task is currently RUNNING — avoid overwriting mid-execution
+          // Skip update if task is currently RUNNING - avoid overwriting mid-execution
           if (existing.lastExecutionStatus === CronTaskStatus.RUNNING) {
             logger.debug("Skipping sync for RUNNING task", {
               id: remoteTask.id,
@@ -243,7 +243,7 @@ export class TaskSyncRepository {
             continue;
           }
 
-          // Update definition fields only — never overwrite local execution state
+          // Update definition fields only - never overwrite local execution state
           // (enabled, lastExecutionStatus, counts, etc. are managed by the local pulse runner)
           await db
             .update(cronTasks)
@@ -251,7 +251,7 @@ export class TaskSyncRepository {
             .where(eq(cronTasks.id, existing.id));
           synced++;
         } else {
-          // New task — use remote's id directly.
+          // New task - use remote's id directly.
           // Cross-instance delegated tasks (targetInstance set) are always treated as
           // run-once: the remote re-creates them if it wants another execution.
           // This prevents a task created with runOnce:false from looping indefinitely
@@ -437,7 +437,7 @@ export class TaskSyncRepository {
           // sent to cloud. On first sync it is null → send "none" (a non-empty sentinel)
           // so cloud's condition `if (data.capabilitiesJson)` fires and stores the caps.
           const body: Record<string, string> = {
-            // Tell the remote who we are — our own selfInstanceId
+            // Tell the remote who we are - our own selfInstanceId
             instanceId: conn.remoteInstanceId ?? localInstanceId,
             memoriesHash: localMemoriesHash,
             capabilitiesVersion: conn.capabilitiesVersion ?? "none",
@@ -474,10 +474,10 @@ export class TaskSyncRepository {
           });
 
           if (!response.ok) {
-            // 401 — token expired. Mark connection inactive; user must reconnect.
+            // 401 - token expired. Mark connection inactive; user must reconnect.
             if (response.status === 401) {
               logger.warn(
-                "Pull from remote: 401 — marking connection inactive",
+                "Pull from remote: 401 - marking connection inactive",
                 {
                   userId: conn.userId,
                   instanceId: conn.instanceId,
@@ -535,7 +535,7 @@ export class TaskSyncRepository {
           const { RemoteConnectionRepository: RemoteRepo2 } =
             await import("@/app/api/[locale]/user/remote-connection/repository");
 
-          // Use remote DB server time as next cursor — avoids JS process / Docker
+          // Use remote DB server time as next cursor - avoids JS process / Docker
           // container timezone skew where local new Date() is ahead of remote DB clock.
           const newTaskCursor = data.serverTime;
 
@@ -639,11 +639,11 @@ export class TaskSyncRepository {
 
   /**
    * Push a task status update to all active remote connections.
-   * Fire-and-forget per user — logs errors but never fails the caller.
+   * Fire-and-forget per user - logs errors but never fails the caller.
    * Cloud instances (NEXT_PUBLIC_VIBE_IS_CLOUD=true) skip outbound push.
    */
   static async pushStatusToRemote(params: {
-    /** The task's unique id (e.g. "remote-hermes-dev-...") — used by /report to look up the exact task */
+    /** The task's unique id (e.g. "remote-hermes-dev-...") - used by /report to look up the exact task */
     taskId: string;
     status: string;
     summary: string;
@@ -722,7 +722,7 @@ export class TaskSyncRepository {
   /**
    * Get shared memories for sync.
    * Includes active shared memories AND tombstones (recently unshared memories
-   * that still have a syncId — so the remote knows to remove them).
+   * that still have a syncId - so the remote knows to remove them).
    * When userId is provided, only returns that user's memories (per-user sync).
    */
   static async getSharedMemories(params: {
@@ -848,7 +848,7 @@ export class TaskSyncRepository {
           continue;
         }
 
-        // Tombstone for unknown memory — nothing to do
+        // Tombstone for unknown memory - nothing to do
         if (!remoteMem.isShared) {
           continue;
         }
@@ -879,7 +879,7 @@ export class TaskSyncRepository {
           continue;
         }
 
-        // 3. New memory — insert with syncId
+        // 3. New memory - insert with syncId
         const [maxSeq] = await db
           .select({
             max: sql<number>`COALESCE(MAX(${memories.memoryNumber}), -1)`,
@@ -916,14 +916,14 @@ export class TaskSyncRepository {
   }
 
   /**
-   * Hash-first sync handler — cloud side.
+   * Hash-first sync handler - cloud side.
    *
    * Protocol:
    * 1. Local sends: memoriesHash, capabilitiesVersion, capabilitiesJson (if changed), taskCursor
    * 2. Cloud diffs hashes against stored values
    * 3. Cloud returns: memoriesHash, memories (if diff), capabilitiesVersion, capabilities (if diff), tasks (since cursor)
    *
-   * All payloads are null when hashes match — one tiny request per tick in steady state.
+   * All payloads are null when hashes match - one tiny request per tick in steady state.
    */
   static async syncTasks(
     data: SyncRequestOutput,
@@ -946,7 +946,7 @@ export class TaskSyncRepository {
       await import("@/app/api/[locale]/user/remote-connection/db");
 
     // Find the connection record for this user (the local that is calling us).
-    // Local sends its instanceId in the request body — use it to find the right record.
+    // Local sends its instanceId in the request body - use it to find the right record.
     // Fall back to first active record if not provided (backward compat).
     const conditions = [
       eq(connTable.userId, user.id),
@@ -989,7 +989,7 @@ export class TaskSyncRepository {
     }
 
     // ── 1b. Upsert inbound tasks from local instance (outbound push) ──────────
-    // Dev sends tasks targeting our instanceId — upsert them so our pulse picks them up.
+    // Dev sends tasks targeting our instanceId - upsert them so our pulse picks them up.
     if (data.outboundTasks) {
       try {
         const inboundTasks = TaskSyncRepository.parseSyncField<SyncedCronTask>(
@@ -1050,7 +1050,7 @@ export class TaskSyncRepository {
     const capVersionDiffers = data.capabilitiesVersion !== CAPABILITIES_VERSION;
 
     if (capVersionDiffers) {
-      // Use the role matching the requesting user — admin gets admin capabilities
+      // Use the role matching the requesting user - admin gets admin capabilities
       const { userRoles: userRolesTable } =
         await import("@/app/api/[locale]/user/db");
       const userRoleRows = await db
@@ -1086,7 +1086,7 @@ export class TaskSyncRepository {
     // ── 5. Build tasks payload (REMOTE_TOOL_CALL tasks since cursor) ──────────
     const cursor = data.taskCursor ? new Date(data.taskCursor) : new Date(0);
 
-    // Fetch server DB time — local uses this as next cursor to avoid
+    // Fetch server DB time - local uses this as next cursor to avoid
     // JS process / Docker container timezone skew corrupting the cursor.
     const serverTimeResult = await db.execute<{ now: string }>(
       sql`SELECT NOW() as now`,

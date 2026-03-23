@@ -1,5 +1,5 @@
 /**
- * Users Active Total — Route
+ * Users Active Total - Route
  * Server-only.
  */
 

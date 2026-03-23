@@ -155,7 +155,7 @@ export class SkillsIndexGeneratorRepository {
 
         if (!exportMatch || !idMatch) {
           logger.warn(
-            `Could not parse skill file ${basename(skillFile)} — skipping`,
+            `Could not parse skill file ${basename(skillFile)} - skipping`,
           );
           continue;
         }

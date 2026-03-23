@@ -53,7 +53,7 @@ export interface ChatNavigationState {
   setCurrentRootFolderId: (rootFolderId: DefaultFolderId) => void;
   /** Set subfolder ID */
   setCurrentSubFolderId: (subFolderId: string | null) => void;
-  /** Set leaf message ID — updates store and pushes ?message= to URL */
+  /** Set leaf message ID - updates store and pushes ?message= to URL */
   setLeafMessageId: (leafMessageId: string | null) => void;
   /** Batch update all navigation state at once (avoids multiple re-renders) */
   setNavigation: (state: {
@@ -339,7 +339,7 @@ export function parsePathnameToNavState(pathname: string): {
     threadId = seg4;
   } else if (seg3) {
     // 3-segment: /threads/<root>/<something>
-    // Ambiguous — could be folderId or threadId.
+    // Ambiguous - could be folderId or threadId.
     // Treat as threadId here; the server page.tsx disambiguates via DB lookup
     // and the store gets the correct values from initNavigation().
     // For client-side nav, this is always a threadId or "new".

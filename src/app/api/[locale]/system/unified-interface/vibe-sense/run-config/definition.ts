@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Run Config Definition
+ * Vibe Sense - Run Config Definition
  * POST endpoint to execute a graph from an inline config (no DB save required)
  */
 

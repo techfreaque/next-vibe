@@ -3,8 +3,8 @@
  * Handles /subscription/overview, /subscription/buy, /subscription/history
  */
 
-import { notFound } from "next/navigation";
 import { redirect } from "next-vibe-ui/lib/redirect";
+import { notFound } from "next/navigation";
 import type { JSX } from "react";
 
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
@@ -83,7 +83,7 @@ export async function tanstackLoader({
     redirect(`/${locale}/user/login`);
   }
 
-  // Handle NOWPayments success redirect — NP_id is the payment_id appended by NOWPayments
+  // Handle NOWPayments success redirect - NP_id is the payment_id appended by NOWPayments
   const npId = typeof query.NP_id === "string" ? query.NP_id : undefined;
   const paymentType = typeof query.type === "string" ? query.type : undefined;
   const callbackToken =

@@ -61,7 +61,7 @@ export function extractTextData(
     return null;
   }
 
-  // Handle array — format as readable list
+  // Handle array - format as readable list
   if (Array.isArray(value)) {
     if (value.length === 0) {
       return { text: "(empty)", format: "plain" };
@@ -78,7 +78,7 @@ export function extractTextData(
           const row = item as Record<string, WidgetData>;
           const name = String(row[nameKey] ?? "");
           const desc = descKey ? String(row[descKey] ?? "") : "";
-          return desc ? `  ${name}  —  ${desc}` : `  ${name}`;
+          return desc ? `  ${name}  -  ${desc}` : `  ${name}`;
         });
         return { text: lines.join("\n"), format: "plain" };
       }

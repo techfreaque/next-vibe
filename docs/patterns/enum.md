@@ -25,7 +25,7 @@ export const {
   CANCELLED: "enums.consultationStatus.cancelled",
 });
 
-// DB array for Drizzle — manual, explicit, as const
+// DB array for Drizzle - manual, explicit, as const
 export const ConsultationStatusDB = [
   ConsultationStatus.PENDING,
   ConsultationStatus.SCHEDULED,
@@ -53,15 +53,15 @@ Every enum exports exactly 4 things:
 
 ## Translation Keys
 
-Keys are SHORT and scoped — always `"enums.{enumName}.{value}"`:
+Keys are SHORT and scoped - always `"enums.{enumName}.{value}"`:
 
 ```typescript
-// ✅ CORRECT — short scoped key
+// ✅ CORRECT - short scoped key
 "enums.consultationStatus.pending";
 "enums.leadStatus.new";
 "enums.userRole.admin";
 
-// ❌ WRONG — old global format, never use
+// ❌ WRONG - old global format, never use
 "app.api.consultation.enums.consultationStatus.pending";
 ```
 
@@ -93,14 +93,14 @@ export const translations: typeof enTranslations = {
   },
 };
 
-// i18n/pl/index.ts — same pattern with typeof enTranslations
+// i18n/pl/index.ts - same pattern with typeof enTranslations
 ```
 
 ---
 
 ## Database Integration
 
-Use `text()` with enum constraint — **never `pgEnum`** (translation keys exceed PostgreSQL's 63-byte label limit):
+Use `text()` with enum constraint - **never `pgEnum`** (translation keys exceed PostgreSQL's 63-byte label limit):
 
 ```typescript
 // db.ts
@@ -122,7 +122,7 @@ export const consultations = pgTable("consultations", {
 ## Usage
 
 ```typescript
-// In definition.ts — use Options for fields, z.enum() for validation
+// In definition.ts - use Options for fields, z.enum() for validation
 import { ConsultationStatus, ConsultationStatusOptions } from "./enum";
 
 status: requestField({
@@ -130,10 +130,10 @@ status: requestField({
   // ...
 }, z.enum(ConsultationStatus).optional()),
 
-// In examples — use enum values
+// In examples - use enum values
 status: ConsultationStatus.PENDING,
 
-// In repository.ts — use Value type, enum values for comparisons
+// In repository.ts - use Value type, enum values for comparisons
 import { ConsultationStatus, ConsultationStatusValue } from "./enum";
 
 async function getByStatus(status: ConsultationStatusValue) {
@@ -148,7 +148,7 @@ await db.update(consultations).set({ status: ConsultationStatus.COMPLETED });
 ## Anti-Patterns
 
 ```typescript
-// ❌ Missing scopedTranslation — TypeScript can't validate keys
+// ❌ Missing scopedTranslation - TypeScript can't validate keys
 createEnumOptions({ ACTIVE: "enums.status.active" });
 // ✅
 createEnumOptions(scopedTranslation, { ACTIVE: "enums.status.active" });
@@ -186,12 +186,12 @@ export const StatusDB = [Status.PENDING, Status.ACTIVE] as const;
 
 ## Migration Steps
 
-1. **Create translations first** — add `enums.{name}.{value}` keys to en/de/pl `index.ts`
+1. **Create translations first** - add `enums.{name}.{value}` keys to en/de/pl `index.ts`
 2. **Create enum** with `createEnumOptions<ModuleTranslationKey>({...})`
 3. **Export DB array** manually with `as const`
-4. **Replace all usage** — hardcoded strings → enum values, string arrays → Options
-5. **Update db.ts** — `pgEnum` → `text("col", { enum: DB })`
-6. **Run vibe check** — 0 errors before done
+4. **Replace all usage** - hardcoded strings → enum values, string arrays → Options
+5. **Update db.ts** - `pgEnum` → `text("col", { enum: DB })`
+6. **Run vibe check** - 0 errors before done
 
 ---
 

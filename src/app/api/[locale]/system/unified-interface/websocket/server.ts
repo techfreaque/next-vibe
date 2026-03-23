@@ -51,7 +51,7 @@ let shuttingDown = false;
 
 /**
  * Broadcast an event to LOCAL subscribers of a channel (this process only).
- * Called directly by the emitter (same process — no HTTP POST needed).
+ * Called directly by the emitter (same process - no HTTP POST needed).
  */
 export function broadcastLocal(
   channel: string,
@@ -76,7 +76,7 @@ export function broadcastLocal(
     try {
       ws.send(payload);
     } catch {
-      // Socket may be closing — silently skip
+      // Socket may be closing - silently skip
     }
   }
 }
@@ -251,12 +251,12 @@ export function startWebSocketServer(
     port,
     hostname,
     reusePort: true, // allow re-binding after restart without waiting for TIME_WAIT
-    idleTimeout: 0, // disable idle timeout — dev builds can take >10s
+    idleTimeout: 0, // disable idle timeout - dev builds can take >10s
 
     async fetch(req, bunServer): Promise<Response> {
       const url = new URL(req.url);
 
-      // ── Internal broadcast endpoint — called by Next.js to emit WS events ──
+      // ── Internal broadcast endpoint - called by Next.js to emit WS events ──
       // Next.js runs in a separate process and can't call broadcastLocal() directly,
       // so it POSTs here and the proxy calls broadcastLocal() in-process.
       if (url.pathname === "/ws/broadcast" && req.method === "POST") {
@@ -308,7 +308,7 @@ export function startWebSocketServer(
         const { userId, leadId } = await authenticateFromCookies(req, logger);
 
         if (!leadId) {
-          logger.warn("[WS] Rejected upgrade — missing lead_id cookie");
+          logger.warn("[WS] Rejected upgrade - missing lead_id cookie");
           return new Response("Missing lead_id cookie", { status: 401 });
         }
 
@@ -330,7 +330,7 @@ export function startWebSocketServer(
       }
 
       // ── Proxy everything else to Next.js ─────────────────────────────────
-      // Use a raw Node http pipe instead of fetch() — Bun's fetch auto-decompresses
+      // Use a raw Node http pipe instead of fetch() - Bun's fetch auto-decompresses
       // responses which breaks streaming SSR and compressed assets.
       // On ECONNREFUSED (Next.js restarting), retry with backoff so the browser
       // gets a real response once Next.js recovers instead of a hard 502.
@@ -407,7 +407,7 @@ export function startWebSocketServer(
           );
 
           proxyReq.on("error", (err) => {
-            // On ECONNREFUSED Next.js is restarting — signal retry via null
+            // On ECONNREFUSED Next.js is restarting - signal retry via null
             const isConnRefused =
               (err as NodeJS.ErrnoException).code === "ECONNREFUSED";
             if (isConnRefused && !shuttingDown) {
@@ -435,7 +435,7 @@ export function startWebSocketServer(
           return proxyResult;
         }
 
-        // Next.js not ready yet — wait before retrying
+        // Next.js not ready yet - wait before retrying
         const delay = PROXY_RETRY_DELAYS[attempt] ?? 8000;
         if (!shuttingDown) {
           logger.warn("[Proxy] Next.js not ready, retrying", {
@@ -454,7 +454,7 @@ export function startWebSocketServer(
 
     websocket: {
       open(ws): void {
-        // Proxy connection — wire up upstream → browser bridging
+        // Proxy connection - wire up upstream → browser bridging
         if (ws.data.proxyWs) {
           const upstream = ws.data.proxyWs;
           upstream.addEventListener("message", (event): void => {
@@ -465,7 +465,7 @@ export function startWebSocketServer(
                   : (event.data as ArrayBuffer),
               );
             } catch {
-              // Socket may be closing — silently skip
+              // Socket may be closing - silently skip
             }
           });
           upstream.addEventListener("close", (): void => {
@@ -491,12 +491,12 @@ export function startWebSocketServer(
       },
 
       message(ws, raw): void {
-        // Proxy connection — forward browser → upstream
+        // Proxy connection - forward browser → upstream
         if (ws.data.proxyWs) {
           try {
             ws.data.proxyWs.send(raw as string | ArrayBuffer);
           } catch {
-            // Upstream socket may be closing — silently skip
+            // Upstream socket may be closing - silently skip
           }
           return;
         }
@@ -525,7 +525,7 @@ export function startWebSocketServer(
       },
 
       close(ws): void {
-        // Proxy connection — close upstream
+        // Proxy connection - close upstream
         if (ws.data.proxyWs) {
           ws.data.proxyWs.close();
           return;

@@ -1,6 +1,6 @@
 /**
  * Signals Field Widget Types
- * Handles SIGNALS field type — array of SignalEvents.
+ * Handles SIGNALS field type - array of SignalEvents.
  * Used as input/output handles on vibe-sense graph nodes.
  */
 

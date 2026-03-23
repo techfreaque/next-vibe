@@ -38,12 +38,12 @@ export const translations: typeof enTranslations = {
   },
   text: {
     label: "Nachricht",
-    description: "Nur-Text-Inhalt — für SMS/WhatsApp/Telegram; E-Mail-Fallback",
+    description: "Nur-Text-Inhalt - für SMS/WhatsApp/Telegram; E-Mail-Fallback",
     placeholder: "Nachricht eingeben...",
   },
   html: {
     label: "HTML-Inhalt",
-    description: "HTML-Inhalt (nur E-Mail, optional — Fallback auf Text)",
+    description: "HTML-Inhalt (nur E-Mail, optional - Fallback auf Text)",
     placeholder: "<p>HTML-E-Mail-Inhalt eingeben...</p>",
   },
   senderName: {

@@ -143,7 +143,7 @@ export const translations: typeof enTranslations = {
       adminTitle: "Limit wydatków",
       description: "Używaj kredytów w {{modelCount}} modelach AI",
       adminDescription:
-        "Kredyty działają jako limit wydatków — kontroluj dozwolone użycie AI przez wszystkich użytkowników.",
+        "Kredyty działają jako limit wydatków - kontroluj dozwolone użycie AI przez wszystkich użytkowników.",
       credit: "{{count}} kredyt",
       credits: "{{count}} kredytów",
       expiring: {
@@ -153,8 +153,8 @@ export const translations: typeof enTranslations = {
       },
       permanent: {
         title: "Stałe kredyty",
-        description: "Nie wygasają — należą do Ciebie",
-        adminDescription: "Stałe kredyty — nie wygasają",
+        description: "Nie wygasają - należą do Ciebie",
+        adminDescription: "Stałe kredyty - nie wygasają",
       },
       free: {
         title: "Darmowe kredyty",
@@ -165,7 +165,7 @@ export const translations: typeof enTranslations = {
       earned: {
         title: "Zarobione kredyty",
         description:
-          "Zarobione przez polecenia — kliknij, aby zaprosić znajomych",
+          "Zarobione przez polecenia - kliknij, aby zaprosić znajomych",
       },
       spending: {
         title: "Twoje zarobione kredyty",
@@ -429,7 +429,7 @@ export const translations: typeof enTranslations = {
   email: {
     creditPack: {
       user: {
-        subject: "Twój pakiet kredytów jest gotowy — {{appName}}",
+        subject: "Twój pakiet kredytów jest gotowy - {{appName}}",
         title: "Kredyty zostały dodane do Twojego konta",
         previewText: "{{credits}} kredytów zostało dodanych do Twojego konta",
         greeting: "Cześć {{privateName}},",
@@ -439,7 +439,7 @@ export const translations: typeof enTranslations = {
       },
       admin: {
         subject:
-          "[{{appName}}] Zakupiono pakiet kredytów — {{credits}} kredytów",
+          "[{{appName}}] Zakupiono pakiet kredytów - {{credits}} kredytów",
         title: "Zakup pakietu kredytów",
         preview: "Użytkownik zakupił pakiet kredytów",
         body: "Użytkownik zakupił pakiet kredytów.",

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "MACD",
     description:
-      "Zbieżność i rozbieżność średnich kroczących — wskaźnik momentum podążający za trendem",
+      "Zbieżność i rozbieżność średnich kroczących - wskaźnik momentum podążający za trendem",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       resolution: {

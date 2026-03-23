@@ -1,7 +1,7 @@
 /**
  * TanStack Start shim for `server-only`.
  *
- * In Vite SSR context (import.meta.env.SSR = true), this is a no-op — the module
+ * In Vite SSR context (import.meta.env.SSR = true), this is a no-op - the module
  * is legitimately imported on the server.
  *
  * In the client bundle (import.meta.env.SSR = false), throw to catch any server-only

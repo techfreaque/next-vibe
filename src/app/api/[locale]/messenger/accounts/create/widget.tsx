@@ -25,11 +25,14 @@ import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
-import { CHANNEL_TO_PROVIDERS, MessengerProviderOptions } from "../enum";
+import {
+  CHANNEL_TO_PROVIDERS,
+  MessageChannel,
+  MessengerProviderOptions,
+} from "../enum";
 import messengerAccountsListDefinition from "../list/definition";
 import type definition from "./definition";
 import type { MessengerAccountCreatePOSTResponseOutput } from "./definition";
-import { MessageChannel } from "../enum";
 
 interface CustomWidgetProps {
   field: {
@@ -272,7 +275,7 @@ export function MessengerAccountCreateContainer({
           </SectionCard>
         )}
 
-        {/* IMAP inbound — collapsible, optional */}
+        {/* IMAP inbound - collapsible, optional */}
         {isSmtp && (
           <CollapsibleSection
             title={t("sections.imap")}
@@ -325,7 +328,7 @@ export function MessengerAccountCreateContainer({
           </CollapsibleSection>
         )}
 
-        {/* Email routing — collapsible */}
+        {/* Email routing - collapsible */}
         {isEmail && (
           <CollapsibleSection
             title={t("sections.routing")}

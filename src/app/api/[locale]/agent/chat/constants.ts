@@ -110,7 +110,7 @@ export const DEFAULT_TOOL_IDS = DEFAULT_TOOL_IDS_ADMIN;
 
 /**
  * Default remote tools made available (enabled) when a remote instance is connected.
- * These are unprefixed tool IDs — the instanceId prefix (e.g. "hermes__") is added
+ * These are unprefixed tool IDs - the instanceId prefix (e.g. "hermes__") is added
  * at connect time when writing into the user's availableTools setting.
  *
  * Mirrors DEFAULT_TOOL_IDS: same pinned/available distinction, same reset-to-defaults
@@ -125,7 +125,7 @@ export const DEFAULT_REMOTE_TOOL_IDS = [
 
 /**
  * Default remote tools pinned into the AI context window on connect.
- * Empty by default — remote tools start as available-only (callable via execute-tool,
+ * Empty by default - remote tools start as available-only (callable via execute-tool,
  * shown in help, but not auto-loaded into every AI context).
  * User can promote individual tools to pinned via the tool settings UI.
  */

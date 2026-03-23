@@ -45,7 +45,7 @@ export class WaitForTaskRepository {
 
     try {
       // tools-loader injects currentToolMessageId from pendingToolMessages before execute() is called.
-      // No polling needed — by the time execute() runs, tool-call has already been processed.
+      // No polling needed - by the time execute() runs, tool-call has already been processed.
 
       // Short retry to handle the parallel-batch race: if execute-tool(wakeUp) and
       // wait-for-task run in the same parallel tool batch, execute-tool may not have
@@ -69,11 +69,11 @@ export class WaitForTaskRepository {
       }
 
       if (!task) {
-        // Task not found — it was already completed and cleaned up by revival.
+        // Task not found - it was already completed and cleaned up by revival.
         // This is not an error: the wakeUp result was already injected into the thread.
         // Return success so the AI can continue gracefully.
         logger.info(
-          "[WaitForTask] Task not found — already completed and cleaned up",
+          "[WaitForTask] Task not found - already completed and cleaned up",
           { taskId },
         );
         return success({
@@ -83,7 +83,7 @@ export class WaitForTaskRepository {
         });
       }
 
-      // If already completed, return result immediately — stream continues as normal.
+      // If already completed, return result immediately - stream continues as normal.
       if (
         task.lastExecutionStatus === CronTaskStatus.COMPLETED ||
         task.lastExecutionStatus === CronTaskStatus.FAILED ||
@@ -97,7 +97,7 @@ export class WaitForTaskRepository {
           .orderBy(desc(cronTaskExecutions.completedAt))
           .limit(1);
 
-        logger.info("[WaitForTask] Task already completed — returning result", {
+        logger.info("[WaitForTask] Task already completed - returning result", {
           taskId,
           status: task.lastExecutionStatus,
         });
@@ -132,7 +132,7 @@ export class WaitForTaskRepository {
         });
       }
 
-      // Task is pending/running — register the calling thread as a waiter.
+      // Task is pending/running - register the calling thread as a waiter.
       // When the task completes, handleTaskCompletion will backfill the tool
       // message and schedule resume-stream to revive the AI.
       const effectiveThreadId = streamContext?.threadId;
@@ -146,7 +146,7 @@ export class WaitForTaskRepository {
 
         const streamLeafMessageId = streamContext?.leafMessageId;
 
-        // Write revival context to typed wakeUp* columns — not into taskInput JSON blob.
+        // Write revival context to typed wakeUp* columns - not into taskInput JSON blob.
         await db
           .update(cronTasks)
           .set({
@@ -172,7 +172,7 @@ export class WaitForTaskRepository {
           },
         );
 
-        // Pause the stream — resume-stream will revive when the task completes.
+        // Pause the stream - resume-stream will revive when the task completes.
         // Set pendingTimeoutMs so finish-step-handler starts the 90s abort timer.
         if (streamContext) {
           streamContext.waitingForRemoteResult = true;
@@ -180,7 +180,7 @@ export class WaitForTaskRepository {
         }
       } else {
         logger.warn(
-          "[WaitForTask] No streamContext — cannot register waiter, returning pending status",
+          "[WaitForTask] No streamContext - cannot register waiter, returning pending status",
           { taskId },
         );
       }

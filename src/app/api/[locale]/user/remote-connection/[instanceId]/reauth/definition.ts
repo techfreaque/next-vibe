@@ -1,6 +1,6 @@
 /**
  * Remote Connection Re-authenticate
- * POST — refresh credentials for an existing connection
+ * POST - refresh credentials for an existing connection
  */
 
 import { z } from "zod";

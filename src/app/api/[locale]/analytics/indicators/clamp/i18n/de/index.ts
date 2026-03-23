@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Clamp",
     description:
-      "Werte auf einen [min, max] Bereich begrenzen — kappt Ausreißer",
+      "Werte auf einen [min, max] Bereich begrenzen - kappt Ausreißer",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

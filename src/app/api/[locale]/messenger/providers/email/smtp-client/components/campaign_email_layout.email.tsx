@@ -1,7 +1,7 @@
 /**
  * Campaign Email Layout
  * Minimal layout for lead outreach campaigns.
- * No branding header — looks like a plain personal email.
+ * No branding header - looks like a plain personal email.
  * Footer contains only the legally required unsubscribe link and a plain copyright.
  */
 
@@ -70,7 +70,7 @@ export function CampaignEmailLayout({
             {children}
           </Section>
 
-          {/* Minimal legal footer — unsubscribe only */}
+          {/* Minimal legal footer - unsubscribe only */}
           <Section
             style={{
               borderTop: "1px solid #e5e7eb",

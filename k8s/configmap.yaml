@@ -7,7 +7,7 @@ metadata:
   namespace: next-vibe
 data:
   NODE_ENV: "production"
-  # App URL — must match your ingress hostname
+  # App URL - must match your ingress hostname
   NEXT_PUBLIC_APP_URL: "https://your-domain.com"
   NEXT_PUBLIC_PROJECT_URL: "https://unbottled.ai"
   # Instance ID for task routing

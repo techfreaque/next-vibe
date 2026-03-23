@@ -9,17 +9,16 @@
  * 4. Runs electron-builder from the stage dir to produce the final binary.
  */
 
-
 import { execSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -34,7 +33,7 @@ export class ElectronBuildRepository {
   private static readonly ELECTRON_DIR =
     "src/app/api/[locale]/system/unified-interface/electron";
   private static readonly STAGE_DIR = "dist/electron-stage";
-  // Defer cwd resolution to runtime — prevents Turbopack from statically
+  // Defer cwd resolution to runtime - prevents Turbopack from statically
   // resolving path.join(cwd, STAGE_DIR) to project root and globbing 12k files
   private static cwd(): string {
     return process.cwd();
@@ -94,7 +93,11 @@ export class ElectronBuildRepository {
             `bun build ${ElectronBuildRepository.ELECTRON_DIR}/main.ts --outdir=dist/electron --target=node --external=electron`,
             `bun build ${ElectronBuildRepository.ELECTRON_DIR}/preload.ts --outdir=dist/electron --target=node --external=electron`,
           ].join(" && "),
-          { encoding: "utf-8", cwd: ElectronBuildRepository.cwd(), env: { ...process.env } },
+          {
+            encoding: "utf-8",
+            cwd: ElectronBuildRepository.cwd(),
+            env: { ...process.env },
+          },
         );
         output.push("   ✅ main.js + preload.js compiled to dist/electron/");
       } catch (err) {
@@ -110,12 +113,15 @@ export class ElectronBuildRepository {
 
       // Step 3: prepare staging directory
       // electron-builder with bun workspaces walks up from the app dir to find
-      // the workspace root, then traverses all node_modules — including dev deps
+      // the workspace root, then traverses all node_modules - including dev deps
       // that are hoisted but not in their expected locations. By staging into a
       // clean dir with an empty dependencies object, we bypass that entirely.
       output.push("");
       output.push("3️⃣  Preparing staging directory...");
-      const stageDir = path.join(ElectronBuildRepository.cwd(), ElectronBuildRepository.STAGE_DIR);
+      const stageDir = path.join(
+        ElectronBuildRepository.cwd(),
+        ElectronBuildRepository.STAGE_DIR,
+      );
       const stageElectronDir = path.join(stageDir, "dist", "electron");
       mkdirSync(stageElectronDir, { recursive: true });
 
@@ -128,11 +134,14 @@ export class ElectronBuildRepository {
           cwd: ElectronBuildRepository.cwd(),
         },
       );
-      execSync(`cp ${ElectronBuildRepository.ELECTRON_DIR}/assets/icon.png ${stageAssetsDir}/`, {
-        cwd: ElectronBuildRepository.cwd(),
-      });
+      execSync(
+        `cp ${ElectronBuildRepository.ELECTRON_DIR}/assets/icon.png ${stageAssetsDir}/`,
+        {
+          cwd: ElectronBuildRepository.cwd(),
+        },
+      );
 
-      // Minimal package.json — no dependencies so electron-builder skips traversal.
+      // Minimal package.json - no dependencies so electron-builder skips traversal.
       // type:module required because bun compiles main.ts as ESM.
       const pkg = {
         name: "unbottled",
@@ -153,7 +162,8 @@ export class ElectronBuildRepository {
       const electronVersion = JSON.parse(
         readFileSync("node_modules/electron/package.json", "utf-8"),
       ).version as string;
-      const platformFlags = ElectronBuildRepository.PLATFORM_FLAG[data.platform] ?? "";
+      const platformFlags =
+        ElectronBuildRepository.PLATFORM_FLAG[data.platform] ?? "";
       const builderConfig = {
         appId: "ai.unbottled.app",
         productName: "Unbottled",

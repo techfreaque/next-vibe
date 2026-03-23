@@ -36,7 +36,7 @@ export const translations: typeof enTranslations = {
       },
       response: {
         result:
-          "Dane wynikowe zwrócone przez docelową trasę. W przypadku błędu pole to jest nieobecne — sama odpowiedź zawiera błąd.",
+          "Dane wynikowe zwrócone przez docelową trasę. W przypadku błędu pole to jest nieobecne - sama odpowiedź zawiera błąd.",
         resultLabel: "Wynik",
       },
       errors: {
@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
   },
   tools: {
     get: {
-      title: "Pomoc narzędzi — odkryj dostępne narzędzia AI",
+      title: "Pomoc narzędzi - odkryj dostępne narzędzia AI",
       description:
         "Wyszukuj i odkrywaj wszystkie dostępne narzędzia AI. Użyj query do wyszukiwania, category do filtrowania.",
       category: "Narzędzia AI",

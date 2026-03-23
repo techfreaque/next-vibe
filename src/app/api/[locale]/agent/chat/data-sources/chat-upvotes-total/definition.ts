@@ -1,5 +1,5 @@
 /**
- * Chat Upvotes Total — Endpoint Definition
+ * Chat Upvotes Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

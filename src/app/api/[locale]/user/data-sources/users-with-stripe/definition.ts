@@ -1,5 +1,5 @@
 /**
- * Users With Stripe — Endpoint Definition
+ * Users With Stripe - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

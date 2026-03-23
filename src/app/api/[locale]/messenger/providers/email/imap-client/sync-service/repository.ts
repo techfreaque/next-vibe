@@ -18,6 +18,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type {
+  MessengerFolder,
   NewEmail,
   NewMessengerFolder,
 } from "@/app/api/[locale]/messenger/messages/db";
@@ -25,16 +26,15 @@ import {
   emails,
   messengerFolders,
 } from "@/app/api/[locale]/messenger/messages/db";
-import type { MessengerFolder } from "@/app/api/[locale]/messenger/messages/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { MessageType, SpecialFolderType } from "../../../../messages/enum";
-import type { SpecialFolderTypeValue } from "../../../../messages/enum";
+import type { TranslationKey } from "@/i18n/core/static-types";
 import { messengerAccounts } from "../../../../accounts/db";
 import { MessengerAccountStatus } from "../../../../accounts/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { SpecialFolderTypeValue } from "../../../../messages/enum";
+import { MessageType, SpecialFolderType } from "../../../../messages/enum";
 
 import { MessageChannel } from "../../../../accounts/enum";
 import { ImapConnectionRepository } from "../connection/repository";
@@ -692,7 +692,7 @@ export class ImapSyncRepository {
           const isTrash = folder.specialUseType === SpecialFolderType.TRASH;
 
           if (isTrash) {
-            // Messages missing from Trash were permanently expunged — remove from DB
+            // Messages missing from Trash were permanently expunged - remove from DB
             const deleted = await db
               .delete(emails)
               .where(

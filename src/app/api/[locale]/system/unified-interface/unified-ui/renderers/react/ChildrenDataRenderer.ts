@@ -114,7 +114,7 @@ export interface ChildrenFilterConfig {
   requestOnly?: boolean;
   /** Whether the context has actual response data (from context.response.success) */
   hasResponseData?: boolean;
-  /** User's permission roles — used to enforce visibleFor field-level role whitelist */
+  /** User's permission roles - used to enforce visibleFor field-level role whitelist */
   userRoles?: readonly (typeof UserPermissionRoleValue)[];
   /** Custom predicate to filter children */
   predicate?: (
@@ -250,7 +250,7 @@ export class ChildrenDataRenderer {
 
       // Hide response-only fields that have no data.
       // Widget-only fields always render (static content, no data dependency).
-      // This applies universally — not just in responseOnly mode — so that
+      // This applies universally - not just in responseOnly mode - so that
       // response fields inside mixed containers don't render empty labels.
       const isResponseOnly = isResponseField(field) && !isRequestField(field);
       if (isResponseOnly && !isWidgetField && !isWidgetOnly) {

@@ -393,7 +393,7 @@ export const translations: typeof enTranslations = {
       activeBadge: "Aktiv",
       greeting: "Hey {{privateName}},",
       intro:
-        "Dein {{appName}} Abo ist bestätigt und bereit. Du hast jeden Monat 800 Credits für alle Modelle — keine Tageslimits, keine Inhaltsfilter, keine Erklärungen nötig.",
+        "Dein {{appName}} Abo ist bestätigt und bereit. Du hast jeden Monat 800 Credits für alle Modelle - keine Tageslimits, keine Inhaltsfilter, keine Erklärungen nötig.",
       models: {
         title: "{{modelCount}} Modelle, 3 Kategorien",
         mainstream: "Mainstream",

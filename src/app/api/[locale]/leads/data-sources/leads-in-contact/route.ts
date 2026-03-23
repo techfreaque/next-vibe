@@ -1,5 +1,5 @@
 /**
- * Leads In Contact — Route
+ * Leads In Contact - Route
  * Server-only.
  */
 

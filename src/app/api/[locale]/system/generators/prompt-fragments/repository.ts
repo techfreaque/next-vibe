@@ -4,14 +4,14 @@
  * Scans for system-prompt/prompt.ts files across all modules,
  * extracts fragment IDs by importing each file, then generates
  * three output files:
- *   generated/prompt-fragments.ts        — isomorphic, fragment IDs + getPromptFragment()
- *   generated/prompt-fragments-server.ts — server-only, getServerLoader()
- *   generated/prompt-fragments-client.ts — client-side, static named imports of hooks + fragments
+ *   generated/prompt-fragments.ts        - isomorphic, fragment IDs + getPromptFragment()
+ *   generated/prompt-fragments-server.ts - server-only, getServerLoader()
+ *   generated/prompt-fragments-client.ts - client-side, static named imports of hooks + fragments
  *
  * Each module that participates in the system prompt owns three files:
- *   module/system-prompt/prompt.ts   — isomorphic fragment definition (build fn + data type)
- *   module/system-prompt/server.ts   — server-only data loader
- *   module/system-prompt/client.ts   — React hook returning same data shape
+ *   module/system-prompt/prompt.ts   - isomorphic fragment definition (build fn + data type)
+ *   module/system-prompt/server.ts   - server-only data loader
+ *   module/system-prompt/client.ts   - React hook returning same data shape
  */
 
 import "server-only";
@@ -56,7 +56,7 @@ interface PromptFragmentsResponseType {
 
 import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
-/** Erased fragment type used only for runtime scanning — data type is not needed here */
+/** Erased fragment type used only for runtime scanning - data type is not needed here */
 type AnyFragment = SystemPromptFragment<never>;
 
 /** Dynamically imported prompt.ts module shape */
@@ -227,7 +227,7 @@ export class PromptFragmentsGeneratorRepository {
 
         if (fragmentExportNames.length === 0) {
           logger.warn(
-            `No SystemPromptFragment exports found in ${promptFile} — skipping`,
+            `No SystemPromptFragment exports found in ${promptFile} - skipping`,
           );
           continue;
         }
@@ -260,7 +260,7 @@ export class PromptFragmentsGeneratorRepository {
             )
           : null;
 
-        // One entry per fragment ID — each knows its own export name and placement
+        // One entry per fragment ID - each knows its own export name and placement
         for (const [id, ownExportName] of idToExportName) {
           // Get the placement from the actual fragment object
           const fragment = mod[ownExportName] as AnyFragment | undefined;
@@ -349,11 +349,11 @@ export class PromptFragmentsGeneratorRepository {
   }
 
   /**
-   * Generate prompt-fragments-client.ts — combined hook that calls all fragment
+   * Generate prompt-fragments-client.ts - combined hook that calls all fragment
    * client hooks with a single standard params object.
    *
    * Exports:
-   *   useAllPromptFragmentsData(params) — calls every hook, returns Record<fragmentId, data>
+   *   useAllPromptFragmentsData(params) - calls every hook, returns Record<fragmentId, data>
    *   + re-exports all fragment objects (for use in hook.ts without individual imports)
    */
   private static generateClientContent(fragments: FragmentEntry[]): string {
@@ -446,14 +446,14 @@ export class PromptFragmentsGeneratorRepository {
 
 import type { SystemPromptClientParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
-// Fragment objects — from each module's system-prompt/prompt.ts
+// Fragment objects - from each module's system-prompt/prompt.ts
 ${fragmentImports.join("\n")}
 
-// Client hooks — from each module's system-prompt/client.ts
+// Client hooks - from each module's system-prompt/client.ts
 ${hookImports.join("\n")}
 
 /**
- * Combined hook — calls every fragment's client hook, builds strings, returns results.
+ * Combined hook - calls every fragment's client hook, builds strings, returns results.
  * Returns leading/trailing arrays (sorted by priority) plus a byId map of built strings.
  * All hooks called unconditionally (React rules of hooks).
  */
@@ -486,7 +486,7 @@ ${fragments
   }
 
   /**
-   * Generate prompt-fragments.ts — isomorphic index with fragment IDs and getPromptFragment.
+   * Generate prompt-fragments.ts - isomorphic index with fragment IDs and getPromptFragment.
    * No server-only or client-only dependencies.
    */
   private static generateContent(fragments: FragmentEntry[]): string {
@@ -499,7 +499,7 @@ ${fragments
       },
     );
 
-    // Each fragment ID gets its own case (multiple IDs may point to the same file — that's fine)
+    // Each fragment ID gets its own case (multiple IDs may point to the same file - that's fine)
     const allPromptCases = fragments.map(
       (f) =>
         `    case "${f.id}":\n      return import("${f.promptImportPath}") as Promise<Record<string, unknown>>;`,
@@ -515,7 +515,7 @@ ${fragments
 
 /**
  * All registered prompt fragment IDs.
- * Auto-generated — do not edit manually.
+ * Auto-generated - do not edit manually.
  */
 export const PROMPT_FRAGMENT_IDS = [
 ${fragmentIdList}
@@ -540,9 +540,9 @@ ${allPromptCases.join("\n")}
   }
 
   /**
-   * Generate prompt-fragments-server.ts — server-only combined loader.
+   * Generate prompt-fragments-server.ts - server-only combined loader.
    * Exports loadAllPromptFragments(params) that loads all fragment data in parallel
-   * and builds leading/trailing arrays — mirrors useAllPromptFragments on the client.
+   * and builds leading/trailing arrays - mirrors useAllPromptFragments on the client.
    */
   private static generateServerContent(fragments: FragmentEntry[]): string {
     const header = generateFileHeader(
@@ -559,7 +559,7 @@ ${allPromptCases.join("\n")}
       string,
       { loaderName: string; dataVar: string }
     >();
-    // Fragment imports (prompt.ts) — deduplicated
+    // Fragment imports (prompt.ts) - deduplicated
     const seenPrompt = new Set<string>();
 
     const serverImports: string[] = [];
@@ -587,7 +587,7 @@ ${allPromptCases.join("\n")}
       }
     }
 
-    // Generate parallel load calls — deduplicated by server path
+    // Generate parallel load calls - deduplicated by server path
     const loaderCalls: string[] = [];
     const loaderVarNames: string[] = [];
     for (const [, { loaderName, dataVar }] of seenServer) {
@@ -645,14 +645,14 @@ import "server-only";
 
 import type { SystemPromptServerParams } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
-// Fragment objects — from each module's system-prompt/prompt.ts
+// Fragment objects - from each module's system-prompt/prompt.ts
 ${fragmentImports.join("\n")}
 
-// Server loaders — from each module's system-prompt/server.ts
+// Server loaders - from each module's system-prompt/server.ts
 ${serverImports.join("\n")}
 
 /**
- * Combined server loader — loads all fragment data in parallel, builds strings, returns results.
+ * Combined server loader - loads all fragment data in parallel, builds strings, returns results.
  * Returns leading/trailing arrays (sorted by priority) plus a byId map of built strings.
  * Mirror of useAllPromptFragments on the client.
  */

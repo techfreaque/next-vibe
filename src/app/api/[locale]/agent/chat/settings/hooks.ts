@@ -52,7 +52,7 @@ interface UseChatSettingsReturn {
 export function useChatSettings(
   user: JwtPayloadType,
   logger: EndpointLogger,
-  /** SSR-prefetched settings — pre-populates React Query cache, skips initial fetch */
+  /** SSR-prefetched settings - pre-populates React Query cache, skips initial fetch */
   initialData?: ChatSettingsGetResponseOutput | null,
 ): UseChatSettingsReturn {
   const isAuthenticated = useMemo(

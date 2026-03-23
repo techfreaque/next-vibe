@@ -360,7 +360,7 @@ export function TaskExecuteContainer({ field }: WidgetProps): JSX.Element {
         </Div>
       )}
 
-      {/* Tool endpoint UI — editable input form */}
+      {/* Tool endpoint UI - editable input form */}
       {taskId && taskData && toolEndpoint && toolMethod && (
         <Div className="rounded-lg border p-4 flex flex-col gap-3">
           <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">

@@ -5,9 +5,9 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useMemo } from "react";
 
@@ -16,8 +16,8 @@ import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { TtsVoice } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
+import type { TtsVoice } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -83,13 +83,13 @@ export interface LinearMessageViewProps {
   onLoadNewerHistory: ((anchorId: string) => void) | null;
   /** Whether newer history is currently loading */
   isLoadingNewerHistory: boolean;
-  /** Vote callback — null when voting is not available */
+  /** Vote callback - null when voting is not available */
   onVoteMessage:
     | ((messageId: string, vote: 1 | -1 | 0) => Promise<void>)
     | null;
   ttsAutoplay: boolean;
   ttsVoice: (typeof TtsVoice)[keyof typeof TtsVoice] | undefined;
-  /** Optional debug slots — only provided by DebugLinearMessageView */
+  /** Optional debug slots - only provided by DebugLinearMessageView */
   debugLeading?: JSX.Element;
   renderDebugBeforeMessage?: (
     message: ChatMessage,

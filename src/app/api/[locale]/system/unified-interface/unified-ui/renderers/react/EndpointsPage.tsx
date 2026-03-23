@@ -5,9 +5,9 @@
 
 "use client";
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils/utils";
@@ -67,7 +67,7 @@ interface EndpointsPagePropsBase<
   /**
    * Optional pre-created endpoint instance from a parent's useEndpoint call.
    * When provided, EndpointsPage skips its own useEndpoint call and uses this
-   * instance instead — the parent owns the query key, data, and side effects.
+   * instance instead - the parent owns the query key, data, and side effects.
    * useEndpoint is still called internally (no conditional hooks) but its result
    * is discarded in favour of this instance.
    */
@@ -125,7 +125,7 @@ export type EndpointsPageProps<
  * - Submit button in header (if configured)
  * - EndpointRenderer for form and response display
  */
-// Internal props type — erases the conditional endpointOptions requirement for use inside the component
+// Internal props type - erases the conditional endpointOptions requirement for use inside the component
 type EndpointsPagePropsInternal<
   T extends {
     GET?: CreateApiEndpointAny;
@@ -164,7 +164,7 @@ function EndpointsPageInternal<
   // Check finalNavigation stack to render stacked endpoints (only for base layer)
   const navigation = useNavigationStack();
 
-  // Extract stable Zustand refs directly — these are stable function/array references
+  // Extract stable Zustand refs directly - these are stable function/array references
   // that only change when the store actually changes (push/pop), not on every render.
   const navigationPop = navigation.pop;
   const navigationReplace = navigation.replace;
@@ -173,7 +173,7 @@ function EndpointsPageInternal<
   // Apply navigationOverride if provided.
   // IMPORTANT: navigation is a new plain object every render (useNavigationStack returns
   // { push, replace, pop, stack, canGoBack, current } inline). We must NOT put `navigation`
-  // in the dep array or the body — use only the stable extracted refs so the memoized
+  // in the dep array or the body - use only the stable extracted refs so the memoized
   // object reference stays stable across renders when nothing actually changed.
   const navigationPush = navigation.push;
   const navigationCanGoBack = navigation.canGoBack;

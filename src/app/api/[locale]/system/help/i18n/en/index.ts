@@ -3,7 +3,7 @@ export const translations = {
   tag: "Help",
   uncategorized: "Other",
   get: {
-    title: "Tool Help — Discover Available Tools",
+    title: "Tool Help - Discover Available Tools",
     description:
       "Search and discover all tools available to you. Call with no params to list all tools and categories. Use query to search by name/description/alias. Use toolName to get full parameter schema for a specific tool. Use category to filter by category. Supports pagination via page/pageSize. Default page size for AI/MCP is 25.",
     tags: {
@@ -301,12 +301,12 @@ export const translations = {
     modal: {
       pinnedLabel: "pinned",
       pinnedTooltip:
-        "Pinned tools are always in context — the AI sees them every turn",
+        "Pinned tools are always in context - the AI sees them every turn",
       enabledLabel: "allowed",
       enabledTooltip:
         "Allowed tools can be called on demand when help is enabled",
       totalLabel: "total",
-      totalTooltip: "Show all tools — click to clear filter",
+      totalTooltip: "Show all tools - click to clear filter",
       searchPlaceholder: "Search tools...",
       expandAll: "Expand All",
       collapseAll: "Collapse All",
@@ -319,10 +319,10 @@ export const translations = {
       legendActive: "Always in context (pinned)",
       legendConfirm: "Asks before running",
       stats: "{{pinned}} of {{total}} tools pinned",
-      activeOn: "Pinned — always in context. Click to unpin",
-      activeOff: "Not pinned — AI can still call on demand. Click to pin",
-      confirmOn: "Asks for confirmation — click to disable",
-      confirmOff: "Runs automatically — click to require confirmation",
+      activeOn: "Pinned - always in context. Click to unpin",
+      activeOff: "Not pinned - AI can still call on demand. Click to pin",
+      confirmOn: "Asks for confirmation - click to disable",
+      confirmOff: "Runs automatically - click to require confirmation",
     },
 
     platformFilter: {

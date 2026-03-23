@@ -1,10 +1,10 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { memo, useCallback, useMemo } from "react";
 
@@ -17,10 +17,10 @@ import {
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -61,7 +61,7 @@ export interface FlatMessageProps {
   collapseState?: CollapseStateStore;
   currentUserId?: string;
   user: JwtPayloadType;
-  /** Message operations — passed from parent (no context dependency) */
+  /** Message operations - passed from parent (no context dependency) */
   onBranchMessage?: (
     messageId: string,
     content: string,
@@ -296,7 +296,7 @@ export const FlatMessage = memo(function FlatMessage({
 
   // TTS support for assistant messages is handled by the message action buttons
 
-  // Get all messages in the sequence (primary + continuations) — memoized
+  // Get all messages in the sequence (primary + continuations) - memoized
   const allMessagesInSequence = useMemo(
     () =>
       messageGroup
@@ -337,7 +337,7 @@ export const FlatMessage = memo(function FlatMessage({
   let displayName: string;
   if (isUser) {
     if (rootFolderId === "public" || rootFolderId === "shared") {
-      // Public/shared: show stored authorName or Anonymous — ID badge shown separately
+      // Public/shared: show stored authorName or Anonymous - ID badge shown separately
       displayName = message.authorName ?? t("widget.flatView.anonymous");
     } else {
       // Private/incognito/cron: always "You"
@@ -353,7 +353,7 @@ export const FlatMessage = memo(function FlatMessage({
   const isHighlighted = hoveredRef === postNum.toString();
   const directReplies = getDirectReplies(messages, message.id);
 
-  // Vote state — only for non-incognito, signed-in users
+  // Vote state - only for non-incognito, signed-in users
   const canVote =
     onVoteMessage && currentUserId && rootFolderId !== "incognito";
   const { userVote, voteScore } = getVoteStatus(message, currentUserId);
@@ -454,7 +454,7 @@ export const FlatMessage = memo(function FlatMessage({
           </Span>
         )}
 
-        {/* Vote score badge — always show if non-zero */}
+        {/* Vote score badge - always show if non-zero */}
         {(voteScore !== 0 || canVote) && (
           <Div className="flex items-center gap-0.5">
             {canVote && (

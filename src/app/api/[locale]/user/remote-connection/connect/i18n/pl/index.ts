@@ -6,16 +6,16 @@ export const translations = {
   widget: {
     signInDescription: "Zaloguj się, aby połączyć się ze zdalnym kontem.",
     benefit1:
-      "Wspomnienia synchronizują się automatycznie — wszystko czego uczysz AI przenosi się",
+      "Wspomnienia synchronizują się automatycznie - wszystko czego uczysz AI przenosi się",
     benefit2: "Dostęp do modeli AI w chmurze i narzędzi z lokalnej instancji",
     benefit3: "Kontekst podróżuje z tobą na wszystkich urządzeniach",
     adminBenefit1: "Wspomnienia synchronizują się dwukierunkowo, automatycznie",
     adminBenefit2:
       "AI w chmurze odkrywa i uruchamia twoje lokalne narzędzia (SSH, pliki, wykonywanie kodu)",
     adminBenefit3:
-      "Deleguj zadania z chmury do tej maszyny — Claude Code wykonuje lokalnie",
+      "Deleguj zadania z chmury do tej maszyny - Claude Code wykonuje lokalnie",
     adminBenefit4:
-      "Snapshot możliwości wysyłany przy każdej synchronizacji — Thea zawsze wie co ta instancja potrafi",
+      "Snapshot możliwości wysyłany przy każdej synchronizacji - Thea zawsze wie co ta instancja potrafi",
   },
   post: {
     title: "Połącz z kontem zdalnym",
@@ -60,7 +60,7 @@ export const translations = {
       description: "ID leada zdalnej instancji (ustawiane automatycznie)",
     },
     credentialWarning:
-      "Twoje dane logowania trafiają bezpośrednio z przeglądarki do serwera zdalnego. Jednak token przechowywany tutaj daje operatorowi tego serwera pełny dostęp do twojego zdalnego konta — może robić wszystko co ty. Łącz się tylko na serwerach, którym w pełni ufasz.",
+      "Twoje dane logowania trafiają bezpośrednio z przeglądarki do serwera zdalnego. Jednak token przechowywany tutaj daje operatorowi tego serwera pełny dostęp do twojego zdalnego konta - może robić wszystko co ty. Łącz się tylko na serwerach, którym w pełni ufasz.",
     actions: {
       submit: "Połącz",
       submitting: "Łączenie...",

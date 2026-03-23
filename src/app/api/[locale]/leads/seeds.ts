@@ -9,11 +9,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Countries, Languages } from "@/i18n/core/config";
 
-import { MessageStatus } from "../messenger/messages/enum";
 import {
   CampaignType,
   type CampaignTypeValue,
 } from "../messenger/accounts/enum";
+import { MessageStatus } from "../messenger/messages/enum";
 import {
   emailCampaigns,
   emailJourneyVariants,
@@ -410,7 +410,7 @@ function generateRandomLead(index: number): NewLead {
     campaignStage,
   );
 
-  // Generate timestamps based on status — spread over 1 year of history
+  // Generate timestamps based on status - spread over 1 year of history
   const createdAt = getRandomPastDate(365);
   const campaignStartedAt =
     campaignStage === EmailCampaignStage.NOT_STARTED
@@ -617,7 +617,7 @@ async function generateEmailCampaigns(
 }
 
 /**
- * Seed journey variants into DB (upsert — safe to run repeatedly)
+ * Seed journey variants into DB (upsert - safe to run repeatedly)
  */
 async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
   const variants: Array<{
@@ -740,9 +740,9 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
 
 /**
  * Controls what gets seeded in the dev environment:
- * - "none"           — only journey variants; no lead data
- * - "random"         — random leads with mixed statuses/stages (like it was before)
- * - "campaign_ready" — imported leads in NEW status / NOT_STARTED stage, ready to run a campaign
+ * - "none"           - only journey variants; no lead data
+ * - "random"         - random leads with mixed statuses/stages (like it was before)
+ * - "campaign_ready" - imported leads in NEW status / NOT_STARTED stage, ready to run a campaign
  */
 const SEED_MODE: "none" | "random" | "campaign_ready" = "random";
 
@@ -806,7 +806,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   await seedJourneyVariants(logger);
 
   if (SEED_MODE === "none") {
-    logger.debug("⏭️ SEED_MODE=none — skipping lead seeding");
+    logger.debug("⏭️ SEED_MODE=none - skipping lead seeding");
     return;
   }
 

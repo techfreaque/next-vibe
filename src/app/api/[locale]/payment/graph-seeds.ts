@@ -1,5 +1,5 @@
 /**
- * Payment Domain — Vibe Sense Graph Seeds
+ * Payment Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the payment domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,24 +7,24 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
+import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import { PAYMENTS_REVENUE_ALIAS } from "./data-sources/payments-revenue/constants";
 import { PAYMENTS_COUNT_ALIAS } from "./data-sources/payments-count/constants";
-import { PAYMENTS_FAILED_ALIAS } from "./data-sources/payments-failed/constants";
-import { PAYMENTS_REFUND_VOLUME_ALIAS } from "./data-sources/payments-refund-volume/constants";
-import { PAYMENTS_REFUND_COUNT_ALIAS } from "./data-sources/payments-refund-count/constants";
 import { PAYMENTS_DISPUTES_COUNT_ALIAS } from "./data-sources/payments-disputes-count/constants";
+import { PAYMENTS_FAILED_ALIAS } from "./data-sources/payments-failed/constants";
 import { PAYMENTS_INVOICES_PAID_ALIAS } from "./data-sources/payments-invoices-paid/constants";
 import { PAYMENTS_METHODS_ADDED_ALIAS } from "./data-sources/payments-methods-added/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { PAYMENTS_REFUND_COUNT_ALIAS } from "./data-sources/payments-refund-count/constants";
+import { PAYMENTS_REFUND_VOLUME_ALIAS } from "./data-sources/payments-refund-volume/constants";
+import { PAYMENTS_REVENUE_ALIAS } from "./data-sources/payments-revenue/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 

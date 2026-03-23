@@ -323,7 +323,7 @@ export const {
 });
 
 /**
- * Database enum array for Drizzle — explicit, as const
+ * Database enum array for Drizzle - explicit, as const
  */
 export const LeadStatusDB = [
   LeadStatus.NEW,

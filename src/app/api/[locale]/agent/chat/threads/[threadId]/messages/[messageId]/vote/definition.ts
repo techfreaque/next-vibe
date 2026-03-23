@@ -165,7 +165,7 @@ const { POST } = createEndpoint({
     description: "post.success.description",
   },
 
-  // Route to client (localStorage) for incognito threads — voting is a no-op there
+  // Route to client (localStorage) for incognito threads - voting is a no-op there
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {

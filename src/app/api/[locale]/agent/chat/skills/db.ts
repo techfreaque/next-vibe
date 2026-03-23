@@ -72,7 +72,7 @@ export const customSkills = pgTable("custom_skills", {
   // Memory budget in chars (null = inherit from user settings; overrides user default for this skill)
   memoryLimit: integer("memory_limit"),
 
-  // Tool configuration — null = inherit from settings (default)
+  // Tool configuration - null = inherit from settings (default)
   availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
   pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
   // Tools blocked at skill level regardless of favorites/user settings
@@ -84,7 +84,7 @@ export const customSkills = pgTable("custom_skills", {
   // Publishing status (DRAFT | PUBLISHED | UNLISTED)
   status: text("status").$type<typeof SkillStatusValue>(),
 
-  // Companion soul fragment — prepended to sub-agent system prompt on ai-run
+  // Companion soul fragment - prepended to sub-agent system prompt on ai-run
   companionPrompt: text("companion_prompt"),
 
   // Community store metrics (for published skills)
@@ -96,7 +96,7 @@ export const customSkills = pgTable("custom_skills", {
     .default(SkillTrustLevel.COMMUNITY)
     .$type<typeof SkillTrustLevelValue>(),
 
-  // Lightweight versioning — set when status transitions to PUBLISHED
+  // Lightweight versioning - set when status transitions to PUBLISHED
   publishedAt: timestamp("published_at"),
   changeNote: text("change_note"),
 

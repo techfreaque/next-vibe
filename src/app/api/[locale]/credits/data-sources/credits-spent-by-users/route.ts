@@ -1,5 +1,5 @@
 /**
- * Credits Spent By Users — Route
+ * Credits Spent By Users - Route
  * Server-only.
  */
 

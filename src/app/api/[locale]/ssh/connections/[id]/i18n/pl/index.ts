@@ -13,7 +13,7 @@ export const translations = {
   errors: {
     connectionNotFound: "Połączenie nie znalezione",
     encryptionFailed:
-      "Szyfrowanie nieudane — SSH_SECRET_KEY może być nieprawidłowy",
+      "Szyfrowanie nieudane - SSH_SECRET_KEY może być nieprawidłowy",
   },
 
   get: {

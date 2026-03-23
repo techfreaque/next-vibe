@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Script Transformer Compute
+ * Vibe Sense - Script Transformer Compute
  * Server-only pure computation. No DB access.
  * Executes a sandboxed user-supplied function over a time series.
  */

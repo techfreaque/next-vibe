@@ -17,8 +17,8 @@ import "server-only";
 import type { JSONValue } from "ai";
 import { eq } from "drizzle-orm";
 
-import { ResumeStreamRepository } from "@/app/api/[locale]/agent/ai-stream/resume-stream/repository";
 import { resumeStreamRequestSchema } from "@/app/api/[locale]/agent/ai-stream/resume-stream/definition";
+import { ResumeStreamRepository } from "@/app/api/[locale]/agent/ai-stream/resume-stream/repository";
 import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type {
   ToolCall,
@@ -87,20 +87,20 @@ function sortObjectKeys(obj: JSONValue): JSONValue {
 }
 
 export async function handleTaskCompletion(params: {
-  /** Typed revival context — read from cron_tasks wakeUp* columns (not from taskInput JSON) */
+  /** Typed revival context - read from cron_tasks wakeUp* columns (not from taskInput JSON) */
   toolMessageId: string;
   threadId: string | null;
   callbackMode: CallbackModeValue | null;
   status: string;
   output: ToolCallResult | null;
   taskId: string;
-  /** Revival routing — typed columns from the cron task row */
+  /** Revival routing - typed columns from the cron task row */
   modelId?: string | null;
   skillId?: string | null;
   favoriteId?: string | null;
-  /** Branch leaf message ID at tool-call time — typed column wakeUpLeafMessageId */
+  /** Branch leaf message ID at tool-call time - typed column wakeUpLeafMessageId */
   leafMessageId?: string | null;
-  /** userId of the task owner — resume-stream cron task must run as this user */
+  /** userId of the task owner - resume-stream cron task must run as this user */
   userId: string;
   logger: EndpointLogger;
   /**
@@ -164,7 +164,7 @@ export async function handleTaskCompletion(params: {
 
       if (existing) {
         const toolCall = existing.metadata?.toolCall;
-        // Apply sortObjectKeys to result for cache-stable serialization — same as ToolResultHandler
+        // Apply sortObjectKeys to result for cache-stable serialization - same as ToolResultHandler
         const stableResult =
           output !== null && output !== undefined
             ? (sortObjectKeys(
@@ -200,7 +200,7 @@ export async function handleTaskCompletion(params: {
           });
         } else {
           logger.info(
-            "[TaskCompletion] wakeUp — original untouched, deferred handled by resume-stream",
+            "[TaskCompletion] wakeUp - original untouched, deferred handled by resume-stream",
             { toolMessageId, taskId },
           );
         }
@@ -208,7 +208,7 @@ export async function handleTaskCompletion(params: {
         // For endLoop: insert a deferred result message so the result is visible
         // in UI and AI context even if the original is later compacted.
         // wakeUp: deferred insertion is handled by resume-stream (after stream dies).
-        // detach: never injects into the thread — result is only in task history.
+        // detach: never injects into the thread - result is only in task history.
         // Uses a new unique toolCallId; originalToolCallId links back to the original.
         const effectiveThreadId = threadId ?? existing.threadId;
         if (
@@ -299,7 +299,7 @@ export async function handleTaskCompletion(params: {
     });
   }
 
-  // 2b. For endLoop: task is done, no AI continuation — clear thread from "waiting" → "idle".
+  // 2b. For endLoop: task is done, no AI continuation - clear thread from "waiting" → "idle".
   //    The abort handler set thread to "waiting" when the stream died. Now that the task
   //    has completed (and TASK_COMPLETED WS was just emitted above), the UI can unlock.
   if (callbackMode === CallbackMode.END_LOOP && threadId) {
@@ -322,7 +322,7 @@ export async function handleTaskCompletion(params: {
       );
 
       logger.info(
-        "[TaskCompletion] endLoop — cleared thread from waiting to idle",
+        "[TaskCompletion] endLoop - cleared thread from waiting to idle",
         { threadId, taskId },
       );
     } catch (clearErr) {
@@ -347,17 +347,17 @@ export async function handleTaskCompletion(params: {
     try {
       const resumeTaskId = `resume-stream-${taskId}-${Date.now()}`;
 
-      // Build resume-stream input from typed columns only — never from raw taskInput JSON.
+      // Build resume-stream input from typed columns only - never from raw taskInput JSON.
       const resumeInput = resumeStreamRequestSchema.parse({
         threadId,
         callbackMode,
-        // Revival routing — from typed wakeUp* columns on the cron task row.
+        // Revival routing - from typed wakeUp* columns on the cron task row.
         ...(modelId ? { modelId } : {}),
         ...(skillId ? { skillId } : {}),
         ...(favoriteId ? { favoriteId } : {}),
         // Pass the tool message ID so resume-stream can find the original tool call metadata.
         ...(toolMessageId ? { wakeUpToolMessageId: toolMessageId } : {}),
-        // Branch leaf from typed column — resume-stream appends to the correct branch.
+        // Branch leaf from typed column - resume-stream appends to the correct branch.
         ...(leafMessageId ? { leafMessageId } : {}),
         // wakeUp: pass the task result so resume-stream can create the deferred TOOL message
         // without touching the original. Stored as object in taskInput JSONB.
@@ -415,7 +415,7 @@ export async function handleTaskCompletion(params: {
 
       // Direct fire: when user + locale are available (local flows), fire resume-stream
       // immediately instead of waiting for the cron pulse. The cron task above serves
-      // as a safety net — resume-stream's atomic isStreaming claim prevents double-firing.
+      // as a safety net - resume-stream's atomic isStreaming claim prevents double-firing.
       if (directResumeUser && directResumeLocale) {
         const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
         void ResumeStreamRepository.resume(

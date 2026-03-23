@@ -221,7 +221,7 @@ export class CreditRepository {
   }
 
   /**
-   * Read-only version of getUserPool — does NOT create wallets or trigger side effects.
+   * Read-only version of getUserPool - does NOT create wallets or trigger side effects.
    * Use for admin reads of another user's data.
    */
   private static async getUserPoolReadOnly(
@@ -822,14 +822,14 @@ export class CreditRepository {
     let freeCreditsSpentThisPeriod = 0;
 
     if (leadWallets.length > 0) {
-      // Use the current calendar period — all lead wallets in a pool share the
+      // Use the current calendar period - all lead wallets in a pool share the
       // same month after ensureMonthlyFreeCreditsForPool advances them together.
       const activePeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
       const leadWalletIds = leadWallets.map((w) => w.id);
 
       // Count ALL free-credit USAGE in this period across all lead wallets.
-      // Do NOT filter by latestGrant cutoff — after a pool merge, each lead has
+      // Do NOT filter by latestGrant cutoff - after a pool merge, each lead has
       // its own FREE_GRANT timestamp and filtering would miss the older lead's spending.
       const usageTransactions = await db
         .select()
@@ -1349,7 +1349,7 @@ export class CreditRepository {
         return poolResult;
       }
 
-      // Monthly free credit reset (side effect — must happen before balance read)
+      // Monthly free credit reset (side effect - must happen before balance read)
       await CreditRepository.ensureMonthlyFreeCreditsForPool(
         poolResult.data,
         logger,
@@ -1699,7 +1699,7 @@ export class CreditRepository {
           })
           .returning();
 
-        // Atomic SQL increment — prevents lost updates from concurrent writes
+        // Atomic SQL increment - prevents lost updates from concurrent writes
         const [updated] = await tx
           .update(creditWallets)
           .set({
@@ -1826,7 +1826,7 @@ export class CreditRepository {
           })
           .returning();
 
-        // Atomic SQL increment — prevents lost updates from concurrent writes
+        // Atomic SQL increment - prevents lost updates from concurrent writes
         const [updated] = await tx
           .update(creditWallets)
           .set({
@@ -2463,7 +2463,7 @@ export class CreditRepository {
     }>
   > {
     try {
-      // Read-only pool fetch — does NOT create wallets or trigger side effects
+      // Read-only pool fetch - does NOT create wallets or trigger side effects
       const poolResult = await CreditRepository.getUserPoolReadOnly(
         userId,
         logger,
@@ -3733,7 +3733,7 @@ export class CreditRepository {
           })
           .returning();
 
-        // Atomic SQL increment — prevents lost updates from concurrent writes
+        // Atomic SQL increment - prevents lost updates from concurrent writes
         const [updated] = await tx
           .update(creditWallets)
           .set({

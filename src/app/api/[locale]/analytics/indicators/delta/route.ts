@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Delta Route
+ * Vibe Sense - Delta Route
  * Server-only.
  */
 

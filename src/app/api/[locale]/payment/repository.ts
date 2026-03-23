@@ -130,7 +130,7 @@ export class PaymentRepository {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: {
             error:
-              "Stripe is not configured — set STRIPE_SECRET_KEY in your .env",
+              "Stripe is not configured - set STRIPE_SECRET_KEY in your .env",
           },
         });
       }
@@ -622,7 +622,7 @@ export class PaymentRepository {
   }
 
   /**
-   * Handle invoice.created — pre-grant credits before payment confirmation.
+   * Handle invoice.created - pre-grant credits before payment confirmation.
    * This ensures users have credits immediately when a new billing period starts,
    * even if payment takes time or fails temporarily.
    */
@@ -755,7 +755,7 @@ export class PaymentRepository {
   }
 
   /**
-   * Handle invoice.voided — revoke pre-granted credits if invoice is voided.
+   * Handle invoice.voided - revoke pre-granted credits if invoice is voided.
    * This can happen if Stripe voids an invoice (e.g., subscription changed before payment).
    */
   private static async handleInvoiceVoided(
@@ -895,7 +895,7 @@ export class PaymentRepository {
   }
 
   /**
-   * Handle checkout.session.expired — clean up PENDING transactions.
+   * Handle checkout.session.expired - clean up PENDING transactions.
    */
   private static async handleCheckoutSessionExpired(
     data: WebhookData,
@@ -946,7 +946,7 @@ export class PaymentRepository {
         },
       );
 
-      // Find transaction by session ID first — it holds the authoritative userId
+      // Find transaction by session ID first - it holds the authoritative userId
       const [transaction] = await db
         .select()
         .from(paymentTransactions)
@@ -960,7 +960,7 @@ export class PaymentRepository {
         return;
       }
 
-      // Look up user's locale from DB — the transaction userId is the source of truth
+      // Look up user's locale from DB - the transaction userId is the source of truth
       const [userRecord] = await db
         .select({ locale: users.locale })
         .from(users)
@@ -969,7 +969,7 @@ export class PaymentRepository {
 
       if (!userRecord) {
         logger.warn(
-          "User not found for transaction — cannot process checkout",
+          "User not found for transaction - cannot process checkout",
           {
             sessionId,
             userId: transaction.userId,

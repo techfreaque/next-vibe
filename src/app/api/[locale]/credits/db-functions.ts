@@ -1,7 +1,7 @@
 /**
  * Credit DB Functions
  *
- * All queries written in Drizzle — compiled to SQL at deploy time.
+ * All queries written in Drizzle - compiled to SQL at deploy time.
  * Row types are 100% inferred from the schema: no hand-written shapes.
  * Logic is a typed TypeScript function serialized to PL/v8 at deploy time.
  *
@@ -21,7 +21,7 @@ import { creditPacks, creditTransactions, creditWallets } from "./db";
 
 // plv8 is a global injected by PostgreSQL's V8 engine at runtime.
 // Declared here for type safety inside the logic function body.
-// Does NOT exist in Node.js — logic is serialized and deployed to PL/v8.
+// Does NOT exist in Node.js - logic is serialized and deployed to PL/v8.
 declare const plv8: Plv8Global;
 
 export const getPoolBalance = defineDbFunction({
@@ -309,7 +309,7 @@ export const getPoolBalance = defineDbFunction({
     // ── Step 3: Load wallets and aggregate balances ───────────────────────
     const allWallets = isUserPool ? q.walletsForUser() : q.walletsForLead();
 
-    // Deduplicate by wallet ID — the user pool OR conditions may return the same
+    // Deduplicate by wallet ID - the user pool OR conditions may return the same
     // wallet twice if the current session lead is also already in userLeadLinks
     const seenIds = new Set<string>();
     const wallets = allWallets.filter((w) => {

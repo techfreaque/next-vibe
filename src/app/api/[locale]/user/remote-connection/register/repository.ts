@@ -99,7 +99,7 @@ export class RemoteConnectionRegisterRepository {
     // execute-tool to set targetInstance correctly when routing tasks back to this client.
     // reverseToken: JWT from the connecting instance, encrypted before storage. Enables
     // this instance to call /report on the connector (push task completion status back).
-    // Reconnect is allowed — update localUrl/isActive if the record already exists.
+    // Reconnect is allowed - update localUrl/isActive if the record already exists.
     const encryptedReverseToken = reverseToken
       ? RemoteConnectionRepository.encryptToken(reverseToken)
       : null;
@@ -176,7 +176,7 @@ export class RemoteConnectionRegisterRepository {
         }
       } else {
         logger.info(
-          "[REGISTER] Local instance not directly accessible — using task-queue",
+          "[REGISTER] Local instance not directly accessible - using task-queue",
           {
             instanceId,
             localUrl,

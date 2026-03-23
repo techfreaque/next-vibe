@@ -370,7 +370,7 @@ export const translations = {
       activeBadge: "Active",
       greeting: "Hey {{privateName}},",
       intro:
-        "Your {{appName}} subscription is confirmed and ready. You have 800 credits every month across all models — no daily caps, no content filters, no explanations required.",
+        "Your {{appName}} subscription is confirmed and ready. You have 800 credits every month across all models - no daily caps, no content filters, no explanations required.",
       models: {
         title: "{{modelCount}} models, 3 categories",
         mainstream: "Mainstream",

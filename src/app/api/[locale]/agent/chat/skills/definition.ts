@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   navigateButtonField,
   objectField,
   requestField,
@@ -29,13 +29,13 @@ import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId, TOTAL_MODEL_COUNT } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import createFavoriteDefinitions from "../favorites/create/definition";
-import { SKILLS_LIST_ALIAS, NO_SKILL_ID } from "./constants";
+import { NO_SKILL_ID, SKILLS_LIST_ALIAS } from "./constants";
 import {
-  SkillCategory,
-  SkillCategoryDB,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillCategoryDB,
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
 } from "./enum";
@@ -219,7 +219,7 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
 
-      // Pagination metadata (AI/MCP platform only — null for human callers)
+      // Pagination metadata (AI/MCP platform only - null for human callers)
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,

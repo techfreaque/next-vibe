@@ -23,7 +23,7 @@ export const COMPACT_TRIGGER = 32_000;
 export const COMPACT_TRIGGER_PERCENTAGE = 0.6;
 
 /**
- * Stream abort reasons — typed enum for control flow.
+ * Stream abort reasons - typed enum for control flow.
  * Used as the `reason` property on StreamAbortError.
  */
 export enum AbortReason {
@@ -38,7 +38,7 @@ export enum AbortReason {
 }
 
 /**
- * Typed error for stream aborts — no string matching needed.
+ * Typed error for stream aborts - no string matching needed.
  * Use `instanceof StreamAbortError` to check, then `.reason` for the enum.
  */
 export class StreamAbortError extends Error {

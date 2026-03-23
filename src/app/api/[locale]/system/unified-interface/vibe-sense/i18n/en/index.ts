@@ -425,7 +425,7 @@ export const translations = {
   indicators: {
     ema: {
       description:
-        "Exponential Moving Average — weights recent prices more heavily",
+        "Exponential Moving Average - weights recent prices more heavily",
       input: { source: { label: "Source" } },
       output: { value: { label: "EMA" } },
       params: {
@@ -433,7 +433,7 @@ export const translations = {
       },
     },
     rsi: {
-      description: "Relative Strength Index — momentum oscillator (0–100)",
+      description: "Relative Strength Index - momentum oscillator (0–100)",
       input: { source: { label: "Source" } },
       output: { value: { label: "RSI" } },
       params: {
@@ -442,7 +442,7 @@ export const translations = {
     },
     bollinger: {
       description:
-        "Bollinger Bands — volatility envelope around a moving average",
+        "Bollinger Bands - volatility envelope around a moving average",
       input: { source: { label: "Source" } },
       output: {
         upper: { label: "Upper Band" },
@@ -458,7 +458,7 @@ export const translations = {
       },
     },
     macd: {
-      description: "MACD — trend-following momentum indicator",
+      description: "MACD - trend-following momentum indicator",
       input: { source: { label: "Source" } },
       output: {
         macd: { label: "MACD" },
@@ -725,7 +725,7 @@ export const translations = {
     },
     script: {
       description:
-        "Sandboxed custom evaluator — receives input series, returns signal events",
+        "Sandboxed custom evaluator - receives input series, returns signal events",
       input: { inputs: { label: "Inputs" } },
       output: { signal: { label: "Signal" } },
       params: {

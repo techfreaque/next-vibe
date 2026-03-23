@@ -6,7 +6,7 @@
 
 ## Core Concept
 
-A **node** is a regular next-vibe endpoint — same `definition.ts` + `route.ts` as everything else. A **graph** wires nodes together with edges. An **edge** connects one node's output field to another node's input field. The field names on each end of the edge are the handle names.
+A **node** is a regular next-vibe endpoint - same `definition.ts` + `route.ts` as everything else. A **graph** wires nodes together with edges. An **edge** connects one node's output field to another node's input field. The field names on each end of the edge are the handle names.
 
 There is no node type system. No indicator vs evaluator vs transformer distinction at the config level. Every node is `{ endpointPath, params }`. The engine treats them identically.
 
@@ -57,9 +57,9 @@ Every node endpoint follows the standard 3-file pattern. Field helpers from `vib
 
 | Field        | Type         | Default | Notes                                                       |
 | ------------ | ------------ | ------- | ----------------------------------------------------------- |
-| `source`     | `TimeSeries` | —       | Primary input series. Omitted on root nodes (data sources). |
+| `source`     | `TimeSeries` | -       | Primary input series. Omitted on root nodes (data sources). |
 | `resolution` | `Resolution` | `"1d"`  | Computation timeframe.                                      |
-| `range`      | `TimeRange`  | —       | Injected by engine from graph-level range.                  |
+| `range`      | `TimeRange`  | -       | Injected by engine from graph-level range.                  |
 | `lookback`   | `number`     | `0`     | Extra bars before `range.from` for warm-up.                 |
 
 Endpoints with multiple `TimeSeries` inputs use named fields instead of `source` (e.g. `a`, `b` for ratio).
@@ -72,7 +72,7 @@ Endpoints with multiple `TimeSeries` inputs use named fields instead of `source`
 | `signals` | `SignalEvent[]` | Condition check results (fired/not-fired per timestamp).     |
 | `meta`    | `NodeMeta`      | Execution metadata.                                          |
 
-An endpoint outputs `result`, or `signals`, or named series fields — whichever its logic produces. The engine reads whatever the `outputField` config points to (default `"result"`), and separately checks for `signals`.
+An endpoint outputs `result`, or `signals`, or named series fields - whichever its logic produces. The engine reads whatever the `outputField` config points to (default `"result"`), and separately checks for `signals`.
 
 ### Custom Parameters
 
@@ -80,7 +80,7 @@ Beyond the standard fields, endpoints declare their own parameters as regular re
 
 ### Graph Behavior Markers
 
-Endpoint definitions declare intrinsic properties that the engine uses during graph execution. These are properties of the endpoint itself, not of the graph config — they describe what this endpoint _is_, not how a user configures it.
+Endpoint definitions declare intrinsic properties that the engine uses during graph execution. These are properties of the endpoint itself, not of the graph config - they describe what this endpoint _is_, not how a user configures it.
 
 ```typescript
 // On the endpoint definition:
@@ -97,9 +97,9 @@ graphNode?: {
 | `sideEffect`   | `false`  | `true`: endpoint has external effects (send email, trigger AI run). Engine skips in readOnly/chart mode. Backtest passes `actionMode: "simulate"`.                            |
 | `cacheable`    | `true`   | `true`: same inputs → same outputs. Engine can reuse results within a run and across runs for overlapping ranges. `false`: always re-execute (live prices, random, stateful). |
 
-- **`backtestMode: "rolling"`** — PnL tracking, position sizing, trade simulation. Each call gets `{ from: rangeStart, to: currentBar }`.
-- **`sideEffect: true`** — replaces the gating heuristic of checking "evaluator" in the alias. The engine knows definitively which nodes have side effects.
-- **`cacheable: false`** — live market data feeds, endpoints with internal randomness, anything where the same range can return different results on different calls.
+- **`backtestMode: "rolling"`** - PnL tracking, position sizing, trade simulation. Each call gets `{ from: rangeStart, to: currentBar }`.
+- **`sideEffect: true`** - replaces the gating heuristic of checking "evaluator" in the alias. The engine knows definitively which nodes have side effects.
+- **`cacheable: false`** - live market data feeds, endpoints with internal randomness, anything where the same range can return different results on different calls.
 
 Data sources and indicators: `{ cacheable: true }`. Transformers: `{ cacheable: true }`. Evaluators: `{ cacheable: true }`. Action endpoints: `{ sideEffect: true, cacheable: false }`.
 
@@ -124,7 +124,7 @@ The engine resolves edge wiring as follows:
 2. Inject the series into the target node's input at `toHandle ?? "source"`.
 3. `params` entries provide non-series static parameters.
 
-**Example — single input:**
+**Example - single input:**
 
 ```
 leads-created → ema (period=14)
@@ -135,7 +135,7 @@ edges: [{ from: "leads_created", to: "ema_14" }];
 // Engine: ema_14.source = leads_created.result
 ```
 
-**Example — multi input:**
+**Example - multi input:**
 
 ```
 leads-converted → ratio.a
@@ -151,7 +151,7 @@ edges: [
 //         conversion_rate.b = leads_created.result
 ```
 
-**Example — multi output:**
+**Example - multi output:**
 
 ```
 bollinger.upper → threshold.source
@@ -172,7 +172,7 @@ The builder validates this on save by resolving endpoint schemas and checking fi
 
 ## Signals
 
-Signals are a **side-channel**, not an edge-connectable output. An endpoint that produces signals declares a `signals: SignalEvent[]` response field using `customResponseField` — it has no `FieldDataType.TIME_SERIES`, so the builder doesn't render a handle for it.
+Signals are a **side-channel**, not an edge-connectable output. An endpoint that produces signals declares a `signals: SignalEvent[]` response field using `customResponseField` - it has no `FieldDataType.TIME_SERIES`, so the builder doesn't render a handle for it.
 
 The engine checks for signals after every node execution. Signals affect downstream behavior via **gating** (see Execution section), not via edge wiring.
 
@@ -215,7 +215,7 @@ Stores the endpoint **alias** from the generated alias-map (e.g. `"ema"`, `"thre
 
 `outputField` controls which response field the engine stores as this node's **primary** resolved output (keyed by node id in `resolvedSeries`). Default: `"result"`.
 
-`fromHandle` on an edge selects which output a **downstream** node reads. For single-output nodes both are the same. For multi-output nodes (e.g. Bollinger with `upper`, `middle`, `lower`), the engine also scans all response fields — any that parse as `TimeSeries` get stored as `"nodeId:fieldName"`. A downstream edge uses `fromHandle: "upper"` to pick a specific one.
+`fromHandle` on an edge selects which output a **downstream** node reads. For single-output nodes both are the same. For multi-output nodes (e.g. Bollinger with `upper`, `middle`, `lower`), the engine also scans all response fields - any that parse as `TimeSeries` get stored as `"nodeId:fieldName"`. A downstream edge uses `fromHandle: "upper"` to pick a specific one.
 
 ### Parameters
 
@@ -243,13 +243,13 @@ trigger fires (cron / manual / chart request)
   → record pipeline_run
 ```
 
-In-process dispatch via `RouteExecutionExecutor` — no HTTP. Auth context = system user for cron, graph owner's JWT for manual/chart. Same dispatch mechanism as cron tasks and AI tool calls.
+In-process dispatch via `RouteExecutionExecutor` - no HTTP. Auth context = system user for cron, graph owner's JWT for manual/chart. Same dispatch mechanism as cron tasks and AI tool calls.
 
 ### Resolution
 
 Resolution resolves as: `nodeConfig.resolution ?? graphConfig.resolution ?? "1d"`. The graph-level resolution is the default for all nodes; per-node overrides are for mixed-resolution graphs (e.g. a `1h` data source feeding a `1d` indicator).
 
-The engine doesn't resample between nodes — if you wire a `1h` EMA into a `1d` threshold, the threshold gets hourly data. This is by design: the user controls resolution per node or adds a transformer.
+The engine doesn't resample between nodes - if you wire a `1h` EMA into a `1d` threshold, the threshold gets hourly data. This is by design: the user controls resolution per node or adds a transformer.
 
 In chart mode, if the display resolution differs from the node's resolution, the engine scales up (forward-fill) for rendering.
 
@@ -261,7 +261,7 @@ In chart mode, if the display resolution differs from the node's resolution, the
 | **Chart**    | Last N bars at selected resolution | Full DAG. Read persisted data first, compute rest on-the-fly. `readOnly: true`.              |
 | **Backtest** | User-specified historical range    | Mixed bulk/rolling per node. `actionMode: "simulate"` on side-effect nodes.                  |
 
-**Sinks** — a node is a sink if it has `persist: "always"` or `sideEffect: true`. In cron mode, the engine prunes nodes that aren't on a path to any sink (pure intermediate compute with no persistence and no side effects).
+**Sinks** - a node is a sink if it has `persist: "always"` or `sideEffect: true`. In cron mode, the engine prunes nodes that aren't on a path to any sink (pure intermediate compute with no persistence and no side effects).
 
 ### Backtest
 
@@ -269,7 +269,7 @@ Backtesting replays a graph over a historical range. The engine supports two sim
 
 | Mode        | Behavior                                                                                                                                                                                                                                           |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `"bulk"`    | Default. Engine calls the endpoint once with the full range. Data sources and indicators work this way — they compute over the entire window at once.                                                                                              |
+| `"bulk"`    | Default. Engine calls the endpoint once with the full range. Data sources and indicators work this way - they compute over the entire window at once.                                                                                              |
 | `"rolling"` | Engine calls the endpoint bar-by-bar, advancing the window one resolution step at a time. Used for nodes that need cumulative state (e.g. PnL tracking, position sizing, trade simulation). Each call gets `{ from: rangeStart, to: currentBar }`. |
 
 A graph can mix both modes. The engine processes the topological order per bar for rolling nodes, but pre-computes bulk nodes once upfront. Rolling nodes receive their upstream data sliced to the current bar.
@@ -286,7 +286,7 @@ interface BacktestConfig {
 }
 ```
 
-`actionMode: "simulate"` is passed to action endpoints — they skip actual side effects but return a response (e.g. simulated trade result) for analysis. `actionMode: "execute"` runs actions for real (rare — used for replay/recovery).
+`actionMode: "simulate"` is passed to action endpoints - they skip actual side effects but return a response (e.g. simulated trade result) for analysis. `actionMode: "execute"` runs actions for real (rare - used for replay/recovery).
 
 Backtest results are stored in `pipeline_backtests` + `pipeline_datapoints` (tagged with `backtestRunId`). The chart widget can overlay backtest results on the live chart.
 
@@ -298,16 +298,16 @@ The engine walks the DAG backwards from each side-effect node to find the neares
 
 ### Action Nodes
 
-Action nodes are regular endpoints with `sideEffect: true` wired downstream of an evaluator. There is no special "action" type — any endpoint can be an action. Typical actions:
+Action nodes are regular endpoints with `sideEffect: true` wired downstream of an evaluator. There is no special "action" type - any endpoint can be an action. Typical actions:
 
-- **AI run** — trigger an agent conversation
-- **Send message** — email, SMS, push notification
-- **Contact form** — submit a form
-- **Webhook** — POST to an external URL
+- **AI run** - trigger an agent conversation
+- **Send message** - email, SMS, push notification
+- **Contact form** - submit a form
+- **Webhook** - POST to an external URL
 
 The canonical graph pattern: `data source → indicator(s) → evaluator → action endpoint`. The evaluator produces signals; the action endpoint only executes when a signal fires.
 
-In backtest mode, action nodes receive `actionMode: "simulate"` — endpoints that support this flag skip the actual side effect but return a response for PnL tracking and analysis.
+In backtest mode, action nodes receive `actionMode: "simulate"` - endpoints that support this flag skip the actual side effect but return a response for PnL tracking and analysis.
 
 ### Error Handling
 
@@ -346,7 +346,7 @@ The graph builder derives handles from the endpoint's field definitions:
 - Handle id = field name (`source`, `a`, `b`, `result`, `upper`, `middle`, `lower`, etc.)
 - Handle label = field label from `scopedTranslation`
 
-`signals` uses `customResponseField` without `FieldDataType.TIME_SERIES` — no handle. Signals are not edge-connectable.
+`signals` uses `customResponseField` without `FieldDataType.TIME_SERIES` - no handle. Signals are not edge-connectable.
 
 Multi-output example (Bollinger): three output handles `upper`, `middle`, `lower`.
 Multi-input example (ratio): two input handles `a`, `b`.
@@ -368,14 +368,14 @@ Palette items show: endpoint alias and category badge.
 
 Unified for all nodes. Shows:
 
-- **Endpoint** — alias (read-only)
-- **Resolution** — override picker
-- **Lookback** — override number
-- **Parameters** — key-value editor for `params`. New entries can be added. Values auto-coerced (numbers, booleans, strings).
-- **Output Field** — which response field is the primary output (default: `"result"`)
-- **Persist** — always / never / snapshot
-- **Display** — color picker, pane selector, visibility toggle
-- **Validation errors** — inline error list if any
+- **Endpoint** - alias (read-only)
+- **Resolution** - override picker
+- **Lookback** - override number
+- **Parameters** - key-value editor for `params`. New entries can be added. Values auto-coerced (numbers, booleans, strings).
+- **Output Field** - which response field is the primary output (default: `"result"`)
+- **Persist** - always / never / snapshot
+- **Display** - color picker, pane selector, visibility toggle
+- **Validation errors** - inline error list if any
 
 No type-specific inspector panels. Every node gets the same UI.
 
@@ -391,7 +391,7 @@ Invalid connections are rejected with a toast message.
 
 ### Node Visuals
 
-Nodes display a category badge and colored border derived from their endpoint's `category` field (not from the alias string). Categories: data-source, indicator, transformer, evaluator, other. Visual distinction is purely cosmetic — the engine doesn't use it.
+Nodes display a category badge and colored border derived from their endpoint's `category` field (not from the alias string). Categories: data-source, indicator, transformer, evaluator, other. Visual distinction is purely cosmetic - the engine doesn't use it.
 
 ---
 
@@ -401,11 +401,11 @@ The chart view (at `graphs/[id]/data/`) renders persisted and computed series us
 
 ### Layout
 
-- **Resolution selector** — row of resolution buttons at top
-- **Multi-pane chart** — nodes with different `pane` values render in separate vertically stacked chart panes
-- **Floating legend** — series name + last value, one row per visible series
-- **Crosshair tooltip** — shows all series values at the cursor timestamp
-- **Signal markers** — vertical lines at timestamps where signals fired
+- **Resolution selector** - row of resolution buttons at top
+- **Multi-pane chart** - nodes with different `pane` values render in separate vertically stacked chart panes
+- **Floating legend** - series name + last value, one row per visible series
+- **Crosshair tooltip** - shows all series values at the cursor timestamp
+- **Signal markers** - vertical lines at timestamps where signals fired
 
 ### Interaction
 
@@ -495,21 +495,21 @@ const config: GraphConfig = {
 
 ### Persist Modes
 
-`persist: "always"` — datapoints written on every run, read on chart requests.
-`persist: "never"` — computed on-the-fly every time (volatile transforms, intermediate compute).
-`persist: "snapshot"` — written once, never overwritten (point-in-time capture).
+`persist: "always"` - datapoints written on every run, read on chart requests.
+`persist: "never"` - computed on-the-fly every time (volatile transforms, intermediate compute).
+`persist: "snapshot"` - written once, never overwritten (point-in-time capture).
 
 ### Datapoint Keying
 
-`pipeline_datapoints` is keyed by `(graphId, nodeId, timestamp)`. Not by `endpointPath` — two nodes using the same endpoint with different params (e.g. `ema_14` and `ema_50`) are separate series. The node id is the unique identifier within a graph.
+`pipeline_datapoints` is keyed by `(graphId, nodeId, timestamp)`. Not by `endpointPath` - two nodes using the same endpoint with different params (e.g. `ema_14` and `ema_50`) are separate series. The node id is the unique identifier within a graph.
 
 ### Caching
 
 Two levels of caching, both gated by `cacheable: true` on the endpoint definition:
 
-**Intra-run cache** — within a single graph execution, if the engine would call the same endpoint with identical inputs (same range, resolution, params), it reuses the result. This happens when the same data source feeds multiple branches.
+**Intra-run cache** - within a single graph execution, if the engine would call the same endpoint with identical inputs (same range, resolution, params), it reuses the result. This happens when the same data source feeds multiple branches.
 
-**Cross-run cache** — on chart requests (`readOnly: true`), the engine reads from `pipeline_datapoints` for nodes with `persist: "always"` before executing. If persisted data covers the requested range, the node is skipped entirely. For cron runs, persisted data is not read — the engine always computes fresh results for the delta range.
+**Cross-run cache** - on chart requests (`readOnly: true`), the engine reads from `pipeline_datapoints` for nodes with `persist: "always"` before executing. If persisted data covers the requested range, the node is skipped entirely. For cron runs, persisted data is not read - the engine always computes fresh results for the delta range.
 
 Endpoints with `cacheable: false` are always re-executed regardless of persist mode.
 
@@ -519,11 +519,11 @@ Endpoints with `cacheable: false` are always re-executed regardless of persist m
 
 Graphs have an `ownerType`: `"system"` (seeded), `"admin"` (created by admin), or `"user"` (created by user).
 
-- **System graphs** — created by seeds, editable by admins, visible to all admins
-- **Admin graphs** — created via builder, scoped to the admin who created them
-- **User graphs** — users create personal analytics dashboards. Node endpoints use `allowedRoles` to control access — users can only wire endpoints they have permission to call.
+- **System graphs** - created by seeds, editable by admins, visible to all admins
+- **Admin graphs** - created via builder, scoped to the admin who created them
+- **User graphs** - users create personal analytics dashboards. Node endpoints use `allowedRoles` to control access - users can only wire endpoints they have permission to call.
 
-Engine execution uses a system user context for cron runs. Manual execution and chart requests use the requesting user's JWT. Each node endpoint checks its own `allowedRoles` — the engine doesn't bypass auth.
+Engine execution uses a system user context for cron runs. Manual execution and chart requests use the requesting user's JWT. Each node endpoint checks its own `allowedRoles` - the engine doesn't bypass auth.
 
 ---
 
@@ -533,10 +533,10 @@ Every save creates a new immutable version in `pipeline_versions`. The graph alw
 
 ### Version Management
 
-- **Version list** — browsable history showing timestamp, diff summary, and which version is active
-- **Switch** — activate any previous version. The graph immediately runs against the selected version on next trigger.
-- **Delete** — remove a version (with confirmation). Cannot delete the active version.
-- **Diff** — visual comparison between two versions showing added/removed/changed nodes and edges
+- **Version list** - browsable history showing timestamp, diff summary, and which version is active
+- **Switch** - activate any previous version. The graph immediately runs against the selected version on next trigger.
+- **Delete** - remove a version (with confirmation). Cannot delete the active version.
+- **Diff** - visual comparison between two versions showing added/removed/changed nodes and edges
 
 The edit endpoint always forks from the current active version. Saving creates a new version and activates it. Switching to an old version and editing forks from that version.
 

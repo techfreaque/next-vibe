@@ -1,5 +1,5 @@
 /**
- * Vibe Frame — Inside Bridge
+ * Vibe Frame - Inside Bridge
  *
  * Runs inside the iframe (loaded by vibe-frame-hydrate.js or similar).
  * Provides window.bridgeCall for widget code to call privileged parent APIs:

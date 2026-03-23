@@ -60,7 +60,7 @@ export const {
     schema: z.string().url().default(DEFAULT_PROJECT_URL),
     value: process.env.NEXT_PUBLIC_PROJECT_URL,
     example: DEFAULT_PROJECT_URL,
-    comment: `Project URL — defaults to ${DEFAULT_PROJECT_URL}. Override to use your own domain.`,
+    comment: `Project URL - defaults to ${DEFAULT_PROJECT_URL}. Override to use your own domain.`,
     commented: true,
   },
   NEXT_PUBLIC_LOCAL_MODE: {

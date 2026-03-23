@@ -372,14 +372,14 @@ export class PulseHealthRepository {
     locale: CountryLanguage;
   } | null> {
     if (!userId) {
-      // System task — use the cached admin user
+      // System task - use the cached admin user
       if (!adminAuthResult?.success || !adminAuthResult.data) {
         return null;
       }
       return { user: adminAuthResult.data, locale: systemLocale };
     }
 
-    // User task — resolve locale, roles, and leadId
+    // User task - resolve locale, roles, and leadId
     let userLocale: CountryLanguage = systemLocale;
     const ownerRow = await db
       .select({ locale: usersTable.locale })
@@ -517,7 +517,7 @@ export class PulseHealthRepository {
         if (dbTask.lastExecutionStatus === CronTaskStatus.RUNNING) {
           tasksSkipped.push(dbTask.displayName);
           logger.debug(
-            `Pulse: skipping task "${dbTask.displayName}" — still running from previous pulse`,
+            `Pulse: skipping task "${dbTask.displayName}" - still running from previous pulse`,
           );
           continue;
         }
@@ -537,7 +537,7 @@ export class PulseHealthRepository {
             .where(
               and(
                 eq(cronTasksTable.id, dbTask.id),
-                // NULL != 'running' is NULL in SQL (three-value logic) — must explicitly handle NULL
+                // NULL != 'running' is NULL in SQL (three-value logic) - must explicitly handle NULL
                 or(
                   isNull(cronTasksTable.lastExecutionStatus),
                   ne(
@@ -569,7 +569,7 @@ export class PulseHealthRepository {
         if (!claimed) {
           tasksSkipped.push(dbTask.displayName);
           logger.debug(
-            `Pulse: skipping task "${dbTask.displayName}" — claimed by another instance`,
+            `Pulse: skipping task "${dbTask.displayName}" - claimed by another instance`,
           );
           continue;
         }
@@ -844,7 +844,7 @@ export class PulseHealthRepository {
 
             // If task has callback context (set by wait-for-task or execute-tool AI path),
             // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
-            // Read from typed wakeUp* columns — not from untyped taskInput JSON blob.
+            // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
             const taskCallbackMode =
               (dbTask.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
             const taskThreadId = dbTask.wakeUpThreadId ?? null;

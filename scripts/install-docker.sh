@@ -21,7 +21,7 @@ done
 echo "Running migrations..."
 if ! $COMPOSE run --rm app \
   bun src/app/api/\[locale\]/system/unified-interface/cli/vibe-runtime.ts migrate; then
-  echo "ERROR: Migration failed! Old container is still running — prod is NOT down."
+  echo "ERROR: Migration failed! Old container is still running - prod is NOT down."
   echo "Fix the migration and re-run this script."
   exit 1
 fi
@@ -52,7 +52,7 @@ until $COMPOSE exec -T app wget -q --server-response -O /dev/null http://localho
   sleep 2
 done
 
-echo "Deployment successful — new app is responding."
+echo "Deployment successful - new app is responding."
 echo "Cleaning up docker resources..."
 docker system prune -a -f
 docker volume prune -a -f

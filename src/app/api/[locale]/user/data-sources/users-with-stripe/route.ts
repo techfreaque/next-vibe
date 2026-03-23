@@ -1,5 +1,5 @@
 /**
- * Users With Stripe — Route
+ * Users With Stripe - Route
  * Server-only.
  */
 

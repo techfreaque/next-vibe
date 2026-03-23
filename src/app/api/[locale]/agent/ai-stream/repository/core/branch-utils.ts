@@ -3,7 +3,7 @@
  *
  * When inserting deferred messages (wakeUp revival, approve confirmation),
  * the deferred result must be appended to the *current tip* of the branch
- * that was active when the tool was called — not a stale leafMessageId and
+ * that was active when the tool was called - not a stale leafMessageId and
  * not the global latest message (which may be on a different branch).
  *
  * walkToLeafMessage walks forward from a given message ID following the

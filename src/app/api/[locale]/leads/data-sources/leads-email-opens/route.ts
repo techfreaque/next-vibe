@@ -1,5 +1,5 @@
 /**
- * Leads Email Opens — Route
+ * Leads Email Opens - Route
  * Server-only.
  */
 

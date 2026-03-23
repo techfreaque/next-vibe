@@ -1,5 +1,5 @@
 /**
- * Leads Domain — Vibe Sense Graph Seeds
+ * Leads Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the leads domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,30 +7,30 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
+import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import { LEADS_CREATED_ALIAS } from "./data-sources/leads-created/constants";
-import { LEADS_CONVERTED_ALIAS } from "./data-sources/leads-converted/constants";
-import { LEADS_BOUNCED_ALIAS } from "./data-sources/leads-bounced/constants";
 import { LEADS_ACTIVE_ALIAS } from "./data-sources/leads-active/constants";
-import { LEADS_EMAILS_SENT_ALIAS } from "./data-sources/leads-emails-sent/constants";
-import { LEADS_EMAIL_OPENS_ALIAS } from "./data-sources/leads-email-opens/constants";
-import { LEADS_EMAIL_CLICKS_ALIAS } from "./data-sources/leads-email-clicks/constants";
-import { LEADS_UNSUBSCRIBED_ALIAS } from "./data-sources/leads-unsubscribed/constants";
+import { LEADS_BOUNCED_ALIAS } from "./data-sources/leads-bounced/constants";
 import { LEADS_CAMPAIGN_RUNNING_ALIAS } from "./data-sources/leads-campaign-running/constants";
-import { LEADS_NEWSLETTER_SUBSCRIBERS_ALIAS } from "./data-sources/leads-newsletter-subscribers/constants";
-import { LEADS_WEBSITE_USERS_ALIAS } from "./data-sources/leads-website-users/constants";
-import { LEADS_IN_CONTACT_ALIAS } from "./data-sources/leads-in-contact/constants";
+import { LEADS_CONVERTED_ALIAS } from "./data-sources/leads-converted/constants";
+import { LEADS_CREATED_ALIAS } from "./data-sources/leads-created/constants";
+import { LEADS_EMAIL_CLICKS_ALIAS } from "./data-sources/leads-email-clicks/constants";
+import { LEADS_EMAIL_OPENS_ALIAS } from "./data-sources/leads-email-opens/constants";
+import { LEADS_EMAILS_SENT_ALIAS } from "./data-sources/leads-emails-sent/constants";
 import { LEADS_ENGAGEMENTS_ALIAS } from "./data-sources/leads-engagements/constants";
-import { LEADS_WEBSITE_VISITS_ALIAS } from "./data-sources/leads-website-visits/constants";
 import { LEADS_FORM_SUBMITS_ALIAS } from "./data-sources/leads-form-submits/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { LEADS_IN_CONTACT_ALIAS } from "./data-sources/leads-in-contact/constants";
+import { LEADS_NEWSLETTER_SUBSCRIBERS_ALIAS } from "./data-sources/leads-newsletter-subscribers/constants";
+import { LEADS_UNSUBSCRIBED_ALIAS } from "./data-sources/leads-unsubscribed/constants";
+import { LEADS_WEBSITE_USERS_ALIAS } from "./data-sources/leads-website-users/constants";
+import { LEADS_WEBSITE_VISITS_ALIAS } from "./data-sources/leads-website-visits/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 

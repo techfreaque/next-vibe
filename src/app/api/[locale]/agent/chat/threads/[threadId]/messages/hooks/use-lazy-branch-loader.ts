@@ -1,7 +1,7 @@
 /**
  * Lazy Branch Loader Hook
  * Fetches all messages in the current chunk (compaction boundary to all leaf tips).
- * Branch switching is purely local — no refetch, no data change, just display change.
+ * Branch switching is purely local - no refetch, no data change, just display change.
  * The cache key is stable: keyed only on threadId + rootFolderId (not leafMessageId).
  *
  * Uses useEndpoint() for the initial chunk fetch so React Query cache + initialData work.
@@ -52,9 +52,9 @@ export function useLazyBranchLoader(
   leafMessageId: string | null,
   setThreadLoadMode: (threadId: string, mode: "full" | "partial") => void,
   user: JwtPayloadType,
-  /** SSR-prefetched path data — pre-populates React Query cache, skips initial fetch */
+  /** SSR-prefetched path data - pre-populates React Query cache, skips initial fetch */
   initialPathData?: PathGetResponseOutput | null,
-  /** Current root folder ID from navigation — used as fallback when thread not yet in store */
+  /** Current root folder ID from navigation - used as fallback when thread not yet in store */
   currentRootFolderId?: DefaultFolderId,
   /** Update the navigation store's leafMessageId when server resolves to a different leaf */
   setLeafMessageId?: (leafMessageId: string | null) => void,
@@ -85,7 +85,7 @@ export function useLazyBranchLoader(
   // Enabled only when: data is loaded, thread exists, not pending create.
   // Incognito threads use useClientRoute on the path endpoint to load from localStorage.
   // Cache key is stable: keyed only on threadId + rootFolderId (NOT leafMessageId).
-  // Branch switching is purely local — no refetch, no data change.
+  // Branch switching is purely local - no refetch, no data change.
   const pathOptions = useMemo(
     () => ({
       read: {
@@ -125,7 +125,7 @@ export function useLazyBranchLoader(
   /**
    * Sync path data from React Query into Zustand store when it arrives.
    * Since the server now returns ALL messages in the chunk (all branch paths),
-   * branch switching is purely local — no refetch needed.
+   * branch switching is purely local - no refetch needed.
    */
   useEffect(() => {
     if (!pathData || !activeThreadId) {
@@ -151,7 +151,7 @@ export function useLazyBranchLoader(
     const currentLeaf = leafMessageIdRef.current;
     const resolvedLeaf = pathData.resolvedLeafMessageId;
     if (resolvedLeaf && resolvedLeaf !== currentLeaf) {
-      // Replace URL (not pushState) — this is a correction, not a navigation
+      // Replace URL (not pushState) - this is a correction, not a navigation
       if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
         url.searchParams.set("message", resolvedLeaf);
@@ -214,7 +214,7 @@ export function useLazyBranchLoader(
           if (response.success) {
             const data = response.data;
 
-            // Clear hasOlderHistory flag on the current oldest message — the older
+            // Clear hasOlderHistory flag on the current oldest message - the older
             // chunk now replaces it (the chunk itself will have the flag if needed).
             const cachedData = apiClient.getEndpointData(
               messagesDefinitions.GET,
@@ -266,7 +266,7 @@ export function useLazyBranchLoader(
                 (m) => m.id === data.newerChunkAnchorId,
               );
               if (alreadyLoaded) {
-                // The leaf message that had the flag — find it by newerAnchorId
+                // The leaf message that had the flag - find it by newerAnchorId
                 for (const msg of msgs) {
                   const meta = msg.metadata as MessageMetadata | null;
                   if (meta?.newerAnchorId === data.newerChunkAnchorId) {

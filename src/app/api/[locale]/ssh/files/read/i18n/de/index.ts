@@ -7,7 +7,7 @@ export const translations = {
     permissionDenied: "Zugriff verweigert",
     connectionNotFound: "Verbindung nicht gefunden",
     encryptionFailed:
-      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
+      "Verschlüsselung fehlgeschlagen - SSH_SECRET_KEY möglicherweise ungültig",
     connectTimeout: "Verbindung hat Zeitlimit überschritten",
     sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
     sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",

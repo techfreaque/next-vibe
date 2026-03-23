@@ -37,8 +37,8 @@ import {
   LeadSource,
   LeadStatus,
 } from "../enum";
-import { scopedTranslation } from "../i18n";
 import type { LeadsT } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type {
   ClickTrackingRequestOutput,
@@ -428,7 +428,7 @@ export class LeadTrackingRepository {
         status: LeadStatus.WEBSITE_USER, // Website leads are always WEBSITE_USER
         notes: "", // Will be set with proper translation key when needed
         currentCampaignStage: EmailCampaignStage.NOT_STARTED,
-        // Identity columns — first-touch, written once
+        // Identity columns - first-touch, written once
         ipAddress: clientInfo.ipAddress,
         userAgent: clientInfo.userAgent,
         deviceType: parsedDevice.deviceType,

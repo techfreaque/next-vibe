@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Backtest Engine
+ * Vibe Sense - Backtest Engine
  *
  * Runs a graph over a historical range with actions intercepted.
  * Checks eligibility (all source indicators have persist:always data covering range).
@@ -11,9 +11,9 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
-import type { GraphConfig } from "../graph/types";
-import type { TimeRange, Resolution } from "../shared/fields";
 import { pipelineDatapoints } from "../db";
+import type { GraphConfig } from "../graph/types";
+import type { Resolution, TimeRange } from "../shared/fields";
 import {
   createBacktestRun,
   markBacktestEligibility,

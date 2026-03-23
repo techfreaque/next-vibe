@@ -1,5 +1,5 @@
 /**
- * Payments Failed — Route
+ * Payments Failed - Route
  * Server-only.
  */
 

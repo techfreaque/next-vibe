@@ -1,7 +1,7 @@
 /**
- * Vibe Sense — Graph Detail + Data Definition
+ * Vibe Sense - Graph Detail + Data Definition
  *
- * GET  — Graph detail view: metadata + time-series data
+ * GET  - Graph detail view: metadata + time-series data
  *         Resolution controls bucket size; cursor enables backwards pagination.
  */
 
@@ -24,12 +24,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { graphConfigSchema } from "../../../graph/schema";
 import {
   GraphOwnerType,
   GraphResolution,
   GraphResolutionDB,
 } from "../../../enum";
+import { graphConfigSchema } from "../../../graph/schema";
 
 import React from "react";
 

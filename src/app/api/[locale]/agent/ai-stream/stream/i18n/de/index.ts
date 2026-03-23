@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "KI-Agent ausführen",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Einen headless KI-Agenten ausführen und die vollständige Textantwort erhalten. Verwende dies, um Aufgaben zu delegieren, Tool-Ergebnisse zusammenzufassen, Inhalte zu generieren oder Tools zu einer einzigen KI-Antwort zu verketten. Credits werden je nach Modell verbraucht. SCHNELLSTART: Übergib favoriteId, um Charakter + Modell + Tool-Konfiguration aus einem gespeicherten Favoriten zu laden. Überschreibe jedes Feld (model, skill, tools, availableTools) durch explizite Angabe. EINRICHTUNG: Vor der Ausführung den richtigen Charakter + Favoriten einrichten. Charaktere definieren Persona und System-Prompt (erstellen mit agent_chat_skills_create_POST). Favoriten bündeln Charakter mit Modellüberschreibung und Tool-Konfiguration (erstellen mit agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} oder {selectionType:'FILTERS',...}). Workflow: 1) Favoriten (agent_chat_favorites_GET) oder Charaktere (agent_chat_skills_GET) auflisten. 2) Falls keiner passt, Charakter erstellen, dann Favorit dafür anlegen. 3) favoriteId an diesen Aufruf übergeben. TOOL-ZUGRIFF: Standard-Setup: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool führt jeden Endpunkt aus, system_help_GET ermöglicht Tool-Entdeckung.",
+        "Einen headless KI-Agenten ausführen und die vollständige Textantwort erhalten. Verwende dies, um Aufgaben zu delegieren, Tool-Ergebnisse zusammenzufassen, Inhalte zu generieren oder Tools zu einer einzigen KI-Antwort zu verketten. Credits werden je nach Modell verbraucht. SCHNELLSTART: Übergib favoriteId, um Charakter + Modell + Tool-Konfiguration aus einem gespeicherten Favoriten zu laden. Überschreibe jedes Feld (model, skill, tools, availableTools) durch explizite Angabe. EINRICHTUNG: Vor der Ausführung den richtigen Charakter + Favoriten einrichten. Charaktere definieren Persona und System-Prompt (erstellen mit agent_chat_skills_create_POST). Favoriten bündeln Charakter mit Modellüberschreibung und Tool-Konfiguration (erstellen mit agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} oder {selectionType:'FILTERS',...}). Workflow: 1) Favoriten (agent_chat_favorites_GET) oder Charaktere (agent_chat_skills_GET) auflisten. 2) Falls keiner passt, Charakter erstellen, dann Favorit dafür anlegen. 3) favoriteId an diesen Aufruf übergeben. TOOL-ZUGRIFF: Standard-Setup: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool führt jeden Endpunkt aus, system_help_GET ermöglicht Tool-Entdeckung.",
       container: {
         title: "KI-Agent-Ausführung",
         description:
@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
         prompt: {
           label: "Prompt",
           description:
-            "Die Hauptanweisung oder Frage an die KI. Sei spezifisch — die KI nutzt Vorausruf-Ergebnisse als Kontext falls vorhanden.",
+            "Die Hauptanweisung oder Frage an die KI. Sei spezifisch - die KI nutzt Vorausruf-Ergebnisse als Kontext falls vorhanden.",
           placeholder: "Prompt eingeben...",
         },
         instructions: {
@@ -67,13 +67,13 @@ export const translations: typeof enTranslations = {
           args: {
             label: "Argumente",
             description:
-              'Flache Schlüssel-Wert-Argumente — urlPathParams und Body-Felder zusammengeführt (z.B. {"query": "neueste Nachrichten", "maxResults": 5}).',
+              'Flache Schlüssel-Wert-Argumente - urlPathParams und Body-Felder zusammengeführt (z.B. {"query": "neueste Nachrichten", "maxResults": 5}).',
           },
         },
         availableTools: {
           label: "Ausführbar (Berechtigungsschicht)",
           description:
-            "Ausführungs-Berechtigungsschicht — kontrolliert welche Tools die KI tatsächlich ausführen darf. null = alle Tools erlaubt. Array = nur aufgelistete Tools (andere werden mit 'vom Benutzer deaktiviert' blockiert). Standard-Agent-Setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatcht jeden registrierten Endpunkt, system_help_GET ermöglicht Tool-Entdeckung. Tools aus dem tools-Feld müssen nicht wiederholt werden.",
+            "Ausführungs-Berechtigungsschicht - kontrolliert welche Tools die KI tatsächlich ausführen darf. null = alle Tools erlaubt. Array = nur aufgelistete Tools (andere werden mit 'vom Benutzer deaktiviert' blockiert). Standard-Agent-Setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool dispatcht jeden registrierten Endpunkt, system_help_GET ermöglicht Tool-Entdeckung. Tools aus dem tools-Feld müssen nicht wiederholt werden.",
           toolId: {
             label: "Tool-ID",
             description:
@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
         pinnedTools: {
           label: "Im Kontext (KI sieht diese)",
           description:
-            "Tools im Kontextfenster des Modells — was die KI kennt und worüber sie nachdenken kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten, minimalen Kontext. Hinweis: availableTools kontrolliert die tatsächliche Ausführung — dieses Feld beeinflusst nur, was das Modell sieht.",
+            "Tools im Kontextfenster des Modells - was die KI kennt und worüber sie nachdenken kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten, minimalen Kontext. Hinweis: availableTools kontrolliert die tatsächliche Ausführung - dieses Feld beeinflusst nur, was das Modell sieht.",
           toolId: {
             label: "Tool-ID",
             description:
@@ -307,7 +307,7 @@ export const translations: typeof enTranslations = {
     availableTools: {
       label: "Ausführbar",
       description:
-        "Ausführungs-Berechtigungsschicht — welche Tools die KI tatsächlich ausführen darf. null = alle erlaubt. Array = nur diese Tools.",
+        "Ausführungs-Berechtigungsschicht - welche Tools die KI tatsächlich ausführen darf. null = alle erlaubt. Array = nur diese Tools.",
       toolId: {
         label: "Tool-ID",
         description: "Alias oder vollständiger Name des erlaubten Tools",
@@ -316,7 +316,7 @@ export const translations: typeof enTranslations = {
     pinnedTools: {
       label: "Im Kontext (KI sieht diese)",
       description:
-        "Tools im Kontextfenster des Modells — was die KI kennt. null = Standard-Set des Benutzers. availableTools steuert die tatsächliche Ausführung.",
+        "Tools im Kontextfenster des Modells - was die KI kennt. null = Standard-Set des Benutzers. availableTools steuert die tatsächliche Ausführung.",
       toolId: {
         label: "Tool-ID",
         description: "Alias oder vollständiger Name des Tools im Kontext",
@@ -522,7 +522,7 @@ export const translations: typeof enTranslations = {
     invalidRequest:
       "Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
     compactingStreamError:
-      "Kontextlimit erreicht — die Konversation ist zu lang für automatisches Komprimieren. Versuchen Sie, von einer früheren Nachricht zu verzweigen, ein Modell mit größerem Kontextfenster zu wählen oder das Kontextfenster in Ihren Favoriten-Einstellungen anzupassen.",
+      "Kontextlimit erreicht - die Konversation ist zu lang für automatisches Komprimieren. Versuchen Sie, von einer früheren Nachricht zu verzweigen, ein Modell mit größerem Kontextfenster zu wählen oder das Kontextfenster in Ihren Favoriten-Einstellungen anzupassen.",
     compactingStreamErrorExpensive:
       "Kontextlimit erreicht ({{tokens}} Token). Das Erweitern des Kontextfensters ist möglich, kann aber teuer sein. Versuchen Sie zunächst, von einer früheren Nachricht zu verzweigen oder das Modell zu wechseln.",
     compactingException:
@@ -536,7 +536,7 @@ export const translations: typeof enTranslations = {
     revivalPrompt:
       "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
     revivalInstructions:
-      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result — 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
+      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result - 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
   },
   info: {
     streamInterrupted:
@@ -545,7 +545,7 @@ export const translations: typeof enTranslations = {
   headless: {
     errors: {
       missingModelOrSkill:
-        "Modell und Charakter sind erforderlich — direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
+        "Modell und Charakter sind erforderlich - direkt angeben oder favoriteId mit auflösbarer Modellauswahl bereitstellen",
       favoriteNotFound:
         "Favorit nicht gefunden oder gehört nicht diesem Benutzer",
     },
@@ -653,7 +653,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Stell dir uns als dein KI-Team vor.",
       line1:
-        "Dein Begleiter kümmert sich um alltägliche Gespräche. Spezialisten übernehmen für Coding, Recherche, Schreiben — was auch immer gebraucht wird.",
+        "Dein Begleiter kümmert sich um alltägliche Gespräche. Spezialisten übernehmen für Coding, Recherche, Schreiben - was auch immer gebraucht wird.",
       line2: "Die KI wechselt automatisch zwischen ihnen. Du redest einfach.",
       line3: "Lass uns dich in unter einer Minute einrichten.",
       continue: "Los geht's",
@@ -663,7 +663,7 @@ export const translations: typeof enTranslations = {
       line1:
         "Deine Einstellungen, dein Begleiter und dein Chatverlauf werden nur lokal auf diesem Gerät gespeichert.",
       line2:
-        "Melde dich an, um alles geräteübergreifend zu synchronisieren — und dein Setup nie zu verlieren.",
+        "Melde dich an, um alles geräteübergreifend zu synchronisieren - und dein Setup nie zu verlieren.",
       signIn: "Anmelden / Konto erstellen",
       continueAnyway: "Als Gast fortfahren",
       note: "Du kannst dich jederzeit über das Menü anmelden.",
@@ -682,11 +682,11 @@ export const translations: typeof enTranslations = {
         },
         brilliant: {
           label: "Brilliant",
-          desc: "Beste Qualität — ideal für komplexe Fragen, Schreiben und Analysen",
+          desc: "Beste Qualität - ideal für komplexe Fragen, Schreiben und Analysen",
         },
         max: {
           label: "Max",
-          desc: "Höchstes Denkvermögen, keine Kompromisse — für wenn es wirklich darauf ankommt",
+          desc: "Höchstes Denkvermögen, keine Kompromisse - für wenn es wirklich darauf ankommt",
         },
       },
     },
@@ -696,7 +696,7 @@ export const translations: typeof enTranslations = {
         "Wir fügen automatisch die richtigen Spezialisten zu deinem KI-Toolkit hinzu.",
       saving: "Einrichtung...",
       start: "Chat starten",
-      skip: "Überspringen — ich richte es später ein",
+      skip: "Überspringen - ich richte es später ein",
       noProviderAvailable:
         "Kein KI-Anbieter konfiguriert. Füge OPENROUTER_API_KEY hinzu oder aktiviere Claude Code (CLAUDE_CODE_ENABLED=true) um fortzufahren.",
       coding: {

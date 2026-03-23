@@ -741,7 +741,7 @@ export class LeadsImportRepository {
   }
 
   /**
-   * Retry a failed import job — resets status to pending
+   * Retry a failed import job - resets status to pending
    */
   static async retryJob(
     userId: string,
@@ -797,7 +797,7 @@ export class LeadsImportRepository {
   }
 
   /**
-   * Stop a running import job — sets status to cancelled
+   * Stop a running import job - sets status to cancelled
    */
   static async stopJob(
     userId: string,
@@ -1018,7 +1018,7 @@ export class LeadsImportRepository {
   }
 
   /**
-   * Generic CSV import handler — creates batch record or chunked job
+   * Generic CSV import handler - creates batch record or chunked job
    */
   private static async importFromCsv(
     config: CsvImportConfig,

@@ -1,5 +1,5 @@
 /**
- * Chat Messages With Attachments — Route
+ * Chat Messages With Attachments - Route
  * Server-only.
  */
 

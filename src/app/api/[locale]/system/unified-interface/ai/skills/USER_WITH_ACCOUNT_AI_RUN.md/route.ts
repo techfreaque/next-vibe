@@ -3,7 +3,7 @@
  * GET /api/[locale]/system/unified-interface/ai/skills/USER_WITH_ACCOUNT_AI_RUN.md
  *
  * Focused guide for using POST /agent/ai-stream/run with account-required tools.
- * All requests require a Bearer JWT token. No tool listing — see USER_WITH_ACCOUNT_SKILL.md
+ * All requests require a Bearer JWT token. No tool listing - see USER_WITH_ACCOUNT_SKILL.md
  * for the HTTP endpoint reference.
  */
 

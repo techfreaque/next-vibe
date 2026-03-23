@@ -1,6 +1,6 @@
 /**
  * SSH Files List Endpoint Definition
- * GET /ssh/files/list — List directory contents
+ * GET /ssh/files/list - List directory contents
  */
 
 import { z } from "zod";

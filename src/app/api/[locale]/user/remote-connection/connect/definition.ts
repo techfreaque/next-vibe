@@ -1,14 +1,14 @@
 /**
  * Remote Connection Connect API Definition
- * POST — login to remote instance and store session in DB
+ * POST - login to remote instance and store session in DB
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   requestField,
   responseField,
   widgetField,

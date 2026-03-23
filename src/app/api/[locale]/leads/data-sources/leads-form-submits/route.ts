@@ -1,5 +1,5 @@
 /**
- * Leads Form Submits — Route
+ * Leads Form Submits - Route
  * Server-only.
  */
 

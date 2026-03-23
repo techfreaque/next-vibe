@@ -3,7 +3,7 @@
  * GET /api/[locale]/system/unified-interface/ai/skills/USER_WITH_ACCOUNT_SKILL.md
  *
  * Returns a markdown document listing tools that strictly require an authenticated account
- * (CUSTOMER role only, no PUBLIC access — REMOTE_SKILL marker required).
+ * (CUSTOMER role only, no PUBLIC access - REMOTE_SKILL marker required).
  *
  * Use this manifest when building agents that perform account-specific actions:
  * posting messages, managing threads, updating profile, etc.

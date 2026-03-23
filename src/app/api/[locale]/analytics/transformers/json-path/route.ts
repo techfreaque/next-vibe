@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — JSON Path Transformer Route
+ * Vibe Sense - JSON Path Transformer Route
  * Server-only.
  */
 

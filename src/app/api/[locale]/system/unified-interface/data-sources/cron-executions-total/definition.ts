@@ -1,5 +1,5 @@
 /**
- * Cron Executions Total — Endpoint Definition
+ * Cron Executions Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

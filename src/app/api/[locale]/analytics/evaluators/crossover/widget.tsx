@@ -1,6 +1,6 @@
 /**
- * Vibe Sense — Crossover Evaluator Widget
- * No params — just a description label in the node inspector.
+ * Vibe Sense - Crossover Evaluator Widget
+ * No params - just a description label in the node inspector.
  */
 
 "use client";

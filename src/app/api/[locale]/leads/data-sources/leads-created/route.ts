@@ -1,5 +1,5 @@
 /**
- * Leads Created — Route
+ * Leads Created - Route
  * Server-only.
  */
 

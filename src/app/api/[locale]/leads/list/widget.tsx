@@ -8,11 +8,11 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
@@ -323,7 +323,7 @@ export function LeadsListContainer({
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const isLoading = isLoadingFresh;
 
-  // Status counts — from server (accurate across full DB, not just current page)
+  // Status counts - from server (accurate across full DB, not just current page)
   const statusCounts = useMemo((): Partial<
     Record<LeadsTranslationKey, number>
   > => {

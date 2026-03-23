@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "MACD",
     description:
-      "Moving Average Convergence Divergence — trend-following momentum indicator",
+      "Moving Average Convergence Divergence - trend-following momentum indicator",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

@@ -18,7 +18,7 @@ import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/to
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 /**
- * Tool executor function type — matches CoreTool's execute signature (with options)
+ * Tool executor function type - matches CoreTool's execute signature (with options)
  */
 type ToolExecutor = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- tool args are dynamic
@@ -38,7 +38,7 @@ export class AgentToolExecutorRegistry {
   /**
    * Set of callbackMode values seen in the current batch that require stopping
    * the Agent SDK loop after the batch completes.
-   * The MCP handler populates this directly from tool args — no dependency on
+   * The MCP handler populates this directly from tool args - no dependency on
    * stream-part-handler having processed the tool-call events yet.
    */
   batchStopModes = new Set<string>();
@@ -84,7 +84,7 @@ export class AgentToolExecutorRegistry {
 
   /**
    * Execute a tool by name. Called by the Agent SDK MCP handler.
-   * Returns the result plus `isLastInBatch` — true when no other tool calls
+   * Returns the result plus `isLastInBatch` - true when no other tool calls
    * remain pending in the current batch (mirrors finish-step pendingToolMessages check).
    */
   async execute(

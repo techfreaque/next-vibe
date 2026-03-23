@@ -26,7 +26,7 @@ type Normalize<T> = { [K in keyof T]: T[K] };
  *
  * If no children have includeInCacheKey: true, resolves to `undefined`.
  * If some children have it, resolves to an object with exactly those keys and their
- * inferred RequestData types — same inference as the full RequestOutput but filtered.
+ * inferred RequestData types - same inference as the full RequestOutput but filtered.
  *
  * Uses Normalize<> on both the parent fields and each child so that intersection
  * types (produced by requestField etc.) are flattened before pattern matching.

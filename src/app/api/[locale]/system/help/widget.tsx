@@ -77,7 +77,7 @@ import type {
 import { scopedTranslation } from "./i18n";
 
 /**
- * Props for custom widget — follows the CustomWidgetProps pattern
+ * Props for custom widget - follows the CustomWidgetProps pattern
  */
 interface CustomWidgetProps {
   field: {
@@ -232,11 +232,11 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     [user],
   );
 
-  // Platform / prodOnly / instanceId — read from form (already requestFields in definition)
+  // Platform / prodOnly / instanceId - read from form (already requestFields in definition)
   const activePlatform = form.watch("platform");
   const prodOnly = form.watch("includeProdOnly") ?? false;
 
-  // Instance switcher — fetch connected remote instances
+  // Instance switcher - fetch connected remote instances
   const activeInstanceId = form.watch("instanceId");
   const endpointOptions = useMemo(() => {
     return {
@@ -444,7 +444,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           setVibeFrame({ serverUrl, endpoint: bareToolName });
           return;
         }
-        // Fallback: no server URL known — navigate to execute-tool
+        // Fallback: no server URL known - navigate to execute-tool
         const { getEndpoint } =
           await import("@/app/api/[locale]/system/generated/endpoint");
         const executeTool = await getEndpoint("execute-tool");
@@ -775,7 +775,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         </Div>
       )}
 
-      {/* Instance Switcher — shows when remote instances are connected */}
+      {/* Instance Switcher - shows when remote instances are connected */}
       {connectedInstances.length > 0 && (
         <Div className="flex items-center gap-1 px-4 pt-3">
           <Button

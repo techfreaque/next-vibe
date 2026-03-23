@@ -1,5 +1,5 @@
 /**
- * Credits Subscription Revenue — Route
+ * Credits Subscription Revenue - Route
  * Server-only.
  */
 

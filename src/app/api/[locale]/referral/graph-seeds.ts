@@ -1,5 +1,5 @@
 /**
- * Referral Domain — Vibe Sense Graph Seeds
+ * Referral Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the referral domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,20 +7,20 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
+import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import { REFERRALS_SIGNUPS_ALIAS } from "./data-sources/referrals-signups/constants";
-import { REFERRALS_EARNINGS_VOLUME_ALIAS } from "./data-sources/referrals-earnings-volume/constants";
 import { REFERRALS_CODES_CREATED_ALIAS } from "./data-sources/referrals-codes-created/constants";
+import { REFERRALS_EARNINGS_VOLUME_ALIAS } from "./data-sources/referrals-earnings-volume/constants";
 import { REFERRALS_LEAD_CLICKS_ALIAS } from "./data-sources/referrals-lead-clicks/constants";
 import { REFERRALS_PAYOUTS_ALIAS } from "./data-sources/referrals-payouts/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { REFERRALS_SIGNUPS_ALIAS } from "./data-sources/referrals-signups/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 

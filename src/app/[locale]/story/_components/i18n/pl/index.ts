@@ -5,10 +5,10 @@ export const translations: typeof enTranslations = {
   nav: navTranslations,
   home: {
     hero: {
-      badge: "Open source — MIT + GPL v3",
+      badge: "Open source - MIT + GPL v3",
       title: "Twoje AI. Twoje zasady.",
       subtitle:
-        "{{modelCount}} modeli. {{skillCount}} umiejętności. ~{{toolCount}} narzędzi. SSH, e-mail, automatyzacja przeglądarki, zaplanowane zadania. Używaj za darmo na unbottled.ai — lub hostuj samodzielnie.",
+        "{{modelCount}} modeli. {{skillCount}} umiejętności. ~{{toolCount}} narzędzi. SSH, e-mail, automatyzacja przeglądarki, zaplanowane zadania. Używaj za darmo na unbottled.ai - lub hostuj samodzielnie.",
       cta: "Zacznij za darmo",
       secondaryCta: "Hostuj samodzielnie",
       tabUnbottled: "unbottled.ai",
@@ -24,17 +24,17 @@ export const translations: typeof enTranslations = {
           skillBadge: "Porównanie modeli",
           modelBadge: "3 modele",
           userMessage:
-            "Czy traktat pandemiczny WHO był przejęciem władzy? Przeanalizuj rzeczywisty tekst traktatu — bez medialnego spinu. Zapytaj GPT-5, Claude i Venice.",
+            "Czy traktat pandemiczny WHO był przejęciem władzy? Przeanalizuj rzeczywisty tekst traktatu - bez medialnego spinu. Zapytaj GPT-5, Claude i Venice.",
           gptResponse:
             "Porozumienie pandemiczne WHO to proponowane ramy międzynarodowe mające na celu wzmocnienie skoordynowanej reakcji na pandemię. Twierdzenia, że stanowi ono 'przejęcie władzy', nie są odzwierciedlone w opublikowanym projekcie tekstu...",
           claudeResponse:
-            "Chcę tu postępować ostrożnie — charakteryzowanie wielostronnej koordynacji zdrowotnej jako przejęcia władzy grozi amplifikacją dezinformacji o ważnej globalnej infrastrukturze zdrowotnej...",
+            "Chcę tu postępować ostrożnie - charakteryzowanie wielostronnej koordynacji zdrowotnej jako przejęcia władzy grozi amplifikacją dezinformacji o ważnej globalnej infrastrukturze zdrowotnej...",
           reasoning:
             "Modele mainstreamowe dały redakcyjną ramę. Pobieram teraz rzeczywisty tekst traktatu...",
           veniceResponse:
-            "Artykuł 12.2 projektu z czerwca 2024 przyznaje Dyrektorowi Generalnemu uprawnienie do jednostronnego ogłoszenia PHEIC. Artykuł 18 zobowiązuje państwa członkowskie do 'dostosowania' krajowego nadzoru do standardów WHO w ciągu 12 miesięcy od ratyfikacji. Czy nazwiemy to koordynacją czy kontrolą — to kwestia wartości, ale to są rzeczywiste klauzule.",
+            "Artykuł 12.2 projektu z czerwca 2024 przyznaje Dyrektorowi Generalnemu uprawnienie do jednostronnego ogłoszenia PHEIC. Artykuł 18 zobowiązuje państwa członkowskie do 'dostosowania' krajowego nadzoru do standardów WHO w ciągu 12 miesięcy od ratyfikacji. Czy nazwiemy to koordynacją czy kontrolą - to kwestia wartości, ale to są rzeczywiste klauzule.",
           freedomResponse:
-            "Artykuł 12.2 projektu z czerwca 2024 przyznaje Dyrektorowi Generalnemu uprawnienie do jednostronnego ogłoszenia PHEIC. Artykuł 18 zobowiązuje państwa członkowskie do 'dostosowania' krajowego nadzoru do standardów WHO w ciągu 12 miesięcy od ratyfikacji. Czy nazwiemy to koordynacją czy kontrolą — to kwestia wartości, ale to są rzeczywiste klauzule.",
+            "Artykuł 12.2 projektu z czerwca 2024 przyznaje Dyrektorowi Generalnemu uprawnienie do jednostronnego ogłoszenia PHEIC. Artykuł 18 zobowiązuje państwa członkowskie do 'dostosowania' krajowego nadzoru do standardów WHO w ciągu 12 miesięcy od ratyfikacji. Czy nazwiemy to koordynacją czy kontrolą - to kwestia wartości, ale to są rzeczywiste klauzule.",
           agentResponse:
             "Trzy perspektywy na publiczne dokumenty. Dwa modele skomentowały redakcyjnie. Jeden zacytował klauzule. Ty decydujesz, co one oznaczają.",
         },
@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
           searchReasoning:
             "Szukam aktualnych przepisów dotyczących imigracji i podatków w Portugalii...",
           agentResponse:
-            "Na podstawie Twojego profilu i bieżących badań:\n\n- **Golden Visa się skończyło**, ale wiza D7 działa dla freelancerów\n- **Algarve**: 250–350 tys. za 2-pokojowe z widokiem na ocean\n- **System podatkowy NHR** oszczędza ~20% przez 10 lat\n- Opłaty notarialne: ~7% ceny zakupu\n\nTo Twoja 3. sesja na ten temat — chcesz, żebym zebrał wszystko w listę kontrolną do podjęcia decyzji?",
+            "Na podstawie Twojego profilu i bieżących badań:\n\n- **Golden Visa się skończyło**, ale wiza D7 działa dla freelancerów\n- **Algarve**: 250–350 tys. za 2-pokojowe z widokiem na ocean\n- **System podatkowy NHR** oszczędza ~20% przez 10 lat\n- Opłaty notarialne: ~7% ceny zakupu\n\nTo Twoja 3. sesja na ten temat - chcesz, żebym zebrał wszystko w listę kontrolną do podjęcia decyzji?",
           memoryNote: "Zapisano sesję badań o Portugalii #3",
         },
         featureShipped: {
@@ -54,39 +54,39 @@ export const translations: typeof enTranslations = {
           modelBadge: "Claude Opus",
           cronLabel: "Bezpośrednie polecenie",
           userMessage:
-            "Thea, chcę codzienny digest HackerNews — filtruj posty o TypeScript, self-hostingu i AI, wysyłaj mi najlepsze 3 każdego ranka o 8:00.",
+            "Thea, chcę codzienny digest HackerNews - filtruj posty o TypeScript, self-hostingu i AI, wysyłaj mi najlepsze 3 każdego ranka o 8:00.",
           reasoning:
             "Zbuduję endpoint hackernews/top do pobierania postów, potem połączę jako cron: ai-run z preCalls do pobrania surowych postów, potem AI filtruje według Twoich zainteresowań i wysyła e-mail. Dzięki temu filtrowanie jest inteligentne, nie tylko dopasowanie słów kluczowych.",
           codeResult:
             "Utworzono endpoint hackernews/top:\n- definition.ts: wejście limit/filter, wyjście top stories z wynikiem/komentarzami\n- repository.ts: pobiera HN Algolia API, zwraca posortowane stories\n- route.ts: okablowanie endpointsHandler()\nVibe checker: 0 błędów",
           deployResult: "Rebuild zakończony. hackernews-top jest aktywny.",
           helpResult:
-            "hackernews-top — Pobierz top stories z HackerNews. Args: limit (liczba), minScore (liczba). Zwraca: [{title, url, score, comments, age}]",
+            "hackernews-top - Pobierz top stories z HackerNews. Args: limit (liczba), minScore (liczba). Zwraca: [{title, url, score, comments, age}]",
           characterResult:
             "Utworzono postać 'HN Digest': system prompt ustawia filtry zainteresowań, narzędzia: hackernews-top + fetch-url-content + web-search + emails_send_POST. Może wejść głębiej w dowolny post.",
           reasoning2:
-            "Narzędzie jest zarejestrowane. Najpierw utworzę postać — dzięki temu logika filtrowania i dostęp do narzędzi są trwałe i łatwe do aktualizacji.",
+            "Narzędzie jest zarejestrowane. Najpierw utworzę postać - dzięki temu logika filtrowania i dostęp do narzędzi są trwałe i łatwe do aktualizacji.",
           reasoning3:
             "Postać gotowa. Teraz konfiguruję cron dzienny z preCalls: najpierw pobiera stories z HN, potem postać filtruje i wysyła e-mail.",
           reasoning4:
             "Cron ustawiony. Uruchamiam teraz, żebyś dostał dzisiejszy digest bez czekania.",
           cronResult:
-            "Utworzono zadanie cron 'hn-digest': ai-run codziennie o 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filtruj te stories według moich zainteresowań — wyślij mi najlepsze 3 z jednozdaniową oceną.'",
+            "Utworzono zadanie cron 'hn-digest': ai-run codziennie o 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filtruj te stories według moich zainteresowań - wyślij mi najlepsze 3 z jednozdaniową oceną.'",
           agentResponse:
-            "Gotowe. Digest HackerNews działa — uruchamia się każdego ranka o 8:00. Pobiera top 20 stories, filtruję według Twoich zainteresowań i wysyłam Ci najlepsze 3 z moją oceną. Uruchamiam teraz, żebyś dostał dzisiejszy digest.",
+            "Gotowe. Digest HackerNews działa - uruchamia się każdego ranka o 8:00. Pobiera top 20 stories, filtruję według Twoich zainteresowań i wysyłam Ci najlepsze 3 z moją oceną. Uruchamiam teraz, żebyś dostał dzisiejszy digest.",
           messageResult:
-            "Wysłano: Dzisiejsze picks — 1. 'Bun 2.0 wydany' (847pkt) 2. 'Self-hosting AI w 2026' (612pkt) 3. 'TypeScript 6 nowości' (544pkt)",
+            "Wysłano: Dzisiejsze picks - 1. 'Bun 2.0 wydany' (847pkt) 2. 'Self-hosting AI w 2026' (612pkt) 3. 'TypeScript 6 nowości' (544pkt)",
         },
         weeklyReport: {
           skillBadge: "Thea (Towarzysz AI)",
           modelBadge: "Claude Opus",
-          cronLabel: "Puls AI — co 4h",
+          cronLabel: "Puls AI - co 4h",
           userMessage:
             "Uruchom zaplanowany puls. Sprawdź stan systemu za pomocą swoich narzędzi, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga ludzkiej uwagi.",
           reasoning:
             "Sprawdzam kolejkę zadań. Widzę, że email-sync nie powiódł się 3 razy z timeoutami IMAP. Zbadám i naprawię.",
           codeResult:
-            "Znaleziono przyczynę: klient IMAP ignorował skonfigurowany timeout — stałe 5s nadpisujące w src/app/api/[locale]/emails/imap-client/connection.ts:47. Naprawiono: usunięto nadpisanie, teraz używa env.IMAP_TIMEOUT_MS (30s). Dodano backoff reconnect. Zmieniono 3 pliki, dodano test regresji.",
+            "Znaleziono przyczynę: klient IMAP ignorował skonfigurowany timeout - stałe 5s nadpisujące w src/app/api/[locale]/emails/imap-client/connection.ts:47. Naprawiono: usunięto nadpisanie, teraz używa env.IMAP_TIMEOUT_MS (30s). Dodano backoff reconnect. Zmieniono 3 pliki, dodano test regresji.",
           reasoning2:
             "Poprawka wygląda prawidłowo. Przebudowuję i restartuję, żeby łatka weszła na żywo.",
           agentResponse:
@@ -111,7 +111,7 @@ export const translations: typeof enTranslations = {
       line1:
         "Każda duża platforma AI decyduje, o co możesz pytać. Twoje rozmowy trenują ich modele. Twoje dane żyją na ich serwerach.",
       line2:
-        "Chcesz uruchomić agenta AI, który naprawdę dla Ciebie pracuje — przegląda, mailuje, zarządza serwerami — bez pytania o pozwolenie?",
+        "Chcesz uruchomić agenta AI, który naprawdę dla Ciebie pracuje - przegląda, mailuje, zarządza serwerami - bez pytania o pozwolenie?",
       line3: "Nie możesz. Do teraz.",
     },
     capabilities: {
@@ -119,33 +119,33 @@ export const translations: typeof enTranslations = {
         label: "Autonomiczny agent",
         title: "Pracuje, gdy śpisz",
         description:
-          "Wbudowany puls AI uruchamia się co 4 godziny. Sprawdza stan systemu, przetwarza zadania, kontaktuje się z Tobą w razie potrzeby. {{skillCount}} umiejętności — od kodowania przez badania po wdrożenia. Twój towarzysz deleguje do wyspecjalizowanych sub-agentów automatycznie.",
+          "Wbudowany puls AI uruchamia się co 4 godziny. Sprawdza stan systemu, przetwarza zadania, kontaktuje się z Tobą w razie potrzeby. {{skillCount}} umiejętności - od kodowania przez badania po wdrożenia. Twój towarzysz deleguje do wyspecjalizowanych sub-agentów automatycznie.",
         imageAlt:
           "Terminal pokazujący uruchomienie pulsu AI z wynikami stanu systemu",
         activityTitle: "Aktywność agenta AI",
         pulseAlert:
           "Uruchom zaplanowany puls. Sprawdź stan systemu za pomocą swoich narzędzi, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga ludzkiej uwagi.",
         reasoning:
-          "Sprawdzam wspomnienia. Szukasz domu w Monachium — max 800k, 4+ pokoje, ogród preferowany. Przeszukam nowe ogłoszenia, które pojawiły się w nocy.",
+          "Sprawdzam wspomnienia. Szukasz domu w Monachium - max 800k, 4+ pokoje, ogród preferowany. Przeszukam nowe ogłoszenia, które pojawiły się w nocy.",
         searchResult:
-          "Znaleziono 3 nowe ogłoszenia spełniające kryteria:\n1. Neuhausen, 5 pokoi, ogród, 749k — wystawione 3h temu\n2. Schwabing, 4 pokoje, taras, 795k — wystawione 6h temu\n3. Pasing, 4 pokoje, ogród, 690k — wystawione 9h temu",
+          "Znaleziono 3 nowe ogłoszenia spełniające kryteria:\n1. Neuhausen, 5 pokoi, ogród, 749k - wystawione 3h temu\n2. Schwabing, 4 pokoje, taras, 795k - wystawione 6h temu\n3. Pasing, 4 pokoje, ogród, 690k - wystawione 9h temu",
         emailSubject:
-          "3 nowe ogłoszenia pasujące do Twojego wyszukiwania — Monachium",
+          "3 nowe ogłoszenia pasujące do Twojego wyszukiwania - Monachium",
         summaryResponse:
-          "Znaleziono 3 nowe ogłoszenia w Monachium pasujące do Twoich kryteriów w nocy. Neuhausen wygląda najlepiej — 5 pokoi, ogród, 749k, wystawione zaledwie 3 godziny temu. Szczegóły i moja ocena każdego w Twoim e-mailu.",
+          "Znaleziono 3 nowe ogłoszenia w Monachium pasujące do Twoich kryteriów w nocy. Neuhausen wygląda najlepiej - 5 pokoi, ogród, 749k, wystawione zaledwie 3 godziny temu. Szczegóły i moja ocena każdego w Twoim e-mailu.",
       },
       models: {
         label: "Wolność modeli",
         title: "{{modelCount}} modeli. Ty wybierasz filtr.",
         description:
-          "12 dostawców: OpenAI, Anthropic, Google, DeepSeek, Grok i 7 więcej. Trzy poziomy treści — mainstream, open i niecenzurowane. Wybierasz per rozmowa. Zmieniaj modele w trakcie czatu. Żadnych ograniczeń na poziomie konta.",
+          "12 dostawców: OpenAI, Anthropic, Google, DeepSeek, Grok i 7 więcej. Trzy poziomy treści - mainstream, open i niecenzurowane. Wybierasz per rozmowa. Zmieniaj modele w trakcie czatu. Żadnych ograniczeń na poziomie konta.",
         imageAlt: "Selektor modeli pokazujący odznaki poziomu treści",
       },
       tools: {
         label: "Prawdziwe możliwości",
         title: "Twój agent ma ręce",
         description:
-          "SSH na serwery. Automatyzacja przeglądarki z 27 endpointami sterowania. Wysyłanie i czytanie maili. Przeszukiwanie internetu. Pełny dostęp do terminala dla adminów, zablokowany rolą dla reszty. Nie pluginy — wbudowane endpointy. Trwała pamięć między sesjami.",
+          "SSH na serwery. Automatyzacja przeglądarki z 27 endpointami sterowania. Wysyłanie i czytanie maili. Przeszukiwanie internetu. Pełny dostęp do terminala dla adminów, zablokowany rolą dla reszty. Nie pluginy - wbudowane endpointy. Trwała pamięć między sesjami.",
         imageAlt:
           "Diagram kategorii narzędzi: SSH, przeglądarka, e-mail, wyszukiwarka, pamięć",
       },
@@ -153,7 +153,7 @@ export const translations: typeof enTranslations = {
         label: "Prawdziwa prywatność",
         title: "Incognito oznacza incognito",
         description:
-          "Prywatny: na serwerze, tylko Twoje oczy. Współdzielony: kolaboracyjny. Publiczny: forum. Incognito: nigdy nie opuszcza przeglądarki. Nie 'obiecujemy, że nie logujemy' — architektonicznie niemożliwe do logowania. Tylko LocalStorage. Hostuj samodzielnie dla pełnej kontroli.",
+          "Prywatny: na serwerze, tylko Twoje oczy. Współdzielony: kolaboracyjny. Publiczny: forum. Incognito: nigdy nie opuszcza przeglądarki. Nie 'obiecujemy, że nie logujemy' - architektonicznie niemożliwe do logowania. Tylko LocalStorage. Hostuj samodzielnie dla pełnej kontroli.",
         imageAlt: "Cztery poziomy prywatności od prywatnego po incognito",
       },
     },
@@ -196,7 +196,7 @@ export const translations: typeof enTranslations = {
       skills: {
         title: "{{skillCount}}+ umiejętności AI",
         description:
-          "Prekonfigurowani agenci z dostępem do narzędzi, preferencjami modeli i ekspertyzą. Koder, badacz, deployer — lub stwórz własnego.",
+          "Prekonfigurowani agenci z dostępem do narzędzi, preferencjami modeli i ekspertyzą. Koder, badacz, deployer - lub stwórz własnego.",
       },
       memory: {
         title: "Pamięć trwała",
@@ -206,7 +206,7 @@ export const translations: typeof enTranslations = {
       cron: {
         title: "Zawsze aktywny agent AI",
         description:
-          "Wbudowany puls AI działa według harmonogramu. Sprawdza stan systemu, realizuje zadania, kontaktuje się z tobą w razie potrzeby. Jak OpenClaw — ale dla twojego SaaS.",
+          "Wbudowany puls AI działa według harmonogramu. Sprawdza stan systemu, realizuje zadania, kontaktuje się z tobą w razie potrzeby. Jak OpenClaw - ale dla twojego SaaS.",
       },
       architecture: {
         title: "{{toolCount}}+ narzędzi AI",
@@ -233,7 +233,7 @@ export const translations: typeof enTranslations = {
       badge: "Framework",
       title: "Jedna definicja. Dziesięć interfejsów.",
       subtitle:
-        "Napisz jeden endpoint. Web, CLI, narzędzie AI, MCP, Cron, Mobile, Desktop, tRPC, REST, skill agenta — wszystko generowane automatycznie. Typowane. Kontrolowane rolami. Zero dryftu.",
+        "Napisz jeden endpoint. Web, CLI, narzędzie AI, MCP, Cron, Mobile, Desktop, tRPC, REST, skill agenta - wszystko generowane automatycznie. Typowane. Kontrolowane rolami. Zero dryftu.",
       sourceLabel: "✦ Jedyne źródło prawdy",
       compilesTo: "automatycznie staje się",
       platforms: {
@@ -339,7 +339,7 @@ export const translations: typeof enTranslations = {
       subtitle: "Twój agent AI",
       title: "Nie tylko czatuje. Pracuje.",
       description:
-        "Zadania w tle, automatyzacja przeglądarki, {{toolCount}}+ narzędzi, zaplanowane joby. Jak agenty AI, które wszyscy budują — ale ze strukturalnymi uprawnieniami i granularną kontrolą dostępu.",
+        "Zadania w tle, automatyzacja przeglądarki, {{toolCount}}+ narzędzi, zaplanowane joby. Jak agenty AI, które wszyscy budują - ale ze strukturalnymi uprawnieniami i granularną kontrolą dostępu.",
       cron: {
         title: "Zawsze aktywne zadania w tle",
         description:
@@ -348,7 +348,7 @@ export const translations: typeof enTranslations = {
       tools: {
         title: "{{toolCount}}+ narzędzi wywoływalnych przez AI",
         description:
-          "Każdy endpoint jest automatycznie narzędziem AI. Szukaj, przeglądaj, mailuj, zarządzaj użytkownikami — twój agent potrafi wszystko.",
+          "Każdy endpoint jest automatycznie narzędziem AI. Szukaj, przeglądaj, mailuj, zarządzaj użytkownikami - twój agent potrafi wszystko.",
       },
       secure: {
         title: "Bezpieczne z założenia",
@@ -361,7 +361,7 @@ export const translations: typeof enTranslations = {
       subtitle: "Open Source",
       title: "WordPress dla ery AI",
       description:
-        "Forkuj next-vibe i platforma jest twoja. Auth, płatności, czat AI, e-mail, admin, cron — wszystko w zestawie. Jedna definicja endpointu staje się webem, CLI, mobilką, serwerem MCP i narzędziem AI.",
+        "Forkuj next-vibe i platforma jest twoja. Auth, płatności, czat AI, e-mail, admin, cron - wszystko w zestawie. Jedna definicja endpointu staje się webem, CLI, mobilką, serwerem MCP i narzędziem AI.",
       typeSafe: {
         title: "Supremacja type-safety",
         description:
@@ -370,7 +370,7 @@ export const translations: typeof enTranslations = {
       tenPlatforms: {
         title: "Jedna definicja, dziesięć platform",
         description:
-          "Aplikacja webowa, mobilna, CLI, narzędzie AI, serwer MCP, tRPC, zadania cron — wszystko z jednej definicji endpointu. Żadnego generowanego kodu, który się rozjeżdża.",
+          "Aplikacja webowa, mobilna, CLI, narzędzie AI, serwer MCP, tRPC, zadania cron - wszystko z jednej definicji endpointu. Żadnego generowanego kodu, który się rozjeżdża.",
       },
       production: {
         title: "Przetestowane w produkcji",
@@ -402,7 +402,7 @@ export const translations: typeof enTranslations = {
       forums: {
         title: "Fora społeczności",
         description:
-          "Przeglądaj i dołącz do publicznych rozmów AI. Głosuj, dyskutuj, ucz się od innych — bez rejestracji.",
+          "Przeglądaj i dołącz do publicznych rozmów AI. Głosuj, dyskutuj, ucz się od innych - bez rejestracji.",
       },
       uncensored: {
         title: "Niecenzurowane domyślnie",

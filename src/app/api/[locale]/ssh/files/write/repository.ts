@@ -94,7 +94,7 @@ export class FilesWriteRepository {
         realFilePath = await realpath(filePath);
       } catch (e) {
         if (isNodeError(e) && e.code === "ENOENT") {
-          // File doesn't exist yet — resolve the parent dir instead
+          // File doesn't exist yet - resolve the parent dir instead
           try {
             const parentReal = await realpath(dirname(filePath));
             realFilePath = `${parentReal}/${filePath.split("/").pop() ?? ""}`;

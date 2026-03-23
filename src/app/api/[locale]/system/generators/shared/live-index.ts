@@ -1,8 +1,8 @@
 /**
- * Live Index — In-memory file index for the smart dev watcher
+ * Live Index - In-memory file index for the smart dev watcher
  *
  * Maintained by the dev watcher across the lifetime of the dev server.
- * Surgically updated on each file change — no rescan needed.
+ * Surgically updated on each file change - no rescan needed.
  * Passed to generators so they skip their own discovery scans.
  */
 
@@ -21,27 +21,27 @@ import { findFilesRecursively } from "./utils";
  * Which generator group a changed file belongs to
  */
 export interface FileClass {
-  /** definition.ts or route.ts — affects endpoint generators */
+  /** definition.ts or route.ts - affects endpoint generators */
   endpoints?: boolean;
-  /** route-client.ts — affects client-routes generator */
+  /** route-client.ts - affects client-routes generator */
   clientRoutes?: boolean;
-  /** task.ts or task-runner.ts — affects task-index generator */
+  /** task.ts or task-runner.ts - affects task-index generator */
   taskIndex?: boolean;
-  /** seeds.ts — affects seeds generator */
+  /** seeds.ts - affects seeds generator */
   seeds?: boolean;
-  /** email.tsx / *.email.tsx — affects email-templates generator */
+  /** email.tsx / *.email.tsx - affects email-templates generator */
   emailTemplates?: boolean;
-  /** indicators.ts — affects indicator-index generator */
+  /** indicators.ts - affects indicator-index generator */
   indicatorIndex?: boolean;
-  /** graph-seeds.ts — affects graph-seeds-index generator */
+  /** graph-seeds.ts - affects graph-seeds-index generator */
   graphSeedsIndex?: boolean;
-  /** system-prompt/prompt.ts — affects prompt-fragments generator */
+  /** system-prompt/prompt.ts - affects prompt-fragments generator */
   promptFragments?: boolean;
-  /** skill.ts anywhere in api/ — affects skills-index generator */
+  /** skill.ts anywhere in api/ - affects skills-index generator */
   skillsIndex?: boolean;
 }
 
-/** Dirty flags — which generator groups need to run */
+/** Dirty flags - which generator groups need to run */
 export interface DirtyFlags {
   endpoints: boolean;
   clientRoutes: boolean;
@@ -160,7 +160,7 @@ export function extractMethodsFromFile(absPath: string): string[] {
 
 /**
  * Given a relative or absolute filename (as reported by fs.watch),
- * return which generator groups it affects — or null if irrelevant.
+ * return which generator groups it affects - or null if irrelevant.
  */
 export function classifyFile(filename: string): FileClass | null {
   // Skip generated, temp, and hidden files
@@ -205,7 +205,7 @@ export function classifyFile(filename: string): FileClass | null {
   if (base === "graph-seeds.ts") {
     return { graphSeedsIndex: true };
   }
-  // system-prompt/prompt.ts — the fragment definition file
+  // system-prompt/prompt.ts - the fragment definition file
   if (base === "prompt.ts" && filename.includes("/system-prompt/")) {
     return { promptFragments: true };
   }
@@ -228,7 +228,7 @@ function getApiDir(): string {
   return join(process.cwd(), "src", "app", "api", "[locale]");
 }
 
-/** Base directory for tasks (broader — includes all api/) */
+/** Base directory for tasks (broader - includes all api/) */
 function getApiRootDir(): string {
   // eslint-disable-next-line i18next/no-literal-string
   return join(process.cwd(), "src", "app", "api");

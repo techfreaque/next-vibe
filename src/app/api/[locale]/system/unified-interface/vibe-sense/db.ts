@@ -1,9 +1,9 @@
 /**
- * Vibe Sense — Database Schema
+ * Vibe Sense - Database Schema
  *
  * Tables for graphs, time-series datapoints, evaluator signals, and backtests.
  *
- * NOTE: Using text() with enum constraint instead of pgEnum() — translation keys
+ * NOTE: Using text() with enum constraint instead of pgEnum() - translation keys
  * exceed PostgreSQL's 63-byte enum label limit.
  */
 
@@ -22,10 +22,9 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { users } from "@/app/api/[locale]/user/db";
-import type { GraphConfig } from "./graph/types";
 import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { ResolutionValues } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { users } from "@/app/api/[locale]/user/db";
 import {
   BacktestActionMode,
   BacktestActionModeDB,
@@ -33,13 +32,14 @@ import {
   RunStatus,
   RunStatusDB,
 } from "./enum";
+import type { GraphConfig } from "./graph/types";
 
 // ─── Graphs ───────────────────────────────────────────────────────────────────
 
 /**
- * Pipeline Graphs — versioned DAG configs.
+ * Pipeline Graphs - versioned DAG configs.
  * Each row is a version of a graph. Active version is marked with isActive=true.
- * Edits create new rows (branches) — never mutate existing versions.
+ * Edits create new rows (branches) - never mutate existing versions.
  */
 export const pipelineGraphs = pgTable(
   "pipeline_graphs",
@@ -82,7 +82,7 @@ export type NewPipelineGraph = z.infer<typeof insertPipelineGraphSchema>;
 // ─── Datapoints ───────────────────────────────────────────────────────────────
 
 /**
- * Pipeline Datapoints — time series values.
+ * Pipeline Datapoints - time series values.
  * Only written for nodes with persist: "always" or persist: "snapshot".
  * persist: "never" nodes are computed on read from nearest persisted ancestor.
  */
@@ -119,8 +119,8 @@ export type PipelineDatapoint = z.infer<typeof selectPipelineDatapointSchema>;
 // ─── Signals ──────────────────────────────────────────────────────────────────
 
 /**
- * Pipeline Signals — evaluator fire history.
- * Always persisted regardless of input persist modes — the audit trail.
+ * Pipeline Signals - evaluator fire history.
+ * Always persisted regardless of input persist modes - the audit trail.
  */
 export const pipelineSignals = pgTable(
   "pipeline_signals",
@@ -172,7 +172,7 @@ export const pipelineBacktestRuns = pgTable(
     })
       .notNull()
       .default(BacktestActionMode.SIMULATE),
-    /** Whether all source data was available — null until run completes */
+    /** Whether all source data was available - null until run completes */
     eligible: boolean("eligible"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -222,7 +222,7 @@ export type PipelineBacktestResult = z.infer<
 // ─── Execution Runs ──────────────────────────────────────────────────────────
 
 /**
- * Pipeline Runs — execution history for scheduled and on-demand graph runs.
+ * Pipeline Runs - execution history for scheduled and on-demand graph runs.
  * Tracks when each graph ran, whether it succeeded, node/error counts.
  */
 export const pipelineRuns = pgTable(
@@ -325,7 +325,7 @@ export const pipelineBacktestResultsRelations = relations(
 // ─── Snapshot TTL ─────────────────────────────────────────────────────────────
 
 /**
- * Snapshot cache table — per-node TTL cache for persist: "snapshot" nodes.
+ * Snapshot cache table - per-node TTL cache for persist: "snapshot" nodes.
  * Keyed by nodeId + range hash.
  */
 export const pipelineSnapshots = pgTable(

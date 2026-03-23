@@ -202,7 +202,7 @@ export const translations = {
       allocate: {
         title: "Allocate Credits",
         description:
-          "Add credits to any user account. Credits act as a spending cap — they control how much AI usage is allowed. For self-hosted instances, set this to the budget you want to allow.",
+          "Add credits to any user account. Credits act as a spending cap - they control how much AI usage is allowed. For self-hosted instances, set this to the budget you want to allow.",
         howItWorks: {
           title: "How Credit Limits Work",
           freePool: {
@@ -213,7 +213,7 @@ export const translations = {
           bonus: {
             title: "Bonus Credits (Per User)",
             description:
-              "Bonus credits are permanent — they never expire and stack on top of free pool credits. Use these to grant individual users extra capacity.",
+              "Bonus credits are permanent - they never expire and stack on top of free pool credits. Use these to grant individual users extra capacity.",
           },
           apiKeys: {
             title: "Remove All Limits",

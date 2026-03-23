@@ -13,11 +13,11 @@ import {
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseArrayOptionalField,
   objectField,
   requestField,
   requestUrlPathParamsField,
   responseArrayField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -130,7 +130,7 @@ const { GET } = createEndpoint({
         },
       }),
 
-      // Unified items array — each item is either a folder or a thread
+      // Unified items array - each item is either a folder or a thread
       items: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: objectField(scopedTranslation, {

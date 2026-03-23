@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "EMA",
     description:
-      "Exponential Moving Average — weights recent prices more heavily",
+      "Exponential Moving Average - weights recent prices more heavily",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

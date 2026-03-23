@@ -10,8 +10,7 @@ import {
   type NestedValue,
   processTranslationValue,
 } from "./shared-translation-utils";
-import type { TParams } from "./static-types";
-import type { DotNotation } from "./static-types";
+import type { DotNotation, TParams } from "./static-types";
 
 // this value should never be used at runtime
 export type TranslatedKeyType = "createScopedTranslation-key";
@@ -74,8 +73,8 @@ export interface TranslationSchemaConstraint {
  *
  * export const simpleT = createScopedTranslation({
  *   en: enTranslations,
- *   de: () => require("./de").translations,  // lazy — loaded on first DE request
- *   pl: () => require("./pl").translations,  // lazy — loaded on first PL request
+ *   de: () => require("./de").translations,  // lazy - loaded on first DE request
+ *   pl: () => require("./pl").translations,  // lazy - loaded on first PL request
  * });
  *
  * // Usage:
@@ -92,7 +91,7 @@ export type ExtractScopedTranslationKey<T> = T extends {
   : never;
 
 /**
- * Resolves a translation entry — supports both eager objects and lazy getters.
+ * Resolves a translation entry - supports both eager objects and lazy getters.
  * Lazy getters are called once and their result is cached.
  */
 type LazyOrEager<T> = T | (() => T);

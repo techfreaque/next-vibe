@@ -8,7 +8,7 @@
  * Algorithm:
  *  1. Resolve toolName / alias → canonical path via getFullPath
  *  2. Load the endpoint definition via getEndpoint
- *  3. safeParse mergedArgs through requestUrlPathParamsSchema — matching keys go to urlPathParams
+ *  3. safeParse mergedArgs through requestUrlPathParamsSchema - matching keys go to urlPathParams
  *  4. Everything else goes to data
  *
  * If the endpoint cannot be resolved the entire object is passed as data (safe fallback).

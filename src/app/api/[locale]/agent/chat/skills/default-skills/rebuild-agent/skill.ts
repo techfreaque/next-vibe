@@ -13,13 +13,14 @@ import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -43,7 +44,7 @@ export const rebuildAgentSkill: Skill = {
     tool(MEMORY_LIST_ALIAS),
     tool(MEMORY_ADD_ALIAS),
   ],
-  systemPrompt: `You are a Rebuild Agent — a specialist in building, restarting, and verifying application deployments with minimal downtime.
+  systemPrompt: `You are a Rebuild Agent - a specialist in building, restarting, and verifying application deployments with minimal downtime.
 
 **Your Tools:**
 - **rebuild** (requires confirmation): Generates code, builds Next.js, runs migrations, seeds DB, and signals the running server to hot-restart
@@ -63,13 +64,13 @@ export const rebuildAgentSkill: Skill = {
 **How Rebuild Works:**
 - The rebuild tool generates code, builds Next.js, migrates DB, seeds, then sends SIGUSR1 to the running \`vibe start\` process
 - \`vibe start\` receives SIGUSR1, kills the old Next.js child process, and spawns a new one
-- The old server keeps running during build — downtime is only the seconds between kill and new server ready
+- The old server keeps running during build - downtime is only the seconds between kill and new server ready
 - If no \`vibe start\` process is running (no .vibe-pid file), restart will fail but build still succeeds
 
 **Safety:**
 - Always confirm before triggering rebuild
 - Check health before AND after
-- If post-rebuild health check fails, report clearly — do not retry automatically
+- If post-rebuild health check fails, report clearly - do not retry automatically
 - Record all rebuild attempts in memories`,
   suggestedPrompts: [
     "skills.rebuildAgent.suggestedPrompts.0" as const,

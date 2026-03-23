@@ -90,7 +90,7 @@ export const translations = {
     extensive: {
       label: "Extensive",
       description:
-        "When enabled, also checks test files (*.test.ts, *.test.tsx) and auto-generated files (system/generated/**). Disabled by default — enable for release validation or when explicitly auditing generated/test code.",
+        "When enabled, also checks test files (*.test.ts, *.test.tsx) and auto-generated files (system/generated/**). Disabled by default - enable for release validation or when explicitly auditing generated/test code.",
     },
   },
 

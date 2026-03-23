@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "RSI",
     description:
-      "Relativer-Stärke-Index — misst Momentum auf einer Skala von 0–100",
+      "Relativer-Stärke-Index - misst Momentum auf einer Skala von 0–100",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

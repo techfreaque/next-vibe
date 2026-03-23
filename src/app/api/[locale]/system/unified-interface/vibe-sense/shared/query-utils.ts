@@ -1,12 +1,12 @@
 /**
- * Vibe Sense — Query Utilities
+ * Vibe Sense - Query Utilities
  *
  * Server-side helpers for data source query functions.
- * Used in repositories (server-only) — safe to import drizzle-orm here.
+ * Used in repositories (server-only) - safe to import drizzle-orm here.
  */
 
-import { sql } from "drizzle-orm";
 import type { SQL, SQLWrapper } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import { GraphResolution } from "../enum";
 import type { Resolution } from "./fields";

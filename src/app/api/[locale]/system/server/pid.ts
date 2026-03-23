@@ -46,7 +46,7 @@ export function killPreviousInstance(
   }
 
   const pidStr = readFileSync(pidFile, "utf-8").trim();
-  // Support multi-PID files (one per line) — kill all recorded processes
+  // Support multi-PID files (one per line) - kill all recorded processes
   const pids = pidStr
     .split("\n")
     .map((s) => parseInt(s.trim(), 10))
@@ -137,7 +137,7 @@ export function addPidToFile(pidFile: string, pid: number): void {
     pids.add(pid);
     writeFileSync(pidFile, [...pids].join("\n"), "utf-8");
   } catch {
-    // Ignore — best-effort
+    // Ignore - best-effort
   }
 }
 
@@ -156,7 +156,7 @@ export function removePidFromFile(pidFile: string, pid: number): void {
       .filter((p) => p > 0 && p !== pid);
     writeFileSync(pidFile, pids.join("\n"), "utf-8");
   } catch {
-    // Ignore — best-effort
+    // Ignore - best-effort
   }
 }
 

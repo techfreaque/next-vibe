@@ -318,7 +318,7 @@ export class ClaudeCodeRepository {
           displayName: title,
         });
 
-        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} — pass the complete result in the response object so the AI that launched you can see it.`;
+        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} - When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} - pass the complete result in the response object so the AI that launched you can see it.`;
 
         const terminal = ClaudeCodeRepository.detectTerminal(logger);
         if (terminal) {
@@ -337,7 +337,7 @@ export class ClaudeCodeRepository {
             callbackMode,
           });
         } else {
-          // No terminal — spawn detached background process
+          // No terminal - spawn detached background process
           logger.warn(
             "No terminal found, spawning detached via escalateToTask",
           );
@@ -441,7 +441,7 @@ export class ClaudeCodeRepository {
           );
         }
 
-        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} — pass the complete result in the response object so the AI that launched you can see it.`;
+        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} - When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} - pass the complete result in the response object so the AI that launched you can see it.`;
 
         const terminal = ClaudeCodeRepository.detectTerminal(logger);
         if (terminal) {
@@ -480,7 +480,7 @@ export class ClaudeCodeRepository {
         });
       }
 
-      // ── Path 3: CLI/cron — no revival context, just spawn and return ──
+      // ── Path 3: CLI/cron - no revival context, just spawn and return ──
       logger.info("Interactive (CLI/cron): spawning detached, no revival");
       const terminal = ClaudeCodeRepository.detectTerminal(logger);
       if (terminal) {

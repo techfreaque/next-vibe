@@ -6,8 +6,8 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import {
-  stepCountIs,
   streamText as aiStreamText,
+  stepCountIs,
   type StopCondition,
 } from "ai";
 
@@ -141,7 +141,7 @@ export class StreamExecutionHandler {
               const inputTokens = stepResult.usage.inputTokens ?? 0;
               if (inputTokens > 0 && inputTokens >= contextGuardThreshold) {
                 logger.warn(
-                  "[ToolLoop] Context window guard triggered — aborting tool loop",
+                  "[ToolLoop] Context window guard triggered - aborting tool loop",
                   {
                     inputTokens,
                     contextGuardThreshold,

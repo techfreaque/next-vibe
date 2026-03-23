@@ -1,5 +1,5 @@
 /**
- * Vibe Frame — React Hook for Frame-Side Bridge
+ * Vibe Frame - React Hook for Frame-Side Bridge
  *
  * Used inside the iframe to communicate with the parent page.
  * Sets up the postMessage bridge and provides send/listen helpers.

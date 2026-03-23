@@ -27,7 +27,7 @@ export class AbortControllerSetup {
     };
     timeoutAbortController.addEventListener("abort", timeoutAbortHandler);
 
-    // Stream survives page refresh — no request.signal linkage.
+    // Stream survives page refresh - no request.signal linkage.
     // Streams are only cancelled via the cancel endpoint or timeout.
 
     return streamAbortController;

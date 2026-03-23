@@ -15,20 +15,13 @@ import { z } from "zod";
 
 import { scopedTranslation as leadsStatsScopedTranslation } from "@/app/api/[locale]/leads/stats/i18n";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
-import type {
-  AnyChildrenConstrain,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-} from "../../../unified-ui/widgets/_shared/types";
 import { createEndpoint } from "../../endpoints/definition/create";
 import {
+  objectField,
   objectFieldNew,
   requestField,
   requestResponseField,
-  objectField,
-  requestField,
 } from "../../field/utils-new";
 import {
   EndpointErrorTypes,
@@ -37,7 +30,6 @@ import {
   Methods,
   WidgetType,
 } from "../../types/enums";
-import type { UnifiedField } from "../endpoint";
 
 // ============================================================================
 // HELPER: All error types for test endpoints
@@ -437,7 +429,7 @@ const test8d_objectFieldStandalone = objectFieldNew({
 });
 
 /**
- * Tests 9A/9B/9C: Container title key — standalone objectFieldNew tests.
+ * Tests 9A/9B/9C: Container title key - standalone objectFieldNew tests.
  *
  * NOTE: objectFieldNew does NOT enforce global TranslationKey on title at the
  * standalone call site. Key validation happens when the result is assigned to

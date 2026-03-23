@@ -3,7 +3,7 @@
  *
  * Shows a compact summary after `vibe pub` completes.
  * Step-by-step logs are already printed during execution,
- * so this only shows the final outcome — no redundancy.
+ * so this only shows the final outcome - no redundancy.
  */
 
 import { Box, Text } from "ink";
@@ -114,7 +114,7 @@ export function ReleaseResultWidget({ field }: CliWidgetProps): JSX.Element {
       const icon =
         pkg.status === "success" ? "✓" : pkg.status === "skipped" ? "–" : "✗";
       const version = pkg.version !== undefined ? ` v${pkg.version}` : "";
-      const msg = pkg.message !== undefined ? ` — ${pkg.message}` : "";
+      const msg = pkg.message !== undefined ? ` - ${pkg.message}` : "";
       lines.push(`  ${icon} ${pkg.name}${version}${msg}`);
     }
     if (published.length > 0) {

@@ -1,5 +1,5 @@
 /**
- * Credits Free Grants — Route
+ * Credits Free Grants - Route
  * Server-only.
  */
 

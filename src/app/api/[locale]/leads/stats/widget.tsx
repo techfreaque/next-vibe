@@ -26,15 +26,15 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
 import {
-  type LeadsTranslationKey,
-  scopedTranslation as leadsScopedTranslation,
-} from "@/app/api/[locale]/leads/i18n";
-import {
   LeadSource,
   LeadSourceFilter,
   LeadStatus,
   LeadStatusFilter,
 } from "@/app/api/[locale]/leads/enum";
+import {
+  type LeadsTranslationKey,
+  scopedTranslation as leadsScopedTranslation,
+} from "@/app/api/[locale]/leads/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
@@ -69,7 +69,7 @@ interface ActivityRecord {
 }
 
 function computeTrend(recentActivity: ActivityRecord[]): TrendDirection {
-  // Use the recentActivity timestamps to proxy a trend — if more than half of
+  // Use the recentActivity timestamps to proxy a trend - if more than half of
   // the last-10 items are within the past 2 days, we call it "up".
   if (!recentActivity.length) {
     return "neutral";
@@ -935,7 +935,7 @@ export function LeadsStatsContainer({
         />
       </Div>
 
-      {/* New leads timeline — with explicit date ranges */}
+      {/* New leads timeline - with explicit date ranges */}
       <Div className="rounded-lg border bg-card p-4">
         <Span className="text-sm font-semibold mb-3 block">
           {t("widget.newLeadsTimeline")}
@@ -992,7 +992,7 @@ export function LeadsStatsContainer({
       {/* Grouped stats breakdown */}
       {groupedStats && (
         <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* By Status — clickable rows */}
+          {/* By Status - clickable rows */}
           {byStatusItems && byStatusItems.length > 0 && (
             <Div className="rounded-lg border bg-card p-4">
               <Div className="flex items-center gap-2 mb-3">
@@ -1022,7 +1022,7 @@ export function LeadsStatsContainer({
             </Div>
           )}
 
-          {/* By Source — clickable rows */}
+          {/* By Source - clickable rows */}
           {bySourceItems && bySourceItems.length > 0 && (
             <Div className="rounded-lg border bg-card p-4">
               <Div className="flex items-center gap-2 mb-3">

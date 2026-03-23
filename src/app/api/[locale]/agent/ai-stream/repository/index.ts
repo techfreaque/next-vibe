@@ -6,12 +6,12 @@
 import "server-only";
 
 import type { JSONValue } from "ai";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
@@ -84,7 +84,7 @@ export class AiStreamRepository {
     return { userId, leadId, ipAddress };
   }
 
-  /** Headless overload — returns structured result with threadId + lastAiMessageId */
+  /** Headless overload - returns structured result with threadId + lastAiMessageId */
   static createAiStream(params: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -99,7 +99,7 @@ export class AiStreamRepository {
     sequenceIdOverride?: string;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
-  /** Interactive overload — returns response output (events stream via WS) */
+  /** Interactive overload - returns response output (events stream via WS) */
   static createAiStream(params: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -165,7 +165,7 @@ export class AiStreamRepository {
     });
 
     if (!setupResult.success) {
-      // Emit error to chat thread if we have a threadId — setup failures (e.g. insufficient
+      // Emit error to chat thread if we have a threadId - setup failures (e.g. insufficient
       // credits, bad model) should appear as error bubbles in the thread, not silently fail.
       const threadId = data.threadId;
       if (threadId && !user.isPublic && "id" in user) {
@@ -240,11 +240,11 @@ export class AiStreamRepository {
       skipAiTurn,
     } = setupResult.data;
 
-    // All confirmations were wakeUp-pending — no AI turn needed here.
+    // All confirmations were wakeUp-pending - no AI turn needed here.
     // resume-stream will handle revival when each goroutine completes.
     if (skipAiTurn) {
       logger.info(
-        "[AiStream] All confirmations wakeUp-pending — skipping AI turn, revival handles it",
+        "[AiStream] All confirmations wakeUp-pending - skipping AI turn, revival handles it",
         { threadId: data.threadId },
       );
       return {
@@ -260,14 +260,14 @@ export class AiStreamRepository {
     // Captured refs so headless path can read lastAiMessageId + content after runStream completes
     let capturedLastAiMessageId: string = aiMessageId;
     let capturedLastAiMessageContent: string | null = null;
-    // Captured wakeUp payloads — queue written by the signal handler, processed in finally for deferred insertion + revival.
+    // Captured wakeUp payloads - queue written by the signal handler, processed in finally for deferred insertion + revival.
     // Array supports parallel wakeUp tools: each completion pushes its payload; all are processed sequentially.
     const capturedWakeUpPayloads: WakeUpPayload[] = [];
 
     // Insert all pending wakeUp deferred messages, then fire ONE revival from the last one.
     // Batching ensures: if multiple wakeUp tools complete before the stream yields,
     // all their deferred messages are inserted as a linear chain, and a single AI
-    // turn sees all of them — no duplicate revival responses.
+    // turn sees all of them - no duplicate revival responses.
     const handleWakeUpRevivalBatch = async (
       payloads: WakeUpPayload[],
     ): Promise<void> => {
@@ -325,7 +325,7 @@ export class AiStreamRepository {
       });
     };
 
-    // Create emitter on the messages channel — events are owned by messages endpoint
+    // Create emitter on the messages channel - events are owned by messages endpoint
     const wsEmit: WsEmitCallback = createMessagesEmitter(
       threadResultThreadId,
       logger,
@@ -357,7 +357,7 @@ export class AiStreamRepository {
 
         // Wire StreamContext.pendingToolMessages into ToolExecutionContext so
         // tools-loader can inject the correct currentToolMessageId per toolCallId
-        // before calling each tool's execute() — parallel-safe, no polling needed.
+        // before calling each tool's execute() - parallel-safe, no polling needed.
         streamContext.pendingToolMessages = ctx.pendingToolMessages;
 
         // Wire stop-signal into Agent SDK provider so it can abort its internal loop
@@ -370,7 +370,7 @@ export class AiStreamRepository {
           threadResultThreadId,
           (payload) => {
             logger.info(
-              "[WakeUp] Signal received — will yield at next step boundary",
+              "[WakeUp] Signal received - will yield at next step boundary",
               {
                 threadId: threadResultThreadId,
                 toolMessageId: payload.toolMessageId,
@@ -412,7 +412,7 @@ export class AiStreamRepository {
           // Emit USER MESSAGE_CREATED AFTER the compacting check so ordering is always correct:
           // - Non-compacting: user message emitted here with original parentId
           // - Compacting: CompactingHandler emits it with parentId = compactingMessageId
-          // Emit user MESSAGE_CREATED — WS subscribers see the user message appear.
+          // Emit user MESSAGE_CREATED - WS subscribers see the user message appear.
           if (
             userMessageId &&
             data.operation !== "answer-as-ai" &&
@@ -444,7 +444,7 @@ export class AiStreamRepository {
 
             // Determine parent for the new compacting message.
             // Normal: compacting sits directly below effectiveParentMessageId.
-            // Retry: failed compacting already occupies that slot — new compacting is a sibling,
+            // Retry: failed compacting already occupies that slot - new compacting is a sibling,
             //        so use the same parentId as the failed one.
             const compactingParentId = compactingCheck.failedCompactingMessage
               ? (compactingCheck.failedCompactingMessage.parentId ?? null)
@@ -605,11 +605,11 @@ export class AiStreamRepository {
             capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
             capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
           } else if (headless) {
-            // No assistant message was written — stream may have errored before first emit.
+            // No assistant message was written - stream may have errored before first emit.
             // capturedLastAiMessageId falls back to the pre-generated aiMessageId UUID,
             // which may have no content in DB. Log a warning so callers can detect this.
             logger.warn(
-              "[AI Stream] Headless stream completed with no assistant message written — " +
+              "[AI Stream] Headless stream completed with no assistant message written - " +
                 "lastAiMessageId falls back to pre-generated ID, content may be absent",
               { aiMessageId, threadId: threadResultThreadId },
             );
@@ -622,7 +622,7 @@ export class AiStreamRepository {
 
           if (streamAbortController.signal.aborted) {
             // AbortErrorHandler should have already run in StreamExecutionHandler.
-            // Log and continue — the finally block will emit STREAM_FINISHED.
+            // Log and continue - the finally block will emit STREAM_FINISHED.
             logger.info(
               "[AI Stream] Post-abort error in outer catch (abort already handled)",
               {
@@ -652,7 +652,7 @@ export class AiStreamRepository {
         } finally {
           await clearStreamingState(threadResultThreadId, logger);
           // wakeUp revival: insert deferred (single stream = no race) then revive.
-          // Skip if stream was aborted (user cancel or timeout) — don't revive cancelled streams.
+          // Skip if stream was aborted (user cancel or timeout) - don't revive cancelled streams.
           if (
             capturedWakeUpPayloads.length > 0 &&
             !streamAbortController.signal.aborted
@@ -663,7 +663,7 @@ export class AiStreamRepository {
             streamAbortController.signal.aborted
           ) {
             logger.info(
-              "[WakeUp] Headless: skipping revival — stream was aborted",
+              "[WakeUp] Headless: skipping revival - stream was aborted",
               {
                 threadId: threadResultThreadId,
                 pendingWakeUps: capturedWakeUpPayloads.length,
@@ -687,7 +687,7 @@ export class AiStreamRepository {
         } satisfies ResponseType<HeadlessAiStreamResult>;
       }
 
-      // Interactive path: fire-and-forget — stream runs independently of HTTP connection.
+      // Interactive path: fire-and-forget - stream runs independently of HTTP connection.
       // Events flow via WebSocket. The POST returns immediately with threadId.
       // The finally block guarantees isStreaming is cleared even on unhandled crashes.
       let streamFinishReason: "completed" | "cancelled" | "error" | "timeout" =
@@ -722,7 +722,7 @@ export class AiStreamRepository {
           }
 
           // Skip wakeUp revival if the stream was cancelled by the user.
-          // A wakeUp signal may have arrived mid-stream but the user aborted — don't revive.
+          // A wakeUp signal may have arrived mid-stream but the user aborted - don't revive.
           const wasAborted = streamAbortController.signal.aborted;
           const shouldReviveWakeUp =
             capturedWakeUpPayloads.length > 0 && !wasAborted;
@@ -748,7 +748,7 @@ export class AiStreamRepository {
               }
               if (capturedWakeUpPayloads.length > 0) {
                 logger.info(
-                  "[WakeUp] Skipping revival — stream was aborted by user",
+                  "[WakeUp] Skipping revival - stream was aborted by user",
                   {
                     threadId: threadResultThreadId,
                     pendingWakeUps: capturedWakeUpPayloads.length,

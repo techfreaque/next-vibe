@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Version History Route
+ * Vibe Sense - Graph Version History Route
  */
 
 import "server-only";

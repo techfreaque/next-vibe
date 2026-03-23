@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Script Transformer Route
+ * Vibe Sense - Script Transformer Route
  * Server-only.
  */
 

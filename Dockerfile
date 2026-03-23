@@ -259,11 +259,11 @@ RUN --mount=type=cache,target=/root/.bun/install/cache,id=next-vibe-bun-cache,sh
 
 # Build
 # --webpack: use webpack instead of Turbopack (~7.5 GB vs ~12 GB peak memory)
-# /app/.next-prod/cache mounted directly — Next.js webpack/RSC incremental cache persisted across builds
+# /app/.next-prod/cache mounted directly - Next.js webpack/RSC incremental cache persisted across builds
 # DB unreachable at build time (docker network only); migrations run via docker compose run in install-docker.sh
 RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache-v2,sharing=locked \
     bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
-    test -f .next-prod/BUILD_ID || (echo "ERROR: .next-prod/BUILD_ID missing — Next.js build failed" && exit 1)
+    test -f .next-prod/BUILD_ID || (echo "ERROR: .next-prod/BUILD_ID missing - Next.js build failed" && exit 1)
 
 
 # Port 3000: HTTP + WebSocket (proxy mode, default).

@@ -32,7 +32,7 @@ export function ABTestingClient({
       {/* Description */}
       <P className="text-muted-foreground">{t("abTest.subtitle")}</P>
 
-      {/* Journey Variants — live data with GET/POST/PATCH */}
+      {/* Journey Variants - live data with GET/POST/PATCH */}
       <EndpointsPage
         endpoint={journeyVariantsEndpoints}
         locale={locale}

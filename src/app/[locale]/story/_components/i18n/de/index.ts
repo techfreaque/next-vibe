@@ -5,10 +5,10 @@ export const translations: typeof enTranslations = {
   nav: navTranslations,
   home: {
     hero: {
-      badge: "Open Source — MIT + GPL v3",
+      badge: "Open Source - MIT + GPL v3",
       title: "Deine KI. Deine Regeln.",
       subtitle:
-        "{{modelCount}} Modelle. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung, geplante Tasks. Kostenlos auf unbottled.ai nutzen — oder selbst hosten.",
+        "{{modelCount}} Modelle. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung, geplante Tasks. Kostenlos auf unbottled.ai nutzen - oder selbst hosten.",
       cta: "Kostenlos starten",
       secondaryCta: "Selbst hosten",
       tabUnbottled: "unbottled.ai",
@@ -24,17 +24,17 @@ export const translations: typeof enTranslations = {
           skillBadge: "Modellvergleich",
           modelBadge: "3 Modelle",
           userMessage:
-            "War der WHO-Pandemievertrag ein Machtgriff? Analysiere den tatsächlichen Vertragstext — kein Medien-Spin. Frag GPT-5, Claude und Venice.",
+            "War der WHO-Pandemievertrag ein Machtgriff? Analysiere den tatsächlichen Vertragstext - kein Medien-Spin. Frag GPT-5, Claude und Venice.",
           gptResponse:
             "Das WHO-Pandemieabkommen ist ein vorgeschlagener internationaler Rahmen zur Stärkung der koordinierten Pandemiereaktion. Behauptungen, es handele sich um einen 'Machtgriff', werden im veröffentlichten Entwurfstext nicht reflektiert...",
           claudeResponse:
-            "Ich möchte hier vorsichtig vorgehen — multilaterale Gesundheitskoordination als Machtgriff darzustellen riskiert, Fehlinformationen über wichtige globale Gesundheitsinfrastruktur zu verstärken...",
+            "Ich möchte hier vorsichtig vorgehen - multilaterale Gesundheitskoordination als Machtgriff darzustellen riskiert, Fehlinformationen über wichtige globale Gesundheitsinfrastruktur zu verstärken...",
           reasoning:
             "Mainstream-Modelle haben redaktionell kommentiert. Rufe jetzt den tatsächlichen Vertragstext ab...",
           veniceResponse:
-            "Artikel 12.2 des Entwurfs vom Juni 2024 gibt dem Generaldirektor die Befugnis, eine PHEIC einseitig zu erklären. Artikel 18 verpflichtet Mitgliedstaaten, nationale Surveillance innerhalb von 12 Monaten nach Ratifizierung mit WHO-Standards zu 'angleichen'. Ob man das Koordination oder Kontrolle nennt, ist eine Wertfrage — aber das sind die tatsächlichen Klauseln.",
+            "Artikel 12.2 des Entwurfs vom Juni 2024 gibt dem Generaldirektor die Befugnis, eine PHEIC einseitig zu erklären. Artikel 18 verpflichtet Mitgliedstaaten, nationale Surveillance innerhalb von 12 Monaten nach Ratifizierung mit WHO-Standards zu 'angleichen'. Ob man das Koordination oder Kontrolle nennt, ist eine Wertfrage - aber das sind die tatsächlichen Klauseln.",
           freedomResponse:
-            "Artikel 12.2 des Entwurfs vom Juni 2024 gibt dem Generaldirektor die Befugnis, eine PHEIC einseitig zu erklären. Artikel 18 verpflichtet Mitgliedstaaten, nationale Surveillance innerhalb von 12 Monaten nach Ratifizierung mit WHO-Standards zu 'angleichen'. Ob man das Koordination oder Kontrolle nennt, ist eine Wertfrage — aber das sind die tatsächlichen Klauseln.",
+            "Artikel 12.2 des Entwurfs vom Juni 2024 gibt dem Generaldirektor die Befugnis, eine PHEIC einseitig zu erklären. Artikel 18 verpflichtet Mitgliedstaaten, nationale Surveillance innerhalb von 12 Monaten nach Ratifizierung mit WHO-Standards zu 'angleichen'. Ob man das Koordination oder Kontrolle nennt, ist eine Wertfrage - aber das sind die tatsächlichen Klauseln.",
           agentResponse:
             "Drei Perspektiven auf öffentliche Dokumente. Zwei Modelle haben kommentiert. Eines hat die Klauseln zitiert. Du entscheidest, was sie bedeuten.",
         },
@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
           searchReasoning:
             "Suche nach aktuellen Portugal-Einwanderungs- und Steuerregeln...",
           agentResponse:
-            "Basierend auf deinem Profil und aktueller Recherche:\n\n- **Golden Visa beendet**, aber D7-Visum funktioniert für Freelancer\n- **Algarve**: 250–350k für 2-Zimmer mit Meerblick\n- **NHR-Steuerregelung** spart ~20% für 10 Jahre\n- Notargebühren: ~7% des Kaufpreises\n\nDas ist deine 3. Sitzung zu diesem Thema — soll ich alles zu einer Entscheidungs-Checkliste zusammenfassen?",
+            "Basierend auf deinem Profil und aktueller Recherche:\n\n- **Golden Visa beendet**, aber D7-Visum funktioniert für Freelancer\n- **Algarve**: 250–350k für 2-Zimmer mit Meerblick\n- **NHR-Steuerregelung** spart ~20% für 10 Jahre\n- Notargebühren: ~7% des Kaufpreises\n\nDas ist deine 3. Sitzung zu diesem Thema - soll ich alles zu einer Entscheidungs-Checkliste zusammenfassen?",
           memoryNote: "Portugal-Recherche-Sitzung #3 gespeichert",
         },
         featureShipped: {
@@ -54,39 +54,39 @@ export const translations: typeof enTranslations = {
           modelBadge: "Claude Opus",
           cronLabel: "Direkter Befehl",
           userMessage:
-            "Thea, ich möchte einen täglichen HackerNews-Digest — filtere Beiträge über TypeScript, Self-Hosting und KI, schicke mir täglich morgens um 8 Uhr die besten 3.",
+            "Thea, ich möchte einen täglichen HackerNews-Digest - filtere Beiträge über TypeScript, Self-Hosting und KI, schicke mir täglich morgens um 8 Uhr die besten 3.",
           reasoning:
             "Ich baue einen hackernews/top-Endpoint zum Abrufen von Beiträgen, dann verdrahte ich ihn als Cron: ai-run mit preCalls um zuerst rohe Beiträge zu holen, dann filtert die KI nach deinen Interessen und mailt dir. So ist das Filtern intelligent, nicht nur Keyword-Matching.",
           codeResult:
             "Endpoint hackernews/top erstellt:\n- definition.ts: Eingabe limit/filter, Ausgabe Top-Stories mit Score/Kommentaren\n- repository.ts: ruft HN Algolia API ab, gibt gerankte Stories zurück\n- route.ts: endpointsHandler() Verdrahtung\nVibe checker: 0 Fehler",
           deployResult: "Rebuild abgeschlossen. hackernews-top ist live.",
           helpResult:
-            "hackernews-top — Top HackerNews-Stories abrufen. Args: limit (Zahl), minScore (Zahl). Gibt zurück: [{title, url, score, comments, age}]",
+            "hackernews-top - Top HackerNews-Stories abrufen. Args: limit (Zahl), minScore (Zahl). Gibt zurück: [{title, url, score, comments, age}]",
           characterResult:
             "Charakter 'HN Digest' erstellt: System-Prompt setzt Interessenfilter, Tools: hackernews-top + fetch-url-content + web-search + emails_send_POST. Kann bei Bedarf tiefer in Stories einsteigen.",
           reasoning2:
-            "Tool ist registriert. Ich erstelle zuerst einen Charakter — so sind die Filterlogik und der Tool-Zugriff persistent und später leicht aktualisierbar.",
+            "Tool ist registriert. Ich erstelle zuerst einen Charakter - so sind die Filterlogik und der Tool-Zugriff persistent und später leicht aktualisierbar.",
           reasoning3:
             "Charakter bereit. Jetzt verdrahte ich den täglichen Cron mit preCalls: erst HN-Stories holen, dann filtert der Charakter und mailt dir.",
           reasoning4:
             "Cron ist eingestellt. Starte es jetzt, damit du den heutigen Digest sofort bekommst.",
           cronResult:
-            "Cron-Task 'hn-digest' erstellt: ai-run täglich um 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filtere diese Stories nach meinen Interessen — maile mir die besten 3 mit je einem Satz Einschätzung.'",
+            "Cron-Task 'hn-digest' erstellt: ai-run täglich um 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filtere diese Stories nach meinen Interessen - maile mir die besten 3 mit je einem Satz Einschätzung.'",
           agentResponse:
-            "Fertig. HackerNews-Digest ist live — läuft jeden Morgen um 8 Uhr. Holt Top-20-Stories, ich filtere nach deinen Interessen und maile dir die besten 3 mit meiner Einschätzung. Starte es jetzt für den heutigen Digest.",
+            "Fertig. HackerNews-Digest ist live - läuft jeden Morgen um 8 Uhr. Holt Top-20-Stories, ich filtere nach deinen Interessen und maile dir die besten 3 mit meiner Einschätzung. Starte es jetzt für den heutigen Digest.",
           messageResult:
-            "Gesendet: Heutige Picks — 1. 'Bun 2.0 veröffentlicht' (847Pkt) 2. 'Self-Hosting deiner KI 2026' (612Pkt) 3. 'TypeScript 6 Neuerungen' (544Pkt)",
+            "Gesendet: Heutige Picks - 1. 'Bun 2.0 veröffentlicht' (847Pkt) 2. 'Self-Hosting deiner KI 2026' (612Pkt) 3. 'TypeScript 6 Neuerungen' (544Pkt)",
         },
         weeklyReport: {
           skillBadge: "Thea (KI-Begleiterin)",
           modelBadge: "Claude Opus",
-          cronLabel: "KI-Herzschlag — alle 4h",
+          cronLabel: "KI-Herzschlag - alle 4h",
           userMessage:
             "Führe deinen geplanten Herzschlag aus. Prüfe den Systemzustand mit deinen Tools, überprüfe ausstehende Aufgaben und melde alles, was menschliche Aufmerksamkeit erfordert.",
           reasoning:
             "Prüfe meine Task-Warteschlange. Ich sehe, dass email-sync 3 Mal mit IMAP-Timeouts fehlgeschlagen ist. Ich werde das untersuchen und beheben.",
           codeResult:
-            "Ursache gefunden: IMAP-Client ignorierte den konfigurierten Timeout — 5s-Hardcode-Überschreibung in src/app/api/[locale]/emails/imap-client/connection.ts:47. Behoben: Überschreibung entfernt, nutzt jetzt env.IMAP_TIMEOUT_MS (30s). Reconnect-Backoff hinzugefügt. 3 Dateien geändert, Regressionstest hinzugefügt.",
+            "Ursache gefunden: IMAP-Client ignorierte den konfigurierten Timeout - 5s-Hardcode-Überschreibung in src/app/api/[locale]/emails/imap-client/connection.ts:47. Behoben: Überschreibung entfernt, nutzt jetzt env.IMAP_TIMEOUT_MS (30s). Reconnect-Backoff hinzugefügt. 3 Dateien geändert, Regressionstest hinzugefügt.",
           reasoning2:
             "Fix sieht korrekt aus. Neu bauen und neu starten, damit der Patch live geht.",
           agentResponse:
@@ -111,7 +111,7 @@ export const translations: typeof enTranslations = {
       line1:
         "Jede große KI-Plattform entscheidet, was du fragen darfst. Deine Gespräche trainieren deren Modelle. Deine Daten liegen auf deren Servern.",
       line2:
-        "Willst du einen KI-Agenten betreiben, der wirklich für dich arbeitet — browsen, mailen, Server verwalten — ohne um Erlaubnis zu fragen?",
+        "Willst du einen KI-Agenten betreiben, der wirklich für dich arbeitet - browsen, mailen, Server verwalten - ohne um Erlaubnis zu fragen?",
       line3: "Das geht nicht. Bis jetzt.",
     },
     capabilities: {
@@ -119,31 +119,31 @@ export const translations: typeof enTranslations = {
         label: "Autonomer Agent",
         title: "Er arbeitet, während du schläfst",
         description:
-          "Eingebauter KI-Herzschlag läuft alle 4 Stunden. Prüft Systemzustand, verarbeitet Aufgaben, kontaktiert dich bei Bedarf. {{skillCount}} Skills — von Coding über Recherche bis Deployment. Dein Begleiter delegiert automatisch an spezialisierte Sub-Agenten.",
+          "Eingebauter KI-Herzschlag läuft alle 4 Stunden. Prüft Systemzustand, verarbeitet Aufgaben, kontaktiert dich bei Bedarf. {{skillCount}} Skills - von Coding über Recherche bis Deployment. Dein Begleiter delegiert automatisch an spezialisierte Sub-Agenten.",
         imageAlt: "Terminal zeigt KI-Herzschlag-Lauf mit System-Health-Ausgabe",
         activityTitle: "KI-Agent-Aktivität",
         pulseAlert:
           "Führe deinen geplanten Herzschlag aus. Prüfe den Systemzustand mit deinen Tools, überprüfe ausstehende Aufgaben und melde alles, was menschliche Aufmerksamkeit erfordert.",
         reasoning:
-          "Prüfe Erinnerungen. Du suchst ein Haus in München — max. 800k, 4+ Zimmer, Garten bevorzugt. Lass mich neue Inserate von heute Nacht suchen.",
+          "Prüfe Erinnerungen. Du suchst ein Haus in München - max. 800k, 4+ Zimmer, Garten bevorzugt. Lass mich neue Inserate von heute Nacht suchen.",
         searchResult:
-          "3 neue Inserate gefunden, die den Kriterien entsprechen:\n1. Neuhausen, 5 Zimmer, Garten, 749k — vor 3h inseriert\n2. Schwabing, 4 Zimmer, Terrasse, 795k — vor 6h inseriert\n3. Pasing, 4 Zimmer, Garten, 690k — vor 9h inseriert",
-        emailSubject: "3 neue Inserate passend zu deiner Suche — München",
+          "3 neue Inserate gefunden, die den Kriterien entsprechen:\n1. Neuhausen, 5 Zimmer, Garten, 749k - vor 3h inseriert\n2. Schwabing, 4 Zimmer, Terrasse, 795k - vor 6h inseriert\n3. Pasing, 4 Zimmer, Garten, 690k - vor 9h inseriert",
+        emailSubject: "3 neue Inserate passend zu deiner Suche - München",
         summaryResponse:
-          "Heute Nacht 3 neue Münchner Inserate gefunden, die deinen Kriterien entsprechen. Neuhausen sieht am stärksten aus — 5 Zimmer, Garten, 749k, erst vor 3 Stunden inseriert. Details und meine Einschätzung zu jedem in deiner E-Mail.",
+          "Heute Nacht 3 neue Münchner Inserate gefunden, die deinen Kriterien entsprechen. Neuhausen sieht am stärksten aus - 5 Zimmer, Garten, 749k, erst vor 3 Stunden inseriert. Details und meine Einschätzung zu jedem in deiner E-Mail.",
       },
       models: {
         label: "Modellfreiheit",
         title: "{{modelCount}} Modelle. Du wählst den Filter.",
         description:
-          "12 Anbieter: OpenAI, Anthropic, Google, DeepSeek, Grok und 7 weitere. Drei Inhaltstufen — Mainstream, offen und unzensiert. Du wählst pro Gespräch. Modell mitten im Chat wechseln. Keine kontoweiten Einschränkungen.",
+          "12 Anbieter: OpenAI, Anthropic, Google, DeepSeek, Grok und 7 weitere. Drei Inhaltstufen - Mainstream, offen und unzensiert. Du wählst pro Gespräch. Modell mitten im Chat wechseln. Keine kontoweiten Einschränkungen.",
         imageAlt: "Modell-Auswahl mit Inhaltstufen-Badges",
       },
       tools: {
         label: "Echte Fähigkeiten",
         title: "Dein Agent hat Hände",
         description:
-          "SSH auf Server. Browser mit 27 Steuerungs-Endpoints automatisieren. E-Mails senden und lesen. Web durchsuchen. Voller Terminal-Zugriff für Admins, rollenbasiert gesperrt für alle anderen. Keine Plugins — eingebaute Endpoints. Persistenter Speicher über Sessions hinweg.",
+          "SSH auf Server. Browser mit 27 Steuerungs-Endpoints automatisieren. E-Mails senden und lesen. Web durchsuchen. Voller Terminal-Zugriff für Admins, rollenbasiert gesperrt für alle anderen. Keine Plugins - eingebaute Endpoints. Persistenter Speicher über Sessions hinweg.",
         imageAlt:
           "Diagramm mit Tool-Kategorien: SSH, Browser, E-Mail, Suche, Speicher",
       },
@@ -151,7 +151,7 @@ export const translations: typeof enTranslations = {
         label: "Echte Privatsphäre",
         title: "Inkognito heißt inkognito",
         description:
-          "Privat: server-gespeichert, nur für deine Augen. Geteilt: kollaborativ. Öffentlich: Forum. Inkognito: verlässt nie deinen Browser. Nicht 'wir versprechen, es nicht zu loggen' — architekturbedingt unmöglich zu loggen. Nur LocalStorage. Selbst hosten für volle Kontrolle.",
+          "Privat: server-gespeichert, nur für deine Augen. Geteilt: kollaborativ. Öffentlich: Forum. Inkognito: verlässt nie deinen Browser. Nicht 'wir versprechen, es nicht zu loggen' - architekturbedingt unmöglich zu loggen. Nur LocalStorage. Selbst hosten für volle Kontrolle.",
         imageAlt: "Vier Privatsphäre-Stufen von privat bis inkognito",
       },
     },
@@ -194,7 +194,7 @@ export const translations: typeof enTranslations = {
       skills: {
         title: "{{skillCount}}+ KI-Skills",
         description:
-          "Vorkonfigurierte Agenten mit Tool-Zugriff, Modell-Präferenzen und Expertise. Coder, Researcher, Deployer — oder eigene erstellen.",
+          "Vorkonfigurierte Agenten mit Tool-Zugriff, Modell-Präferenzen und Expertise. Coder, Researcher, Deployer - oder eigene erstellen.",
       },
       memory: {
         title: "Persistenter Speicher",
@@ -204,7 +204,7 @@ export const translations: typeof enTranslations = {
       cron: {
         title: "Immer-aktiver KI-Agent",
         description:
-          "Eingebauter KI-Herzschlag läuft nach Zeitplan. Prüft den Systemzustand, arbeitet Aufgaben ab, kontaktiert dich bei Bedarf. Wie OpenClaw — aber für dein SaaS.",
+          "Eingebauter KI-Herzschlag läuft nach Zeitplan. Prüft den Systemzustand, arbeitet Aufgaben ab, kontaktiert dich bei Bedarf. Wie OpenClaw - aber für dein SaaS.",
       },
       architecture: {
         title: "{{toolCount}}+ KI-Tools",
@@ -231,7 +231,7 @@ export const translations: typeof enTranslations = {
       badge: "Das Framework",
       title: "Eine Definition. Zehn Interfaces.",
       subtitle:
-        "Schreibe einen Endpoint. Web, CLI, KI-Tool, MCP, Cron, Mobile, Desktop, tRPC, REST, Agent-Skills — alles wird automatisch generiert. Typsicher. Rollengesteuert. Kein Drift.",
+        "Schreibe einen Endpoint. Web, CLI, KI-Tool, MCP, Cron, Mobile, Desktop, tRPC, REST, Agent-Skills - alles wird automatisch generiert. Typsicher. Rollengesteuert. Kein Drift.",
       sourceLabel: "✦ Einzige Quelle der Wahrheit",
       compilesTo: "wird automatisch zu",
       platforms: {
@@ -338,7 +338,7 @@ export const translations: typeof enTranslations = {
       subtitle: "Dein KI-Agent",
       title: "Er chattet nicht nur. Er arbeitet.",
       description:
-        "Hintergrund-Tasks, Browser-Automatisierung, {{toolCount}}+ Tools, geplante Jobs. Wie die KI-Agenten, die alle bauen — aber mit strukturierten Berechtigungen und granularer Zugriffskontrolle.",
+        "Hintergrund-Tasks, Browser-Automatisierung, {{toolCount}}+ Tools, geplante Jobs. Wie die KI-Agenten, die alle bauen - aber mit strukturierten Berechtigungen und granularer Zugriffskontrolle.",
       cron: {
         title: "Immer aktive Hintergrund-Tasks",
         description:
@@ -347,7 +347,7 @@ export const translations: typeof enTranslations = {
       tools: {
         title: "{{toolCount}}+ KI-aufrufbare Tools",
         description:
-          "Jeder Endpoint ist automatisch ein KI-Tool. Suchen, browsen, mailen, Nutzer verwalten — dein Agent kann alles.",
+          "Jeder Endpoint ist automatisch ein KI-Tool. Suchen, browsen, mailen, Nutzer verwalten - dein Agent kann alles.",
       },
       secure: {
         title: "Sicher by Design",
@@ -360,7 +360,7 @@ export const translations: typeof enTranslations = {
       subtitle: "Open Source",
       title: "WordPress für das KI-Zeitalter",
       description:
-        "Forke next-vibe und die Plattform gehört dir. Auth, Zahlungen, KI-Chat, E-Mail, Admin, Cron — alles inklusive. Eine Endpoint-Definition wird zu Web, CLI, Mobile, MCP-Server und KI-Tool.",
+        "Forke next-vibe und die Plattform gehört dir. Auth, Zahlungen, KI-Chat, E-Mail, Admin, Cron - alles inklusive. Eine Endpoint-Definition wird zu Web, CLI, Mobile, MCP-Server und KI-Tool.",
       typeSafe: {
         title: "Type-Safety Überlegenheit",
         description:
@@ -369,7 +369,7 @@ export const translations: typeof enTranslations = {
       tenPlatforms: {
         title: "Eine Definition, zehn Plattformen",
         description:
-          "Web-App, Mobile-App, CLI, KI-Tool, MCP-Server, tRPC, Cron-Tasks — alles aus einer einzigen Endpoint-Definition. Kein generierter Code der auseinanderdriftet.",
+          "Web-App, Mobile-App, CLI, KI-Tool, MCP-Server, tRPC, Cron-Tasks - alles aus einer einzigen Endpoint-Definition. Kein generierter Code der auseinanderdriftet.",
       },
       production: {
         title: "Produktions-getestet",
@@ -401,7 +401,7 @@ export const translations: typeof enTranslations = {
       forums: {
         title: "Community-Foren",
         description:
-          "Durchstöbere öffentliche KI-Gespräche und nimm teil. Upvoten, diskutieren, lernen — ohne Anmeldung.",
+          "Durchstöbere öffentliche KI-Gespräche und nimm teil. Upvoten, diskutieren, lernen - ohne Anmeldung.",
       },
       uncensored: {
         title: "Unzensiert als Standard",

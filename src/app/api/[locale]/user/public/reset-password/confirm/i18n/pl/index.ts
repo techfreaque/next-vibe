@@ -13,11 +13,11 @@ export const translations: typeof enTranslations = {
       "Hasło {{appName}} zostało zresetowane. Zaloguj się i zacznij rozmawiać z {{modelCount}} modelami AI.",
     greeting: "Hej {{name}},",
     successMessage:
-      "Twoje hasło zostało zresetowane. Wszystko gotowe — zaloguj się i kontynuuj od miejsca, w którym skończyłeś.",
+      "Twoje hasło zostało zresetowane. Wszystko gotowe - zaloguj się i kontynuuj od miejsca, w którym skończyłeś.",
     loginButton: "Zaloguj się do {{appName}}",
     promoText: "{{modelCount}} modeli AI. Bez filtrów. Bez cenzury.",
     securityWarning:
-      "Nie resetowałeś hasła? Skontaktuj się natychmiast ze wsparciem — Twoje konto może być zagrożone.",
+      "Nie resetowałeś hasła? Skontaktuj się natychmiast ze wsparciem - Twoje konto może być zagrożone.",
   },
   groups: {
     verification: {

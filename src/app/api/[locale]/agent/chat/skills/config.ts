@@ -4,26 +4,26 @@
  * This file contains default/built-in skills that are read-only
  *
  * Individual skill definitions are in ./default-skills/<name>/skill.ts
- * DEFAULT_SKILLS and COMPANION_SKILLS are auto-generated — see generators/skills-index
+ * DEFAULT_SKILLS and COMPANION_SKILLS are auto-generated - see generators/skills-index
  */
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
-import {
-  SkillCategory,
-  type SkillCategoryValue,
-  SkillOwnershipType,
-  type SkillOwnershipTypeValue,
-  ModelSelectionType,
-} from "./enum";
 import type { ToolConfigItem } from "../settings/definition";
 import { NO_SKILL_ID } from "./constants";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "./create/definition";
+import {
+  ModelSelectionType,
+  SkillCategory,
+  type SkillCategoryValue,
+  SkillOwnershipType,
+  type SkillOwnershipTypeValue,
+} from "./enum";
 import type { SkillsTranslationKey } from "./i18n";
 export {
   COMPANION_SKILLS,

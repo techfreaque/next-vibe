@@ -1,5 +1,5 @@
 /**
- * Users Registered — Route
+ * Users Registered - Route
  * Server-only.
  */
 

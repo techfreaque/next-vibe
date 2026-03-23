@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Cleanup Definition
+ * Vibe Sense - Cleanup Definition
  */
 
 import { z } from "zod";

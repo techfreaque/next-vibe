@@ -33,7 +33,7 @@ import type {
 
 /**
  * Constrained field type for extractAllFields.
- * Children satisfy AnyChildrenConstrain by construction — they originate from
+ * Children satisfy AnyChildrenConstrain by construction - they originate from
  * hasChildren-narrowed object fields whose children Record is typed against it.
  */
 export type ExtractedField<TKey extends string> = UnifiedField<
@@ -47,7 +47,7 @@ export type ExtractedField<TKey extends string> = UnifiedField<
  * Extract ALL fields from endpoint definition.
  * Flattens nested containers into a flat list of [path, field] pairs.
  *
- * Internal assembly uses `any` for the heterogeneous array — Object.entries loses
+ * Internal assembly uses `any` for the heterogeneous array - Object.entries loses
  * specific child types. Return is asserted to ExtractedField which is safe because
  * children originate from hasChildren-narrowed fields that structurally satisfy
  * AnyChildrenConstrain.
@@ -60,7 +60,7 @@ export function extractAllFields<const TKey extends string>(
     return [];
   }
 
-  // Handle object-union fields — add as leaf (widget handles variant switching)
+  // Handle object-union fields - add as leaf (widget handles variant switching)
   // oxlint-disable-next-line typescript/no-unnecessary-condition -- `in` narrowing required: TS cannot distribute schemaType through nested union-of-unions
   if ("schemaType" in fields && fields.schemaType === "object-union") {
     const fullPath = parentPath ? `${parentPath}` : "";
@@ -87,7 +87,7 @@ export function extractAllFields<const TKey extends string>(
     }
   }
 
-  // Assert at return boundary — safe: children from hasChildren-narrowed fields
+  // Assert at return boundary - safe: children from hasChildren-narrowed fields
   // structurally satisfy AnyChildrenConstrain by construction.
   return result as Array<[string, ExtractedField<TKey>]>;
 }

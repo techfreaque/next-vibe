@@ -142,7 +142,7 @@ export function loadEnvironment(): EnvironmentResult {
         copyFileSync(examplePath, targetPath);
         envPath = targetPath;
       } catch {
-        // ignore — proceed without .env
+        // ignore - proceed without .env
       }
     }
   }
@@ -176,7 +176,7 @@ export function loadEnvironment(): EnvironmentResult {
   // using PREVIEW_DB_PORT (default 5433) and PREVIEW_PORT (default 3001).
   // Must happen BEFORE the env singleton is created by defineEnv().
   //
-  // --local is an explicit override — always targets the local DB (5433) regardless
+  // --local is an explicit override - always targets the local DB (5433) regardless
   // of NODE_ENV. This allows MCP (NODE_ENV=production) to hit the local preview DB.
   // Other triggers (build/start/rebuild) only apply in non-production to avoid
   // accidentally switching a real prod server's DB.
@@ -196,7 +196,7 @@ export function loadEnvironment(): EnvironmentResult {
   // Explicitly set to "false" when not in preview mode to clear any stale shell env.
   process.env["IS_PREVIEW_MODE"] = isPreviewMode ? "true" : "false";
 
-  // vibe start/build/rebuild always run in production mode — force NODE_ENV so
+  // vibe start/build/rebuild always run in production mode - force NODE_ENV so
   // dev-only task runners (e.g. devWatcher) stay disabled.
   if (isPreviewMode) {
     // eslint-disable-next-line i18next/no-literal-string

@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
   patch: {
     title: "Aktualizuj wspomnienie",
     description:
-      "Aktualizuje istniejące wspomnienie. Wszystkie pola są opcjonalne — pominięte pola zachowują bieżącą wartość. Aby zaktualizować tylko tagi lub priorytet, po prostu pomiń treść. WAŻNE: nigdy nie przekazuj pustego ciągu dla treści — zostanie zignorowany i istniejąca treść zostanie zachowana. Aby usunąć wspomnienie, użyj endpointu delete.",
+      "Aktualizuje istniejące wspomnienie. Wszystkie pola są opcjonalne - pominięte pola zachowują bieżącą wartość. Aby zaktualizować tylko tagi lub priorytet, po prostu pomiń treść. WAŻNE: nigdy nie przekazuj pustego ciągu dla treści - zostanie zignorowany i istniejąca treść zostanie zachowana. Aby usunąć wspomnienie, użyj endpointu delete.",
     container: {
       title: "Aktualizuj wspomnienie",
       description: "Zmodyfikuj istniejące wspomnienie",
@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
     content: {
       label: "Treść wspomnienia",
       description:
-        "Zaktualizowany fakt do zapisania. Opcjonalne — pomiń, aby zachować bieżącą treść. Puste ciągi są ignorowane (treść nigdy nie jest nadpisywana pustą wartością).",
+        "Zaktualizowany fakt do zapisania. Opcjonalne - pomiń, aby zachować bieżącą treść. Puste ciągi są ignorowane (treść nigdy nie jest nadpisywana pustą wartością).",
     },
     tags: {
       memories: "Wspomnienia",

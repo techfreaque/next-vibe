@@ -60,16 +60,16 @@ import {
   ToolsConfigEdit,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
+import { useAddToFavorites } from "../../favorites/create/hooks";
+import { useChatFavorites } from "../../favorites/hooks/hooks";
+import { CompactTriggerEdit } from "../../settings/widget";
 import {
   SkillOwnershipType,
   type SkillOwnershipTypeValue,
 } from "../../skills/enum";
-import { useAddToFavorites } from "../../favorites/create/hooks";
-import { useChatFavorites } from "../../favorites/hooks/hooks";
-import { CompactTriggerEdit } from "../../settings/widget";
-import type definitionGet from "./definition";
-import type definitionPatch from "./definition";
 import type {
+  default as definitionGet,
+  default as definitionPatch,
   SkillGetResponseOutput,
   SkillUpdateResponseOutput,
 } from "./definition";
@@ -238,7 +238,7 @@ export function SkillEditContainer({
             />
           )}
 
-          {/* Tool configuration — per-skill override */}
+          {/* Tool configuration - per-skill override */}
           {form && (
             <ToolsConfigEdit
               value={toolsValue}

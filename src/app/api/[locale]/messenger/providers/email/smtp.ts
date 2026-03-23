@@ -3,14 +3,14 @@
  * Wraps the existing SmtpRepository + ImapConnectionRepository to implement
  * the MessengerProvider interface for the EMAIL channel via SMTP/IMAP.
  *
- * Extends LocalStateProvider — listInbox and listFolders use DB state.
+ * Extends LocalStateProvider - listInbox and listFolders use DB state.
  * moveMessage and markRead additionally apply changes on the IMAP server.
  */
 
 import "server-only";
 
-import Imap from "imap";
 import { and, eq } from "drizzle-orm";
+import Imap from "imap";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -26,21 +26,20 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
-import { toImapShape } from "./imap-client/db";
+import { messengerAccounts } from "../../accounts/db";
+import { CampaignType, MessageChannel } from "../../accounts/enum";
 import { messengerFolders } from "../../messages/db";
 import type { SpecialFolderTypeValue } from "../../messages/enum";
 import { SpecialFolderType } from "../../messages/enum";
-import { messengerAccounts } from "../../accounts/db";
-import { CampaignType } from "../../accounts/enum";
-import { scopedTranslation as smtpScopedTranslation } from "./smtp-client/i18n";
-import { SmtpRepository } from "./smtp-client/repository";
-import type { SmtpSelectionCriteria } from "./smtp-client/repository";
-import type { SendMessageInput, SendMessageResult } from "../provider";
-import { MessageChannel } from "../../accounts/enum";
 import { scopedTranslation as providerScopedTranslation } from "../i18n";
 import { LocalStateProvider } from "../local-state-base";
+import type { SendMessageInput, SendMessageResult } from "../provider";
+import { toImapShape } from "./imap-client/db";
+import { scopedTranslation as smtpScopedTranslation } from "./smtp-client/i18n";
+import type { SmtpSelectionCriteria } from "./smtp-client/repository";
+import { SmtpRepository } from "./smtp-client/repository";
 
-// Well-known system user UUID — used for service-layer sends (not tied to a real user)
+// Well-known system user UUID - used for service-layer sends (not tied to a real user)
 const SYSTEM_UUID = "00000000-0000-0000-0000-000000000001";
 
 const SERVICE_USER: JwtPrivatePayloadType = {
@@ -98,7 +97,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
       });
     }
 
-    // Append to IMAP Sent folder (fire-and-forget — don't fail the send)
+    // Append to IMAP Sent folder (fire-and-forget - don't fail the send)
     this.appendToSentFolder(
       result.data.accountId,
       {

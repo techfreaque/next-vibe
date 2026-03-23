@@ -886,7 +886,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
         generated,
       );
     } else {
-      // Insert inside args: block — after "args:" line
+      // Insert inside args: block - after "args:" line
       updated = original.replace(/( +args:\n)/, `$1${generated}\n`);
     }
 

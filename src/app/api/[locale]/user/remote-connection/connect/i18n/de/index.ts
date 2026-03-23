@@ -7,7 +7,7 @@ export const translations = {
     signInDescription:
       "Melde dich an, um dich mit einem Remote-Konto zu verbinden.",
     benefit1:
-      "Erinnerungen synchronisieren automatisch — alles, was du der KI beibringst, überträgt sich",
+      "Erinnerungen synchronisieren automatisch - alles, was du der KI beibringst, überträgt sich",
     benefit2:
       "Greife auf Cloud-KI-Modelle und Tools von deiner lokalen Instanz aus zu",
     benefit3: "Kontext reist mit dir auf allen Geräten",
@@ -15,9 +15,9 @@ export const translations = {
     adminBenefit2:
       "Cloud-KI entdeckt und führt deine lokalen Tools aus (SSH, Dateien, Code-Ausführung)",
     adminBenefit3:
-      "Delegiere Aufgaben von der Cloud an diese Maschine — Claude Code führt lokal aus",
+      "Delegiere Aufgaben von der Cloud an diese Maschine - Claude Code führt lokal aus",
     adminBenefit4:
-      "Fähigkeiten-Snapshot wird bei jeder Synchronisierung gesendet — Thea weiß immer, was diese Instanz kann",
+      "Fähigkeiten-Snapshot wird bei jeder Synchronisierung gesendet - Thea weiß immer, was diese Instanz kann",
   },
   post: {
     title: "Mit Remote-Konto verbinden",
@@ -62,7 +62,7 @@ export const translations = {
       description: "Lead-ID der Remote-Instanz (wird automatisch gesetzt)",
     },
     credentialWarning:
-      "Deine Zugangsdaten gehen direkt von deinem Browser an den Remote-Server. Der hier gespeicherte Token gibt dem Betreiber dieses Servers jedoch vollen Zugriff auf dein Remote-Konto — er kann alles tun, was du dort tun kannst. Verbinde dich nur auf Servern, denen du vollständig vertraust.",
+      "Deine Zugangsdaten gehen direkt von deinem Browser an den Remote-Server. Der hier gespeicherte Token gibt dem Betreiber dieses Servers jedoch vollen Zugriff auf dein Remote-Konto - er kann alles tun, was du dort tun kannst. Verbinde dich nur auf Servern, denen du vollständig vertraust.",
     actions: {
       submit: "Verbinden",
       submitting: "Verbinde...",

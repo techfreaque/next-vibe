@@ -12,11 +12,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  responseArrayOptionalField,
   objectField,
   objectOptionalField,
   requestDataArrayOptionalField,
   requestField,
+  responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
@@ -1496,7 +1496,7 @@ export type NpmPackageConfig = NonNullable<ApiConfigObject["npmPackage"]>;
 
 /** Bun build options type inferred from API definition, extended with runtime-only fields */
 export type BunBuildOptions = NonNullable<FileToCompile["bunOptions"]> & {
-  /** Bun build plugins — programmatic only, not serializable via API */
+  /** Bun build plugins - programmatic only, not serializable via API */
   plugins?: BunPlugin[];
 };
 

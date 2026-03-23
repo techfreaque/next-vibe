@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — AND Evaluator Route
+ * Vibe Sense - AND Evaluator Route
  * Server-only.
  */
 

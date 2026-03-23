@@ -1,5 +1,5 @@
 /**
- * Users Marketing Consent — Repository
+ * Users Marketing Consent - Repository
  * Server-only. DB access.
  * Snapshot: count of users with marketingConsent=true per resolution bucket.
  */
@@ -17,9 +17,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
-import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { TimeRange } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type {
+  DataPoint,
+  Resolution,
+  TimeRange,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { users } from "../../db";
 
 export class QueryUsersMarketingConsentRepository {

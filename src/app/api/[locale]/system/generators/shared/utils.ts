@@ -346,7 +346,7 @@ export function jsonToTs(
       return "[]";
     }
 
-    // Try inline for all arrays — renderInline returns null for values that
+    // Try inline for all arrays - renderInline returns null for values that
     // can't be represented inline (e.g. nested objects that are too deep).
     // +1 for the trailing comma that the parent object will append
     const inlineParts = value.map(renderInline);

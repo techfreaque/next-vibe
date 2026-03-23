@@ -42,8 +42,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { defaultLocale } from "@/i18n/core/config";
 
-import { scopedTranslation } from "../i18n";
 import type { TanstackT } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { GenerateResponseOutput } from "./definition";
 
 interface GenerationResult {
@@ -161,7 +161,7 @@ export class GenerateTanstackRoutesRepository {
       GenerateTanstackRoutesRepository.UI_DIR,
       "page.tsx",
     );
-    // Scan API source files (route.ts) — from api dir
+    // Scan API source files (route.ts) - from api dir
     const allApiRoutes = existsSync(GenerateTanstackRoutesRepository.API_DIR)
       ? GenerateTanstackRoutesRepository.findFiles(
           GenerateTanstackRoutesRepository.API_DIR,
@@ -169,11 +169,11 @@ export class GenerateTanstackRoutesRepository {
         )
       : [];
 
-    // Generate layout files — track written flat names to skip duplicate route groups
+    // Generate layout files - track written flat names to skip duplicate route groups
     const writtenLayoutNames = new Set<string>();
     for (const relPath of allLayouts) {
       const dir = dirname(relPath);
-      // Root layout (dir === ".") is handled by __root.tsx — skip it here
+      // Root layout (dir === ".") is handled by __root.tsx - skip it here
       if (dir === ".") {
         result.skipped.push(relPath);
         continue;
@@ -279,7 +279,7 @@ export class GenerateTanstackRoutesRepository {
       "index.tsx",
     );
     const content = [
-      `// AUTO-GENERATED — redirects / to the default locale.`,
+      `// AUTO-GENERATED - redirects / to the default locale.`,
       `import { createFileRoute, redirect } from "@tanstack/react-router";`,
       ``,
       `export const Route = createFileRoute("/")({`,
@@ -428,7 +428,7 @@ export class GenerateTanstackRoutesRepository {
       ].join("\n");
     } else {
       // Plain Next.js async server layout without tanstackLoader/TanstackPage.
-      // Cannot be rendered directly in TanStack — use a transparent Outlet passthrough.
+      // Cannot be rendered directly in TanStack - use a transparent Outlet passthrough.
       content = [
         `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
@@ -457,7 +457,7 @@ export class GenerateTanstackRoutesRepository {
     sourceDir: string,
     writtenLayoutNames: Set<string> = new Set(),
   ): string | null {
-    // Detect catch-all segment — Next.js [...name] maps to TanStack splat ($)
+    // Detect catch-all segment - Next.js [...name] maps to TanStack splat ($)
     const catchAllName =
       GenerateTanstackRoutesRepository.getCatchAllParamName(dir);
 
@@ -695,7 +695,7 @@ export class GenerateTanstackRoutesRepository {
     let flatName: string;
     let importSuffix: string;
 
-    // All routes live under /$locale — prepend it since discovery starts inside [locale]
+    // All routes live under /$locale - prepend it since discovery starts inside [locale]
     const localePrefix = "$locale";
 
     if (kind === "page") {
@@ -747,8 +747,8 @@ export class GenerateTanstackRoutesRepository {
 
   /**
    * Convert a single Next.js path segment to a TanStack path segment.
-   * Returns null for route groups — they have no URL representation.
-   * [locale] is NOT stripped here — it becomes $locale in the route path.
+   * Returns null for route groups - they have no URL representation.
+   * [locale] is NOT stripped here - it becomes $locale in the route path.
    * Discovery already starts inside the [locale] folder, so [locale] only
    * appears if a segment literally named "[locale]" exists deeper in the tree
    * (shouldn't happen, but handled gracefully via the dynamic segment rule).
@@ -804,7 +804,7 @@ export class GenerateTanstackRoutesRepository {
       if (!seg.startsWith("(") || !seg.endsWith(")")) {
         continue;
       }
-      // Found a route group ancestor — check if it has a layout.tsx
+      // Found a route group ancestor - check if it has a layout.tsx
       const groupDir = segments.slice(0, i + 1).join("/");
       const layoutFile = join(sourceDir, groupDir, "layout.tsx");
       if (!existsSync(layoutFile)) {
@@ -952,7 +952,7 @@ export class GenerateTanstackRoutesRepository {
 
   /**
    * Returns true if tanstackLoader accepts a params argument (i.e. uses { params } in its signature).
-   * No-data layouts define tanstackLoader() with no args — those should be called without params.
+   * No-data layouts define tanstackLoader() with no args - those should be called without params.
    */
   private static hasParamsInLoader(filePath: string): boolean {
     if (!existsSync(filePath)) {

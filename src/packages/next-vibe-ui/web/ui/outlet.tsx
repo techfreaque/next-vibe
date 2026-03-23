@@ -6,7 +6,7 @@ interface OutletProps {
 
 /**
  * Web (Next.js) implementation of Outlet.
- * In Next.js, child routes are passed as `children` — this just renders them.
+ * In Next.js, child routes are passed as `children` - this just renders them.
  */
 export function Outlet({ children }: OutletProps): ReactNode {
   return children ?? null;

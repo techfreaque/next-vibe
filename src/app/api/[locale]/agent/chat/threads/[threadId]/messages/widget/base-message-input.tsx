@@ -3,10 +3,9 @@
 /**
  * BaseMessageInput Component
  * Shared UI for message editing/branching and replying.
- * Receives all computed state as props — hooks are self-contained here.
+ * Receives all computed state as props - hooks are self-contained here.
  */
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
@@ -26,9 +25,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
-import { useCallback, useState } from "react";
-import React from "react";
+import React, { useCallback, useState } from "react";
 
 import { CallModeIndicator } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/call-mode-indicator";
 import { FileUploadButton } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/file-upload-button";

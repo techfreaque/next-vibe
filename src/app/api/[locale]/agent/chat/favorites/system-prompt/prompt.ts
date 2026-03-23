@@ -1,5 +1,6 @@
 /* eslint-disable i18next/no-literal-string */
 
+import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import { SKILL_CREATE_ALIAS, SKILLS_LIST_ALIAS } from "../../skills/constants";
 import {
   FAVORITE_CREATE_ALIAS,
@@ -7,7 +8,6 @@ import {
   FAVORITE_UPDATE_ALIAS,
   FAVORITES_LIST_ALIAS,
 } from "../constants";
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
 export interface FavoriteSummaryItem {
   id: string;
@@ -66,13 +66,13 @@ export const favoritesFragment: SystemPromptFragment<FavoritesData> = {
 - When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config`;
 
     if (favorites.length === 0) {
-      return `## Favorites — Not Set Up Yet
+      return `## Favorites - Not Set Up Yet
 
 You have no saved favorites. Favorites let you save character + model + tool combinations for instant reuse.
 
 **Why set one up:**
 - Switch between specialized personas (coder, writer, analyst) in one click
-- Lock a preferred model per character — no manual selection each time
+- Lock a preferred model per character - no manual selection each time
 - Pre-configure which tools each persona can access
 - Use \`favoriteId\` in API/CLI/cron calls for zero-config AI runs
 
@@ -97,7 +97,7 @@ You have no saved favorites. Favorites let you save character + model + tool com
 
     const activeFav = sorted.find((f) => f.isActive);
     const activeNote = activeFav
-      ? ` — active: "${activeFav.name}" (${activeFav.modelId ?? activeFav.modelInfo})`
+      ? ` - active: "${activeFav.name}" (${activeFav.modelId ?? activeFav.modelInfo})`
       : "";
 
     const header = `## Favorites (${favorites.length})${activeNote}`;
@@ -124,7 +124,7 @@ You have no saved favorites. Favorites let you save character + model + tool com
     const parts = [header, lines.join("\n")];
     if (hiddenCount > 0) {
       parts.push(
-        `[... ${hiddenCount} more favorite${hiddenCount === 1 ? "" : "s"} not shown — use \`${FAVORITES_LIST_ALIAS}\` for the full list]`,
+        `[... ${hiddenCount} more favorite${hiddenCount === 1 ? "" : "s"} not shown - use \`${FAVORITES_LIST_ALIAS}\` for the full list]`,
       );
     }
     parts.push(footer);

@@ -13,10 +13,10 @@ import { z } from "zod";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { filterUserPermissionRoles } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CliRequestData } from "../cli/runtime/cli-request-data";
@@ -100,8 +100,8 @@ function createToolFromEndpoint(
       description:
         "Optional. Controls post-execution behavior. " +
         "'detach': fire-and-forget, returns {taskId} immediately, use wait-for-task later to get result. " +
-        "'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready — you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. " +
-        "'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop — AI will not make any further tool calls after this batch completes. " +
+        "'wakeUp': fire-and-forget, returns {taskId} immediately. Result is automatically injected into the thread when ready - you will see it as a tool result in a follow-up message. Do NOT call wait-for-task for wakeUp. " +
+        "'endLoop': execute this tool normally (parallel sibling tools in the same batch also run), then stop - AI will not make any further tool calls after this batch completes. " +
         "'approve': require user confirmation before executing. " +
         "Omit for default synchronous execution.",
     };
@@ -145,7 +145,7 @@ function createToolFromEndpoint(
     description,
     inputSchema,
     execute: async (params, options) => {
-      // Extract callbackMode from params — async modes (detach, wakeUp) route through
+      // Extract callbackMode from params - async modes (detach, wakeUp) route through
       // RouteExecuteRepository which handles task creation, backfill, and resume-stream.
       // For execute-tool itself, callbackMode must stay in restParams so the route
       // handler receives it (execute-tool handles all callbackModes natively).
@@ -189,7 +189,7 @@ function createToolFromEndpoint(
           (callbackMode === CM.WAKE_UP || callbackMode === CM.DETACH)
         ) {
           context.logger.info(
-            "[ToolsLoader] tool requires confirmation — blocking wakeUp/detach, returning placeholder",
+            "[ToolsLoader] tool requires confirmation - blocking wakeUp/detach, returning placeholder",
             { toolName, callbackMode },
           );
           return {
@@ -204,7 +204,7 @@ function createToolFromEndpoint(
           toolName === "execute-tool"
         ) {
           // Inject the correct toolMessageId for this specific parallel tool call.
-          // pendingToolMessages is keyed by AI SDK toolCallId — populated by stream-part-handler.
+          // pendingToolMessages is keyed by AI SDK toolCallId - populated by stream-part-handler.
           // The AI SDK may call execute() before stream-part-handler processes the tool-call event,
           // so spin-wait up to 200ms (20 × 10ms) for the entry to appear.
           // Resolve per-call toolMessageId BEFORE touching shared streamContext.
@@ -330,10 +330,10 @@ function createToolFromEndpoint(
         return executeToolInline();
       }
 
-      // Already aborted — bail immediately
+      // Already aborted - bail immediately
       if (abortSignal.aborted) {
         context.logger.info(
-          "[ToolsLoader] Stream already cancelled — skipping tool",
+          "[ToolsLoader] Stream already cancelled - skipping tool",
           { toolName },
         );
         return { error: "Stream cancelled" };
@@ -419,7 +419,7 @@ function createRemoteTool(params: {
 }): CoreTool {
   const { toolName, cap, user, locale, logger, streamContext } = params;
 
-  // Accept any JSON object as input — schema is opaque for remote tools
+  // Accept any JSON object as input - schema is opaque for remote tools
   const inputSchema = jsonSchema(
     {
       type: "object",
@@ -494,10 +494,10 @@ function createRemoteTool(params: {
         return executeRemoteInline();
       }
 
-      // Already aborted — bail immediately
+      // Already aborted - bail immediately
       if (abortSignal.aborted) {
         logger.info(
-          "[ToolsLoader] Stream already cancelled — skipping remote tool",
+          "[ToolsLoader] Stream already cancelled - skipping remote tool",
           { toolName },
         );
         return { error: "Stream cancelled" };
@@ -528,7 +528,7 @@ export async function loadTools(params: {
   systemPrompt: string;
   /** Map of tool IDs to their confirmation requirements (from API request) */
   toolConfirmationConfig?: Map<string, boolean>;
-  /** Stream context — rootFolderId, threadId, aiMessageId, etc. */
+  /** Stream context - rootFolderId, threadId, aiMessageId, etc. */
   streamContext: ToolExecutionContext;
 }): Promise<{
   tools: Record<string, CoreTool> | undefined;

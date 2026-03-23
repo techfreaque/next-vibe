@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — RSI Route
+ * Vibe Sense - RSI Route
  * Server-only.
  */
 

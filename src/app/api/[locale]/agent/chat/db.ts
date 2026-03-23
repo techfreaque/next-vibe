@@ -90,9 +90,9 @@ export interface ToolCall {
   waitingForConfirmation?: boolean; // True when stream is paused waiting for user confirmation
   /** For async remote tools: pending until /report backfills the result */
   status?: "pending" | "completed" | "failed";
-  /** taskId of the remote cron task — set for async remote tool calls */
+  /** taskId of the remote cron task - set for async remote tool calls */
   remoteTaskId?: string;
-  /** callbackMode used for this tool call — determines continuation behavior */
+  /** callbackMode used for this tool call - determines continuation behavior */
   callbackMode?: CallbackModeValue;
   /**
    * For deferred result messages (endLoop): the toolCallId of the
@@ -103,7 +103,7 @@ export interface ToolCall {
    */
   originalToolCallId?: string;
   /**
-   * True for deferred result messages — result arrived asynchronously after
+   * True for deferred result messages - result arrived asynchronously after
    * the original stream ended (wakeUp/endLoop). UI shows a distinct badge.
    */
   isDeferred?: boolean;
@@ -380,7 +380,7 @@ export const chatThreads = pgTable(
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
 
-    // Streaming state — 'idle' | 'streaming' | 'aborting' | 'waiting'
+    // Streaming state - 'idle' | 'streaming' | 'aborting' | 'waiting'
     // 'waiting' = stream ended but an escalated task is still in flight (e.g. interactive claude-code)
     streamingState: text("streaming_state")
       .$type<"idle" | "streaming" | "aborting" | "waiting">()

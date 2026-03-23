@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — EMA Compute
+ * Vibe Sense - EMA Compute
  * Server-only pure computation. No DB access.
  */
 

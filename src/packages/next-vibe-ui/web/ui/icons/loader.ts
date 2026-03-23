@@ -2,7 +2,7 @@
  * Statically-analyzable icon lazy loader.
  *
  * Vite/TanStack: uses import.meta.glob so Vite statically analyzes all icon
- * files and creates proper lazy chunks — fixing the "dynamic import cannot be
+ * files and creates proper lazy chunks - fixing the "dynamic import cannot be
  * analyzed" warning and the "!" hydration error caused by failed imports.
  *
  * Next.js/webpack: uses a dynamic import with a static `./` prefix and `.tsx`

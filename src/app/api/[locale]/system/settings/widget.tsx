@@ -33,6 +33,7 @@ import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetContext,
   useWidgetLocale,
@@ -40,7 +41,6 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
@@ -179,7 +179,7 @@ function SettingFieldInput({
     );
   }
 
-  // Text input (all env values are strings — fieldType is just metadata)
+  // Text input (all env values are strings - fieldType is just metadata)
   return (
     <Input
       className={cn("h-7 text-xs font-mono", isEdited && "border-primary")}
@@ -564,7 +564,7 @@ export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
             </Div>
           )}
 
-          {/* Save bar — always visible when writable */}
+          {/* Save bar - always visible when writable */}
           {isWritable && (
             <Div className="sticky bottom-0 flex items-center justify-end gap-2 px-4 py-3 bg-background border-t">
               {hasEdits && (
@@ -594,7 +594,7 @@ export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
 
 /**
  * CLI-only interactive editor widget for PATCH endpoint.
- * Replaced at runtime by Bun's widget.cli plugin — this stub satisfies TypeScript.
+ * Replaced at runtime by Bun's widget.cli plugin - this stub satisfies TypeScript.
  */
 export function SystemSettingsPatchWidget(): null {
   return null;

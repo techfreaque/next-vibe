@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — JSON Path Transformer Compute
+ * Vibe Sense - JSON Path Transformer Compute
  * Server-only pure computation. No DB access.
  *
  * NOTE: This transformer has been superseded. The new DataPoint type is

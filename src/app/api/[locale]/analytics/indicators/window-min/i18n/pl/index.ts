@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Minimum okna",
     description:
-      "Krocząca minimalna okna — śledzi najniższą wartość w stałym oknie",
+      "Krocząca minimalna okna - śledzi najniższą wartość w stałym oknie",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       resolution: {

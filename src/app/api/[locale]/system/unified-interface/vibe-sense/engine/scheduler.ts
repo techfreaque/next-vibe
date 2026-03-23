@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Scheduler
+ * Vibe Sense - Graph Scheduler
  *
  * Reads all active graphs with cron triggers and executes them.
  * Called by the vibe-sense-graph-runner cron task.
@@ -21,8 +21,8 @@ import {
   formatSense,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
-import { RunStatus } from "../enum";
 import { pipelineGraphs } from "../db";
+import { RunStatus } from "../enum";
 import { getLatestRun } from "../store/runs";
 import { runGraph } from "./runner";
 
@@ -118,7 +118,7 @@ function checkIfDue(
   lastRun: { startedAt: Date; status: string } | null,
   schedule: string,
 ): boolean {
-  // Never run before — always due
+  // Never run before - always due
   if (!lastRun) {
     return true;
   }

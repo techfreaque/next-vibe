@@ -243,7 +243,7 @@ function useResolvedEndpoint(routeId: string | null | undefined): {
 }
 
 // ---------------------------------------------------------------------------
-// TaskInputViewSection — read-only display for GET detail view
+// TaskInputViewSection - read-only display for GET detail view
 // ---------------------------------------------------------------------------
 
 function TaskInputViewSection({
@@ -317,13 +317,13 @@ function TaskInputViewSection({
 }
 
 // ---------------------------------------------------------------------------
-// TaskInputEditWidget — editable widget for PUT form (custom widget render)
+// TaskInputEditWidget - editable widget for PUT form (custom widget render)
 // Loads endpoint definition by routeId from GET response, renders its fields,
 // and propagates changes back to the parent form's taskInput field.
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// TaskInputEditSection — dynamic task input section for PUT form
+// TaskInputEditSection - dynamic task input section for PUT form
 // Loads endpoint definition by routeId, renders its fields,
 // and propagates changes back to the parent form's taskInput field.
 // ---------------------------------------------------------------------------
@@ -411,7 +411,7 @@ function TaskInputEditSection({
 }
 
 // ---------------------------------------------------------------------------
-// ScheduleField — wraps ScheduleAutocomplete with react-hook-form integration
+// ScheduleField - wraps ScheduleAutocomplete with react-hook-form integration
 // ---------------------------------------------------------------------------
 
 function ScheduleField({
@@ -462,7 +462,7 @@ function ScheduleField({
 }
 
 // ---------------------------------------------------------------------------
-// CronTaskEditContainer — root custom widget for PUT form
+// CronTaskEditContainer - root custom widget for PUT form
 // Renders all form fields + dynamic task input section
 // ---------------------------------------------------------------------------
 

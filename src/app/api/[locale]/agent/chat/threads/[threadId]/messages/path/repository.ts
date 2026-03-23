@@ -9,7 +9,7 @@
  *    (all branch paths within the chunk), returned via a typed Drizzle query.
  *
  * The client receives the full chunk and derives branchIndices locally from the
- * leafMessageId URL param — no round-trips for branch switching.
+ * leafMessageId URL param - no round-trips for branch switching.
  */
 
 import "server-only";
@@ -58,8 +58,8 @@ export class pathRepository {
       isCompacting: boolean;
     })[]
   > {
-    // Raw SQL is required for WITH RECURSIVE — Drizzle doesn't support recursive CTEs.
-    // db.execute<T>() returns QueryResult<T> (from pg), so .rows is T[] — fully typed.
+    // Raw SQL is required for WITH RECURSIVE - Drizzle doesn't support recursive CTEs.
+    // db.execute<T>() returns QueryResult<T> (from pg), so .rows is T[] - fully typed.
     const result: QueryResult<
       QueryResultRow & {
         id: string;
@@ -126,7 +126,7 @@ export class pathRepository {
     const rootIdsArray = sql.join(rootIdsLiteral, sql`, `);
 
     // Walk DOWN from chunk roots, stopping BEFORE the next compacting boundary.
-    // The seed row may itself be a compacting boundary (chunk header) — it is seeded
+    // The seed row may itself be a compacting boundary (chunk header) - it is seeded
     // unconditionally so its children are walked, but filtered out of the final SELECT
     // (the caller adds it explicitly via allIds.add(oldestAncestor.id)).
     // Expansion stops when a CHILD is compacting (next chunk boundary).
@@ -208,7 +208,7 @@ export class pathRepository {
     // Combine: oldest ancestor (always) + all descendants.
     // The oldest ancestor may be a compaction boundary excluded by fetchAllDescendantIds —
     // explicitly adding it ensures the chunk header is always present.
-    // NOTE: do NOT add oldestAncestor.parentId — the parent belongs to the older chunk,
+    // NOTE: do NOT add oldestAncestor.parentId - the parent belongs to the older chunk,
     // not the current one.
     const allIds = new Set<string>(allDescendantIds);
     allIds.add(oldestAncestor.id);
@@ -383,7 +383,7 @@ export class pathRepository {
 
       const oldestAncestor = ancestorChain[0]!;
       // hasOlderHistory: true if the oldest ancestor has a parent (history exists above it).
-      // This includes the case where the oldest is a compaction boundary — the compacted
+      // This includes the case where the oldest is a compaction boundary - the compacted
       // messages are older history that can be loaded via "Show older messages".
       const hasOlderHistory = !!oldestAncestor.parentId;
       const compactionBoundaryId = oldestAncestor.isCompacting

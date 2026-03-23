@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Script Evaluator Endpoint Definition
+ * Vibe Sense - Script Evaluator Endpoint Definition
  *
  * Client+server safe. No server imports.
  * Sandboxed custom evaluation via user-provided function body. Admin-only.
@@ -27,8 +27,8 @@ import {
   timeSeriesRequestField,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { scopedTranslation } from "./i18n";
 import { EVALUATOR_SCRIPT_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

@@ -150,7 +150,7 @@ function stripFiles(obj: JsonValue): JsonValue {
 export function objectToFormData(obj: JsonObject): FormData {
   const formData = new FormData();
 
-  // Serialize all non-file data as JSON in "data" field — preserves booleans, numbers, nulls
+  // Serialize all non-file data as JSON in "data" field - preserves booleans, numbers, nulls
   const jsonData = stripFiles(obj);
   formData.append("data", JSON.stringify(jsonData));
 
@@ -261,7 +261,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     // Attach CSRF double-submit token for mutating browser requests.
     // The server validates that X-CSRF-Token === csrf_token cookie.
     // Non-browser callers (CLI, MCP, server-to-server) won't have the cookie
-    // so the header is simply absent — the server allows that case.
+    // so the header is simply absent - the server allows that case.
     if (MUTATING_METHODS.has(endpoint.method)) {
       const csrfToken = getCsrfToken();
       if (csrfToken) {

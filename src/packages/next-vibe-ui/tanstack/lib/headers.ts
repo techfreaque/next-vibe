@@ -9,8 +9,11 @@
  * Set-Cookie headers on the response.
  */
 
-import { deleteCookie, setCookie } from "@tanstack/start-server-core";
-import { getRequest } from "@tanstack/start-server-core";
+import {
+  deleteCookie,
+  getRequest,
+  setCookie,
+} from "@tanstack/start-server-core";
 
 // ── Types matching next/headers public surface ──────────────────────────────
 
@@ -77,7 +80,7 @@ export async function cookies(): Promise<ReadonlyRequestCookies> {
       cookieList = parseCookieHeader(raw);
     }
   } catch {
-    // Outside request context — return empty store
+    // Outside request context - return empty store
   }
 
   const map = new Map(cookieList.map((c) => [c.name, c]));
@@ -132,7 +135,7 @@ export async function headers(): Promise<ReadonlyHeaders> {
       reqHeaders = req.headers;
     }
   } catch {
-    // Outside request context — return empty headers
+    // Outside request context - return empty headers
   }
 
   return {

@@ -1,5 +1,5 @@
 /**
- * Subscriptions Payment Failed — Route
+ * Subscriptions Payment Failed - Route
  * Server-only.
  */
 

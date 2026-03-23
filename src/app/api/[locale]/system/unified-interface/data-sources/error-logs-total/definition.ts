@@ -1,5 +1,5 @@
 /**
- * Error Logs Total — Endpoint Definition
+ * Error Logs Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

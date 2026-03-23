@@ -1,6 +1,6 @@
 /**
  * SSH Exec Endpoint Definition
- * POST /ssh/exec — Run a shell command (local child_process or SSH)
+ * POST /ssh/exec - Run a shell command (local child_process or SSH)
  */
 
 import { z } from "zod";

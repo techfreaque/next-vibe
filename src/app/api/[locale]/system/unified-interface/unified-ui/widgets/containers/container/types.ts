@@ -255,7 +255,7 @@ export type ContainerWidgetConfig<
     | ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
 > =
   // Each union member only resolves when TSchemaType/TChildren match the variant constraint.
-  // Inference at definition sites requires the full union — narrowing happens via hasChild/hasChildren guards at render time.
+  // Inference at definition sites requires the full union - narrowing happens via hasChild/hasChildren guards at render time.
   | ContainerArrayWidgetConfig<
       TKey,
       TUsage,

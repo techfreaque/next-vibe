@@ -109,7 +109,7 @@ export function InkWidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
 /**
  * Render helper - switches on field.type for discriminated union narrowing.
  * Each case casts the widget function to AnyInkWidget (dispatch boundary pattern,
- * matching React WidgetRenderer) — switch discriminant guarantees type safety.
+ * matching React WidgetRenderer) - switch discriminant guarantees type safety.
  */
 function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
   fieldName: Path<TEndpoint["types"]["RequestOutput"]>;
@@ -118,7 +118,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
   const { fieldName, field } = props;
 
   // PaginationWidgetConfig has type: WidgetType.PAGINATION but is not yet in the
-  // DispatchField union — handle it before the exhaustive switch to avoid a
+  // DispatchField union - handle it before the exhaustive switch to avoid a
   // "not comparable" error while still rendering the widget correctly at runtime.
   if ((field.type as WidgetType) === WidgetType.PAGINATION) {
     const W = PaginationWidgetInk as AnyInkWidget;
@@ -138,7 +138,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
       // CLI widgets mark themselves with a static `.cliWidget = true` property
       // so we can distinguish them from web React components (which would crash in Ink).
       //
-      // Use lazyCliWidget() in definition.ts to wrap React.lazy() — it stamps
+      // Use lazyCliWidget() in definition.ts to wrap React.lazy() - it stamps
       // .cliWidget = true on the lazy wrapper synchronously so we can check it here
       // without unwrapping the async promise.
       const customField = field as typeof field & {
@@ -155,7 +155,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
         // never render request field children alongside them.
         return <CustomRender fieldName={fieldName} field={field} />;
       }
-      // No CLI override — fall back to ContainerWidgetInk which renders children.
+      // No CLI override - fall back to ContainerWidgetInk which renders children.
       const W = ContainerWidgetInk as AnyInkWidget;
       return <W fieldName={fieldName} field={field} />;
     }
@@ -429,7 +429,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
     }
 
     case WidgetType.PAGINATION:
-      // Handled by guard before switch — unreachable here.
+      // Handled by guard before switch - unreachable here.
       return <></>;
     default:
       // oxlint-disable-next-line no-unused-vars

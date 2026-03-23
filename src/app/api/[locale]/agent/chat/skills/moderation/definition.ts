@@ -1,7 +1,7 @@
 /**
  * Skill Moderation API Definition
- * GET  /agent/chat/skills/moderation — list skills with reports (admin only)
- * PATCH /agent/chat/skills/moderation — hide or clear reports on a skill (admin only)
+ * GET  /agent/chat/skills/moderation - list skills with reports (admin only)
+ * PATCH /agent/chat/skills/moderation - hide or clear reports on a skill (admin only)
  */
 
 import { z } from "zod";

@@ -280,7 +280,7 @@ export function CreditsPurchaseContainer({
                 )}
               </Div>
 
-              {/* Buy Button — opens provider modal */}
+              {/* Buy Button - opens provider modal */}
               <Button
                 type="button"
                 className="w-full"

@@ -1,5 +1,5 @@
 /**
- * Users Email Verified — Endpoint Definition
+ * Users Email Verified - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

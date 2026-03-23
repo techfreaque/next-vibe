@@ -1,6 +1,6 @@
 /**
  * Remote Connection Rename Route Handler
- * PATCH — update the friendly name
+ * PATCH - update the friendly name
  */
 
 import "server-only";

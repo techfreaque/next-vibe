@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
       title: "Uruchom agenta AI",
       dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Uruchom headless agenta AI i otrzymaj pełną odpowiedź tekstową. Użyj do delegowania zadań, podsumowywania wyników narzędzi, generowania treści lub łączenia narzędzi w jedną odpowiedź AI. Kredyty są pobierane w zależności od modelu. SZYBKI START: Przekaż favoriteId, aby załadować postać + model + konfigurację narzędzi z zapisanego ulubionego. Nadpisz dowolne pole (model, skill, tools, availableTools) przekazując je jawnie. KONFIGURACJA: Przed uruchomieniem skonfiguruj odpowiednią postać + ulubiony. Postacie definiują personę i prompt systemowy (utwórz za pomocą agent_chat_skills_create_POST). Ulubione łączą postać z nadpisaniem modelu i konfiguracją narzędzi (utwórz za pomocą agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} lub {selectionType:'FILTERS',...}). Workflow: 1) Listuj ulubione (agent_chat_favorites_GET) lub postacie (agent_chat_skills_GET). 2) Jeśli żaden nie pasuje, utwórz postać, potem ulubiony. 3) Przekaż favoriteId. DOSTĘP DO NARZĘDZI: Standardowe ustawienie: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać narzędzia.",
+        "Uruchom headless agenta AI i otrzymaj pełną odpowiedź tekstową. Użyj do delegowania zadań, podsumowywania wyników narzędzi, generowania treści lub łączenia narzędzi w jedną odpowiedź AI. Kredyty są pobierane w zależności od modelu. SZYBKI START: Przekaż favoriteId, aby załadować postać + model + konfigurację narzędzi z zapisanego ulubionego. Nadpisz dowolne pole (model, skill, tools, availableTools) przekazując je jawnie. KONFIGURACJA: Przed uruchomieniem skonfiguruj odpowiednią postać + ulubiony. Postacie definiują personę i prompt systemowy (utwórz za pomocą agent_chat_skills_create_POST). Ulubione łączą postać z nadpisaniem modelu i konfiguracją narzędzi (utwórz za pomocą agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} lub {selectionType:'FILTERS',...}). Workflow: 1) Listuj ulubione (agent_chat_favorites_GET) lub postacie (agent_chat_skills_GET). 2) Jeśli żaden nie pasuje, utwórz postać, potem ulubiony. 3) Przekaż favoriteId. DOSTĘP DO NARZĘDZI: Standardowe ustawienie: availableTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać narzędzia.",
       container: {
         title: "Uruchomienie agenta AI",
         description:
@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
         prompt: {
           label: "Prompt",
           description:
-            "Główna instrukcja lub pytanie do AI. Bądź konkretny — AI użyje wyników wywołań wstępnych jako kontekstu jeśli podano.",
+            "Główna instrukcja lub pytanie do AI. Bądź konkretny - AI użyje wyników wywołań wstępnych jako kontekstu jeśli podano.",
           placeholder: "Wpisz prompt...",
         },
         instructions: {
@@ -67,13 +67,13 @@ export const translations: typeof enTranslations = {
           args: {
             label: "Argumenty",
             description:
-              'Płaskie argumenty klucz-wartość — urlPathParams i pola body połączone w jeden obiekt (np. {"query": "najnowsze wiadomości", "maxResults": 5}).',
+              'Płaskie argumenty klucz-wartość - urlPathParams i pola body połączone w jeden obiekt (np. {"query": "najnowsze wiadomości", "maxResults": 5}).',
           },
         },
         availableTools: {
           label: "Może wykonywać (warstwa uprawnień)",
           description:
-            "Brama uprawnień do wykonania — kontroluje które narzędzia AI faktycznie może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione narzędzia (inne blokowane z 'wyłączone przez użytkownika'). Standardowe ustawienie: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatchuje dowolny zarejestrowany endpoint, system_help_GET pozwala odkrywać narzędzia. Nie trzeba powtarzać narzędzi z pola tools.",
+            "Brama uprawnień do wykonania - kontroluje które narzędzia AI faktycznie może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione narzędzia (inne blokowane z 'wyłączone przez użytkownika'). Standardowe ustawienie: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] - execute-tool dispatchuje dowolny zarejestrowany endpoint, system_help_GET pozwala odkrywać narzędzia. Nie trzeba powtarzać narzędzi z pola tools.",
           toolId: {
             label: "ID narzędzia",
             description:
@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
         pinnedTools: {
           label: "W kontekście (AI to widzi)",
           description:
-            "Narzędzia załadowane do okna kontekstu modelu — co AI zna i nad czym może rozumować. null = domyślny zestaw narzędzi użytkownika (zalecane). Podaj tablicę tylko dla skupionego, minimalnego kontekstu. Uwaga: availableTools kontroluje co faktycznie się wykonuje — to pole wpływa tylko na to, co model widzi.",
+            "Narzędzia załadowane do okna kontekstu modelu - co AI zna i nad czym może rozumować. null = domyślny zestaw narzędzi użytkownika (zalecane). Podaj tablicę tylko dla skupionego, minimalnego kontekstu. Uwaga: availableTools kontroluje co faktycznie się wykonuje - to pole wpływa tylko na to, co model widzi.",
           toolId: {
             label: "ID narzędzia",
             description:
@@ -302,7 +302,7 @@ export const translations: typeof enTranslations = {
     availableTools: {
       label: "Może wykonywać",
       description:
-        "Warstwa uprawnień wykonania — które narzędzia AI może faktycznie uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione.",
+        "Warstwa uprawnień wykonania - które narzędzia AI może faktycznie uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione.",
       toolId: {
         label: "ID narzędzia",
         description: "Alias lub pełna nazwa narzędzia, które AI może wykonać",
@@ -311,7 +311,7 @@ export const translations: typeof enTranslations = {
     pinnedTools: {
       label: "W kontekście (AI to widzi)",
       description:
-        "Narzędzia w oknie kontekstu modelu — co AI zna. null = domyślny zestaw użytkownika. availableTools kontroluje rzeczywiste wykonanie.",
+        "Narzędzia w oknie kontekstu modelu - co AI zna. null = domyślny zestaw użytkownika. availableTools kontroluje rzeczywiste wykonanie.",
       toolId: {
         label: "ID narzędzia",
         description: "Alias lub pełna nazwa narzędzia w kontekście",
@@ -514,7 +514,7 @@ export const translations: typeof enTranslations = {
     invalidRequest:
       "Nieprawidłowe żądanie. Sprawdź swoje dane i spróbuj ponownie.",
     compactingStreamError:
-      "Osiągnięto limit kontekstu — rozmowa jest zbyt długa do automatycznej kompresji. Spróbuj rozgałęzić się od wcześniejszej wiadomości, wybrać model z większym oknem kontekstowym lub dostosować okno kontekstowe w ustawieniach ulubionych.",
+      "Osiągnięto limit kontekstu - rozmowa jest zbyt długa do automatycznej kompresji. Spróbuj rozgałęzić się od wcześniejszej wiadomości, wybrać model z większym oknem kontekstowym lub dostosować okno kontekstowe w ustawieniach ulubionych.",
     compactingStreamErrorExpensive:
       "Osiągnięto limit kontekstu ({{tokens}} tokenów). Rozszerzenie okna kontekstowego jest możliwe, ale może być kosztowne. Najpierw spróbuj rozgałęzić się od wcześniejszej wiadomości lub zmienić model.",
     compactingException:
@@ -528,7 +528,7 @@ export const translations: typeof enTranslations = {
     revivalPrompt:
       "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
     revivalInstructions:
-      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result — 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
+      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result - 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
   },
   info: {
     streamInterrupted:
@@ -537,7 +537,7 @@ export const translations: typeof enTranslations = {
   headless: {
     errors: {
       missingModelOrSkill:
-        "Model i charakter są wymagane — podaj je bezpośrednio lub podaj favoriteId z rozwiązywalnym wyborem modelu",
+        "Model i charakter są wymagane - podaj je bezpośrednio lub podaj favoriteId z rozwiązywalnym wyborem modelu",
       favoriteNotFound:
         "Ulubiony nie znaleziony lub nie należy do tego użytkownika",
     },
@@ -639,7 +639,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Pomyśl o nas jak o swoim zespole AI.",
       line1:
-        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu — cokolwiek jest potrzebne.",
+        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu - cokolwiek jest potrzebne.",
       line2:
         "AI przełącza się między nimi automatycznie. Ty po prostu rozmawiasz.",
       line3: "Skonfigurujmy cię w mniej niż minutę.",
@@ -650,7 +650,7 @@ export const translations: typeof enTranslations = {
       line1:
         "Twoje ustawienia, towarzysz i historia czatu są zapisywane lokalnie tylko na tym urządzeniu.",
       line2:
-        "Zaloguj się, aby synchronizować wszystko między urządzeniami — i mieć pewność, że nigdy nie stracisz swojej konfiguracji.",
+        "Zaloguj się, aby synchronizować wszystko między urządzeniami - i mieć pewność, że nigdy nie stracisz swojej konfiguracji.",
       signIn: "Zaloguj się / Utwórz konto",
       continueAnyway: "Kontynuuj jako gość",
       note: "Możesz zalogować się później z menu w dowolnym momencie.",
@@ -669,11 +669,11 @@ export const translations: typeof enTranslations = {
         },
         brilliant: {
           label: "Brilliant",
-          desc: "Najlepsza jakość — świetna do złożonych pytań, pisania i analizy",
+          desc: "Najlepsza jakość - świetna do złożonych pytań, pisania i analizy",
         },
         max: {
           label: "Max",
-          desc: "Najwyższe możliwości rozumowania, bez kompromisów — gdy naprawdę ma znaczenie",
+          desc: "Najwyższe możliwości rozumowania, bez kompromisów - gdy naprawdę ma znaczenie",
         },
       },
     },
@@ -683,7 +683,7 @@ export const translations: typeof enTranslations = {
         "Automatycznie dodamy odpowiednich specjalistów do zestawu narzędzi twojej AI.",
       saving: "Konfigurowanie...",
       start: "Rozpocznij czat",
-      skip: "Pomiń — skonfigruję to później",
+      skip: "Pomiń - skonfigruję to później",
       noProviderAvailable:
         "Brak skonfigurowanego dostawcy AI. Dodaj OPENROUTER_API_KEY lub włącz Claude Code (CLAUDE_CODE_ENABLED=true) aby kontynuować.",
       coding: {

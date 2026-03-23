@@ -1,5 +1,5 @@
 /**
- * DB Functions — Compiled Query Types
+ * DB Functions - Compiled Query Types
  *
  * Types for the intermediate format between Drizzle query builders
  * and the final function body. Used during deploy-time compilation.
@@ -19,7 +19,7 @@ export interface PlaceholderParam {
 /** A static (literal) parameter value */
 export type StaticParam = string | number | boolean | null;
 
-/** Compiled query — SQL string + ordered parameter list */
+/** Compiled query - SQL string + ordered parameter list */
 export interface CompiledQuery {
   readonly sql: string;
   readonly params: readonly (PlaceholderParam | StaticParam)[];

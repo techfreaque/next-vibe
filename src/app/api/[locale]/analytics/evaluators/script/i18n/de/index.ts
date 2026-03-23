@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
       fn: {
         label: "Funktion",
         description:
-          "Funktionskörper — erhält inputs-Array, gibt SignalEvent[] zurück",
+          "Funktionskörper - erhält inputs-Array, gibt SignalEvent[] zurück",
       },
       signals: { label: "Signale", description: "Ausgabe-Signalereignisse" },
     },

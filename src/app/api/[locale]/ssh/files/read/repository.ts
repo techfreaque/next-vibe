@@ -36,7 +36,7 @@ export class FilesReadRepository {
   private static readonly MAX_ALLOWED_BYTES = 524288;
   /**
    * Allowed base directories for local file access.
-   * Paths outside these roots are rejected — prevents reading arbitrary system files
+   * Paths outside these roots are rejected - prevents reading arbitrary system files
    * (e.g. /etc/passwd, /proc/*, private keys) via path traversal or symlink attacks.
    *
    * Defaults to the user's home directory. Override with SSH_FILES_ALLOWED_BASE env var

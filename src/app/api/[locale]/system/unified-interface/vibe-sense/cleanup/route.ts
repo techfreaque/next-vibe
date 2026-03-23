@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Cleanup Route
+ * Vibe Sense - Cleanup Route
  */
 
 import "server-only";

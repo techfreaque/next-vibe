@@ -12,7 +12,7 @@ import type { NavigationStackEntry } from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 
 /**
- * Navigation options — mirrors NavigationOptions in use-navigation-stack.tsx
+ * Navigation options - mirrors NavigationOptions in use-navigation-stack.tsx
  */
 interface NavigationOptions<TEndpoint extends CreateApiEndpointAny> {
   urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;

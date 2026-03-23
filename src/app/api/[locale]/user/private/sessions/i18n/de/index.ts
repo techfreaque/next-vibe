@@ -51,7 +51,7 @@ export const translations = {
       token: "Token",
       id: "Sitzungs-ID",
       name: "Name",
-      message: "Kopieren Sie diesen Token — er wird nicht wieder angezeigt",
+      message: "Kopieren Sie diesen Token - er wird nicht wieder angezeigt",
     },
     success: {
       title: "Sitzung erstellt",

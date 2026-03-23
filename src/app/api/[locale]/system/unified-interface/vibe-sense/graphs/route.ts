@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graphs List + Create Route
+ * Vibe Sense - Graphs List + Create Route
  */
 
 import "server-only";

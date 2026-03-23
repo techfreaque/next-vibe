@@ -12,7 +12,7 @@ import { agentEnv } from "./env";
 export interface AgentEnvAvailability {
   /** Main LLM routing - most models require this */
   openRouter: boolean;
-  /** Claude Code provider — auto-detected from `claude` CLI or set via CLAUDE_CODE_ENABLED */
+  /** Claude Code provider - auto-detected from `claude` CLI or set via CLAUDE_CODE_ENABLED */
   claudeCode: boolean;
   /** Voice / Text-to-Speech via Eden AI */
   voice: boolean;

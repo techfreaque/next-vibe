@@ -36,7 +36,7 @@ function getBroadcastUrl(): string {
 }
 
 /**
- * Publish a WS event — POST to the Bun proxy's internal broadcast endpoint.
+ * Publish a WS event - POST to the Bun proxy's internal broadcast endpoint.
  * Fire-and-forget: errors are logged but not thrown.
  */
 export function publishWsEvent(

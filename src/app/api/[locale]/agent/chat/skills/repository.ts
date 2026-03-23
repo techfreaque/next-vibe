@@ -53,10 +53,10 @@ import {
   type SkillCategoryValue,
   type SkillOwnershipTypeValue,
   type SkillTrustLevelValue,
-  SkillOwnershipType,
+  CATEGORY_CONFIG,
   ModelSelectionType,
+  SkillOwnershipType,
 } from "./enum";
-import { CATEGORY_CONFIG } from "./enum";
 import type { SkillsT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import { SkillsRepositoryClient } from "./repository-client";
@@ -301,7 +301,7 @@ export class SkillsRepository {
 
   /**
    * Build the response object, adding pagination metadata for compact (AI/MCP) callers.
-   * Human callers get sections only (no pagination fields — null).
+   * Human callers get sections only (no pagination fields - null).
    */
   private static buildResponse(
     allMatchedSkills: SkillListItem[],
@@ -538,7 +538,7 @@ export class SkillsRepository {
       return defaultSkill.companionPrompt ?? null;
     }
 
-    // Custom skill — DB lookup by ID only (no user filter; caller already validated ownership)
+    // Custom skill - DB lookup by ID only (no user filter; caller already validated ownership)
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(skillId)) {

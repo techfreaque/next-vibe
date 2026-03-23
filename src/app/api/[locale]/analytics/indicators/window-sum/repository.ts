@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Window Sum Compute
+ * Vibe Sense - Window Sum Compute
  * Server-only pure computation. No DB access.
  */
 

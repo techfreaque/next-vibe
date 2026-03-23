@@ -35,7 +35,7 @@ export enum DefaultFolderId {
 }
 
 /**
- * Stream Context — rich context passed to tool executions during AI streaming.
+ * Stream Context - rich context passed to tool executions during AI streaming.
  * Replaces the old single `rootFolderId` parameter with a structured object
  * so handlers know which thread/message/model they're operating in.
  */
@@ -74,7 +74,7 @@ export interface ToolExecutionContext {
   /**
    * When set, finish-step-handler starts a timeout of this many ms using the
    * stream's abort controller. Used for remote queue path and wait-for-task.
-   * Direct HTTP wait mode does NOT use this — the HTTP connection is the timeout.
+   * Direct HTTP wait mode does NOT use this - the HTTP connection is the timeout.
    */
   pendingTimeoutMs: number | undefined;
   /**
@@ -91,7 +91,7 @@ export interface ToolExecutionContext {
    */
   leafMessageId: string | undefined;
   /**
-   * The active favorite ID — allows resume-stream to reload the exact same
+   * The active favorite ID - allows resume-stream to reload the exact same
    * model + character config when restarting a dead stream after a remote tool result.
    */
   favoriteId: string | undefined;
@@ -110,11 +110,11 @@ export interface ToolExecutionContext {
    * Set by escalateToTask(callbackMode=wait) to trigger endLoop semantics:
    * wait for all parallel tools to finish, then stop the AI loop without a
    * new request. Bridged to StreamContext.shouldStopLoop in index.ts.
-   * Optional — only present in streaming contexts (bridged via defineProperty).
+   * Optional - only present in streaming contexts (bridged via defineProperty).
    */
   shouldStopLoop?: boolean;
   /**
-   * The stream's abort signal — set when streaming, undefined for non-stream contexts.
+   * The stream's abort signal - set when streaming, undefined for non-stream contexts.
    * Tool executions check this before starting to bail out if the stream was cancelled.
    */
   abortSignal: AbortSignal;
@@ -139,9 +139,9 @@ export interface ToolExecutionContext {
    * - wait: sets shouldStopLoop (endLoop semantics, all parallel tools finish first)
    * - wakeUp/detach: sets waitingForRemoteResult (REMOTE_TOOL_WAIT, stream aborts immediately)
    * Also wires cancel propagation. The tool continues running after this returns.
-   * When the tool finishes, call onComplete() — or for tools that delegate completion
+   * When the tool finishes, call onComplete() - or for tools that delegate completion
    * to an external process (e.g. claude-code calling complete-task), ignore onComplete.
-   * Only available in streaming contexts — undefined for cron/headless invocations.
+   * Only available in streaming contexts - undefined for cron/headless invocations.
    *
    * Usage:
    *   if (context.streamContext?.escalateToTask) {
@@ -155,7 +155,7 @@ export interface ToolExecutionContext {
    */
   escalateToTask:
     | ((options?: {
-        /** callbackMode to honour — defaults to wakeUp for backward compat */
+        /** callbackMode to honour - defaults to wakeUp for backward compat */
         callbackMode?: CallbackModeValue;
         /** Human-readable name shown in task dashboard */
         displayName?: string;

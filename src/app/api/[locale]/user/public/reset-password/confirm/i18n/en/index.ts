@@ -11,11 +11,11 @@ export const translations = {
       "Your {{appName}} password has been reset. Log in and start chatting with {{modelCount}} AI models.",
     greeting: "Hey {{name}},",
     successMessage:
-      "Your password has been reset. You're all set — log in and pick up where you left off.",
+      "Your password has been reset. You're all set - log in and pick up where you left off.",
     loginButton: "Log In to {{appName}}",
     promoText: "{{modelCount}} AI models. No filters. No lectures.",
     securityWarning:
-      "Didn't reset your password? Contact support immediately — your account may be at risk.",
+      "Didn't reset your password? Contact support immediately - your account may be at risk.",
   },
   groups: {
     verification: {

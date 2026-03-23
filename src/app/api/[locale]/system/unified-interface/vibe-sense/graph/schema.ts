@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — GraphConfig Zod Schema
+ * Vibe Sense - GraphConfig Zod Schema
  *
  * Runtime validation for graph configs.
  * Used by create/edit endpoints to reject invalid configurations
@@ -78,6 +78,6 @@ export const graphConfigSchema = z.object({
   trigger: triggerConfigSchema,
 });
 
-/** Inferred GraphConfig type — single source of truth */
+/** Inferred GraphConfig type - single source of truth */
 export type GraphConfigInferred = z.infer<typeof graphConfigSchema>;
 export type GraphNodeConfig = GraphConfigInferred["nodes"][string];

@@ -21,17 +21,17 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { DefaultFolderId } from "../../chat/config";
+import type { MessageMetadata, ToolCallResult } from "../../chat/db";
+import { chatMessages } from "../../chat/db";
+import { ChatMessageRole } from "../../chat/enum";
+import { chatFavorites } from "../../chat/favorites/db";
 import { NO_SKILL_ID } from "../../chat/skills/constants";
 import {
   isFiltersSelection,
   isManualSelection,
 } from "../../chat/skills/create/definition";
 import { SkillsRepositoryClient } from "../../chat/skills/repository-client";
-import { DefaultFolderId } from "../../chat/config";
-import type { MessageMetadata, ToolCallResult } from "../../chat/db";
-import { chatMessages } from "../../chat/db";
-import { ChatMessageRole } from "../../chat/enum";
-import { chatFavorites } from "../../chat/favorites/db";
 import { ThreadsRepository } from "../../chat/threads/repository";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import type { AiStreamPostRequestOutput } from "../stream/definition";
@@ -65,10 +65,10 @@ export interface HeadlessAiStreamParams {
    * Overrides the skill from the favorite when both are given.
    */
   skill?: string;
-  /** User prompt — the main question/instruction */
+  /** User prompt - the main question/instruction */
   prompt: string;
   /**
-   * Pinned tools — tools loaded into the AI context window (visible to model).
+   * Pinned tools - tools loaded into the AI context window (visible to model).
    * null/undefined = agent mode (all tools visible).
    * [] = no tools visible.
    * Array of { toolId, requiresConfirmation } = specific tools pinned to context.
@@ -78,7 +78,7 @@ export interface HeadlessAiStreamParams {
     requiresConfirmation: boolean;
   }> | null;
   /**
-   * Available tools — permission layer controlling which tools the model may execute.
+   * Available tools - permission layer controlling which tools the model may execute.
    * null/undefined = all tools permitted.
    * Array = restrict execution to listed toolIds.
    */
@@ -115,7 +115,7 @@ export interface HeadlessAiStreamParams {
   /**
    * When true, use the "wakeup-resume" operation instead of "answer-as-ai".
    * This loads DB history normally (walking parent chain from the last message)
-   * but does NOT inject CONTINUE_CONVERSATION_PROMPT — the AI sees the deferred
+   * but does NOT inject CONTINUE_CONVERSATION_PROMPT - the AI sees the deferred
    * tool result as the last context item and responds naturally.
    * Used exclusively by resume-stream for wakeUp revival.
    */
@@ -125,7 +125,7 @@ export interface HeadlessAiStreamParams {
    * When provided, skips the "find last message by createdAt" query and uses
    * this ID directly as the starting point for building message ancestry.
    * Critical for WAIT mode resume where the tool message with backfilled result
-   * must be the ancestor chain root — not whatever message was created last.
+   * must be the ancestor chain root - not whatever message was created last.
    */
   explicitParentMessageId?: string;
   /**
@@ -145,18 +145,18 @@ export interface HeadlessAiStreamParams {
 }
 
 export interface HeadlessAiStreamResult {
-  /** ID of the last assistant message — read content from DB using this */
+  /** ID of the last assistant message - read content from DB using this */
   lastAiMessageId: string;
-  /** Thread ID — undefined when threadMode is "none" */
+  /** Thread ID - undefined when threadMode is "none" */
   threadId?: string;
-  /** Final text content — populated in memory even for incognito (no DB read needed) */
+  /** Final text content - populated in memory even for incognito (no DB read needed) */
   lastAiMessageContent: string | null;
 }
 
 /**
  * Run a full AI stream without SSE.
  * DB persistence, compacting, and tool loops work exactly like the regular stream.
- * Returns the lastAiMessageId — caller reads message content from DB.
+ * Returns the lastAiMessageId - caller reads message content from DB.
  */
 /**
  * Resolve model and skill from a favorite ID.
@@ -224,7 +224,7 @@ export async function resolveFavorite(
   }
 
   logger.warn(
-    "[Headless AI] Favorite has no resolvable model — pass model explicitly",
+    "[Headless AI] Favorite has no resolvable model - pass model explicitly",
     {
       favoriteId,
       skillId: skill,
@@ -419,7 +419,7 @@ export async function runHeadlessAiStream(
     }
 
     // For "append" mode with no preCalls, determine the parent message for history.
-    // explicitParentMessageId takes priority — critical for WAIT mode resume where
+    // explicitParentMessageId takes priority - critical for WAIT mode resume where
     // the tool message with its backfilled result must be the history root, not
     // whatever message was created most recently by timestamp.
     if (threadMode === "append" && !parentMessageIdForAi && existingThreadId) {
@@ -439,7 +439,7 @@ export async function runHeadlessAiStream(
       }
     }
 
-    // wakeUpRevival uses "wakeup-resume" — same as answer-as-ai but without
+    // wakeUpRevival uses "wakeup-resume" - same as answer-as-ai but without
     // CONTINUE_CONVERSATION_PROMPT. The AI sees the deferred tool result as
     // the last message and responds naturally.
     const operation =

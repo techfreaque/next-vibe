@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Chart View Widget
+ * Vibe Sense - Graph Chart View Widget
  *
  * Multi-pane resolution selector + lightweight-charts line chart.
  * Panning left loads older history via cursor-based pagination.
@@ -20,23 +20,23 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Archive } from "next-vibe-ui/ui/icons/Archive";
+import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
-import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
 import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { Edit } from "next-vibe-ui/ui/icons/Edit";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
+import { Grip } from "next-vibe-ui/ui/icons/Grip";
 import { History } from "next-vibe-ui/ui/icons/History";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
-import { Eye } from "next-vibe-ui/ui/icons/Eye";
-import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
-import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
-import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Grip } from "next-vibe-ui/ui/icons/Grip";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React, {
@@ -49,6 +49,7 @@ import React, {
 
 import { cn } from "next-vibe/shared/utils";
 
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
   useWidgetEndpointMutations,
   useWidgetLocale,
@@ -57,7 +58,6 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
 import type {
   IChartApi,
@@ -68,16 +68,16 @@ import type {
   UTCTimestamp,
 } from "lightweight-charts";
 
-import { GraphOwnerType, GraphResolution } from "../../../enum";
 import {
   RESOLUTION_MS,
   type Resolution,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { GraphOwnerType, GraphResolution } from "../../../enum";
 
-import type definition from "./definition";
-import definitions from "./definition";
 import type { GraphNodeConfig } from "../../../graph/schema";
 import type { GraphConfig } from "../../../graph/types";
+import type definition from "./definition";
+import definitions from "./definition";
 
 import editDefinitions from "../edit/definition";
 import versionsDefinitions from "../versions/definition";
@@ -401,7 +401,7 @@ interface PaneState {
   seriesMap: Map<string, LwcSeries>;
 }
 
-/** Render series data into chart panes — used both by chart setup and data effect */
+/** Render series data into chart panes - used both by chart setup and data effect */
 function renderSeriesData(
   series: SeriesItem[],
   signals: SignalItem[],
@@ -561,7 +561,7 @@ function syncScaleWidths(
           minimumWidth: Math.max(maxLeft, 60),
         });
       } else {
-        // No pane uses left scale — ensure all panes hide it consistently
+        // No pane uses left scale - ensure all panes hide it consistently
         pane.chart.priceScale("left").applyOptions({
           visible: false,
           minimumWidth: 0,
@@ -650,7 +650,7 @@ function useMultiPaneRenderer(
     setChartKey((k) => k + 1);
   }, [resolution]);
 
-  // ── Chart setup — runs on mount and chartKey changes ─────────────────────
+  // ── Chart setup - runs on mount and chartKey changes ─────────────────────
 
   useEffect(() => {
     const outerContainer = paneContainerRef.current;
@@ -1244,7 +1244,7 @@ function PaneActions({
   );
 }
 
-/** Collapsed pane header bar — shows first series + count on left, hover actions on right */
+/** Collapsed pane header bar - shows first series + count on left, hover actions on right */
 function CollapsedPaneBar({
   paneNum,
   seriesCount,
@@ -1345,7 +1345,7 @@ function CrosshairTooltip({
   }
   const containerWidth = containerRef.current.clientWidth;
   const tooltipWidth = 180;
-  // Position tooltip offset from cursor — 40px right, flip left if overflows
+  // Position tooltip offset from cursor - 40px right, flip left if overflows
   const left =
     crosshair.x + tooltipWidth + 40 > containerWidth
       ? crosshair.x - tooltipWidth - 16
@@ -1513,8 +1513,8 @@ function PaneDragHandle({
 // Priority order for hiding: least important removed first.
 // 1m and 1M are trimmed before 3m and 1W, etc.
 const RESOLUTION_DROP_ORDER: Resolution[] = [
-  GraphResolution.ONE_MINUTE, // drop 1st — too granular for most use
-  GraphResolution.ONE_MONTH, // drop 2nd — too coarse for most use
+  GraphResolution.ONE_MINUTE, // drop 1st - too granular for most use
+  GraphResolution.ONE_MONTH, // drop 2nd - too coarse for most use
   GraphResolution.THREE_MINUTES,
   GraphResolution.ONE_WEEK,
   GraphResolution.FIVE_MINUTES,
@@ -1664,7 +1664,7 @@ function ResolutionPicker({
             ))}
           </Div>
 
-          {/* Overflow button — shows hidden resolutions in a popover */}
+          {/* Overflow button - shows hidden resolutions in a popover */}
           {hidden.length > 0 && (
             <Div ref={overflowRef} className="relative">
               <Button
@@ -1795,7 +1795,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
       : undefined;
 
   /**
-   * Save an updated graph config optimistically — update local state immediately,
+   * Save an updated graph config optimistically - update local state immediately,
    * fire `apiClient.mutate` in background, navigate to the new version ID on success.
    */
   const saveLayoutConfig = useCallback(
@@ -2363,7 +2363,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                     panesRef={panesRef}
                   />
                 )}
-                {/* Collapsed pane bar — shown when pane is collapsed */}
+                {/* Collapsed pane bar - shown when pane is collapsed */}
                 {isCollapsed &&
                   (() => {
                     const paneSeries = accSeries.filter((s) => {
@@ -2396,7 +2396,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                       />
                     );
                   })()}
-                {/* Pane wrapper — always in DOM so lwc chart stays attached.
+                {/* Pane wrapper - always in DOM so lwc chart stays attached.
                     Hidden via h-0 overflow-hidden when collapsed.
                     group/pane enables hover-only pane action visibility. */}
                 <Div
@@ -2443,7 +2443,7 @@ export function GraphChartView({ field }: WidgetProps): React.JSX.Element {
                       }}
                     />
                   )}
-                  {/* Pane action buttons — hover-only on pointer devices */}
+                  {/* Pane action buttons - hover-only on pointer devices */}
                   <PaneActions
                     paneNum={paneNum}
                     rightOffset={scaleWidths.right}

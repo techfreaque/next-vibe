@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     notConnected: {
       title: "Połącz konto w chmurze",
       description:
-        "Połącz się ze swoim kontem w chmurze (np. unbottled.ai), aby synchronizować wspomnienia i korzystać z narzędzi AI z terminala — z dowolnego miejsca.",
+        "Połącz się ze swoim kontem w chmurze (np. unbottled.ai), aby synchronizować wspomnienia i korzystać z narzędzi AI z terminala - z dowolnego miejsca.",
       benefit1:
         "Twoje wspomnienia synchronizują się automatycznie między tym urządzeniem a kontem w chmurze",
       benefit2: "Uruchamiaj narzędzia AI z wiersza poleceń za pomocą",

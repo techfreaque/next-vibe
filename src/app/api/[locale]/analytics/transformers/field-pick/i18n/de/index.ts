@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Feld auswählen",
     description:
-      "Feld auswählen — extrahiert ein benanntes Feld (abgelöst, gibt leer zurück)",
+      "Feld auswählen - extrahiert ein benanntes Feld (abgelöst, gibt leer zurück)",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       field: {

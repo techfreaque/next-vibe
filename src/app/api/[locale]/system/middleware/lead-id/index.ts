@@ -96,7 +96,7 @@ export { LeadIdCheckResult };
 // ─── Exchange Token Redemption ────────────────────────────────────────────────
 
 export interface ExchangeTokenPayload {
-  /** Null when the host page didn't provide a leadId — middleware creates a new lead */
+  /** Null when the host page didn't provide a leadId - middleware creates a new lead */
   leadId: string | null;
   authToken: string | null;
 }
@@ -108,7 +108,7 @@ export interface ExchangeTokenPayload {
  *
  * Atomicity: the UPDATE ... WHERE usedAt IS NULL ... RETURNING pattern is a
  * single round-trip. Only the connection that successfully updates the row
- * (rowCount > 0) gets the payload — concurrent redemptions are safely rejected.
+ * (rowCount > 0) gets the payload - concurrent redemptions are safely rejected.
  */
 export async function redeemExchangeToken(
   token: string,
@@ -125,7 +125,7 @@ export async function redeemExchangeToken(
         and(
           eq(frameExchangeTokens.token, token),
           isNull(frameExchangeTokens.usedAt),
-          // gt(expiresAt, now) — filter expired tokens atomically
+          // gt(expiresAt, now) - filter expired tokens atomically
           gt(frameExchangeTokens.expiresAt, now),
         ),
       )
@@ -136,7 +136,7 @@ export async function redeemExchangeToken(
 
     const row = updated[0];
     if (!row) {
-      // Token missing, already used, or expired — all treated the same
+      // Token missing, already used, or expired - all treated the same
       return null;
     }
 

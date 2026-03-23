@@ -32,7 +32,7 @@ export class JourneyVariantsRepository {
   private static readonly VALID_VARIANT_KEYS = new Set<string>(
     Object.values(EmailJourneyVariant),
   );
-  // ── GET — list all ──────────────────────────────────────────────────────────
+  // ── GET - list all ──────────────────────────────────────────────────────────
   static async getAll(
     logger: EndpointLogger,
     t: JourneyVariantsT,
@@ -77,7 +77,7 @@ export class JourneyVariantsRepository {
     }
   }
 
-  // ── POST — register new variant ─────────────────────────────────────────────
+  // ── POST - register new variant ─────────────────────────────────────────────
   static async register(
     data: JourneyVariantsPostRequestOutput,
     logger: EndpointLogger,
@@ -158,7 +158,7 @@ export class JourneyVariantsRepository {
     }
   }
 
-  // ── PATCH — update active/weight/metadata ────────────────────────────────────
+  // ── PATCH - update active/weight/metadata ────────────────────────────────────
   static async update(
     data: JourneyVariantsPatchRequestOutput,
     logger: EndpointLogger,

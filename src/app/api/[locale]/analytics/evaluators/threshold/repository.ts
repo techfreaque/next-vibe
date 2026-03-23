@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Threshold Evaluator Pure Computation
+ * Vibe Sense - Threshold Evaluator Pure Computation
  * Server-only.
  */
 

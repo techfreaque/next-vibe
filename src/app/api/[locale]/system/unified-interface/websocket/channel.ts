@@ -19,12 +19,12 @@
  * @returns Channel string like "agent/chat/threads/abc123/messages"
  *
  * @example
- * // Endpoint with path params — params resolve the channel
+ * // Endpoint with path params - params resolve the channel
  * buildWsChannel(["agent", "chat", "threads", "[threadId]", "messages"], { threadId: "abc" })
  * // → "agent/chat/threads/abc/messages"
  *
  * @example
- * // Endpoint without path params — scope adds context
+ * // Endpoint without path params - scope adds context
  * buildWsChannel(["agent", "ai-stream"], {}, "thread-abc")
  * // → "agent/ai-stream/thread-abc"
  */

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Skrypt",
     description:
-      "Skrypt — stosuje niestandardową funkcję w piaskownicy do serii czasowej",
+      "Skrypt - stosuje niestandardową funkcję w piaskownicy do serii czasowej",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       fn: {

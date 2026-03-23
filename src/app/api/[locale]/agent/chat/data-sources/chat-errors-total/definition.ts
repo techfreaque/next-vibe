@@ -1,5 +1,5 @@
 /**
- * Chat Errors Total — Endpoint Definition
+ * Chat Errors Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

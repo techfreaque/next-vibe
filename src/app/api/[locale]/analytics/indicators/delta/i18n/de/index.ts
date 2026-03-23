@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Delta",
     description:
-      "Differenz zwischen aufeinanderfolgenden Werten — misst die Änderungsrate",
+      "Differenz zwischen aufeinanderfolgenden Werten - misst die Änderungsrate",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

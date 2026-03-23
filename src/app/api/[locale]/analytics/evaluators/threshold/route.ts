@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Threshold Evaluator Route
+ * Vibe Sense - Threshold Evaluator Route
  * Server-only.
  */
 

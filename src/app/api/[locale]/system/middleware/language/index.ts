@@ -106,7 +106,7 @@ export function detectLocale(
     if (localeSegment === matchedLocale) {
       return null;
     }
-    // Casing is wrong (e.g. "en-us" instead of "en-US") — redirect to fix it
+    // Casing is wrong (e.g. "en-us" instead of "en-US") - redirect to fix it
     return matchedLocale;
   }
 

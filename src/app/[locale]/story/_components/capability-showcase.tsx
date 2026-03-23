@@ -257,8 +257,8 @@ function buildPulseFixGroup(t: ScopedT): MessageGroup {
       },
       emailContent: {
         subject: t("home.capabilities.autonomous.emailSubject"),
-        html: "<p>3 new Munich listings matching your criteria. Neuhausen looks strongest — 5 rooms, garden, 749k, listed 3h ago. Details inside.</p>",
-        text: "3 new Munich listings matching your criteria. Neuhausen looks strongest — 5 rooms, garden, 749k, listed 3h ago. Details inside.",
+        html: "<p>3 new Munich listings matching your criteria. Neuhausen looks strongest - 5 rooms, garden, 749k, listed 3h ago. Details inside.</p>",
+        text: "3 new Munich listings matching your criteria. Neuhausen looks strongest - 5 rooms, garden, 749k, listed 3h ago. Details inside.",
       },
       senderSettings: {
         senderName: "Thea",

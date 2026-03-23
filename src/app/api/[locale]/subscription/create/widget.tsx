@@ -133,7 +133,7 @@ export function SubscriptionCreateContainer({
       ? yearlySubscriptionPrice / 12
       : subscriptionPrice;
 
-  // Crypto (NOWPayments) requires yearly billing — minimum transaction value.
+  // Crypto (NOWPayments) requires yearly billing - minimum transaction value.
   const isCryptoDisabled = billingInterval !== BillingInterval.YEARLY;
 
   const handleSubscribe = (): void => {

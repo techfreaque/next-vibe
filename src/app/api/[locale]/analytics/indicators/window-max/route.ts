@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Window Maximum Route
+ * Vibe Sense - Window Maximum Route
  * Server-only.
  */
 

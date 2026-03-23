@@ -148,7 +148,7 @@ export class ChatSettingsRepository {
 
       const defaults = ChatSettingsRepositoryClient.getDefaults();
 
-      // Normalize tools — null passthrough means "all allowed"
+      // Normalize tools - null passthrough means "all allowed"
       const availableToolsToStore =
         data.availableTools !== undefined
           ? ChatSettingsRepository.normalizeToolsOrNull(

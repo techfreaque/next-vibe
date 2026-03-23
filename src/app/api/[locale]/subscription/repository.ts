@@ -61,7 +61,7 @@ interface SyncSubscriptionResult {
 export class SubscriptionRepository {
   /**
    * Map Stripe subscription status to our subscription status.
-   * Exhaustive over Stripe.Subscription.Status — adding a new Stripe status will
+   * Exhaustive over Stripe.Subscription.Status - adding a new Stripe status will
    * cause a compile error, forcing us to handle it explicitly.
    */
   private static readonly STRIPE_STATUS_MAP: Record<
@@ -186,7 +186,7 @@ export class SubscriptionRepository {
       let subscription = results[0];
 
       // AUTOMATIC SYNC: Verify subscription with Stripe if it has a provider ID.
-      // Skip for NOWPayments — one-time payments have no recurring subscription to sync.
+      // Skip for NOWPayments - one-time payments have no recurring subscription to sync.
       if (
         subscription.providerSubscriptionId &&
         subscription.provider !== PaymentProvider.NOWPAYMENTS
@@ -283,7 +283,7 @@ export class SubscriptionRepository {
                         productId,
                         locale,
                       );
-                      // Credits expire at exact period end — new period credits are pre-granted via invoice.paid
+                      // Credits expire at exact period end - new period credits are pre-granted via invoice.paid
                       const expiresAt = new Date(currentPeriodEnd * 1000);
 
                       // Canonical idempotency key shared across all credit grant paths
@@ -695,7 +695,7 @@ export class SubscriptionRepository {
         (session.metadata?.provider as typeof PaymentProviderValue) ||
         PaymentProvider.STRIPE;
 
-      // NOWPayments processes subscriptions as one-time invoices — no recurring
+      // NOWPayments processes subscriptions as one-time invoices - no recurring
       // subscription object exists. Calculate period dates from billingInterval.
       const isNowPayments = providerEnum === PaymentProvider.NOWPAYMENTS;
 
@@ -981,7 +981,7 @@ export class SubscriptionRepository {
   }
 
   /**
-   * Handle invoice.created webhook — pre-grant credits before payment confirmation.
+   * Handle invoice.created webhook - pre-grant credits before payment confirmation.
    * This ensures users have credits immediately when a new billing period starts.
    * Idempotency: uses SubscriptionRepository.renewalSessionKey() so duplicate webhooks or later invoice.paid
    * events won't double-grant.
@@ -1002,7 +1002,7 @@ export class SubscriptionRepository {
         billingReason,
       });
 
-      // Skip initial checkout invoice — handled separately by checkout flow
+      // Skip initial checkout invoice - handled separately by checkout flow
       if (billingReason === "subscription_create") {
         logger.info("Skipping credit pre-grant - initial checkout invoice", {
           billingReason,
@@ -1011,7 +1011,7 @@ export class SubscriptionRepository {
         return;
       }
 
-      // Skip voided or $0 invoices — don't pre-grant credits for non-chargeable invoices
+      // Skip voided or $0 invoices - don't pre-grant credits for non-chargeable invoices
       if (invoice.status === "void" || invoice.status === "uncollectible") {
         logger.info(
           "Skipping credit pre-grant - invoice is void/uncollectible",
@@ -1116,7 +1116,7 @@ export class SubscriptionRepository {
 
       const expiresAt = periodEnd;
 
-      // Canonical idempotency key — shared with invoice.paid and subscription.updated
+      // Canonical idempotency key - shared with invoice.paid and subscription.updated
       const renewalSessionId = SubscriptionRepository.renewalSessionKey(
         subscriptionId,
         periodEnd.getTime(),
@@ -1314,7 +1314,7 @@ export class SubscriptionRepository {
             return;
           }
 
-          // Credits expire at exact period end — no grace buffer needed
+          // Credits expire at exact period end - no grace buffer needed
           const expiresAt = periodEnd;
 
           // Canonical idempotency key shared across all credit grant paths
@@ -1355,7 +1355,7 @@ export class SubscriptionRepository {
             const { CreditTransactionType } = await import("../credits/enum");
 
             // Look up revoked credits from this grace period only (not all-time).
-            // Scope by paymentFailedAt — revocations happen after that timestamp.
+            // Scope by paymentFailedAt - revocations happen after that timestamp.
             const scopeStart =
               subscription.paymentFailedAt ??
               subscription.currentPeriodEnd ??
@@ -1691,7 +1691,7 @@ export class SubscriptionRepository {
             .limit(1);
 
           if (!existingPack) {
-            // Credits expire at exact period end — no grace buffer needed
+            // Credits expire at exact period end - no grace buffer needed
             await CreditRepository.addUserCredits(
               subscription.userId,
               product.credits,
@@ -1950,7 +1950,7 @@ export class SubscriptionRepository {
    * Handle NOWPayments success redirect.
    * Called from the subscription page when NP_id (payment_id) is present in the URL.
    * Fetches payment status from NOWPayments, looks up stored invoice metadata,
-   * and processes the subscription checkout — idempotent via renewalSessionKey.
+   * and processes the subscription checkout - idempotent via renewalSessionKey.
    */
   static async handleNowPaymentsSuccessRedirect(
     npId: string,
@@ -2001,7 +2001,7 @@ export class SubscriptionRepository {
       const orderUserId = paymentStatus.order_id?.split("_")[0];
       if (orderUserId !== userId) {
         logger.warn(
-          "User mismatch on NOWPayments success redirect — ignoring",
+          "User mismatch on NOWPayments success redirect - ignoring",
           {
             npId,
             orderUserId,
@@ -2012,7 +2012,7 @@ export class SubscriptionRepository {
       }
 
       // Look up stored invoice metadata (contains planId, billingInterval, etc.)
-      // order_id = "userId_timestamp" — use the timestamp to find the right invoice.
+      // order_id = "userId_timestamp" - use the timestamp to find the right invoice.
       const { paymentInvoices } = await import("../payment/db");
 
       const orderTimestamp = parseInt(

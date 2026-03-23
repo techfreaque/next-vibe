@@ -70,7 +70,7 @@ export function FolderMoveContainer({ field }: MoveWidgetProps): JSX.Element {
     [foldersEndpoint.read?.response],
   );
 
-  // id comes from urlPathParams — read from form values
+  // id comes from urlPathParams - read from form values
   const currentFolderId = form.watch("subFolderId") ?? undefined;
 
   // Compute descendant IDs to exclude (can't move into self or children)

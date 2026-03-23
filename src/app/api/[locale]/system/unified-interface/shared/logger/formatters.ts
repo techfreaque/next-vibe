@@ -105,7 +105,7 @@ export function createNextjsFormatter(
 
       const prefix = `[${getTimePrefix()}] `;
       if (prefix === lastPrefix) {
-        // Same timestamp as previous line — indent instead to visually group
+        // Same timestamp as previous line - indent instead to visually group
         out.push(
           maybeColorize(`${" ".repeat(prefix.length)}${raw}`, semantic.nextjs),
         );
@@ -120,7 +120,7 @@ export function createNextjsFormatter(
 }
 
 /**
- * Format a Next.js output line (simple, no timestamp — use createNextjsFormatter for stateful timestamping)
+ * Format a Next.js output line (simple, no timestamp - use createNextjsFormatter for stateful timestamping)
  */
 export function formatNextjs(line: string): string {
   return maybeColorize(line, semantic.nextjs);

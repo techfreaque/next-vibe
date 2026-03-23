@@ -34,12 +34,12 @@ const numericNumber = customType<{
  * - lastResetAt: timestamp of last midnight reset (done lazily or by cron)
  *
  * "Free-tier user" = pool where ALL wallets have balance === 0 (no paid credits).
- * Race conditions are intentionally ignored here — minor over-spend is acceptable.
+ * Race conditions are intentionally ignored here - minor over-spend is acceptable.
  */
 export const publicFreeTierDailyCap = pgTable("public_free_tier_daily_cap", {
   id: uuid("id").primaryKey().defaultRandom(),
 
-  // Running spend since lastResetAt — zeroed at midnight
+  // Running spend since lastResetAt - zeroed at midnight
   spendToday: numericNumber("spend_today").notNull().default(0),
 
   // Configurable daily limit (updated via POST endpoint)

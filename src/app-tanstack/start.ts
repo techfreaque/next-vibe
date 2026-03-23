@@ -3,7 +3,7 @@
  *
  * Integrates src/proxy.ts (Next.js middleware) as a TanStack request middleware
  * so that locale detection, lead tracking, CSRF stamping, and cookie management
- * run on every server request — matching the Next.js edge middleware behaviour.
+ * run on every server request - matching the Next.js edge middleware behaviour.
  */
 
 import { createMiddleware, createStart } from "@tanstack/react-start";
@@ -38,7 +38,7 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
   }
 
   // Build a bodyless NextRequest for the proxy (it only needs URL + headers/cookies).
-  // Do NOT pass the original request body — Bun transfers body ownership when passing
+  // Do NOT pass the original request body - Bun transfers body ownership when passing
   // a Request to new Request(), leaving downstream handlers with an empty stream.
   const nextRequest = new NextRequest(
     new Request(request.url, {

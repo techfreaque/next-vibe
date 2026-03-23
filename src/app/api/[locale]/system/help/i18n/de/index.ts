@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   tag: "Hilfe",
   uncategorized: "Sonstige",
   get: {
-    title: "Tool-Hilfe — Verfügbare Tools entdecken",
+    title: "Tool-Hilfe - Verfügbare Tools entdecken",
     description:
       "Durchsuchen und entdecken Sie alle verfügbaren Tools. Verwenden Sie query für die Suche, category für die Filterung.",
     tags: {
@@ -303,12 +303,12 @@ export const translations: typeof enTranslations = {
     modal: {
       pinnedLabel: "angeheftet",
       pinnedTooltip:
-        "Angeheftete Tools sind immer im Kontext — die KI sieht sie bei jedem Schritt",
+        "Angeheftete Tools sind immer im Kontext - die KI sieht sie bei jedem Schritt",
       enabledLabel: "erlaubt",
       enabledTooltip:
         "Erlaubte Tools können auf Anfrage aufgerufen werden, wenn Hilfe aktiviert ist",
       totalLabel: "gesamt",
-      totalTooltip: "Alle Tools anzeigen — klicken um Filter zu löschen",
+      totalTooltip: "Alle Tools anzeigen - klicken um Filter zu löschen",
       searchPlaceholder: "Tools suchen...",
       expandAll: "Alle erweitern",
       collapseAll: "Alle zusammenklappen",
@@ -321,11 +321,11 @@ export const translations: typeof enTranslations = {
       legendActive: "Immer im Kontext (angeheftet)",
       legendConfirm: "Fragt vor dem Ausführen",
       stats: "{{pinned}} von {{total}} Tools angeheftet",
-      activeOn: "Angeheftet — immer im Kontext. Klicken zum Ablösen",
+      activeOn: "Angeheftet - immer im Kontext. Klicken zum Ablösen",
       activeOff:
-        "Nicht angeheftet — KI kann trotzdem auf Anfrage aufrufen. Klicken zum Anheften",
-      confirmOn: "Fragt nach Bestätigung — klicken zum Deaktivieren",
-      confirmOff: "Läuft automatisch — klicken um Bestätigung zu erfordern",
+        "Nicht angeheftet - KI kann trotzdem auf Anfrage aufrufen. Klicken zum Anheften",
+      confirmOn: "Fragt nach Bestätigung - klicken zum Deaktivieren",
+      confirmOff: "Läuft automatisch - klicken um Bestätigung zu erfordern",
     },
 
     platformFilter: {

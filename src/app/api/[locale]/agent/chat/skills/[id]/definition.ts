@@ -13,8 +13,8 @@ import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/type
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -30,8 +30,10 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import {
@@ -40,11 +42,11 @@ import {
   TtsVoiceOptions,
 } from "../../../text-to-speech/enum";
 import {
-  SkillOwnershipType,
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   PriceLevel,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../skills/enum";
 import {
@@ -57,8 +59,7 @@ import type {
   ManualModelSelection,
 } from "../create/definition";
 import type { SkillListResponseOutput } from "../definition";
-import { CategoryOptions } from "../enum";
-import { SkillCategory } from "../enum";
+import { CategoryOptions, SkillCategory } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
 import { SkillEditContainer, SkillViewContainer } from "./widget";
@@ -556,7 +557,7 @@ const { PATCH } = createEndpoint({
         schema: z.number().int().min(1000).max(200000).nullable().optional(),
       }),
 
-      // Tool configuration — null = inherit from settings (default)
+      // Tool configuration - null = inherit from settings (default)
       availableTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -775,7 +776,7 @@ const { GET } = createEndpoint({
         schema: z.number().int().nullable(),
       }),
 
-      // Tool configuration — null = inherit from settings (default)
+      // Tool configuration - null = inherit from settings (default)
       availableTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,

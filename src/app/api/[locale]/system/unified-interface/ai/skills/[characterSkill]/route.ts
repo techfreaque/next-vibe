@@ -1,5 +1,5 @@
 /**
- * Skill Skill Manifest — Dynamic Route
+ * Skill Skill Manifest - Dynamic Route
  * GET /api/[locale]/system/unified-interface/ai/skills/[skill-id]-skill.md
  *
  * Returns a per-skill manifest listing only the tools that skill

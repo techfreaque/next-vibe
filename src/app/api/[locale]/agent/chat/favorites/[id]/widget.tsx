@@ -43,19 +43,19 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
+import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { ModelSelectionSimple } from "../../../models/types";
 import {
   ToolsConfigEdit,
   type ToolEntry,
   type ToolsConfigValue,
 } from "../../../tools/widget/tools-config-widget";
-import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 
-import { useSkill } from "../../skills/[id]/hooks";
 import { useChatSettings } from "../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import { CompactTriggerEdit } from "../../settings/widget";
+import { useSkill } from "../../skills/[id]/hooks";
 import type definitionPatch from "./definition";
 import type { FavoriteUpdateResponseOutput } from "./definition";
 
@@ -417,7 +417,7 @@ export function FavoriteEditContainer({
             />
           )}
 
-          {/* Context Memory Budget — per-slot override */}
+          {/* Context Memory Budget - per-slot override */}
           {form && (
             <CompactTriggerEdit
               value={form.watch("compactTrigger") ?? null}
@@ -431,7 +431,7 @@ export function FavoriteEditContainer({
             />
           )}
 
-          {/* Tool configuration — per-slot override */}
+          {/* Tool configuration - per-slot override */}
           {form && (
             <ToolsConfigEdit
               value={toolsValue}
@@ -444,7 +444,7 @@ export function FavoriteEditContainer({
             />
           )}
 
-          {/* Denied tools — block specific tools for this slot */}
+          {/* Denied tools - block specific tools for this slot */}
           {form && (
             <DeniedToolsEdit
               value={watchedDeniedTools}
@@ -456,7 +456,7 @@ export function FavoriteEditContainer({
             />
           )}
 
-          {/* Prompt append — extra instructions for this slot */}
+          {/* Prompt append - extra instructions for this slot */}
           {form && (
             <Div className="flex flex-col gap-2">
               <Label className="text-sm font-medium">

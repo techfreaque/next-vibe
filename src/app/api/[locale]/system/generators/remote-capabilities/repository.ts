@@ -5,9 +5,9 @@
  * Output: src/app/api/[locale]/system/generated/remote-capabilities/{locale}/{role}.ts
  *
  * Also generates version.ts with the build version string (git SHA or package
- * version) — changes only on deploy, so remote sync can skip unchanged snapshots.
+ * version) - changes only on deploy, so remote sync can skip unchanged snapshots.
  *
- * These files are pure data — no TS imports of definition files — so they are
+ * These files are pure data - no TS imports of definition files - so they are
  * fast and safe to import in any context including the sync cron.
  */
 
@@ -73,7 +73,7 @@ interface RemoteCapabilitiesResponseType {
 
 /**
  * Compute build version: git SHA if available, else package version, else timestamp.
- * This changes only on deploy — used by remote sync to skip unchanged snapshots.
+ * This changes only on deploy - used by remote sync to skip unchanged snapshots.
  *
  * Uses execSync("git rev-parse") instead of reading .git/ files directly —
  * subprocess calls are opaque to Turbopack's static file-glob analysis.
@@ -83,14 +83,14 @@ interface RemoteCapabilitiesResponseType {
 export class RemoteCapabilitiesGeneratorRepository {
   /**
    * Compute build version: git SHA if available, else package version, else timestamp.
-   * This changes only on deploy — used by remote sync to skip unchanged snapshots.
+   * This changes only on deploy - used by remote sync to skip unchanged snapshots.
    *
    * Uses execSync("git rev-parse") instead of reading .git/ files directly —
    * subprocess calls are opaque to Turbopack's static file-glob analysis.
    */
   private static getBuildVersion(): string {
     try {
-      // execSync is opaque to Turbopack — no file-glob warnings
+      // execSync is opaque to Turbopack - no file-glob warnings
       const sha = execSync("git rev-parse --short=12 HEAD", {
         encoding: "utf-8",
         stdio: ["ignore", "pipe", "ignore"],
@@ -99,7 +99,7 @@ export class RemoteCapabilitiesGeneratorRepository {
         return sha;
       }
     } catch {
-      // Not a git repo or git not installed — fall through
+      // Not a git repo or git not installed - fall through
     }
 
     try {
@@ -316,7 +316,7 @@ export class RemoteCapabilitiesGeneratorRepository {
         }
       } catch (error) {
         logger.warn(
-          `Could not load definition: ${defFile} — ${parseError(error).message}`,
+          `Could not load definition: ${defFile} - ${parseError(error).message}`,
         );
       }
     }
@@ -393,12 +393,12 @@ export class RemoteCapabilitiesGeneratorRepository {
         try {
           title = t(definition.title);
         } catch {
-          /* missing translation — keep raw key */
+          /* missing translation - keep raw key */
         }
         try {
           description = t(definition.description ?? definition.title);
         } catch {
-          /* missing translation — keep raw key */
+          /* missing translation - keep raw key */
         }
 
         // Translate category via global i18n (category keys are global, e.g. "app.endpointCategories.chat")
@@ -425,7 +425,7 @@ export class RemoteCapabilitiesGeneratorRepository {
           ? [...definition.aliases]
           : [];
 
-        // Serialize fields — JSON.stringify drops render/function refs,
+        // Serialize fields - JSON.stringify drops render/function refs,
         // then walk the result and resolve all translatable string values.
         const fields =
           RemoteCapabilitiesGeneratorRepository.translateFieldStrings(
@@ -491,7 +491,7 @@ export class RemoteCapabilitiesGeneratorRepository {
           try {
             out[key] = t(val);
           } catch {
-            out[key] = val; // missing translation — keep raw key
+            out[key] = val; // missing translation - keep raw key
           }
         } else if (
           val !== null &&

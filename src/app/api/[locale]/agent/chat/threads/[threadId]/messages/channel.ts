@@ -5,7 +5,7 @@
  * Used by both server (emitter) and client (subscriber) to ensure
  * the channel name is derived from a single source of truth.
  *
- * This file is client-safe — no "server-only" imports.
+ * This file is client-safe - no "server-only" imports.
  */
 
 import { buildWsChannel } from "@/app/api/[locale]/system/unified-interface/websocket/channel";

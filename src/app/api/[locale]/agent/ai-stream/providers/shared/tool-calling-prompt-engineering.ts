@@ -102,7 +102,7 @@ MULTI-STEP WORKFLOW:
 - You may call the same tool again with DIFFERENT arguments (e.g. a refined search query, a different URL). Do NOT repeat the exact same call.
 - When your task requires multiple steps (search → read → summarize), work through each step. Call tools as needed, then write your final answer once you have all the information.
 
-STOP LOOP — callbackMode endLoop:
+STOP LOOP - callbackMode endLoop:
 When a tool call needs no follow-up response (e.g. saving a memory), add "callbackMode": "endLoop" to the arguments. The system stops after that tool completes.
 - Use for: ${MEMORY_ADD_ALIAS}, ${MEMORY_UPDATE_ALIAS}, ${MEMORY_DELETE_ALIAS}
 - Example: {"name": "${MEMORY_ADD_ALIAS}", "arguments": {"content": "...", "callbackMode": "endLoop"}}

@@ -754,7 +754,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
         return null;
       }
 
-      // Stat and dynamic import in parallel — stat is needed for stale check anyway
+      // Stat and dynamic import in parallel - stat is needed for stale check anyway
       // Use indirect import to prevent Turbopack static analysis
       // eslint-disable-next-line -- dynamic import required for runtime config loading
       const dynamicImport = new Function("p", "return import(p)") as (

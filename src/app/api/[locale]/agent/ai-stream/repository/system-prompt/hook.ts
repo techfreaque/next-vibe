@@ -11,17 +11,17 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { buildTrailingSystemMessage, generateSystemPrompt } from "./assembler";
 
 export interface DebugSystemPromptParts {
-  /** Leading system prompt — sent as the static `system` param to the AI (cacheable). */
+  /** Leading system prompt - sent as the static `system` param to the AI (cacheable). */
   systemPrompt: string;
-  /** Trailing system message — injected as a system message in the messages array, before the context line. Empty when nothing to inject. */
+  /** Trailing system message - injected as a system message in the messages array, before the context line. Empty when nothing to inject. */
   trailingSystemMessage: string;
-  /** Upcoming assistant context line — always the last message in the array. */
+  /** Upcoming assistant context line - always the last message in the array. */
   contextLine: string;
 }
 
 /**
  * Hook for debug view that handles all data fetching and system prompt generation.
- * Uses generated useAllPromptFragments — zero hardcoded fragment imports.
+ * Uses generated useAllPromptFragments - zero hardcoded fragment imports.
  * Adding a new fragment only requires running the generator; no changes here.
  */
 export function useDebugSystemPrompt(params: {
@@ -32,7 +32,7 @@ export function useDebugSystemPrompt(params: {
   selectedModel?: string;
   user: JwtPayloadType;
   logger: EndpointLogger;
-  /** ttsAutoplay from settings — caller must pass this to avoid a second useChatSettings instance */
+  /** ttsAutoplay from settings - caller must pass this to avoid a second useChatSettings instance */
   callMode: boolean;
 }): DebugSystemPromptParts {
   const {

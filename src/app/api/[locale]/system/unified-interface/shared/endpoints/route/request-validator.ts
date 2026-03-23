@@ -172,7 +172,7 @@ export function validateHandlerRequestData<
       return urlValidation;
     }
 
-    // Normalize: AI models sometimes send object fields as JSON strings — parse them
+    // Normalize: AI models sometimes send object fields as JSON strings - parse them
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Request data from AI tools is WidgetData at runtime despite generic typing
     const normalizedRequestData = deepParseJsonStrings(
       context.requestData as WidgetData,

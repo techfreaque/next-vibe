@@ -8,7 +8,7 @@
  *
  * The taskInput carries: threadId, modelId (or favoriteId), skillId.
  * handleTaskCompletion creates a one-shot cron task with routeId="resume-stream"
- * and all needed context flows through taskInput — no DB columns needed.
+ * and all needed context flows through taskInput - no DB columns needed.
  */
 
 import { z } from "zod";

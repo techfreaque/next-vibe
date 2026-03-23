@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
 import {
@@ -154,7 +154,7 @@ export function NavigateButtonWidget<
     }
   }
 
-  // Forward navigation (push to stack) — always async to support resolver + async extractParams
+  // Forward navigation (push to stack) - always async to support resolver + async extractParams
   const handleClick = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
 

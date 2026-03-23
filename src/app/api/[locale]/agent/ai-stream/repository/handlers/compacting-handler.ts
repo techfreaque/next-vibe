@@ -52,7 +52,7 @@ function buildCompactingInstructions(): string {
 - Write in past tense from a neutral observer perspective
 - Group related points together
 - Use bullet points for clarity
-- Output ONLY the summary — no preamble, no meta-commentary, no section headers like "Summary:"`;
+- Output ONLY the summary - no preamble, no meta-commentary, no section headers like "Summary:"`;
 }
 
 /**
@@ -193,7 +193,7 @@ export class CompactingHandler {
     try {
       const streamResult = await streamText({
         model: providerModel,
-        // Do NOT pass system prompt or tools — compacting is a pure summarization
+        // Do NOT pass system prompt or tools - compacting is a pure summarization
         // task that should not be influenced by skill personas, tool definitions,
         // or other system-level instructions that would bloat the context.
         messages: compactingMessages,

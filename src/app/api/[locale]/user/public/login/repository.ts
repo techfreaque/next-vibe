@@ -5,6 +5,7 @@
 import "server-only";
 
 import { and, count, eq, gt, isNull, or } from "drizzle-orm";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -13,7 +14,6 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
-import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -126,7 +126,7 @@ export class LoginRepository {
     try {
       logger.debug("Login attempt", { email });
 
-      // DB-backed rate limiting — safe across restarts and load-balanced instances
+      // DB-backed rate limiting - safe across restarts and load-balanced instances
       const isLocked = await this.isAccountLockedDb(email, ipAddress);
       if (isLocked) {
         logger.debug("Login failed: Account locked", { email });
@@ -139,7 +139,7 @@ export class LoginRepository {
 
       // Fetch user + password hash in one query.
       // We intentionally do this BEFORE checking user existence so that
-      // the Argon2 verification below always runs — preventing timing-based
+      // the Argon2 verification below always runs - preventing timing-based
       // user enumeration (non-existent users get a dummy hash and take the
       // same ~500ms as real users with a wrong password).
       const userRow = await db
@@ -151,7 +151,7 @@ export class LoginRepository {
       const storedHash =
         userRow?.password ?? (await LoginRepository.getDummyHash());
 
-      // Always run Argon2 — constant-time regardless of whether user exists
+      // Always run Argon2 - constant-time regardless of whether user exists
       const isPasswordValid = await verifyPassword(password, storedHash);
 
       if (!userRow || !isPasswordValid) {
@@ -654,7 +654,7 @@ export class LoginRepository {
         failureCount: success ? 0 : 1,
       });
     } catch {
-      // Non-critical — don't fail login if attempt recording fails
+      // Non-critical - don't fail login if attempt recording fails
     }
   }
 

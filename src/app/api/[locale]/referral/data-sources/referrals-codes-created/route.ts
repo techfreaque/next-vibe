@@ -1,5 +1,5 @@
 /**
- * Referrals Codes Created — Route
+ * Referrals Codes Created - Route
  * Server-only.
  */
 

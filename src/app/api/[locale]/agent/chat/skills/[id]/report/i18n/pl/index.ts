@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Zgłoś umiejętność",
     description:
-      "Zgłoś umiejętność społeczności do moderacji. Idempotentne — jedno zgłoszenie na użytkownika.",
+      "Zgłoś umiejętność społeczności do moderacji. Idempotentne - jedno zgłoszenie na użytkownika.",
     dynamicTitle: "Zgłoszenie: {{name}}",
     reason: {
       label: "Powód",

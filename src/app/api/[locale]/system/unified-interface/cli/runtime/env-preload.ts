@@ -10,7 +10,7 @@
  * loadEnvironment() in environment.ts gets a chance to swap it.
  *
  * Used by:
- * - .mcp.json (MCP server — always targets preview DB)
+ * - .mcp.json (MCP server - always targets preview DB)
  */
 import { loadEnvironment } from "./environment";
 

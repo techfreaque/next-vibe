@@ -43,7 +43,7 @@ export class StreamContext {
 
   // Tool tracking
   pendingToolMessages = new Map<string, PendingToolData>();
-  /** All toolCallIds ever seen in this stream — prevents duplicate DB rows
+  /** All toolCallIds ever seen in this stream - prevents duplicate DB rows
    *  when a provider reuses IDs across steps or retries. */
   allSeenToolCallIds = new Set<string>();
   /** Set when any approve-mode tool is called. Persists across steps so that
@@ -59,7 +59,7 @@ export class StreamContext {
    *  so a headless revival can take over with the deferred result in DB context. */
   shouldYieldForWakeUp = false;
 
-  /** The deferredId from a wake-up-ready signal — set alongside shouldYieldForWakeUp.
+  /** The deferredId from a wake-up-ready signal - set alongside shouldYieldForWakeUp.
    *  Stream cleanup fires runHeadlessAiStream with this as explicitParentMessageId. */
   pendingWakeUpDeferredId: string | null = null;
 

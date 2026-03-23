@@ -1,12 +1,12 @@
 /**
- * Vibe Sense — Graph Detail Page
+ * Vibe Sense - Graph Detail Page
  * Shows graph config, chart visualization, and management actions
  */
 
 import type { JSX } from "react";
 
-import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { VibeSenseDetailClient } from "./page-client";

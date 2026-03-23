@@ -411,7 +411,7 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
   },
 };
 
-// Admin contact notification template — same component, isForCompany forced true
+// Admin contact notification template - same component, isForCompany forced true
 const adminContactPropsSchema = z.object({
   name: z.string(),
   email: z.string().email(),

@@ -1,6 +1,6 @@
 /**
  * Linux Users [username] Endpoint Definition
- * DELETE /ssh/linux/users/[username] — Delete an OS user
+ * DELETE /ssh/linux/users/[username] - Delete an OS user
  */
 
 import { z } from "zod";

@@ -42,7 +42,7 @@ export const translations = {
         prompt: {
           label: "Prompt",
           description:
-            "The main instruction or question for the AI. Be specific — the AI will use preCalls results as context if provided.",
+            "The main instruction or question for the AI. Be specific - the AI will use preCalls results as context if provided.",
           placeholder: "Enter your prompt...",
         },
         instructions: {
@@ -64,13 +64,13 @@ export const translations = {
           args: {
             label: "Arguments",
             description:
-              'Flat key-value args for the tool — merge urlPathParams and body fields into one object (e.g. {"query": "latest news", "maxResults": 5}).',
+              'Flat key-value args for the tool - merge urlPathParams and body fields into one object (e.g. {"query": "latest news", "maxResults": 5}).',
           },
         },
         availableTools: {
           label: "Allowed to Execute",
           description:
-            "Execution permission gate — controls which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only (any other call is blocked with 'disabled by user'). Standard agentic setup: [{toolId:'execute-tool'},{toolId:'tool-help'}] — execute-tool dispatches any registered endpoint, tool-help lets the agent discover available tools. No need to repeat tools already listed in the tools field.",
+            "Execution permission gate - controls which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only (any other call is blocked with 'disabled by user'). Standard agentic setup: [{toolId:'execute-tool'},{toolId:'tool-help'}] - execute-tool dispatches any registered endpoint, tool-help lets the agent discover available tools. No need to repeat tools already listed in the tools field.",
           toolId: {
             label: "Tool ID",
             description:
@@ -85,7 +85,7 @@ export const translations = {
         pinnedTools: {
           label: "In Context (model sees these)",
           description:
-            "Tools loaded into the model's context window — what the AI knows about and can reason over. null = use the user's default tool set (recommended). Provide an array only if you need a focused, minimal context. Note: availableTools controls what can actually execute — this field only affects what the model sees.",
+            "Tools loaded into the model's context window - what the AI knows about and can reason over. null = use the user's default tool set (recommended). Provide an array only if you need a focused, minimal context. Note: availableTools controls what can actually execute - this field only affects what the model sees.",
           toolId: {
             label: "Tool ID",
             description:
@@ -244,7 +244,7 @@ export const translations = {
     threadId: {
       label: "Thread ID",
       description:
-        "UUID of the thread to send this message to. Must be a valid UUID — create a thread first if you don't have one.",
+        "UUID of the thread to send this message to. Must be a valid UUID - create a thread first if you don't have one.",
     },
     userMessageId: {
       label: "User Message ID",
@@ -257,7 +257,7 @@ export const translations = {
     leafMessageId: {
       label: "Leaf Message ID",
       description:
-        "Current branch leaf message ID — tracks active branch without relying on URL",
+        "Current branch leaf message ID - tracks active branch without relying on URL",
     },
     messageHistory: {
       label: "Message History",
@@ -337,7 +337,7 @@ export const translations = {
     availableTools: {
       label: "Allowed to Execute",
       description:
-        "Execution permission gate — which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only.",
+        "Execution permission gate - which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only.",
       toolId: {
         label: "Tool ID",
         description: "Alias or full tool name the AI is permitted to execute",
@@ -346,7 +346,7 @@ export const translations = {
     pinnedTools: {
       label: "In Context (model sees these)",
       description:
-        "Tools loaded into the model's context window — what the AI knows about. null = user's default set. availableTools controls what can actually execute.",
+        "Tools loaded into the model's context window - what the AI knows about. null = user's default set. availableTools controls what can actually execute.",
       toolId: {
         label: "Tool ID",
         description: "Alias or full tool name to load into the model's context",
@@ -502,7 +502,7 @@ export const translations = {
     revivalPrompt:
       "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
     revivalInstructions:
-      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result — 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
+      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result - 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
   },
   info: {
     streamInterrupted:
@@ -531,7 +531,7 @@ export const translations = {
       "Failed to connect to the AI service. Please check your connection and try again.",
     invalidRequest: "Invalid request. Please check your input and try again.",
     compactingStreamError:
-      "Context limit reached — your conversation is too long for automatic compacting. Try branching from an earlier message, switching to a model with a larger context window, or adjusting the context window in your favorite settings.",
+      "Context limit reached - your conversation is too long for automatic compacting. Try branching from an earlier message, switching to a model with a larger context window, or adjusting the context window in your favorite settings.",
     compactingStreamErrorExpensive:
       "Context limit reached ({{tokens}} tokens). Expanding the context window is possible but may be expensive. Try branching from an earlier message or switching models first.",
     compactingException:
@@ -547,7 +547,7 @@ export const translations = {
       // Either pass model+skill directly, or pass favoriteId pointing to a favorite
       // that has a MANUAL or FILTERS modelSelection (not SKILL_BASED with no skill).
       missingModelOrSkill:
-        "model and skill are required — pass them directly or provide a favoriteId with a resolvable model selection",
+        "model and skill are required - pass them directly or provide a favoriteId with a resolvable model selection",
       favoriteNotFound: "Favorite not found or does not belong to this user",
     },
   },
@@ -609,7 +609,7 @@ export const translations = {
       errors: {
         validation: {
           title: "Validation Error",
-          description: "Invalid parameters — threadId must be a valid UUID",
+          description: "Invalid parameters - threadId must be a valid UUID",
         },
         unauthorized: {
           title: "Unauthorized",
@@ -662,7 +662,7 @@ export const translations = {
     welcome: {
       title: "Think of us as your AI team.",
       line1:
-        "Your companion handles everyday chat. Specialists step in for coding, research, writing — whatever the task needs.",
+        "Your companion handles everyday chat. Specialists step in for coding, research, writing - whatever the task needs.",
       line2: "The AI switches between them automatically. You just talk.",
       line3: "Let's get you set up in under a minute.",
       continue: "Get Started",
@@ -672,7 +672,7 @@ export const translations = {
       line1:
         "Your settings, companion, and chat history are saved locally on this device only.",
       line2:
-        "Sign in to keep everything synced across devices — and make sure you never lose your setup.",
+        "Sign in to keep everything synced across devices - and make sure you never lose your setup.",
       signIn: "Sign In / Create Account",
       continueAnyway: "Continue as Guest",
       note: "You can sign in later from the menu at any time.",
@@ -691,11 +691,11 @@ export const translations = {
         },
         brilliant: {
           label: "Brilliant",
-          desc: "Best quality — great for complex questions, writing, and analysis",
+          desc: "Best quality - great for complex questions, writing, and analysis",
         },
         max: {
           label: "Max",
-          desc: "Highest reasoning, no compromises — for when it really matters",
+          desc: "Highest reasoning, no compromises - for when it really matters",
         },
       },
     },
@@ -705,7 +705,7 @@ export const translations = {
         "We'll add the right specialists to your AI's toolkit automatically.",
       saving: "Setting up...",
       start: "Start Chatting",
-      skip: "Skip — I'll set it up later",
+      skip: "Skip - I'll set it up later",
       noProviderAvailable:
         "No AI provider configured. Add OPENROUTER_API_KEY or enable Claude Code (CLAUDE_CODE_ENABLED=true) to continue.",
       coding: {

@@ -1,5 +1,5 @@
 /**
- * Subscriptions Churned — Route
+ * Subscriptions Churned - Route
  * Server-only.
  */
 

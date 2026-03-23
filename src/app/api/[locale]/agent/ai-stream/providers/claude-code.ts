@@ -3,7 +3,7 @@
  *
  * Implements LanguageModelV2 interface using the Claude Agent SDK.
  * This allows the Agent SDK to be used as a standard provider in streamText(),
- * identical to OpenRouter, Venice.ai, etc. — no special-casing required.
+ * identical to OpenRouter, Venice.ai, etc. - no special-casing required.
  *
  * How it works:
  * 1. Our tools are passed to the Agent SDK via createSdkMcpServer()
@@ -44,7 +44,7 @@ export function createClaudeCode(
   toolExecutors?: AgentToolExecutorRegistry,
 ): {
   chat: (modelId: string) => LanguageModelV2;
-  /** Registry for tool executors — populate with registerTools() before streaming */
+  /** Registry for tool executors - populate with registerTools() before streaming */
   toolExecutors: AgentToolExecutorRegistry;
 } {
   const registry = toolExecutors ?? new AgentToolExecutorRegistry();
@@ -87,7 +87,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
   }
 
   /**
-   * Non-streaming generation — collect streaming output into a single response.
+   * Non-streaming generation - collect streaming output into a single response.
    */
   async doGenerate(options: LanguageModelV2CallOptions): Promise<{
     content: LanguageModelV2Content[];
@@ -135,7 +135,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
   }
 
   /**
-   * Streaming generation — the main entry point.
+   * Streaming generation - the main entry point.
    * Maps Agent SDK query() output to LanguageModelV2StreamPart events.
    */
   async doStream(options: LanguageModelV2CallOptions): Promise<{
@@ -160,7 +160,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
     const toolExecutors = this.toolExecutors;
     const logger = this.logger;
 
-    // Stream controller ref — set once ReadableStream.start() fires.
+    // Stream controller ref - set once ReadableStream.start() fires.
     // MCP handlers use this to emit tool-call/tool-result in real-time.
     let streamController: ReadableStreamDefaultController<LanguageModelV2StreamPart> | null =
       null;
@@ -192,7 +192,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               providerExecuted: true,
             });
 
-            // Record callbackMode directly from args — stream-part-handler may not
+            // Record callbackMode directly from args - stream-part-handler may not
             // have processed the tool-call event yet, so ctx flags aren't reliable here.
             const callbackMode =
               typeof args["callbackMode"] === "string"
@@ -210,7 +210,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               batchStopModes: [...toolExecutors.batchStopModes],
             });
 
-            // approve tools must NOT execute — stream-part-handler emits TOOL_WAITING
+            // approve tools must NOT execute - stream-part-handler emits TOOL_WAITING
             // and the user confirms separately. Return a placeholder so the Agent SDK
             // gets a result (which we'll discard via abort anyway).
             const isApprove = callbackMode === "approve";
@@ -234,14 +234,14 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
             });
 
             // Only abort after the full parallel batch completes (isLastInBatch).
-            // Check stop modes directly from args (not ctx) — ctx flags may not be
+            // Check stop modes directly from args (not ctx) - ctx flags may not be
             // set yet since stream-part-handler runs asynchronously.
             const stopModes = toolExecutors.batchStopModes;
             const shouldStop =
               stopModes.has("endLoop") || stopModes.has("approve");
             if (isLastInBatch && shouldStop) {
               logger.info(
-                "[AnthropicAgent] Stop condition met after batch — aborting agent loop",
+                "[AnthropicAgent] Stop condition met after batch - aborting agent loop",
                 { toolName: t.name, toolCallId, stopModes: [...stopModes] },
               );
               agentAbortController.abort();
@@ -301,7 +301,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
         let finishReason: LanguageModelV2FinishReason = "other";
         let textBlockId = 0;
         let hasStartedText = false;
-        /** Current text block id — stable across deltas within the same block */
+        /** Current text block id - stable across deltas within the same block */
         let currentTextId = "";
         /** Track current reasoning block id for emitting reasoning-end */
         let currentReasoningId = "";
@@ -309,7 +309,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 
         // Build env without CLAUDECODE / CLAUDE_CODE_ENTRYPOINT so the nested-session
         // guard doesn't fire when running inside a Claude Code session.
-        // Must omit keys entirely — setting to undefined is ignored by the SDK merge.
+        // Must omit keys entirely - setting to undefined is ignored by the SDK merge.
         const { CLAUDECODE, CLAUDE_CODE_ENTRYPOINT, ...agentEnv } = process.env;
         void CLAUDECODE;
         void CLAUDE_CODE_ENTRYPOINT;
@@ -355,7 +355,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               case "stream_event": {
                 const event = message.event;
 
-                // Handle content_block_start — track block type and allocate ids
+                // Handle content_block_start - track block type and allocate ids
                 if (event.type === "content_block_start") {
                   if (event.content_block.type === "text") {
                     currentTextId = `text-${textBlockId++}`;
@@ -366,7 +366,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                   }
                 }
 
-                // Handle content_block_stop — emit reasoning-end / text-end
+                // Handle content_block_stop - emit reasoning-end / text-end
                 if (event.type === "content_block_stop") {
                   if (isInReasoningBlock) {
                     controller.enqueue({
@@ -395,7 +395,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                 // Accumulate usage from complete messages
                 const msg = message.message;
                 // Count tool_use blocks so the registry knows batch size before
-                // any MCP handlers fire — needed for isLastInBatch accuracy.
+                // any MCP handlers fire - needed for isLastInBatch accuracy.
                 const toolUseCount = msg.content.filter(
                   (b) => b.type === "tool_use",
                 ).length;
@@ -428,7 +428,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               }
 
               case "result": {
-                // Final result — override totals
+                // Final result - override totals
                 if (message.usage) {
                   totalInputTokens = message.usage.input_tokens;
                   totalOutputTokens = message.usage.output_tokens;
@@ -447,7 +447,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
             }
           }
 
-          // Emit finish — include cache write tokens in providerMetadata
+          // Emit finish - include cache write tokens in providerMetadata
           // since LanguageModelV2Usage doesn't have inputTokenDetails
           controller.enqueue({
             type: "finish",
@@ -546,7 +546,7 @@ function extractPromptParts(prompt: LanguageModelV2CallOptions["prompt"]): {
           // Include assistant context as part of the prompt
           userParts.push(part.text);
         }
-        // tool-call parts are handled by tool-result below — no text to extract
+        // tool-call parts are handled by tool-result below - no text to extract
       }
     } else if (message.role === "tool") {
       // Tool results must be included as text context so the Agent SDK knows
@@ -575,9 +575,9 @@ function extractPromptParts(prompt: LanguageModelV2CallOptions["prompt"]): {
  */
 function mapStreamEvent(
   event: BetaRawMessageStreamEvent,
-  /** Stable text block id — shared across all deltas within one content block */
+  /** Stable text block id - shared across all deltas within one content block */
   textId: string,
-  /** Stable reasoning block id — shared across all deltas within one reasoning block */
+  /** Stable reasoning block id - shared across all deltas within one reasoning block */
   reasoningId: string,
 ): LanguageModelV2StreamPart[] {
   const parts: LanguageModelV2StreamPart[] = [];

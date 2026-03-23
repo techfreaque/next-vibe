@@ -70,7 +70,7 @@ export class SkillReportRepository {
         });
       }
 
-      // Check for existing report (idempotent — one per user per skill)
+      // Check for existing report (idempotent - one per user per skill)
       const [existingReport] = await db
         .select({ id: skillReports.id })
         .from(skillReports)

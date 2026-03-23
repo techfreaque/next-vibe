@@ -230,16 +230,16 @@ export const journeysTranslations = {
   },
   signupNurture: {
     initial: {
-      subject: "Willkommen bei unbottled.ai — so geht's los",
+      subject: "Willkommen bei unbottled.ai - so geht's los",
       previewText: "du bist dabei, hol das Beste raus",
       greeting: "Hey,",
       welcome:
         "Willkommen an Bord. Du hast dich bei unbottled.ai angemeldet, und wir wollen sicherstellen, dass du vom ersten Tag an das Beste daraus machst.",
       firstSteps:
-        "Fang damit an, eine Aufgabe auszuprobieren, die du vermieden hast, weil andere KI-Tools sie ständig verweigert haben. Keine Guardrails, keine Vorträge — nur Ergebnisse.",
+        "Fang damit an, eine Aufgabe auszuprobieren, die du vermieden hast, weil andere KI-Tools sie ständig verweigert haben. Keine Guardrails, keine Vorträge - nur Ergebnisse.",
       modelChoice:
         "Du hast Zugang zu 42+ Modellen. Wenn du nicht weißt, wo du anfangen sollst, probier das Standard-Modell. Du kannst jederzeit wechseln.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     followup1: {
       subject: "3 Dinge, die es wert sind, in unbottled.ai zu erkunden",
@@ -250,7 +250,7 @@ export const journeysTranslations = {
       exploreModels:
         "Wechsle Modelle für verschiedene Aufgaben. Einige sind schneller, einige besser für Langform, einige glänzen bei Code. Erkunde die Modellauswahl.",
       tip: "Wenn eine Antwort nicht ganz stimmt, füge 'sei direkter' oder 'keine Hinweise' zu deinem Prompt hinzu. Das macht einen spürbaren Unterschied.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     followup2: {
       subject: "deine Zensurfilter-Einstellungen",
@@ -260,7 +260,7 @@ export const journeysTranslations = {
         "Ein Feature, über das du Bescheid wissen solltest: Zensursteuerung. Du entscheidest, womit sich die KI beschäftigt und womit nicht.",
       filterControl:
         "Geh zu Einstellungen → Filter, um deine Erfahrung anzupassen. Du kannst bestimmte Inhaltskategorien je nach deinen Bedürfnissen erlauben oder einschränken.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     followup3: {
       subject: "wie findest du es bisher?",
@@ -270,7 +270,7 @@ export const journeysTranslations = {
         "Wir würden gerne wissen, was du bisher denkst. Was funktioniert? Was nicht? Du kannst direkt auf diese E-Mail antworten.",
       upgrade:
         "Wenn du den kostenlosen Plan nutzt und an Grenzen stößt, schalten unsere bezahlten Pläne höhere Nutzungslimits und priorisierten Modellzugang frei.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     nurture: {
       subject: "neue Modelle verfügbar",
@@ -280,7 +280,7 @@ export const journeysTranslations = {
         "Wir haben seit deiner Anmeldung mehrere neue Modelle hinzugefügt, darunter Optionen, die besonders stark für Langform-Texte und Coding-Aufgaben sind.",
       advancedTip:
         "Probier die Modellvergleichsfunktion: Führe denselben Prompt auf zwei verschiedenen Modellen aus und vergleiche die Ergebnisse direkt nebeneinander.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     reactivation: {
       subject: "noch hier, wenn du uns brauchst",
@@ -289,13 +289,13 @@ export const journeysTranslations = {
       stillHere:
         "Du warst eine Weile nicht mehr aktiv auf unbottled.ai. Wir sind noch da, wann immer du eine fähige KI brauchst, die ohne Einschränkungen arbeitet.",
       whatChanged:
-        "Seit deinem letzten Besuch hat sich viel verbessert — schnellere Antworten, mehr Modelle, bessere Langform-Ausgabe. Lohnt sich ein weiterer Blick.",
-      signature: "— Das unbottled.ai-Team",
+        "Seit deinem letzten Besuch hat sich viel verbessert - schnellere Antworten, mehr Modelle, bessere Langform-Ausgabe. Lohnt sich ein weiterer Blick.",
+      signature: "Das unbottled.ai-Team",
     },
   },
   retention: {
     initial: {
-      subject: "danke fürs Abonnieren — du bist in guter Gesellschaft",
+      subject: "danke fürs Abonnieren - du bist in guter Gesellschaft",
       previewText: "eine kurze Notiz vom Team",
       greeting: "Hey,",
       thankYou:
@@ -303,8 +303,8 @@ export const journeysTranslations = {
       valueSummary:
         "Als Abonnent hast du priorisierten Zugang zu allen 42+ Modellen, höhere Nutzungslimits und als Erster Zugang zu neuen Features.",
       whatIsNext:
-        "Wir melden uns von Zeit zu Zeit mit Tipps, neuen Feature-Highlights und Updates. Nichts Übermäßiges — nur das Zeug, das wirklich deine Zeit wert ist.",
-      signature: "— Das unbottled.ai-Team",
+        "Wir melden uns von Zeit zu Zeit mit Tipps, neuen Feature-Highlights und Updates. Nichts Übermäßiges - nur das Zeug, das wirklich deine Zeit wert ist.",
+      signature: "Das unbottled.ai-Team",
     },
     followup1: {
       subject: "neues Feature, das du vielleicht verpasst hast",
@@ -313,10 +313,10 @@ export const journeysTranslations = {
       newFeature:
         "Wir haben gerade ein Feature fertiggestellt, an dem wir eine Weile gearbeitet haben: Modellvergleichsmodus. Führe denselben Prompt auf mehreren Modellen gleichzeitig aus und vergleiche die Ausgaben.",
       howToUse:
-        "Du findest es in der Modellauswahl — klick auf 'Vergleichen' statt ein einzelnes Modell zu wählen. Funktioniert am besten bei kreativen Aufgaben, bei denen du verschiedene Ansätze sehen willst.",
+        "Du findest es in der Modellauswahl - klick auf 'Vergleichen' statt ein einzelnes Modell zu wählen. Funktioniert am besten bei kreativen Aufgaben, bei denen du verschiedene Ansätze sehen willst.",
       encouragement:
         "Mach weiter und erkunde. Du nutzt eine der wenigen KI-Plattformen, die dir tatsächlich vertrauen, selbst zu entscheiden, was du brauchst.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     followup2: {
       subject: "du holst mehr raus als die meisten Nutzer",
@@ -326,7 +326,7 @@ export const journeysTranslations = {
         "Abonnenten wie du nutzen unbottled.ai deutlich mehr als kostenlose Nutzer. Das sagt uns, dass du echten Mehrwert darin gefunden hast.",
       insiderTip:
         "Power-User-Tipp: Speicher deine meistgenutzten System-Prompts als Vorlagen. Geh zu Einstellungen → Prompt-Vorlagen und du sparst bei wiederkehrenden Aufgaben erheblich Zeit.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     followup3: {
       subject: "was sollen wir als nächstes bauen?",
@@ -336,7 +336,7 @@ export const journeysTranslations = {
         "Wir planen unser nächstes Quartal und wollen wissen, was Abonnenten am wichtigsten ist. Welches Feature würde unbottled.ai für dich 10x nützlicher machen?",
       feedback:
         "Antworte auf diese E-Mail mit deiner Antwort. Wir lesen jede Antwort und sie beeinflusst direkt, was wir priorisieren.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     nurture: {
       subject: "ein Jahr ohne Vorträge",
@@ -346,7 +346,7 @@ export const journeysTranslations = {
         "Wir schätzen es, dass du bei unbottled.ai bleibst. Jeder Abonnent, der bleibt, sagt uns, dass wir etwas bauen, das es wert ist.",
       exclusiveContent:
         "Demnächst für Langzeit-Abonnenten: Früher Zugang zu unserer API und ein dediziertes Model-Fine-Tuning-Feature. Du erfährst es als Erster.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     reactivation: {
       subject: "großes Update, das du kennen solltest",
@@ -356,21 +356,21 @@ export const journeysTranslations = {
         "Du bist schon eine Weile bei uns und wir wollen sicherstellen, dass du weißt, was wir zuletzt geliefert haben.",
       bigUpdate:
         "Große Updates: neuer unzensierter Modell-Tier, 3x schnellere Antwortzeiten und eine neu gestaltete Oberfläche, die den Workflow erheblich verbessert. Meld dich an, um es zu sehen.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
   },
   winback: {
     initial: {
       subject: "wir haben bemerkt, dass du gegangen bist",
-      previewText: "kein böses Blut — wollten nur kurz nachfragen",
+      previewText: "kein böses Blut - wollten nur kurz nachfragen",
       greeting: "Hey,",
       noticed:
-        "Wir haben bemerkt, dass dein Abonnement endete. Kein harter Verkauf hier — wir wollten uns nur einmal melden und sehen, ob wir irgendetwas hätten besser machen können.",
+        "Wir haben bemerkt, dass dein Abonnement endete. Kein harter Verkauf hier - wir wollten uns nur einmal melden und sehen, ob wir irgendetwas hätten besser machen können.",
       whatChanged:
         "Wenn du wegen etwas Bestimmtem gegangen bist, würden wir das wirklich gerne wissen. Antworte auf diese E-Mail.",
       noHardFeelings:
         "Wenn es einfach nicht die richtige Passform war, ist das auch in Ordnung. Wir schicken nur noch ein paar Nachrichten und lassen dich dann in Ruhe.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     followup1: {
       subject: "das hat sich verändert, seit du gegangen bist",
@@ -382,7 +382,7 @@ export const journeysTranslations = {
         "Antwortzeiten sind jetzt 3x schneller. Wir haben 12 neue Modelle hinzugefügt. Und wir haben die Oberfläche basierend auf Abonnenten-Feedback neu gestaltet.",
       openDoor:
         "Falls das relevant klingt, haben wir einen 14-tägigen kostenlosen Test für zurückkehrende Abonnenten. Ohne Bedingungen.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     followup2: {
       subject: "Angebot für zurückkehrende Abonnenten",
@@ -391,8 +391,8 @@ export const journeysTranslations = {
       specialOffer:
         "Wir wollen es einfach machen, zurückzukommen und auszuprobieren, was wir gebaut haben. Für die nächsten 7 Tage bieten wir zurückkehrenden Abonnenten 30% Rabatt auf den ersten Monat.",
       offerDetails:
-        "Verwende den Code COMEBACK30 beim Auschecken. Keine Verpflichtung — jederzeit kündbar, genauso wie zuvor.",
-      signature: "— Das unbottled.ai-Team",
+        "Verwende den Code COMEBACK30 beim Auschecken. Keine Verpflichtung - jederzeit kündbar, genauso wie zuvor.",
+      signature: "Das unbottled.ai-Team",
     },
     followup3: {
       subject: "letzte Nachricht von uns",
@@ -401,8 +401,8 @@ export const journeysTranslations = {
       lastAttempt:
         "Das ist die letzte E-Mail, die wir über die Rückkehr zu unbottled.ai schicken. Wir wollen nicht nervig sein.",
       honesty:
-        "Wenn du jemals wieder unzensierten KI-Zugang willst — für Content-Arbeit, Forschung, kreatives Schreiben oder sonst etwas — wir sind hier. Das Angebot unten ist immer verfügbar.",
-      signature: "— Das unbottled.ai-Team",
+        "Wenn du jemals wieder unzensierten KI-Zugang willst - für Content-Arbeit, Forschung, kreatives Schreiben oder sonst etwas - wir sind hier. Das Angebot unten ist immer verfügbar.",
+      signature: "Das unbottled.ai-Team",
     },
     nurture: {
       subject: "großes Update von unbottled.ai",
@@ -412,7 +412,7 @@ export const journeysTranslations = {
         "Es ist eine Weile her seit du Abonnent warst. Wir haben große Verbesserungen gemacht: neue Modelle, schnellere Performance, neu gestaltete Oberfläche und API-Zugang für Power-User.",
       gentleInvite:
         "Wenn du nach einer fähigen KI ohne Einschränkungen gesucht hast, würden wir uns freuen, dich zurückzuhaben. Kostenloser Test noch verfügbar.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
     reactivation: {
       subject: "noch hier, wenn du uns brauchst",
@@ -422,7 +422,7 @@ export const journeysTranslations = {
         "Es ist lange her seit du unbottled.ai abonniert hattest. Wir bauen noch dasselbe: eine KI-Plattform, die deine Intelligenz und deine Zeit respektiert.",
       finalOffer:
         "Wenn du dich jemals entscheidest, wieder uneingeschränkten KI-Zugang zu wollen, sind wir hier. Kein Druck, keine weiteren E-Mails nach dieser.",
-      signature: "— Das unbottled.ai-Team",
+      signature: "Das unbottled.ai-Team",
     },
   },
 };

@@ -371,7 +371,7 @@ export const translations: typeof enTranslations = {
       activeBadge: "Aktywna",
       greeting: "Hej {{privateName}},",
       intro:
-        "Twoja subskrypcja {{appName}} jest potwierdzona i gotowa. Masz 800 creditów każdego miesiąca na wszystkie modele — bez dziennych limitów, bez filtrów treści, bez tłumaczenia się.",
+        "Twoja subskrypcja {{appName}} jest potwierdzona i gotowa. Masz 800 creditów każdego miesiąca na wszystkie modele - bez dziennych limitów, bez filtrów treści, bez tłumaczenia się.",
       models: {
         title: "{{modelCount}} modeli, 3 kategorie",
         mainstream: "Główny nurt",

@@ -19,14 +19,14 @@ export const translations: typeof enTranslations = {
     title: "Zresetuj swoje hasło {{appName}}",
     subject: "Żądanie resetowania hasła - {{appName}}",
     previewText:
-      "Zresetuj hasło {{appName}} — link ważny przez {{hours}} godziny.",
+      "Zresetuj hasło {{appName}} - link ważny przez {{hours}} godziny.",
     greeting: "Hej {{name}},",
     requestInfo:
       "Ktoś poprosił o zresetowanie hasła do Twojego konta {{appName}}. Jeśli to byłeś Ty, kliknij przycisk poniżej.",
     buttonText: "Zresetuj moje hasło",
     expirationInfo:
-      "Link wygasa za {{hours}} godziny. Jeśli nie prosiłeś o reset, zignoruj tę wiadomość — hasło pozostaje bez zmian.",
-    signoff: "— Zespół {{appName}}",
+      "Link wygasa za {{hours}} godziny. Jeśli nie prosiłeś o reset, zignoruj tę wiadomość - hasło pozostaje bez zmian.",
+    signoff: "Zespół {{appName}}",
     promoText: "{{modelCount}} modeli AI. Bez filtrów. Bez cenzury.",
   },
   groups: {

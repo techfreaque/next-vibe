@@ -1,5 +1,5 @@
 /**
- * Chat Downvotes Total — Route
+ * Chat Downvotes Total - Route
  * Server-only.
  */
 

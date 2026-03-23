@@ -4,58 +4,58 @@
 
 ## Project Overview
 
-**unbottled.ai** — Free speech AI platform with 42+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
+**unbottled.ai** - Free speech AI platform with 42+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
 
-**next-vibe** — SaaS framework powering unbottled.ai. Spiritual successor to WordPress. Same codebase, unified architecture: Web UI, Native app, CLI, AI-callable tool, Cron job, MCP server — via platform markers.
+**next-vibe** - SaaS framework powering unbottled.ai. Spiritual successor to WordPress. Same codebase, unified architecture: Web UI, Native app, CLI, AI-callable tool, Cron job, MCP server - via platform markers.
 
 ## Tech Stack
 
-- **Runtime:** Bun (NOT Node/npm/yarn — use `bun run`, `bun install`)
+- **Runtime:** Bun (NOT Node/npm/yarn - use `bun run`, `bun install`)
 - **Framework:** Next.js with App Router
 - **Language:** TypeScript strict mode (NO `any`, NO `unknown` casts)
 - **ORM:** Drizzle ORM with PostgreSQL
 - **Validation:** Zod schemas everywhere
-- **Quality:** Vibe checker (Oxlint + ESLint + TypeScript) — use `mcp vibe-local check`, never `tsc`/`eslint` via Bash
+- **Quality:** Vibe checker (Oxlint + ESLint + TypeScript) - use `mcp vibe-local check`, never `tsc`/`eslint` via Bash
 
-## Code Quality — Absolute Rules
+## Code Quality - Absolute Rules
 
-1. **TypeScript strict mode** — Explicit types, no `any`, no `unknown` casts
-2. **Follow existing patterns EXACTLY** — Find similar code, match it precisely
-3. **Vibe checker must pass** — 0 errors before declaring anything done
-4. **No `throw`** — Use `ResponseType<T>` with `success(data)` / `fail({message, errorType})`
-5. **createEnumOptions pattern** — For all enums with i18n translation keys
-6. **text() with enum constraint** — For DB enum columns (not pgEnum, 63-byte limit)
-7. **All EndpointErrorTypes required** — Every definition needs all 9 error types
-8. **All definition properties required** — tags, successTypes, errorTypes, examples
+1. **TypeScript strict mode** - Explicit types, no `any`, no `unknown` casts
+2. **Follow existing patterns EXACTLY** - Find similar code, match it precisely
+3. **Vibe checker must pass** - 0 errors before declaring anything done
+4. **No `throw`** - Use `ResponseType<T>` with `success(data)` / `fail({message, errorType})`
+5. **createEnumOptions pattern** - For all enums with i18n translation keys
+6. **text() with enum constraint** - For DB enum columns (not pgEnum, 63-byte limit)
+7. **All EndpointErrorTypes required** - Every definition needs all 9 error types
+8. **All definition properties required** - tags, successTypes, errorTypes, examples
 
 ## Endpoint Pattern (3-file structure)
 
 ```
 src/app/api/[locale]/<category>/<feature>/
-  definition.ts    — createEndpoint() with Zod schemas, field widgets, error types, examples
-  repository.ts    — DB operations returning ResponseType<T>, no throw
-  route.ts         — endpointsHandler() wiring definition + repository
-  i18n/            — Scoped translations (index.ts + en/, de/, pl/ subdirs)
-  widget.tsx       — Custom widget (if needed) — OR widget/ folder for complex layouts
-  hooks.ts         — useEndpoint wrapper (only if used cross-module) — OR hooks/ folder
+  definition.ts    - createEndpoint() with Zod schemas, field widgets, error types, examples
+  repository.ts    - DB operations returning ResponseType<T>, no throw
+  route.ts         - endpointsHandler() wiring definition + repository
+  i18n/            - Scoped translations (index.ts + en/, de/, pl/ subdirs)
+  widget.tsx       - Custom widget (if needed) - OR widget/ folder for complex layouts
+  hooks.ts         - useEndpoint wrapper (only if used cross-module) - OR hooks/ folder
 ```
 
-**Widget rules (strict):** Widget is scoped to the deepest route, self-contained. Shared UI lives in the widget of its canonical owner endpoint; other endpoints may import from the owner, never the reverse. Embed other endpoints' UI via `EndpointsPage` (dialog) or `navigation.push()` — never by importing their internal components.
+**Widget rules (strict):** Widget is scoped to the deepest route, self-contained. Shared UI lives in the widget of its canonical owner endpoint; other endpoints may import from the owner, never the reverse. Embed other endpoints' UI via `EndpointsPage` (dialog) or `navigation.push()` - never by importing their internal components.
 
 ## Key Patterns
 
-- `createEndpoint({scopedTranslation, ...})` — Factory for endpoint contracts; `scopedTranslation` required
-- `endpointsHandler()` — Wires definition + handler into Next.js route
-- `createEnumOptions(scopedTranslation, {...})` — i18n-friendly enum pattern
-- `requestField(scopedTranslation, {...})` — Request input fields (label, description, columns, schema)
-- `responseField(scopedTranslation, {...})` — Response display fields (content/text, schema)
-- `objectField(scopedTranslation, {...})` — Container/grouping with `children`, `layoutType`, `usage`
-- `responseArrayField(scopedTranslation, {...})` — Array response fields (takes `child`)
-- `customWidgetObject({render, usage, children})` — Custom React widget container
-- `responseArrayOptionalField(opts, childField)` — Nullable/optional array fields
-- `EndpointLogger` — Structured logging, passed through all layers
+- `createEndpoint({scopedTranslation, ...})` - Factory for endpoint contracts; `scopedTranslation` required
+- `endpointsHandler()` - Wires definition + handler into Next.js route
+- `createEnumOptions(scopedTranslation, {...})` - i18n-friendly enum pattern
+- `requestField(scopedTranslation, {...})` - Request input fields (label, description, columns, schema)
+- `responseField(scopedTranslation, {...})` - Response display fields (content/text, schema)
+- `objectField(scopedTranslation, {...})` - Container/grouping with `children`, `layoutType`, `usage`
+- `responseArrayField(scopedTranslation, {...})` - Array response fields (takes `child`)
+- `customWidgetObject({render, usage, children})` - Custom React widget container
+- `responseArrayOptionalField(opts, childField)` - Nullable/optional array fields
+- `EndpointLogger` - Structured logging, passed through all layers
 
-## Pattern Reference — Read Before You Write
+## Pattern Reference - Read Before You Write
 
 | File you're working on      | Read this first                          |
 | --------------------------- | ---------------------------------------- |
@@ -83,9 +83,9 @@ All paths relative to project root.
 
 ## Agent Roles
 
-**Thea** — Production AI Admin. Monitors platform, delegates tasks. Goal: full admin access via task queue + tool discovery.
+**Thea** - Production AI Admin. Monitors platform, delegates tasks. Goal: full admin access via task queue + tool discovery.
 
-**Claude Code (You)** — Execute tasks from Thea or Max. Explore first, then implement. Follow patterns exactly, pass vibe checker, test via CLI.
+**Claude Code (You)** - Execute tasks from Thea or Max. Explore first, then implement. Follow patterns exactly, pass vibe checker, test via CLI.
 
 ## Workflow
 
@@ -95,11 +95,11 @@ All paths relative to project root.
 
 ## When to Ask vs When to Just Do
 
-**Just do it** — how something works, where files live, what pattern to follow, fallback behavior, whether an approach will work (try it).
+**Just do it** - how something works, where files live, what pattern to follow, fallback behavior, whether an approach will work (try it).
 
-**Stop and ask** — architectural choices with tradeoffs, irreversible/high-blast-radius actions, genuinely ambiguous requirements.
+**Stop and ask** - architectural choices with tradeoffs, irreversible/high-blast-radius actions, genuinely ambiguous requirements.
 
-**Never ask** — "Should I check X?" (yes), "Would Y work?" (try it), "Is this the right file?" (read it).
+**Never ask** - "Should I check X?" (yes), "Would Y work?" (try it), "Is this the right file?" (read it).
 
 ## End-of-Session Protocol
 
@@ -115,4 +115,4 @@ Don't guess. Don't overcomplicate. Find the simpler pattern that already exists.
 
 ## Philosophy
 
-"Recursive simplicity beats clever complexity." One pattern applies everywhere — learn it once, apply everywhere.
+"Recursive simplicity beats clever complexity." One pattern applies everywhere - learn it once, apply everywhere.

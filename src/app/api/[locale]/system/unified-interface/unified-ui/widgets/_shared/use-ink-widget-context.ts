@@ -125,7 +125,7 @@ export function useInkWidgetPlatform(): BaseWidgetContext<CreateApiEndpointAny>[
 
 /**
  * Hook to determine if field labels should be shown.
- * MCP consumers are AI agents — labels add noise without value.
+ * MCP consumers are AI agents - labels add noise without value.
  */
 export function useInkWidgetShowLabels(): boolean {
   const platform = useInkWidgetPlatform();

@@ -77,7 +77,7 @@ export function usePromptContextData(
       userData && !userData.isPublic ? (userData.privateName ?? "") : "";
     const publicName =
       userData && !userData.isPublic ? (userData.publicName ?? "") : "";
-    // On the client we don't have DB counts — assume not fresh if names exist
+    // On the client we don't have DB counts - assume not fresh if names exist
     const isFreshUser = !privateName && !publicName;
 
     return {

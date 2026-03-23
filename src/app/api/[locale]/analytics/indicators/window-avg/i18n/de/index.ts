@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Fenster-Durchschnitt",
     description:
-      "Gleitender Fensterdurchschnitt — glättet Werte über ein festes Fenster",
+      "Gleitender Fensterdurchschnitt - glättet Werte über ein festes Fenster",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

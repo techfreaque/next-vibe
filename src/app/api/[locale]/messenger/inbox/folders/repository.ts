@@ -1,6 +1,6 @@
 /**
  * Unified Inbox Folders Repository
- * Routes listFolders through the MessengerProvider interface — channel-agnostic.
+ * Routes listFolders through the MessengerProvider interface - channel-agnostic.
  */
 
 import "server-only";

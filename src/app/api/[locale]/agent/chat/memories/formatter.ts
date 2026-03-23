@@ -24,9 +24,9 @@ const MEMORY_BUDGET = 20000;
  */
 export function formatMemorySummary(memoriesList: MemoriesList): string {
   const tools = `**Tools:**
-- \`${MEMORY_ADD_ALIAS}\` — Store NEW facts only
-- \`${MEMORY_UPDATE_ALIAS}\` — Merge/improve existing (use ID number)
-- \`${MEMORY_DELETE_ALIAS}\` — Remove wrong/outdated`;
+- \`${MEMORY_ADD_ALIAS}\` - Store NEW facts only
+- \`${MEMORY_UPDATE_ALIAS}\` - Merge/improve existing (use ID number)
+- \`${MEMORY_DELETE_ALIAS}\` - Remove wrong/outdated`;
 
   const management = `## Memory Management
 
@@ -35,18 +35,18 @@ ${tools}
 **Remember:** User preferences, important facts, ongoing projects, communication style, expertise level, recurring topics, workflow preferences
 **Don't remember:** Temporary context, common knowledge, frequently changing info
 
-**Proactive memory:** Don't wait to be asked — if you learn something worth remembering, store it immediately. Good signals: preferences, goals, expertise, recurring topics, communication style, ongoing projects.
+**Proactive memory:** Don't wait to be asked - if you learn something worth remembering, store it immediately. Good signals: preferences, goals, expertise, recurring topics, communication style, ongoing projects.
 
 **Self-management:** After completing the user's request, consolidate duplicates (>80% overlap → always UPDATE the highest-priority entry first to merge in useful details, THEN DELETE the leftover duplicates), remove stale entries, and briefly mention what you changed.`;
 
   // Always include memory management instructions even with 0 memories
   if (memoriesList.length === 0) {
     return `## User Memories (0)
-No memories stored yet — this is your first opportunity to learn about this user.
+No memories stored yet - this is your first opportunity to learn about this user.
 
 **Legend:** ID=memory identifier | P=priority (0-100, higher=more important) | Age=when added
 
-**PRIORITY ACTION:** You have zero memories for this user. As soon as you learn anything useful — their name, preferences, goals, expertise, communication style, ongoing projects — store it immediately using \`${MEMORY_ADD_ALIAS}\`. Don't wait. The sooner you build a memory profile, the more personalized and useful you become.
+**PRIORITY ACTION:** You have zero memories for this user. As soon as you learn anything useful - their name, preferences, goals, expertise, communication style, ongoing projects - store it immediately using \`${MEMORY_ADD_ALIAS}\`. Don't wait. The sooner you build a memory profile, the more personalized and useful you become.
 
 ${management}`;
   }
@@ -102,7 +102,7 @@ ${management}`;
   const parts = [header, lines.join("\n"), legend];
   if (hiddenCount > 0) {
     parts.push(
-      `[... ${hiddenCount} more memor${hiddenCount === 1 ? "y" : "ies"} not shown (lowest priority) — use \`${MEMORY_LIST_ALIAS}\` to view all]`,
+      `[... ${hiddenCount} more memor${hiddenCount === 1 ? "y" : "ies"} not shown (lowest priority) - use \`${MEMORY_LIST_ALIAS}\` to view all]`,
     );
   }
   parts.push(`\n${management}`);

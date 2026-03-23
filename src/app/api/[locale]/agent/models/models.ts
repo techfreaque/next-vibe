@@ -2433,7 +2433,7 @@ export const TOTAL_CHARACTER_COUNT = 52;
  * Featured models by category for use in marketing content, emails, etc.
  */
 export const FEATURED_MODELS = {
-  // Representative picks per category — used in marketing content and emails
+  // Representative picks per category - used in marketing content and emails
   mainstream: [
     modelDefinitions[ModelId.CLAUDE_OPUS_4_6].name,
     modelDefinitions[ModelId.GPT_5_2_PRO].name,

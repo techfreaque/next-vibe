@@ -291,7 +291,7 @@ const { POST } = createEndpoint({
       }),
 
       // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
-      // Hidden from default widget — rendered via CompactTriggerEdit in custom UI
+      // Hidden from default widget - rendered via CompactTriggerEdit in custom UI
       compactTrigger: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,

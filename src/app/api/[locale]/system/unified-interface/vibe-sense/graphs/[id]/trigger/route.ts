@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Trigger Route
+ * Vibe Sense - Graph Trigger Route
  */
 
 import "server-only";

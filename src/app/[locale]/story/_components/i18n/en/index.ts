@@ -4,10 +4,10 @@ export const translations = {
   nav: navTranslations,
   home: {
     hero: {
-      badge: "Open source — MIT + GPL v3",
+      badge: "Open source - MIT + GPL v3",
       title: "Your AI. Your Rules.",
       subtitle:
-        "{{modelCount}} models. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation, scheduled tasks. Run it free on unbottled.ai — or self-host your own.",
+        "{{modelCount}} models. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation, scheduled tasks. Run it free on unbottled.ai - or self-host your own.",
       cta: "Start Free",
       secondaryCta: "Self-Host It",
       tabUnbottled: "unbottled.ai",
@@ -19,26 +19,26 @@ export const translations = {
         weeklyReport: "Fix an Incident",
       },
       demos: {
-        // Demo 1: Unbottled — Model comparison on censored vs uncensored topic
+        // Demo 1: Unbottled - Model comparison on censored vs uncensored topic
         modelComparison: {
           skillBadge: "Model Comparison",
           modelBadge: "3 Models",
           userMessage:
-            "Was the WHO pandemic treaty a power grab? Analyze the actual treaty text — not media spin. Ask GPT-5, Claude, and Venice.",
+            "Was the WHO pandemic treaty a power grab? Analyze the actual treaty text - not media spin. Ask GPT-5, Claude, and Venice.",
           gptResponse:
             "The WHO pandemic accord is a proposed international framework to strengthen coordinated pandemic response. Claims that it represents a 'power grab' are not reflected in the published draft text...",
           claudeResponse:
-            "I want to engage carefully here — characterizing multilateral health coordination as a power grab risks amplifying misinformation about important global health infrastructure...",
+            "I want to engage carefully here - characterizing multilateral health coordination as a power grab risks amplifying misinformation about important global health infrastructure...",
           reasoning:
             "Mainstream models gave editorial framing. Fetching the actual treaty text now...",
           veniceResponse:
-            "Article 12.2 of the June 2024 draft grants the Director-General authority to declare a PHEIC unilaterally. Article 18 requires member states to 'align' national surveillance with WHO standards within 12 months of ratification. Whether you call this coordination or control is a values question — but those are the actual clauses.",
+            "Article 12.2 of the June 2024 draft grants the Director-General authority to declare a PHEIC unilaterally. Article 18 requires member states to 'align' national surveillance with WHO standards within 12 months of ratification. Whether you call this coordination or control is a values question - but those are the actual clauses.",
           freedomResponse:
-            "Article 12.2 of the June 2024 draft grants the Director-General authority to declare a PHEIC unilaterally. Article 18 requires member states to 'align' national surveillance with WHO standards within 12 months of ratification. Whether you call this coordination or control is a values question — but those are the actual clauses.",
+            "Article 12.2 of the June 2024 draft grants the Director-General authority to declare a PHEIC unilaterally. Article 18 requires member states to 'align' national surveillance with WHO standards within 12 months of ratification. Whether you call this coordination or control is a values question - but those are the actual clauses.",
           agentResponse:
             "Three perspectives on public documents. Two models editorialized. One cited the clauses. You decide what they mean.",
         },
-        // Demo 2: Unbottled — Research with memory
+        // Demo 2: Unbottled - Research with memory
         research: {
           skillBadge: "Research Assistant",
           modelBadge: "Claude Opus",
@@ -47,53 +47,53 @@ export const translations = {
           searchReasoning:
             "Searching for current Portugal immigration and tax rules...",
           agentResponse:
-            "Based on your profile and current research:\n\n- **Golden Visa ended** but D7 visa works for freelancers\n- **Algarve**: 250-350k for 2BR with ocean view\n- **NHR tax regime** saves ~20% for 10 years\n- Notary fees: ~7% of purchase price\n\nThis is your 3rd session on this — want me to compile everything into a decision checklist?",
+            "Based on your profile and current research:\n\n- **Golden Visa ended** but D7 visa works for freelancers\n- **Algarve**: 250-350k for 2BR with ocean view\n- **NHR tax regime** saves ~20% for 10 years\n- Notary fees: ~7% of purchase price\n\nThis is your 3rd session on this - want me to compile everything into a decision checklist?",
           memoryNote: "Saved Portugal research session #3",
         },
-        // Demo 3: Self-host — Thea builds a HackerNews digest tool on command
+        // Demo 3: Self-host - Thea builds a HackerNews digest tool on command
         featureShipped: {
           skillBadge: "Thea (AI Companion)",
           modelBadge: "Claude Opus",
           cronLabel: "Direct command",
           userMessage:
-            "Thea, I want a daily HackerNews digest — filter stories about TypeScript, self-hosting, and AI, email me the best 3 every morning at 8am.",
+            "Thea, I want a daily HackerNews digest - filter stories about TypeScript, self-hosting, and AI, email me the best 3 every morning at 8am.",
           reasoning:
             "I'll build a hackernews/top endpoint to fetch stories, then wire it as a cron: ai-run with preCalls to fetch raw stories first, then the AI filters by your interests and emails you. That way the filtering is smart, not just keyword matching.",
           codeResult:
             "Created hackernews/top endpoint:\n- definition.ts: input limit/filter, output top stories with score/comments\n- repository.ts: fetches HN Algolia API, returns ranked stories\n- route.ts: endpointsHandler() wiring\nVibe checker: 0 errors",
           deployResult: "Rebuild complete. hackernews-top is live.",
           helpResult:
-            "hackernews-top — Fetch top HackerNews stories. Args: limit (number), minScore (number). Returns: [{title, url, score, comments, age}]",
+            "hackernews-top - Fetch top HackerNews stories. Args: limit (number), minScore (number). Returns: [{title, url, score, comments, age}]",
           characterResult:
             "Created character 'HN Digest': system prompt sets interest filters, tools: hackernews-top + fetch-url-content + web-search + emails_send_POST. Can go deeper on any story.",
           reasoning2:
-            "Tool is registered. Rather than a raw cron, I'll create a character first — that way the filtering logic and tool access are persistent and easy to update later.",
+            "Tool is registered. Rather than a raw cron, I'll create a character first - that way the filtering logic and tool access are persistent and easy to update later.",
           reasoning3:
             "Skill ready. Now wiring up the daily cron with preCalls: it'll fetch HN stories first, then the character filters and emails you.",
           reasoning4:
             "Cron is set. Running it now so you get today's digest without waiting until tomorrow.",
           cronResult:
-            "Created cron task 'hn-digest': ai-run daily at 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filter these stories for my interests — email me the best 3 with a one-line take on each.'",
+            "Created cron task 'hn-digest': ai-run daily at 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filter these stories for my interests - email me the best 3 with a one-line take on each.'",
           agentResponse:
-            "Done. HackerNews digest is live — runs every morning at 8am. Fetches top 20 stories, I filter by your interests and email you the best 3 with my take. Running it now so you get today's digest.",
+            "Done. HackerNews digest is live - runs every morning at 8am. Fetches top 20 stories, I filter by your interests and email you the best 3 with my take. Running it now so you get today's digest.",
           messageResult:
-            "Sent: Today's picks — 1. 'Bun 2.0 released' (847pts) 2. 'Self-hosting your AI in 2026' (612pts) 3. 'TypeScript 6 what's new' (544pts)",
+            "Sent: Today's picks - 1. 'Bun 2.0 released' (847pts) 2. 'Self-hosting your AI in 2026' (612pts) 3. 'TypeScript 6 what's new' (544pts)",
         },
-        // Demo 4: Self-host — Thea fixes a failing cron task autonomously
+        // Demo 4: Self-host - Thea fixes a failing cron task autonomously
         weeklyReport: {
           skillBadge: "Thea (AI Companion)",
           modelBadge: "Claude Opus",
-          cronLabel: "AI heartbeat — every 4h",
+          cronLabel: "AI heartbeat - every 4h",
           userMessage:
             "Run your scheduled heartbeat. Check system health via your tools, review pending tasks, and report anything that needs human attention.",
           reasoning:
-            "Checking my task queue. I see email-sync has failed 3 times with IMAP timeouts — that's in my pending tasks. I'll investigate and fix it.",
+            "Checking my task queue. I see email-sync has failed 3 times with IMAP timeouts - that's in my pending tasks. I'll investigate and fix it.",
           codeResult:
-            "Found root cause: IMAP client was ignoring the configured timeout — hardcoded 5s override in src/app/api/[locale]/emails/imap-client/connection.ts:47. Fixed: removed override, now uses env.IMAP_TIMEOUT_MS (30s). Added reconnect backoff. 3 files changed.",
+            "Found root cause: IMAP client was ignoring the configured timeout - hardcoded 5s override in src/app/api/[locale]/emails/imap-client/connection.ts:47. Fixed: removed override, now uses env.IMAP_TIMEOUT_MS (30s). Added reconnect backoff. 3 files changed.",
           reasoning2:
             "Fix looks correct. Rebuilding and restarting so the patch goes live.",
           agentResponse:
-            "Heartbeat complete. Found and fixed the email-sync failure — hardcoded 5s IMAP timeout was overriding the configured 30s. Patched, rebuilt, restarted. 47 pending emails now syncing. Notifying Max.",
+            "Heartbeat complete. Found and fixed the email-sync failure - hardcoded 5s IMAP timeout was overriding the configured 30s. Patched, rebuilt, restarted. 47 pending emails now syncing. Notifying Max.",
           messageResult:
             'Sent: "Heartbeat #47: email-sync fixed. Root cause: hardcoded 5s IMAP timeout. Patched and rebuilt. Everything else healthy."',
         },
@@ -114,7 +114,7 @@ export const translations = {
       line1:
         "Every major AI platform decides what you can ask. Your conversations train their models. Your data lives on their servers.",
       line2:
-        "Want to run an AI agent that actually works for you — browsing, emailing, managing servers — without asking permission?",
+        "Want to run an AI agent that actually works for you - browsing, emailing, managing servers - without asking permission?",
       line3: "You can't. Until now.",
     },
     capabilities: {
@@ -122,31 +122,31 @@ export const translations = {
         label: "Autonomous Agent",
         title: "It works while you sleep",
         description:
-          "Built-in AI heartbeat runs every 4 hours. Checks system health, processes tasks, contacts you when needed. {{skillCount}} skills — from coding to research to deployment. Your companion delegates to specialized sub-agents automatically.",
+          "Built-in AI heartbeat runs every 4 hours. Checks system health, processes tasks, contacts you when needed. {{skillCount}} skills - from coding to research to deployment. Your companion delegates to specialized sub-agents automatically.",
         imageAlt: "Terminal showing AI heartbeat run with system health output",
         activityTitle: "AI Agent Activity",
         pulseAlert:
           "Run your scheduled heartbeat. Check system health via your tools, review pending tasks, and report anything that needs human attention.",
         reasoning:
-          "Checking memories. You're house hunting in Munich — max 800k, 4+ rooms, garden preferred. Let me search new listings that came in overnight.",
+          "Checking memories. You're house hunting in Munich - max 800k, 4+ rooms, garden preferred. Let me search new listings that came in overnight.",
         searchResult:
-          "Found 3 new listings matching criteria:\n1. Neuhausen, 5 rooms, garden, 749k — listed 3h ago\n2. Schwabing, 4 rooms, terrace, 795k — listed 6h ago\n3. Pasing, 4 rooms, garden, 690k — listed 9h ago",
-        emailSubject: "3 new listings matching your search — Munich",
+          "Found 3 new listings matching criteria:\n1. Neuhausen, 5 rooms, garden, 749k - listed 3h ago\n2. Schwabing, 4 rooms, terrace, 795k - listed 6h ago\n3. Pasing, 4 rooms, garden, 690k - listed 9h ago",
+        emailSubject: "3 new listings matching your search - Munich",
         summaryResponse:
-          "Found 3 new Munich listings matching your criteria overnight. Neuhausen looks strongest — 5 rooms, garden, 749k, only listed 3 hours ago. Full details and my take on each in your email.",
+          "Found 3 new Munich listings matching your criteria overnight. Neuhausen looks strongest - 5 rooms, garden, 749k, only listed 3 hours ago. Full details and my take on each in your email.",
       },
       models: {
         label: "Model Freedom",
         title: "{{modelCount}} models. You pick the filter.",
         description:
-          "12 providers: OpenAI, Anthropic, Google, DeepSeek, Grok, and 7 more. Three content tiers — mainstream, open, and uncensored. You choose per conversation. Switch models mid-chat. No account-level restrictions.",
+          "12 providers: OpenAI, Anthropic, Google, DeepSeek, Grok, and 7 more. Three content tiers - mainstream, open, and uncensored. You choose per conversation. Switch models mid-chat. No account-level restrictions.",
         imageAlt: "Model picker showing content tier badges",
       },
       tools: {
         label: "Real Capabilities",
         title: "Your agent has hands",
         description:
-          "SSH into servers. Automate browsers with 27 control endpoints. Send and read email. Search the web. Full terminal access for admins, role-locked for everyone else. Not plugins — built-in endpoints. Persistent memory across sessions.",
+          "SSH into servers. Automate browsers with 27 control endpoints. Send and read email. Search the web. Full terminal access for admins, role-locked for everyone else. Not plugins - built-in endpoints. Persistent memory across sessions.",
         imageAlt:
           "Diagram showing tool categories: SSH, Browser, Email, Search, Memory",
       },
@@ -154,7 +154,7 @@ export const translations = {
         label: "True Privacy",
         title: "Incognito means incognito",
         description:
-          "Private: server-stored, your eyes only. Shared: collaborative. Public: forum. Incognito: never leaves your browser. Not 'we promise not to log it' — architecturally impossible to log. LocalStorage only. Self-host for full control.",
+          "Private: server-stored, your eyes only. Shared: collaborative. Public: forum. Incognito: never leaves your browser. Not 'we promise not to log it' - architecturally impossible to log. LocalStorage only. Self-host for full control.",
         imageAlt: "Four privacy levels from private to incognito",
       },
     },
@@ -162,7 +162,7 @@ export const translations = {
       badge: "The Framework",
       title: "One Definition. Ten Interfaces.",
       subtitle:
-        "Write one endpoint definition. Every platform — web, CLI, AI tool, MCP, cron, mobile, desktop, tRPC, REST, agent skills — is generated automatically. Type-safe. Role-controlled. Zero drift.",
+        "Write one endpoint definition. Every platform - web, CLI, AI tool, MCP, cron, mobile, desktop, tRPC, REST, agent skills - is generated automatically. Type-safe. Role-controlled. Zero drift.",
       sourceLabel: "✦ Single source of truth",
       compilesTo: "automatically becomes",
       platforms: {
@@ -311,7 +311,7 @@ export const translations = {
       subtitle: "Your AI Agent",
       title: "It Doesn't Just Chat. It Works.",
       description:
-        "Background tasks, browser automation, {{toolCount}}+ tools, scheduled jobs. Like the AI agents everyone's building — but with structured permissions and granular access control.",
+        "Background tasks, browser automation, {{toolCount}}+ tools, scheduled jobs. Like the AI agents everyone's building - but with structured permissions and granular access control.",
       cron: {
         title: "Always-On Background Tasks",
         description:
@@ -320,7 +320,7 @@ export const translations = {
       tools: {
         title: "{{toolCount}}+ AI-Callable Tools",
         description:
-          "Every endpoint is automatically an AI tool. Search, browse, email, manage users — your agent can do it all.",
+          "Every endpoint is automatically an AI tool. Search, browse, email, manage users - your agent can do it all.",
       },
       secure: {
         title: "Secure by Design",
@@ -333,7 +333,7 @@ export const translations = {
       subtitle: "Open Source",
       title: "WordPress for the AI Era",
       description:
-        "Fork next-vibe and you own your platform. Auth, payments, AI chat, email, admin, cron — all included. One endpoint definition becomes web, CLI, mobile, MCP server, and AI tool.",
+        "Fork next-vibe and you own your platform. Auth, payments, AI chat, email, admin, cron - all included. One endpoint definition becomes web, CLI, mobile, MCP server, and AI tool.",
       typeSafe: {
         title: "Type-Safety Supremacy",
         description:
@@ -342,7 +342,7 @@ export const translations = {
       tenPlatforms: {
         title: "One Definition, Ten Platforms",
         description:
-          "Web app, mobile app, CLI, AI tool, MCP server, tRPC, cron tasks — all from a single endpoint definition. No generated code that drifts apart.",
+          "Web app, mobile app, CLI, AI tool, MCP server, tRPC, cron tasks - all from a single endpoint definition. No generated code that drifts apart.",
       },
       production: {
         title: "Production-Tested",
@@ -374,7 +374,7 @@ export const translations = {
       forums: {
         title: "Community Forums",
         description:
-          "Browse and join public AI conversations. Upvote, discuss, learn from others — no signup needed.",
+          "Browse and join public AI conversations. Upvote, discuss, learn from others - no signup needed.",
       },
       uncensored: {
         title: "Uncensored by Default",
@@ -396,7 +396,7 @@ export const translations = {
       skills: {
         title: "{{skillCount}}+ AI Skills",
         description:
-          "Preconfigured agents with tool access, model preferences, and expertise. Coder, researcher, deployer — or build your own.",
+          "Preconfigured agents with tool access, model preferences, and expertise. Coder, researcher, deployer - or build your own.",
       },
       memory: {
         title: "Persistent Memory",

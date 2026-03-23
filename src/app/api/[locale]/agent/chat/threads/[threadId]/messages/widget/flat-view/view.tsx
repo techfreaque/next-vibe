@@ -31,7 +31,7 @@ interface FlatMessageViewProps {
   onInsertQuote?: () => void; // Only inserts '>' character
   currentUserId?: string;
   user: JwtPayloadType;
-  /** Message operations — passed from parent */
+  /** Message operations - passed from parent */
   onBranchMessage?: (
     messageId: string,
     content: string,

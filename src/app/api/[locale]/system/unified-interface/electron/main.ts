@@ -9,7 +9,7 @@
  */
 
 /* eslint-disable i18next/no-literal-string */
-// Main process — no i18n needed, stdout output only
+// Main process - no i18n needed, stdout output only
 
 import type { ChildProcess } from "node:child_process";
 import { spawn } from "node:child_process";
@@ -24,7 +24,7 @@ import {
   shell,
 } from "electron";
 
-// Must be set before app is ready — used by Wayland compositor as window class
+// Must be set before app is ready - used by Wayland compositor as window class
 app.setName("Unbottled");
 // Wayland app ID must match appId in electron-builder config for compositor icon lookup
 app.commandLine.appendSwitch("enable-features", "WaylandWindowDecorations");
@@ -84,7 +84,7 @@ let vibeProcess: ChildProcess | null = null;
 // ─── Vibe Start ───────────────────────────────────────────────────────────────
 
 function spawnVibeStart(): ChildProcess {
-  // Always use bun from PATH — the AppImage is a thin shell that runs against
+  // Always use bun from PATH - the AppImage is a thin shell that runs against
   // the user's local next-vibe project. A fully self-contained bundle would
   // require shipping bun + node_modules + Next.js build inside the AppImage.
   const vibeCmd = "bun";
@@ -159,7 +159,7 @@ async function waitForServer(port: number): Promise<boolean> {
         return true;
       }
     } catch {
-      // Connection refused — not ready yet
+      // Connection refused - not ready yet
     }
 
     await new Promise<void>((resolve) => {
@@ -243,7 +243,7 @@ function showLoadingScreen(win: BrowserWindow): void {
 // ─── App Lifecycle ────────────────────────────────────────────────────────────
 
 app.on("ready", async () => {
-  // Derive port before spawning — env vars are already set by this point
+  // Derive port before spawning - env vars are already set by this point
   // (either from shell or from the ELECTRON_SPAWN_VIBE_START env the caller set).
   // IS_PREVIEW_MODE is set to "true" in the vibe start child env, but Electron
   // itself also sets it so derivePort() reads the right value here.

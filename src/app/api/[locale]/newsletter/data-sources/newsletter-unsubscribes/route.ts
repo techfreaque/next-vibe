@@ -1,5 +1,5 @@
 /**
- * Newsletter Unsubscribes — Route
+ * Newsletter Unsubscribes - Route
  * Server-only.
  */
 

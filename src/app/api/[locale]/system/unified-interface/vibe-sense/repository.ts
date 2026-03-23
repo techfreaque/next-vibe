@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Repository
+ * Vibe Sense - Repository
  *
  * All DB operations for graphs, registry, triggers, and backtests.
  */
@@ -22,11 +22,11 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { RESOLUTION_MS } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { GraphOwnerType } from "./enum";
 import { pipelineDatapoints, pipelineGraphs } from "./db";
 import { runBacktest } from "./engine/backtest";
 import { runGraph } from "./engine/runner";
 import { runDueGraphs } from "./engine/scheduler";
+import { GraphOwnerType } from "./enum";
 import type {
   GraphConfig,
   GraphDataPayload,
@@ -429,7 +429,7 @@ export class VibeSenseRepository {
         });
       }
 
-      // System graphs are read-only — cannot branch from system directly
+      // System graphs are read-only - cannot branch from system directly
       // Admins can branch from any graph they can see
       if (
         parent.ownerType !== GraphOwnerType.SYSTEM &&
@@ -943,7 +943,7 @@ export class VibeSenseRepository {
         });
       }
 
-      // Check for existing datapoints — only allow hard delete if no data
+      // Check for existing datapoints - only allow hard delete if no data
       const dataCheck = await db
         .select({ count: sql<number>`count(*)` })
         .from(pipelineDatapoints)

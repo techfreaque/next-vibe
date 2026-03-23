@@ -7,7 +7,7 @@
  * Flow:
  * 1. SSRF guard on remoteUrl
  * 2. Login to remote server (email + password → token)
- * 3. Local collision check — instanceId must not already exist locally
+ * 3. Local collision check - instanceId must not already exist locally
  * 4. Register this instance on the remote (cloud-side collision check)
  * 5. Store connection locally (only if remote registration succeeded)
  */
@@ -215,7 +215,7 @@ export class RemoteConnectionConnectRepository {
     const { email, password } = data;
     const remoteUrl = data.remoteUrl ?? "";
 
-    // ── Step 1: SSRF guard — reject private/loopback URLs ──────────────────────
+    // ── Step 1: SSRF guard - reject private/loopback URLs ──────────────────────
     const urlError =
       RemoteConnectionConnectRepository.validateRemoteUrl(remoteUrl);
     if (urlError) {
@@ -375,7 +375,7 @@ export class RemoteConnectionConnectRepository {
     // instanceId = what the remote calls itself (its self-identity)
     const instanceId = registerResult.remoteInstanceId ?? selfInstanceId;
 
-    // ── Step 4b: Local collision check — reject if this instanceId already exists ──
+    // ── Step 4b: Local collision check - reject if this instanceId already exists ──
     const [localExisting] = await db
       .select({ id: remoteConnections.id })
       .from(remoteConnections)
@@ -477,7 +477,7 @@ export class RemoteConnectionConnectRepository {
         );
       }
     } catch (toolWriteError) {
-      // Non-fatal — connection is established, tools can be added manually
+      // Non-fatal - connection is established, tools can be added manually
       logger.warn("[CONNECT] Failed to write remote tools to availableTools", {
         error: String(toolWriteError),
       });
@@ -500,7 +500,7 @@ export class RemoteConnectionConnectRepository {
           instanceId,
         });
       } catch (syncError) {
-        // Non-fatal — capabilities will sync on the next cron pulse
+        // Non-fatal - capabilities will sync on the next cron pulse
         logger.warn("[CONNECT] Initial capability sync failed (non-fatal)", {
           error: String(syncError),
         });

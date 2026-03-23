@@ -207,7 +207,7 @@ export const translations: typeof enTranslations = {
       allocate: {
         title: "Credits zuweisen",
         description:
-          "Fügen Sie einem Benutzerkonto Credits hinzu. Credits wirken als Ausgabenlimit — sie steuern, wie viel KI-Nutzung erlaubt ist.",
+          "Fügen Sie einem Benutzerkonto Credits hinzu. Credits wirken als Ausgabenlimit - sie steuern, wie viel KI-Nutzung erlaubt ist.",
         howItWorks: {
           title: "Wie Credit-Limits funktionieren",
           freePool: {
@@ -218,7 +218,7 @@ export const translations: typeof enTranslations = {
           bonus: {
             title: "Bonus-Credits (Pro Benutzer)",
             description:
-              "Bonus-Credits sind dauerhaft — sie laufen nie ab und stapeln sich auf den freien Pool-Credits.",
+              "Bonus-Credits sind dauerhaft - sie laufen nie ab und stapeln sich auf den freien Pool-Credits.",
           },
           apiKeys: {
             title: "Alle Limits entfernen",

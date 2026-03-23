@@ -159,7 +159,7 @@ export const {
 export const SortOrderDB = [SortOrder.ASC, SortOrder.DESC] as const;
 
 /**
- * Message Sync Status — used for inbox sync (IMAP, WhatsApp, etc.)
+ * Message Sync Status - used for inbox sync (IMAP, WhatsApp, etc.)
  */
 export const {
   enum: MessageSyncStatus,
@@ -180,7 +180,7 @@ export const MessageSyncStatusDB = [
 ] as const;
 
 /**
- * Special Folder Type — well-known inbox folder roles
+ * Special Folder Type - well-known inbox folder roles
  */
 export const {
   enum: SpecialFolderType,
@@ -205,7 +205,7 @@ export const SpecialFolderTypeDB = [
 ] as const;
 
 /**
- * Retry Range — for message retry statistics
+ * Retry Range - for message retry statistics
  */
 export const {
   enum: RetryRange,

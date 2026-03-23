@@ -9,12 +9,12 @@ export const translations = {
         title: "Run Claude Code",
         dynamicTitle: "Claude Code: {{prompt}}",
         description:
-          "Run a Claude Code task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session — result is delivered back automatically when the session ends.",
+          "Run a Claude Code task. Batch mode (DEFAULT): runs headlessly and returns output. Interactive mode: opens a live terminal session - result is delivered back automatically when the session ends.",
         fields: {
           prompt: {
             label: "Prompt",
             description:
-              "The task or question to send to Claude Code. Be specific — include file paths, context, and expected output format.",
+              "The task or question to send to Claude Code. Be specific - include file paths, context, and expected output format.",
           },
           model: {
             label: "Model",
@@ -44,7 +44,7 @@ export const translations = {
           interactiveMode: {
             label: "Interactive Mode",
             description:
-              "false (DEFAULT): runs headlessly and returns all output when done. true: opens a terminal window for a live session — result is delivered back automatically when the session ends.",
+              "false (DEFAULT): runs headlessly and returns all output when done. true: opens a terminal window for a live session - result is delivered back automatically when the session ends.",
           },
           output: {
             label: "Output",
@@ -69,11 +69,11 @@ export const translations = {
         errors: {
           validation: {
             title: "Validation Error",
-            description: "Invalid request parameters — check prompt and fields",
+            description: "Invalid request parameters - check prompt and fields",
           },
           unauthorized: {
             title: "Unauthorized",
-            description: "Authentication required — admin role needed",
+            description: "Authentication required - admin role needed",
           },
           internal: {
             title: "Execution Failed",
@@ -86,7 +86,7 @@ export const translations = {
           },
           forbidden: {
             title: "Forbidden",
-            description: "Access denied — insufficient permissions",
+            description: "Access denied - insufficient permissions",
           },
           notFound: {
             title: "Not Found",
@@ -106,7 +106,7 @@ export const translations = {
           },
           conflict: {
             title: "Conflict",
-            description: "Execution conflict — another session may be running",
+            description: "Execution conflict - another session may be running",
           },
         },
         success: {
@@ -118,7 +118,7 @@ export const translations = {
           runningBatch: "Claude is running...",
           runningInteractive: "Launching interactive terminal session...",
           escalated:
-            "Running in background — result will be injected when complete.",
+            "Running in background - result will be injected when complete.",
           taskIdLabel: "Task ID",
           outputLabel: "Output",
           interactiveSessionLaunched:

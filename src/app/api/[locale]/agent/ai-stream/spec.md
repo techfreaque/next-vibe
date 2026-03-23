@@ -1,4 +1,4 @@
-# AI Stream — callbackMode Spec
+# AI Stream - callbackMode Spec
 
 ## Core Principle
 
@@ -6,11 +6,11 @@ The AI sees identical behavior regardless of local/remote/transport. Every mode 
 
 ---
 
-## Remote Execution — Two Tiers
+## Remote Execution - Two Tiers
 
-**Tier 1 — Direct HTTP** (preferred): If the remote instance has `isDirectlyAccessible=true` (set at connect time by pinging `localUrl`), the executing side calls the tool's HTTP route directly via `executeRemote()`.
+**Tier 1 - Direct HTTP** (preferred): If the remote instance has `isDirectlyAccessible=true` (set at connect time by pinging `localUrl`), the executing side calls the tool's HTTP route directly via `executeRemote()`.
 
-**Tier 2 — Task-queue** (fallback): If `isDirectlyAccessible=false` (NAT, unreachable), create a `cron_task` with `targetInstance`. The remote picks it up on its next cron pulse (~1 min). Result arrives via `/report`.
+**Tier 2 - Task-queue** (fallback): If `isDirectlyAccessible=false` (NAT, unreachable), create a `cron_task` with `targetInstance`. The remote picks it up on its next cron pulse (~1 min). Result arrives via `/report`.
 
 **No polling anywhere.** `/report` → `handleTaskCompletion` is the universal result delivery mechanism for the queue path.
 
@@ -26,7 +26,7 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 - Cleared when: revival fires (`claimRevival` atomically transitions `idle|waiting` → `streaming`)
 - Also cleared when: cancel is called, or task completes with no revival (endLoop remote)
 - `STREAMING_STATE_CHANGED` WS event fires immediately when state → `waiting` so live clients update the stop button without a page refresh
-- Persisted in DB: page refresh recovery — if thread is `waiting` on load, stop button shown immediately
+- Persisted in DB: page refresh recovery - if thread is `waiting` on load, stop button shown immediately
 
 ---
 
@@ -34,22 +34,22 @@ Threads have four streaming states: `idle | streaming | aborting | waiting`.
 
 ### `wait` (default)
 
-AI sees: tool result returned inline, loop continues — **local only**. For remote/escalated, AI sees no result in this turn; stream aborts and revival delivers result in a new turn.
+AI sees: tool result returned inline, loop continues - **local only**. For remote/escalated, AI sees no result in this turn; stream aborts and revival delivers result in a new turn.
 
 | Transport                | Behavior                                                                                                                                       |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Local**                | Inline execution. Result returned to AI immediately. Loop continues.                                                                           |
-| **Remote direct**        | Blocking HTTP call via `executeRemote()`. Awaits response. Connection is alive and waiting — no timer. Result returned inline. Loop continues. |
+| **Remote direct**        | Blocking HTTP call via `executeRemote()`. Awaits response. Connection is alive and waiting - no timer. Result returned inline. Loop continues. |
 | **Remote queue**         | `waitingForRemoteResult=true`. Stream aborts (`REMOTE_TOOL_WAIT`). Thread → `waiting`. `/report` → `handleTaskCompletion(WAIT)` → revival.     |
 | **Escalated (>timeout)** | Same as remote queue path: `waitingForRemoteResult=true`, stream aborts, thread → `waiting`. Revival delivers result.                          |
 
-**Tool message lifecycle — `wait` (remote/escalated):**
+**Tool message lifecycle - `wait` (remote/escalated):**
 
 - At tool-call time: original tool message created with `status: "pending"`, content = tool input args
 - While waiting: original message stays `pending`
-- On `handleTaskCompletion(WAIT)`: original tool message **backfilled** — `status: "completed"` (or `"failed"`), content = actual result
+- On `handleTaskCompletion(WAIT)`: original tool message **backfilled** - `status: "completed"` (or `"failed"`), content = actual result
 - `TOOL_RESULT` WS event emitted so live clients update the message in place
-- Revival fires headless stream from the original tool message as parent — AI sees result as part of its context
+- Revival fires headless stream from the original tool message as parent - AI sees result as part of its context
 
 **No deferred message created for `wait`.** The original message is updated in place.
 
@@ -57,7 +57,7 @@ AI sees: tool result returned inline, loop continues — **local only**. For rem
 
 ### `detach`
 
-AI sees: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` — always.
+AI sees: `{ taskId, status: "pending", hint: "use wait-for-task(taskId) if you need the result" }` - always.
 
 | Transport         | Behavior                                                                          |
 | ----------------- | --------------------------------------------------------------------------------- |
@@ -73,7 +73,7 @@ Result stored in task history only. AI can later call `wait-for-task(taskId)` to
 
 ### `wakeUp`
 
-AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready — do NOT call wait-for-task" }` — always.
+AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready - do NOT call wait-for-task" }` - always.
 
 | Transport         | Behavior                                                                                                            |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -81,7 +81,7 @@ AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready
 | **Remote direct** | HTTP call (non-blocking). Remote calls `/report` when done → `handleTaskCompletion(WAKE_UP)` → resume-stream.       |
 | **Remote queue**  | Task created. Remote picks up on cron, executes, calls `/report` → `handleTaskCompletion(WAKE_UP)` → resume-stream. |
 
-**Tool message lifecycle — `wakeUp`:**
+**Tool message lifecycle - `wakeUp`:**
 
 - At tool-call time: original tool message created with `status: "pending"`, content = `{taskId, status:"pending"}`
 - Original tool message is **never modified** after creation
@@ -90,7 +90,7 @@ AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready
 - `TASK_COMPLETED` WS event emitted (carries `deferredMessage` for optimistic UI)
 - Revival fires headless stream from the deferred message as parent
 
-**AI context (message-converter):** for wakeUp deferred results, input args are suppressed — AI sees the result only. Input preserved in DB and shown in UI.
+**AI context (message-converter):** for wakeUp deferred results, input args are suppressed - AI sees the result only. Input preserved in DB and shown in UI.
 
 **When resume-stream fires:**
 
@@ -101,7 +101,7 @@ AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready
 
 ### `endLoop`
 
-AI sees: tool result returned, then loop stops — always.
+AI sees: tool result returned, then loop stops - always.
 
 | Transport         | Behavior                                                                                                                                                                                 |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -109,9 +109,9 @@ AI sees: tool result returned, then loop stops — always.
 | **Remote direct** | Blocking HTTP call. Result to AI. Loop stops. Thread → `idle`.                                                                                                                           |
 | **Remote queue**  | `waitingForRemoteResult=true`. Stream aborts (`REMOTE_TOOL_WAIT`). Thread → `waiting`. On completion: result backfilled, `TASK_COMPLETED` WS event. No AI continuation. Thread → `idle`. |
 
-**Thread stays `waiting` (stop button visible) until task completes** — even though no AI continuation fires. This tells the user the background task is still running.
+**Thread stays `waiting` (stop button visible) until task completes** - even though no AI continuation fires. This tells the user the background task is still running.
 
-**Tool message lifecycle — `endLoop` (remote queue):**
+**Tool message lifecycle - `endLoop` (remote queue):**
 
 - Original tool message backfilled with result on `handleTaskCompletion`
 - Additionally: a deferred TOOL message is inserted (same as wakeUp) for UI visibility
@@ -124,7 +124,7 @@ No resume-stream for endLoop.
 
 ### `approve`
 
-AI sees: tool blocked pending human confirmation; other parallel tools proceed — always.
+AI sees: tool blocked pending human confirmation; other parallel tools proceed - always.
 
 | Transport            | Behavior                                                                                                        |
 | -------------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -137,7 +137,7 @@ AI cannot opt out if `requiresConfirmation=true` in tool settings.
 
 ---
 
-## Tool Call Errors — Loop Always Continues
+## Tool Call Errors - Loop Always Continues
 
 Failed tool calls never stop the loop. `tool-result-handler.ts` marks the tool as failed and returns the error as a tool result. The AI receives:
 
@@ -145,7 +145,7 @@ Failed tool calls never stop the loop. `tool-result-handler.ts` marks the tool a
 { "success": false, "message": "...", "errorType": "..." }
 ```
 
-The AI decides what to do (retry, skip, explain). Consistent with `ResponseType<T>` — no throw, always a result.
+The AI decides what to do (retry, skip, explain). Consistent with `ResponseType<T>` - no throw, always a result.
 
 ---
 
@@ -156,7 +156,7 @@ Works for **both** `detach` and `wakeUp` tasks:
 - Task **already complete**: returns result inline. Stream continues. Cleans up task + any pending revival.
 - Task **pending**: writes `callbackMode=WAKE_UP + threadId + toolMessageId` onto task row (upgrades detach to wakeUp semantics), sets `pendingTimeoutMs=90000` → stream pauses.
 - On timeout (`STREAM_TIMEOUT`): stream dies cleanly. Thread → `waiting`. When task completes, `handleTaskCompletion(WAKE_UP)` fires revival.
-- AI always sees: `{ taskId, status, result?, waiting }` — same shape for all cases.
+- AI always sees: `{ taskId, status, result?, waiting }` - same shape for all cases.
 
 ---
 
@@ -170,11 +170,11 @@ Any time the stream is waiting for a remote result (queue path, `wait-for-task`,
 - Clean abort: no error shown to user; revival handles continuation
 - `pendingTimeoutMs = 0` → no timer (wait forever)
 
-**Default timeout: 90s** — covers a full cron pulse cycle.
+**Default timeout: 90s** - covers a full cron pulse cycle.
 
 **Per-tool override:** set `streamTimeoutMs` on the endpoint definition in `createEndpoint()`. This is passed down by `tools-loader.ts` before calling execute. Tools that need no timeout (shell, claude-code interactive) set `streamTimeoutMs: 0`.
 
-**Direct HTTP `wait` mode does not use this timer** — the HTTP connection itself is the timeout.
+**Direct HTTP `wait` mode does not use this timer** - the HTTP connection itself is the timeout.
 
 ---
 
@@ -187,7 +187,7 @@ For tools that may run longer than the configured timeout (shell, claude-code, e
 **Escalation:** Tool calls `context.escalateToTask(callbackMode)` before the long-running operation:
 
 1. Creates cron task row with the given callbackMode, stores `leafMessageId`
-2. Sets `waitingForRemoteResult = true` — **never** `shouldStopLoop` (that's for endLoop only)
+2. Sets `waitingForRemoteResult = true` - **never** `shouldStopLoop` (that's for endLoop only)
 3. Sets `pendingTimeoutMs` from the tool's `streamTimeoutMs` definition (or default); `0` = no timer
 4. `STREAMING_STATE_CHANGED` → `waiting` emitted immediately
 5. Stream aborts at timeout (`REMOTE_TOOL_WAIT`) or immediately if `streamTimeoutMs=0`... wait, stream must stay alive until step batch ends
@@ -201,17 +201,17 @@ For tools that may run longer than the configured timeout (shell, claude-code, e
 - `WAKE_UP`: deferred message inserted, AI sees only result (args suppressed)
 - `END_LOOP`: backfill + deferred message, no AI continuation
 
-**The caller's callbackMode (passed by AI when invoking the tool) is used** — tools do not pick their own default unilaterally. `escalateToTask` receives the `callbackMode` from the tool's execution context.
+**The caller's callbackMode (passed by AI when invoking the tool) is used** - tools do not pick their own default unilaterally. `escalateToTask` receives the `callbackMode` from the tool's execution context.
 
 ---
 
 ## Branch Tracking for Revival
 
-Every wakeUp task stores `leafMessageId` (= `ctx.currentParentId` at tool-call time — the branch tip at the moment the tool was called).
+Every wakeUp task stores `leafMessageId` (= `ctx.currentParentId` at tool-call time - the branch tip at the moment the tool was called).
 
 - `execute-tool/repository.ts` and `wait-for-task/repository.ts`: store `leafMessageId` in the dedicated `wakeUpLeafMessageId` column on the task row (NOT in the `taskInput` JSON blob)
-- `handleTaskCompletion` accepts `leafMessageId?: string | null` as a **first-class typed param** — callers pass it explicitly, never via `taskInput` spread
-- `resumeStreamRequestSchema.parse` receives only the known routing fields (`threadId`, `callbackMode`, `modelId`, `skillId`, `favoriteId`, `leafMessageId`) — never arbitrary tool input fields
+- `handleTaskCompletion` accepts `leafMessageId?: string | null` as a **first-class typed param** - callers pass it explicitly, never via `taskInput` spread
+- `resumeStreamRequestSchema.parse` receives only the known routing fields (`threadId`, `callbackMode`, `modelId`, `skillId`, `favoriteId`, `leafMessageId`) - never arbitrary tool input fields
 - `resume-stream/repository.ts` uses stored `leafMessageId` as the parent for the deferred message
 - Falls back to latest-message query only if `leafMessageId` not set (backwards compat)
 
@@ -230,7 +230,7 @@ All parallel tools execute concurrently. Rules for how results land:
 | `detach + detach`            | Both fire. Neither schedules revival. AI gets two taskIds.                                              |
 | `endLoop + anything`         | All parallel tools complete. Non-endLoop results returned to AI. Then loop stops.                       |
 | `approve + anything`         | approve blocks only itself. Other tools execute normally. Loop stops after batch.                       |
-| `wakeUp + endLoop`           | Both fire. endLoop stops loop. wakeUp revival fires later — fresh turn with full tool access.           |
+| `wakeUp + endLoop`           | Both fire. endLoop stops loop. wakeUp revival fires later - fresh turn with full tool access.           |
 | `wakeUp + approve`           | approve blocks itself, wakeUp fires. Loop stops after batch. wakeUp revival fires when result arrives.  |
 | `detach + wakeUp`            | Both fire. Only wakeUp schedules revival.                                                               |
 | `wait + wakeUp`              | wait returns result to AI (local) or aborts with waiting (remote). wakeUp fires independently.          |
@@ -248,11 +248,11 @@ When `isDirectlyAccessible=true`, cloud pushes changes to local immediately inst
 - **Memories**: on `create`/`update`/`delete`, push delta to local's task-sync endpoint fire-and-forget.
 - **Capabilities**: on version bump, push updated capabilities to local immediately.
 
-Connecting side (local) always has `pullFromRemote()` as fallback — push is opportunistic.
+Connecting side (local) always has `pullFromRemote()` as fallback - push is opportunistic.
 
 ---
 
-## toolMessageId — No Polling
+## toolMessageId - No Polling
 
 Each `execute()` wrapper in `tools-loader.ts` injects `currentToolMessageId` from `ctx.pendingToolMessages.get(toolCallId)?.messageId` before calling execute. No shared map, no polling. By the time `execute()` is called, the `tool-call` event has already been processed and `pendingToolMessages` is populated.
 

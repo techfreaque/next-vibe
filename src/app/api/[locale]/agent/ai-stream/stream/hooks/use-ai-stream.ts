@@ -1,5 +1,5 @@
 /**
- * AI Stream Hook — POST Trigger + Cancel
+ * AI Stream Hook - POST Trigger + Cancel
  *
  * Pure fire-and-forget: makes the POST request to start a stream,
  * handles HTTP errors, and provides cancel functionality.
@@ -8,8 +8,8 @@
  * by useMessagesSubscription in the messages widget.
  */
 
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { toast } from "next-vibe-ui/hooks/use-toast";
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { useCallback, useMemo } from "react";
 
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
@@ -45,7 +45,7 @@ export interface UseAIStreamReturn {
 /**
  * Hook for AI streaming operations.
  *
- * POST is fire-and-forget — it returns immediately with threadId.
+ * POST is fire-and-forget - it returns immediately with threadId.
  * All stream events arrive via WebSocket and are handled by
  * useMessagesSubscription in the messages widget.
  *
@@ -100,7 +100,7 @@ export function useAIStream(): UseAIStreamReturn {
       // ================================================================
       // Make the POST request via useApiMutation (type-safe, handles
       // FormData automatically when File objects are present).
-      // The server fires-and-forgets the stream — POST returns immediately.
+      // The server fires-and-forgets the stream - POST returns immediately.
       // WS events (handled by useMessagesSubscription) drive all UI updates.
       // ================================================================
       logger.info("Making AI stream request", {
@@ -173,7 +173,7 @@ export function useAIStream(): UseAIStreamReturn {
         return false;
       }
 
-      // POST returned successfully — stream is now running on the server.
+      // POST returned successfully - stream is now running on the server.
       // WS events will drive all UI updates. STREAM_FINISHED will clean up.
       logger.info("Stream triggered successfully (fire-and-forget)", {
         threadId,
@@ -198,7 +198,7 @@ export function useAIStream(): UseAIStreamReturn {
       // Stop audio immediately
       getAudioQueue().stop();
 
-      // Set aborting + drain mode — shows spinner on stop button, suppresses deltas
+      // Set aborting + drain mode - shows spinner on stop button, suppresses deltas
       storeSetAborting(threadId, true);
 
       // Call server-side cancel endpoint via typesafe mutation

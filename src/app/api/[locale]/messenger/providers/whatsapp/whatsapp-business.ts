@@ -1,7 +1,7 @@
 /**
  * WhatsApp Business Provider
  * Send-only provider for WhatsApp via Business API.
- * Inbox operations are not supported — handled by SendOnlyProvider base.
+ * Inbox operations are not supported - handled by SendOnlyProvider base.
  */
 
 import "server-only";
@@ -16,10 +16,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { MessageChannel } from "../../accounts/enum";
+import { sendViaMessagingAccount } from "../../messaging/send/service";
 import { scopedTranslation as providerScopedTranslation } from "../i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";
-import { sendViaMessagingAccount } from "../../messaging/send/service";
 
 export class WhatsAppMessengerProvider extends SendOnlyProvider {
   readonly channel = MessageChannel.WHATSAPP;

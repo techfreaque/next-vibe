@@ -144,7 +144,7 @@ export function ContainerWidgetInk<
     showLabels && descriptionKey ? t(descriptionKey) : undefined;
 
   // Container can have children (object) or child (array)
-  // Handle array containers — render each item using the child template
+  // Handle array containers - render each item using the child template
   const structField: { schemaType: SchemaTypes } = field;
   if (hasChild(structField)) {
     const parentValue = coerceToWidgetData(field.value);

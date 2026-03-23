@@ -110,7 +110,7 @@ const variantItemSchema = objectField(scopedTranslation, {
   },
 });
 
-// ── GET — list all registered variants ───────────────────────────────────────
+// ── GET - list all registered variants ───────────────────────────────────────
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -194,7 +194,7 @@ const { GET } = createEndpoint({
   },
 });
 
-// ── POST — register a new variant ────────────────────────────────────────────
+// ── POST - register a new variant ────────────────────────────────────────────
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -296,7 +296,7 @@ const { POST } = createEndpoint({
         schema: z.string().email().optional(),
       }),
 
-      // Response — the created record
+      // Response - the created record
       id: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.id",
@@ -381,7 +381,7 @@ const { POST } = createEndpoint({
   },
 });
 
-// ── PATCH — toggle active / update metadata ───────────────────────────────────
+// ── PATCH - toggle active / update metadata ───────────────────────────────────
 
 const { PATCH } = createEndpoint({
   scopedTranslation,

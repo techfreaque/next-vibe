@@ -1,14 +1,14 @@
 /* eslint-disable i18next/no-literal-string */
 
-import type { MemoriesList } from "@/app/api/[locale]/agent/chat/memories/definition";
+import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
 } from "@/app/api/[locale]/agent/chat/memories/[id]/constants";
 import { MEMORY_LIST_ALIAS } from "@/app/api/[locale]/agent/chat/memories/constants";
 import { MEMORY_ADD_ALIAS } from "@/app/api/[locale]/agent/chat/memories/create/constants";
+import type { MemoriesList } from "@/app/api/[locale]/agent/chat/memories/definition";
 import { MEMORY_SEARCH_ALIAS } from "@/app/api/[locale]/agent/chat/memories/search/constants";
-import type { SystemPromptFragment } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/types";
 
 export interface MemoriesData {
   memories: MemoriesList;
@@ -44,7 +44,7 @@ export const memoriesFragment: SystemPromptFragment<MemoriesData> = {
 
     if (memories.length === 0) {
       return `## User Memories (0)
-No memories yet — store useful facts immediately as you learn them.
+No memories yet - store useful facts immediately as you learn them.
 
 ${management}`;
     }

@@ -20,7 +20,7 @@ export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): any {
   try {
     // z.toJSONSchema handles most schemas; unrepresentable:"any" ensures
     // fields with transforms/pipelines still appear (as {} / any) rather than throwing.
-    // Override: ZodPipe (z.coerce.number, z.string().pipe(...)) — emit type from the
+    // Override: ZodPipe (z.coerce.number, z.string().pipe(...)) - emit type from the
     // output schema so clients see "number"/"integer" instead of unknown {}.
     const jsonSchema = z.toJSONSchema(schema, {
       target: "draft-7",
@@ -33,12 +33,12 @@ export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): any {
         if (!def) {
           return;
         }
-        // ZodDate — emit as ISO string (JSON has no native date type)
+        // ZodDate - emit as ISO string (JSON has no native date type)
         if (def.type === "date") {
           ctx.jsonSchema.type = "string";
           ctx.jsonSchema.format = "date-time";
         }
-        // ZodCustom types — treat as object
+        // ZodCustom types - treat as object
         if (def.type === "custom") {
           ctx.jsonSchema.type = "object";
         }
@@ -81,7 +81,7 @@ export function zodSchemaToJsonSchema(schema: z.ZodTypeAny): any {
           if ("anyOf" in value) {
             jsonSchema.properties[key] = cleanupAnyOf(value);
           } else if (Object.keys(value).length === 0) {
-            // Bare {} means fully unrepresentable — fall back to string
+            // Bare {} means fully unrepresentable - fall back to string
             jsonSchema.properties[key] = { type: "string" };
           }
         }
@@ -201,7 +201,7 @@ function cleanupAnyOf(schema: any): any {
     return { type: singleType, ...cleanedSchema };
   }
 
-  // Multiple types — add type array (JSON Schema draft-7 supports this)
+  // Multiple types - add type array (JSON Schema draft-7 supports this)
   if (types.size > 0) {
     const result = { type: [...types], ...cleanedSchema };
     if (types.has("array") && arrayItemsType) {
@@ -261,7 +261,7 @@ function fieldDataTypeToJsonSchemaHint(fieldType: string): Record<string, any> {
       return { type: "array" };
     // TEXT, TEL, TEXTAREA, SELECT, TIMEZONE, CURRENCY_SELECT,
     // LANGUAGE_SELECT, COUNTRY_SELECT, ICON, BADGE, STATUS, CODE,
-    // MARKDOWN, AVATAR — all string
+    // MARKDOWN, AVATAR - all string
     default:
       return { type: "string" };
   }
@@ -272,7 +272,7 @@ function fieldDataTypeToJsonSchemaHint(fieldType: string): Record<string, any> {
  * endpoint field tree. Walks the top-level children and applies accurate
  * type/format hints, preserving existing constraints (enum, min, max, pattern).
  *
- * Only overrides type/format — never removes constraints Zod already emitted.
+ * Only overrides type/format - never removes constraints Zod already emitted.
  */
 export function enrichJsonSchemaFromFields(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -306,22 +306,22 @@ any {
 
     const hint = fieldDataTypeToJsonSchemaHint(fieldType);
 
-    // Apply type override — but only when the current type is missing,
+    // Apply type override - but only when the current type is missing,
     // is "string" (may be wrong from io:input), or is an anyOf without a clear type.
     // Never downgrade a more specific type (e.g. don't overwrite "integer" with "number").
     const currentType = prop.type;
     const shouldOverrideType =
       !currentType ||
-      // anyOf with no top-level type — add the hint type
+      // anyOf with no top-level type - add the hint type
       (!("type" in prop) && "anyOf" in prop) ||
-      // Zod emitted "string" from io:input for a coerced number/int — upgrade it
+      // Zod emitted "string" from io:input for a coerced number/int - upgrade it
       (currentType === "string" &&
         (hint.type === "number" ||
           hint.type === "integer" ||
           hint.type === "boolean" ||
           hint.type === "array" ||
           hint.type === "object")) ||
-      // Zod emitted "number" but fieldType says integer — upgrade precision
+      // Zod emitted "number" but fieldType says integer - upgrade precision
       (currentType === "number" && hint.type === "integer");
 
     if (shouldOverrideType) {

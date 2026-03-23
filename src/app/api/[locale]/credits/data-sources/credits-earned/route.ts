@@ -1,5 +1,5 @@
 /**
- * Credits Earned — Route
+ * Credits Earned - Route
  * Server-only.
  */
 

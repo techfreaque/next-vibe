@@ -1,7 +1,7 @@
 /**
  * Complete Task API Definition
  * MCP tool called by tools (e.g. claude-code interactive) when their async work is done.
- * Accepts the exact response payload of the originating tool — same shape as if the tool
+ * Accepts the exact response payload of the originating tool - same shape as if the tool
  * had returned synchronously. The framework uses this as the wakeUpResult so the deferred
  * TOOL message in the thread renders with the correct response fields.
  *
@@ -130,7 +130,7 @@ const { POST } = createEndpoint({
       default: {
         taskId: "escalated-1234567890-abc123",
         response: {
-          output: "Ran echo hello — output: hello",
+          output: "Ran echo hello - output: hello",
           durationMs: 1200,
         },
       },

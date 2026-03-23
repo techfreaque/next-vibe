@@ -1,6 +1,6 @@
 /**
  * SSH Files Write Endpoint Definition
- * POST /ssh/files/write — Write or overwrite a file
+ * POST /ssh/files/write - Write or overwrite a file
  */
 
 import { z } from "zod";

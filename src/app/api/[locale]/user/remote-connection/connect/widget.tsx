@@ -2,7 +2,7 @@
  * Remote Connection Connect Widget
  *
  * Renders the Card layout with benefits, security warning, and form fields.
- * Email + password are regular form fields — the server handles the
+ * Email + password are regular form fields - the server handles the
  * remote login and only stores the token.
  *
  * Role-aware:
@@ -120,7 +120,7 @@ export function RemoteConnectWidget({
               </P>
             </Div>
 
-            {/* Credentials — sent to local server, which logs in on your behalf */}
+            {/* Credentials - sent to local server, which logs in on your behalf */}
             <Div className="col-span-2 sm:col-span-1">
               <EmailFieldWidget
                 fieldName="email"

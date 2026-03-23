@@ -3,14 +3,13 @@
  * Standalone reusable component for editing/viewing the auto-compact token threshold.
  * Used in: character edit, favorite edit, settings edit.
  *
- * "Context Memory Budget" — how many tokens of conversation history the AI
+ * "Context Memory Budget" - how many tokens of conversation history the AI
  * keeps before summarising older messages to save cost.
  */
 
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -31,6 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
 
@@ -161,7 +161,7 @@ function CardHeader({
                 <Span className="text-muted-foreground">
                   When the conversation grows past this limit, older messages
                   are automatically summarised. The AI stays coherent but uses
-                  fewer tokens — reducing cost.
+                  fewer tokens - reducing cost.
                 </Span>
                 <Span className="text-muted-foreground">
                   {"Current model supports up to "}
@@ -198,7 +198,7 @@ export interface CompactTriggerEditProps {
   /** Called when user changes the value. null = reset to default */
   onChange: (value: number | null) => void;
   /**
-   * Favorite's own model selection override — used to cap the slider.
+   * Favorite's own model selection override - used to cap the slider.
    * When null/undefined, falls back to characterModelSelection.
    */
   modelSelection?:
@@ -208,7 +208,7 @@ export interface CompactTriggerEditProps {
     | ModelId
     | null;
   /**
-   * Skill's model selection — fallback when favoriteModelSelection is null.
+   * Skill's model selection - fallback when favoriteModelSelection is null.
    * Ensures the slider cap reflects the actual resolved model.
    */
   characterModelSelection?: FiltersModelSelection | ManualModelSelection | null;
@@ -274,7 +274,7 @@ export function CompactTriggerEdit({
           {"Lower = cheaper"}
         </Span>
         {
-          " (to a point) — you trade a little memory for lower per-message cost."
+          " (to a point) - you trade a little memory for lower per-message cost."
         }
       </Div>
 
@@ -338,7 +338,7 @@ export function CompactTriggerEdit({
 // Cost/Memory trade-off bar
 // ---------------------------------------------------------------------------
 
-// Color values for the progress bar (inline style — cannot mix className + style on Div)
+// Color values for the progress bar (inline style - cannot mix className + style on Div)
 const BAR_COLORS = {
   cheap: "#10b981", // emerald-500
   balanced: "#eab308", // yellow-500
@@ -384,7 +384,7 @@ function CostMemoryBar({
         <Span>{"🧠 more memory"}</Span>
       </Div>
       <Div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-        {/* Inner bar: use style-only (StyleType constraint — no mixing style+className on Div) */}
+        {/* Inner bar: use style-only (StyleType constraint - no mixing style+className on Div) */}
         <Div
           style={{
             height: "100%",

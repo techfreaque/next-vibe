@@ -26,7 +26,7 @@ export function useSkill(
   skillId: string | undefined,
   user: JwtPayloadType,
   logger: EndpointLogger,
-  /** SSR-prefetched skill data — pre-populates React Query cache, skips initial fetch */
+  /** SSR-prefetched skill data - pre-populates React Query cache, skips initial fetch */
   initialData?: SkillGetResponseOutput | null,
 ): SkillEndpointReturn {
   const options = useMemo(

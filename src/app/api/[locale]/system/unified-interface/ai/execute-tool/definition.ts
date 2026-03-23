@@ -2,7 +2,7 @@
  * Route Execute Endpoint Definition
  * POST /api/[locale]/system/unified-interface/ai/execute-tool
  *
- * Universal route executor — call any registered endpoint by toolName + input.
+ * Universal route executor - call any registered endpoint by toolName + input.
  * Auth is enforced by the target route; this endpoint is intentionally public
  * so MCP, AI tools, and external callers can delegate execution.
  *
@@ -33,9 +33,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { scopedTranslation } from "../i18n";
 import { CallbackMode, EXECUTE_TOOL_ALIAS } from "./constants";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
 const ExecuteToolWidget = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.ExecuteToolWidget })),
@@ -64,7 +64,7 @@ const { POST } = createEndpoint({
     firstCliArgKey: "toolName",
   },
 
-  // Public — the target route enforces its own auth
+  // Public - the target route enforces its own auth
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,

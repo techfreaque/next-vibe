@@ -389,7 +389,7 @@ export async function tanstackLoader({
 
     // Prefetch folder contents for the sidebar (avoids loading flash on mount).
     // When in a subfolder, fetch BOTH root-level (subFolderId: null) AND the
-    // subfolder's contents in parallel — root seeds the top-level EndpointsPage,
+    // subfolder's contents in parallel - root seeds the top-level EndpointsPage,
     // subfolder seeds the expanded FolderRow's child EndpointsPage.
     const folderContentsPromises: [
       ReturnType<typeof FolderContentsRepository.getFolderContents>,

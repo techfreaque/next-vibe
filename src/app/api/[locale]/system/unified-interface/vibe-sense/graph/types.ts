@@ -1,8 +1,8 @@
 /**
- * Vibe Sense — Graph Types
+ * Vibe Sense - Graph Types
  *
  * A Graph is a stored DAG config connecting nodes.
- * All nodes are endpoint nodes — dispatched via RouteExecutionExecutor.
+ * All nodes are endpoint nodes - dispatched via RouteExecutionExecutor.
  */
 
 import type { BacktestActionModeType } from "../enum";
@@ -18,7 +18,7 @@ import type { GraphConfigInferred } from "./schema";
  * The engine dispatches via RouteExecutionExecutor.executeGenericHandler()
  * using the endpoint's tool name derived from endpointPath + method.
  *
- * Data sources, indicators, transformers, evaluators — all the same shape.
+ * Data sources, indicators, transformers, evaluators - all the same shape.
  * The distinction is conveyed by endpointPath category prefix:
  *   - "credits/data-sources/..." → data source
  *   - ".../indicators/ema"       → indicator
@@ -54,7 +54,7 @@ export type TriggerConfig =
   | { type: "cron"; schedule: string }
   | { type: "manual" };
 
-/** The full graph config stored in the DB — derived from graphConfigSchema */
+/** The full graph config stored in the DB - derived from graphConfigSchema */
 export type GraphConfig = GraphConfigInferred;
 
 export interface BacktestConfig {

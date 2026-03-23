@@ -116,7 +116,7 @@ export class ToolResultHandler {
           };
         }
       | undefined;
-    /** Stream context — used to detect waitingForRemoteResult for escalated tools */
+    /** Stream context - used to detect waitingForRemoteResult for escalated tools */
     streamContext?: ToolExecutionContext;
     threadId: string;
     model: ModelId;
@@ -184,7 +184,7 @@ export class ToolResultHandler {
     let toolError: ErrorResponseType | undefined;
     if (effectiveIsError) {
       if (isErrorResponse && typeof output === "object" && output !== null) {
-        // Output is a structured ErrorResponseType from fail() — pass through its
+        // Output is a structured ErrorResponseType from fail() - pass through its
         // message as messageParams so the AI sees the specific error detail
         // (e.g. "Tool not found: xyz") rather than a generic wrapper.
         const errObj = output as Record<string, JSONValue>;
@@ -219,17 +219,17 @@ export class ToolResultHandler {
         : undefined;
 
     // detach: fire-and-forget, AI gets taskId immediately, result arrives later
-    // wakeUp: original message is never modified — deferred message carries the real result
-    // Both start as "pending" — handleTaskCompletion/resume-stream backfill when done
+    // wakeUp: original message is never modified - deferred message carries the real result
+    // Both start as "pending" - handleTaskCompletion/resume-stream backfill when done
     const isBackground =
       !effectiveIsError &&
       (toolCallData.toolCall.callbackMode === "detach" ||
         toolCallData.toolCall.callbackMode === "wakeUp");
     // Mark as "pending" for remote wait when:
-    // 1. streamContext.waitingForRemoteResult=true — set by escalateToTask or remote queue WAIT/END_LOOP
+    // 1. streamContext.waitingForRemoteResult=true - set by escalateToTask or remote queue WAIT/END_LOOP
     //    before processToolResult is called. This covers escalated tools (e.g. claude-code) whose
     //    own output shape doesn't signal pending.
-    // 2. Output shape {status: "status.pending"} — set by execute-tool for remote queue WAIT/wakeUp.
+    // 2. Output shape {status: "status.pending"} - set by execute-tool for remote queue WAIT/wakeUp.
     //    tools-loader unwraps success().data, so output is {status: "status.pending"} directly.
     let isWaitingForRemote =
       !effectiveIsError && streamContext?.waitingForRemoteResult === true;
@@ -265,13 +265,13 @@ export class ToolResultHandler {
     }
 
     // For wait/wakeUp-escalated tools (isWaitingForRemote=true): the tool message
-    // stays in "executing" state with no result — the real result arrives via
+    // stays in "executing" state with no result - the real result arrives via
     // handleTaskCompletion → resume-stream when the background task completes.
     // Do NOT emit any result now; leave the message as-is in DB.
     // Only on cancel will a "failed/cancelled" result be written (by cancel/repository.ts).
     if (isWaitingForRemote && !effectiveIsError) {
       logger.debug(
-        "[AI Stream] Skipping tool result emit — tool is waiting for remote task",
+        "[AI Stream] Skipping tool result emit - tool is waiting for remote task",
         { toolMessageId, toolName: part.toolName },
       );
       return { currentParentId: toolMessageId };
@@ -328,7 +328,7 @@ export class ToolResultHandler {
       typeof output.taskId === "string"
     ) {
       const bgTaskId = output.taskId;
-      // Fire-and-forget — don't block the stream response
+      // Fire-and-forget - don't block the stream response
       void (async (): Promise<void> => {
         try {
           const { db } = await import("@/app/api/[locale]/system/db");

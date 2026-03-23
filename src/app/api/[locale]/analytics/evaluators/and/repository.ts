@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — AND Evaluator Pure Computation
+ * Vibe Sense - AND Evaluator Pure Computation
  * Server-only.
  */
 

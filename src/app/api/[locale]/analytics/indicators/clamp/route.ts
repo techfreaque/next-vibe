@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Clamp Route
+ * Vibe Sense - Clamp Route
  * Server-only.
  */
 

@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
       fn: {
         label: "Funkcja",
         description:
-          "Ciało funkcji — otrzymuje tablicę inputs, zwraca SignalEvent[]",
+          "Ciało funkcji - otrzymuje tablicę inputs, zwraca SignalEvent[]",
       },
       signals: {
         label: "Sygnały",

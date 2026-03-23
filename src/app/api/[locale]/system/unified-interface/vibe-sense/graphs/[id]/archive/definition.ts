@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Archive Definition
+ * Vibe Sense - Graph Archive Definition
  */
 
 import { z } from "zod";
@@ -18,8 +18,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { scopedTranslation } from "./i18n";
 
 const ArchiveWidget = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.ArchiveWidget })),

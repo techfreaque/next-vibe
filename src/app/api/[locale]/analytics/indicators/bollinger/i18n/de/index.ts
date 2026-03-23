@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Bollinger Bänder",
     description:
-      "Bollinger Bänder — oberes, mittleres (SMA) und unteres Band mit Standardabweichung",
+      "Bollinger Bänder - oberes, mittleres (SMA) und unteres Band mit Standardabweichung",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "MACD",
     description:
-      "Gleitender Durchschnitt Konvergenz Divergenz — trendfolgendes Momentum-Indikator",
+      "Gleitender Durchschnitt Konvergenz Divergenz - trendfolgendes Momentum-Indikator",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

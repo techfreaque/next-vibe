@@ -11,12 +11,12 @@ export const translations: typeof enTranslations = {
         title: "Uruchom Claude Code",
         dynamicTitle: "Claude Code: {{prompt}}",
         description:
-          "Uruchamia zadanie Claude Code. Tryb wsadowy (DOMYŚLNY): działa bezgłowo i zwraca wynik. Tryb interaktywny: otwiera sesję terminala na żywo — wynik jest dostarczany automatycznie gdy sesja się kończy.",
+          "Uruchamia zadanie Claude Code. Tryb wsadowy (DOMYŚLNY): działa bezgłowo i zwraca wynik. Tryb interaktywny: otwiera sesję terminala na żywo - wynik jest dostarczany automatycznie gdy sesja się kończy.",
         fields: {
           prompt: {
             label: "Prompt",
             description:
-              "Zadanie lub pytanie dla Claude Code. Bądź konkretny — podaj ścieżki plików, kontekst i oczekiwany format wyjścia.",
+              "Zadanie lub pytanie dla Claude Code. Bądź konkretny - podaj ścieżki plików, kontekst i oczekiwany format wyjścia.",
           },
           model: {
             label: "Model",
@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
           interactiveMode: {
             label: "Tryb interaktywny",
             description:
-              "false (DOMYŚLNY): działa bezgłowo i zwraca cały wynik po zakończeniu. true: otwiera okno terminala dla sesji na żywo — wynik jest dostarczany automatycznie gdy sesja się kończy.",
+              "false (DOMYŚLNY): działa bezgłowo i zwraca cały wynik po zakończeniu. true: otwiera okno terminala dla sesji na żywo - wynik jest dostarczany automatycznie gdy sesja się kończy.",
           },
           output: {
             label: "Wyjście",
@@ -72,11 +72,11 @@ export const translations: typeof enTranslations = {
           validation: {
             title: "Błąd walidacji",
             description:
-              "Nieprawidłowe parametry żądania — sprawdź prompt i pola",
+              "Nieprawidłowe parametry żądania - sprawdź prompt i pola",
           },
           unauthorized: {
             title: "Brak autoryzacji",
-            description: "Wymagane uwierzytelnienie — potrzebna rola admina",
+            description: "Wymagane uwierzytelnienie - potrzebna rola admina",
           },
           internal: {
             title: "Wykonanie nie powiodło się",
@@ -90,7 +90,7 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Zabronione",
-            description: "Odmowa dostępu — niewystarczające uprawnienia",
+            description: "Odmowa dostępu - niewystarczające uprawnienia",
           },
           notFound: {
             title: "Nie znaleziono",
@@ -111,7 +111,7 @@ export const translations: typeof enTranslations = {
           conflict: {
             title: "Konflikt",
             description:
-              "Konflikt wykonania — możliwe że inna sesja już działa",
+              "Konflikt wykonania - możliwe że inna sesja już działa",
           },
         },
         success: {
@@ -123,7 +123,7 @@ export const translations: typeof enTranslations = {
           runningBatch: "Claude działa...",
           runningInteractive: "Uruchamianie interaktywnej sesji terminala...",
           escalated:
-            "Działa w tle — wynik zostanie injektowany po zakończeniu.",
+            "Działa w tle - wynik zostanie injektowany po zakończeniu.",
           taskIdLabel: "ID zadania",
           outputLabel: "Wyjście",
           interactiveSessionLaunched:

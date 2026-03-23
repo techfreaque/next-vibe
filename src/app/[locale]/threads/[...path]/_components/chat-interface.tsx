@@ -1,13 +1,15 @@
 "use client";
 
-import { AlertDialog } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogAction } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogCancel } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogContent } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogDescription } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogFooter } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogHeader } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe-ui/ui/alert-dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -101,7 +103,7 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
         {/* Sidebar and Main Chat Area */}
         <ErrorBoundary locale={locale}>
           <SidebarWrapper locale={locale} user={user} logger={logger}>
-            {/* Main Content Area — public feed or chat */}
+            {/* Main Content Area - public feed or chat */}
             <ErrorBoundary locale={locale}>
               {isPublicFeed ? (
                 <EndpointsPage

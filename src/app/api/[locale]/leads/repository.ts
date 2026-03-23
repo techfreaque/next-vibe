@@ -507,7 +507,7 @@ export class LeadsRepository {
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
-      // Build base conditions without status filter — used for per-status counts
+      // Build base conditions without status filter - used for per-status counts
       // so all tabs show accurate counts simultaneously regardless of active status filter
       const baseConditions: SQL[] = [];
       if (campaignStageFilters && campaignStageFilters.length > 0) {
@@ -584,7 +584,7 @@ export class LeadsRepository {
         .from(leads)
         .where(whereClause);
 
-      // Per-status counts — independent of the active status filter
+      // Per-status counts - independent of the active status filter
       const [
         countNew,
         countPending,

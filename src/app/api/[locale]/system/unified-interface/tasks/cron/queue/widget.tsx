@@ -65,15 +65,10 @@ import {
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 
-import cronTaskIdDefinition from "../[id]/definition";
-import cronTasksDefinition from "../tasks/definition";
-import cronHistoryDefinition from "../history/definition";
-import executeDefinition from "../../execute/definition";
-import bulkEndpoints from "../bulk/definition";
 import type {
   CronTaskPriorityDB,
-  TaskCategoryDB,
   CronTaskPriorityFilterValue,
+  TaskCategoryDB,
   TaskCategoryValue,
 } from "../../enum";
 import {
@@ -83,7 +78,12 @@ import {
   CronTaskStatus,
   TaskCategoryOptions,
 } from "../../enum";
+import executeDefinition from "../../execute/definition";
 import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
+import cronTaskIdDefinition from "../[id]/definition";
+import bulkEndpoints from "../bulk/definition";
+import cronHistoryDefinition from "../history/definition";
+import cronTasksDefinition from "../tasks/definition";
 import type endpoints from "./definition";
 import type { CronQueueListResponseOutput } from "./definition";
 
@@ -217,7 +217,7 @@ function getStatusColorClass(status: string | null): string {
 }
 
 // ---------------------------------------------------------------------------
-// Countdown cell — re-renders every second
+// Countdown cell - re-renders every second
 // ---------------------------------------------------------------------------
 
 function CountdownCell({
@@ -335,7 +335,7 @@ function QueueRow({
         </Span>
       </Div>
 
-      {/* Countdown — most important info */}
+      {/* Countdown - most important info */}
       <Div className="flex-shrink-0 flex flex-col items-end gap-0.5 min-w-[90px]">
         <CountdownCell
           nextExecutionAt={task.nextExecutionAt}
@@ -759,7 +759,7 @@ export function CronQueueContainer({ field }: WidgetProps): React.JSX.Element {
         .mutateAsync({ requestData: { ids, action } })
         .then(async () => {
           handleClearSelection();
-          // Update caches optimistically — no refetch needed
+          // Update caches optimistically - no refetch needed
           const { apiClient } =
             await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
           const tasksDef = await import("../tasks/definition");

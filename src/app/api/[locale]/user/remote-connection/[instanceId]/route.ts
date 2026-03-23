@@ -1,6 +1,6 @@
 /**
  * Remote Connection by Instance ID Route Handler
- * GET — status of this connection
+ * GET - status of this connection
  */
 
 import "server-only";

@@ -61,7 +61,7 @@ export const translations = {
       title: "Skills Loaded",
       description: "Reported skills retrieved successfully",
     },
-    empty: "No reported skills — community looks healthy!",
+    empty: "No reported skills - community looks healthy!",
     action: {
       moderate: "Moderate",
     },

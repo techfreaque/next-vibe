@@ -1,5 +1,5 @@
 /**
- * Users Email Verified — Route
+ * Users Email Verified - Route
  * Server-only.
  */
 

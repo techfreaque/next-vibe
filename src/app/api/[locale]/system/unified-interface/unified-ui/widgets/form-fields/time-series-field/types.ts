@@ -1,6 +1,6 @@
 /**
  * Time Series Field Widget Types
- * Handles TIME_SERIES field type — array of DataPoints.
+ * Handles TIME_SERIES field type - array of DataPoints.
  * Used as input/output handles on vibe-sense graph nodes.
  */
 

@@ -18,8 +18,8 @@ import type {
   PublicCapGetResponseOutput,
   PublicCapPostResponseOutput,
 } from "./definition";
-import { scopedTranslation } from "./i18n";
 import type { PublicCapT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 /** YYYY-MM-DD string for today in server local time */
 export class PublicCapRepository {
@@ -42,7 +42,7 @@ export class PublicCapRepository {
       const [row] = await db.select().from(publicFreeTierDailyCap).limit(1);
 
       if (!row) {
-        // First ever call — seed the row
+        // First ever call - seed the row
         const [created] = await db
           .insert(publicFreeTierDailyCap)
           .values({ capAmount: PublicCapRepository.DEFAULT_CAP, spendToday: 0 })
@@ -88,7 +88,7 @@ export class PublicCapRepository {
   }
 
   /**
-   * GET handler — returns current status for admin view.
+   * GET handler - returns current status for admin view.
    */
   static async getStatus(
     logger: EndpointLogger,
@@ -117,7 +117,7 @@ export class PublicCapRepository {
   }
 
   /**
-   * POST handler — update the cap amount.
+   * POST handler - update the cap amount.
    */
   static async updateCap(
     capAmount: number,
@@ -190,7 +190,7 @@ export class PublicCapRepository {
         })
         .where(eq(publicFreeTierDailyCap.id, row.id));
     } catch (error) {
-      // Non-fatal — log and continue, don't fail the credit deduction
+      // Non-fatal - log and continue, don't fail the credit deduction
       logger.error("Failed to increment public cap spend", parseError(error));
     }
   }
@@ -209,14 +209,14 @@ export class PublicCapRepository {
       const [row] = await db.select().from(publicFreeTierDailyCap).limit(1);
 
       if (!row) {
-        // No row yet means no spend yet — allow
+        // No row yet means no spend yet - allow
         return success(undefined);
       }
 
       // Lazy midnight reset
       const resetDate = row.lastResetAt.toISOString().slice(0, 10);
       if (resetDate !== PublicCapRepository.todayString()) {
-        // New day — reset and allow
+        // New day - reset and allow
         await db
           .update(publicFreeTierDailyCap)
           .set({
@@ -238,7 +238,7 @@ export class PublicCapRepository {
       return success(undefined);
     } catch (error) {
       logger.error("Failed to check public cap", parseError(error));
-      // On error, allow — don't block users due to cap check failure
+      // On error, allow - don't block users due to cap check failure
       return success(undefined);
     }
   }

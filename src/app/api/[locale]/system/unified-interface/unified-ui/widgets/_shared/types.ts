@@ -74,7 +74,7 @@ export interface BaseWidgetProps<
  * Value type is inferred from the field's schema for type safety.
  */
 /**
- * Distributive conditional — each union member of TWidgetConfig
+ * Distributive conditional - each union member of TWidgetConfig
  * gets its own value type, enabling schemaType-based narrowing
  * via hasChild/hasChildren guards.
  */

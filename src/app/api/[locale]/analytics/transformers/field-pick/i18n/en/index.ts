@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "Field Pick",
     description:
-      "Field Pick — extracts a named field from a time series (superseded, returns empty)",
+      "Field Pick - extracts a named field from a time series (superseded, returns empty)",
     fields: {
       source: { label: "Source", description: "Input time series" },
       field: {

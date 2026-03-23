@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -61,7 +61,7 @@ const { PATCH } = createEndpoint({
       backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
-      // Filter criteria — hidden fields prefilled from list widget
+      // Filter criteria - hidden fields prefilled from list widget
       ...leadsBatchFilterFields,
       scope: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -322,7 +322,7 @@ const { DELETE } = createEndpoint({
       backButton: backButton(scopedTranslation, {
         usage: { response: true },
       }),
-      // Filter criteria — hidden fields prefilled from list widget
+      // Filter criteria - hidden fields prefilled from list widget
       ...leadsBatchFilterFields,
       confirmDelete: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

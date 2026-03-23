@@ -169,7 +169,7 @@ export class FolderContentsRepository {
           rolesPost: folder.rolesPost ?? [],
           rolesModerate: folder.rolesModerate ?? [],
           rolesAdmin: folder.rolesAdmin ?? [],
-          // Thread-only fields — null for folders
+          // Thread-only fields - null for folders
           title: null,
           folderId: null,
           status: null,
@@ -330,7 +330,7 @@ export class FolderContentsRepository {
           rolesPost: thread.rolesPost ?? null,
           rolesModerate: thread.rolesModerate ?? null,
           rolesAdmin: thread.rolesAdmin ?? null,
-          // Folder-only fields — null for threads
+          // Folder-only fields - null for threads
           name: null,
           icon: null,
           color: null,

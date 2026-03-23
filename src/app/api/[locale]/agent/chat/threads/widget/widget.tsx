@@ -1,31 +1,33 @@
 /**
  * Custom Widget for Threads List
- * Renders threads for a given folder — used by EndpointsPage from folders/widget.tsx
+ * Renders threads for a given folder - used by EndpointsPage from folders/widget.tsx
  */
 
 "use client";
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
-import { AlertDialog } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogAction } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogCancel } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogContent } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogDescription } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogFooter } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogHeader } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe-ui/ui/alert-dialog";
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivMouseEvent } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
-import { DropdownMenu } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuContent } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSeparator } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSub } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSubContent } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSubTrigger } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "next-vibe-ui/ui/dropdown-menu";
 import { Archive } from "next-vibe-ui/ui/icons/Archive";
 import { ArchiveRestore } from "next-vibe-ui/ui/icons/ArchiveRestore";
 import { Edit2 } from "next-vibe-ui/ui/icons/Edit2";
@@ -39,11 +41,15 @@ import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import type { InputKeyboardEvent } from "next-vibe-ui/ui/input";
 import { Input } from "next-vibe-ui/ui/input";
-import { Tooltip } from "next-vibe-ui/ui/tooltip";
-import { TooltipContent } from "next-vibe-ui/ui/tooltip";
-import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
-import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
+import { success } from "next-vibe/shared/types/response.schema";
+import { cn } from "next-vibe/shared/utils";
 import React, { useEffect, useMemo, useState } from "react";
 
 import {
@@ -73,7 +79,7 @@ type ThreadFromResponse = ThreadListResponseOutput["threads"][number];
 type FolderFromResponse = FolderListResponseOutput["folders"][number];
 
 /**
- * Props for custom widget — matches the customWidgetObject pattern
+ * Props for custom widget - matches the customWidgetObject pattern
  */
 interface CustomWidgetProps {
   field: {
@@ -121,7 +127,7 @@ function ThreadRow({
     if (e.target.closest?.("button") || e.target.closest?.("input")) {
       return;
     }
-    // Update Zustand store — single source of truth
+    // Update Zustand store - single source of truth
     setNavigation({
       activeThreadId: thread.id,
       currentRootFolderId: thread.rootFolderId as DefaultFolderId,
@@ -142,7 +148,7 @@ function ThreadRow({
     archived?: boolean;
     folderId?: string | null;
   }): Promise<void> => {
-    // Optimistic update — apply immediately in cache
+    // Optimistic update - apply immediately in cache
     const threadsDefModule = await import("../definition");
     const isFolderMove =
       "folderId" in updates && updates.folderId !== thread.folderId;
@@ -246,7 +252,7 @@ function ThreadRow({
 
   const handleConfirmDelete = (): void => {
     void (async (): Promise<void> => {
-      // Optimistic update — remove thread from cache immediately
+      // Optimistic update - remove thread from cache immediately
       const threadsDefModule = await import("../definition");
       apiClient.updateEndpointData(
         threadsDefModule.default.GET,
@@ -460,7 +466,7 @@ function ThreadRow({
                   </DropdownMenuItem>
                 )}
 
-                {/* Manage Sharing — only for threads in SHARED folder */}
+                {/* Manage Sharing - only for threads in SHARED folder */}
                 {/* eslint-disable-next-line i18next/no-literal-string */}
                 {thread.rootFolderId === "shared" && thread.canEdit && (
                   <DropdownMenuItem
@@ -770,7 +776,7 @@ export function ThreadsList({
 }
 
 /**
- * ThreadsListContainer — the widget rendered by EndpointsPage for threads/definition GET.
+ * ThreadsListContainer - the widget rendered by EndpointsPage for threads/definition GET.
  * Only used as fallback; primary rendering is done via ThreadsList in folders/widget.tsx.
  */
 export function ThreadsListContainer({

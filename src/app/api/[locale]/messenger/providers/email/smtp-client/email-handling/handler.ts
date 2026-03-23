@@ -23,7 +23,7 @@ import type {
 export type { EmailRenderProps, EmailResolvedData };
 
 /**
- * Email Function Type — resolver that maps request context to email data.
+ * Email Function Type - resolver that maps request context to email data.
  */
 export type EmailFunctionType<
   TRequest,
@@ -45,7 +45,7 @@ export type EmailFunctionType<
   | ErrorResponseType;
 
 /**
- * Email handler — carries the template typed by its render/scopedTranslation surface.
+ * Email handler - carries the template typed by its render/scopedTranslation surface.
  * TUserRoles flows from the endpoint's allowedRoles so user is properly typed.
  * The template's translation key is widened to string since templates use their own scopedT.
  */

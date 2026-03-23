@@ -1,5 +1,5 @@
 /**
- * Users Banned — Endpoint Definition
+ * Users Banned - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

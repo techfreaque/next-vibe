@@ -3,7 +3,7 @@
  *
  * When a file named "widget.tsx" is loaded, this plugin checks if a sibling
  * "widget.cli.tsx" or "widget.cli.ts" exists and re-exports it instead.
- * Only active in the CLI Bun process — the Next.js child process spawned by
+ * Only active in the CLI Bun process - the Next.js child process spawned by
  * `vibe dev` is unaffected (separate process).
  *
  * For widget.tsx files WITHOUT a CLI override, a no-op stub is returned so
@@ -11,12 +11,12 @@
  *
  * Note: `export * from "widget.cli.tsx"` can trigger non-deterministic
  * "Cannot access 'default' before initialization" warnings during vibe gen.
- * This is a Bun limitation — synthetic onLoad modules with `export *` create
+ * This is a Bun limitation - synthetic onLoad modules with `export *` create
  * a dependency chain that races with the importing definition's initialization.
  * Bun ignores the `loader` field in onLoad (always uses original extension),
  * so inlining .tsx content fails. And onResolve doesn't fire for relative
  * imports Bun resolves internally, so path redirection isn't possible either.
- * The endpoint generator handles these gracefully — definitions still register
+ * The endpoint generator handles these gracefully - definitions still register
  * and work correctly at runtime.
  */
 
@@ -27,7 +27,7 @@ import { plugin } from "bun";
 
 // Import JSX runtimes before NODE_ENV can be set to "production" by environment.ts.
 // Bun always uses jsxDEV for .tsx transpilation. React's jsx-dev-runtime.js gates
-// its exports on NODE_ENV — importing here caches the dev version in Bun's module
+// its exports on NODE_ENV - importing here caches the dev version in Bun's module
 // registry before loadEnvironment() runs and changes NODE_ENV.
 // This file is the first static import in vibe-runtime.ts, so it evaluates before
 // run-cli.ts (which calls loadEnvironment() at module level).
@@ -85,7 +85,7 @@ plugin({
         }
       }
 
-      // No CLI override — stub out React widget with no-op exports
+      // No CLI override - stub out React widget with no-op exports
       return {
         contents: [
           "const noop = () => null;", // eslint-disable-line i18next/no-literal-string

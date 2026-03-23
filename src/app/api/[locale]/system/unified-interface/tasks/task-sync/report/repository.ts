@@ -147,7 +147,7 @@ export class TaskReportRepository {
           serverTz: data.serverTimezone,
         });
 
-        // Read revival context from typed wakeUp* columns — not from untyped taskInput JSON.
+        // Read revival context from typed wakeUp* columns - not from untyped taskInput JSON.
         const toolMessageId = task.wakeUpToolMessageId ?? null;
         const threadId = task.wakeUpThreadId ?? null;
         const rawCallbackMode = task.wakeUpCallbackMode;

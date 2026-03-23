@@ -249,8 +249,8 @@ export const payoutUserEmailTemplate: EmailTemplateDefinition<
       }
       const isCrypto = requestData.currency !== PayoutCurrency.CREDITS;
       const subject = isCrypto
-        ? `${t("payout.email.user.subjectCrypto")} — ${globalT("config.appName")}`
-        : `${t("payout.email.user.subjectCredits")} — ${globalT("config.appName")}`;
+        ? `${t("payout.email.user.subjectCrypto")} - ${globalT("config.appName")}`
+        : `${t("payout.email.user.subjectCredits")} - ${globalT("config.appName")}`;
       const tracking = createTrackingContext(locale, user.leadId, user.id);
       const jsx = (
         <PayoutUserEmail
@@ -374,7 +374,7 @@ export const payoutAdminEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: adminEmail,
         toName: globalT("config.appName"),
-        subject: `[${globalT("config.appName")}] ${t("payout.email.admin.subject")} — ${requestData.amountCents} ${t("payout.email.admin.credits")} via ${requestData.currency}`,
+        subject: `[${globalT("config.appName")}] ${t("payout.email.admin.subject")} - ${requestData.amountCents} ${t("payout.email.admin.credits")} via ${requestData.currency}`,
         replyToEmail: userEmail,
         replyToName: userEmail,
         leadId: user.leadId,
@@ -411,7 +411,7 @@ function renderAdminPayoutEmailContent(
   return (
     <EmailTemplate
       locale={locale}
-      title={`${t("payout.email.admin.title")} — ${globalT("config.appName")}`}
+      title={`${t("payout.email.admin.title")} - ${globalT("config.appName")}`}
       previewText={t("payout.email.admin.preview")}
       recipientEmail={recipientEmail}
       tracking={createTrackingContext(locale)}

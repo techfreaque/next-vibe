@@ -60,13 +60,13 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Memory budget in chars (null = inherit from skill → user settings; overrides for this favorite)
   memoryLimit: integer("memory_limit"),
 
-  // Tool configuration — null = fall through to character/settings default
+  // Tool configuration - null = fall through to character/settings default
   availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
   pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
   // Additional tool blocks on top of skill defaults
   deniedTools: jsonb("denied_tools").$type<ToolConfigItem[] | null>(),
 
-  // User-level prompt customization — appended to skill's systemPrompt
+  // User-level prompt customization - appended to skill's systemPrompt
   promptAppend: text("prompt_append"),
 
   // Sub-agent favorite override: which favorite config sub-agents spawned by this favorite inherit

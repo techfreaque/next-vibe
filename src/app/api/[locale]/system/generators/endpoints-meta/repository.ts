@@ -8,7 +8,7 @@
  * fields (title, description, category, tags) plus raw structural data
  * (method, path, allowedRoles, aliases, icon, toolName).
  *
- * These files are pure data — no TS imports of definition files — so they are
+ * These files are pure data - no TS imports of definition files - so they are
  * tiny, fast, and safe to import on any platform including the client.
  */
 
@@ -70,7 +70,7 @@ interface EndpointsMetaResponseType {
 
 /**
  * The shape of each entry in the generated metadata array.
- * Kept as a plain interface (no Zod) — this lives in generated files only.
+ * Kept as a plain interface (no Zod) - this lives in generated files only.
  */
 interface EndpointMeta {
   /** Full tool name: path segments joined by "_" + "_" + METHOD */
@@ -278,12 +278,12 @@ export class EndpointsMetaGeneratorRepository {
             return (await import(defFile)) as { default?: ApiSection };
           } catch (retryError) {
             logger.warn(
-              `Could not load definition: ${defFile} — ${parseError(retryError).message}`,
+              `Could not load definition: ${defFile} - ${parseError(retryError).message}`,
             );
             return null;
           }
         }
-        logger.warn(`Could not load definition: ${defFile} — ${msg}`);
+        logger.warn(`Could not load definition: ${defFile} - ${msg}`);
         return null;
       }
     };
@@ -293,7 +293,7 @@ export class EndpointsMetaGeneratorRepository {
       return null;
     }
 
-    // Access .default with retry — Bun plugin race can throw TDZ here too
+    // Access .default with retry - Bun plugin race can throw TDZ here too
     let defaultExport: ApiSection | undefined;
     try {
       defaultExport = mod.default;
@@ -307,12 +307,12 @@ export class EndpointsMetaGeneratorRepository {
           defaultExport = mod.default;
         } catch (retryError) {
           logger.warn(
-            `Could not access default export: ${defFile} — ${parseError(retryError).message}`,
+            `Could not access default export: ${defFile} - ${parseError(retryError).message}`,
           );
           return null;
         }
       } else {
-        logger.warn(`Could not access default export: ${defFile} — ${msg}`);
+        logger.warn(`Could not access default export: ${defFile} - ${msg}`);
         return null;
       }
     }
@@ -372,21 +372,21 @@ export class EndpointsMetaGeneratorRepository {
       try {
         title = t(definition.title);
       } catch {
-        /* missing translation — keep raw key */
+        /* missing translation - keep raw key */
       }
       try {
         description = t(definition.description);
       } catch {
-        /* missing translation — keep raw key */
+        /* missing translation - keep raw key */
       }
 
-      // Translate category via global i18n (cast to string — global keys are wider)
+      // Translate category via global i18n (cast to string - global keys are wider)
       let category: string = definition.category;
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         category = globalT(definition.category as any);
       } catch {
-        /* missing translation — keep raw key */
+        /* missing translation - keep raw key */
       }
 
       // Translate tags via scoped i18n
@@ -528,7 +528,7 @@ export class EndpointsMetaGeneratorRepository {
 
   /**
    * Render the TypeScript source for one locale file.
-   * Pure data export — no imports of definition files.
+   * Pure data export - no imports of definition files.
    */
   private static renderFile(
     entries: EndpointMeta[],

@@ -1,11 +1,11 @@
-# Machine Access — Specification
+# Machine Access - Specification
 
 > Gives the AI agent and admin users terminal access to Linux machines.
 >
 > Two backends, same tool surface:
 >
-> - **Local** (`LOCAL_MODE=true`) — `child_process` on the host machine, running as the current OS user the app process runs as. Zero config. Default for self-hosted VPS.
-> - **SSH** — connects to remote machines via ssh2. For multi-server setups.
+> - **Local** (`LOCAL_MODE=true`) - `child_process` on the host machine, running as the current OS user the app process runs as. Zero config. Default for self-hosted VPS.
+> - **SSH** - connects to remote machines via ssh2. For multi-server setups.
 >
 > `connectionId` absent → local. `connectionId` present → SSH.
 
@@ -13,7 +13,7 @@
 
 ## Motivation
 
-Machine access extends the AI chat to real server ops: deploy code, tail logs, manage services, edit configs — all from a chat conversation.
+Machine access extends the AI chat to real server ops: deploy code, tail logs, manage services, edit configs - all from a chat conversation.
 
 In LOCAL_MODE the app already runs as a real Linux user (whoever launched it). No separate agent user, no sudo wrangling, no key management. The AI just runs commands as that same user. Simple.
 
@@ -25,15 +25,15 @@ All endpoints are definition-driven → automatically become AI tools via the ex
 
 ## Core concepts
 
-**Current process user (LOCAL_MODE)** — the OS user running the Next.js process (e.g. `max`, `deploy`, `www-data`). The app uses `child_process.exec` with no user-switching. What the process user can do, the AI can do. Admins control permissions at the OS level by choosing which user to run the app as.
+**Current process user (LOCAL_MODE)** - the OS user running the Next.js process (e.g. `max`, `deploy`, `www-data`). The app uses `child_process.exec` with no user-switching. What the process user can do, the AI can do. Admins control permissions at the OS level by choosing which user to run the app as.
 
-**SSH connection** — a stored SSH config (host, port, user, auth). Persists in DB. One or many per admin user. Used for remote machines.
+**SSH connection** - a stored SSH config (host, port, user, auth). Persists in DB. One or many per admin user. Used for remote machines.
 
-**Session (SSH only)** — live `ssh2.Client` instance, kept in memory, keyed by `connectionId + threadId`. 5 min idle TTL. Reused across calls in the same chat thread.
+**Session (SSH only)** - live `ssh2.Client` instance, kept in memory, keyed by `connectionId + threadId`. 5 min idle TTL. Reused across calls in the same chat thread.
 
-**PTY session (SSH only)** — pseudo-terminal for interactive/long-running processes (REPLs, `top`, `tail -f`). AI writes input, reads buffered output.
+**PTY session (SSH only)** - pseudo-terminal for interactive/long-running processes (REPLs, `top`, `tail -f`). AI writes input, reads buffered output.
 
-**Linux OS user management** — admin-only endpoints to create/list/delete/lock Linux accounts on the host. Only for LOCAL_MODE. Uses `useradd`, `userdel`, `usermod`, `passwd` via child_process.
+**Linux OS user management** - admin-only endpoints to create/list/delete/lock Linux accounts on the host. Only for LOCAL_MODE. Uses `useradd`, `userdel`, `usermod`, `passwd` via child_process.
 
 ---
 
@@ -79,7 +79,7 @@ src/app/api/[locale]/ssh/
 │       ├── widget.tsx               ← connectivity test result card
 │       └── i18n/{de,en,pl}/index.ts
 │
-├── session/                         ← SSH PTY only (no widget needed — terminal widget covers this)
+├── session/                         ← SSH PTY only (no widget needed - terminal widget covers this)
 │   ├── open/
 │   │   ├── definition.ts
 │   │   ├── repository.ts
@@ -202,7 +202,7 @@ export enum ExecBackend {
 
 ## Database schema (`db.ts`)
 
-### `ssh_connections` — SSH mode only
+### `ssh_connections` - SSH mode only
 
 | Column          | Type    | Notes                                          |
 | --------------- | ------- | ---------------------------------------------- |
@@ -247,42 +247,42 @@ Sessions are lost on process restart. The AI reopens them transparently on next 
 
 ## Endpoints
 
-### `POST /ssh/exec` — **tool: `ssh_exec_POST`** ← PRIMARY AI TOOL
+### `POST /ssh/exec` - **tool: `ssh_exec_POST`** ← PRIMARY AI TOOL
 
 Run a single shell command. Backend selected by presence of `connectionId`.
 
 **Request:**
 
 ```
-connectionId?  — omit → LOCAL backend; provide → SSH backend
-command        — shell command string
-timeoutMs?     — default 30 000, max 300 000
-workingDir?    — cd to this path before running
-env?           — { KEY: "value" } extra env vars merged with process env
+connectionId?  - omit → LOCAL backend; provide → SSH backend
+command        - shell command string
+timeoutMs?     - default 30 000, max 300 000
+workingDir?    - cd to this path before running
+env?           - { KEY: "value" } extra env vars merged with process env
 ```
 
 **Response:**
 
 ```
-stdout         — string, capped at max output bytes
-stderr         — string, capped at max output bytes
-exitCode       — number
-status         — SUCCESS | ERROR | TIMEOUT
-durationMs     — number
-backend        — LOCAL | SSH
-sessionId?     — SSH only: session used (created or reused)
-truncated?     — true if output was capped
+stdout         - string, capped at max output bytes
+stderr         - string, capped at max output bytes
+exitCode       - number
+status         - SUCCESS | ERROR | TIMEOUT
+durationMs     - number
+backend        - LOCAL | SSH
+sessionId?     - SSH only: session used (created or reused)
+truncated?     - true if output was capped
 ```
 
 **Local behaviour:** `child_process.exec(command, { cwd, env })` as the current process user. No user switching. `workingDir` validated as absolute path, no `..` traversal.
 
 **SSH behaviour:** opens/reuses a persistent session keyed by `connectionId + threadId`. Shell state (cwd, env) persists within a thread session when `keepSession: true` (default).
 
-**Output truncation:** stdout and stderr capped at `LOCAL_MAX_OUTPUT_BYTES` / `SSH_MAX_OUTPUT_BYTES` (default 32 KB each). If truncated, `truncated: true` and last line is `[output truncated — use ssh_files_read_GET to retrieve full output]`.
+**Output truncation:** stdout and stderr capped at `LOCAL_MAX_OUTPUT_BYTES` / `SSH_MAX_OUTPUT_BYTES` (default 32 KB each). If truncated, `truncated: true` and last line is `[output truncated - use ssh_files_read_GET to retrieve full output]`.
 
 ---
 
-### `GET /ssh/connections/list` — **tool: `ssh_connections_list_GET`**
+### `GET /ssh/connections/list` - **tool: `ssh_connections_list_GET`**
 
 All SSH connections for the requesting user. No secret fields returned.
 
@@ -290,7 +290,7 @@ All SSH connections for the requesting user. No secret fields returned.
 
 ---
 
-### `POST /ssh/connections/create` — **tool: `ssh_connections_create_POST`**
+### `POST /ssh/connections/create` - **tool: `ssh_connections_create_POST`**
 
 Save a new SSH connection.
 
@@ -298,9 +298,9 @@ Save a new SSH connection.
 
 ```
 label, host, port (default 22), username, authType,
-secret         — password or PEM private key (encrypted immediately on arrival)
-passphrase?    — PEM passphrase (encrypted)
-isDefault?     — bool
+secret         - password or PEM private key (encrypted immediately on arrival)
+passphrase?    - PEM passphrase (encrypted)
+isDefault?     - bool
 notes?
 ```
 
@@ -308,7 +308,7 @@ notes?
 
 ---
 
-### `GET /PATCH /DELETE /ssh/connections/[id]` — **tools: `ssh_connections_id_GET/PATCH/DELETE`**
+### `GET /PATCH /DELETE /ssh/connections/[id]` - **tools: `ssh_connections_id_GET/PATCH/DELETE`**
 
 - **GET**: connection detail (no secrets).
 - **PATCH**: update any field. If `secret` provided, re-encrypt and store.
@@ -316,7 +316,7 @@ notes?
 
 ---
 
-### `POST /ssh/connections/test` — **tool: `ssh_connections_test_POST`**
+### `POST /ssh/connections/test` - **tool: `ssh_connections_test_POST`**
 
 Connect and immediately disconnect. Updates `fingerprint` on success.
 
@@ -328,7 +328,7 @@ Fails with `FINGERPRINT_CHANGED` error type if stored fingerprint no longer matc
 
 ---
 
-### `POST /ssh/session/open` — **tool: `ssh_session_open_POST`**
+### `POST /ssh/session/open` - **tool: `ssh_session_open_POST`**
 
 Open a PTY session for interactive use. SSH only.
 
@@ -338,17 +338,17 @@ Open a PTY session for interactive use. SSH only.
 
 ---
 
-### `POST /ssh/session/write` — **tool: `ssh_session_write_POST`**
+### `POST /ssh/session/write` - **tool: `ssh_session_write_POST`**
 
 Send input to an open PTY session.
 
-**Request:** `{ sessionId, input, raw? (default false — appends newline) }`
+**Request:** `{ sessionId, input, raw? (default false - appends newline) }`
 
 **Response:** `{ ok }`
 
 ---
 
-### `GET /ssh/session/read` — **tool: `ssh_session_read_GET`**
+### `GET /ssh/session/read` - **tool: `ssh_session_read_GET`**
 
 Drain buffered PTY output.
 
@@ -358,7 +358,7 @@ Drain buffered PTY output.
 
 ---
 
-### `POST /ssh/session/close` — **tool: `ssh_session_close_POST`**
+### `POST /ssh/session/close` - **tool: `ssh_session_close_POST`**
 
 Close a PTY or exec session.
 
@@ -366,13 +366,13 @@ Close a PTY or exec session.
 
 ---
 
-### `GET /ssh/terminal` — widget-only, no AI tool
+### `GET /ssh/terminal` - widget-only, no AI tool
 
-Server-side shell/pass-through for the browser terminal widget. The definition renders the `TerminalContainer` widget. No meaningful server response body — the widget opens its own WebSocket/SSE connection to the PTY for real-time I/O.
+Server-side shell/pass-through for the browser terminal widget. The definition renders the `TerminalContainer` widget. No meaningful server response body - the widget opens its own WebSocket/SSE connection to the PTY for real-time I/O.
 
 ---
 
-### `GET /ssh/files/list` — **tool: `ssh_files_list_GET`**
+### `GET /ssh/files/list` - **tool: `ssh_files_list_GET`**
 
 List directory contents.
 
@@ -384,7 +384,7 @@ Local: `fs.readdir` with `stat` per entry. SSH: SFTP `readdir`.
 
 ---
 
-### `GET /ssh/files/read` — **tool: `ssh_files_read_GET`**
+### `GET /ssh/files/read` - **tool: `ssh_files_read_GET`**
 
 Read a text file.
 
@@ -396,7 +396,7 @@ Local: `fs.readFile`. SSH: SFTP `createReadStream`.
 
 ---
 
-### `POST /ssh/files/write` — **tool: `ssh_files_write_POST`**
+### `POST /ssh/files/write` - **tool: `ssh_files_write_POST`**
 
 Write or overwrite a file.
 
@@ -408,7 +408,7 @@ Local: `fs.writeFile` (as current process user). SSH: SFTP `createWriteStream`.
 
 ---
 
-### `GET /ssh/linux/users/list` — **tool: `ssh_linux_users_list_GET`** (LOCAL_MODE + ADMIN)
+### `GET /ssh/linux/users/list` - **tool: `ssh_linux_users_list_GET`** (LOCAL_MODE + ADMIN)
 
 List OS user accounts on the host (uid ≥ 1000).
 
@@ -418,18 +418,18 @@ Parsed from `/etc/passwd` + `groups <username>` + `passwd -S <username>`.
 
 ---
 
-### `POST /ssh/linux/users/create` — **tool: `ssh_linux_users_create_POST`** (LOCAL_MODE + ADMIN)
+### `POST /ssh/linux/users/create` - **tool: `ssh_linux_users_create_POST`** (LOCAL_MODE + ADMIN)
 
 Create a new OS user account.
 
 **Request:**
 
 ```
-username      — lowercase, alphanumeric + hyphen, 1–32 chars
-groups?       — extra groups e.g. ["docker", "www-data"]
-shell?        — default /bin/bash
-homeDir?      — default /home/{username}
-sudoAccess?   — bool, default false
+username      - lowercase, alphanumeric + hyphen, 1–32 chars
+groups?       - extra groups e.g. ["docker", "www-data"]
+shell?        - default /bin/bash
+homeDir?      - default /home/{username}
+sudoAccess?   - bool, default false
 ```
 
 **Response:** `{ ok, uid, gid, homeDir, shell }`
@@ -438,7 +438,7 @@ Runs: `useradd --create-home --shell <shell> [--groups <groups>] <username>`
 
 ---
 
-### `DELETE /ssh/linux/users/[username]` — **tool: `ssh_linux_users_username_DELETE`** (LOCAL_MODE + ADMIN)
+### `DELETE /ssh/linux/users/[username]` - **tool: `ssh_linux_users_username_DELETE`** (LOCAL_MODE + ADMIN)
 
 Delete an OS user.
 
@@ -448,7 +448,7 @@ Refuses uid < 1000 or the current process user.
 
 ---
 
-### `POST /ssh/linux/users/[username]/lock` / `unlock` — **tools: `ssh_linux_users_username_lock/unlock_POST`** (LOCAL_MODE + ADMIN)
+### `POST /ssh/linux/users/[username]/lock` / `unlock` - **tools: `ssh_linux_users_username_lock/unlock_POST`** (LOCAL_MODE + ADMIN)
 
 Lock or unlock password login for an OS user.
 
@@ -458,7 +458,7 @@ Lock or unlock password login for an OS user.
 
 ## Widget descriptions
 
-### `exec/widget.tsx` — Command Runner
+### `exec/widget.tsx` - Command Runner
 
 A split-pane UI:
 
@@ -467,7 +467,7 @@ A split-pane UI:
 - **History**: collapsible list of previous commands run in this session (client-side only).
 - On submit: calls `ssh_exec_POST`, streams response into output area.
 
-### `terminal/widget.tsx` — Full PTY Terminal
+### `terminal/widget.tsx` - Full PTY Terminal
 
 A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`).
 
@@ -478,9 +478,9 @@ A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`
 - **Output polling**: `setInterval` every 100ms → calls `ssh_session_read_GET` → writes output into xterm.js terminal.
 - Resize: `ResizeObserver` on container → `addon-fit` → calls `PATCH /ssh/session/[id]/resize` (or pass cols/rows to next write).
 - Disconnect button: calls `ssh_session_close_POST`.
-- Widget definition has no meaningful request/response fields — it is purely an interactive widget. The definition exists so it appears in the admin nav and can be navigated to from other widgets.
+- Widget definition has no meaningful request/response fields - it is purely an interactive widget. The definition exists so it appears in the admin nav and can be navigated to from other widgets.
 
-### `files/list/widget.tsx` — File Browser
+### `files/list/widget.tsx` - File Browser
 
 - Path breadcrumb bar at the top with back navigation.
 - Directory listing as a table: icon (file/dir/symlink), name, size, permissions, modified date.
@@ -489,7 +489,7 @@ A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`
 - "New file" and "Upload" buttons in header.
 - Connection selector (Local or SSH).
 
-### `files/read/widget.tsx` — File Viewer / Editor
+### `files/read/widget.tsx` - File Viewer / Editor
 
 - Displays file content in a `<pre>` block with monospace font, line numbers.
 - "Edit" button switches to textarea edit mode.
@@ -497,7 +497,7 @@ A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`
 - Breadcrumb with link back to directory.
 - File size, encoding, truncation warning if applicable.
 
-### `connections/list/widget.tsx` — SSH Connections List
+### `connections/list/widget.tsx` - SSH Connections List
 
 - Table of connections: label, host:port, username, auth type, default badge, last tested, status.
 - "Add connection" button → navigates to `connections/create` widget.
@@ -505,7 +505,7 @@ A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`
 - "Test" button per row → calls `connections/test`, shows latency inline.
 - Delete button per row with confirmation.
 
-### `connections/create/widget.tsx` & `connections/[id]/widget.tsx` — Connection Form
+### `connections/create/widget.tsx` & `connections/[id]/widget.tsx` - Connection Form
 
 - Form: label, host, port, username, auth type selector.
 - Auth type drives visible fields: password input, PEM key textarea, or "use SSH agent" note.
@@ -515,7 +515,7 @@ A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`
 - "Test connection" button before saving.
 - Fingerprint change warning dialog if test returns `FINGERPRINT_CHANGED`.
 
-### `linux/users/list/widget.tsx` — OS User Management
+### `linux/users/list/widget.tsx` - OS User Management
 
 - Table: username, uid, home dir, shell, groups, locked status.
 - Lock/unlock toggle per row.
@@ -523,7 +523,7 @@ A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`
 - "Create user" button → navigates to `linux/users/create` widget.
 - Only visible/accessible when `LOCAL_MODE=true`.
 
-### `linux/users/create/widget.tsx` — Create OS User Form
+### `linux/users/create/widget.tsx` - Create OS User Form
 
 - Username input (validated pattern).
 - Groups multi-select (common groups pre-listed: docker, www-data, sudo, etc.).
@@ -537,7 +537,7 @@ A browser-based terminal using **xterm.js** (`@xterm/xterm` + `@xterm/addon-fit`
 
 ```
 First exec/session.open with connectionId
-  → pool.get(connectionId + threadId) — miss
+  → pool.get(connectionId + threadId) - miss
   → ssh2.Client.connect(decryptCredentials(connection))
   → on 'ready': store in pool, start idle timer
   → execute
@@ -564,7 +564,7 @@ SSH keep-alive: every 30s. On connection drop: entry marked `ERROR`, next call r
 ### Access control
 
 - All SSH endpoints: `UserRole.ADMIN` required.
-- SSH connections: `userId` scoped — users only see their own connections.
+- SSH connections: `userId` scoped - users only see their own connections.
 - Local exec: runs as current process user. Admin controls the process user at the OS level.
 - Linux user management: `LOCAL_MODE=true` + `UserRole.ADMIN` required. Refuses uid < 1000 and current process user.
 
@@ -576,7 +576,7 @@ SSH keep-alive: every 30s. On connection drop: entry marked `ERROR`, next call r
 
 ### Local exec sandboxing
 
-- No user switching — commands run exactly as the process user.
+- No user switching - commands run exactly as the process user.
 - `workingDir` validated: absolute path, no `..` segments.
 - `env` values are passed as a flat object to `child_process.exec`, not interpolated into the command string.
 - Admins choosing what user to run the app as is the security boundary.
@@ -613,17 +613,17 @@ SSH_DEFAULT_TIMEOUT_MS=30000        # exec timeout (default: 30 s)
 
 ## Dependencies
 
-- `ssh2` + `@types/ssh2` — SSH client (exec, PTY, SFTP). SSH mode only.
-- `@xterm/xterm` + `@xterm/addon-fit` — browser terminal. Terminal widget only.
-- Node built-in `child_process` — local exec.
-- Node built-in `fs/promises` — local file ops.
-- Node built-in `crypto` — AES-256-GCM.
+- `ssh2` + `@types/ssh2` - SSH client (exec, PTY, SFTP). SSH mode only.
+- `@xterm/xterm` + `@xterm/addon-fit` - browser terminal. Terminal widget only.
+- Node built-in `child_process` - local exec.
+- Node built-in `fs/promises` - local file ops.
+- Node built-in `crypto` - AES-256-GCM.
 
 ---
 
 ## AI usage patterns
 
-### LOCAL_MODE — self-hosted VPS
+### LOCAL_MODE - self-hosted VPS
 
 ```
 User: "Check disk usage"
@@ -642,7 +642,7 @@ AI:   ssh_files_write_POST { path: "/etc/nginx/nginx.conf", content: "...", crea
       ssh_exec_POST { command: "nginx -t && systemctl reload nginx" }
 ```
 
-### SSH — remote machines
+### SSH - remote machines
 
 ```
 User: "Deploy latest build on prod-web-01"
@@ -656,16 +656,16 @@ AI:   ssh_connections_list_GET → finds connectionId "abc"
 
 ## Build priority
 
-1. **`ssh_exec_POST`** local backend — `child_process`, input validation, output capping
-2. **`ssh_files_list/read/write_GET/POST`** local backend — `fs/promises`
-3. **`exec/widget.tsx`** — command runner UI
-4. **`files/*/widget.tsx`** — file browser, viewer/editor
-5. **`linux/users/*`** — OS user management endpoints + widgets
-6. **Admin pages** — `src/app/[locale]/admin/ssh/` layout + pages
-7. **`ssh_connections` table** + encryption — SSH credential storage
+1. **`ssh_exec_POST`** local backend - `child_process`, input validation, output capping
+2. **`ssh_files_list/read/write_GET/POST`** local backend - `fs/promises`
+3. **`exec/widget.tsx`** - command runner UI
+4. **`files/*/widget.tsx`** - file browser, viewer/editor
+5. **`linux/users/*`** - OS user management endpoints + widgets
+6. **Admin pages** - `src/app/[locale]/admin/ssh/` layout + pages
+7. **`ssh_connections` table** + encryption - SSH credential storage
 8. **SSH connections CRUD** + widgets
-9. **SSH exec backend** — session pool, keepalive
-10. **SSH file ops** — SFTP backend
-11. **`terminal/widget.tsx`** — xterm.js PTY terminal (depends on session endpoints)
-12. **SSH PTY sessions** — `session/open/write/read/close`
+9. **SSH exec backend** - session pool, keepalive
+10. **SSH file ops** - SFTP backend
+11. **`terminal/widget.tsx`** - xterm.js PTY terminal (depends on session endpoints)
+12. **SSH PTY sessions** - `session/open/write/read/close`
 13. **Fingerprint change detection**

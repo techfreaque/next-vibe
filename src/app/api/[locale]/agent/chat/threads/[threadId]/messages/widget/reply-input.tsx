@@ -53,7 +53,7 @@ export function ReplyInput({
       onSubmit={editor.handleReply}
       onCancel={editor.handleCancel}
       onSubmitAudio={async () => {
-        // Voice reply is future work — log and skip
+        // Voice reply is future work - log and skip
         logger.warn(
           "ReplyInput",
           "Voice reply is not yet supported, skipping audio submission",

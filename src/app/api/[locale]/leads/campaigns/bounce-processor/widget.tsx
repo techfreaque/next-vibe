@@ -73,7 +73,7 @@ export function BounceProcessorConfigWidget({
         )}
       </Div>
 
-      {/* Guidance — shown before first save */}
+      {/* Guidance - shown before first save */}
       {!hasBeenSaved && !isPending && (
         <Div className="rounded-lg border border-dashed bg-muted/30 p-5 flex flex-col gap-3">
           <Div className="flex items-start gap-3">
@@ -92,7 +92,7 @@ export function BounceProcessorConfigWidget({
 
       <FormAlertWidget field={{}} />
 
-      {/* Section 1 — General */}
+      {/* Section 1 - General */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -109,7 +109,7 @@ export function BounceProcessorConfigWidget({
         </CardContent>
       </Card>
 
-      {/* Section 2 — Schedule */}
+      {/* Section 2 - Schedule */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -140,7 +140,7 @@ export function BounceProcessorConfigWidget({
         </CardContent>
       </Card>
 
-      {/* Section 3 — Processing */}
+      {/* Section 3 - Processing */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -156,7 +156,7 @@ export function BounceProcessorConfigWidget({
         </CardContent>
       </Card>
 
-      {/* Section 4 — Advanced */}
+      {/* Section 4 - Advanced */}
       <Card className="border-dashed">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">

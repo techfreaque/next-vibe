@@ -2,7 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Ratio",
-    description: "Ratio — divides series A by series B, aligned by timestamp",
+    description: "Ratio - divides series A by series B, aligned by timestamp",
     fields: {
       a: { label: "Numerator (A)", description: "Dividend time series" },
       b: { label: "Denominator (B)", description: "Divisor time series" },

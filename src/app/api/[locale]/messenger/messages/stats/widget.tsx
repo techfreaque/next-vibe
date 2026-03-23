@@ -358,7 +358,7 @@ export function EmailStatsContainer({
           </Div>
         )}
 
-        {/* Status filter chips — scrollable */}
+        {/* Status filter chips - scrollable */}
         <Div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
           {MessageStatusFilterOptions.map((opt) => {
             const isActive = activeStatus === opt.value;
@@ -382,7 +382,7 @@ export function EmailStatsContainer({
           })}
         </Div>
 
-        {/* Type filter chips — scrollable */}
+        {/* Type filter chips - scrollable */}
         <Div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
           {MessageTypeFilterOptions.map((opt) => {
             const isActive = activeType === opt.value;

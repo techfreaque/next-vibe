@@ -20,7 +20,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../../../user/auth/types";
 import { messengerAccounts } from "../../../../accounts/db";
-import { MessengerAccountStatus } from "../../../../accounts/enum";
+import {
+  MessageChannel,
+  MessengerAccountStatus,
+} from "../../../../accounts/enum";
 import { toImapShape } from "../db";
 import { ImapSyncRepository as ImapSyncServiceRepository } from "../sync-service/repository";
 import type {
@@ -28,7 +31,6 @@ import type {
   ImapSyncPostResponseOutput,
 } from "./definition";
 import type { ImapSyncT } from "./i18n";
-import { MessageChannel } from "../../../../accounts/enum";
 
 /**
  * IMAP Sync Repository
@@ -120,7 +122,7 @@ export class ImapSyncRepository {
             email: account.email,
           });
 
-          // No intermediate status update — messenger_accounts doesn't have syncStatus field
+          // No intermediate status update - messenger_accounts doesn't have syncStatus field
 
           const syncResult = await ImapSyncServiceRepository.syncAccount(
             account,

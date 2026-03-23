@@ -144,7 +144,7 @@ export class CronQueueRepository {
         }
       }
 
-      // Visibility filter — default is ALL (include hidden tasks in queue)
+      // Visibility filter - default is ALL (include hidden tasks in queue)
       if (data.hidden === CronTaskHiddenFilter.HIDDEN) {
         conditions.push(eq(cronTasks.hidden, true));
       } else if (data.hidden === CronTaskHiddenFilter.VISIBLE) {
@@ -189,7 +189,7 @@ export class CronQueueRepository {
         .where(fullWhereClause);
       const totalTasks = countRow?.total ?? 0;
 
-      // Fetch all enabled tasks — we sort in-memory by nextExecutionAt after computing it
+      // Fetch all enabled tasks - we sort in-memory by nextExecutionAt after computing it
       // (nextExecutionAt is computed, not stored, so we can't ORDER BY in SQL)
       const rows = await db
         .select()

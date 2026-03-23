@@ -205,7 +205,7 @@ Available parameters from the endpoint handler:
 
 ### Importing i18n / Scoped Translations in Routes
 
-Routes must **never** import scoped translations. The handler already provides `t` automatically — it is scoped to the endpoint's own `scopedTranslation`. Just destructure `t` from the handler params and pass it to the repository.
+Routes must **never** import scoped translations. The handler already provides `t` automatically - it is scoped to the endpoint's own `scopedTranslation`. Just destructure `t` from the handler params and pass it to the repository.
 
 ```typescript
 // ❌ WRONG - Route importing its own i18n just to get t
@@ -274,9 +274,9 @@ Three routes legitimately bypass `endpointsHandler()` and export raw Next.js han
 
 | File                                             | Reason                                                                                        |
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `payment/providers/stripe/webhook/route.ts`      | Stripe requires raw body + `headers()` for signature verification — cannot use parsed request |
-| `payment/providers/nowpayments/webhook/route.ts` | Same as Stripe — raw webhook with signature verification                                      |
-| `tracking/pixel/route.ts`                        | Returns 1×1 GIF binary — not a JSON endpoint                                                  |
+| `payment/providers/stripe/webhook/route.ts`      | Stripe requires raw body + `headers()` for signature verification - cannot use parsed request |
+| `payment/providers/nowpayments/webhook/route.ts` | Same as Stripe - raw webhook with signature verification                                      |
+| `tracking/pixel/route.ts`                        | Returns 1×1 GIF binary - not a JSON endpoint                                                  |
 | `manifest/route.ts`                              | Returns web app manifest JSON with custom Content-Type headers                                |
 
 All other `route.ts` files MUST use `endpointsHandler()`.

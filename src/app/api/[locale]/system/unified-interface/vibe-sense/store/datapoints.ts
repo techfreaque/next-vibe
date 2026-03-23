@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Datapoints Store
+ * Vibe Sense - Datapoints Store
  *
  * Time-series read/write + retention cleanup.
  * Only persist: "always" and persist: "snapshot" nodes write here.
@@ -21,7 +21,7 @@ import type { DataPoint, TimeRange } from "../shared/fields";
  * Upserts by (nodeId, graphId, timestamp) to handle re-runs.
  *
  * @param options.skipZero - When true, filters out zero-valued points before writing.
- *   Use for sparse event indicators where zero means "no events" — gaps are implicit.
+ *   Use for sparse event indicators where zero means "no events" - gaps are implicit.
  *   Do NOT use for snapshot indicators where zero is meaningful (e.g. balance = 0).
  */
 export async function writeDatapoints(
@@ -154,7 +154,7 @@ export async function runRetentionCleanup(
     deletedRows += result.length;
   }
 
-  // Row count-based cleanup — keep only the most recent maxRows rows
+  // Row count-based cleanup - keep only the most recent maxRows rows
   if (config.maxRows !== undefined && config.maxRows > 0) {
     const countResult = await db
       .select({ count: sql<number>`count(*)` })

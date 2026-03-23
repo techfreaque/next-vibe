@@ -3,7 +3,7 @@
 /**
  * Message Editor Component
  * Editor for branching/editing messages with voice support.
- * Thin wrapper around BaseMessageInput — keeps useMessageEditor hook for state.
+ * Thin wrapper around BaseMessageInput - keeps useMessageEditor hook for state.
  */
 
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";

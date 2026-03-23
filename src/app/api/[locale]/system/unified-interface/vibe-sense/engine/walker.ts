@@ -1,12 +1,12 @@
 /**
- * Vibe Sense — DAG Walker
+ * Vibe Sense - DAG Walker
  *
  * Topological sort of a graph's nodes for correct execution order.
  * Deduplicates shared indicator nodes across multiple graphs.
  */
 
-import type { GraphConfig } from "../graph/types";
 import type { GraphNodeConfig } from "../graph/schema";
+import type { GraphConfig } from "../graph/types";
 
 // ─── Topological Sort ─────────────────────────────────────────────────────────
 
@@ -66,7 +66,7 @@ export function resolveExecutionOrder(config: GraphConfig): ExecutionOrder {
   }
 
   if (order.length !== nodeIds.length) {
-    // Cycle detected — identify the cycle nodes for error reporting
+    // Cycle detected - identify the cycle nodes for error reporting
     const resolved = new Set(order);
     const cycleNodes = nodeIds.filter((id) => !resolved.has(id));
     return { order, cycleNodes };
@@ -147,10 +147,10 @@ export function getNodeConfig(
 /**
  * Returns the set of node IDs that have a path to at least one sink node
  * (evaluator or endpoint type). Used by the runner to skip chart-only nodes
- * during scheduled cron runs — those nodes are computed on-demand when charting.
+ * during scheduled cron runs - those nodes are computed on-demand when charting.
  *
  * A node is "sink-reachable" if it IS a sink OR any of its descendants is a sink.
- * Nodes that are NOT sink-reachable are pure chart nodes — no action depends on them.
+ * Nodes that are NOT sink-reachable are pure chart nodes - no action depends on them.
  */
 export function getSinkReachableNodeIds(config: GraphConfig): Set<string> {
   // Build reverse adjacency: child → parents (who feeds into child)
@@ -175,7 +175,7 @@ export function getSinkReachableNodeIds(config: GraphConfig): Set<string> {
     }
   }
 
-  // BFS backwards through the graph — mark all ancestors of sinks
+  // BFS backwards through the graph - mark all ancestors of sinks
   while (queue.length > 0) {
     const nodeId = queue.shift()!;
     for (const parentId of reverseAdj.get(nodeId) ?? []) {

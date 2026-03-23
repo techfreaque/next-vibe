@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "NOT",
     description:
-      "Inverts a signal stream — fired becomes not-fired and vice versa",
+      "Inverts a signal stream - fired becomes not-fired and vice versa",
     fields: {
       signal: { label: "Signal", description: "Input signal stream to invert" },
       result: { label: "Result", description: "Inverted output signal events" },

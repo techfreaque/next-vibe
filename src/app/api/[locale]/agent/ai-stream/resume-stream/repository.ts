@@ -12,7 +12,7 @@
  *           CONTINUE_CONVERSATION_PROMPT injection.
  *
  * wakeup-resume vs answer-as-ai:
- * - "answer-as-ai" injects CONTINUE_CONVERSATION_PROMPT — wrong for revival
+ * - "answer-as-ai" injects CONTINUE_CONVERSATION_PROMPT - wrong for revival
  * - "wakeup-resume" loads DB history normally, finds deferred TOOL as last
  *   context item, and lets the AI respond naturally to it
  *
@@ -21,7 +21,7 @@
  *
  * Race safety:
  * - isStreaming is read once. If it flips between read and act the worst outcome
- *   is an extra stream turn or a missed WS event — not data corruption.
+ *   is an extra stream turn or a missed WS event - not data corruption.
  * - Message insertion uses random UUIDs so it is safe to call once.
  */
 
@@ -55,8 +55,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { NO_SKILL_ID } from "../../chat/skills/constants";
 import { walkToLeafMessage } from "../repository/core/branch-utils";
-import { resolveFavorite, runHeadlessAiStream } from "../repository/headless";
 import { publishWakeUpSignal } from "../repository/core/wake-up-channel";
+import { resolveFavorite, runHeadlessAiStream } from "../repository/headless";
 import type { AiStreamT } from "../stream/i18n";
 import type {
   ResumeStreamRequestOutput,
@@ -86,7 +86,7 @@ export class ResumeStreamRepository {
     } = data;
 
     try {
-      // Read thread state — streamingState tells us if the live loop is still running.
+      // Read thread state - streamingState tells us if the live loop is still running.
       // If state is 'streaming', wait for it to settle (the stream is ending soon —
       // escalateToTask already set 'waiting' in DB; we just need to let the stream
       // finish its finally block before we attempt revival).
@@ -111,7 +111,7 @@ export class ResumeStreamRepository {
           break;
         }
         logger.info(
-          "[ResumeStream] Stream still active — waiting for it to settle",
+          "[ResumeStream] Stream still active - waiting for it to settle",
           {
             threadId,
             streamingState: state,
@@ -125,7 +125,7 @@ export class ResumeStreamRepository {
 
       const streamingState = thread?.streamingState ?? "idle";
       // A live stream is actively running ('streaming'). 'aborting' means user
-      // requested cancel — the live stream will die shortly; treat as dead so we
+      // requested cancel - the live stream will die shortly; treat as dead so we
       // don't try to signal a dying stream via publishWakeUpSignal.
       const isLive = streamingState === "streaming";
       const isAborting = streamingState === "aborting";
@@ -134,7 +134,7 @@ export class ResumeStreamRepository {
       // If 0 rows updated, another resume-stream task already claimed this revival slot.
       // This prevents the parallel wakeUp race where two simultaneous completions both
       // try to fire a headless revival on the same thread.
-      // Note: we do NOT claim if streamingState='aborting' — that means user cancelled.
+      // Note: we do NOT claim if streamingState='aborting' - that means user cancelled.
       const claimRevival = async (claimThreadId: string): Promise<boolean> => {
         const claimed = await db
           .update(chatThreads)
@@ -168,14 +168,14 @@ export class ResumeStreamRepository {
       // and emit STREAM_FINISHED. No deferred messages or headless revival needed.
       if (isAborting) {
         logger.info(
-          "[ResumeStream] Thread is aborting — skipping revival (user cancelled)",
+          "[ResumeStream] Thread is aborting - skipping revival (user cancelled)",
           { threadId, toolMessageId },
         );
         return success({ resumed: false, lastAiMessageId: null });
       }
 
       // For wakeUp: inject a deferred result message so it appears in the thread UI.
-      // Live case:  emit TOOL_RESULT WS event — the running loop already has the
+      // Live case:  emit TOOL_RESULT WS event - the running loop already has the
       //             backfilled result in DB and will present it to the AI naturally.
       // Dead case:  insert synthetic ASSISTANT + deferred TOOL messages (same sequenceId,
       //             model/skill metadata), emit WS events, then revive with headless
@@ -227,7 +227,7 @@ export class ResumeStreamRepository {
 
           if (!resolvedModel) {
             logger.error(
-              "[ResumeStream] No model resolved — cannot revive stream",
+              "[ResumeStream] No model resolved - cannot revive stream",
               { threadId, favoriteId, modelId },
             );
             return fail({
@@ -240,14 +240,14 @@ export class ResumeStreamRepository {
 
           // ── WAKE_UP mode ─────────────────────────────────────────────────
           // Flow for parallel wakeUp calls:
-          // - Both arrive concurrently. We must ensure NO siblings — deferred messages
+          // - Both arrive concurrently. We must ensure NO siblings - deferred messages
           //   must form a linear chain (parent → child), never branch off the same parent.
           // - Strategy: insert deferred AFTER we know where we stand in the queue.
           //   The first to claim revival inserts at the current leaf and runs.
           //   The second backs off, re-walks (finding first's deferred + AI response),
           //   then inserts its deferred as a child of that new leaf, then runs.
           if (isWakeUpMode) {
-            logger.info("[ResumeStream] wakeUp — starting", {
+            logger.info("[ResumeStream] wakeUp - starting", {
               toolMessageId,
               hasResult: !!wakeUpResultObj,
               isLive,
@@ -270,7 +270,7 @@ export class ResumeStreamRepository {
 
             if (existingDeferred) {
               logger.info(
-                "[ResumeStream] wakeUp — deferred already exists (fallback cron re-run), skipping",
+                "[ResumeStream] wakeUp - deferred already exists (fallback cron re-run), skipping",
                 { toolMessageId, existingDeferredId: existingDeferred.id },
               );
               return success({ resumed: false, lastAiMessageId: null });
@@ -300,14 +300,14 @@ export class ResumeStreamRepository {
               originalToolCallId: toolCall.toolCallId,
               callbackMode: "wakeUp",
               isDeferred: true,
-              // Do NOT propagate isConfirmed — this is an async background result,
+              // Do NOT propagate isConfirmed - this is an async background result,
               // not a user-confirmation action. Prevents "Confirmed by you" badge.
               isConfirmed: false,
             };
 
             // If the thread's live stream is still running, signal it with the full
             // payload. The live stream inserts the deferred message itself in its
-            // finally block — this is the only correct place since only one live stream
+            // finally block - this is the only correct place since only one live stream
             // runs per thread, eliminating any concurrent-insertion race.
             if (isLive) {
               publishWakeUpSignal(effectiveThreadId, {
@@ -323,11 +323,11 @@ export class ResumeStreamRepository {
                 favoriteId: favoriteId ?? undefined,
               });
               logger.info(
-                "[ResumeStream] wakeUp — published wake-up signal to live stream (insertion deferred to stream finally)",
+                "[ResumeStream] wakeUp - published wake-up signal to live stream (insertion deferred to stream finally)",
                 { threadId: effectiveThreadId, toolMessageId },
               );
 
-              // Cleanup cron tasks — live stream handles insertion + revival, these are no longer needed.
+              // Cleanup cron tasks - live stream handles insertion + revival, these are no longer needed.
               const liveWakeUpCleanupIds = [wakeUpTaskId, resumeTaskId].filter(
                 Boolean,
               ) as string[];
@@ -366,7 +366,7 @@ export class ResumeStreamRepository {
             if (!(await claimRevival(effectiveThreadId))) {
               // Sibling claimed revival first. Back off until it finishes (isStreaming→false).
               logger.info(
-                "[ResumeStream] wakeUp — revival claimed by sibling, backing off until sibling finishes",
+                "[ResumeStream] wakeUp - revival claimed by sibling, backing off until sibling finishes",
                 { threadId: effectiveThreadId, toolMessageId },
               );
 
@@ -391,7 +391,7 @@ export class ResumeStreamRepository {
                 // not attempt revival on a cancelled thread.
                 if (siblingState === "aborting") {
                   logger.info(
-                    "[ResumeStream] wakeUp — thread aborting during backoff, skipping revival",
+                    "[ResumeStream] wakeUp - thread aborting during backoff, skipping revival",
                     { threadId: effectiveThreadId, toolMessageId },
                   );
                   return success({ resumed: false, lastAiMessageId: null });
@@ -401,7 +401,7 @@ export class ResumeStreamRepository {
               // Retry the claim.
               if (!(await claimRevival(effectiveThreadId))) {
                 logger.info(
-                  "[ResumeStream] wakeUp — revival claim failed after backoff, giving up",
+                  "[ResumeStream] wakeUp - revival claim failed after backoff, giving up",
                   { threadId: effectiveThreadId, toolMessageId },
                 );
                 return success({ resumed: false, lastAiMessageId: null });
@@ -466,17 +466,17 @@ export class ResumeStreamRepository {
               logger,
             );
 
-            logger.info("[ResumeStream] wakeUp — deferred message inserted", {
+            logger.info("[ResumeStream] wakeUp - deferred message inserted", {
               threadId,
               toolMessageId,
               deferredId,
               chainParentId,
             });
 
-            // Fire wakeup-resume headless stream — loads full DB history (all deferred TOOLs
+            // Fire wakeup-resume headless stream - loads full DB history (all deferred TOOLs
             // now in chain), AI sees all results naturally without any continuation prompt.
             // Pass favoriteId so the revival streamContext has it set (needed if the AI calls
-            // escalateToTask() during revival — otherwise favoriteId would be undefined).
+            // escalateToTask() during revival - otherwise favoriteId would be undefined).
             void runHeadlessAiStream({
               favoriteId: favoriteId ?? undefined,
               model: resolvedModel,
@@ -549,7 +549,7 @@ export class ResumeStreamRepository {
 
           // ── Non-wakeUp: isLive check ─────────────────────────────────────
           if (isLive) {
-            // Stream still running — live loop will pick up the backfilled result.
+            // Stream still running - live loop will pick up the backfilled result.
             // Emit TOOL_RESULT WS so the UI bubble updates immediately.
             publishWsEvent(
               {
@@ -567,11 +567,11 @@ export class ResumeStreamRepository {
             );
 
             logger.info(
-              "[ResumeStream] Stream live — emitted TOOL_RESULT WS, live loop picks up result",
+              "[ResumeStream] Stream live - emitted TOOL_RESULT WS, live loop picks up result",
               { threadId, toolMessageId },
             );
 
-            // Cleanup cron tasks — live stream handles the result, these are no longer needed.
+            // Cleanup cron tasks - live stream handles the result, these are no longer needed.
             const liveCleanupIds = [wakeUpTaskId, resumeTaskId].filter(
               Boolean,
             ) as string[];
@@ -618,7 +618,7 @@ export class ResumeStreamRepository {
             );
 
             logger.info(
-              "[ResumeStream] WAIT mode — emitted tool-result WS, firing headless stream",
+              "[ResumeStream] WAIT mode - emitted tool-result WS, firing headless stream",
               { threadId, toolMessageId, resolvedModel },
             );
 
@@ -626,7 +626,7 @@ export class ResumeStreamRepository {
             // task already claimed this thread (parallel wakeUp/wait race), skip.
             if (!(await claimRevival(effectiveThreadId))) {
               logger.info(
-                "[ResumeStream] WAIT — revival already claimed by another task, skipping",
+                "[ResumeStream] WAIT - revival already claimed by another task, skipping",
                 { threadId: effectiveThreadId, toolMessageId },
               );
               return success({ resumed: false, lastAiMessageId: null });
@@ -713,15 +713,15 @@ export class ResumeStreamRepository {
       }
 
       if (isLive) {
-        // No toolMessageId path — just bail, live loop handles everything.
-        logger.info("[ResumeStream] Stream still live — skipping resume", {
+        // No toolMessageId path - just bail, live loop handles everything.
+        logger.info("[ResumeStream] Stream still live - skipping resume", {
           threadId,
         });
         return success({ resumed: false, lastAiMessageId: null });
       }
 
       // No toolMessageId + stream dead: nothing to do.
-      logger.info("[ResumeStream] No toolMessageId and stream dead — no-op", {
+      logger.info("[ResumeStream] No toolMessageId and stream dead - no-op", {
         threadId,
       });
       return success({ resumed: false, lastAiMessageId: null });

@@ -34,7 +34,7 @@ import type { SpeechToTextT } from "./i18n";
  * Speech-to-Text Repository
  */
 export class SpeechToTextRepository {
-  /** Server-side provider configuration — hardcoded to use OpenAI Whisper via Eden AI */
+  /** Server-side provider configuration - hardcoded to use OpenAI Whisper via Eden AI */
   private static readonly STT_PROVIDER = "openai"; // Eden AI expects "openai" for Whisper
   private static readonly STT_MODEL = "whisper-1";
   private static readonly MAX_POLLING_ATTEMPTS = 30;
@@ -187,7 +187,7 @@ export class SpeechToTextRepository {
 
       // Calculate credits based on actual cost from Eden AI when available,
       // falling back to duration-based calculation.
-      // Eden AI returns cost in USD — convert to credits using CREDIT_VALUE_USD with our markup.
+      // Eden AI returns cost in USD - convert to credits using CREDIT_VALUE_USD with our markup.
       const audioDurationSeconds = pollResult.data.duration;
       const edenAiCostUsd = pollResult.data.edenAiCostUsd;
 
@@ -207,9 +207,9 @@ export class SpeechToTextRepository {
       } else if (audioDurationSeconds > 0) {
         creditsNeeded = audioDurationSeconds * STT_COST_PER_SECOND;
       } else {
-        // Eden AI returned neither cost nor duration — charge minimum (1 second)
+        // Eden AI returned neither cost nor duration - charge minimum (1 second)
         logger.error(
-          "STT: Eden AI did not return cost or audio_duration — charging 1-second minimum",
+          "STT: Eden AI did not return cost or audio_duration - charging 1-second minimum",
           {
             pollResult: JSON.stringify(pollResult.data),
             provider: this.STT_PROVIDER,

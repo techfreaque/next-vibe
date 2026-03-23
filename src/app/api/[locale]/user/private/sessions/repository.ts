@@ -73,7 +73,7 @@ export class SessionManagementRepository {
 
   /**
    * Create a named session token for the authenticated user.
-   * Returns the raw JWT once — not stored elsewhere.
+   * Returns the raw JWT once - not stored elsewhere.
    */
   static async create(
     user: JwtPrivatePayloadType,

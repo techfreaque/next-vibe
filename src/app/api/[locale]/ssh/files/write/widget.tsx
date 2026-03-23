@@ -1,5 +1,5 @@
 /**
- * SSH Files Write Widget — File Writer
+ * SSH Files Write Widget - File Writer
  */
 
 "use client";

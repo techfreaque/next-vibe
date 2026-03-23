@@ -1,6 +1,6 @@
 /**
  * Unified Inbox List Repository
- * Routes listInbox through the MessengerProvider interface — channel-agnostic.
+ * Routes listInbox through the MessengerProvider interface - channel-agnostic.
  */
 
 import "server-only";

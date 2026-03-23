@@ -1,5 +1,5 @@
 /**
- * DB Functions — Type System
+ * DB Functions - Type System
  *
  * Maps PostgreSQL types to TypeScript for type-safe database function definitions.
  * Used by defineDbFunction() to infer SQL signatures and TS call-site types.
@@ -16,7 +16,7 @@ export interface PgToTs {
   boolean: boolean;
   integer: number;
   bigint: number;
-  jsonb: string; // serialized JSON — use JSON.parse() inside function body
+  jsonb: string; // serialized JSON - use JSON.parse() inside function body
   timestamp: string;
   void: void;
 }
@@ -31,18 +31,18 @@ export type InferRecord<R extends Record<string, PgType>> = {
 
 /**
  * A Drizzle query builder that has .toSQL() and a typed `_` metadata object.
- * Drizzle exposes the result type via `builder._.result` — we use this for inference.
+ * Drizzle exposes the result type via `builder._.result` - we use this for inference.
  */
 export interface TypedQueryBuilder<TResult> {
   // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Drizzle's .toSQL() returns unknown[] params
   toSQL(): { sql: string; params: unknown[] };
-  /** Drizzle stores all HKT type params in `_` — `_.result` is the row array type */
+  /** Drizzle stores all HKT type params in `_` - `_.result` is the row array type */
   readonly _: { readonly result: TResult };
 }
 
 /**
  * Extract the result row type from a typed Drizzle query builder.
- * `db.select({...}).from(table)` has `_.result: Row[]` — we extract `Row`.
+ * `db.select({...}).from(table)` has `_.result: Row[]` - we extract `Row`.
  */
 export type InferQueryResult<TBuilder> =
   TBuilder extends TypedQueryBuilder<infer TResult>

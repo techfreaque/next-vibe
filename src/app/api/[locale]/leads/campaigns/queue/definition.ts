@@ -73,7 +73,7 @@ const { GET } = createEndpoint({
         schema: z.enum(CampaignTypeFilterDB).optional(),
       }),
 
-      // Response fields — named distinctly from request fields to avoid duplicate keys
+      // Response fields - named distinctly from request fields to avoid duplicate keys
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.total",

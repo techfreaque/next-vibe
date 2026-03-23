@@ -6,9 +6,9 @@ Comprehensive guide to writing `hooks.ts` files and `hooks/` folders for endpoin
 
 Most endpoints don't need a `hooks.ts` file at all. The primary pattern for data access is:
 
-1. **Widget** — use `useEndpoint()` directly inside `EndpointsPage` (via `endpointOptions` prop)
-2. **Dialog wrapper** — pass `endpointOptions` to `EndpointsPage`
-3. **Cross-module use** — only then write a `hooks.ts`
+1. **Widget** - use `useEndpoint()` directly inside `EndpointsPage` (via `endpointOptions` prop)
+2. **Dialog wrapper** - pass `endpointOptions` to `EndpointsPage`
+3. **Cross-module use** - only then write a `hooks.ts`
 
 A `hooks.ts` file (or `hooks/` folder) is justified when:
 
@@ -106,16 +106,16 @@ export function useSkill(
   return useEndpoint(definitions, options, logger, user);
 }
 
-// Export the return type — consumers import this for typing
+// Export the return type - consumers import this for typing
 export type SkillEndpointReturn = EndpointReturn<typeof definitions>;
 ```
 
 ### Key rules
 
-- Always `useMemo()` the options object — prevents unnecessary re-renders
-- `enabled: !!dependency` — don't query before required params are available
-- `staleTime` — set based on how frequently this data changes (list: 30s–60s, detail: 5min)
-- `initialData` — for SSR prefetching, pass server-fetched data to skip initial fetch
+- Always `useMemo()` the options object - prevents unnecessary re-renders
+- `enabled: !!dependency` - don't query before required params are available
+- `staleTime` - set based on how frequently this data changes (list: 30s–60s, detail: 5min)
+- `initialData` - for SSR prefetching, pass server-fetched data to skip initial fetch
 - Export the `ReturnType` alias so callers are typed without re-deriving it
 
 ## Hook That Wraps Mutation
@@ -248,17 +248,17 @@ export function useChatFavorites(
 
 Pattern notes:
 
-- Explicit `interface` for return type — not inferred
+- Explicit `interface` for return type - not inferred
 - `useMemo` for every derived value
 - Expose `endpoint` in return if callers need raw access
 - Use `satisfies UseEndpointOptions<typeof def>` to enforce type without losing inference
 
-## Complex Hooks Folder — Main Hook Pattern
+## Complex Hooks Folder - Main Hook Pattern
 
 When there are many related hooks, create a `hooks/` folder with a main hook that composes others:
 
 ```typescript
-// hooks/use-operations.ts — main hook file
+// hooks/use-operations.ts - main hook file
 
 export interface MessageOperations {
   sendMessage: (content: string, attachments: Attachment[]) => Promise<void>;
@@ -301,7 +301,7 @@ export function useMessageOperations(
 And in `operations/send-message.ts`:
 
 ```typescript
-// operations/send-message.ts — pure async function (not a hook)
+// operations/send-message.ts - pure async function (not a hook)
 export async function sendMessageOp(
   params: SendMessageParams,
   deps: SendMessageDeps,
@@ -314,7 +314,7 @@ Pattern notes:
 
 - Main hook exports a clean `interface` as its contract
 - Dependencies passed as a single `deps` object
-- Operation functions in `operations/` are plain async functions (not hooks) — imported by the main hook and wrapped in `useCallback`
+- Operation functions in `operations/` are plain async functions (not hooks) - imported by the main hook and wrapped in `useCallback`
 - Small single-purpose hooks (`use-collapse-state.ts`, `use-delete-dialog-store.ts`) are separate files
 
 ## What Hooks Must NOT Do
@@ -360,6 +360,6 @@ Hook rules:
 
 Client-side utilities:
   - Pure computation / localStorage / shared logic → repository-client.ts (static class)
-  - Hooks import from repository-client.ts directly — not via useEndpoint()
+  - Hooks import from repository-client.ts directly - not via useEndpoint()
   - See: Client Repository pattern (repository.client.md)
 ```

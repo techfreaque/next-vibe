@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -76,14 +76,14 @@ export function MessageAuthorInfo({
     // AI messages show model name or "Assistant"
     displayName = authorName ?? t("widget.messages.assistant");
   } else if (rootFolderId === "public" || rootFolderId === "shared") {
-    // Public/shared: authorName is stored — show it with ID slice, or Anonymous
+    // Public/shared: authorName is stored - show it with ID slice, or Anonymous
     const name = authorName ?? t("widget.messages.anonymous");
     const idSlice = authorId ? authorId.slice(0, 8) : null;
     displayName = idSlice
       ? t("widget.messages.authorWithId", { name, id: idSlice })
       : name;
   } else {
-    // Private/incognito/cron: authorName not stored — always "You"
+    // Private/incognito/cron: authorName not stored - always "You"
     displayName = t("widget.messages.you");
   }
 

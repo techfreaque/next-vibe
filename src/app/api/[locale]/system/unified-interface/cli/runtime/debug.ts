@@ -313,7 +313,7 @@ function formatExecutionSummary(
   // Render time comes from inside the route execution (result-formatter.ts)
   const renderMs = result.renderMs ?? 0;
 
-  // Overhead = total minus route execution (which includes render) — i.e. startup + tool load
+  // Overhead = total minus route execution (which includes render) - i.e. startup + tool load
   const overhead = breakdown.totalDuration - breakdown.routeExecution;
   parts.push(`Overhead ${Math.max(0, overhead)}ms`);
 

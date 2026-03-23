@@ -59,7 +59,7 @@ export const {
   LEADS_IMAP_HOST: {
     schema: z.string().optional(),
     example: "imap.example.com",
-    comment: "Lead campaigns IMAP (inbound) — leave blank if same host as SMTP",
+    comment: "Lead campaigns IMAP (inbound) - leave blank if same host as SMTP",
     commented: true,
   },
   LEADS_IMAP_PORT: {

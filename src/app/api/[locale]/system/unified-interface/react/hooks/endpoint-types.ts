@@ -219,7 +219,7 @@ type DeleteOptions<T> = {
     : DeepPartial<DeleteRequest<T>>;
 } & UrlParamsField<DeleteUrlVariables<T>>;
 
-// Hook options type — all section keys are always optional for indexability.
+// Hook options type - all section keys are always optional for indexability.
 // Enforcement of required sections happens at the call site via OptionsOptional<T>
 // and the conditional mapped type in UseEndpointOptions (below).
 // Within each section, urlPathParams/initialState are conditionally required

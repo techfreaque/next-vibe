@@ -1,10 +1,10 @@
 /**
- * Vibe Sense — Cron Tasks
+ * Vibe Sense - Cron Tasks
  *
  * 1. Cleanup: Runs retention cleanup and evicts expired snapshots (daily)
  * 2. Graph Runner: Executes all due cron-triggered graphs (every 5 min)
  *
- * Both tasks share the cleanup endpoint — the handler runs retention, snapshot
+ * Both tasks share the cleanup endpoint - the handler runs retention, snapshot
  * eviction, and graph scheduling. Retention and snapshot eviction are cheap
  * (just DB queries), so running them every 5 min alongside scheduling is fine.
  */

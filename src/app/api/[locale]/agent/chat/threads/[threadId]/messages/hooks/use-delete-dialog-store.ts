@@ -13,7 +13,7 @@ interface DeleteDialogState {
   deleteDialogOpen: boolean;
   /** ID of the message pending deletion */
   messageToDelete: string | null;
-  /** Stored delete callback — set when opening, called on confirm */
+  /** Stored delete callback - set when opening, called on confirm */
   deleteCallback: ((messageId: string) => Promise<void>) | null;
   /** Open the delete dialog for a specific message */
   openDeleteDialog: (

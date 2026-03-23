@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Ścieżka JSON",
     description:
-      "Ścieżka JSON — wyodrębnia wartość przez notację kropkową (przestarzałe, zwraca pustą tablicę)",
+      "Ścieżka JSON - wyodrębnia wartość przez notację kropkową (przestarzałe, zwraca pustą tablicę)",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       path: {

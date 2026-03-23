@@ -3,7 +3,7 @@
  * Runs a headless AI agent on a schedule to check system health,
  * work through tasks, and serve the human.
  *
- * Disabled by default — user must opt in via the cron task UI.
+ * Disabled by default - user must opt in via the cron task UI.
  * Uses the user's companion skill (default: Thea).
  * All runs persist in the CRON folder as background chats.
  */
@@ -43,7 +43,7 @@ const aiHeartbeatTask = createCronTask(aiRunDefinition.POST, tools.POST, {
     prompt:
       "Run your scheduled heartbeat. Check system health via your tools, review pending tasks, and report anything that needs human attention. If you cannot reach the human (no email or messaging configured), mention that they should set up a contact method in their settings.",
     instructions:
-      "You are running as a scheduled background agent (every 4 hours). Be concise and actionable. Use your tools to gather system state. If something needs human attention, try to contact them via email or messaging. You can spawn sub-agents via ai-run for complex work. All your conversations persist in the Cron folder — the human can review them anytime.",
+      "You are running as a scheduled background agent (every 4 hours). Be concise and actionable. Use your tools to gather system state. If something needs human attention, try to contact them via email or messaging. You can spawn sub-agents via ai-run for complex work. All your conversations persist in the Cron folder - the human can review them anytime.",
     maxTurns: 5,
     rootFolderId: DefaultFolderId.CRON,
     appendThreadId: undefined,

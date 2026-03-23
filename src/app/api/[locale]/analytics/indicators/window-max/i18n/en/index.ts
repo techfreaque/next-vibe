@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "Window Max",
     description:
-      "Rolling window maximum — tracks the highest value in a fixed window",
+      "Rolling window maximum - tracks the highest value in a fixed window",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

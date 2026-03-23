@@ -1,6 +1,6 @@
 /**
  * Remote Connection Self Rename Repository
- * PATCH — update the instanceId of the current instance's own identity.
+ * PATCH - update the instanceId of the current instance's own identity.
  *         Propagates to all connected remotes so they update their local label for us.
  */
 

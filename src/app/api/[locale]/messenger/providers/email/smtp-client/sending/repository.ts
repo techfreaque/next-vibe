@@ -11,28 +11,28 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { SmtpClientT } from "../i18n";
 import type {
   SmtpCapacityResponseOutput,
   SmtpSendParams,
   SmtpSendResult,
 } from "../repository";
 import { SmtpRepository } from "../repository";
-import type { SmtpClientT } from "../i18n";
 
 /**
- * SMTP Sending Repository — thin wrapper over SmtpRepository.
+ * SMTP Sending Repository - thin wrapper over SmtpRepository.
  * Kept for backward-compat with existing callers (EmailSendingRepository, etc.).
  */
 export class SmtpSendingRepository {
   /**
-   * Send email — delegates entirely to SmtpRepository which now reads messenger_accounts.
+   * Send email - delegates entirely to SmtpRepository which now reads messenger_accounts.
    */
   static async sendEmail(
     data: SmtpSendParams,
     logger: EndpointLogger,
     t: SmtpClientT,
   ): Promise<ResponseType<SmtpSendResult>> {
-    // SmtpRepository.sendEmail requires a user — use a minimal service user shape
+    // SmtpRepository.sendEmail requires a user - use a minimal service user shape
     const serviceUser: JwtPayloadType = {
       id: "00000000-0000-0000-0000-000000000001",
       leadId: "00000000-0000-0000-0000-000000000001",
@@ -43,7 +43,7 @@ export class SmtpSendingRepository {
   }
 
   /**
-   * Get total sending capacity — delegates to SmtpRepository.
+   * Get total sending capacity - delegates to SmtpRepository.
    */
   static async getTotalSendingCapacity(
     data: Record<string, never>,

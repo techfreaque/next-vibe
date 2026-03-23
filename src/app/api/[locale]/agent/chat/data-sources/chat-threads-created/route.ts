@@ -1,5 +1,5 @@
 /**
- * Chat Threads Created — Route
+ * Chat Threads Created - Route
  * Server-only.
  */
 

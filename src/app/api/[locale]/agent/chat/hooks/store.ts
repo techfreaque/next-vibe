@@ -11,7 +11,7 @@ import { saveThread as saveIncognitoThread } from "../incognito/storage";
 export type { ChatFolder, ChatThread };
 
 /**
- * UI tool model — used by the tool selection modal.
+ * UI tool model - used by the tool selection modal.
  * Converted to/from availableTools/pinnedTools when persisting to settings.
  */
 export interface EnabledTool {

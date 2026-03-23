@@ -1,6 +1,6 @@
 /**
  * SSH Session Open Endpoint Definition
- * POST /ssh/session/open — Open a PTY session (SSH only)
+ * POST /ssh/session/open - Open a PTY session (SSH only)
  */
 
 import { z } from "zod";

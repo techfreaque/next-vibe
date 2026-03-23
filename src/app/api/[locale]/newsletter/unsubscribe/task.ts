@@ -1,6 +1,6 @@
 /**
  * Newsletter Unsubscribe Sync Task
- * Pure metadata — dispatches to newsletter/unsubscribe/sync POST route via pulse runner.
+ * Pure metadata - dispatches to newsletter/unsubscribe/sync POST route via pulse runner.
  */
 import "server-only";
 

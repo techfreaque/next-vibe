@@ -26,15 +26,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { messengerAccounts } from "../../../../accounts/db";
 import { messengerFolders } from "../../../../messages/db";
-import { toImapShape } from "../db";
+import { SpecialFolderType } from "../../../../messages/enum";
 import { smtpProvider } from "../../../../providers/email/smtp";
+import { toImapShape } from "../db";
 import {
   ImapAccountFilter,
   ImapMessageSortField,
   ImapMessageStatusFilter,
   SortOrder,
 } from "../enum";
-import { SpecialFolderType } from "../../../../messages/enum";
 import { scopedTranslation } from "./i18n";
 
 interface ImapMessageResponseType {
@@ -770,7 +770,7 @@ export class ImapMessagesRepository {
   }
 
   /**
-   * Mark message as read/unread — updates DB and syncs to IMAP via provider
+   * Mark message as read/unread - updates DB and syncs to IMAP via provider
    */
   static async updateMessageReadStatus(
     data: { messageId: string; isRead: boolean },
@@ -830,7 +830,7 @@ export class ImapMessagesRepository {
             locale,
           );
           if (!markResult.success) {
-            // Non-fatal — DB already updated, just log the IMAP sync failure
+            // Non-fatal - DB already updated, just log the IMAP sync failure
             logger.warn("IMAP markRead sync failed (DB already updated)", {
               messageId: data.messageId,
               error: markResult.message,

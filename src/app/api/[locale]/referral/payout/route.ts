@@ -4,9 +4,9 @@
 
 import "server-only";
 
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 
 import { PayoutCurrency } from "../enum";
 import { ReferralRepository } from "../repository";
@@ -71,7 +71,7 @@ export const { GET, POST, tools } = endpointsHandler({
           message:
             data.currency === PayoutCurrency.CREDITS
               ? "Credits converted successfully"
-              : "Payout request submitted — processing within 48 hours",
+              : "Payout request submitted - processing within 48 hours",
         },
       };
     },

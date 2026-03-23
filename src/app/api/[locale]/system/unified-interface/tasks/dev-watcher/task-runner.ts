@@ -3,7 +3,7 @@
  *
  * Maintains a live in-memory index of all generator-relevant files.
  * On each file change, surgically updates the index and runs only the
- * generators whose slice is actually dirty — not everything every time.
+ * generators whose slice is actually dirty - not everything every time.
  */
 
 import "server-only";
@@ -79,7 +79,7 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
 };
 
 // ---------------------------------------------------------------------------
-// Smart watcher — live index + surgical generator dispatch
+// Smart watcher - live index + surgical generator dispatch
 // ---------------------------------------------------------------------------
 
 const startSmartFileWatcher = async (
@@ -97,7 +97,7 @@ const startSmartFileWatcher = async (
       `${liveIndex.routeFiles.size} routes, ${liveIndex.taskFiles.size} tasks`,
   );
 
-  // Debounce settings — shorter than before since we're doing less work per run
+  // Debounce settings - shorter than before since we're doing less work per run
   const DEBOUNCE_MS = 300;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let changeCount = 0;
@@ -122,7 +122,7 @@ const startSmartFileWatcher = async (
     }
 
     if (dirtyNames.length === 0) {
-      logger.debug("⏭️  No dirty generators — skipping run");
+      logger.debug("⏭️  No dirty generators - skipping run");
       return;
     }
 
@@ -188,7 +188,7 @@ const startSmartFileWatcher = async (
             }
 
             // Resolve to absolute path.
-            // Use string concat instead of join() — Turbopack's static analysis
+            // Use string concat instead of join() - Turbopack's static analysis
             // treats join(watchRoot, ...) as a broad glob over src/app/api/[locale]/.
             const sep = watchRoot.endsWith("/") ? "" : "/";
             const absPath = watchRoot + sep + filename;
@@ -230,7 +230,7 @@ const startSmartFileWatcher = async (
       "📌 One-shot mode (DEV_WATCHER_CONTINUOUS=false). Press 'r' to regenerate.",
     );
 
-    // Close all fs.watch watchers — we don't need them in one-shot mode
+    // Close all fs.watch watchers - we don't need them in one-shot mode
     for (const watcher of watchers) {
       try {
         watcher.close();
@@ -253,7 +253,7 @@ const startSmartFileWatcher = async (
 
       const onData = (chunk: Buffer): void => {
         const key = chunk.toString();
-        // Ctrl+C — restore terminal and re-raise SIGINT
+        // Ctrl+C - restore terminal and re-raise SIGINT
         if (key === "\x03") {
           if (process.stdin.isTTY) {
             process.stdin.setRawMode(false);
@@ -262,7 +262,7 @@ const startSmartFileWatcher = async (
           return;
         }
         if (key === "r" || key === "R") {
-          logger.debug("🔄 'r' pressed — re-running generators...");
+          logger.debug("🔄 'r' pressed - re-running generators...");
           liveIndex.dirty.endpoints = true;
           liveIndex.dirty.clientRoutes = true;
           liveIndex.dirty.taskIndex = true;
@@ -336,7 +336,7 @@ const startSmartFileWatcher = async (
 };
 
 // ---------------------------------------------------------------------------
-// Fallback polling watcher (no live index — rescans each cycle)
+// Fallback polling watcher (no live index - rescans each cycle)
 // ---------------------------------------------------------------------------
 
 const startPollingWatcher = async (

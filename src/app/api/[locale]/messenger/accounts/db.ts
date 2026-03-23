@@ -2,7 +2,7 @@
  * Unified Messenger Accounts Database Schema
  *
  * Single table replacing smtp_accounts, imap_accounts, and messaging_accounts.
- * All platforms share typed nullable columns — no JSONB credential blobs.
+ * All platforms share typed nullable columns - no JSONB credential blobs.
  *
  * Channel discriminator determines which fields are applicable:
  *   EMAIL  → smtp_* outbound fields + imap_* inbound fields + email routing fields
@@ -32,14 +32,14 @@ import {
   EmailImapAuthMethodDB,
   EmailSecurityTypeDB,
 } from "../providers/email/enum";
+import type { CampaignType } from "./enum";
 import {
+  MessageChannelDB,
   MessengerAccountStatus,
   MessengerAccountStatusDB,
   MessengerHealthStatusDB,
   MessengerProviderDB,
 } from "./enum";
-import type { CampaignType } from "./enum";
-import { MessageChannelDB } from "./enum";
 
 /**
  * NOTE: Using text() with enum constraint instead of pgEnum() because translation keys

@@ -81,7 +81,7 @@ function deriveBranchIndices(
     }
 
     const siblings = childrenByParent.get(msg.parentId ?? null) ?? [];
-    // Only record real branches — parallel tool calls share the same non-null sequenceId
+    // Only record real branches - parallel tool calls share the same non-null sequenceId
     // and must NOT trigger branch navigation or URL updates.
     // User messages always have sequenceId=null, so null-only sets are real branches.
     const seqs = new Set(siblings.map((s) => s.sequenceId));
@@ -108,7 +108,7 @@ export function useBranchManagement({
   threadId,
   logger,
 }: UseBranchManagementProps): UseBranchManagementReturn {
-  // Derive branchIndices from the leaf + loaded messages (local — for branch navigator rendering)
+  // Derive branchIndices from the leaf + loaded messages (local - for branch navigator rendering)
   const branchIndices = useMemo(
     () => deriveBranchIndices(activeThreadMessages, leafMessageId),
     [activeThreadMessages, leafMessageId],
@@ -134,7 +134,7 @@ export function useBranchManagement({
   /**
    * Auto-switch to new leaf when a new message arrives.
    * Depends on `messageIds` (stable string) rather than `activeThreadMessages`
-   * so it only fires when the set of IDs changes — not on every content delta.
+   * so it only fires when the set of IDs changes - not on every content delta.
    */
   useEffect(() => {
     if (!threadId) {
@@ -147,7 +147,7 @@ export function useBranchManagement({
     prevMessageIdsRef.current = currentIds;
 
     if (prevIds.size === 0) {
-      // Initial load — don't auto-switch, URL already has the right leaf
+      // Initial load - don't auto-switch, URL already has the right leaf
       return;
     }
 
@@ -169,10 +169,10 @@ export function useBranchManagement({
 
     // Only auto-switch when the new message is a direct child of the current leaf,
     // OR when new messages form a chain rooted at the current leaf (e.g. wakeUp revival
-    // adds a synthetic user message + AI response in one batch — the AI response's
+    // adds a synthetic user message + AI response in one batch - the AI response's
     // parentId is the synthetic user message, not currentLeaf directly).
     // Do NOT auto-switch when:
-    //   - currentLeaf is null (no branch selected — avoid corrupting URL with old messages)
+    //   - currentLeaf is null (no branch selected - avoid corrupting URL with old messages)
     //   - loading older history (new messages are not children of the current leaf)
     if (currentLeaf) {
       const newMessageIds = new Set(newMessages.map((m) => m.id));
@@ -200,7 +200,7 @@ export function useBranchManagement({
    * Update URL to that leaf.
    *
    * Walking down locally is correct because the server returns ALL branch paths
-   * in the chunk — every sibling and all their descendants are in the loaded set.
+   * in the chunk - every sibling and all their descendants are in the loaded set.
    */
   const handleSwitchBranch = useCallback(
     (parentMessageId: string, branchIndex: number): void => {
@@ -240,7 +240,7 @@ export function useBranchManagement({
         if (!kids || kids.length === 0) {
           break;
         }
-        // kids is sorted ascending — take the last one (latest)
+        // kids is sorted ascending - take the last one (latest)
         const latestKid = kids[kids.length - 1];
         if (!latestKid) {
           break;

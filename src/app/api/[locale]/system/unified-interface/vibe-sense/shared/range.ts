@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Range Arithmetic
+ * Vibe Sense - Range Arithmetic
  *
  * Handles time series range extension, trimming, and resolution scaling.
  */
@@ -220,7 +220,7 @@ function buildBucketTimestamps(
 
 /**
  * Calendar-aware monthly bucket timestamps.
- * Matches date_trunc('month', ...) — always the 1st of each month at 00:00 UTC.
+ * Matches date_trunc('month', ...) - always the 1st of each month at 00:00 UTC.
  */
 function buildMonthBuckets(range: TimeRange): number[] {
   const result: number[] = [];
@@ -247,7 +247,7 @@ function buildMonthBuckets(range: TimeRange): number[] {
 
 /**
  * Calendar-aware weekly bucket timestamps.
- * Matches date_trunc('week', ...) — ISO weeks start on Monday at 00:00 UTC.
+ * Matches date_trunc('week', ...) - ISO weeks start on Monday at 00:00 UTC.
  */
 function buildWeekBuckets(range: TimeRange): number[] {
   const MS_PER_WEEK = 7 * 86_400_000;

@@ -2,8 +2,8 @@
  * Remote Connection Repository
  *
  * DB operations for the two-table schema:
- * - `instance_identities` — self-identity (who am I?)
- * - `remote_connections`  — outbound connections (who do I talk to?)
+ * - `instance_identities` - self-identity (who am I?)
+ * - `remote_connections`  - outbound connections (who do I talk to?)
  */
 
 import {
@@ -354,7 +354,7 @@ export class RemoteConnectionRepository {
 
   /**
    * Clear a remote connection (by instanceId, or all if not specified).
-   * Does NOT delete instance identities — those persist across reconnects.
+   * Does NOT delete instance identities - those persist across reconnects.
    */
   static async clearRemoteConnection(
     user: JwtPrivatePayloadType,
@@ -428,7 +428,7 @@ export class RemoteConnectionRepository {
   }
 
   /**
-   * Get all active connections across all users — for system-level task sync.
+   * Get all active connections across all users - for system-level task sync.
    */
   static async getAllActiveConnectionsForSync(): Promise<
     Array<{
@@ -470,7 +470,7 @@ export class RemoteConnectionRepository {
   }
 
   /**
-   * Get all active connections for a user — for task sync and system prompt.
+   * Get all active connections for a user - for task sync and system prompt.
    */
   static async getAllActiveConnections(userId: string): Promise<
     Array<{
@@ -610,7 +610,7 @@ export class RemoteConnectionRepository {
     remoteInstanceId: string | null;
     isDirectlyAccessible: boolean;
     remoteUrl: string;
-    /** Local instance URL — set on cloud-side records to push tasks/memories directly. */
+    /** Local instance URL - set on cloud-side records to push tasks/memories directly. */
     localUrl: string | null;
     token: string | null;
     leadId: string | null;
@@ -698,7 +698,7 @@ export class RemoteConnectionRepository {
   /**
    * Get capabilities for a remote instance without requiring a specific userId.
    * Used by CLI_AUTH_BYPASS / public contexts where userId is unavailable.
-   * Read-only metadata — safe for unauthenticated discovery.
+   * Read-only metadata - safe for unauthenticated discovery.
    */
   static async getCapabilitiesAnyUser(
     instanceId: string,

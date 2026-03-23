@@ -47,7 +47,7 @@ export const {
       .default("https://api-sandbox.nowpayments.io/v1"),
     example: "https://api-sandbox.nowpayments.io/v1",
     comment:
-      "NOWPayments API endpoint — sandbox for testing, production for live payments",
+      "NOWPayments API endpoint - sandbox for testing, production for live payments",
     commented: true,
     fieldType: "select" as const,
     options: [

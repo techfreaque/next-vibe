@@ -5,12 +5,12 @@
  * combined loader, then assembles the final system prompt strings.
  *
  * All fragment logic lives in each module's system-prompt/prompt.ts + server.ts.
- * Import paths are centralized in generated/prompt-fragments-server.ts — no hardcoding here.
+ * Import paths are centralized in generated/prompt-fragments-server.ts - no hardcoding here.
  *
  * Flow:
- *   Step 1 — Load all fragment data in parallel via generated combined loader
- *   Step 2 — Assemble system prompt from leading fragments (sorted by priority)
- *   Step 3 — Build trailing system message and return
+ *   Step 1 - Load all fragment data in parallel via generated combined loader
+ *   Step 2 - Assemble system prompt from leading fragments (sorted by priority)
+ *   Step 3 - Build trailing system message and return
  */
 
 import "server-only";

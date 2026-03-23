@@ -4,7 +4,7 @@
  * Every provider implements this interface so the rest of the system
  * doesn't care whether it's SMTP, Resend, Twilio, WhatsApp or Telegram.
  *
- * All methods are required — providers that don't support a feature must
+ * All methods are required - providers that don't support a feature must
  * return fail({ errorType: NOT_SUPPORTED }) rather than omitting the method.
  */
 
@@ -20,7 +20,7 @@ import type { MessageChannelValue } from "../accounts/enum";
 // ─── Send Types ──────────────────────────────────────────────────────────────
 
 export interface SendMessageInput {
-  /** Recipient — email address, phone number, or chat ID depending on channel */
+  /** Recipient - email address, phone number, or chat ID depending on channel */
   to: string;
   toName?: string;
   /** Short subject line (email only; optional for other channels) */

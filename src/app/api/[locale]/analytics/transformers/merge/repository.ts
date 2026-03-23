@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Merge Transformer Compute
+ * Vibe Sense - Merge Transformer Compute
  * Server-only pure computation. No DB access.
  * Sums two time series aligned by timestamp.
  */

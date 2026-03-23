@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Backtest Widget
+ * Vibe Sense - Backtest Widget
  * Form with date range + resolution, shows eligibility and ineligible nodes.
  */
 
@@ -19,9 +19,9 @@ import {
   useWidgetForm,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 
 import type definition from "./definition";
 

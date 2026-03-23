@@ -82,7 +82,7 @@ export interface EndpointLogger {
 export type ErrorLogLevel = "error" | "warn";
 
 /**
- * Global error sink — set once on server startup to persist errors/warnings.
+ * Global error sink - set once on server startup to persist errors/warnings.
  * Client-side this stays null (no DB access).
  */
 let globalErrorSink:

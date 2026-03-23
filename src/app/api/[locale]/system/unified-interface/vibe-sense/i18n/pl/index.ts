@@ -473,7 +473,7 @@ export const translations: typeof enTranslations = {
       },
     },
     rsi: {
-      description: "Wskaźnik siły względnej — oscylator momentum (0–100)",
+      description: "Wskaźnik siły względnej - oscylator momentum (0–100)",
       input: { source: { label: "Źródło" } },
       output: { value: { label: "RSI" } },
       params: {
@@ -482,7 +482,7 @@ export const translations: typeof enTranslations = {
     },
     bollinger: {
       description:
-        "Wstęgi Bollingera — obwiednia zmienności wokół średniej kroczącej",
+        "Wstęgi Bollingera - obwiednia zmienności wokół średniej kroczącej",
       input: { source: { label: "Źródło" } },
       output: {
         upper: { label: "Górna wstęga" },
@@ -498,7 +498,7 @@ export const translations: typeof enTranslations = {
       },
     },
     macd: {
-      description: "MACD — wskaźnik momentum podążający za trendem",
+      description: "MACD - wskaźnik momentum podążający za trendem",
       input: { source: { label: "Źródło" } },
       output: {
         macd: { label: "MACD" },
@@ -772,7 +772,7 @@ export const translations: typeof enTranslations = {
     },
     script: {
       description:
-        "Sandboxowany ewaluator skryptowy — otrzymuje serie wejściowe, zwraca zdarzenia sygnałów",
+        "Sandboxowany ewaluator skryptowy - otrzymuje serie wejściowe, zwraca zdarzenia sygnałów",
       input: { inputs: { label: "Wejścia" } },
       output: { signal: { label: "Sygnał" } },
       params: {

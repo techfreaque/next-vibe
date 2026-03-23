@@ -82,7 +82,7 @@ export class UnifiedTaskRunnerRepository {
   }
   /**
    * Fallback user for system tasks (userId IS NULL in DB).
-   * Only used when a task has no owner — e.g. seeded infrastructure tasks.
+   * Only used when a task has no owner - e.g. seeded infrastructure tasks.
    * User-created tasks always execute as their owner's actual roles.
    */
   private static readonly CRON_SYSTEM_USER: JwtPrivatePayloadType = {
@@ -280,7 +280,7 @@ export class UnifiedTaskRunnerRepository {
           userLocale = ownerRow[0].locale;
         }
 
-        // Load the task owner's actual roles — execute with their permissions,
+        // Load the task owner's actual roles - execute with their permissions,
         // not the hardcoded ADMIN system user. Prevents privilege escalation
         // where a CUSTOMER creates a cron task that calls an ADMIN-only endpoint.
         const roleRows = await db
@@ -316,7 +316,7 @@ export class UnifiedTaskRunnerRepository {
       const path = getPreferredToolName(task.definition);
       const { data, urlPathParams } = await splitTaskArgs(path, resolvedInput);
 
-      // Call the route handler directly — no more string-based resolution
+      // Call the route handler directly - no more string-based resolution
       const taskAbortController = new AbortController();
       const result = await task.route({
         data,
@@ -426,10 +426,10 @@ export class UnifiedTaskRunnerRepository {
       }
 
       // If the handler manages its own lifecycle (e.g. interactive Claude Code sessions),
-      // leave the task as RUNNING — the handler will mark it done via complete-task.
+      // leave the task as RUNNING - the handler will mark it done via complete-task.
       if (result.taskLifecycleManagedExternally) {
         UnifiedTaskRunnerRepository.logger!.info(
-          `Task "${taskName}" lifecycle managed externally — skipping automatic completion`,
+          `Task "${taskName}" lifecycle managed externally - skipping automatic completion`,
         );
         return success({
           status: CronTaskStatus.RUNNING,
@@ -792,7 +792,7 @@ export class UnifiedTaskRunnerRepository {
         });
 
       // Cron tasks are executed by the pulse runner (task-runner.ts),
-      // not scheduled here — pulse fires every minute and uses isCronTaskDue()
+      // not scheduled here - pulse fires every minute and uses isCronTaskDue()
       const cronTasks = tasks.filter(
         (task): task is CronTaskAny => task.type === "cron",
       );

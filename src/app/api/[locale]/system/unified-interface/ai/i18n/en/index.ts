@@ -4,7 +4,7 @@ export const translations = {
       title: "Execute Tool",
       dynamicTitle: "Execute: {{toolName}}",
       description:
-        "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication — this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
+        "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication - this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
       container: {
         title: "Tool Execution",
         description: "Route name and input parameters",
@@ -29,12 +29,12 @@ export const translations = {
         callbackMode: {
           label: "Callback Mode",
           description:
-            '"wait": execute synchronously, return result inline (default). "detach": fire-and-forget, returns {taskId} immediately — use wait-for-task later if needed. "wakeUp": fire-and-forget, result is automatically injected into the thread when ready — do NOT call wait-for-task. "endLoop": execute normally and return the result, but stop the tool loop after this batch — no further tool calls this turn (parallel sibling calls in the same batch still run). "approve": require user confirmation before executing.',
+            '"wait": execute synchronously, return result inline (default). "detach": fire-and-forget, returns {taskId} immediately - use wait-for-task later if needed. "wakeUp": fire-and-forget, result is automatically injected into the thread when ready - do NOT call wait-for-task. "endLoop": execute normally and return the result, but stop the tool loop after this batch - no further tool calls this turn (parallel sibling calls in the same batch still run). "approve": require user confirmation before executing.',
         },
       },
       response: {
         result:
-          "The result data returned by the target route. On failure this field is absent — the response itself will be an error.",
+          "The result data returned by the target route. On failure this field is absent - the response itself will be an error.",
         resultLabel: "Result",
       },
       errors: {
@@ -83,9 +83,9 @@ export const translations = {
     },
   },
   tools: {
-    // Translations moved to system/help/get — see system/help/i18n/en/index.ts
+    // Translations moved to system/help/get - see system/help/i18n/en/index.ts
     get: {
-      title: "Tool Help — Discover Available Tools",
+      title: "Tool Help - Discover Available Tools",
       description:
         "Search and discover all AI tools available to you. Use query to search by name, description, or alias. Use category to filter by tool category. Returns tool names, descriptions, aliases, and metadata.",
       category: "AI Tools",

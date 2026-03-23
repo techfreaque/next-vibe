@@ -4,7 +4,7 @@ import { scopedTranslation } from "./i18n";
 
 /**
  * IMAP Auth Method Enum
- * Keys match MessengerImapAuthMethod in accounts/enum so values are identical — no converter needed.
+ * Keys match MessengerImapAuthMethod in accounts/enum so values are identical - no converter needed.
  */
 export const {
   enum: ImapAuthMethod,

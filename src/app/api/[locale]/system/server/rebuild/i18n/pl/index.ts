@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Przebuduj i uruchom ponownie",
     description:
-      "Przebuduj aplikację i uruchom ponownie serwer Next.js. Wykonuje 6 kroków sekwencyjnie: 1) generowanie kodu, 2) vibe check (bramka jakości kodu), 3) produkcyjny build Next.js, 4) migracje bazy danych, 5) seeding bazy danych, 6) hot-restart przez SIGUSR1. Vibe check blokuje build przy błędach — użyj 'vibe check' lub MCP check tool po szczegóły. UWAGA: Odpowiedź HTTP może zostać ucięta, ponieważ serwer restartuje się przed ukończeniem odpowiedzi.",
+      "Przebuduj aplikację i uruchom ponownie serwer Next.js. Wykonuje 6 kroków sekwencyjnie: 1) generowanie kodu, 2) vibe check (bramka jakości kodu), 3) produkcyjny build Next.js, 4) migracje bazy danych, 5) seeding bazy danych, 6) hot-restart przez SIGUSR1. Vibe check blokuje build przy błędach - użyj 'vibe check' lub MCP check tool po szczegóły. UWAGA: Odpowiedź HTTP może zostać ucięta, ponieważ serwer restartuje się przed ukończeniem odpowiedzi.",
     form: {
       title: "Przebuduj i uruchom ponownie",
       description: "Przebuduj aplikację i uruchom ponownie serwer",
@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
       migrationFailed: "Migracja nie powiodła się: {{error}}",
       seedingFailed: "Seeding nie powiódł się: {{error}}",
       restartFailed: "Restart serwera nie powiódł się: {{error}}",
-      noPidFile: "Nie znaleziono pliku .vibe-pid — czy vibe start działa?",
+      noPidFile: "Nie znaleziono pliku .vibe-pid - czy vibe start działa?",
       invalidPid: "Nieprawidłowy PID w .vibe-pid: {{pid}}",
       processNotRunning: "Proces {{pid}} nie działa",
       signalFailed: "Nie udało się wysłać SIGUSR1: {{error}}",

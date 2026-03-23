@@ -7,7 +7,7 @@ export const translations = {
     signInDescription: "Sign in to connect to a remote account.",
     // Customer benefits (non-admin)
     benefit1:
-      "Memories sync automatically — everything you teach the AI here carries over",
+      "Memories sync automatically - everything you teach the AI here carries over",
     benefit2: "Access cloud AI models and tools from your local instance",
     benefit3: "Context travels with you across devices",
     // Admin benefits
@@ -15,9 +15,9 @@ export const translations = {
     adminBenefit2:
       "Cloud AI discovers and runs your local tools (SSH, files, code execution)",
     adminBenefit3:
-      "Delegate tasks from cloud to this machine — Claude Code executes locally",
+      "Delegate tasks from cloud to this machine - Claude Code executes locally",
     adminBenefit4:
-      "Capabilities snapshot sent every sync — Thea always knows what this instance can do",
+      "Capabilities snapshot sent every sync - Thea always knows what this instance can do",
   },
   post: {
     title: "Connect to Remote Account",
@@ -62,7 +62,7 @@ export const translations = {
       description: "Lead ID from the remote instance (set automatically)",
     },
     credentialWarning:
-      "Your credentials go directly from your browser to the remote server. However, the token stored here grants the operator of this server full access to your remote account — they can do anything you can do there. Only connect on servers you fully trust.",
+      "Your credentials go directly from your browser to the remote server. However, the token stored here grants the operator of this server full access to your remote account - they can do anything you can do there. Only connect on servers you fully trust.",
     actions: {
       submit: "Connect",
       submitting: "Connecting...",

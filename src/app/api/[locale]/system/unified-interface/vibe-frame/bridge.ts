@@ -1,14 +1,14 @@
 /**
- * Vibe Frame — Bridge
+ * Vibe Frame - Bridge
  *
  * Type-safe postMessage communication between parent page and iframe.
  * Two protocols:
  *
- *  1. vf: messages — high-level lifecycle events (ready, resize, success, etc.)
+ *  1. vf: messages - high-level lifecycle events (ready, resize, success, etc.)
  *     Parent → iframe: init, auth, theme, data, navigate
  *     iframe → parent: ready, resize, close, success, error, navigate, etc.
  *
- *  2. BRIDGE_CALL / BRIDGE_RESPONSE — privileged API calls from iframe to parent
+ *  2. BRIDGE_CALL / BRIDGE_RESPONSE - privileged API calls from iframe to parent
  *     iframe requests cookies, storage, URL info, navigation, etc.
  *     Parent executes and sends response back to iframe.
  *

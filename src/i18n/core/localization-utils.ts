@@ -247,7 +247,7 @@ export function getDefaultTimezone(locale: CountryLanguage): string {
   const country = getCountryFromLocale(locale);
   const key: TranslationKey = `config.timezone.${country}`;
   const resolved = t(key);
-  // If key wasn't found, t() returns the key itself — fall back to UTC
+  // If key wasn't found, t() returns the key itself - fall back to UTC
   return resolved === key ? "UTC" : resolved;
 }
 

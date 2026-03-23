@@ -11,7 +11,7 @@ interface ScriptProps {
 }
 
 /**
- * TanStack Start — renders a plain script tag via createElement to avoid lint rules.
+ * TanStack Start - renders a plain script tag via createElement to avoid lint rules.
  */
 export function Script({
   id,

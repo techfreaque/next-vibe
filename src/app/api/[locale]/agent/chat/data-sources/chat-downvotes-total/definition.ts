@@ -1,5 +1,5 @@
 /**
- * Chat Downvotes Total — Endpoint Definition
+ * Chat Downvotes Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

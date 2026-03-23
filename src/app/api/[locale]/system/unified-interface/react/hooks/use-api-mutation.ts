@@ -217,7 +217,7 @@ export function useApiMutation<TEndpoint extends CreateApiEndpointAny>(
   // - data/error: the actual result values
   // - reset: stable function from RQ
   // Intentionally excluded from deps: variables, context, failureReason, failureCount
-  // — these are object references RQ recreates every render even when idle (always undefined),
+  // - these are object references RQ recreates every render even when idle (always undefined),
   // which would cause the memo to fire every render and make streamMutation/cancelMutation
   // unstable, cascading into startStream/cancelStream re-creation on every render.
   // These fields are still returned (reading from closure is fine), just not depended on.

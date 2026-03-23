@@ -2,7 +2,7 @@
  * Vibe Frame Page
  *
  * Renders any next-vibe endpoint in isolation for iframe embedding.
- * This is a standard Next.js page — SSR + hydration handled by Next.js.
+ * This is a standard Next.js page - SSR + hydration handled by Next.js.
  *
  * URL: /[locale]/frame/[endpoint_identifier]
  * Query params: data, urlPathParams, theme, frameId, authToken

@@ -1,5 +1,5 @@
 /**
- * Users Marketing Consent — Route
+ * Users Marketing Consent - Route
  * Server-only.
  */
 

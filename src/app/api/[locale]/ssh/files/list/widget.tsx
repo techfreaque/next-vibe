@@ -1,5 +1,5 @@
 /**
- * SSH Files List Widget — File Browser
+ * SSH Files List Widget - File Browser
  */
 
 "use client";

@@ -36,16 +36,16 @@ import {
   TaskOutputModeDB,
 } from "../../enum";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { CRON_QUEUE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
 const CronQueueContainer = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.CronQueueContainer })),
 );
 
 /**
- * GET /cron/queue — Upcoming task queue sorted by next execution time
+ * GET /cron/queue - Upcoming task queue sorted by next execution time
  */
 const { GET } = createEndpoint({
   scopedTranslation,

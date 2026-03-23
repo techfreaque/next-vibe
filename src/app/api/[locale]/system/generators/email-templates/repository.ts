@@ -255,11 +255,11 @@ export class EmailTemplateGeneratorRepository {
           templateModule as Record<string, EmailTemplateDefinitionAny | null>,
         );
 
-        // Warn on default export — not allowed
+        // Warn on default export - not allowed
         if ("default" in templateModule) {
           logger.warn(
             formatWarning(
-              `${nestedPath}/email.tsx has a default export — not allowed. Use named exports ending in "EmailTemplate" instead. Default export ignored.`,
+              `${nestedPath}/email.tsx has a default export - not allowed. Use named exports ending in "EmailTemplate" instead. Default export ignored.`,
             ),
           );
         }
@@ -277,7 +277,7 @@ export class EmailTemplateGeneratorRepository {
           ) {
             logger.warn(
               formatWarning(
-                `${nestedPath}/email.tsx exports "${name}" which looks like an EmailTemplateDefinition but does not end in "EmailTemplate" — rename it to "${name}EmailTemplate".`,
+                `${nestedPath}/email.tsx exports "${name}" which looks like an EmailTemplateDefinition but does not end in "EmailTemplate" - rename it to "${name}EmailTemplate".`,
               ),
             );
           }
@@ -308,7 +308,7 @@ export class EmailTemplateGeneratorRepository {
           if (seenIds.has(id)) {
             logger.warn(
               formatWarning(
-                `Duplicate template id "${id}" in ${nestedPath}/email.tsx (export: ${exportName}) — skipping`,
+                `Duplicate template id "${id}" in ${nestedPath}/email.tsx (export: ${exportName}) - skipping`,
               ),
             );
             continue;
@@ -316,7 +316,7 @@ export class EmailTemplateGeneratorRepository {
           seenIds.add(id);
           fileTemplateCount++;
 
-          // Validate exampleProps — only string | number | boolean allowed
+          // Validate exampleProps - only string | number | boolean allowed
           const rawProps = templateDef.exampleProps ?? {};
           const validProps: Record<string, string | number | boolean> = {};
           for (const [k, v] of Object.entries(rawProps)) {
@@ -329,7 +329,7 @@ export class EmailTemplateGeneratorRepository {
             } else {
               logger.warn(
                 formatWarning(
-                  `${nestedPath}/email.tsx "${exportName}" exampleProps.${k} has invalid type "${v === null ? "null" : typeof v}" — must be string | number | boolean. Field skipped.`,
+                  `${nestedPath}/email.tsx "${exportName}" exampleProps.${k} has invalid type "${v === null ? "null" : typeof v}" - must be string | number | boolean. Field skipped.`,
                 ),
               );
             }
@@ -357,7 +357,7 @@ export class EmailTemplateGeneratorRepository {
         if (fileTemplateCount === 0) {
           logger.warn(
             formatWarning(
-              `${nestedPath}/email.tsx has no exports ending in "EmailTemplate" — no templates registered from this file.`,
+              `${nestedPath}/email.tsx has no exports ending in "EmailTemplate" - no templates registered from this file.`,
             ),
           );
         } else {
@@ -386,7 +386,7 @@ export class EmailTemplateGeneratorRepository {
       a.id.localeCompare(b.id),
     );
 
-    // All loaders return EmailTemplateDefinition — no per-template type imports needed
+    // All loaders return EmailTemplateDefinition - no per-template type imports needed
 
     // Generate template loaders (with trailing commas) - sorted by ID
     const loaderEntries = templatesById
@@ -394,7 +394,7 @@ export class EmailTemplateGeneratorRepository {
         // Build the accessor: .default for default export, [exportName] for named
         const accessor =
           t.exportName === "default" ? ".default" : `["${t.exportName}"]`;
-        // Cast to EmailTemplateDefinitionAny — TScopedTranslation is invariant so
+        // Cast to EmailTemplateDefinitionAny - TScopedTranslation is invariant so
         // concrete templates can't assign to the any-typed loader type without a cast.
         const cast = " as EmailTemplateDefinitionAny";
         const singleLine = `  "${t.id}": async () => (await import("${t.importPath}"))${accessor}${cast},`;

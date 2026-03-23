@@ -6,7 +6,7 @@ export const translations = {
   post: {
     title: "Start Electron App",
     description:
-      "Compile main/preload and launch the Electron desktop window (dev mode — no packaging)",
+      "Compile main/preload and launch the Electron desktop window (dev mode - no packaging)",
     form: {
       title: "Electron Start Configuration",
       description: "Configure how the Electron app starts",

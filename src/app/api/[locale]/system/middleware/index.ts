@@ -76,7 +76,7 @@ function stampCsrfCookie(request: NextRequest, response: NextResponse): void {
     path: "/",
     secure: env.NODE_ENV === Environment.PRODUCTION,
     sameSite: "strict" as const,
-    maxAge: 24 * 60 * 60, // 1 day — refreshed on every request
+    maxAge: 24 * 60 * 60, // 1 day - refreshed on every request
   });
 }
 
@@ -98,7 +98,7 @@ export async function middleware(
     return NextResponseClass.next();
   }
 
-  // CORS preflight for API routes — needed so cross-origin clients (e.g. a
+  // CORS preflight for API routes - needed so cross-origin clients (e.g. a
   // local instance calling the cloud login endpoint) can complete the request.
   if (request.method === "OPTIONS" && path.startsWith("/api/")) {
     return new NextResponseClass(null, {
@@ -116,7 +116,7 @@ export async function middleware(
 
   // Step 1: Strip bare "/en/" prefix hallucinated by AI tools in local testing.
   // Redirect to the path without it so normal locale detection takes over.
-  // Skipped in production — this only happens during local dev/testing.
+  // Skipped in production - this only happens during local dev/testing.
   if (env.NODE_ENV !== Environment.PRODUCTION) {
     const pathParts = path.split("/").filter(Boolean);
     const isApiRoute = pathParts[0] === "api";
@@ -166,10 +166,10 @@ export async function middleware(
   const locale =
     (extractLocaleFromPath(path) as CountryLanguage) || options.defaultLocale;
 
-  // Step 3: Frame routes — redeem exchange token (?et=) before any lead check.
+  // Step 3: Frame routes - redeem exchange token (?et=) before any lead check.
   // The embed script called the config API (credentials: include), which minted
   // a short-lived token encoding lead_id + optional auth JWT. We redeem it here,
-  // set the real httpOnly cookies, then pass through — no redirect needed.
+  // set the real httpOnly cookies, then pass through - no redirect needed.
   if (path.includes("/frame/")) {
     const et = request.nextUrl.searchParams.get("et");
     if (et) {
@@ -177,7 +177,7 @@ export async function middleware(
       if (payload) {
         const response = NextResponseClass.next();
         // Only set leadId cookie if the token carried one.
-        // If leadId is null, fall through — the leadId check below creates a new lead.
+        // If leadId is null, fall through - the leadId check below creates a new lead.
         if (payload.leadId) {
           response.cookies.set({
             name: LEAD_ID_COOKIE_NAME,
@@ -200,14 +200,14 @@ export async function middleware(
             maxAge: 30 * 24 * 60 * 60, // 30 days
           });
         }
-        // If we set a leadId cookie, we're done — skip the leadId check
+        // If we set a leadId cookie, we're done - skip the leadId check
         if (payload.leadId) {
           stampCsrfCookie(request, response);
           return response;
         }
-        // No leadId in token — fall through to lead creation below
+        // No leadId in token - fall through to lead creation below
       }
-      // Invalid/expired token or missing leadId — fall through to normal lead creation below
+      // Invalid/expired token or missing leadId - fall through to normal lead creation below
     }
   }
 
@@ -229,7 +229,7 @@ export async function middleware(
 
     if (isApiRoute) {
       // If the request carries a Bearer token, the JWT inside already contains
-      // a leadId — the route handler will authenticate via the token. Pass through.
+      // a leadId - the route handler will authenticate via the token. Pass through.
       const authHeader = request.headers.get("authorization");
       if (authHeader?.startsWith("Bearer ")) {
         const bearerResp = NextResponseClass.next();
@@ -240,7 +240,7 @@ export async function middleware(
 
       // The public login endpoint must work without a pre-existing lead_id
       // (cross-origin remote-connect clients have no cookie). Create one on
-      // the fly and pass through — do NOT redirect (that would drop the body).
+      // the fly and pass through - do NOT redirect (that would drop the body).
       if (path.includes("/user/public/login")) {
         const newLead = await createLeadId(request, locale);
         const newLeadId = newLead.cookies.get(LEAD_ID_COOKIE_NAME)?.value;
@@ -304,18 +304,18 @@ export async function middleware(
 
     // For page routes (including /frame/ without valid et), create a new leadId.
     // Frame routes: redirect is OK here because the iframe will reload with the
-    // cookie set — browser follows the redirect transparently.
+    // cookie set - browser follows the redirect transparently.
     const leadIdResp = await createLeadId(request, locale);
     addCorsHeaders(request, leadIdResp, path);
     return leadIdResp;
   }
 
-  // Valid leadId — sync lead locale if it changed
+  // Valid leadId - sync lead locale if it changed
   const leadLocale = request.cookies.get("lead_locale")?.value;
   if (leadLocale !== locale) {
     const leadId = getLeadIdFromRequest(request);
     if (leadId) {
-      // Fire-and-forget DB update — don't block the request
+      // Fire-and-forget DB update - don't block the request
       // eslint-disable-next-line no-empty-function -- Fire-and-forget: best-effort locale sync
       void updateLeadLocale(leadId, locale).catch(() => {});
     }

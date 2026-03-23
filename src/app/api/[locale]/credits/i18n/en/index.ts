@@ -139,7 +139,7 @@ export const translations = {
       adminTitle: "Spending Limit",
       description: "Use your credits across {{modelCount}} AI models",
       adminDescription:
-        "Credits act as a spending cap — control how much AI usage is allowed across all users.",
+        "Credits act as a spending cap - control how much AI usage is allowed across all users.",
       credit: "{{count}} credit",
       credits: "{{count}} credits",
       expiring: {
@@ -149,8 +149,8 @@ export const translations = {
       },
       permanent: {
         title: "Permanent Credits",
-        description: "Never expire — yours to keep",
-        adminDescription: "Permanent credits — never expire",
+        description: "Never expire - yours to keep",
+        adminDescription: "Permanent credits - never expire",
       },
       free: {
         title: "Free Credits",
@@ -160,7 +160,7 @@ export const translations = {
       },
       earned: {
         title: "Earned Credits",
-        description: "Earned via referrals — click to invite friends",
+        description: "Earned via referrals - click to invite friends",
       },
       spending: {
         title: "Your Earned Credits",
@@ -501,7 +501,7 @@ export const translations = {
   email: {
     creditPack: {
       user: {
-        subject: "Your credit pack is ready — {{appName}}",
+        subject: "Your credit pack is ready - {{appName}}",
         title: "Credits added to your account",
         previewText: "{{credits}} credits have been added to your account",
         greeting: "Hi {{privateName}},",
@@ -510,7 +510,7 @@ export const translations = {
         signoff: "Thank you for your purchase!\n\nThe {{appName}} Team",
       },
       admin: {
-        subject: "[{{appName}}] Credit pack purchased — {{credits}} credits",
+        subject: "[{{appName}}] Credit pack purchased - {{credits}} credits",
         title: "Credit Pack Purchase",
         preview: "A user purchased a credit pack",
         body: "A user has purchased a credit pack.",

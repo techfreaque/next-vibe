@@ -29,7 +29,7 @@ export class StreamContextInitializer {
     logger: EndpointLogger;
     locale: CountryLanguage;
     wsEmit?: WsEmitCallback | null;
-    /** Force a specific sequenceId — used by wakeUp revival to share sequence with deferred tool pair */
+    /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): StreamContext {
     const {

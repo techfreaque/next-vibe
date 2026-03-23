@@ -1,5 +1,5 @@
 /**
- * Vibe Frame — Package / Library Entry Point
+ * Vibe Frame - Package / Library Entry Point
  *
  * ESM library export. Does NOT auto-initialize or expose on window.
  * Import this when using vibe-frame as an npm package in a bundled app.
@@ -12,10 +12,24 @@
  *   <script src="/vibe-frame/vibe-frame.js"></script>
  */
 
-export type { FrameBridge, ParentBridge } from "./bridge";
 export { createFrameBridge, createParentBridge } from "./bridge";
-export { getConfig, subscribeConfig, VibeFrame } from "./embed";
+/**
+ * Vibe Frame - Package / Library Entry Point
+ *
+ * ESM library export. Does NOT auto-initialize or expose on window.
+ * Import this when using vibe-frame as an npm package in a bundled app.
+ *
+ * Usage:
+ *   import { VibeFrame, subscribeConfig } from "next-vibe/vibe-frame";
+ *   VibeFrame.mount({ serverUrl, endpoint, target });
+ *
+ * For <script> tag usage with declarative config, use the IIFE bundle instead:
+ *   <script src="/vibe-frame/vibe-frame.js"></script>
+ */
+export type { FrameBridge, ParentBridge } from "./bridge";
+export { VibeFrame, getConfig, subscribeConfig } from "./embed";
 export { setupTrigger } from "./triggers";
+export { DEFAULT_SANDBOX, generateFrameId } from "./types";
 export type {
   BridgeAction,
   BridgeActionMap,
@@ -42,4 +56,3 @@ export type {
   VibeFramePublicAPI,
   VibeFrameSharedOptions,
 } from "./types";
-export { DEFAULT_SANDBOX, generateFrameId } from "./types";

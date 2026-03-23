@@ -59,7 +59,7 @@ export const {
   IMAP_HOST: {
     schema: z.string().optional(),
     example: "imap.example.com",
-    comment: "System IMAP (inbound) — leave blank if same host as SMTP",
+    comment: "System IMAP (inbound) - leave blank if same host as SMTP",
     commented: true,
   },
   IMAP_PORT: {

@@ -1,5 +1,5 @@
 /**
- * Chat Messages Total — Route
+ * Chat Messages Total - Route
  * Server-only.
  */
 

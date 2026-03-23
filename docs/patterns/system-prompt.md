@@ -1,6 +1,6 @@
 # System Prompt Pattern
 
-Guide to the modular system prompt fragment system — how modules contribute context to the AI's system prompt.
+Guide to the modular system prompt fragment system - how modules contribute context to the AI's system prompt.
 
 ## Overview
 
@@ -12,9 +12,9 @@ Fragments are **auto-indexed**: the generator scans all `system-prompt/prompt.ts
 
 ```
 <module>/system-prompt/
-  prompt.ts   — Fragment definition + data interface (isomorphic, no server imports)
-  server.ts   — Server-side data loader (import "server-only")
-  client.ts   — Client-side React hook returning the same data shape
+  prompt.ts   - Fragment definition + data interface (isomorphic, no server imports)
+  server.ts   - Server-side data loader (import "server-only")
+  client.ts   - Client-side React hook returning the same data shape
 ```
 
 ### Types
@@ -36,10 +36,10 @@ interface SystemPromptFragment<TData> {
 | `id`        | Unique string slug across all fragments                                                      |
 | `placement` | `"leading"` = static system prompt (cached); `"trailing"` = injected before each turn        |
 | `priority`  | Lower = earlier in the section. Built-ins use multiples of 100; modules use gaps (150, 250…) |
-| `condition` | Optional — if it returns `false`, `build` is skipped. Check data availability here.          |
-| `build`     | Pure function — returns the text block or `null` to skip. No async, no side effects.         |
+| `condition` | Optional - if it returns `false`, `build` is skipped. Check data availability here.          |
+| `build`     | Pure function - returns the text block or `null` to skip. No async, no side effects.         |
 
-## prompt.ts — Fragment Definition
+## prompt.ts - Fragment Definition
 
 ```typescript
 // agent/chat/favorites/system-prompt/prompt.ts
@@ -61,7 +61,7 @@ export const favoritesFragment: SystemPromptFragment<FavoritesData> = {
   build: (data) => {
     const favorites = data.favorites ?? [];
     if (favorites.length === 0) {
-      return "## Favorites — Not Set Up Yet\n...";
+      return "## Favorites - Not Set Up Yet\n...";
     }
     return `## Favorites (${favorites.length})\n...`;
   },
@@ -70,11 +70,11 @@ export const favoritesFragment: SystemPromptFragment<FavoritesData> = {
 
 **Rules for `prompt.ts`:**
 
-- No `import "server-only"` — this file runs on both server and client
-- No async operations in `build` — data loading belongs in `server.ts`/`client.ts`
+- No `import "server-only"` - this file runs on both server and client
+- No async operations in `build` - data loading belongs in `server.ts`/`client.ts`
 - The `TData` type exported here is the contract that both server and client must satisfy
 
-## server.ts — Data Loader
+## server.ts - Data Loader
 
 ```typescript
 // agent/chat/favorites/system-prompt/server.ts
@@ -107,10 +107,10 @@ export async function loadFavoritesData(
 
 - Always `import "server-only"` as first line
 - Function name: `load<ModuleName>Data(params: SystemPromptServerParams): Promise<TData>`
-- Handle errors gracefully — return safe fallback (never throw)
+- Handle errors gracefully - return safe fallback (never throw)
 - Use dynamic imports for expensive/optional dependencies
 
-## client.ts — React Hook
+## client.ts - React Hook
 
 ```typescript
 // agent/chat/favorites/system-prompt/client.ts
@@ -145,8 +145,8 @@ export function useFavoritesData(
 
 - Function name: `use<ModuleName>Data(params: SystemPromptClientParams): TData`
 - Must return exactly the same `TData` shape as `server.ts`
-- Always call hooks unconditionally (React rules) — gate with params instead
-- No async/await — hooks only
+- Always call hooks unconditionally (React rules) - gate with params instead
+- No async/await - hooks only
 
 ## Standard Params
 
@@ -199,20 +199,20 @@ Use a gap (e.g. 250, 350) so new fragments can be inserted between without renum
 
 ## Placement
 
-- **`"leading"`** — Goes into the static `system` parameter. Sent once per session start. Cached by the model provider. Use for stable identity/context.
-- **`"trailing"`** — Injected as a system message immediately before `[Context:]` each turn. Use for dynamic data (favorites, memories, live task state).
+- **`"leading"`** - Goes into the static `system` parameter. Sent once per session start. Cached by the model provider. Use for stable identity/context.
+- **`"trailing"`** - Injected as a system message immediately before `[Context:]` each turn. Use for dynamic data (favorites, memories, live task state).
 
 ## Adding a New Module Fragment
 
-1. Create `<module>/system-prompt/prompt.ts` — define `TData` interface and export fragment
-2. Create `<module>/system-prompt/server.ts` — export `load<Module>Data(params)`
-3. Create `<module>/system-prompt/client.ts` — export `use<Module>Data(params)` hook
+1. Create `<module>/system-prompt/prompt.ts` - define `TData` interface and export fragment
+2. Create `<module>/system-prompt/server.ts` - export `load<Module>Data(params)`
+3. Create `<module>/system-prompt/client.ts` - export `use<Module>Data(params)` hook
 4. Run the fragment generator: `vibe generate-prompt-fragments` (or `vibe generate-all`)
 5. The fragment appears in the three generated index files automatically
 
 ## Auto-generated Indices
 
-Three files in `system/generated/` are auto-generated — **never edit them manually**:
+Three files in `system/generated/` are auto-generated - **never edit them manually**:
 
 ### `prompt-fragments.ts` (isomorphic)
 

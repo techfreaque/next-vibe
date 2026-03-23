@@ -211,7 +211,7 @@ export class CronTasksListRepository {
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
-      // Server-side search filter — applied after base filters, not counted in status counts
+      // Server-side search filter - applied after base filters, not counted in status counts
       const searchTerm = data.search?.trim();
       const searchCondition = searchTerm
         ? or(
@@ -339,7 +339,7 @@ export class CronTasksListRepository {
         disabled: countDisabled,
       };
 
-      // Counts by hidden visibility — independent of the current hidden filter
+      // Counts by hidden visibility - independent of the current hidden filter
       // so all 3 visibility tabs can show accurate counts simultaneously
       const baseCountConditions = [];
       if (!isAdmin) {
@@ -502,7 +502,7 @@ export class CronTasksListRepository {
         }
       }
 
-      // Public (unauthenticated) users must never create tasks — tasks without
+      // Public (unauthenticated) users must never create tasks - tasks without
       // a userId run as the system ADMIN user, which would be a privilege escalation.
       // Auth is enforced at the route level but we guard here as a safety net.
       if (user.isPublic) {
@@ -515,7 +515,7 @@ export class CronTasksListRepository {
       const userId = user.id;
       const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
 
-      // Validate targetInstance — everyone can set it, but only to instances
+      // Validate targetInstance - everyone can set it, but only to instances
       // they own (i.e. have an active remote connection for). This prevents
       // a customer from routing tasks to another user's instance, which would
       // execute as ADMIN on the remote (synced tasks have no userId locally).
@@ -544,7 +544,7 @@ export class CronTasksListRepository {
 
       // Prepare task data for insertion
       const fullId = data.id || crypto.randomUUID();
-      // shortId: caller-provided ids (system slugs) are already short — mirror them.
+      // shortId: caller-provided ids (system slugs) are already short - mirror them.
       // Generated UUIDs get a compact nanoid(8) scoped per user.
       const shortId = data.id ? data.id : nanoid(8);
       const taskData = {

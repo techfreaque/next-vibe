@@ -1,5 +1,5 @@
 /**
- * SSH Terminal Widget — Full PTY terminal using xterm.js polling loop
+ * SSH Terminal Widget - Full PTY terminal using xterm.js polling loop
  * Uses session/open + session/write + session/read endpoints
  */
 
@@ -41,7 +41,7 @@ function getCsrfToken(): string | null {
 
 // Strip ANSI/VT escape sequences so raw shell output renders cleanly.
 // Covers: CSI sequences, OSC strings, DCS, private modes (e.g. ?2004h for bracketed paste).
-// Control characters are required here intentionally — disable the rule.
+// Control characters are required here intentionally - disable the rule.
 // eslint-disable-next-line no-control-regex, no-useless-escape
 const ANSI_RE =
   // eslint-disable-next-line no-control-regex

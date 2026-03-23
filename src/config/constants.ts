@@ -20,7 +20,7 @@ function getPortSuffix(): string {
       }
     }
   } catch {
-    // ignore — fall through to no suffix
+    // ignore - fall through to no suffix
   }
   return "";
 }
@@ -33,7 +33,7 @@ export const AUTH_TOKEN_COOKIE_MAX_AGE_DAYS = 90;
 export const AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS =
   60 * 60 * 24 * AUTH_TOKEN_COOKIE_MAX_AGE_DAYS; // AUTH_TOKEN_COOKIE_MAX_AGE_DAYS days
 /**
- * Auth token cookie name — port-scoped in non-production to prevent
+ * Auth token cookie name - port-scoped in non-production to prevent
  * dev (3000) and local (3001) from clobbering each other's sessions.
  * In production there's only one port so no suffix is needed.
  */

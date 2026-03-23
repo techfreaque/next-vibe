@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Client Component
+ * Vibe Sense - Client Component
  * Renders the graph list using EndpointsPage
  */
 

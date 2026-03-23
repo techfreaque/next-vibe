@@ -1,5 +1,5 @@
 /**
- * Credits Free Pool Utilization — Repository
+ * Credits Free Pool Utilization - Repository
  * Server-only. DB access.
  * Snapshot: ratio of consumed free credits across lead wallets per resolution bucket.
  */

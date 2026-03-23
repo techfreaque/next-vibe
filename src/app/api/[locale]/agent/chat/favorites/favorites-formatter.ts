@@ -55,7 +55,7 @@ function compactLine(fav: FavoriteSummaryItem): string {
 
 /**
  * Format favorites list into a system prompt summary string.
- * Single source of truth (isomorphic — works on client and server).
+ * Single source of truth (isomorphic - works on client and server).
  *
  * Strategy:
  * - Active favorite first, then by position
@@ -63,16 +63,16 @@ function compactLine(fav: FavoriteSummaryItem): string {
  */
 /**
  * Returns setup guidance when no favorites exist yet.
- * Only shown in private/cron threads (caller responsibility — builder.ts filters).
+ * Only shown in private/cron threads (caller responsibility - builder.ts filters).
  */
 export function formatEmptyFavoritesGuidance(): string {
-  return `## Favorites — Not Set Up Yet
+  return `## Favorites - Not Set Up Yet
 
 You have no saved favorites. Favorites let you save character + model + tool combinations for instant reuse.
 
 **Why set one up:**
 - Switch between specialized personas (coder, writer, analyst) in one click
-- Lock a preferred model per character — no manual selection each time
+- Lock a preferred model per character - no manual selection each time
 - Pre-configure which tools each persona can access
 - Use \`favoriteId\` in API/CLI/cron calls for zero-config AI runs
 
@@ -104,7 +104,7 @@ export function formatFavoritesSummary(
 
   const activeFav = sorted.find((f) => f.isActive);
   const activeNote = activeFav
-    ? ` — active: "${activeFav.name}" (${activeFav.modelId ?? activeFav.modelInfo})`
+    ? ` - active: "${activeFav.name}" (${activeFav.modelId ?? activeFav.modelInfo})`
     : "";
 
   const header = `## Favorites (${favorites.length})${activeNote}`;
@@ -140,7 +140,7 @@ export function formatFavoritesSummary(
   const parts = [header, lines.join("\n")];
   if (hiddenCount > 0) {
     parts.push(
-      `[... ${hiddenCount} more favorite${hiddenCount === 1 ? "" : "s"} not shown — use \`${FAVORITES_LIST_ALIAS}\` for the full list]`,
+      `[... ${hiddenCount} more favorite${hiddenCount === 1 ? "" : "s"} not shown - use \`${FAVORITES_LIST_ALIAS}\` for the full list]`,
     );
   }
   parts.push(footer);

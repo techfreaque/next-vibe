@@ -18,7 +18,7 @@ export const translations = {
       leadId: {
         label: "Lead ID",
         description:
-          "Visitor lead ID from the host page (cross-origin — cannot be read from cookies)",
+          "Visitor lead ID from the host page (cross-origin - cannot be read from cookies)",
       },
       authToken: {
         label: "Auth Token",
@@ -46,7 +46,7 @@ export const translations = {
       hasRendered: {
         label: "Has Rendered",
         description:
-          "Set to true if this integration is already mounted — server can skip it",
+          "Set to true if this integration is already mounted - server can skip it",
       },
       theme: {
         label: "Theme",

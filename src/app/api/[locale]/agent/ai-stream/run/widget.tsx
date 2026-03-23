@@ -48,7 +48,6 @@ import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { useSkill } from "../../chat/skills/[id]/hooks";
 import { DefaultFolderId } from "../../chat/config";
 import { ChatMessageRole } from "../../chat/enum";
 import {
@@ -56,6 +55,7 @@ import {
   useChatNavigationStore,
 } from "../../chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "../../chat/settings/hooks";
+import { useSkill } from "../../chat/skills/[id]/hooks";
 import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
 import { defaultModel, type ModelId } from "../../models/models";
 import {
@@ -524,7 +524,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
     <Div className="flex flex-col h-[500px] min-h-[300px]">
       <FormAlertWidget field={emptyField} />
 
-      {/* Messages area — flex-grow + scroll so input stays at bottom */}
+      {/* Messages area - flex-grow + scroll so input stays at bottom */}
       <Div className="flex-1 overflow-y-auto min-h-0">
         {/* Loading state */}
         {isSubmitting && !displayThreadId && (
@@ -533,7 +533,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
           </Div>
         )}
 
-        {/* Response thread messages — real threadId OR mock incognito data */}
+        {/* Response thread messages - real threadId OR mock incognito data */}
         {(displayThreadId ?? mockMessagesInitialData) && (
           <ChatNavigationProvider
             activeThreadId={displayThreadId ?? "mock"}
@@ -555,7 +555,7 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
         )}
       </Div>
 
-      {/* Chat-like input — sticky at bottom */}
+      {/* Chat-like input - sticky at bottom */}
       <WidgetChatInput
         content={promptValue}
         onContentChange={handleContentChange}

@@ -1,5 +1,5 @@
 /**
- * Leads Form Submits — Repository
+ * Leads Form Submits - Repository
  * Server-only. DB access.
  * Counts FORM_SUBMIT engagement events per resolution bucket.
  */
@@ -17,9 +17,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
-import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { TimeRange } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type {
+  DataPoint,
+  Resolution,
+  TimeRange,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { leadEngagements } from "../../db";
 import { EngagementTypes } from "../../enum";
 

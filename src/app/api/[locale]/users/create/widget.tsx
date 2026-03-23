@@ -307,7 +307,7 @@ export function UserCreateContainer({
     );
   }
 
-  // Default: form state — framework renders form fields; widget provides the wrapper
+  // Default: form state - framework renders form fields; widget provides the wrapper
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}

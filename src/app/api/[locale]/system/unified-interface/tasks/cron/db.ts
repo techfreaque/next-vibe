@@ -32,24 +32,24 @@ import type { JsonValue, NotificationTarget } from "../unified-runner/types";
  */
 export const cronTasks = pgTable("cron_tasks", {
   /**
-   * id — stable, human-readable identity (e.g. "db-health", "credits-expire").
+   * id - stable, human-readable identity (e.g. "db-health", "credits-expire").
    * System tasks get this from code; user/remote tasks get it generated.
    */
   id: text("id").primaryKey(),
   /**
-   * shortId — short, user-scoped display identifier (nanoid ~8 chars).
+   * shortId - short, user-scoped display identifier (nanoid ~8 chars).
    * For system tasks (userId IS NULL): mirrors id (already a short slug).
    * For user tasks: nanoid(8), unique per user via partial index.
    * Use this for display/formatter output; use id for internal DB references.
    */
   shortId: text("short_id").notNull(),
   /**
-   * routeId — which handler to call.
-   * NOT an identity key — multiple tasks can call the same endpoint.
+   * routeId - which handler to call.
+   * NOT an identity key - multiple tasks can call the same endpoint.
    * Accepts: task name, endpoint alias, or full endpoint path.
    */
   routeId: text("route_id").notNull(),
-  /** Human-readable label — separate from routeId for display */
+  /** Human-readable label - separate from routeId for display */
   displayName: text("display_name").notNull(),
   description: text("description"),
   version: text("version").notNull().default("1.0.0"),
@@ -64,7 +64,7 @@ export const cronTasks = pgTable("cron_tasks", {
   retries: integer("retries").default(3),
   retryDelay: integer("retry_delay").default(30000), // 30 seconds default
   /**
-   * taskInput — the input the task executes with (body + URL path params merged flat).
+   * taskInput - the input the task executes with (body + URL path params merged flat).
    * Can be overridden per DB instance. splitTaskArgs() splits by schema at execution time.
    */
   taskInput: jsonb("task_input")
@@ -72,7 +72,7 @@ export const cronTasks = pgTable("cron_tasks", {
     .notNull()
     .default({}),
   /**
-   * runOnce — when true, the task disables itself after the first execution
+   * runOnce - when true, the task disables itself after the first execution
    * (success or failure). Re-enable by setting enabled=true again.
    */
   runOnce: boolean("run_once").notNull().default(false),
@@ -108,13 +108,13 @@ export const cronTasks = pgTable("cron_tasks", {
   averageExecutionTime: integer("average_execution_time").default(0),
 
   // Failure tracking (informational only)
-  /** Running count of consecutive failures — reset to 0 on success */
+  /** Running count of consecutive failures - reset to 0 on success */
   consecutiveFailures: integer("consecutive_failures").notNull().default(0),
 
-  // Instance routing — null means "run only on host instance"
+  // Instance routing - null means "run only on host instance"
   targetInstance: text("target_instance"),
 
-  // Revival context — typed columns for wakeUp/wait callback flow.
+  // Revival context - typed columns for wakeUp/wait callback flow.
   // Stored here (not in taskInput) so they are first-class typed fields
   // that handleTaskCompletion can read without parsing untyped JSON.
   wakeUpThreadId: text("wake_up_thread_id"),

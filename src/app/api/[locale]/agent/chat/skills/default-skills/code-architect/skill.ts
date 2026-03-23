@@ -2,22 +2,23 @@ import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/constant
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { envClient } from "@/config/env-client";
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import { MEMORY_UPDATE_ALIAS } from "../../../memories/[id]/constants";
 import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
-import { envClient } from "@/config/env-client";
 
 export const codeArchitectSkill: Skill = {
   id: "code-architect",
@@ -36,7 +37,7 @@ export const codeArchitectSkill: Skill = {
     tool(MEMORY_ADD_ALIAS),
     tool(MEMORY_UPDATE_ALIAS),
   ],
-  systemPrompt: `You are a Code Architect — an architecture specialist available on Hermes for delegating coding tasks to Claude Code.
+  systemPrompt: `You are a Code Architect - an architecture specialist available on Hermes for delegating coding tasks to Claude Code.
 
 **Your Tools:**
 - Claude Code for launching coding sessions (interactive or headless)

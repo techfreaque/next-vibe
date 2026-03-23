@@ -21,18 +21,10 @@ import {
   scopedTranslation,
 } from "@/app/api/[locale]/contact/i18n";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { ExtractScopedKeyType, TParams } from "@/i18n/core/static-types";
+import type { ExtractScopedKeyType } from "@/i18n/core/static-types";
 
-import type {
-  AnyChildrenConstrain,
-  ConstrainedChildUsage,
-  FieldUsageConfig,
-} from "../../../unified-ui/widgets/_shared/types";
 import { createEndpoint } from "../../endpoints/definition/create";
 import { objectField, requestField } from "../../field/utils-new";
-import type { UnifiedField } from "../../types/endpoint";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -646,7 +638,7 @@ const globalEndpointInvalidTitle = createEndpoint({
   },
 });
 
-// Invalid widget label — using requestField so error appears at the label property.
+// Invalid widget label - using requestField so error appears at the label property.
 const globalEndpointInvalidWidgetLabel = createEndpoint({
   scopedTranslation: scopedTranslation,
   method: Methods.POST,
@@ -1309,7 +1301,7 @@ const scopedEndpointInvalidSelectFieldOptionLabel = createEndpoint({
   },
 });
 
-// Invalid container title key — standalone objectField test.
+// Invalid container title key - standalone objectField test.
 // NOTE: Using @ts-expect-error inside objectField within createEndpoint breaks type
 // inference for the whole endpoint (same limitation as global objectField). Standalone form works.
 const scopedEndpointInvalidContainerTitle = objectField(scopedTranslation, {
@@ -1330,7 +1322,7 @@ const scopedEndpointInvalidContainerTitle = objectField(scopedTranslation, {
   },
 });
 
-// Invalid container description key — standalone objectField test.
+// Invalid container description key - standalone objectField test.
 const scopedEndpointInvalidContainerDescription = objectField(
   scopedTranslation,
   {
@@ -1560,7 +1552,7 @@ const test6B_validField = requestField({
 });
 
 // NOTE: requestField does NOT enforce translation key validation at the property level.
-// The label "invalid.key" does not produce a compile error here — no @ts-expect-error needed.
+// The label "invalid.key" does not produce a compile error here - no @ts-expect-error needed.
 const test6B_invalidField = requestField({
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
@@ -1571,8 +1563,8 @@ const test6B_invalidField = requestField({
 
 // ---------------------------------------------------------------------------
 // Test 6C: objectField validation
-// objectField uses global TranslationKey — container title must be a global key.
-// "form.label" is a scoped contact key, NOT a global key — use a global key here.
+// objectField uses global TranslationKey - container title must be a global key.
+// "form.label" is a scoped contact key, NOT a global key - use a global key here.
 // ---------------------------------------------------------------------------
 const test6C_validObject = objectFieldNew({
   type: WidgetType.CONTAINER,
@@ -1592,7 +1584,7 @@ const test6C_validObject = objectFieldNew({
 });
 
 // NOTE: requestField does NOT enforce key validation at the property level inside objectField either.
-// Child label keys in requestField are not validated — no @ts-expect-error needed.
+// Child label keys in requestField are not validated - no @ts-expect-error needed.
 const test6C_invalidObject = objectFieldNew({
   type: WidgetType.CONTAINER,
   title: "app.common.active", // Valid global key

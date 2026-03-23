@@ -1,5 +1,5 @@
 /**
- * Chat Messages By User — Route
+ * Chat Messages By User - Route
  * Server-only.
  */
 

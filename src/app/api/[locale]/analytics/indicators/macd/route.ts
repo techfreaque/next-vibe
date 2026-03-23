@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — MACD Route
+ * Vibe Sense - MACD Route
  * Server-only.
  */
 

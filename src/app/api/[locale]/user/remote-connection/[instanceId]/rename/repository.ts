@@ -1,6 +1,6 @@
 /**
  * Remote Connection Rename Repository
- * PATCH — update the local instanceId label for a remote connection.
+ * PATCH - update the local instanceId label for a remote connection.
  *         When propagate=true, also calls the remote's self/rename with
  *         propagate=false so the remote updates its own identity without
  *         calling us back.

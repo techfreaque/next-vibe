@@ -1,5 +1,5 @@
 /**
- * Newsletter Events Total — Route
+ * Newsletter Events Total - Route
  * Server-only.
  */
 

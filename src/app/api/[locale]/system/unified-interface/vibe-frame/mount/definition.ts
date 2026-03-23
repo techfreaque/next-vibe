@@ -1,5 +1,5 @@
 /**
- * Vibe Frame Config — Endpoint Definition
+ * Vibe Frame Config - Endpoint Definition
  *
  * POST /api/[locale]/system/unified-interface/vibe-frame/mount
  *

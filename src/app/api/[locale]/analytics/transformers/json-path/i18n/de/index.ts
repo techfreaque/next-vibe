@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "JSON-Pfad",
     description:
-      "JSON-Pfad — extrahiert Wert per Punktnotation (abgelöst, gibt leer zurück)",
+      "JSON-Pfad - extrahiert Wert per Punktnotation (abgelöst, gibt leer zurück)",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       path: {

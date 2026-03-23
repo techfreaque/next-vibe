@@ -85,7 +85,7 @@ export function buildMessagePath(
   // When leafMessageId is known and present in the window, build the path by walking
   // UP from the leaf to the oldest loaded ancestor, then reversing.
   // This correctly handles partially-loaded branch windows (e.g. after compaction) where
-  // the ancestry chain has gaps — it doesn't require a fully-connected tree from root to leaf.
+  // the ancestry chain has gaps - it doesn't require a fully-connected tree from root to leaf.
   if (leafMessageId && messageIds.has(leafMessageId)) {
     const reversePath: ChatMessage[] = [];
     let cur: string | null = leafMessageId;
@@ -100,7 +100,7 @@ export function buildMessagePath(
     reversePath.reverse();
 
     // Build branchInfo so the branch navigator renders correctly.
-    // Only record real branches — parallel tool calls in a single AI step share
+    // Only record real branches - parallel tool calls in a single AI step share
     // the same sequenceId and must NOT trigger the branch navigator.
     const branchInfo: Record<
       string,
@@ -134,7 +134,7 @@ export function buildMessagePath(
     return { path: reversePath, branchInfo };
   }
 
-  // Fallback: no leafMessageId — traverse DOWN from roots using branchIndices.
+  // Fallback: no leafMessageId - traverse DOWN from roots using branchIndices.
   // Find ALL root messages: messages with no parent OR whose parent is not in the current window.
   const rootMessages = messages
     .filter((msg) => !msg.parentId || !messageIds.has(msg.parentId))
@@ -186,7 +186,7 @@ export function buildMessagePath(
       };
       currentMessage = children[validIndex];
     } else if (children.length > 1) {
-      // Same-sequence siblings (parallel tool calls) — pick latest by createdAt
+      // Same-sequence siblings (parallel tool calls) - pick latest by createdAt
       currentMessage = children[children.length - 1];
     } else {
       currentMessage = children[0];

@@ -153,7 +153,7 @@ export const translations: typeof enTranslations = {
     graphSettings: "Ustawienia grafu",
     canvasEmpty: "Canvas jest pusty",
     canvasEmptyHint: "Przeciagnij wezly z palety aby zaczac",
-    shortcutDelete: "Del — usun wezel",
-    shortcutSave: "⌘S — zapisz",
+    shortcutDelete: "Del - usun wezel",
+    shortcutSave: "⌘S - zapisz",
   },
 };

@@ -1,5 +1,5 @@
 /**
- * Leads Website Visits — Route
+ * Leads Website Visits - Route
  * Server-only.
  */
 

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Zusammenführen",
     description:
-      "Zusammenführen — summiert zwei zeitlich ausgerichtete Zeitreihen",
+      "Zusammenführen - summiert zwei zeitlich ausgerichtete Zeitreihen",
     fields: {
       a: { label: "Reihe A", description: "Erste Eingabe-Zeitreihe" },
       b: { label: "Reihe B", description: "Zweite Eingabe-Zeitreihe" },

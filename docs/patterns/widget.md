@@ -4,7 +4,7 @@ Comprehensive guide to the `widget.tsx` / `widget/` folder pattern for custom UI
 
 ## Overview
 
-Every endpoint is **definition-driven by default** — the rendering engine (`EndpointsPage` → `EndpointRenderer`) reads the definition fields and generates UI automatically. A custom widget is only needed when the auto-rendered UI is insufficient.
+Every endpoint is **definition-driven by default** - the rendering engine (`EndpointsPage` → `EndpointRenderer`) reads the definition fields and generates UI automatically. A custom widget is only needed when the auto-rendered UI is insufficient.
 
 When a custom widget IS needed, it lives alongside the endpoint's `definition.ts`, in one of two forms:
 
@@ -15,12 +15,12 @@ When a custom widget IS needed, it lives alongside the endpoint's `definition.ts
 
 ## Fundamental Rules
 
-1. **Scoped to deepest route** — A widget file lives next to the `definition.ts` it renders. No exceptions.
-2. **Self-contained** — A widget owns all its sub-components. It does NOT import UI components from sibling or parent endpoint widgets.
-3. **No reconstruction** — Never recreate features that belong to another endpoint. If you need another endpoint's UI, use `EndpointsPage` (for embedding) or the navigation stack (for navigation/modal).
-4. **Definition is the contract** — Widgets access data through the typed `field.children` from `customWidgetObject`. No raw API calls inside a widget.
-5. **Context hooks for runtime data** — Inside a `customWidgetObject` widget, use `useWidget*` hooks for locale, user, form, navigation. Never accept these via props. Exception: dialog wrappers and page-level wrappers that pass `locale`/`user` down to `EndpointsPage` DO accept them as props — but they are not widgets, they are wrappers.
-6. **No local state for request params** — Search queries, filters, sort order, pagination — any value that controls what data is fetched or how it is filtered — must be a `requestField` in the definition and read/written via `form.watch()` / `form.setValue()`. Only use `useState` for pure UI state (open/closed dialogs, hover, loading spinners).
+1. **Scoped to deepest route** - A widget file lives next to the `definition.ts` it renders. No exceptions.
+2. **Self-contained** - A widget owns all its sub-components. It does NOT import UI components from sibling or parent endpoint widgets.
+3. **No reconstruction** - Never recreate features that belong to another endpoint. If you need another endpoint's UI, use `EndpointsPage` (for embedding) or the navigation stack (for navigation/modal).
+4. **Definition is the contract** - Widgets access data through the typed `field.children` from `customWidgetObject`. No raw API calls inside a widget.
+5. **Context hooks for runtime data** - Inside a `customWidgetObject` widget, use `useWidget*` hooks for locale, user, form, navigation. Never accept these via props. Exception: dialog wrappers and page-level wrappers that pass `locale`/`user` down to `EndpointsPage` DO accept them as props - but they are not widgets, they are wrappers.
+6. **No local state for request params** - Search queries, filters, sort order, pagination - any value that controls what data is fetched or how it is filtered - must be a `requestField` in the definition and read/written via `form.watch()` / `form.setValue()`. Only use `useState` for pure UI state (open/closed dialogs, hover, loading spinners).
 
 ## File Structure
 
@@ -102,8 +102,8 @@ const { POST } = createEndpoint({
 
 `usage: { request: "data", response: true }` means:
 
-- `request: "data"` — request fields become form inputs
-- `response: true` — response fields are display-only
+- `request: "data"` - request fields become form inputs
+- `response: true` - response fields are display-only
 
 ## Writing a Widget Component
 
@@ -118,9 +118,9 @@ interface CustomWidgetProps {
 }
 ```
 
-- `field.children` — typed access to every child field defined in `customWidgetObject`
-- `field.value` — the response data (after successful mutation), or `null`
-- `fieldName` — the key of this field in the parent (usually not needed)
+- `field.children` - typed access to every child field defined in `customWidgetObject`
+- `field.value` - the response data (after successful mutation), or `null`
+- `fieldName` - the key of this field in the parent (usually not needed)
 
 ### Context hooks (never use props for these)
 
@@ -148,10 +148,10 @@ import {
 
 ### Form state for search / filter / sort (never `useState`)
 
-Request params (search, filter, sort, pagination) must live in form state — not `useState`. Add the field to `definition.ts` as a `requestField`, then read and write it via `form`:
+Request params (search, filter, sort, pagination) must live in form state - not `useState`. Add the field to `definition.ts` as a `requestField`, then read and write it via `form`:
 
 ```typescript
-// definition.ts — declare the field
+// definition.ts - declare the field
 search: requestField(scopedTranslation, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
@@ -159,7 +159,7 @@ search: requestField(scopedTranslation, {
   schema: z.string().optional(),
 }),
 
-// widget.tsx — read & write via form (never useState)
+// widget.tsx - read & write via form (never useState)
 const form = useWidgetForm<typeof definition.GET>();
 const search = form?.watch("search") ?? "";
 
@@ -171,17 +171,17 @@ const search = form?.watch("search") ?? "";
 
 `useState` is only appropriate for pure UI state: open/closed dialogs, hover highlights, local loading flags.
 
-### Filter / search refetch — framework handles it, never call refetch manually
+### Filter / search refetch - framework handles it, never call refetch manually
 
-When `autoSubmit: true` is configured (set in `page-client.tsx` or `hooks.ts` via `endpointOptions.read.formOptions`), the framework watches every form value change, debounces it, and triggers a refetch automatically. **You must not call `refetch()` after `form.setValue()`** — the value hasn't propagated to the query params yet and the refetch will fire with stale params.
+When `autoSubmit: true` is configured (set in `page-client.tsx` or `hooks.ts` via `endpointOptions.read.formOptions`), the framework watches every form value change, debounces it, and triggers a refetch automatically. **You must not call `refetch()` after `form.setValue()`** - the value hasn't propagated to the query params yet and the refetch will fire with stale params.
 
 ```typescript
-// ✅ Correct — just set the value, framework refetches
+// ✅ Correct - just set the value, framework refetches
 const handleStatusChange = (status: string) => {
   form.setValue("status", status);
 };
 
-// ❌ Wrong — refetch fires before form value reaches query params
+// ❌ Wrong - refetch fires before form value reaches query params
 const handleStatusChange = (status: string) => {
   form.setValue("status", status);
   endpointMutations?.read?.refetch?.(); // fires with OLD params
@@ -192,7 +192,7 @@ const handleStatusChange = (status: string) => {
 
 ### All filtering must happen server-side (repository), never client-side
 
-There are **no exceptions**. Every filter — search, status, `hidden`, `resolved`, category, ownership, display flags — must be a `requestField`, sent to the server, and applied in `repository.ts` before `LIMIT`/`OFFSET`.
+There are **no exceptions**. Every filter - search, status, `hidden`, `resolved`, category, ownership, display flags - must be a `requestField`, sent to the server, and applied in `repository.ts` before `LIMIT`/`OFFSET`.
 
 Client-side filtering is always wrong because:
 
@@ -202,16 +202,16 @@ Client-side filtering is always wrong because:
 - It defeats caching (server cache key changes but data is stale)
 
 ```typescript
-// ❌ Wrong — any .filter() on response data in a widget
+// ❌ Wrong - any .filter() on response data in a widget
 const visible = tasks.filter((t) => !t.hidden);
 const active = logs.filter((l) => !l.resolved);
 const matching = items.filter((i) => i.name.includes(search));
 
-// ❌ Wrong — filtering in repository AFTER pagination
+// ❌ Wrong - filtering in repository AFTER pagination
 let rows = await db.select().limit(50).offset(0);
 if (search) rows = rows.filter((r) => r.name.includes(search));
 
-// ✅ Correct — all conditions in DB before LIMIT/OFFSET
+// ✅ Correct - all conditions in DB before LIMIT/OFFSET
 if (search) conditions.push(ilike(tasks.name, `%${search}%`));
 if (!showHidden) conditions.push(eq(tasks.hidden, false));
 const rows = await db
@@ -221,7 +221,7 @@ const rows = await db
   .offset(0);
 ```
 
-If a count badge needs to show a number that differs from the current filter (e.g. "unresolved" badge while viewing all logs), add a separate count field to the response schema and compute it with a second DB query — never derive it from the returned rows.
+If a count badge needs to show a number that differs from the current filter (e.g. "unresolved" badge while viewing all logs), add a separate count field to the response schema and compute it with a second DB query - never derive it from the returned rows.
 
 ### Rendering child fields
 
@@ -247,7 +247,7 @@ Render request fields directly (form state is managed by context):
 ### Interactive elements
 
 ```typescript
-// Submit button — reads text from i18n keys
+// Submit button - reads text from i18n keys
 <SubmitButtonWidget<typeof definition.POST>
   field={{
     text: "post.submitButton.text",
@@ -315,7 +315,7 @@ export function MyCustomWidget({ field }: CustomWidgetProps): JSX.Element {
 
 ## Dialog Wrapper Pattern
 
-When an endpoint's UI should appear as a dialog (launched from another widget), wrap `EndpointsPage` in a dialog shell. This is the correct pattern for reusing another endpoint's UI — you embed the whole endpoint, not individual components.
+When an endpoint's UI should appear as a dialog (launched from another widget), wrap `EndpointsPage` in a dialog shell. This is the correct pattern for reusing another endpoint's UI - you embed the whole endpoint, not individual components.
 
 ```typescript
 // threads/[threadId]/permissions/widget.tsx
@@ -384,7 +384,7 @@ export function ThreadPermissionsDialog({
 }
 ```
 
-This dialog widget lives at `permissions/widget.tsx`. It is designed to be **imported and mounted** by the parent threads list widget (`threads/widget/widget.tsx`). This is correct — a parent widget that manages a list can import dialog wrappers from its child route endpoints.
+This dialog widget lives at `permissions/widget.tsx`. It is designed to be **imported and mounted** by the parent threads list widget (`threads/widget/widget.tsx`). This is correct - a parent widget that manages a list can import dialog wrappers from its child route endpoints.
 
 ## Navigation Stack Pattern
 
@@ -431,24 +431,24 @@ export function MyWidget({
 }
 ```
 
-## Shared UI Components — Canonical Owner Pattern
+## Shared UI Components - Canonical Owner Pattern
 
 When a UI component is reused across multiple endpoints, it lives in the widget of the endpoint that **conceptually owns** it. Other endpoints import from the owner.
 
 Rules:
 
 1. The component lives in the endpoint widget that **conceptually owns** it
-2. Imports flow **inward only** — owner never imports from its consumers
+2. Imports flow **inward only** - owner never imports from its consumers
 3. The owner widget does NOT depend on any widget that imports it (no circular deps)
 
 ```
-// ✅ skills/widget imports from models/widget — models owns ModelSelector
+// ✅ skills/widget imports from models/widget - models owns ModelSelector
 import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
 
-// ✅ messages/widget imports from threads/widget/chat-input — threads owns chat input
+// ✅ messages/widget imports from threads/widget/chat-input - threads owns chat input
 import { Selector } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/selector";
 
-// ❌ models/widget imports from skills/widget — that reverses ownership
+// ❌ models/widget imports from skills/widget - that reverses ownership
 import { SkillCard } from "@/app/api/[locale]/agent/chat/skills/widget"; // WRONG
 ```
 
@@ -459,7 +459,7 @@ For truly generic, domain-agnostic components (buttons, inputs, icons, layout pr
 Many endpoints don't need a custom widget at all. If the auto-rendered form is sufficient, omit `customWidgetObject` entirely and use flat field definitions. `EndpointRenderer` handles all layout:
 
 ```typescript
-// definition.ts — no widget needed
+// definition.ts - no widget needed
 const { GET } = createEndpoint({
   scopedTranslation,
   fields: {
@@ -478,7 +478,7 @@ const { GET } = createEndpoint({
     }),
   },
 });
-// No widget.tsx needed — EndpointsPage renders this automatically
+// No widget.tsx needed - EndpointsPage renders this automatically
 ```
 
 Use a custom widget only when:
@@ -510,7 +510,7 @@ If you encounter a `_components/` folder: move its files to `widget/`, update al
 
 ### Rule: Widget i18n is private to the widget
 
-If a `widget/` folder contains an `i18n/` subfolder, those translations are **private** to that widget. No other file — including the endpoint's own `i18n/en/index.ts` — may import from `widget/i18n/`. Endpoint i18n lives in `i18n/` (sibling to `definition.ts`). Widget i18n lives in `widget/i18n/`. They do not cross.
+If a `widget/` folder contains an `i18n/` subfolder, those translations are **private** to that widget. No other file - including the endpoint's own `i18n/en/index.ts` - may import from `widget/i18n/`. Endpoint i18n lives in `i18n/` (sibling to `definition.ts`). Widget i18n lives in `widget/i18n/`. They do not cross.
 
 If the widget is removed, its `widget/i18n/` goes with it. Any dependent imports break immediately and must be fixed.
 
@@ -526,12 +526,12 @@ Not acceptable: importing bare components or hooks from a sibling endpoint's `wi
 
 A widget (or any hook it calls) must **never** import a Zustand store from a different endpoint domain. Cross-domain state access is only allowed via:
 
-1. **`apiClient.updateEndpointData`** — write to another domain's endpoint cache (optimistic updates, streaming signals, etc.)
-2. **`apiClient.getCachedData`** — read from another domain's endpoint cache (rare, prefer `useEndpoint`)
-3. **`useEndpoint(definition, ...)`** — self-contained fetch + subscribe to another endpoint's data (e.g. loading folder list inside threads widget without importing from folders widget)
+1. **`apiClient.updateEndpointData`** - write to another domain's endpoint cache (optimistic updates, streaming signals, etc.)
+2. **`apiClient.getCachedData`** - read from another domain's endpoint cache (rare, prefer `useEndpoint`)
+3. **`useEndpoint(definition, ...)`** - self-contained fetch + subscribe to another endpoint's data (e.g. loading folder list inside threads widget without importing from folders widget)
 
 ```typescript
-// ❌ Cross-domain store import — forbidden
+// ❌ Cross-domain store import - forbidden
 import { useAIStreamStore } from "../../ai-stream/stream/hooks/store";
 import { useSidebarFolders } from "../../folders/widget/widget";
 
@@ -564,4 +564,4 @@ apiClient.updateEndpointData(
 );
 ```
 
-Shared neutral stores (e.g. `useChatStore`, `useChatNavigationStore`) that are owned by neither domain but serve as a coordination layer are **not** cross-domain imports — they are explicitly shared infrastructure.
+Shared neutral stores (e.g. `useChatStore`, `useChatNavigationStore`) that are owned by neither domain but serve as a coordination layer are **not** cross-domain imports - they are explicitly shared infrastructure.

@@ -1,5 +1,5 @@
 /**
- * Vibe Frame — Embed Script
+ * Vibe Frame - Embed Script
  *
  * Standalone browser script that mounts next-vibe endpoints inside iframes
  * on any website. Zero React dependency.
@@ -67,7 +67,7 @@ const frames = new Map<string, ManagedFrame>();
 
 // ─── Config Signal ────────────────────────────────────────────────────────────
 // Single source of truth. window.vibeFrameConfig is replaced with a
-// getter/setter proxy backed by this value after init — mirrors widget-engine
+// getter/setter proxy backed by this value after init - mirrors widget-engine
 // WidgetEnginePostInitContext.pweConfigSignal pattern.
 
 let configSignal: VibeFrameGlobalConfig | undefined;
@@ -93,7 +93,7 @@ function subscribeConfig(fn: (cfg: VibeFrameGlobalConfig) => void): () => void {
 }
 
 // ─── Global Context ───────────────────────────────────────────────────────────
-// Initialization gate — prevents double-init (mirrors setGlobalContext pattern).
+// Initialization gate - prevents double-init (mirrors setGlobalContext pattern).
 
 let initialized = false;
 
@@ -203,7 +203,7 @@ function mountWithTrigger(
     });
   });
 
-  // Stub instance — held by host while waiting for trigger
+  // Stub instance - held by host while waiting for trigger
   const iframe = document.createElement("iframe");
   const stub = createStubInstance(frameId, iframe, () => {
     triggerCleanup();
@@ -246,7 +246,7 @@ function mountImmediate(
   let container: HTMLElement = document.createElement("div");
   const serverOrigin = new URL(config.serverUrl).origin;
 
-  // Bridge — listens to vf: and BRIDGE_CALL messages from this iframe
+  // Bridge - listens to vf: and BRIDGE_CALL messages from this iframe
   const bridge = createParentBridge({
     iframe,
     frameId,
@@ -468,7 +468,7 @@ function handleFrameMessage(
 
     case "vf:formState":
     case "vf:log":
-      // Internal events — no host callback
+      // Internal events - no host callback
       break;
   }
 }
@@ -552,7 +552,7 @@ async function fetchFrameConfig(
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      // No credentials: "include" — identity comes from the body, not cookies.
+      // No credentials: "include" - identity comes from the body, not cookies.
       // The embed script is always cross-origin; it cannot read our domain cookies.
       body: JSON.stringify(body),
     });
@@ -704,7 +704,7 @@ export const VibeFrame: VibeFramePublicAPI = {
 };
 
 // ─── Window Exposure ─────────────────────────────────────────────────────────
-// Typed via `declare global { interface Window }` in types.ts — no cast needed.
+// Typed via `declare global { interface Window }` in types.ts - no cast needed.
 
 if (typeof window !== "undefined") {
   window.VibeFrame = VibeFrame;
@@ -715,10 +715,11 @@ if (typeof window !== "undefined") {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", autoInit);
   } else {
-    // Async/deferred script — DOM already ready
+    // Async/deferred script - DOM already ready
     scheduleIdle(autoInit);
   }
 }
 
+// ─── Exported for ESM package use (embed-package.ts re-exports) ──────────────
 // ─── Exported for ESM package use (embed-package.ts re-exports) ──────────────
 export { getConfig, subscribeConfig };

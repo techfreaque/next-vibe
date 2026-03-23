@@ -1,5 +1,5 @@
 /**
- * Subscriptions Cancelled — Route
+ * Subscriptions Cancelled - Route
  * Server-only.
  */
 

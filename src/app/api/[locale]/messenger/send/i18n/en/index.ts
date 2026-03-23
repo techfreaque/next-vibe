@@ -37,13 +37,13 @@ export const translations = {
   text: {
     label: "Message",
     description:
-      "Plain text body — used for SMS/WhatsApp/Telegram; email fallback",
+      "Plain text body - used for SMS/WhatsApp/Telegram; email fallback",
     placeholder: "Enter your message...",
   },
   html: {
     label: "HTML Content",
     description:
-      "HTML body (email only, optional — falls back to text if omitted)",
+      "HTML body (email only, optional - falls back to text if omitted)",
     placeholder: "<p>Enter HTML email content...</p>",
   },
   senderName: {

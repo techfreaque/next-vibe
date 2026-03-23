@@ -165,7 +165,7 @@ const { GET } = createEndpoint({
     description: "get.success.description",
   },
 
-  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  // Route to client (localStorage) for incognito threads - caller passes rootFolderId
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {
@@ -320,7 +320,7 @@ const { PATCH } = createEndpoint({
     description: "patch.success.description",
   },
 
-  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  // Route to client (localStorage) for incognito threads - caller passes rootFolderId
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {
@@ -516,7 +516,7 @@ const { DELETE } = createEndpoint({
     description: "delete.success.description",
   },
 
-  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  // Route to client (localStorage) for incognito threads - caller passes rootFolderId
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {

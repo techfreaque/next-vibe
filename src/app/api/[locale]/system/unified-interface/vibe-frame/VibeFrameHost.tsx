@@ -1,5 +1,5 @@
 /**
- * Vibe Frame — React Host Component
+ * Vibe Frame - React Host Component
  *
  * React component for embedding a vibe-frame on the host page.
  * Alternative to using the standalone embed script.
@@ -109,13 +109,13 @@ export function VibeFrameHost({
   const propsRef = useRef({ theme, locale, cssVars, authToken });
   propsRef.current = { theme, locale, cssVars, authToken };
 
-  // Stable mount URL — only identity props (endpoint changes = new iframe)
+  // Stable mount URL - only identity props (endpoint changes = new iframe)
   const mountUrl = useMemo(
     () => buildMountUrl(serverUrl, endpoint, frameId, locale, urlPathParams),
     [serverUrl, endpoint, frameId, locale, urlPathParams],
   );
 
-  // Set up bridge ONCE per iframe identity — uses mountUrl as stable key
+  // Set up bridge ONCE per iframe identity - uses mountUrl as stable key
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) {
@@ -262,7 +262,7 @@ function buildMountUrl(
 ): string {
   const base = serverUrl.replace(/\/$/, "");
   // Use the Next.js frame page which provides full SSR + hydration
-  // The endpoint ID uses underscores (e.g. "contact_POST") — pass as path segment
+  // The endpoint ID uses underscores (e.g. "contact_POST") - pass as path segment
   const url = new URL(`${base}/${locale}/frame/${endpoint}`);
   url.searchParams.set("frameId", frameId);
   if (urlPathParams && Object.keys(urlPathParams).length > 0) {

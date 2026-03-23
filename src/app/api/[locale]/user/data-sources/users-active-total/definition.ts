@@ -1,5 +1,5 @@
 /**
- * Users Active Total — Endpoint Definition
+ * Users Active Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

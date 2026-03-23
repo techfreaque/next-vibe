@@ -137,7 +137,7 @@ export class MessageConverter {
         if (!message.content || !message.content.trim()) {
           return null;
         }
-        // Strip <think>...</think> blocks — kept in DB for UI display but
+        // Strip <think>...</think> blocks - kept in DB for UI display but
         // must not be re-sent to the AI as part of history.
         const strippedContent = message.content
           .replace(/<think>[\s\S]*?<\/think>/g, "")
@@ -169,7 +169,7 @@ export class MessageConverter {
           });
 
           // Always return BOTH: ASSISTANT with tool-call AND TOOL with tool-result.
-          // Tools awaiting confirmation have no result/error yet — emit the
+          // Tools awaiting confirmation have no result/error yet - emit the
           // waiting_for_confirmation status as a placeholder result so the AI SDK
           // never sees a tool-call without a matching tool-result.
           const output = toolCall.error
@@ -235,7 +235,7 @@ export class MessageConverter {
               },
             ];
           }
-          // No result, no error, not waiting — tool-call only (shouldn't normally happen)
+          // No result, no error, not waiting - tool-call only (shouldn't normally happen)
           return {
             role: "assistant",
             content: [
@@ -351,9 +351,9 @@ export class MessageConverter {
       ) {
         // Look ahead to find all TOOL messages in this step.
         // Empty placeholder ASSISTANT messages (no content) between tools do NOT
-        // break the group — they are just DB artifacts from sequential tool calls.
+        // break the group - they are just DB artifacts from sequential tool calls.
         // Non-empty ASSISTANT messages are also skipped when all tools seen so far
-        // are superseded — this handles the wakeUp case where the AI emits a
+        // are superseded - this handles the wakeUp case where the AI emits a
         // "dispatched" response after the pending tool, before the deferred result.
         // A group ends at: a USER message, or an ASSISTANT with text when we already
         // have at least one non-superseded tool.
@@ -366,14 +366,14 @@ export class MessageConverter {
             "metadata" in next &&
             next.metadata?.toolCall
           ) {
-            // Another tool message — add to group
+            // Another tool message - add to group
             toolMessages.push(next);
             j++;
           } else if (
             next?.role === ChatMessageRole.ASSISTANT &&
             (!next.content || !next.content.trim())
           ) {
-            // Empty placeholder ASSISTANT — skip over it (don't add to toolMessages)
+            // Empty placeholder ASSISTANT - skip over it (don't add to toolMessages)
             j++;
           } else if (
             next?.role === ChatMessageRole.ASSISTANT &&
@@ -390,7 +390,7 @@ export class MessageConverter {
             // skip it so the deferred tool is included in the same group.
             j++;
           } else {
-            // Real content boundary — stop
+            // Real content boundary - stop
             break;
           }
         }
@@ -432,7 +432,7 @@ export class MessageConverter {
             !toolCall.isDeferred
           ) {
             logger.info(
-              "[MessageConverter] Skipping superseded tool call — deferred result takes over",
+              "[MessageConverter] Skipping superseded tool call - deferred result takes over",
               {
                 toolCallId: toolCall.toolCallId,
                 toolName: toolCall.toolName,
@@ -441,7 +441,7 @@ export class MessageConverter {
             continue;
           }
 
-          // Skip duplicate toolCallIds — keep the first occurrence
+          // Skip duplicate toolCallIds - keep the first occurrence
           // Duplicates can occur when a tool call fails and is retried with the same ID
           if (seenToolCallIds.has(toolCall.toolCallId)) {
             logger.warn(
@@ -459,7 +459,7 @@ export class MessageConverter {
           seenToolCallIds.add(toolCall.toolCallId);
 
           // Add tool call to assistant message content.
-          // Use the original args — the original message is already suppressed (superseded),
+          // Use the original args - the original message is already suppressed (superseded),
           // so the AI sees the deferred message with full args + real result, making it clear
           // what call completed. Stripping to {taskId} confused the AI into thinking the
           // deferred message was a separate call and caused it to re-call the same tool.
@@ -472,7 +472,7 @@ export class MessageConverter {
           });
 
           // Create tool result message.
-          // Tools awaiting confirmation have no result/error yet — emit the
+          // Tools awaiting confirmation have no result/error yet - emit the
           // waiting_for_confirmation status as a placeholder result so the AI SDK
           // never sees a tool-call without a matching tool-result.
           const output = toolCall.error
@@ -567,7 +567,7 @@ export class MessageConverter {
 
       // Inject metadata system message before user/assistant messages.
       // Only for full ChatMessage objects (not simple { role, content } objects).
-      // Only emit once per sequenceId — sequential tool calls share a sequenceId across
+      // Only emit once per sequenceId - sequential tool calls share a sequenceId across
       // their placeholder ASSISTANT + TOOL chain, so we skip duplicate injections.
       if (
         MessageConverter.isChatMessage(msg) &&

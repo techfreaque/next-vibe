@@ -1,7 +1,7 @@
 /**
  * Task Pull Definition (cron-only)
  * Internal endpoint that pulls new tasks from remote Thea.
- * Not exposed to external callers — used only by the cron runner.
+ * Not exposed to external callers - used only by the cron runner.
  */
 
 import { z } from "zod";

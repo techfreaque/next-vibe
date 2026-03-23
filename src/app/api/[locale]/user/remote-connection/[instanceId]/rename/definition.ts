@@ -1,6 +1,6 @@
 /**
  * Remote Connection Rename
- * PATCH — update the friendly name of a connection
+ * PATCH - update the friendly name of a connection
  */
 
 import { z } from "zod";

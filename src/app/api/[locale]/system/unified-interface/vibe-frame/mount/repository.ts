@@ -1,5 +1,5 @@
 /**
- * Vibe Frame Config — Repository
+ * Vibe Frame Config - Repository
  *
  * For each requested integration:
  *  1. Resolve endpoint identifier (integration.endpoint ?? integration.id)
@@ -10,7 +10,7 @@
  *     a new lead on first load as it would for any page visit)
  *  5. Return { widgets: [{ frameId, widgetUrl }] }
  *
- * Identity (leadId + authToken) comes from the POST body — the embed script
+ * Identity (leadId + authToken) comes from the POST body - the embed script
  * is always cross-origin and cannot read our domain cookies. The host page
  * operator passes their user's identity here.
  */
@@ -123,7 +123,7 @@ export class VibeFrameConfigRepository {
         return success({ widgets: [] });
       }
 
-      // leadId and authToken come from the POST body — provided by the host page.
+      // leadId and authToken come from the POST body - provided by the host page.
       // Mint an exchange token only when there is identity to carry.
       // If neither is present, the iframe URL has no ?et= and the middleware
       // creates a fresh lead on first load (standard behaviour for any visitor).

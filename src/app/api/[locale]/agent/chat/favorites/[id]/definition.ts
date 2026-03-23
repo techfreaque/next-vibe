@@ -17,8 +17,8 @@ import {
 } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   deleteButton,
   navigateButtonField,
   objectField,
@@ -576,7 +576,7 @@ const { PATCH } = createEndpoint({
         schema: z.number().int().min(1000).max(200000).nullable().optional(),
       }),
 
-      // Tool configuration — null = fall through to character/settings default
+      // Tool configuration - null = fall through to character/settings default
       availableTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -607,7 +607,7 @@ const { PATCH } = createEndpoint({
           .nullable()
           .optional(),
       }),
-      // Additional tool blocks on top of skill's defaults — hard blocked regardless of other settings
+      // Additional tool blocks on top of skill's defaults - hard blocked regardless of other settings
       deniedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -864,7 +864,7 @@ const { GET } = createEndpoint({
         schema: z.number().int().nullable(),
       }),
 
-      // Tool configuration — null = fall through to character/settings default
+      // Tool configuration - null = fall through to character/settings default
       availableTools: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,

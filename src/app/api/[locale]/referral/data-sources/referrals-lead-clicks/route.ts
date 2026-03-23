@@ -1,5 +1,5 @@
 /**
- * Referrals Lead Clicks — Route
+ * Referrals Lead Clicks - Route
  * Server-only.
  */
 

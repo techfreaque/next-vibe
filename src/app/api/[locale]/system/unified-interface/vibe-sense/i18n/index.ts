@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Scoped Translation
+ * Vibe Sense - Scoped Translation
  */
 
 import { createScopedTranslation } from "@/i18n/core/scoped-translation";

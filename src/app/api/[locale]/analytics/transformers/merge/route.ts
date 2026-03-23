@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Merge Transformer Route
+ * Vibe Sense - Merge Transformer Route
  * Server-only.
  */
 

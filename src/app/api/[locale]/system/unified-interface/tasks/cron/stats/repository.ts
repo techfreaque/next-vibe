@@ -212,7 +212,7 @@ export class CronStatsRepository {
           .orderBy(desc(count(cronTaskExecutions.id)))
           .limit(limit);
 
-        // tasksByPriority — pre-populate all priority keys with 0 so the
+        // tasksByPriority - pre-populate all priority keys with 0 so the
         // z.record(z.enum(CronTaskPriority), ...) schema finds every key present
         const tasksByPriority = Object.fromEntries(
           Object.values(CronTaskPriority).map((p) => [p, 0]),

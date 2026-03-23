@@ -19,11 +19,11 @@ export enum Platform {
   NEXT_PAGE = "next-page",
   /** Next.js API route context */
   NEXT_API = "next-api",
-  /** Cron/pulse task execution — behaves like AI for permissions */
+  /** Cron/pulse task execution - behaves like AI for permissions */
   CRON = "cron",
-  /** Electron desktop app — wraps vibe start in a BrowserWindow */
+  /** Electron desktop app - wraps vibe start in a BrowserWindow */
   ELECTRON = "electron",
-  /** Vibe Frame — embedded widget */
+  /** Vibe Frame - embedded widget */
   FRAME = "frame",
 }
 

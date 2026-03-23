@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Suma okna",
-    description: "Krocząca suma okna — akumuluje wartości w stałym oknie",
+    description: "Krocząca suma okna - akumuluje wartości w stałym oknie",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       resolution: {

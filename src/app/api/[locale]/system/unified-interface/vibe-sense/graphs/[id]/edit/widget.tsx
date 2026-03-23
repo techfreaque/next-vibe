@@ -1,14 +1,14 @@
 /**
- * Vibe Sense — Edit Graph Widget
+ * Vibe Sense - Edit Graph Widget
  *
  * Three-panel React Flow builder:
- *   Left sidebar  — Node Palette (endpoints grouped by category)
- *   Center        — React Flow canvas (drag, connect, position)
- *   Right panel   — Unified Node Inspector OR Graph Settings
- *   Top bar       — Back, palette toggle, unsaved badge, node count, Save
+ *   Left sidebar  - Node Palette (endpoints grouped by category)
+ *   Center        - React Flow canvas (drag, connect, position)
+ *   Right panel   - Unified Node Inspector OR Graph Settings
+ *   Top bar       - Back, palette toggle, unsaved badge, node count, Save
  *
  * Every node is an endpoint. No node type system.
- * Creates a new version (branch) on save — never mutates.
+ * Creates a new version (branch) on save - never mutates.
  */
 
 "use client";
@@ -51,14 +51,14 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div, type DivDragEvent } from "next-vibe-ui/ui/div";
+import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { History } from "next-vibe-ui/ui/icons/History";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { Database } from "next-vibe-ui/ui/icons/Database";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { History } from "next-vibe-ui/ui/icons/History";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { PanelLeftClose } from "next-vibe-ui/ui/icons/PanelLeftClose";
 import { PanelLeftOpen } from "next-vibe-ui/ui/icons/PanelLeftOpen";
@@ -98,25 +98,25 @@ import {
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { ResolutionValues } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import { GraphResolution } from "../../../enum";
 import type {
   GraphConfig,
   GraphEdge,
   NodePosition,
   TriggerConfig,
 } from "../../../graph/types";
-import { GraphResolution } from "../../../enum";
-import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { ResolutionValues } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 
-import { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
+import { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import type { GraphNodeConfig } from "../../../graph/schema";
 import parentDefinitions from "../data/definition";
 import versionsDefinitions from "../versions/definition";
 import type definition from "./definition";
-import type { GraphNodeConfig } from "../../../graph/schema";
 
 // ─── Endpoint Node Info ──────────────────────────────────────────────────────
 
@@ -439,7 +439,7 @@ function configToFlow(
   );
 
   const edges: VibeEdge[] = config.edges.map((e, idx) => {
-    // Resolve missing handle IDs — when there's a single handle, auto-assign it
+    // Resolve missing handle IDs - when there's a single handle, auto-assign it
     // so React Flow can find the handle even if the graph config omits fromHandle/toHandle.
     let sourceHandle: string | null = e.fromHandle ?? null;
     let targetHandle: string | null = e.toHandle ?? null;
@@ -1616,7 +1616,7 @@ function EditFormInner({
   const dirtyRef = useRef(false);
   dirtyRef.current = dirty;
 
-  // Full reset from server config — only when NOT dirty (no unsaved local changes)
+  // Full reset from server config - only when NOT dirty (no unsaved local changes)
   useEffect(() => {
     if (!isLoading && !dirtyRef.current) {
       loadingRef.current = true;
@@ -1815,7 +1815,7 @@ function EditFormInner({
     setDirty(true);
   }, []);
 
-  // Stable ref wrapper for addNode — prevents palette from re-rendering when workingNodes changes
+  // Stable ref wrapper for addNode - prevents palette from re-rendering when workingNodes changes
   const addNodeRef = useRef(addNode);
   addNodeRef.current = addNode;
   const stableAddNode = useCallback(
@@ -2106,7 +2106,7 @@ function EditFormInner({
 
       {/* Three-panel layout */}
       <Div className="flex flex-1 min-h-0">
-        {/* Left Sidebar — Node Palette (240px) */}
+        {/* Left Sidebar - Node Palette (240px) */}
         {paletteOpen && (
           <NodePalette
             paletteSearch={paletteSearch}
@@ -2117,7 +2117,7 @@ function EditFormInner({
           />
         )}
 
-        {/* Center — React Flow Canvas */}
+        {/* Center - React Flow Canvas */}
         <Div className="flex-1 min-w-0 relative">
           {nodeCount === 0 && <CanvasEmptyHint t={t} />}
           <KeyboardHints t={t} />
@@ -2143,7 +2143,7 @@ function EditFormInner({
           </ReactFlow>
         </Div>
 
-        {/* Right Panel — Node Inspector or Graph Settings (280px) */}
+        {/* Right Panel - Node Inspector or Graph Settings (280px) */}
         <Card className="w-70 border-l border-t-0 border-b-0 border-r-0 rounded-none overflow-hidden shrink-0 flex flex-col">
           {showNodeInspector ? (
             <NodeInspector

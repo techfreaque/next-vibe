@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Code } from "next-vibe-ui/ui/icons/Code";
@@ -9,6 +8,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -521,7 +521,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
       taskInput: {
         character: "hn-digest",
         prompt:
-          "Filter these stories for my interests — email me the best 3 with a one-line take on each.",
+          "Filter these stories for my interests - email me the best 3 with a one-line take on each.",
         preCalls: [{ routeId: "hackernews-top", args: { limit: 20 } }],
         maxTurns: 3,
         rootFolderId: "cron",
@@ -559,7 +559,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     {
       character: "hn-digest",
       prompt:
-        "Filter these stories for my interests — email me the best 3 with a one-line take on each.",
+        "Filter these stories for my interests - email me the best 3 with a one-line take on each.",
       preCalls: [{ routeId: "hackernews-top", args: { limit: 20 } }],
       maxTurns: 3,
       rootFolderId: "cron",
@@ -859,7 +859,7 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
             </Button>
           </Div>
 
-          {/* Demo scenario selector — all 4 visible */}
+          {/* Demo scenario selector - all 4 visible */}
           <Div className="flex flex-wrap justify-center gap-2 mb-6">
             {ALL_DEMOS.map((id) => (
               <Button
@@ -879,7 +879,7 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
             ))}
           </Div>
 
-          {/* Chat demo — uses the REAL chat components with mock data */}
+          {/* Chat demo - uses the REAL chat components with mock data */}
           <MotionDiv
             className="mx-auto max-w-2xl rounded-lg border bg-card/80 backdrop-blur-sm overflow-hidden text-left shadow-lg"
             initial={{ opacity: 0, y: 30 }}
@@ -899,7 +899,7 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
               </Span>
             </Div>
 
-            {/* Message area — real components, mock data */}
+            {/* Message area - real components, mock data */}
             <MockChatProvider>
               <Div className="p-4 space-y-1">
                 <UserMessageBubble

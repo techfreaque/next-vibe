@@ -128,7 +128,7 @@ export function ReferralPayoutContainer({
           </CardContent>
         </Card>
 
-        {/* Withdraw Your Earnings — state-aware */}
+        {/* Withdraw Your Earnings - state-aware */}
         <Card
           className={
             canRequestPayout
@@ -226,7 +226,7 @@ export function ReferralPayoutContainer({
         </Card>
       </Div>
 
-      {/* Payout History — only shown when entries exist */}
+      {/* Payout History - only shown when entries exist */}
       {hasHistory && (
         <Card>
           <CardHeader className="pb-3">

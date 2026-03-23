@@ -175,7 +175,7 @@ export class EndpointGeneratorRepository {
         definition = await import(defFile);
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        // Bun TDZ race: "Cannot access 'X' before initialization" — yield and retry once
+        // Bun TDZ race: "Cannot access 'X' before initialization" - yield and retry once
         if (errorMsg.includes("before initialization")) {
           await new Promise((resolve) => {
             setTimeout(resolve, 10);
@@ -189,7 +189,7 @@ export class EndpointGeneratorRepository {
                 : String(retryError);
             logger.warn(
               formatWarning(
-                `Could not load definition: ${defFile.replace(process.cwd(), "").replace(/^\//, "")} — ${retryMsg}`,
+                `Could not load definition: ${defFile.replace(process.cwd(), "").replace(/^\//, "")} - ${retryMsg}`,
               ),
             );
             continue;

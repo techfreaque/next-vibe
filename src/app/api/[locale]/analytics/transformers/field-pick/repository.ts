@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Field Pick Transformer Compute
+ * Vibe Sense - Field Pick Transformer Compute
  * Server-only pure computation. No DB access.
  *
  * NOTE: This transformer has been superseded. The new DataPoint type is

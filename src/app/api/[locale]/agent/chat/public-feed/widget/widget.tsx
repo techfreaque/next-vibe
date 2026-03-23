@@ -5,7 +5,6 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -19,6 +18,7 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import React from "react";
 
 import {
@@ -39,7 +39,7 @@ import { scopedTranslation } from "../i18n";
 type SortMode = (typeof FeedSortMode)[keyof typeof FeedSortMode];
 
 /**
- * Props for custom widget — matches the customWidgetObject pattern
+ * Props for custom widget - matches the customWidgetObject pattern
  */
 interface CustomWidgetProps {
   field: {
@@ -183,7 +183,7 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
 }
 
 /**
- * Main public feed view — sort tabs + search + thread list
+ * Main public feed view - sort tabs + search + thread list
  */
 function PublicFeedView({
   items,
@@ -291,7 +291,7 @@ function PublicFeedView({
 }
 
 /**
- * Container widget — receives field data from EndpointsPage
+ * Container widget - receives field data from EndpointsPage
  */
 export function PublicFeedContainer({
   field,

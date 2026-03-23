@@ -1,8 +1,8 @@
 /**
- * Vibe Sense — Script Transformer Definition
+ * Vibe Sense - Script Transformer Definition
  *
  * Client+server safe. No server imports.
- * Custom sandboxed script transformation — admin-only escape hatch.
+ * Custom sandboxed script transformation - admin-only escape hatch.
  */
 
 import { z } from "zod";
@@ -29,8 +29,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
 import { TRANSFORMER_SCRIPT_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

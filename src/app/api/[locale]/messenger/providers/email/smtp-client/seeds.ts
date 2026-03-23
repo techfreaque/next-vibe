@@ -3,7 +3,7 @@
  * Load SMTP accounts from environment variables for development and production.
  * Seeds into the unified messenger_accounts table.
  *
- * Each account can optionally include IMAP inbound config — same account, not a separate row.
+ * Each account can optionally include IMAP inbound config - same account, not a separate row.
  * - System account: EMAIL_* for SMTP, IMAP_* for inbound (falls back to IMAP_SEED_* legacy vars)
  * - Leads account:  LEADS_EMAIL_* for SMTP, LEADS_IMAP_* for inbound
  */
@@ -252,7 +252,7 @@ async function upsertAccounts(
 
   try {
     for (const account of accounts) {
-      // Match by name (stable seed identifier) — fromEmail may be shared across accounts in dev
+      // Match by name (stable seed identifier) - fromEmail may be shared across accounts in dev
       const existing = await db
         .select()
         .from(messengerAccounts)

@@ -1,5 +1,5 @@
 /**
- * Messenger Total — Route
+ * Messenger Total - Route
  * Server-only.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Users Login Attempts Total — Route
+ * Users Login Attempts Total - Route
  * Server-only.
  */
 

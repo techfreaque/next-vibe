@@ -30,7 +30,7 @@ export interface SendMessagingParams {
   to: string;
   /** Message text content */
   message: string;
-  /** Account ID — now references messenger_accounts.id */
+  /** Account ID - now references messenger_accounts.id */
   messagingAccountId: string;
   /** Optional subject (stored in the emails record) */
   subject?: string;

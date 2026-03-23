@@ -580,7 +580,7 @@ export function MultiWidgetRenderer<
     return <></>;
   }
 
-  // Cast value to WidgetData for dispatch boundary — sub-renderers use runtime type guards
+  // Cast value to WidgetData for dispatch boundary - sub-renderers use runtime type guards
   // to determine the actual shape; the generic TChildren type cannot flow through.
   const widgetValue = value as WidgetData;
 

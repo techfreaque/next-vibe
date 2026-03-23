@@ -168,7 +168,7 @@ export class RouteHandlersGeneratorRepository {
       try {
         defaultExport = definition.default;
       } catch {
-        // Bun plugin race — yield then retry
+        // Bun plugin race - yield then retry
         await new Promise((resolve) => {
           setTimeout(resolve, 10);
         });

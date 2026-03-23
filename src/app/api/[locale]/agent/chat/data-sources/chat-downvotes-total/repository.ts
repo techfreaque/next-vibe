@@ -1,5 +1,5 @@
 /**
- * Chat Downvotes Total — Repository
+ * Chat Downvotes Total - Repository
  * Server-only. DB access.
  * Sum of all downvotes on chat messages per resolution bucket.
  */
@@ -18,8 +18,8 @@ import type {
   Resolution,
   TimeRange,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
+import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
 import { chatMessages } from "../../db";
 

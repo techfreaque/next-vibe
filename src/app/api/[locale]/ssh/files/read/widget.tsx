@@ -1,5 +1,5 @@
 /**
- * SSH Files Read Widget — File Viewer / Editor
+ * SSH Files Read Widget - File Viewer / Editor
  */
 
 "use client";

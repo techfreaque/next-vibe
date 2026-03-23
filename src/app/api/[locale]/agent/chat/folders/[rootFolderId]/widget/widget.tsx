@@ -6,7 +6,6 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -21,10 +20,13 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Input, type InputRefObject } from "next-vibe-ui/ui/input";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Span } from "next-vibe-ui/ui/span";
-import { Tooltip } from "next-vibe-ui/ui/tooltip";
-import { TooltipContent } from "next-vibe-ui/ui/tooltip";
-import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
-import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
+import { cn } from "next-vibe/shared/utils";
 import { useMemo, useRef, useState } from "react";
 
 import {
@@ -209,7 +211,7 @@ function RootFolderBar({
 }
 
 // ---------------------------------------------------------------------------
-// FoldersListContainer — shell widget
+// FoldersListContainer - shell widget
 // ---------------------------------------------------------------------------
 
 interface CustomWidgetProps {
@@ -453,5 +455,6 @@ export function FoldersListContainer({
   );
 }
 
+// Keep ThreadsList export for backward compatibility
 // Keep ThreadsList export for backward compatibility
 export { ThreadsList };

@@ -1,5 +1,5 @@
 /**
- * Subscriptions Trialing — Route
+ * Subscriptions Trialing - Route
  * Server-only.
  */
 

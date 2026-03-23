@@ -1,10 +1,10 @@
 "use client";
 
 import { AlertCircle } from "lucide-react";
-import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -112,7 +112,7 @@ export function ErrorMessageBubble({
           </Div>
         </Div>
 
-        {/* Actions — same hover pattern as other messages */}
+        {/* Actions - same hover pattern as other messages */}
         <Div
           className={cn(
             "flex items-center gap-1 mt-1",

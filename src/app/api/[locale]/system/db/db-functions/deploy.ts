@@ -1,12 +1,12 @@
 /**
- * DB Functions — Deployment
+ * DB Functions - Deployment
  *
  * Auto-discovers all `db-functions.ts` files colocated with endpoints,
  * extracts compiled Drizzle queries + logic, and deploys them
  * to PostgreSQL via `CREATE OR REPLACE FUNCTION`.
  *
  * Runs after Drizzle migrations on every `vibe dev` / `vibe start`.
- * Functions are idempotent code — safe to deploy fresh on every startup.
+ * Functions are idempotent code - safe to deploy fresh on every startup.
  */
 
 import "server-only";
@@ -77,7 +77,7 @@ export async function deployDbFunctions(logger: EndpointLogger): Promise<void> {
       ),
       parseError(error),
     );
-    // Don't re-throw — deployment failure shouldn't block server startup
+    // Don't re-throw - deployment failure shouldn't block server startup
   }
 }
 

@@ -2,7 +2,7 @@
  * AI Stream Lifecycle Store
  *
  * Tracks which threads are streaming, local vs remote, and drain state.
- * Pure lifecycle — NO message content, NO message state.
+ * Pure lifecycle - NO message content, NO message state.
  *
  * Message content (deltas, tokens, isStreaming flag) lives in the
  * apiClient React Query cache via updateMessages / seedMessageItemCache.
@@ -34,14 +34,14 @@ export interface ActiveStream {
  * AI Stream Lifecycle State
  */
 interface AIStreamState {
-  // Lifecycle state — keyed by threadId
+  // Lifecycle state - keyed by threadId
   activeStreams: Record<string, ActiveStream>;
   threads: Record<string, StreamingThread>;
   /** Thread IDs where the local client initiated the stream */
   localStreamThreadIds: Set<string>;
   /** Thread IDs where cancel was requested but STREAM_FINISHED hasn't arrived yet */
   drainingThreads: Set<string>;
-  /** Thread IDs where cancel request was sent (aborting state — shows spinner on stop button) */
+  /** Thread IDs where cancel request was sent (aborting state - shows spinner on stop button) */
   abortingThreads: Set<string>;
   /** Thread IDs where stream is dead but an escalated task is still in flight */
   waitingThreadIds: Set<string>;
@@ -165,7 +165,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
       const newDraining = new Set(state.drainingThreads);
       if (value) {
         newAborting.add(threadId);
-        // Aborting implies draining — suppress incoming deltas
+        // Aborting implies draining - suppress incoming deltas
         newDraining.add(threadId);
       } else {
         newAborting.delete(threadId);

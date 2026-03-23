@@ -1,5 +1,5 @@
 /**
- * Chat/AI Domain — Vibe Sense Graph Seeds
+ * Chat/AI Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the chat/AI domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,29 +7,29 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../../analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "../../analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../../analytics/transformers/ratio/constants";
+import { COMPLETE_TASK_ALIAS } from "../../system/unified-interface/tasks/complete-task/constants";
+import { GraphResolution } from "../../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../../system/unified-interface/vibe-sense/enum";
-import { CHAT_MESSAGES_TOTAL_ALIAS } from "./data-sources/chat-messages-total/constants";
-import { CHAT_MESSAGES_BY_USER_ALIAS } from "./data-sources/chat-messages-by-user/constants";
+import { CHAT_DOWNVOTES_TOTAL_ALIAS } from "./data-sources/chat-downvotes-total/constants";
+import { CHAT_ERRORS_TOTAL_ALIAS } from "./data-sources/chat-errors-total/constants";
+import { CHAT_MEMORIES_CREATED_ALIAS } from "./data-sources/chat-memories-created/constants";
 import { CHAT_MESSAGES_BY_AI_ALIAS } from "./data-sources/chat-messages-by-ai/constants";
+import { CHAT_MESSAGES_BY_USER_ALIAS } from "./data-sources/chat-messages-by-user/constants";
+import { CHAT_MESSAGES_TOTAL_ALIAS } from "./data-sources/chat-messages-total/constants";
+import { CHAT_MESSAGES_WITH_ATTACHMENTS_ALIAS } from "./data-sources/chat-messages-with-attachments/constants";
+import { CHAT_SHARE_LINKS_CREATED_ALIAS } from "./data-sources/chat-share-links-created/constants";
+import { CHAT_THREADS_ACTIVE_TOTAL_ALIAS } from "./data-sources/chat-threads-active-total/constants";
 import { CHAT_THREADS_CREATED_ALIAS } from "./data-sources/chat-threads-created/constants";
 import { CHAT_TOOL_CALLS_TOTAL_ALIAS } from "./data-sources/chat-tool-calls-total/constants";
-import { CHAT_ERRORS_TOTAL_ALIAS } from "./data-sources/chat-errors-total/constants";
-import { CHAT_UPVOTES_TOTAL_ALIAS } from "./data-sources/chat-upvotes-total/constants";
-import { CHAT_DOWNVOTES_TOTAL_ALIAS } from "./data-sources/chat-downvotes-total/constants";
-import { CHAT_SHARE_LINKS_CREATED_ALIAS } from "./data-sources/chat-share-links-created/constants";
-import { CHAT_MEMORIES_CREATED_ALIAS } from "./data-sources/chat-memories-created/constants";
 import { CHAT_UNIQUE_USERS_ALIAS } from "./data-sources/chat-unique-users/constants";
-import { CHAT_MESSAGES_WITH_ATTACHMENTS_ALIAS } from "./data-sources/chat-messages-with-attachments/constants";
-import { CHAT_THREADS_ACTIVE_TOTAL_ALIAS } from "./data-sources/chat-threads-active-total/constants";
-import { EMA_ALIAS } from "../../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../../analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../../analytics/evaluators/threshold/constants";
-import { COMPLETE_TASK_ALIAS } from "../../system/unified-interface/tasks/complete-task/constants";
+import { CHAT_UPVOTES_TOTAL_ALIAS } from "./data-sources/chat-upvotes-total/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 

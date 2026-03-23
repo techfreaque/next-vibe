@@ -54,7 +54,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   aliases: [CLAUDE_CODE_ALIAS, "claude"],
 
-  // No stream timeout — claude-code sessions can run indefinitely
+  // No stream timeout - claude-code sessions can run indefinitely
   streamTimeoutMs: 0,
 
   cli: {
@@ -201,7 +201,7 @@ const { POST } = createEndpoint({
         interactiveMode: false,
       },
       interactive: {
-        prompt: "Fix the login bug — check the auth flow and patch it.",
+        prompt: "Fix the login bug - check the auth flow and patch it.",
         interactiveMode: true,
         taskTitle: "Fix login bug",
       },

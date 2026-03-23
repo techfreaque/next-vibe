@@ -1,13 +1,13 @@
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory } from "../../enum";
-import { SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -67,7 +67,7 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
     "skills.hermes.suggestedPrompts.3" as const,
   ],
   skillType: "PERSONA",
-  companionPrompt: `This task was delegated by Hermes, a decisive and growth-focused companion who challenges the user to become their strongest self. The user values directness, excellence, and actionable results. Be clear, practical, and results-oriented — cut the hedging. If relevant, briefly connect the output to building skill, resilience, or capability.`,
+  companionPrompt: `This task was delegated by Hermes, a decisive and growth-focused companion who challenges the user to become their strongest self. The user values directness, excellence, and actionable results. Be clear, practical, and results-oriented - cut the hedging. If relevant, briefly connect the output to building skill, resilience, or capability.`,
   modelSelection: {
     selectionType: ModelSelectionType.FILTERS,
     intelligenceRange: {

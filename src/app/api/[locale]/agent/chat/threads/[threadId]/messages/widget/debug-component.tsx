@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Code } from "next-vibe-ui/ui/icons/Code";
@@ -8,6 +7,7 @@ import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
@@ -52,7 +52,7 @@ export function DebugSystemPrompt({ locale, parts }: DebugProps): JSX.Element {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // clipboard write failed — ignore silently
+      // clipboard write failed - ignore silently
     }
   }, [fullText]);
 
@@ -104,7 +104,7 @@ export function DebugSystemPrompt({ locale, parts }: DebugProps): JSX.Element {
           </Div>
         </Div>
 
-        {/* Leading system prompt only — trailing and context appear after history */}
+        {/* Leading system prompt only - trailing and context appear after history */}
         <Div className="mb-1 text-xs font-mono text-purple-400/60 uppercase tracking-wide">
           {t("debugView.systemPromptLabel")}
         </Div>
@@ -125,7 +125,7 @@ export function DebugSystemPrompt({ locale, parts }: DebugProps): JSX.Element {
 /**
  * Debug card shown AFTER the message history.
  * Shows the trailing system message (tasks/memories/favorites) and the upcoming
- * assistant context line — in the exact order they are injected into the messages
+ * assistant context line - in the exact order they are injected into the messages
  * array sent to the AI.
  */
 export function DebugTrailingContext({
@@ -180,7 +180,7 @@ export function DebugTrailingContext({
         </Div>
       )}
 
-      {/* Upcoming assistant context — always the last message in the array */}
+      {/* Upcoming assistant context - always the last message in the array */}
       <Div
         className={cn(
           "rounded-xl px-3 py-2 sm:px-4",

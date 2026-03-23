@@ -1,7 +1,7 @@
 /**
- * Vibe Sense — Graph Version History Definition
+ * Vibe Sense - Graph Version History Definition
  *
- * GET — Walk the parentVersionId chain for a graph and return the ancestor list.
+ * GET - Walk the parentVersionId chain for a graph and return the ancestor list.
  */
 
 import { z } from "zod";

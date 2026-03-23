@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.ai",
   tags: ["tags.streaming", "tags.chat", "tags.ai"],
 
-  // No events — ai-stream emits to the messages channel directly.
+  // No events - ai-stream emits to the messages channel directly.
   // Event schemas are defined on the messages endpoint (the consumer).
 
   fields: customWidgetObject({

@@ -13,7 +13,6 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -37,6 +36,7 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
@@ -69,7 +69,7 @@ export interface ToolsConfigEditProps {
   label?: string;
   className?: string;
   /**
-   * Skill's tool configuration — fallback when value is null (inherited).
+   * Skill's tool configuration - fallback when value is null (inherited).
    * Ensures the display reflects the actual resolved character defaults.
    */
   skillAvailableTools?: ToolEntry[] | null;
@@ -381,7 +381,7 @@ export function ToolsConfigEdit({
 
   return (
     <Div className={cn("rounded-xl border bg-card flex flex-col", className)}>
-      {/* Header — always visible, click to expand */}
+      {/* Header - always visible, click to expand */}
       <Div
         className="flex items-center gap-3 p-4 cursor-pointer hover:bg-accent/30 transition-colors rounded-xl"
         onClick={() => setIsExpanded((v) => !v)}

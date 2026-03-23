@@ -71,7 +71,7 @@ export function useTTSAudio({
   // Use voice from props (set by chat settings)
   const voicePreference = voice ?? DEFAULT_TTS_VOICE;
 
-  // Use endpoint create directly — avoids shared instance key problem that causes
+  // Use endpoint create directly - avoids shared instance key problem that causes
   // infinite re-renders when multiple messages each call useTTSAudio simultaneously.
   const ttsForm = useEndpointCreate(
     textToSpeechDefinitions.POST,
@@ -215,9 +215,9 @@ export function useTTSAudio({
     ],
   );
 
-  // Play next chunk in the queue — defined as a stable ref-based function
+  // Play next chunk in the queue - defined as a stable ref-based function
   // We use a plain function (not useCallback) because it calls itself recursively
-  // and references refs directly — no stale closure issues.
+  // and references refs directly - no stale closure issues.
   const playNextChunk = useCallback((): void => {
     const refs = getTtsRefs(messageId);
     const nextIndex = refs.currentPlayingIndex;

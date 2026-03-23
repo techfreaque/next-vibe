@@ -16,15 +16,15 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import { buildMessagesChannel } from "../../../agent/chat/threads/[threadId]/messages/channel";
 import { createStreamEvent } from "../../../agent/chat/threads/[threadId]/messages/events";
-import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import {
   clearStreamingState,
   setStreamingStateAborting,
@@ -101,7 +101,7 @@ export class cancelRepository {
         });
       }
 
-      // Mark as aborting before sending abort signal — gives frontend immediate feedback
+      // Mark as aborting before sending abort signal - gives frontend immediate feedback
       await setStreamingStateAborting(threadId);
 
       // Cancel the stream via the registry
@@ -115,7 +115,7 @@ export class cancelRepository {
         // - isStreaming = false (via clearStreamingState in abort handler)
         // - WS error/interruption event
       } else {
-        // No active stream in registry — thread may be in "waiting" state
+        // No active stream in registry - thread may be in "waiting" state
         // (stream died, escalated task still in flight).
         // Find the waiting tracking task, write a cancelled result to its tool
         // message, then cancel the task and emit STREAM_FINISHED.
@@ -208,7 +208,7 @@ export class cancelRepository {
           });
         }
         // Emit STREAM_FINISHED so the frontend stops showing the streaming
-        // state — without this the client stays stuck in aborting/isStreaming.
+        // state - without this the client stays stuck in aborting/isStreaming.
         await clearStreamingState(threadId, logger);
         publishWsEvent(
           {
@@ -223,7 +223,7 @@ export class cancelRepository {
           logger,
         );
         logger.info(
-          "[Cancel] No active stream found — cleared DB flag, cancelled tasks, emitted STREAM_FINISHED",
+          "[Cancel] No active stream found - cleared DB flag, cancelled tasks, emitted STREAM_FINISHED",
           { threadId },
         );
       }

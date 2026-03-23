@@ -1,5 +1,5 @@
 /**
- * TanStack Start — plain CSS variable, no Next.js font optimization.
+ * TanStack Start - plain CSS variable, no Next.js font optimization.
  */
 export const inter = {
   className: "font-inter",

@@ -1,5 +1,5 @@
 /**
- * Chat Tool Calls Total — Endpoint Definition
+ * Chat Tool Calls Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

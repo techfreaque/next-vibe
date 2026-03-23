@@ -1,5 +1,5 @@
 /**
- * Vibe Frame Config — Route
+ * Vibe Frame Config - Route
  *
  * Public POST endpoint. The embed script (always cross-origin) passes identity
  * (leadId + authToken) in the POST body. No session cookie required.

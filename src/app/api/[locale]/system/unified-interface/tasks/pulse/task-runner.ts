@@ -50,7 +50,7 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
       ),
     );
 
-    // Import once outside the loop — dynamic to avoid circular dependencies at module load time
+    // Import once outside the loop - dynamic to avoid circular dependencies at module load time
     const { PulseHealthRepository } = await import("../pulse/repository");
 
     let pulseCount = 0;

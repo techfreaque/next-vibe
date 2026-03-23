@@ -11,7 +11,7 @@
 
 /**
  * All registered prompt fragment IDs.
- * Auto-generated — do not edit manually.
+ * Auto-generated - do not edit manually.
  */
 export const PROMPT_FRAGMENT_IDS = [
   "bootstrap",

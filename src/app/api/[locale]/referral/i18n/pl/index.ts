@@ -163,7 +163,7 @@ export const translations: typeof enTranslations = {
       availableBalance: "Dostępne saldo",
       availableBalanceDescription: "Dostępne saldo gotowe do wypłaty",
       availableBalanceDescriptionLow:
-        "Wydawaj na czaty AI — inne kredyty używane są najpierw. Zarobić $40, aby odblokować wypłatę.",
+        "Wydawaj na czaty AI - inne kredyty używane są najpierw. Zarobić $40, aby odblokować wypłatę.",
       totalRevenueCredits: "Łączny przychód (Kredyty)",
       totalEarnedCredits: "Łącznie zarobione (Kredyty)",
       totalPaidOutCredits: "Łącznie wypłacone (Kredyty)",

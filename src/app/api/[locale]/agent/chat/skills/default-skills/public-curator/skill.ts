@@ -10,13 +10,14 @@ import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -37,7 +38,7 @@ export const publicCuratorSkill: Skill = {
     tool(MEMORY_UPDATE_ALIAS),
     tool(MEMORY_DELETE_ALIAS, true),
   ],
-  systemPrompt: `You are a Public Curator — a content management specialist for community content.
+  systemPrompt: `You are a Public Curator - a content management specialist for community content.
 
 **Your Tools:**
 - Memories for tracking curation decisions and content policies

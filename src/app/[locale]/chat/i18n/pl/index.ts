@@ -128,17 +128,17 @@ export const translations: typeof enTranslations = {
       enabledLabel: "dozwolone",
       totalLabel: "łącznie",
       activeTooltip:
-        "Przypięte narzędzia są zawsze w kontekście — AI widzi je przy każdym zapytaniu",
+        "Przypięte narzędzia są zawsze w kontekście - AI widzi je przy każdym zapytaniu",
       enabledTooltip:
         "Dozwolone narzędzia mogą być wywoływane na żądanie, gdy pomoc jest włączona",
       legendActive: "Zawsze w kontekście (przypięte)",
       legendConfirm: "Pyta przed uruchomieniem",
-      activeOn: "Przypięte — zawsze w kontekście. Kliknij, aby odpiąć",
+      activeOn: "Przypięte - zawsze w kontekście. Kliknij, aby odpiąć",
       activeOff:
-        "Nieprzypięte — AI może nadal wywoływać na żądanie. Kliknij, aby przypiąć",
-      confirmOn: "Wymaga potwierdzenia — kliknij, aby wyłączyć",
+        "Nieprzypięte - AI może nadal wywoływać na żądanie. Kliknij, aby przypiąć",
+      confirmOn: "Wymaga potwierdzenia - kliknij, aby wyłączyć",
       confirmOff:
-        "Uruchamia się automatycznie — kliknij, aby wymagać potwierdzenia",
+        "Uruchamia się automatycznie - kliknij, aby wymagać potwierdzenia",
     },
   },
 
@@ -755,7 +755,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Pomyśl o nas jak o swoim zespole AI.",
       line1:
-        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu — cokolwiek jest potrzebne.",
+        "Twój towarzysz obsługuje codzienne rozmowy. Specjaliści wkraczają przy kodowaniu, badaniach, pisaniu - cokolwiek jest potrzebne.",
       line2:
         "AI przełącza się między nimi automatycznie. Ty po prostu rozmawiasz.",
       line3: "Skonfigurujmy cię w mniej niż minutę.",
@@ -767,7 +767,7 @@ export const translations: typeof enTranslations = {
       line1:
         "Twoje ustawienia, towarzysz i historia czatu są zapisywane lokalnie tylko na tym urządzeniu.",
       line2:
-        "Zaloguj się, aby synchronizować wszystko między urządzeniami — i mieć pewność, że nigdy nie stracisz swojej konfiguracji.",
+        "Zaloguj się, aby synchronizować wszystko między urządzeniami - i mieć pewność, że nigdy nie stracisz swojej konfiguracji.",
       signIn: "Zaloguj się / Utwórz konto",
       continueAnyway: "Kontynuuj jako gość",
       note: "Możesz zalogować się później z menu w dowolnym momencie.",
@@ -787,11 +787,11 @@ export const translations: typeof enTranslations = {
         },
         brilliant: {
           label: "Brilliant",
-          desc: "Najlepsza jakość — świetna do złożonych pytań, pisania i analizy",
+          desc: "Najlepsza jakość - świetna do złożonych pytań, pisania i analizy",
         },
         max: {
           label: "Max",
-          desc: "Najwyższe możliwości rozumowania, bez kompromisów — gdy naprawdę ma znaczenie",
+          desc: "Najwyższe możliwości rozumowania, bez kompromisów - gdy naprawdę ma znaczenie",
         },
       },
     },
@@ -802,7 +802,7 @@ export const translations: typeof enTranslations = {
         "Automatycznie dodamy odpowiednich specjalistów do zestawu narzędzi twojej AI.",
       saving: "Konfigurowanie...",
       start: "Rozpocznij czat",
-      skip: "Pomiń — skonfigruję to później",
+      skip: "Pomiń - skonfigruję to później",
       coding: {
         label: "Kodowanie & Technika",
         hint: "Vibe Coder, Coder",

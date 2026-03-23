@@ -21,15 +21,15 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import {
-  chatFolders,
-  type ChatMessage,
-  chatMessages,
-  chatThreads,
-  type ToolCall,
-} from "../../../db";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import {
+  chatFolders,
+  chatMessages,
+  chatThreads,
+  type ChatMessage,
+  type ToolCall,
+} from "../../../db";
 import { ChatMessageRole, type ChatMessageRoleDB } from "../../../enum";
 import {
   canPostInThread,
@@ -87,7 +87,7 @@ export class MessagesRepository {
     });
 
     // Build ancestry chain by traversing UP from parent to root.
-    // Stop at the most recent SUCCESSFUL compacting message — it contains a
+    // Stop at the most recent SUCCESSFUL compacting message - it contains a
     // summary of everything before it, so we only need it + subsequent messages.
     // This prevents sending the full uncompacted history alongside the summary.
     const messageMap = new Map(allMessages.map((msg) => [msg.id, msg]));
@@ -192,7 +192,7 @@ export class MessagesRepository {
         ? { attachments: params.attachments }
         : undefined;
 
-    // Verify parent exists — the client may reference an optimistic message that was never
+    // Verify parent exists - the client may reference an optimistic message that was never
     // committed (e.g. stream interrupted mid-flight). Fall back to the actual last committed
     // message in the thread so the conversation stays connected.
     let resolvedParentId = params.parentId;
@@ -203,7 +203,7 @@ export class MessagesRepository {
         .where(eq(chatMessages.id, resolvedParentId))
         .limit(1);
       if (!parent) {
-        // Parent wasn't committed — find the actual last message in this thread
+        // Parent wasn't committed - find the actual last message in this thread
         const [lastCommitted] = await db
           .select({ id: chatMessages.id })
           .from(chatMessages)

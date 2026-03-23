@@ -80,7 +80,7 @@ function persistGeneratedEnvVar(key: string, value: string): void {
       }
     }
   } catch {
-    // Ignore — generation still worked, just won't persist
+    // Ignore - generation still worked, just won't persist
   }
 }
 
@@ -119,7 +119,7 @@ function applyGenerate(
 }
 
 /**
- * Lazily decrypted process.env — computed once, reused across all defineEnv calls.
+ * Lazily decrypted process.env - computed once, reused across all defineEnv calls.
  * Decrypts vibe:enc:* values using the project key file.
  */
 let _decryptedEnv: NodeJS.ProcessEnv | undefined;

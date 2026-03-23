@@ -1,4 +1,4 @@
-# Remote Connection — Implementation Guide
+# Remote Connection - Implementation Guide
 
 Connects a local next-vibe instance to a cloud instance so both AIs can discover and execute each other's tools, memories sync bidirectionally, and task results flow back to the originating thread.
 
@@ -38,7 +38,7 @@ When task completes on either side:
 → emits TASK_COMPLETED WS event on the originating thread's channel
 → client re-triggers AI stream (operation: "answer-as-ai", parentId = last message)
 → AI sees completed task result in system prompt ("Background tasks completed")
-→ stream ends immediately — no polling, no blocking
+→ stream ends immediately - no polling, no blocking
 ```
 
 ---
@@ -105,7 +105,7 @@ connect/repository.ts → connectRemote()
 
 On 409 from cloud register: returns CONFLICT ("instanceId already in use on remote").
 
-**`remoteInstanceId`** — what the cloud calls itself (e.g. "thea"). Stored on local's DB row. Used by:
+**`remoteInstanceId`** - what the cloud calls itself (e.g. "thea"). Stored on local's DB row. Used by:
 
 - System prompt builder: AI learns to call `execute-tool(instanceId="thea")`
 - `outboundTasks`: local creates tasks with `targetInstance="thea"`, pulse sends them to cloud
@@ -151,16 +151,16 @@ tasks/task-sync/pull/task.ts → pullFromRemote()
 Cloud AI: execute-tool("hermes__ssh_exec_POST", input)
 → RouteExecuteRepository.execute()
   1. Parse "hermes__ssh_exec_POST" → instanceId="hermes", tool="ssh_exec_POST"
-  2. getCapabilities(userId, "hermes") — matches by instanceId OR remoteInstanceId
+  2. getCapabilities(userId, "hermes") - matches by instanceId OR remoteInstanceId
   3. Validate tool in snapshot
   4. Insert cronTask: { targetInstance="hermes", routeId="ssh_exec_POST",
                         taskInput: { ...input, __callbackMode, __threadId, __messageId } }
-  5. Return { taskId, status: "pending" } — stream ends immediately
+  5. Return { taskId, status: "pending" } - stream ends immediately
 → Next local pulse: upsertRemoteTasks() inserts task into local DB
 → Local pulse executes task
 → pushStatusToRemote() → POST to cloud /report
 → /report: stores cronTaskExecution, emits TASK_COMPLETED WS event on thread channel
-→ Client re-triggers AI stream ("answer-as-ai") — AI resumes with result in context
+→ Client re-triggers AI stream ("answer-as-ai") - AI resumes with result in context
 ```
 
 ### Local calls cloud tool
@@ -169,16 +169,16 @@ Cloud AI: execute-tool("hermes__ssh_exec_POST", input)
 Local AI: execute-tool("thea__ssh_exec_POST", input)
 → RouteExecuteRepository.execute()
   1. Parse "thea__ssh_exec_POST" → instanceId="thea", tool="ssh_exec_POST"
-  2. getCapabilities(userId, "thea") — matches by remoteInstanceId="thea"
+  2. getCapabilities(userId, "thea") - matches by remoteInstanceId="thea"
   3. Validate tool in snapshot
   4. Insert cronTask: { targetInstance="thea", routeId="ssh_exec_POST",
                         taskInput: { ...input, __callbackMode, __threadId, __messageId } }
-  5. Return { taskId, status: "pending" } — stream ends immediately
+  5. Return { taskId, status: "pending" } - stream ends immediately
 → Next pulse: pullFromRemote() sends task in outboundTasks
 → Cloud syncTasks() upserts it → cloud pulse executes
 → Cloud calls pushStatusToRemote() → POST to local /report (via localUrl)
 → /report: stores cronTaskExecution, emits TASK_COMPLETED WS event on thread channel
-→ Client re-triggers AI stream ("answer-as-ai") — AI resumes with result in context
+→ Client re-triggers AI stream ("answer-as-ai") - AI resumes with result in context
 ```
 
 ### Callback modes
@@ -186,8 +186,8 @@ Local AI: execute-tool("thea__ssh_exec_POST", input)
 | Mode        | Behaviour                                                                                                               | When to use                                                |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `task-done` | Return `{taskId, status:"pending"}` immediately. Stream ends. Next AI turn sees completed tasks in system prompt.       | Default for background work                                |
-| `inject`    | Same as task-done, but TASK_COMPLETED WS event triggers client to re-trigger AI stream immediately after result arrives | Default for interactive tool calls — AI resumes seamlessly |
-| `wait`      | **Removed** — was long-poll (blocking 60s). Now equivalent to `inject`. All remote calls are async.                     | N/A                                                        |
+| `inject`    | Same as task-done, but TASK_COMPLETED WS event triggers client to re-trigger AI stream immediately after result arrives | Default for interactive tool calls - AI resumes seamlessly |
+| `wait`      | **Removed** - was long-poll (blocking 60s). Now equivalent to `inject`. All remote calls are async.                     | N/A                                                        |
 
 **Thread continuation** (for `inject` / `task-done` when user is active):
 
@@ -229,14 +229,14 @@ Defined in `agent/chat/constants.ts`:
 ```ts
 DEFAULT_REMOTE_TOOL_IDS; // CLAUDE_CODE, CRON_LIST, CRON_CREATE, SSH_EXEC,
 // SSH_FILES_READ, SSH_FILES_WRITE, MEMORY_LIST, MEMORY_ADD
-DEFAULT_REMOTE_PINNED_IDS; // [] — user promotes via tool settings
+DEFAULT_REMOTE_PINNED_IDS; // [] - user promotes via tool settings
 ```
 
 Written to the user's `allowedTools` chat setting at connect time, prefixed with `instanceId__`.
 
 ---
 
-## DB Table — `user_remote_connections`
+## DB Table - `user_remote_connections`
 
 One row per user per instance.
 
@@ -258,8 +258,8 @@ One row per user per instance.
 
 **Special sentinel values:**
 
-- `token="self"` — cloud's own self-identity record (so `getLocalInstanceId()` can discover "thea")
-- `token=null` — cloud-side record for a local instance (cloud never initiates calls to local via JWT)
+- `token="self"` - cloud's own self-identity record (so `getLocalInstanceId()` can discover "thea")
+- `token=null` - cloud-side record for a local instance (cloud never initiates calls to local via JWT)
 
 ---
 

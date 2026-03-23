@@ -36,7 +36,7 @@ export class DockerOperationsRepository {
     /^\s*Network\s+[a-zA-Z0-9_-]+_default\s+(Removing|Removed|Creating|Created)\s*$/,
     // Match raw Docker output: Volume {any} {action}
     /^\s*Volume\s+[a-zA-Z0-9_-]+\s+(Removing|Removed|Creating|Created)\s*$/,
-    // Container name already in use — not a real error, container is already running
+    // Container name already in use - not a real error, container is already running
     /already in use by container/,
     /You have to remove \(or rename\) that container/,
     /Error response from daemon: Conflict/,
@@ -308,7 +308,7 @@ export class DockerOperationsRepository {
         resolved = true;
         clearTimeout(timeoutId);
 
-        // Container "already in use" is not a real failure — the container is already running
+        // Container "already in use" is not a real failure - the container is already running
         const isContainerAlreadyRunning =
           error.includes("already in use") && error.includes("container name");
         const commandSuccess = code === 0 || isContainerAlreadyRunning;

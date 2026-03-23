@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Field Pick Transformer Route
+ * Vibe Sense - Field Pick Transformer Route
  * Server-only.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Messenger Domain — Vibe Sense Graph Seeds
+ * Messenger Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the messenger domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,22 +7,22 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
+import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import { MESSENGER_SENT_ALIAS } from "./data-sources/messenger-sent/constants";
+import { MESSENGER_BOUNCED_ALIAS } from "./data-sources/messenger-bounced/constants";
+import { MESSENGER_CLICKED_ALIAS } from "./data-sources/messenger-clicked/constants";
 import { MESSENGER_DELIVERED_ALIAS } from "./data-sources/messenger-delivered/constants";
 import { MESSENGER_OPENED_ALIAS } from "./data-sources/messenger-opened/constants";
-import { MESSENGER_CLICKED_ALIAS } from "./data-sources/messenger-clicked/constants";
-import { MESSENGER_BOUNCED_ALIAS } from "./data-sources/messenger-bounced/constants";
+import { MESSENGER_SENT_ALIAS } from "./data-sources/messenger-sent/constants";
 import { MESSENGER_TOTAL_ALIAS } from "./data-sources/messenger-total/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 

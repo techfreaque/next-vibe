@@ -563,7 +563,7 @@ const oxlint: CheckConfig["oxlint"] = {
                   "aria-describedby",
                   "title",
                   "placeholder",
-                  // HTML meta attributes — values are not user-facing text
+                  // HTML meta attributes - values are not user-facing text
                   "content",
                   "charSet",
                   "name",

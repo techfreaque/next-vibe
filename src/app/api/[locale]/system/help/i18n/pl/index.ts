@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   tag: "Pomoc",
   uncategorized: "Inne",
   get: {
-    title: "Pomoc narzędzi — odkryj dostępne narzędzia",
+    title: "Pomoc narzędzi - odkryj dostępne narzędzia",
     description:
       "Wyszukuj i odkrywaj wszystkie dostępne narzędzia. Użyj query do wyszukiwania, category do filtrowania.",
     tags: {
@@ -302,12 +302,12 @@ export const translations: typeof enTranslations = {
     modal: {
       pinnedLabel: "przypięte",
       pinnedTooltip:
-        "Przypięte narzędzia są zawsze w kontekście — AI widzi je przy każdym kroku",
+        "Przypięte narzędzia są zawsze w kontekście - AI widzi je przy każdym kroku",
       enabledLabel: "dozwolone",
       enabledTooltip:
         "Dozwolone narzędzia mogą być wywoływane na żądanie, gdy pomoc jest włączona",
       totalLabel: "łącznie",
-      totalTooltip: "Pokaż wszystkie narzędzia — kliknij aby wyczyścić filtr",
+      totalTooltip: "Pokaż wszystkie narzędzia - kliknij aby wyczyścić filtr",
       searchPlaceholder: "Szukaj narzędzi...",
       expandAll: "Rozwiń wszystkie",
       collapseAll: "Zwiń wszystkie",
@@ -320,11 +320,11 @@ export const translations: typeof enTranslations = {
       legendActive: "Zawsze w kontekście (przypięte)",
       legendConfirm: "Pyta przed uruchomieniem",
       stats: "{{pinned}} z {{total}} narzędzi przypiętych",
-      activeOn: "Przypięte — zawsze w kontekście. Kliknij aby odpiąć",
+      activeOn: "Przypięte - zawsze w kontekście. Kliknij aby odpiąć",
       activeOff:
-        "Nieprzypięte — AI może wywoływać na żądanie. Kliknij aby przypiąć",
-      confirmOn: "Prosi o potwierdzenie — kliknij aby wyłączyć",
-      confirmOff: "Uruchamia automatycznie — kliknij aby wymagać potwierdzenia",
+        "Nieprzypięte - AI może wywoływać na żądanie. Kliknij aby przypiąć",
+      confirmOn: "Prosi o potwierdzenie - kliknij aby wyłączyć",
+      confirmOff: "Uruchamia automatycznie - kliknij aby wymagać potwierdzenia",
     },
 
     platformFilter: {

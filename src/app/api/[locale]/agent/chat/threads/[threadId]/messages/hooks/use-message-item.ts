@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * useMessageItem — O(1) per-delta subscription to a single message.
+ * useMessageItem - O(1) per-delta subscription to a single message.
  *
  * Uses a per-item React Query cache key (layer 2) seeded by updateMessages.
  * When a streaming delta updates message Y, only message Y's component
- * re-renders — all other message components are unaffected.
+ * re-renders - all other message components are unaffected.
  *
  * Replaces useStreamingMessagesStore for per-message live state reads.
  * Components use message.metadata?.isStreaming instead of streamingStore.isStreaming.
@@ -28,13 +28,13 @@ import { messageItemQueryKey } from "./update-messages";
 export function useMessageItem(messageId: string): ChatMessage | undefined {
   return useQuery<ChatMessage | undefined>({
     queryKey: messageItemQueryKey(messageId),
-    // enabled: false — never fetches. Data is written exclusively via
+    // enabled: false - never fetches. Data is written exclusively via
     // seedMessageItemCache (called by updateMessages on every write).
     // useQuery here is purely a reactive subscription to the cache entry.
     queryFn: () => Promise.resolve(undefined),
     enabled: false,
     staleTime: Infinity,
-    // Only notify observers when data changes — not on isFetching, dataUpdatedAt, etc.
+    // Only notify observers when data changes - not on isFetching, dataUpdatedAt, etc.
     notifyOnChangeProps: ["data"],
   }).data;
 }

@@ -4,7 +4,7 @@
  *
  * Always runs all 6 steps in sequence:
  * 1. Code generation
- * 2. Vibe check (code quality gate — blocks build if errors > 0)
+ * 2. Vibe check (code quality gate - blocks build if errors > 0)
  * 3. Next.js production build (atomic swap)
  * 4. Database migrations
  * 5. Database seeding
@@ -162,7 +162,7 @@ export class RebuildRepository {
           const isOom =
             exitSignal === "SIGKILL" || exitCode === 137 || exitCode === 134;
           const detail = isOom
-            ? `Next.js build killed by OS (likely OOM) — signal: ${exitSignal ?? exitCode}`
+            ? `Next.js build killed by OS (likely OOM) - signal: ${exitSignal ?? exitCode}`
             : `Next.js build exited with code ${exitCode ?? "unknown"}`;
           logger.error("Next.js rebuild failed", {
             exitCode,

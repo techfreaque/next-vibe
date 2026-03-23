@@ -85,7 +85,7 @@ export const translations: typeof enTranslations = {
     extensive: {
       label: "Extensive",
       description:
-        "Wenn aktiviert, werden auch Testdateien (*.test.ts, *.test.tsx) und automatisch generierte Dateien (system/generated/**) geprüft. Standardmäßig deaktiviert — aktivieren Sie es für Release-Validierung oder wenn Sie generierten/Testcode explizit prüfen möchten.",
+        "Wenn aktiviert, werden auch Testdateien (*.test.ts, *.test.tsx) und automatisch generierte Dateien (system/generated/**) geprüft. Standardmäßig deaktiviert - aktivieren Sie es für Release-Validierung oder wenn Sie generierten/Testcode explizit prüfen möchten.",
     },
   },
 

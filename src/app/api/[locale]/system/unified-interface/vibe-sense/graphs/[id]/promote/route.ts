@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Promote Route
+ * Vibe Sense - Graph Promote Route
  */
 
 import "server-only";

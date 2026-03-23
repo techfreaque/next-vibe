@@ -1,6 +1,6 @@
 /**
  * Remote Connection Re-authenticate Route Handler
- * POST — refresh credentials for an existing connection
+ * POST - refresh credentials for an existing connection
  */
 
 import "server-only";

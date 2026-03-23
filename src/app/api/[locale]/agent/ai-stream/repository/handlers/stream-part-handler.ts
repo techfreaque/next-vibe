@@ -84,9 +84,9 @@ export class StreamPartHandler {
     if (part.type === "text-delta") {
       // Once a tool in this step requires confirmation, discard any subsequent
       // text-deltas in the same step. The AI often emits follow-up text after
-      // tool calls (e.g. "Waiting for your approval...") — we don't want this
+      // tool calls (e.g. "Waiting for your approval...") - we don't want this
       // persisted since the stream will stop at finish-step and the confirm flow
-      // takes over. Do NOT abort the stream here — let the step finish naturally.
+      // takes over. Do NOT abort the stream here - let the step finish naturally.
       if (ctx.stepHasToolsAwaitingConfirmation) {
         return { shouldAbort: false };
       }
@@ -191,7 +191,7 @@ export class StreamPartHandler {
         // the history is later sent to the API (e.g. during compacting).
         if (ctx.allSeenToolCallIds.has(part.toolCallId)) {
           logger.warn(
-            "[AI Stream] Duplicate toolCallId from model — skipping",
+            "[AI Stream] Duplicate toolCallId from model - skipping",
             {
               toolCallId: part.toolCallId,
               toolName: part.toolName,
@@ -242,7 +242,7 @@ export class StreamPartHandler {
           result.pendingToolMessage.messageId;
 
         // Track the branch tip at the time of this tool call.
-        // parentId is the assistant message that spawned the tool — this is the
+        // parentId is the assistant message that spawned the tool - this is the
         // correct leaf for deferred result insertion (wakeUp, approve, remote).
         // Updated on every tool-call so it reflects the latest branch tip if
         // multiple sequential tool calls happen in the same step.
@@ -253,7 +253,7 @@ export class StreamPartHandler {
 
         ctx.pendingToolMessages.set(part.toolCallId, result.pendingToolMessage);
 
-        // APPROVE: mark that this stream has approve tools — abort deferred to finish-step.
+        // APPROVE: mark that this stream has approve tools - abort deferred to finish-step.
         // stepHasToolsAwaitingConfirmation persists across steps so sequential tool calls
         // all complete before the stream aborts at the AI-response turn boundary.
         if (result.requiresConfirmation) {
@@ -377,7 +377,7 @@ export class StreamPartHandler {
         if (streamContext.waitingForRemoteResult) {
           streamContext.waitingForRemoteResult = false;
           logger.info(
-            "[AI Stream] Remote tool wait mode — aborting stream immediately",
+            "[AI Stream] Remote tool wait mode - aborting stream immediately",
             {
               toolName: part.toolName,
               toolCallId: part.toolCallId,
@@ -391,12 +391,12 @@ export class StreamPartHandler {
 
         // endLoop: defer abort to finish-step (same as approve).
         // The step must fully complete (all parallel tool results received) before
-        // aborting — otherwise the abort fires mid-step and kills sibling tools.
+        // aborting - otherwise the abort fires mid-step and kills sibling tools.
         // finish-step fires after all tool results in the step, before the AI SDK
         // makes the next API call, so deferring there is always safe.
         if (ctx.shouldStopLoop) {
           logger.info(
-            "[AI Stream] endLoop tool result received — deferring abort to finish-step",
+            "[AI Stream] endLoop tool result received - deferring abort to finish-step",
             {
               toolName: part.toolName,
               toolCallId: part.toolCallId,

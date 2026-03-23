@@ -1,5 +1,5 @@
 /**
- * Referral Lead Clicks — Repository
+ * Referral Lead Clicks - Repository
  * Server-only. DB access.
  * Count of lead referral link clicks per resolution bucket.
  */
@@ -17,9 +17,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
-import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { TimeRange } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type {
+  DataPoint,
+  Resolution,
+  TimeRange,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { leadReferrals } from "../../db";
 
 export class QueryReferralsLeadClicksRepository {

@@ -9,18 +9,18 @@ import React, { createElement } from "react";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { InkEndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer";
 import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
 import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { Platform } from "../../../../shared/types/platform";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
-import { InkEndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointRenderer";
 import { CliErrorFormatter } from "./error-formatter";
 import { renderToString as fastRenderToString } from "./fast-ink-renderer/renderer";
 
 /**
  * Pre-warm React.lazy widgets so their promises resolve before sync rendering.
- * The fast reconciler renders synchronously — lazy components that haven't
+ * The fast reconciler renders synchronously - lazy components that haven't
  * resolved yet will suspend and produce no output.
  */
 interface ReactLazyRef {

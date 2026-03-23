@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Window Average Route
+ * Vibe Sense - Window Average Route
  * Server-only.
  */
 

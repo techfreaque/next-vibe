@@ -1,7 +1,7 @@
 /**
  * Vote Message Client-Side Route Handler
  * Stores votes in localStorage for incognito threads.
- * Votes are used as AI feedback — they affect context messages shown to the AI.
+ * Votes are used as AI feedback - they affect context messages shown to the AI.
  */
 
 "use client";
@@ -13,7 +13,7 @@ import definitions from "./definition";
 import { VoteRepositoryClient } from "./repository-client";
 
 /**
- * Client-side handlers — stores votes in localStorage for incognito threads
+ * Client-side handlers - stores votes in localStorage for incognito threads
  */
 export const { POST } = clientEndpointsHandler({
   endpoint: definitions,

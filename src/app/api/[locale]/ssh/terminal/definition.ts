@@ -1,6 +1,6 @@
 /**
  * SSH Terminal Endpoint Definition
- * GET /ssh/terminal — Widget-only, renders xterm.js browser terminal
+ * GET /ssh/terminal - Widget-only, renders xterm.js browser terminal
  */
 
 import { z } from "zod";
@@ -35,7 +35,7 @@ export const { GET } = createEndpoint({
     render: TerminalContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      // No meaningful server fields — widget manages its own session
+      // No meaningful server fields - widget manages its own session
       ok: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.ok.title",

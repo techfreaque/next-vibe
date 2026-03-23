@@ -206,7 +206,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         break;
 
       case Platform.CRON:
-        // CRON is an internal executor — not blocked by AI_TOOL_OFF (which only prevents
+        // CRON is an internal executor - not blocked by AI_TOOL_OFF (which only prevents
         // AI tool exposure). Only block if WEB_OFF is set (truly server-side-only endpoints).
         if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
           return {

@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   navigateButtonField,
   objectField,
   requestField,
@@ -61,7 +61,7 @@ const { GET } = createEndpoint({
     children: {
       /**
        * Admin-only: fetch favorites for a specific user instead of the authenticated user.
-       * Only visible to admins — regular users never see or send this field.
+       * Only visible to admins - regular users never see or send this field.
        */
       userId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -116,7 +116,7 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
 
-      // Pagination metadata (AI/MCP platform only — null for human callers)
+      // Pagination metadata (AI/MCP platform only - null for human callers)
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,

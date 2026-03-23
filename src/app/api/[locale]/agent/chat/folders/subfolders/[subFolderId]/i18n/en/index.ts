@@ -118,7 +118,7 @@ export const translations = {
       },
       conflict: {
         title: "Conflict",
-        description: "Cannot delete folder — it may have contents",
+        description: "Cannot delete folder - it may have contents",
       },
     },
     success: { title: "Success", description: "Folder deleted successfully" },

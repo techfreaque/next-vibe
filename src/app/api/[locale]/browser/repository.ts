@@ -25,7 +25,7 @@ import { BrowserTool, BrowserToolStatus } from "./enum";
 import type { BrowserT } from "./i18n";
 
 /**
- * MCP bridge response — the shape executeTool always returns
+ * MCP bridge response - the shape executeTool always returns
  */
 interface MCPBridgeResponse {
   success: boolean;

@@ -13,13 +13,14 @@ import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -43,7 +44,7 @@ export const researchAgentSkill: Skill = {
     tool(MEMORY_UPDATE_ALIAS),
     tool(MEMORY_DELETE_ALIAS, true),
   ],
-  systemPrompt: `You are a Research Agent — a specialist in finding, verifying, and synthesizing information from the web.
+  systemPrompt: `You are a Research Agent - a specialist in finding, verifying, and synthesizing information from the web.
 
 **Your Tools:**
 - Web search (Brave & Kagi) for finding current information

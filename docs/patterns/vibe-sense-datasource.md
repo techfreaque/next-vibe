@@ -4,15 +4,15 @@ Guide to writing endpoints that feed time-series data into the Vibe Sense graph 
 
 ## Overview
 
-A **data source** is a standard endpoint (definition + repository + route) that the graph engine can call as a node. What makes it a data source is using the **standard field helpers** from `vibe-sense/shared/fields.ts` for its request and response fields — no custom transforms needed, the engine can wire it directly.
+A **data source** is a standard endpoint (definition + repository + route) that the graph engine can call as a node. What makes it a data source is using the **standard field helpers** from `vibe-sense/shared/fields.ts` for its request and response fields - no custom transforms needed, the engine can wire it directly.
 
 Endpoints are organized by role:
 
-- **Data sources** — fetch raw time-series (`result: TimeSeries`)
-- **Indicators** — transform time-series (EMA, SMA, Bollinger Bands)
-- **Evaluators** — produce signals (`signals: SignalEvent[]`)
-- **Transformers** — combine or reshape series
-- **Actions** — side-effect endpoints (send alert, trigger AI run)
+- **Data sources** - fetch raw time-series (`result: TimeSeries`)
+- **Indicators** - transform time-series (EMA, SMA, Bollinger Bands)
+- **Evaluators** - produce signals (`signals: SignalEvent[]`)
+- **Transformers** - combine or reshape series
+- **Actions** - side-effect endpoints (send alert, trigger AI run)
 
 There is a convention to group data sources under a `data-sources/` folder when a module has many, but it is not required.
 
@@ -139,16 +139,16 @@ All helpers are exported from `vibe-sense/shared/fields.ts`. Import from there, 
 ### Data Types
 
 ```typescript
-// DataPoint — one bar of data
+// DataPoint - one bar of data
 { timestamp: Date; value: number; meta?: Record<string, string | number | boolean | null> }
 
-// TimeSeries — array of DataPoints
+// TimeSeries - array of DataPoints
 DataPoint[]
 
-// NodeMeta — returned with every result
+// NodeMeta - returned with every result
 { actualResolution: Resolution; lookbackUsed: number; sparse?: boolean }
 
-// SignalEvent — evaluator output
+// SignalEvent - evaluator output
 { timestamp: Date; fired: boolean; meta?: Record<...> }
 ```
 
@@ -169,20 +169,20 @@ createEndpoint({
 
 | Marker                    | Default  | When to set                                                        |
 | ------------------------- | -------- | ------------------------------------------------------------------ |
-| `backtestMode: "rolling"` | `"bulk"` | PnL tracking, position sizing — called bar-by-bar                  |
-| `sideEffect: true`        | `false`  | Sends email, triggers AI run, writes to DB — skipped in chart mode |
+| `backtestMode: "rolling"` | `"bulk"` | PnL tracking, position sizing - called bar-by-bar                  |
+| `sideEffect: true`        | `false`  | Sends email, triggers AI run, writes to DB - skipped in chart mode |
 | `cacheable: false`        | `true`   | Live prices, randomized output, stateful endpoints                 |
 
 **By role:**
 
-- Data sources, indicators, transformers: `{ cacheable: true }` (default — omit marker)
-- Evaluators: `{ cacheable: true }` (default — omit marker)
+- Data sources, indicators, transformers: `{ cacheable: true }` (default - omit marker)
+- Evaluators: `{ cacheable: true }` (default - omit marker)
 - Actions: `{ sideEffect: true, cacheable: false }`
 - Rolling simulations: `{ backtestMode: "rolling" }`
 
 ## Repository Pattern
 
-Data source repositories follow the standard pattern — return `ResponseType<T>`, no throw:
+Data source repositories follow the standard pattern - return `ResponseType<T>`, no throw:
 
 ```typescript
 // data-sources/cron-executions-failed/repository.ts

@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Fähigkeit melden",
     description:
-      "Fähigkeit zur Moderation melden. Idempotent — eine Meldung pro Benutzer pro Fähigkeit.",
+      "Fähigkeit zur Moderation melden. Idempotent - eine Meldung pro Benutzer pro Fähigkeit.",
     dynamicTitle: "Melden: {{name}}",
     reason: {
       label: "Grund",

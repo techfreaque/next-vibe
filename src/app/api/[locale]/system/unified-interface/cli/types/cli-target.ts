@@ -8,11 +8,11 @@
  */
 
 export const CliTarget = {
-  /** Raw development — default DB port, no preview mode */
+  /** Raw development - default DB port, no preview mode */
   DEV: "dev",
-  /** Preview / daily driver — preview DB port, `vibe start` / `--target local` */
+  /** Preview / daily driver - preview DB port, `vibe start` / `--target local` */
   LOCAL: "local",
-  /** Remote host via HTTP — `--target remote` */
+  /** Remote host via HTTP - `--target remote` */
   REMOTE: "remote",
 } as const;
 

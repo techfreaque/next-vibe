@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Backtest Route
+ * Vibe Sense - Graph Backtest Route
  */
 
 import "server-only";

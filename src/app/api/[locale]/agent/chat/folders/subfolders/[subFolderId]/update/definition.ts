@@ -20,15 +20,15 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   UserPermissionRoleOptions,
+  UserRole,
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
 /**
  * Update Folder Endpoint (PATCH)
- * Updates an existing folder — all fields
+ * Updates an existing folder - all fields
  */
 const { PATCH } = createEndpoint({
   scopedTranslation,

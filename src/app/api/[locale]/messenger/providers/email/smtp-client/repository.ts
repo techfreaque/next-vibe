@@ -1,7 +1,7 @@
 /**
  * SMTP Client Repository
  * Routes all email sending through messenger_accounts (channel='EMAIL', provider='SMTP').
- * The old smtp_accounts table is no longer used for sending — only messenger_accounts is.
+ * The old smtp_accounts table is no longer used for sending - only messenger_accounts is.
  */
 
 import "server-only";
@@ -84,7 +84,7 @@ export interface SmtpCapacityResponseOutput {
 
 /**
  * Normalised SMTP-specific shape extracted from a MessengerAccount row.
- * All types are inferred directly from MessengerAccount — no duplication.
+ * All types are inferred directly from MessengerAccount - no duplication.
  */
 interface SmtpAccountShape {
   id: MessengerAccount["id"];
@@ -118,7 +118,7 @@ interface TestConnectionResult {
 }
 
 /**
- * SMTP Repository — reads from messenger_accounts (channel=EMAIL, provider=SMTP)
+ * SMTP Repository - reads from messenger_accounts (channel=EMAIL, provider=SMTP)
  */
 export class SmtpRepository {
   private static transportCache = new Map<

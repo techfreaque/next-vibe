@@ -11,12 +11,12 @@ export const translations: typeof enTranslations = {
         title: "Claude Code ausführen",
         dynamicTitle: "Claude Code: {{prompt}}",
         description:
-          "Führt eine Claude Code-Aufgabe aus. Batch-Modus (STANDARD): läuft headless und gibt die Ausgabe zurück. Interaktiver Modus: öffnet eine Live-Terminal-Sitzung — das Ergebnis wird automatisch zurückgeliefert wenn die Sitzung endet.",
+          "Führt eine Claude Code-Aufgabe aus. Batch-Modus (STANDARD): läuft headless und gibt die Ausgabe zurück. Interaktiver Modus: öffnet eine Live-Terminal-Sitzung - das Ergebnis wird automatisch zurückgeliefert wenn die Sitzung endet.",
         fields: {
           prompt: {
             label: "Prompt",
             description:
-              "Die Aufgabe oder Frage für Claude Code. Spezifisch sein — Dateipfade, Kontext und erwartetes Ausgabeformat angeben.",
+              "Die Aufgabe oder Frage für Claude Code. Spezifisch sein - Dateipfade, Kontext und erwartetes Ausgabeformat angeben.",
           },
           model: {
             label: "Modell",
@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
           interactiveMode: {
             label: "Interaktiver Modus",
             description:
-              "false (STANDARD): läuft headless und gibt die gesamte Ausgabe zurück. true: öffnet ein Terminal-Fenster für eine Live-Sitzung — das Ergebnis wird automatisch zurückgeliefert wenn die Sitzung endet.",
+              "false (STANDARD): läuft headless und gibt die gesamte Ausgabe zurück. true: öffnet ein Terminal-Fenster für eine Live-Sitzung - das Ergebnis wird automatisch zurückgeliefert wenn die Sitzung endet.",
           },
           output: {
             label: "Ausgabe",
@@ -71,12 +71,12 @@ export const translations: typeof enTranslations = {
           validation: {
             title: "Validierungsfehler",
             description:
-              "Ungültige Anfrageparameter — Prompt und Felder prüfen",
+              "Ungültige Anfrageparameter - Prompt und Felder prüfen",
           },
           unauthorized: {
             title: "Nicht autorisiert",
             description:
-              "Authentifizierung erforderlich — Admin-Rolle benötigt",
+              "Authentifizierung erforderlich - Admin-Rolle benötigt",
           },
           internal: {
             title: "Ausführung fehlgeschlagen",
@@ -90,7 +90,7 @@ export const translations: typeof enTranslations = {
           },
           forbidden: {
             title: "Verboten",
-            description: "Zugriff verweigert — unzureichende Berechtigungen",
+            description: "Zugriff verweigert - unzureichende Berechtigungen",
           },
           notFound: {
             title: "Nicht gefunden",
@@ -111,7 +111,7 @@ export const translations: typeof enTranslations = {
           conflict: {
             title: "Konflikt",
             description:
-              "Ausführungskonflikt — möglicherweise läuft bereits eine Sitzung",
+              "Ausführungskonflikt - möglicherweise läuft bereits eine Sitzung",
           },
         },
         success: {
@@ -123,7 +123,7 @@ export const translations: typeof enTranslations = {
           runningBatch: "Claude läuft...",
           runningInteractive: "Interaktive Terminal-Sitzung wird gestartet...",
           escalated:
-            "Läuft im Hintergrund — Ergebnis wird injiziert wenn fertig.",
+            "Läuft im Hintergrund - Ergebnis wird injiziert wenn fertig.",
           taskIdLabel: "Aufgaben-ID",
           outputLabel: "Ausgabe",
           interactiveSessionLaunched:

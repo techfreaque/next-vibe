@@ -1,7 +1,7 @@
 /**
  * Vote Message Client Repository
  * Handles vote storage in localStorage for incognito threads.
- * Votes serve as AI feedback — they appear in context messages shown to the AI.
+ * Votes serve as AI feedback - they appear in context messages shown to the AI.
  */
 
 "use client";

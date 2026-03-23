@@ -52,9 +52,9 @@ export class MessageDbWriter {
   private readonly locale: CountryLanguage;
   private readonly wsEmit: WsEmitCallback | null;
 
-  /** Tracks the last assistant message ID written — used by headless callers */
+  /** Tracks the last assistant message ID written - used by headless callers */
   lastAssistantMessageId: string | null = null;
-  /** Tracks the final text content of the last assistant message — populated even in incognito */
+  /** Tracks the final text content of the last assistant message - populated even in incognito */
   lastAssistantContent: string | null = null;
 
   constructor(
@@ -762,7 +762,7 @@ export class MessageDbWriter {
   }
 
   /**
-   * Mark a compacting message as failed in the DB (no SSE — stream is already dead).
+   * Mark a compacting message as failed in the DB (no SSE - stream is already dead).
    * Sets metadata.compactingFailed = true and errorMessage so the UI can show a failed state,
    * and the next send can detect it and retry compacting as a sibling.
    */
@@ -889,7 +889,7 @@ export class MessageDbWriter {
    * Used by error handlers to show errors in the chat UI.
    *
    * The MESSAGE_CREATED event is sufficient for the client to display the error bubble.
-   * Do NOT emit a trailing ERROR SSE here — that would cause a duplicate message
+   * Do NOT emit a trailing ERROR SSE here - that would cause a duplicate message
    * because the client's ERROR handler also creates a new chat message.
    *
    * Pass `content` to override the default serialized ErrorResponseType content.
@@ -911,7 +911,7 @@ export class MessageDbWriter {
 
     // SSE: MESSAGE_CREATED for the error message
     // The client's MESSAGE_CREATED handler adds this to the chat store with the
-    // correct parentId/sequenceId — no additional ERROR event needed.
+    // correct parentId/sequenceId - no additional ERROR event needed.
     const errorMessageEvent = createStreamEvent.messageCreated({
       messageId: errorMessageId,
       threadId,

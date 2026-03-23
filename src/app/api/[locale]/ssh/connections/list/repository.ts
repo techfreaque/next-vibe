@@ -17,8 +17,8 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { SshAuthType } from "../../enum";
 import { sshConnections } from "../../db";
+import { SshAuthType } from "../../enum";
 import type { ConnectionsListResponseOutput } from "./definition";
 import type { ConnectionsListT } from "./i18n";
 
@@ -59,7 +59,7 @@ export class ConnectionsListRepository {
           createdAt: r.createdAt.toISOString(),
         }));
 
-      // Ensure a LOCAL entry exists for local mode — upsert once
+      // Ensure a LOCAL entry exists for local mode - upsert once
       const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
       if (isLocalMode) {
         const hasLocal = connections.some(
@@ -78,7 +78,7 @@ export class ConnectionsListRepository {
               authType: SshAuthType.LOCAL,
               encryptedSecret: "",
               isDefault: !hasDefault,
-              notes: "Built-in local shell — no SSH credentials needed",
+              notes: "Built-in local shell - no SSH credentials needed",
             })
             .returning({
               id: sshConnections.id,

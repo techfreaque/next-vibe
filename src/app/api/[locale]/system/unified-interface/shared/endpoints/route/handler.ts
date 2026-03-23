@@ -164,7 +164,7 @@ export interface ApiHandlerProps<
   /** Cron task DB ID when executed by the task runner (for lifecycle tracking) */
   cronTaskId?: string;
 
-  /** Stream context — rich metadata about the AI streaming session.
+  /** Stream context - rich metadata about the AI streaming session.
    *  Contains rootFolderId, threadId, aiMessageId, etc.
    *  Populated at every entry point (web, CLI, MCP, cron, AI tool). */
   streamContext: ToolExecutionContext;
@@ -387,7 +387,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
     // 3. Validate request data using request validator
     // Build a role-filtered schema so fields gated by `visibleFor` are stripped
-    // for callers who don't have the required role — schema-level security guarantee.
+    // for callers who don't have the required role - schema-level security guarantee.
     const permissionRoles = filterUserPermissionRoles(user.roles);
     const roleFilteredRequestSchema = generateRoleFilteredRequestSchema(
       endpoint.fields,

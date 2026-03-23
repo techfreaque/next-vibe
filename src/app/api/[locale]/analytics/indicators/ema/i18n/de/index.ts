@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "EMA",
     description:
-      "Exponentieller gleitender Durchschnitt — gewichtet neuere Preise stärker",
+      "Exponentieller gleitender Durchschnitt - gewichtet neuere Preise stärker",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

@@ -55,7 +55,7 @@ const useSidebarStore = create<SidebarState>((set, get) => ({
 }));
 
 /**
- * Convenience hook — returns [collapsed, setCollapsed] tuple.
+ * Convenience hook - returns [collapsed, setCollapsed] tuple.
  * Initializes the store on first call.
  * Compatible with the previous useSidebarCollapsed() API.
  */

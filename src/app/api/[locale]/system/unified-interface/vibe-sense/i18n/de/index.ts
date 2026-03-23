@@ -490,7 +490,7 @@ export const translations: typeof enTranslations = {
       },
     },
     rsi: {
-      description: "Relativer Stärke-Index — Momentum-Oszillator (0–100)",
+      description: "Relativer Stärke-Index - Momentum-Oszillator (0–100)",
       input: { source: { label: "Quelle" } },
       output: { value: { label: "RSI" } },
       params: {
@@ -499,7 +499,7 @@ export const translations: typeof enTranslations = {
     },
     bollinger: {
       description:
-        "Bollinger-Bänder — Volatilitätshülle um einen gleitenden Durchschnitt",
+        "Bollinger-Bänder - Volatilitätshülle um einen gleitenden Durchschnitt",
       input: { source: { label: "Quelle" } },
       output: {
         upper: { label: "Oberes Band" },
@@ -518,7 +518,7 @@ export const translations: typeof enTranslations = {
       },
     },
     macd: {
-      description: "MACD — trendfolgendes Momentum-Indikator",
+      description: "MACD - trendfolgendes Momentum-Indikator",
       input: { source: { label: "Quelle" } },
       output: {
         macd: { label: "MACD" },
@@ -794,7 +794,7 @@ export const translations: typeof enTranslations = {
     },
     script: {
       description:
-        "Sandboxierter benutzerdefinierter Evaluator — erhält Eingangsreihen, gibt Signalereignisse zurück",
+        "Sandboxierter benutzerdefinierter Evaluator - erhält Eingangsreihen, gibt Signalereignisse zurück",
       input: { inputs: { label: "Eingaben" } },
       output: { signal: { label: "Signal" } },
       params: {

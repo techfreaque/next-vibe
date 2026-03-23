@@ -18,8 +18,8 @@ import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { CronTaskRecentExecution } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
-import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
+import type { CronTaskItem } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -290,7 +290,7 @@ export class CronTasksRepository {
     }
   }
 
-  /** Get all system tasks (userId IS NULL) — for startup sync */
+  /** Get all system tasks (userId IS NULL) - for startup sync */
   static async getAllSystemTasks(
     t: TasksT,
     logger: EndpointLogger,
@@ -350,7 +350,7 @@ export class CronTasksRepository {
   ): Promise<ResponseType<CronTaskPutResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      // null user = internal system call (e.g. task runner) — skip ownership check.
+      // null user = internal system call (e.g. task runner) - skip ownership check.
       // For non-null users, ownership is enforced atomically inside the UPDATE WHERE
       // clause to avoid a TOCTOU race between the read and the write.
       const isAdmin =
@@ -363,7 +363,7 @@ export class CronTasksRepository {
         `Updating task "${id}" (${Object.keys(updates).join(", ")})`,
       );
 
-      // Only admins can set targetInstance — it controls cross-instance task routing
+      // Only admins can set targetInstance - it controls cross-instance task routing
       if ("targetInstance" in updates && !isAdmin) {
         return fail({
           message: t("errors.repositoryUpdateTaskForbidden"),
@@ -371,7 +371,7 @@ export class CronTasksRepository {
         });
       }
 
-      // Only admins can override lastExecutionStatus — used to reset stuck RUNNING tasks
+      // Only admins can override lastExecutionStatus - used to reset stuck RUNNING tasks
       if (updates.lastExecutionStatus && !isAdmin) {
         return fail({
           message: t("errors.repositoryUpdateTaskForbidden"),
@@ -698,7 +698,7 @@ export class CronTasksRepository {
 
   /**
    * Load raw task summary items for system prompt injection.
-   * Returns typed data — formatting is handled by formatTasksSummary() in tasks-formatter.ts.
+   * Returns typed data - formatting is handled by formatTasksSummary() in tasks-formatter.ts.
    */
   static async loadTaskItems(params: {
     userId: string;
@@ -844,7 +844,7 @@ export class CronTasksRepository {
 
   /**
    * Generate a concise tasks summary string for injection into the AI system prompt.
-   * @deprecated Prefer loadTaskItems() + formatTasksSummary() — keeps data and formatting separate.
+   * @deprecated Prefer loadTaskItems() + formatTasksSummary() - keeps data and formatting separate.
    */
   static async generateTasksSummary(params: {
     userId: string;

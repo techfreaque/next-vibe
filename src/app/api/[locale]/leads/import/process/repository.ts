@@ -107,7 +107,7 @@ export class LeadsImportProcessRepository {
 
       // If this task was assigned a specific job (selfTaskId = "leads-import-${jobId}"),
       // re-enable it for the next batch if the job is still pending.
-      // runOnce disables the task after each execution — re-enabling lets Pulse pick it
+      // runOnce disables the task after each execution - re-enabling lets Pulse pick it
       // up again next minute without creating duplicate tasks.
       if (!dryRun && data.selfTaskId) {
         const jobId = data.selfTaskId.replace(/^leads-import-/, "");

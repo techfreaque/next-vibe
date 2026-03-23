@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Maksimum okna",
     description:
-      "Krocząca maksymalna okna — śledzi najwyższą wartość w stałym oknie",
+      "Krocząca maksymalna okna - śledzi najwyższą wartość w stałym oknie",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       resolution: {

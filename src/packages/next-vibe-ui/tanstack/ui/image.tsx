@@ -17,7 +17,7 @@ export type ImageProps = {
 } & StyleType;
 
 /**
- * TanStack Start implementation of Image — plain <img> tag.
+ * TanStack Start implementation of Image - plain <img> tag.
  * Next.js image optimization is not available in TanStack Start.
  */
 export function Image({

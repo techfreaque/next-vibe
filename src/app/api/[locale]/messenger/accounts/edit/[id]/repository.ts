@@ -215,7 +215,7 @@ export class MessengerAccountEditRepository {
       if (data.smtpRateLimitPerHour !== undefined) {
         updateValues.smtpRateLimitPerHour = data.smtpRateLimitPerHour;
       }
-      // API creds — only update if non-empty string provided
+      // API creds - only update if non-empty string provided
       if (data.apiKey) {
         updateValues.apiKey = data.apiKey;
       }

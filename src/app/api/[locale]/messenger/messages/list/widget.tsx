@@ -8,8 +8,8 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
@@ -19,8 +19,6 @@ import React, { useCallback, useMemo } from "react";
 
 import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/messenger/messages/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
-import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -29,6 +27,8 @@ import {
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 
 import type { MessengerChannelFilterValue } from "../../accounts/enum";
 import {
@@ -344,7 +344,7 @@ export function EmailsListContainer({
         </Button>
       </Div>
 
-      {/* Status filter tabs — scrollable */}
+      {/* Status filter tabs - scrollable */}
       <Div className="flex items-center gap-1 px-4 pt-3 pb-1 overflow-x-auto scrollbar-none">
         {STATUS_TABS.map((tab) => {
           const isActive = activeStatus === tab.value;
@@ -384,7 +384,7 @@ export function EmailsListContainer({
         })}
       </Div>
 
-      {/* Type filter chips — scrollable */}
+      {/* Type filter chips - scrollable */}
       <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
         {MessageTypeFilterOptions.map((tab) => {
           const isActive = activeType === tab.value;
@@ -408,7 +408,7 @@ export function EmailsListContainer({
         })}
       </Div>
 
-      {/* Channel filter chips — scrollable */}
+      {/* Channel filter chips - scrollable */}
       <Div className="flex items-center gap-1 px-4 pb-1 overflow-x-auto scrollbar-none">
         {MessengerChannelFilterOptions.map((tab) => {
           const isActive = activeChannel === tab.value;

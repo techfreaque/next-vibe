@@ -1187,7 +1187,7 @@ function createStaticReconciler(): ReturnType<typeof Reconciler> {
 }
 
 /**
- * Extended reconciler type — React 19 adds updateContainerSync and flushSyncWork
+ * Extended reconciler type - React 19 adds updateContainerSync and flushSyncWork
  * but @types/react-reconciler doesn't include them yet.
  */
 interface ExtendedReconciler extends ReturnType<typeof createStaticReconciler> {

@@ -1,5 +1,5 @@
 /**
- * Leads Newsletter Subscribers — Route
+ * Leads Newsletter Subscribers - Route
  * Server-only.
  */
 

@@ -1,6 +1,6 @@
 /**
  * SSH Connections Test Endpoint Definition
- * POST /ssh/connections/test — Test SSH connectivity
+ * POST /ssh/connections/test - Test SSH connectivity
  */
 
 import { z } from "zod";

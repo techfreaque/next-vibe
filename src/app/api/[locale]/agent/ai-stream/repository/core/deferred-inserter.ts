@@ -4,7 +4,7 @@
  * Inserts a deferred TOOL message into the thread and emits the matching WS events.
  * Called by the live stream's finally block when a wakeUp signal was received.
  * Keeping insertion here (inside the stream's finally) means only the single live
- * stream ever inserts — no concurrent-insertion race is possible.
+ * stream ever inserts - no concurrent-insertion race is possible.
  */
 
 import "server-only";
@@ -17,8 +17,8 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 
-import type { WakeUpPayload } from "./wake-up-channel";
 import { walkToLeafMessage } from "./branch-utils";
+import type { WakeUpPayload } from "./wake-up-channel";
 
 export async function insertDeferredWakeUpMessage(
   threadId: string,
@@ -51,7 +51,7 @@ export async function insertDeferredWakeUpMessage(
     originalToolCallId: originalToolCall.toolCallId,
     callbackMode: "wakeUp" as const,
     isDeferred: true,
-    // Do NOT propagate isConfirmed — this is an async background result,
+    // Do NOT propagate isConfirmed - this is an async background result,
     // not a user-confirmation action. Prevents "Confirmed by you" badge.
     isConfirmed: false,
   };

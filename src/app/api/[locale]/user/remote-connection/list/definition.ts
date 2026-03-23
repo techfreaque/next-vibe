@@ -1,6 +1,6 @@
 /**
  * Remote Connection List API Definition
- * GET — list all remote connections for the current user
+ * GET - list all remote connections for the current user
  * Admin users see all connections across all users
  */
 
@@ -18,8 +18,8 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { ConnectionHealthSchema } from "@/app/api/[locale]/user/remote-connection/db";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 import { RemoteConnectionsListContainer } from "./widget";
@@ -54,7 +54,7 @@ export const { GET } = createEndpoint({
           z.object({
             instanceId: z.string(),
             remoteUrl: z.string(),
-            /** Local instance URL — set on cloud-side records for direct embedding via vibe-frame */
+            /** Local instance URL - set on cloud-side records for direct embedding via vibe-frame */
             localUrl: z.string().nullable(),
             isActive: z.boolean(),
             lastSyncedAt: z.string().nullable(),

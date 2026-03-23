@@ -24,16 +24,16 @@ export const {
  *
  * Opt-out markers (_OFF): block a specific platform. All endpoints are accessible
  * by default; add the marker to exclude from that platform.
- *   CLI_OFF       — not available on CLI / MCP (shared opt-out for agent platforms)
- *   AI_TOOL_OFF   — not available as an AI tool
- *   WEB_OFF       — not available on web (tRPC, Next.js pages/API)
- *   MCP_OFF       — not available on MCP specifically (in addition to CLI_OFF)
- *   SKILL_OFF     — excluded from AI skill markdown files (AGENT.md, character skill files, etc.)
- *   PRODUCTION_OFF — disabled in production environment
+ *   CLI_OFF       - not available on CLI / MCP (shared opt-out for agent platforms)
+ *   AI_TOOL_OFF   - not available as an AI tool
+ *   WEB_OFF       - not available on web (tRPC, Next.js pages/API)
+ *   MCP_OFF       - not available on MCP specifically (in addition to CLI_OFF)
+ *   SKILL_OFF     - excluded from AI skill markdown files (AGENT.md, character skill files, etc.)
+ *   PRODUCTION_OFF - disabled in production environment
  *
  * Opt-in markers: endpoint must explicitly include these to be accessible.
- *   MCP_VISIBLE   — endpoint appears in the MCP server's tool *discovery* list
- *   CLI_AUTH_BYPASS — endpoint is accessible without auth for basic routes like check, dev, etc.
+ *   MCP_VISIBLE   - endpoint appears in the MCP server's tool *discovery* list
+ *   CLI_AUTH_BYPASS - endpoint is accessible without auth for basic routes like check, dev, etc.
  */
 export const {
   enum: PlatformMarker,

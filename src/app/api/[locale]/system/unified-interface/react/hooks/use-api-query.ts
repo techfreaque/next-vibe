@@ -2,8 +2,10 @@
 
 import type { QueryKey } from "@tanstack/react-query";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 import { useCallback, useMemo, useRef } from "react";
 
@@ -151,7 +153,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         typeof urlPathParams === "object" &&
         Object.keys(urlPathParams as FormQueryParams).length > 0;
 
-      // Check if this endpoint has any includeInCacheKey fields — if so, requestData
+      // Check if this endpoint has any includeInCacheKey fields - if so, requestData
       // IS the cache discriminator and must be used directly (storedParams are keyed by
       // endpoint only and would return stale data when switching e.g. targetUserId).
       const hasCacheKeyFields =
@@ -165,7 +167,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
 
       // Use stored params if available and non-empty, and no urlPathParams override,
       // and no custom queryKey (custom keys indicate per-value caching where requestData
-      // is already the correct value — using stored params would return stale data from
+      // is already the correct value - using stored params would return stale data from
       // a previous value, e.g. switching root folder tabs).
       // Also skip stored params when the endpoint uses includeInCacheKey fields, since
       // requestData already carries the correct discriminating values.
@@ -248,7 +250,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     // Prevents components from flashing empty state while refetch is in flight
     placeholderData: keepPreviousData,
     // initialData populates the cache and respects staleTime.
-    // initialDataUpdatedAt is required — without it React Query treats the data as
+    // initialDataUpdatedAt is required - without it React Query treats the data as
     // infinitely stale and immediately refetches, defeating the purpose of initialData.
     initialData: initialData
       ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> => {
@@ -263,7 +265,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     initialDataUpdatedAt: initialData ? Date.now() : undefined,
   });
 
-  // Stable refetch function — use ref to avoid depending on query object (new every render)
+  // Stable refetch function - use ref to avoid depending on query object (new every render)
   const queryRef = useRef(query);
   queryRef.current = query;
   const refetch = useCallback(async () => {

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Stosunek",
     description:
-      "Stosunek — dzieli serię A przez serię B, wyrównane według znacznika czasu",
+      "Stosunek - dzieli serię A przez serię B, wyrównane według znacznika czasu",
     fields: {
       a: { label: "Licznik (A)", description: "Seria czasowa dzielnej" },
       b: { label: "Mianownik (B)", description: "Seria czasowa dzielnika" },

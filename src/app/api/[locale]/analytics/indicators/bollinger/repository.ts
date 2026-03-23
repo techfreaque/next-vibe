@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Bollinger Bands Compute
+ * Vibe Sense - Bollinger Bands Compute
  * Server-only pure computation. No DB access.
  */
 

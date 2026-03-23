@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestField,
   requestUrlPathParamsField,
@@ -154,7 +154,7 @@ const { DELETE } = createEndpoint({
 
 /**
  * Update Lead Endpoint (PATCH)
- * Updates an existing lead — flat request fields for simpler pre-fill
+ * Updates an existing lead - flat request fields for simpler pre-fill
  */
 const { PATCH } = createEndpoint({
   scopedTranslation,

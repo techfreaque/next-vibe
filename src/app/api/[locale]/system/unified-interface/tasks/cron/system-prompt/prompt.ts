@@ -85,7 +85,7 @@ function fullLine(task: CronTaskItem): string {
     : "never run";
   const result = task.lastResultSummary ? ` → "${task.lastResultSummary}"` : "";
   const errors = task.errorCount > 0 ? ` ⚠ errors:${task.errorCount}` : "";
-  const desc = task.description ? ` — ${task.description}` : "";
+  const desc = task.description ? ` - ${task.description}` : "";
   return `- [${task.shortId}] ${status} ${task.displayName}${desc} | ${task.schedule} | ${lastRun}${result}${errors} | route:${task.routeId}`;
 }
 
@@ -126,7 +126,7 @@ function formatFailureAlerts(tasks: CronTaskItem[]): string {
         (e) => e.errorSnippet,
       )?.errorSnippet;
       const errorNote = errorSnippet ? ` Last: "${errorSnippet}"` : "";
-      return `- ${t.priority.toUpperCase()} "${t.displayName}" — ${t.consecutiveFailures} consecutive failure${t.consecutiveFailures === 1 ? "" : "s"}!${errorNote}`;
+      return `- ${t.priority.toUpperCase()} "${t.displayName}" - ${t.consecutiveFailures} consecutive failure${t.consecutiveFailures === 1 ? "" : "s"}!${errorNote}`;
     });
   return `⚠ TASK ALERTS\n${lines.join("\n")}\n→ Investigate: \`${CRON_HISTORY_ALIAS}\`, fix: \`${CRON_UPDATE_ALIAS}\``;
 }
@@ -200,7 +200,7 @@ export function formatTasksSummary(tasks: CronTaskItem[]): string {
   parts.push(lines.join("\n"));
   if (hiddenCount > 0) {
     parts.push(
-      `[... ${hiddenCount} more task${hiddenCount === 1 ? "" : "s"} not shown — use \`${CRON_LIST_ALIAS}\` for the full list]`,
+      `[... ${hiddenCount} more task${hiddenCount === 1 ? "" : "s"} not shown - use \`${CRON_LIST_ALIAS}\` for the full list]`,
     );
   }
   if (recentBlock) {

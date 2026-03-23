@@ -18,7 +18,7 @@ import { PanelLeft } from "next-vibe-ui/ui/icons/PanelLeft";
 import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
 import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
@@ -49,7 +49,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
   const folders = useChatStore((s) => s.folders);
   const [sidebarCollapsed, setSidebarCollapsed] = useSidebarCollapsed();
 
-  // Inline handleCreateThread — navigates to new thread in current or specified folder
+  // Inline handleCreateThread - navigates to new thread in current or specified folder
   const handleCreateThread = useCallback(
     (folderId?: string | null): void => {
       let rootId = currentRootFolderId;

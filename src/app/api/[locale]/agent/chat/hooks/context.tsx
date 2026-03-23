@@ -15,12 +15,12 @@ import { createContext, useContext, useMemo } from "react";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 
-import type { SkillGetResponseOutput } from "../skills/[id]/definition";
 import type { DefaultFolderId } from "../config";
 import type { FolderContentsResponseOutput } from "../folder-contents/[rootFolderId]/definition";
 import type { FolderListResponseOutput } from "../folders/[rootFolderId]/definition";
 import type { PublicFeedGetResponseOutput } from "../public-feed/definition";
 import type { ChatSettingsGetResponseOutput } from "../settings/definition";
+import type { SkillGetResponseOutput } from "../skills/[id]/definition";
 import type { MessageListResponseOutput } from "../threads/[threadId]/messages/definition";
 import type { PathGetResponseOutput } from "../threads/[threadId]/messages/path/definition";
 import type { ThreadListResponseOutput } from "../threads/definition";
@@ -34,33 +34,33 @@ export interface RootFolderPermissions {
 }
 
 /**
- * Server-origin boot values — stable after mount
+ * Server-origin boot values - stable after mount
  */
 export interface ChatBootValue {
   initialCredits: CreditsGetResponseOutput;
   envAvailability: AgentEnvAvailability;
   rootFolderPermissions: RootFolderPermissions;
-  /** Initial folders data fetched server-side — used as initialData for the sidebar */
+  /** Initial folders data fetched server-side - used as initialData for the sidebar */
   initialFoldersData: FolderListResponseOutput | null;
-  /** Initial threads data fetched server-side — used as initialData for the threads list */
+  /** Initial threads data fetched server-side - used as initialData for the threads list */
   initialThreadsData: ThreadListResponseOutput | null;
-  /** Root folder ID at page load — initialData only applies to this folder */
+  /** Root folder ID at page load - initialData only applies to this folder */
   initialRootFolderId: DefaultFolderId;
-  /** Initial messages data fetched server-side — used as initialData for the active thread */
+  /** Initial messages data fetched server-side - used as initialData for the active thread */
   initialMessagesData: MessageListResponseOutput | null;
-  /** Initial path data fetched server-side — used as initialData for the branch path */
+  /** Initial path data fetched server-side - used as initialData for the branch path */
   initialPathData: PathGetResponseOutput | null;
-  /** Initial settings fetched server-side — used as initialData for chat settings */
+  /** Initial settings fetched server-side - used as initialData for chat settings */
   initialSettingsData: ChatSettingsGetResponseOutput | null;
-  /** Initial character fetched server-side — used as initialData for the selected character */
+  /** Initial character fetched server-side - used as initialData for the selected character */
   initialSkillData: SkillGetResponseOutput | null;
-  /** Thread ID at page load — initialMessagesData only applies to this thread */
+  /** Thread ID at page load - initialMessagesData only applies to this thread */
   initialThreadId: string | null;
-  /** Initial public feed data fetched server-side — used when rootFolderId=public and no thread selected */
+  /** Initial public feed data fetched server-side - used when rootFolderId=public and no thread selected */
   initialPublicFeedData: PublicFeedGetResponseOutput | null;
-  /** Initial folder contents data fetched server-side — used as initialData for the sidebar folder list */
+  /** Initial folder contents data fetched server-side - used as initialData for the sidebar folder list */
   initialFolderContentsData: FolderContentsResponseOutput | null;
-  /** Initial subfolder contents when URL lands inside a subfolder on SSR — seeds the expanded folder's child EndpointsPage */
+  /** Initial subfolder contents when URL lands inside a subfolder on SSR - seeds the expanded folder's child EndpointsPage */
   initialSubFolderContentsData: FolderContentsResponseOutput | null;
   /** The subfolder ID that initialSubFolderContentsData belongs to */
   initialSubFolderId: string | null;
@@ -100,7 +100,7 @@ interface ChatBootProviderProps {
 }
 
 /**
- * Chat boot provider — provides stable server-origin values.
+ * Chat boot provider - provides stable server-origin values.
  * All dynamic chat state lives in scoped Zustand stores.
  */
 export function ChatBootProvider({

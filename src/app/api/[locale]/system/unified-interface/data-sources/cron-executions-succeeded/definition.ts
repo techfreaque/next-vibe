@@ -1,5 +1,5 @@
 /**
- * Cron Executions Succeeded — Endpoint Definition
+ * Cron Executions Succeeded - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

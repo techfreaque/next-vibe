@@ -1,5 +1,5 @@
 /**
- * Newsletter Campaigns Sent — Route
+ * Newsletter Campaigns Sent - Route
  * Server-only.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Crossover Evaluator Route
+ * Vibe Sense - Crossover Evaluator Route
  * Server-only.
  */
 

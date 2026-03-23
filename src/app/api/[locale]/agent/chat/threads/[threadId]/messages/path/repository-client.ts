@@ -5,7 +5,7 @@
  *
  * Loads all messages from the compaction boundary to the leaf, including siblings,
  * so the client can derive branchIndices locally from the leafMessageId.
- * No DB round-trips — incognito threads are fully in memory/localStorage.
+ * No DB round-trips - incognito threads are fully in memory/localStorage.
  */
 
 "use client";
@@ -135,7 +135,7 @@ export class MessagePathRepositoryClient {
         currentId = msg.parentId;
       }
 
-      // ancestorChain is [leaf, ..., root] — reverse to [root, ..., leaf]
+      // ancestorChain is [leaf, ..., root] - reverse to [root, ..., leaf]
       ancestorChain.reverse();
 
       if (ancestorChain.length === 0) {

@@ -31,17 +31,27 @@ import {
 } from "@/i18n/core/config";
 
 import {
+  CampaignType,
+  CampaignTypeOptions,
+} from "@/app/api/[locale]/messenger/accounts/enum";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
   EmailJourneyVariant,
   EmailJourneyVariantOptions,
 } from "../../../../leads/enum";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import {
-  CampaignType,
-  CampaignTypeOptions,
-} from "@/app/api/[locale]/messenger/accounts/enum";
+  EmailImapAuthMethodDB,
+  EmailImapAuthMethodOptions,
+  EmailSecurityType,
+  EmailSecurityTypeDB,
+  EmailSecurityTypeOptions,
+} from "../../../providers/email/enum";
 import {
+  MessageChannel,
+  MessageChannelDB,
+  MessageChannelOptions,
   MessengerAccountStatus,
   MessengerAccountStatusDB,
   MessengerAccountStatusOptions,
@@ -51,20 +61,8 @@ import {
   MessengerProviderDB,
   MessengerProviderOptions,
 } from "../../enum";
-import {
-  EmailImapAuthMethodDB,
-  EmailImapAuthMethodOptions,
-  EmailSecurityType,
-  EmailSecurityTypeDB,
-  EmailSecurityTypeOptions,
-} from "../../../providers/email/enum";
 import { scopedTranslation } from "./i18n";
 import { MessengerAccountEditContainer } from "./widget";
-import {
-  MessageChannel,
-  MessageChannelDB,
-  MessageChannelOptions,
-} from "../../enum";
 
 // Shared response fields shape
 const accountResponseFields = {
@@ -281,7 +279,7 @@ const accountResponseFields = {
 };
 
 /**
- * GET — retrieve account by ID
+ * GET - retrieve account by ID
  */
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -443,7 +441,7 @@ const { GET } = createEndpoint({
 });
 
 /**
- * PUT — update account
+ * PUT - update account
  */
 const { PUT } = createEndpoint({
   scopedTranslation,
@@ -548,7 +546,7 @@ const { PUT } = createEndpoint({
         schema: z.boolean(),
       }),
 
-      // SMTP — all nullable (mapAccount uses ?? null)
+      // SMTP - all nullable (mapAccount uses ?? null)
       smtpHost: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -636,7 +634,7 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().int().nullable(),
       }),
 
-      // API credentials — request-only (passwords never returned)
+      // API credentials - request-only (passwords never returned)
       apiKey: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
@@ -684,7 +682,7 @@ const { PUT } = createEndpoint({
         schema: z.url().nullable(),
       }),
 
-      // IMAP — nullable fields
+      // IMAP - nullable fields
       imapHost: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -763,7 +761,7 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().int().nullable(),
       }),
 
-      // Email routing — all arrays (mapAccount uses ?? [])
+      // Email routing - all arrays (mapAccount uses ?? [])
       campaignTypes: requestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
@@ -994,7 +992,7 @@ const { PUT } = createEndpoint({
 });
 
 /**
- * DELETE — remove account by ID
+ * DELETE - remove account by ID
  */
 const { DELETE } = createEndpoint({
   scopedTranslation,

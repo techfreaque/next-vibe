@@ -57,7 +57,7 @@ export class AiStreamRunRepository {
 
   /**
    * Execute a single pre-call and return its result.
-   * Args are passed as flat merged data — RouteExecutionExecutor auto-splits
+   * Args are passed as flat merged data - RouteExecutionExecutor auto-splits
    * urlPathParams from data using the endpoint's requestUrlPathParamsSchema.
    */
   private static async executePreCall(
@@ -330,7 +330,7 @@ export class AiStreamRunRepository {
         streamResult.data;
 
       // ── Step 4: Read message content + tokens from DB ───────────────────
-      // For incognito mode, messages aren't persisted — use in-memory content directly.
+      // For incognito mode, messages aren't persisted - use in-memory content directly.
       // For persistent modes, DB read also provides token metadata.
       let rawText: string | null = lastAiMessageContent ?? null;
       let promptTokens: number | null = null;

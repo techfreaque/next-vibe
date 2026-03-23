@@ -6,7 +6,7 @@ export const translations = {
       title: "Local Mode Only",
     },
     connectionNotFound: "Connection not found",
-    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
     connectTimeout: "Connection timed out",
     sshAuthFailed: "SSH authentication failed",
     sshConnectionFailed: "SSH connection failed",

@@ -306,7 +306,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
     const totalCredits = product.credits * quantity;
 
     // NOWPayments does not substitute {CHECKOUT_SESSION_ID} like Stripe does.
-    // Strip the Stripe-specific placeholder — NOWPayments appends its own
+    // Strip the Stripe-specific placeholder - NOWPayments appends its own
     // NP_id query param to the success URL automatically.
     const successUrlWithoutPlaceholder = params.successUrl.replace(
       /[?&]session_id=\{CHECKOUT_SESSION_ID\}/,
@@ -537,7 +537,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       }
 
       // Merge webhook payload metadata with stored metadata.
-      // Stored metadata takes precedence for `type` — e.g. subscription purchases
+      // Stored metadata takes precedence for `type` - e.g. subscription purchases
       // use one-time invoices so payload.subscription_id is absent, but the stored
       // metadata already has type:"subscription" set at checkout creation time.
       const mergedMetadata = {

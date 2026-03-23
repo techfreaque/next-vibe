@@ -1,5 +1,5 @@
 /**
- * Chat Messages With Attachments — Endpoint Definition
+ * Chat Messages With Attachments - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

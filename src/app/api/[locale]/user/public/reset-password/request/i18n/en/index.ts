@@ -17,14 +17,14 @@ export const translations = {
     title: "Reset Your {{appName}} Password",
     subject: "Password Reset Request - {{appName}}",
     previewText:
-      "Reset your {{appName}} password — link valid for {{hours}} hours.",
+      "Reset your {{appName}} password - link valid for {{hours}} hours.",
     greeting: "Hey {{name}},",
     requestInfo:
       "Someone requested a password reset for your {{appName}} account. If that was you, click the button below.",
     buttonText: "Reset My Password",
     expirationInfo:
-      "Link expires in {{hours}} hours. If you didn't request this, ignore this email — your password is unchanged.",
-    signoff: "— The {{appName}} Team",
+      "Link expires in {{hours}} hours. If you didn't request this, ignore this email - your password is unchanged.",
+    signoff: "The {{appName}} Team",
     promoText: "{{modelCount}} AI models. No filters. No lectures.",
   },
   groups: {

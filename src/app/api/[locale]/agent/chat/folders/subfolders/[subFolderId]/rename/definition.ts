@@ -24,7 +24,7 @@ import { FolderRenameContainer } from "./widget";
 
 /**
  * Rename Folder Endpoint (PATCH)
- * Widget variant for the rename dialog — name + icon fields
+ * Widget variant for the rename dialog - name + icon fields
  */
 const { PATCH } = createEndpoint({
   scopedTranslation,

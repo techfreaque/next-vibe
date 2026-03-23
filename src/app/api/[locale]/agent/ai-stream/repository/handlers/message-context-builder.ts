@@ -315,7 +315,7 @@ export class MessageContextBuilder {
     }
 
     // When processing tool confirmations, strip any waitingForConfirmation tool messages
-    // from history — they'll be replaced by the confirmed results via toolConfirmationResults.
+    // from history - they'll be replaced by the confirmed results via toolConfirmationResults.
     // This ensures AI never sees the waiting_for_confirmation placeholder.
     if (params.hasToolConfirmations && contextMessages.length > 0) {
       const before = contextMessages.length;
@@ -406,7 +406,7 @@ export class MessageContextBuilder {
         },
       );
     }
-    // wakeup-resume: no CONTINUE_CONVERSATION_PROMPT — AI sees the deferred tool result
+    // wakeup-resume: no CONTINUE_CONVERSATION_PROMPT - AI sees the deferred tool result
     // as the last message in the thread and responds naturally without extra prompting.
 
     // Build [Context:] line for the trailing messages
@@ -430,7 +430,7 @@ export class MessageContextBuilder {
     if (params.trailingSystemMessage.trim()) {
       messages.push({ role: "system", content: params.trailingSystemMessage });
     }
-    // [Context:] line — always last
+    // [Context:] line - always last
     if (contextLine) {
       messages.push({ role: "system", content: contextLine });
     }
@@ -460,7 +460,7 @@ export class MessageContextBuilder {
       // Text content (may be null for tool messages and some assistant messages)
       const textContent = msg.content ?? "";
 
-      // Tool messages: content is null — actual data is in metadata.toolCall
+      // Tool messages: content is null - actual data is in metadata.toolCall
       // Count both the args and result as JSON (dense, use char/2.5)
       if (msg.role === "tool") {
         const toolCall = msg.metadata?.toolCall;
@@ -657,7 +657,7 @@ export class MessageContextBuilder {
         : null;
 
     // Step 3: Get messages to compact (everything after last SUCCESSFUL compacting, excluding current user message).
-    // If the last compacting failed, treat it as if it doesn't exist — use the previous successful one.
+    // If the last compacting failed, treat it as if it doesn't exist - use the previous successful one.
     const lastSuccessfulCompactingMessage = failedCompactingMessage
       ? (branchMessages
           .toReversed()
@@ -895,7 +895,7 @@ export class MessageContextBuilder {
 
   /**
    * Estimate token count for a ModelMessage[] array.
-   * Uses char/4 heuristic — good enough for truncation decisions.
+   * Uses char/4 heuristic - good enough for truncation decisions.
    */
   static estimateModelMessageTokens(msgs: ModelMessage[]): number {
     return msgs.reduce((sum, m) => {
@@ -930,10 +930,10 @@ export class MessageContextBuilder {
    *   token count fits inside (modelContextWindow - systemTokens - toolsTokens - reservedOutputTokens).
    *
    * systemPrompt and tools are included in the overhead calculation so the
-   * message budget is accurate — without them the truncation underestimates
+   * message budget is accurate - without them the truncation underestimates
    * how many tokens will actually be sent to the API.
    *
-   * This is a last-resort safety net — compacting should have prevented
+   * This is a last-resort safety net - compacting should have prevented
    * overflow, but a single enormous conversation turn can still exceed limits.
    */
   static truncateToContextWindow(
@@ -960,7 +960,7 @@ export class MessageContextBuilder {
       return messages;
     }
 
-    logger.warn("[Truncation] Messages exceed context window — truncating", {
+    logger.warn("[Truncation] Messages exceed context window - truncating", {
       estimatedTokens: currentTokens,
       systemTokens,
       toolsTokens,

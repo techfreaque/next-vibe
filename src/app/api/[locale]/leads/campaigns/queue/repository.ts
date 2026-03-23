@@ -85,7 +85,7 @@ export class CampaignQueueRepository {
       const [countRow] = await countQuery;
       const total = countRow?.total ?? 0;
 
-      // Data query — join with subquery for next scheduled email
+      // Data query - join with subquery for next scheduled email
       const dataQuery = db
         .select({
           leadId: leads.id,

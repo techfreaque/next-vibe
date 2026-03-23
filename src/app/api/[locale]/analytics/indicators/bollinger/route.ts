@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Bollinger Bands Route
+ * Vibe Sense - Bollinger Bands Route
  * Server-only.
  */
 

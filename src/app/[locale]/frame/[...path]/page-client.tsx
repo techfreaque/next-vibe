@@ -1,5 +1,5 @@
 /**
- * Vibe Frame Page — Client Component
+ * Vibe Frame Page - Client Component
  *
  * Renders the target endpoint using EndpointsPage in an isolated context.
  * Communicates with the parent frame via the bridge for resize/success/error.

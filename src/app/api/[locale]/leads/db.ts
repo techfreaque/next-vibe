@@ -20,11 +20,11 @@ import type { z } from "zod";
 
 import { CountriesArr, LanguagesArr } from "@/i18n/core/config";
 
+import { CampaignType, CampaignTypeDB } from "../messenger/accounts/enum";
 import {
   MessageStatus as EmailStatus,
   MessageStatusDB as EmailStatusDB,
 } from "../messenger/messages/enum";
-import { CampaignType, CampaignTypeDB } from "../messenger/accounts/enum";
 import { users } from "../user/db";
 import {
   DeviceTypeDB,
@@ -325,7 +325,7 @@ export const userLeadLinksRelations = relations(userLeadLinks, ({ one }) => ({
 /**
  * Email Journey Variants Table
  * Stores admin-registered journey variant metadata.
- * Source code stays in /journeys/*.email.tsx — this table controls activation,
+ * Source code stays in /journeys/*.email.tsx - this table controls activation,
  * weights, and display metadata without requiring a full deploy for config changes.
  */
 export const emailJourneyVariants = pgTable(

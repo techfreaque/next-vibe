@@ -1,12 +1,11 @@
 /**
  * Resend Provider
  * Send-only email provider using the Resend SDK.
- * Inbox operations are not supported by Resend — handled by SendOnlyProvider base.
+ * Inbox operations are not supported by Resend - handled by SendOnlyProvider base.
  */
 
 import "server-only";
 
-import { Resend } from "resend";
 import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -15,6 +14,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import { Resend } from "resend";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -22,10 +22,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { messengerAccounts } from "../../accounts/db";
 import {
+  MessageChannel,
   MessengerAccountStatus,
   MessengerProvider as MessengerProviderEnum,
 } from "../../accounts/enum";
-import { MessageChannel } from "../../accounts/enum";
 import { scopedTranslation as providerScopedTranslation } from "../i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";

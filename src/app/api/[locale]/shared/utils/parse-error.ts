@@ -53,7 +53,7 @@ export function isErrorResponseType(
  */
 // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Error parsing utility requires 'unknown' to handle any error input type
 export function parseError(error: unknown): Error {
-  // Handle standard Error instances — extract cause for DB errors (e.g. Drizzle wraps PG errors)
+  // Handle standard Error instances - extract cause for DB errors (e.g. Drizzle wraps PG errors)
   if (error instanceof Error) {
     const cause = error.cause;
     if (cause instanceof Error && cause.message) {

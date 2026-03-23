@@ -39,7 +39,7 @@ const wakeUpHandlers = new Map<string, (payload: WakeUpPayload) => void>();
 
 /**
  * Subscribe this live stream to wake-up signals for the given thread.
- * Returns an unsubscribe function — MUST be called when the stream ends.
+ * Returns an unsubscribe function - MUST be called when the stream ends.
  */
 export function subscribeWakeUpSignal(
   threadId: string,
@@ -54,7 +54,7 @@ export function subscribeWakeUpSignal(
 /**
  * Publish a wake-up signal for the given thread.
  * Called by resume-stream when a wakeUp deferred result is ready and isStreaming=true.
- * The live stream handles deferred insertion — no insertion happens here.
+ * The live stream handles deferred insertion - no insertion happens here.
  */
 export function publishWakeUpSignal(
   threadId: string,

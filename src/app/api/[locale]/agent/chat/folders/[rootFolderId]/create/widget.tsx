@@ -1,6 +1,6 @@
 /**
  * Custom Widget for Create Folder
- * Renders the create-folder form — used as modal content via EndpointsPage
+ * Renders the create-folder form - used as modal content via EndpointsPage
  */
 
 "use client";

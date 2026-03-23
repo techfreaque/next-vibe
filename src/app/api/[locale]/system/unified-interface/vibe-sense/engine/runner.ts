@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Runner
+ * Vibe Sense - Graph Runner
  *
  * Orchestrates full graph execution:
  * - Creates a pipeline_runs record
@@ -14,15 +14,15 @@ import "server-only";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { defaultLocale } from "@/i18n/core/config";
 
-import type { GraphConfig } from "../graph/types";
+import { GraphResolution, RunStatus } from "../enum";
 import type { GraphNodeConfig } from "../graph/schema";
+import type { GraphConfig } from "../graph/types";
 import type { DataPoint, Resolution, TimeRange } from "../shared/fields";
 import { RESOLUTION_MS } from "../shared/fields";
-import { GraphResolution, RunStatus } from "../enum";
-import { resolveExecutionOrder, getSinkReachableNodeIds } from "./walker";
-import { executeNode, type ExecutionContext } from "./executor";
-import type { SignalEvent } from "../store/signals";
 import { completeRun, createRun } from "../store/runs";
+import type { SignalEvent } from "../store/signals";
+import { executeNode, type ExecutionContext } from "./executor";
+import { getSinkReachableNodeIds, resolveExecutionOrder } from "./walker";
 
 // ─── Lookback Pre-Pass ────────────────────────────────────────────────────────
 
@@ -78,7 +78,7 @@ function computeNodeRanges(
     if (lb <= 0) {
       continue;
     }
-    // BFS backwards — extend all ancestors by this node's lookback
+    // BFS backwards - extend all ancestors by this node's lookback
     const queue = reverseAdj.get(nodeId) ?? [];
     const visited = new Set<string>();
     for (const parentId of queue) {
@@ -144,7 +144,7 @@ export async function runGraph(
     try {
       runId = await createRun(graphId, graphId);
     } catch {
-      // Non-fatal — run tracking failure shouldn't block execution
+      // Non-fatal - run tracking failure shouldn't block execution
     }
   }
 
@@ -183,7 +183,7 @@ export async function runGraph(
       errors: [
         {
           nodeId: "graph",
-          error: `Cycle detected — nodes involved: ${cycleNodes.join(", ")}`,
+          error: `Cycle detected - nodes involved: ${cycleNodes.join(", ")}`,
         },
       ],
       runId,
@@ -192,7 +192,7 @@ export async function runGraph(
   }
 
   // In scheduled cron mode (not readOnly, not backtest), skip chart-only nodes.
-  // Chart-only nodes have no path to any evaluator or endpoint sink — they exist
+  // Chart-only nodes have no path to any evaluator or endpoint sink - they exist
   // purely for on-demand charting and will be computed when readOnly: true.
   // This avoids unnecessary DB queries on every cron tick for display-only data.
   const isCronMode = !readOnly && !backtestRunId;
@@ -218,7 +218,7 @@ export async function runGraph(
       nodeCount++;
     } catch (err) {
       errors.push({ nodeId, error: String(err) });
-      // Continue with remaining nodes — partial results are useful
+      // Continue with remaining nodes - partial results are useful
     }
   }
 

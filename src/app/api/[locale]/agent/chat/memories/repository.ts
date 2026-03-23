@@ -609,7 +609,7 @@ export class MemoriesRepository {
 
   /**
    * Check total memory size and return whether the self-manage threshold is reached.
-   * No hard count limit — only token-based size is enforced.
+   * No hard count limit - only token-based size is enforced.
    */
   static async checkSelfManageNeeded(params: {
     userId: string;

@@ -36,9 +36,9 @@ export enum StreamEventType {
   COMPACTING_DONE = "compacting-done",
   // Thread metadata update event
   THREAD_TITLE_UPDATED = "thread-title-updated",
-  // Stream lifecycle event — unambiguous "stream is completely done" signal
+  // Stream lifecycle event - unambiguous "stream is completely done" signal
   STREAM_FINISHED = "stream-finished",
-  // Async remote task completed — client should re-trigger AI stream to continue
+  // Async remote task completed - client should re-trigger AI stream to continue
   TASK_COMPLETED = "task-completed",
   // Thread streaming state changed (e.g. stream ended but task is still in flight → "waiting")
   STREAMING_STATE_CHANGED = "streaming-state-changed",
@@ -256,7 +256,7 @@ export interface StreamFinishedEventData {
   threadId: string;
   /** How the stream ended: "completed" | "cancelled" | "error" | "timeout" */
   reason: "completed" | "cancelled" | "error" | "timeout";
-  /** Final thread streaming state — "waiting" means a task is still in flight */
+  /** Final thread streaming state - "waiting" means a task is still in flight */
   finalState: "idle" | "waiting";
 }
 
@@ -272,7 +272,7 @@ export interface TaskCompletedEventData {
   taskId: string;
   /** Terminal status of the task */
   status: "completed" | "failed" | "cancelled" | "timeout";
-  /** Last assistant message ID — client uses this as parentId for resume */
+  /** Last assistant message ID - client uses this as parentId for resume */
   lastMessageId: string | null;
   /** For endLoop: the deferred result message to add to the store */
   deferredMessage?: {
@@ -323,7 +323,7 @@ export interface StreamEventDataMap {
   [StreamEventType.THREAD_TITLE_UPDATED]: ThreadTitleUpdatedEventData;
   // Stream lifecycle
   [StreamEventType.STREAM_FINISHED]: StreamFinishedEventData;
-  // Async task completion — triggers AI stream resume
+  // Async task completion - triggers AI stream resume
   [StreamEventType.TASK_COMPLETED]: TaskCompletedEventData;
   // Thread streaming state changed
   [StreamEventType.STREAMING_STATE_CHANGED]: StreamingStateChangedEventData;

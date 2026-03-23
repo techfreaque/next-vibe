@@ -1,5 +1,5 @@
 /**
- * SSH Connection [id] Endpoint — GET / PATCH / DELETE
+ * SSH Connection [id] Endpoint - GET / PATCH / DELETE
  */
 
 import { z } from "zod";

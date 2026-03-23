@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — RSI Compute
+ * Vibe Sense - RSI Compute
  * Server-only pure computation. No DB access.
  */
 

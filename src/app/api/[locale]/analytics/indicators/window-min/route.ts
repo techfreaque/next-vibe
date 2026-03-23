@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Window Minimum Route
+ * Vibe Sense - Window Minimum Route
  * Server-only.
  */
 

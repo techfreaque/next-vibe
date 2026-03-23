@@ -1,6 +1,6 @@
 /**
  * SSH Terminal Repository
- * No-op — terminal widget manages its own sessions via session/* endpoints
+ * No-op - terminal widget manages its own sessions via session/* endpoints
  */
 
 import "server-only";

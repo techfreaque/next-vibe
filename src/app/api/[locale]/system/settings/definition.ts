@@ -1,7 +1,7 @@
 /**
  * System Settings API Definition
  * GET: Read env configuration grouped by module
- * PATCH: Update .env file values — flat individual fields per env key
+ * PATCH: Update .env file values - flat individual fields per env key
  */
 
 import { z } from "zod";
@@ -26,8 +26,8 @@ import {
   type EnvKeyName,
 } from "@/app/api/[locale]/system/generated/env-keys";
 
-import { scopedTranslation } from "./i18n";
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { scopedTranslation } from "./i18n";
 
 const SystemSettingsWidget = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.SystemSettingsWidget })),
@@ -128,7 +128,7 @@ const settingModuleSchema = z.object({
 });
 
 /**
- * GET — Read system settings
+ * GET - Read system settings
  */
 export const { GET } = createEndpoint({
   scopedTranslation,
@@ -276,7 +276,7 @@ export const { GET } = createEndpoint({
 });
 
 /**
- * PATCH — Update .env settings
+ * PATCH - Update .env settings
  */
 export const { PATCH } = createEndpoint({
   scopedTranslation,

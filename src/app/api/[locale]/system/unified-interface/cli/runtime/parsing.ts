@@ -158,7 +158,7 @@ export class CliInputParser {
    *   --key value          consumes one following non-flag token as value
    *                        (unless the key is a known boolean field)
    *   --key                boolean true (no following non-flag token)
-   *   -k                   single-dash short flags — always boolean, no lookahead
+   *   -k                   single-dash short flags - always boolean, no lookahead
    *   positional           collected into positionalArgs
    *
    * Multi-value arrays use positional args + firstCliArgKey (collects all positionals).
@@ -187,13 +187,13 @@ export class CliInputParser {
         const eqIndex = sliced.indexOf("=");
 
         if (eqIndex !== -1) {
-          // --key=value — explicit value, no lookahead
+          // --key=value - explicit value, no lookahead
           const key = this.kebabToCamelCase(sliced.slice(0, eqIndex));
           const value = this.convertCliValue(sliced.slice(eqIndex + 1));
           namedArgs[key] = value;
           i++;
         } else {
-          // --key — lookahead only when not a known boolean field
+          // --key - lookahead only when not a known boolean field
           const key = this.kebabToCamelCase(sliced);
           const isBoolean = booleanFields.has(key) || booleanFields.has(sliced);
           if (!isBoolean) {
@@ -208,7 +208,7 @@ export class CliInputParser {
           i++;
         }
       } else if (arg.startsWith("-") && arg.length > 1) {
-        // -k — single-dash short flags are always boolean, no lookahead
+        // -k - single-dash short flags are always boolean, no lookahead
         const key = this.kebabToCamelCase(arg.slice(1));
         namedArgs[key] = true;
         i++;
@@ -370,7 +370,7 @@ export class CliInputParser {
         f.type === "default" ||
         f.type === "nullable"
       ) {
-        // Unwrap to inner — check .def.innerType for v4
+        // Unwrap to inner - check .def.innerType for v4
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Zod internals are opaque; must use Record<string, unknown> to safely access dynamic properties
         const def = f.def as Record<string, unknown> | undefined;
         return this.resolveZodType(def?.innerType);
@@ -440,7 +440,7 @@ export class CliInputParser {
         }
       }
     } catch {
-      // Best-effort — ignore errors
+      // Best-effort - ignore errors
     }
 
     return booleans;
@@ -568,7 +568,7 @@ export class CliInputParser {
       const camelCaseKey = this.kebabToCamelCase(key);
 
       // Convert string boolean values to actual booleans (arrays pass through).
-      // Cast is safe — Zod strips incompatible shapes at final parse.
+      // Cast is safe - Zod strips incompatible shapes at final parse.
       data[camelCaseKey] = this.normalizeCliValue(
         value,
       ) as CliRequestData[string];
@@ -600,7 +600,7 @@ export class CliInputParser {
       urlPathParams?: CliUrlParams;
       positionalArgs: string[];
       namedArgs: CliObject;
-      /** Raw tokens after the command — used to re-parse with endpoint boolean field knowledge */
+      /** Raw tokens after the command - used to re-parse with endpoint boolean field knowledge */
       rawTokens?: string[];
       interactive: boolean;
       dryRun: boolean;
@@ -698,7 +698,7 @@ export class CliInputParser {
     if (endpoint?.requestUrlPathParamsSchema && !urlPathParams) {
       // Check if schema is empty
       if (!isEmptySchema(endpoint.requestUrlPathParamsSchema)) {
-        // Parse the full merged input through the URL params schema — it will
+        // Parse the full merged input through the URL params schema - it will
         // strip unknown keys and apply defaults, giving us exactly what belongs
         // in urlPathParams without any manual key inspection.
         const merged = { ...(contextData ?? {}), ...(cliData ?? {}) };

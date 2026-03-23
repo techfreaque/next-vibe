@@ -19,14 +19,14 @@ export const translations: typeof enTranslations = {
     title: "Ihr {{appName}}-Passwort zurücksetzen",
     subject: "Anfrage zur Passwortzurücksetzung - {{appName}}",
     previewText:
-      "Ihr {{appName}}-Passwort zurücksetzen — Link gültig für {{hours}} Stunden.",
+      "Ihr {{appName}}-Passwort zurücksetzen - Link gültig für {{hours}} Stunden.",
     greeting: "Hey {{name}},",
     requestInfo:
       "Jemand hat eine Passwortzurücksetzung für Ihr {{appName}}-Konto angefordert. Falls Sie das waren, klicken Sie auf den Button unten.",
     buttonText: "Mein Passwort zurücksetzen",
     expirationInfo:
-      "Link läuft in {{hours}} Stunden ab. Falls Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail — Ihr Passwort bleibt unverändert.",
-    signoff: "— Das {{appName}} Team",
+      "Link läuft in {{hours}} Stunden ab. Falls Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail - Ihr Passwort bleibt unverändert.",
+    signoff: "Das {{appName}} Team",
     promoText: "{{modelCount}} KI-Modelle. Keine Filter. Keine Lektionen.",
   },
   groups: {

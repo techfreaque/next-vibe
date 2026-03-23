@@ -4,7 +4,7 @@
  *
  * Uses a precise look-ahead strategy: exactly 5 seconds before the current
  * chunk finishes playing, the next chunk's audio element is preloaded and
- * primed for instant playback — eliminating gaps between chunks.
+ * primed for instant playback - eliminating gaps between chunks.
  */
 
 /** How many seconds before the current chunk ends to start preloading the next */
@@ -192,7 +192,7 @@ export class AudioQueueManager {
     };
     audio.addEventListener("loadedmetadata", onMeta);
 
-    // Also listen to timeupdate as a fallback — recalculate if the first
+    // Also listen to timeupdate as a fallback - recalculate if the first
     // schedule attempt couldn't fire (duration was NaN)
     const onTimeUpdate = (): void => {
       if (this.prefetchTriggered) {
@@ -221,7 +221,7 @@ export class AudioQueueManager {
    * Called exactly PREFETCH_LEAD_TIME_S seconds before the current chunk ends.
    */
   private ensureNextChunkReady(nextChunkIndex: number): void {
-    // Already preloaded — nothing to do
+    // Already preloaded - nothing to do
     if (this.preloadedAudio.has(nextChunkIndex)) {
       return;
     }
@@ -233,7 +233,7 @@ export class AudioQueueManager {
       // Kick off preload now so it's ready by the time current chunk ends
       void this.preloadAudio(nextInQueue.audioData, nextInQueue.chunkIndex);
     }
-    // If not in queue yet, it hasn't arrived from the server — preload will
+    // If not in queue yet, it hasn't arrived from the server - preload will
     // happen automatically when it's enqueued via enqueue()
   }
 

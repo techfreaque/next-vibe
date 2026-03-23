@@ -1,10 +1,10 @@
 /**
- * CLI auth-bypass user — no env, no DB, no i18n, no auth imports.
+ * CLI auth-bypass user - no env, no DB, no i18n, no auth imports.
  * Used when an endpoint has CLI_AUTH_BYPASS and the platform is not MCP.
  */
 
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 const CLI_BYPASS_USER_ID = "00000000-0000-0000-0000-000000000001";
 

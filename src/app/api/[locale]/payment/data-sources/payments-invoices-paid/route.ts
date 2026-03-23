@@ -1,5 +1,5 @@
 /**
- * Payments Invoices Paid — Route
+ * Payments Invoices Paid - Route
  * Server-only.
  */
 

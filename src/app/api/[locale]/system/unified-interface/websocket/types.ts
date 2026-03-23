@@ -84,7 +84,7 @@ export interface WsConnectionData {
 }
 
 /**
- * Typed emit function — derived from an endpoint's events record.
+ * Typed emit function - derived from an endpoint's events record.
  * Handlers call emit("eventName", payload) with full type safety.
  */
 export type TypedEmit<TEvents extends EventSchemas | never> =

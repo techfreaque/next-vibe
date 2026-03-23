@@ -179,7 +179,7 @@ export interface ApiEndpoint<
    * - undefined (not set): falls back to allowedRoles with UserRole.PUBLIC stripped
    *   (except login and reset-password endpoints which keep PUBLIC)
    * - [] (empty array): endpoint is disabled for everyone in local mode
-   * - [UserRole.ADMIN, ...]: explicit override — only those roles are allowed
+   * - [UserRole.ADMIN, ...]: explicit override - only those roles are allowed
    */
   readonly allowedLocalModeRoles?: readonly UserRoleValue[];
 
@@ -196,7 +196,7 @@ export interface ApiEndpoint<
    * (route-client.ts), or false to fall through to the server.
    *
    * When true, callApi loads the matching route-client.ts handler via
-   * getClientRouteHandler and executes it — same flow as allowedClientRoles.
+   * getClientRouteHandler and executes it - same flow as allowedClientRoles.
    *
    * Use cases: localStorage-backed data (incognito), offline mode, conditional client routing.
    */
@@ -214,7 +214,7 @@ export interface ApiEndpoint<
 
   /**
    * Optional function that returns a context-specific display title based on request/response data.
-   * Called on every render — as state transitions (loading → complete), the title updates reactively.
+   * Called on every render - as state transitions (loading → complete), the title updates reactively.
    * Return undefined to fall back to the static translated `title`.
    */
   readonly dynamicTitle?: (data: {
@@ -231,7 +231,7 @@ export interface ApiEndpoint<
 
   /**
    * Scoped translation function for this endpoint.
-   * Required — endpoints must declare their i18n scope explicitly.
+   * Required - endpoints must declare their i18n scope explicitly.
    * TScopedTranslationKey is inferred from scopedTranslation.ScopedTranslationKey,
    * so all title/description/category/tags/field labels must be valid scoped keys.
    */
@@ -261,7 +261,7 @@ export interface ApiEndpoint<
   /**
    * Stream timeout in milliseconds when this tool is called by AI and escalates
    * to a background task (via escalateToTask or remote queue).
-   * Default: 90_000 (90s — covers a full cron pulse cycle).
+   * Default: 90_000 (90s - covers a full cron pulse cycle).
    * Set to 0 for no timeout (long-running tools like claude-code, shell).
    */
   readonly streamTimeoutMs?: number;

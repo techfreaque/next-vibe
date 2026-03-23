@@ -9,8 +9,8 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getDefaultToolIdsForUser } from "@/app/api/[locale]/agent/chat/constants";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
+import { upsertMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/update-messages";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
@@ -51,7 +51,7 @@ export interface MessageOperationDeps {
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
-  /** Called immediately after the optimistic user message is added — switches the visible branch */
+  /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
 }
 
@@ -209,7 +209,7 @@ export async function createAndSendUserMessage(
     }));
 
     // Start AI stream (same for all operations)
-    // POST is fire-and-forget — WS events handled by useMessagesSubscription
+    // POST is fire-and-forget - WS events handled by useMessagesSubscription
     const streamStarted = await startStream({
       operation,
       rootFolderId: currentRootFolderId,

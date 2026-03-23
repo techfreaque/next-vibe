@@ -14,7 +14,7 @@ export const translations = {
       fn: {
         label: "Function",
         description:
-          "Function body — receives inputs array, returns SignalEvent[]",
+          "Function body - receives inputs array, returns SignalEvent[]",
       },
       signals: { label: "Signals", description: "Output signal events" },
     },

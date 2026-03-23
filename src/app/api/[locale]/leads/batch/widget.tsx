@@ -510,7 +510,7 @@ export function LeadsBatchDeleteContainer({
         }}
       />
 
-      {/* Prominent danger warning with lead count — shown when preview has entries and no result yet */}
+      {/* Prominent danger warning with lead count - shown when preview has entries and no result yet */}
       {preview.length > 0 && !response?.success && (
         <Div className="rounded-lg border-2 border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/40 p-4 flex items-start gap-3">
           <Div className="h-9 w-9 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">

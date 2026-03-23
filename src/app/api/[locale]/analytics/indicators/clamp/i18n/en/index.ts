@@ -2,7 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Clamp",
-    description: "Clamp values to a [min, max] range — caps outliers",
+    description: "Clamp values to a [min, max] range - caps outliers",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

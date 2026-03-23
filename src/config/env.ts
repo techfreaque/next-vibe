@@ -123,13 +123,13 @@ export const {
             (v.length >= 64 &&
               !v.startsWith("REPLACE_WITH_") &&
               !v.includes("your-secret")),
-          "JWT_SECRET_KEY must be at least 64 random characters in production — run: openssl rand -hex 32",
+          "JWT_SECRET_KEY must be at least 64 random characters in production - run: openssl rand -hex 32",
         ),
       z.string().min(32),
     ),
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     comment:
-      "JWT signing secret — MUST be at least 64 random characters in production. Generate with: openssl rand -hex 32",
+      "JWT signing secret - MUST be at least 64 random characters in production. Generate with: openssl rand -hex 32",
     sensitive: true,
     onboardingRequired: true,
     onboardingStep: 3,
@@ -145,12 +145,12 @@ export const {
           (v) =>
             process.env["NODE_ENV"] !== "production" ||
             (!v.startsWith("REPLACE_WITH_") && !v.includes("your-cron")),
-          "CRON_SECRET must not be a placeholder in production — run: openssl rand -hex 32",
+          "CRON_SECRET must not be a placeholder in production - run: openssl rand -hex 32",
         ),
       z.string().min(32),
     ),
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
-    comment: "Cron job secret — generate with: openssl rand -hex 32",
+    comment: "Cron job secret - generate with: openssl rand -hex 32",
     sensitive: true,
     onboardingStep: 3,
     onboardingGroup: "security",
@@ -248,7 +248,7 @@ export const {
       .transform((v) => v === "true"),
     example: "false",
     comment:
-      "Enable continuous file watching during development. When false (default), generators run once on startup and again when you press 'r' in the terminal — no CPU overhead. When true, generators re-run automatically on every file change. WARNING: continuous mode requires a high-end workstation (64 GB+ RAM, fast multi-core CPU). On less powerful machines it will cause noticeable slowdowns and may make the dev server unresponsive.",
+      "Enable continuous file watching during development. When false (default), generators run once on startup and again when you press 'r' in the terminal - no CPU overhead. When true, generators re-run automatically on every file change. WARNING: continuous mode requires a high-end workstation (64 GB+ RAM, fast multi-core CPU). On less powerful machines it will cause noticeable slowdowns and may make the dev server unresponsive.",
     fieldType: "boolean",
   },
   VIBE_SECRET_KEY: {

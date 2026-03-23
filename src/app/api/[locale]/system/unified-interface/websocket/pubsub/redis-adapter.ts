@@ -63,7 +63,7 @@ export class RedisPubSubAdapter implements PubSubAdapter {
         const parsed = JSON.parse(message) as RedisWireMessage;
         handler(parsed.event, parsed.data);
       } catch {
-        // Malformed message — skip
+        // Malformed message - skip
       }
     });
   }

@@ -13,11 +13,11 @@ export const translations: typeof enTranslations = {
       "Ihr {{appName}}-Passwort wurde zurückgesetzt. Melden Sie sich an und chatten Sie mit {{modelCount}} KI-Modellen.",
     greeting: "Hey {{name}},",
     successMessage:
-      "Ihr Passwort wurde zurückgesetzt. Alles erledigt — melden Sie sich an und machen Sie dort weiter, wo Sie aufgehört haben.",
+      "Ihr Passwort wurde zurückgesetzt. Alles erledigt - melden Sie sich an und machen Sie dort weiter, wo Sie aufgehört haben.",
     loginButton: "Bei {{appName}} anmelden",
     promoText: "{{modelCount}} KI-Modelle. Keine Filter. Keine Lektionen.",
     securityWarning:
-      "Passwort nicht zurückgesetzt? Kontaktieren Sie sofort den Support — Ihr Konto könnte gefährdet sein.",
+      "Passwort nicht zurückgesetzt? Kontaktieren Sie sofort den Support - Ihr Konto könnte gefährdet sein.",
   },
   groups: {
     verification: {

@@ -35,7 +35,6 @@ import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-inter
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
-import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
@@ -48,6 +47,7 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { VibeFrameHost } from "@/app/api/[locale]/system/unified-interface/vibe-frame/VibeFrameHost";
 import remoteConnectionListDefinition from "@/app/api/[locale]/user/remote-connection/list/definition";
 
 import type definition from "./definition";
@@ -239,7 +239,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
       return {
         read: {
           ...(hasInput ? { urlPathParams: inputData as never } : {}),
-          // Never auto-fetch inside execute-tool — user triggers fetch explicitly
+          // Never auto-fetch inside execute-tool - user triggers fetch explicitly
           queryOptions: { enabled: false },
           // Disable auto-submit: prevents the debounced form-watch from calling
           // query.refetch() (which ignores enabled:false) when form values change
@@ -252,7 +252,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
       return undefined;
     }
 
-    // disabled mutations are no-ops — only GET needs the enabled flag
+    // disabled mutations are no-ops - only GET needs the enabled flag
 
     if (method === "DELETE") {
       return {
@@ -379,7 +379,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
         />
       )}
 
-      {/* Remote tool without connection — field-driven fallback */}
+      {/* Remote tool without connection - field-driven fallback */}
       {isRemoteTool && !remoteConnection && !disabled && !resultData && (
         <Div className="flex flex-col gap-3">
           <P className="text-sm text-muted-foreground">

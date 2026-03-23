@@ -5,10 +5,10 @@
  * Uses ink + ink-select-input for reactive navigation (replaces inquirer prompts).
  *
  * Views:
- *   1. Category list — grouped tool overview with counts
- *   2. Tool list — tools within a category (or all)
- *   3. Tool detail — full endpoint info rendered via InkEndpointRenderer
- *   4. Execution result — endpoint response rendered via InkEndpointRenderer
+ *   1. Category list - grouped tool overview with counts
+ *   2. Tool list - tools within a category (or all)
+ *   3. Tool detail - full endpoint info rendered via InkEndpointRenderer
+ *   4. Execution result - endpoint response rendered via InkEndpointRenderer
  */
 
 import { Box, render, Text, useApp, useInput } from "ink";
@@ -66,7 +66,7 @@ interface ToolInfo {
   toolName: string;
   credits?: number;
   aliases: string[];
-  /** Full definition — only populated after user clicks into detail view */
+  /** Full definition - only populated after user clicks into detail view */
   endpoint?: CreateApiEndpointAny;
 }
 
@@ -421,7 +421,7 @@ function ToolDetailView({
         </Text>
       </Box>
 
-      {/* Render endpoint fields — only when full definition is loaded */}
+      {/* Render endpoint fields - only when full definition is loaded */}
       {RendererComponent && tool.endpoint && (
         <Box
           marginTop={1}
@@ -723,7 +723,7 @@ function InteractiveHelp({
 
 /**
  * Launch the interactive help navigator.
- * Renders to the terminal with Ink — takes over stdin/stdout.
+ * Renders to the terminal with Ink - takes over stdin/stdout.
  * Returns a promise that resolves when the user exits.
  */
 export async function startInteractiveHelp(

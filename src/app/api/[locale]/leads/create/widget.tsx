@@ -22,13 +22,13 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 
 import { LeadStatus } from "../enum";
 import type definition from "./definition";
@@ -192,7 +192,7 @@ export function LeadCreateContainer({
     );
   }
 
-  // Form state — render each field directly, exactly like favs pattern
+  // Form state - render each field directly, exactly like favs pattern
   return (
     <Div className="flex flex-col gap-0">
       {/* Top actions */}

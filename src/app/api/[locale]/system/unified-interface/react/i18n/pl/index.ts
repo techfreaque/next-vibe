@@ -54,17 +54,17 @@ export const translations: typeof enTranslations = {
         executing: "Wykonywanie...",
         complete: "Zakończono",
         sentToBackground: "Wysłano w tle",
-        wakeUpBackground: "Zadanie w tle — AI zostanie obudzone z wynikiem",
+        wakeUpBackground: "Zadanie w tle - AI zostanie obudzone z wynikiem",
         waitingForRemote: "Oczekiwanie na zdalne...",
         deferred: "Wynik asynchroniczny",
         confirmed: "Potwierdzone przez Ciebie",
-        confirmedWakeUp: "Potwierdzone — działa w tle",
+        confirmedWakeUp: "Potwierdzone - działa w tle",
         waitingForConfirmation: "Oczekiwanie na potwierdzenie",
         waitingForConfirmationWakeUp: "Potwierdź, aby uruchomić w tle",
         pendingConfirmation: "Oczekujące Potwierdzenie",
         pendingCancellation: "Oczekujące Anulowanie",
         denied: "Odmówiono",
-        deniedWakeUp: "Odmówiono — nie zostanie uruchomione w tle",
+        deniedWakeUp: "Odmówiono - nie zostanie uruchomione w tle",
         notRun: "Nie wykonano",
       },
       sections: {
@@ -84,7 +84,7 @@ export const translations: typeof enTranslations = {
         confirmationRequired:
           "Sprawdź i edytuj parametry, następnie potwierdź.",
         confirmationRequiredWakeUp:
-          "Sprawdź i edytuj parametry, następnie potwierdź — wynik obudzi AI.",
+          "Sprawdź i edytuj parametry, następnie potwierdź - wynik obudzi AI.",
       },
       actions: {
         confirm: "Potwierdź",

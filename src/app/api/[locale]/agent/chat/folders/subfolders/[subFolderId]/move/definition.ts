@@ -21,7 +21,7 @@ import { FolderMoveContainer } from "./widget";
 
 /**
  * Move Folder Endpoint (PATCH)
- * Widget variant for the move dialog — folder-tree parentId picker
+ * Widget variant for the move dialog - folder-tree parentId picker
  */
 const { PATCH } = createEndpoint({
   scopedTranslation,

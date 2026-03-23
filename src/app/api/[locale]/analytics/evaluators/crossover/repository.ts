@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Crossover Evaluator Pure Computation
+ * Vibe Sense - Crossover Evaluator Pure Computation
  * Server-only.
  */
 

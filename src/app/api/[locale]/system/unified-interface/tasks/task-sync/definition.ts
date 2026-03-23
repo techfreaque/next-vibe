@@ -50,7 +50,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        // The local instance's instanceId — used to look up the connection record on cloud
+        // The local instance's instanceId - used to look up the connection record on cloud
         schema: z.string().optional(),
       }),
       memoriesHash: requestField(scopedTranslation, {
@@ -64,21 +64,21 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        // Build version string (git SHA or package version) — changes only on deploy
+        // Build version string (git SHA or package version) - changes only on deploy
         schema: z.string().optional(),
       }),
       capabilitiesJson: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        // Full capability snapshot — only sent when capabilitiesVersion changed
+        // Full capability snapshot - only sent when capabilitiesVersion changed
         schema: z.union([z.string(), z.array(z.any())]).optional(),
       }),
       taskCursor: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        // ISO timestamp — return REMOTE_TOOL_CALL tasks created after this
+        // ISO timestamp - return REMOTE_TOOL_CALL tasks created after this
         schema: z.string().datetime().optional(),
       }),
       outboundTasks: requestField(scopedTranslation, {
@@ -95,12 +95,12 @@ const { POST } = createEndpoint({
       // ── Response: remote returns only what local is missing ─────────────
       remoteMemoriesHash: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Remote's current hash — local stores for next diff
+        // Remote's current hash - local stores for next diff
         schema: z.string(),
       }),
       memories: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Full memory records as JSON string — null if hashes matched
+        // Full memory records as JSON string - null if hashes matched
         schema: z.string().nullable(),
       }),
       remoteCapabilitiesVersion: responseField(scopedTranslation, {
@@ -109,7 +109,7 @@ const { POST } = createEndpoint({
       }),
       capabilities: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Full capability snapshot as JSON string — null if versions matched
+        // Full capability snapshot as JSON string - null if versions matched
         schema: z.string().nullable(),
       }),
       tasks: responseField(scopedTranslation, {
@@ -123,7 +123,7 @@ const { POST } = createEndpoint({
       }),
       serverTime: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        // Remote server's DB time at sync — use as cursor to avoid JS/container timezone skew
+        // Remote server's DB time at sync - use as cursor to avoid JS/container timezone skew
         schema: z.string(),
       }),
     },

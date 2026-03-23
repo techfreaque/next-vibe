@@ -1,5 +1,5 @@
 /**
- * Shared CLI runner — used by both vibe-runtime and package entry points.
+ * Shared CLI runner - used by both vibe-runtime and package entry points.
  *
  * Accepts a name, optional default endpoint, and optional scoped getEndpoint
  * function. All entry points set these then call runCli().
@@ -14,6 +14,7 @@ import { enableDebug, enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   DefinitionLoader,
   type GetEndpointFn,
@@ -38,7 +39,6 @@ import {
   RouteDelegationHandler,
 } from "./runtime/route-executor";
 import { CliTarget, type CliTargetValue } from "./types/cli-target";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 export const binaryStartTime = Date.now();
 
@@ -128,7 +128,7 @@ export interface RunCliOptions {
    */
   defaultEndpoint?: string;
   /**
-   * Custom endpoint resolver — pass a scoped getEndpoint for standalone packages.
+   * Custom endpoint resolver - pass a scoped getEndpoint for standalone packages.
    * Defaults to the global generated endpoint registry.
    */
   getEndpoint?: GetEndpointFn;
@@ -143,7 +143,7 @@ export function runCli({
     ? new DefinitionLoader(getEndpoint)
     : undefined;
 
-  // Scoped definitions registry for packages — lists only the package's endpoints.
+  // Scoped definitions registry for packages - lists only the package's endpoints.
   // Uses the scoped alias-map to enumerate canonical paths, then resolves each via getEndpoint.
   const defRegistry: IDefinitionsRegistry | undefined = getEndpoint
     ? new DefinitionsRegistry()

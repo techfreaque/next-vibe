@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Wstęgi Bollingera",
     description:
-      "Wstęgi Bollingera — górna, środkowa (SMA) i dolna wstęga z odchyleniem standardowym",
+      "Wstęgi Bollingera - górna, środkowa (SMA) i dolna wstęga z odchyleniem standardowym",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       resolution: {

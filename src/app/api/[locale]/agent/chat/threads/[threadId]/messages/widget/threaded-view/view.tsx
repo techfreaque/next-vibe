@@ -1,11 +1,11 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
@@ -26,9 +26,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSkill } from "../../../../../skills/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
-import { useMessageItem } from "../../hooks/use-message-item";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
+import { useMessageItem } from "../../hooks/use-message-item";
 import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";
 import { MessageEditor } from "../message-editor";
@@ -52,7 +52,7 @@ interface ThreadedMessageProps {
   /** Collapse state management callbacks */
   collapseState?: CollapseStateStore;
   currentUserId?: string;
-  /** Message operations — passed from parent (no context dependency) */
+  /** Message operations - passed from parent (no context dependency) */
   onBranchMessage?: (
     messageId: string,
     content: string,
@@ -135,7 +135,7 @@ export function ThreadedMessage({
   const clearAnswering = useMessageEditorStore((s) => s.clearAnswering);
   const clearReplying = useMessageEditorStore((s) => s.clearReplying);
 
-  // Async startRetry — loads attachments then sets retrying state
+  // Async startRetry - loads attachments then sets retrying state
   const startRetry = useCallback(
     async (msg: ChatMessage) => {
       cancelAction();

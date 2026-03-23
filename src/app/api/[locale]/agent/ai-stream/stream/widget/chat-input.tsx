@@ -9,7 +9,6 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
@@ -27,6 +26,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -174,7 +174,7 @@ export function WidgetChatInput({
         className,
       )}
     >
-      {/* Input area — hidden in disabled mode or when hideInputWhenSubmitting+submitting */}
+      {/* Input area - hidden in disabled mode or when hideInputWhenSubmitting+submitting */}
       {!disabled && !(hideInputWhenSubmitting && isSubmitting) && (
         <Div className="relative mb-2 @sm:mb-3">
           <Textarea

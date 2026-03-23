@@ -1,7 +1,7 @@
 /**
  * AI Stream Widget
  *
- * Full-page chat area layout — toolbar, messages via EndpointsPage, real ChatInputContainer.
+ * Full-page chat area layout - toolbar, messages via EndpointsPage, real ChatInputContainer.
  * The ChatInputContainer/ChatInput already reads from useChatInputStore and calls useAIStream
  * directly, so input state is already controlled by the ai-stream layer.
  */
@@ -90,7 +90,7 @@ function AiStreamChatArea(): JSX.Element {
     activeThreadId && activeThreadId !== NEW_MESSAGE_ID ? activeThreadId : null;
 
   // Prefer initialMessagesData (full messages list); fall back to initialPathData messages.
-  // Both apply only to the boot thread — navigated-to threads fetch fresh
+  // Both apply only to the boot thread - navigated-to threads fetch fresh
   // (or use the pre-seeded cache for optimistically created threads).
   const messagesInitialData = useMemo(() => {
     if (!threadIdToRender || threadIdToRender !== initialThreadId) {
@@ -109,7 +109,7 @@ function AiStreamChatArea(): JSX.Element {
   const inputHeight = useInputHeight(inputContainerRef);
   const insets = useSafeAreaInsets();
 
-  // Single endpoint instance — used both for pre-seeding (initialData) and as the
+  // Single endpoint instance - used both for pre-seeding (initialData) and as the
   // widget form owner passed into EndpointsPage via endpointInstance.
   const messagesReadOptions = useMemo(
     () => ({
@@ -131,7 +131,7 @@ function AiStreamChatArea(): JSX.Element {
     logger,
     user,
   );
-  // endpointOptions for EndpointsPage type constraint — only read needed since we pass GET only
+  // endpointOptions for EndpointsPage type constraint - only read needed since we pass GET only
   const messagesEndpointOptions = useMemo(
     () => ({
       read: {

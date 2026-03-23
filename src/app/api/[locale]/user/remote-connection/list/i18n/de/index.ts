@@ -79,13 +79,13 @@ export const translations: typeof enTranslations = {
     cloud: {
       heroTitle: "Deine KI. Überall.",
       heroSubtitle:
-        "unbottled.ai ist dein Cloud-Gehirn. Füge eine lokale Instanz hinzu und deine KI arbeitet auf beiden — Erinnerungen synchronisieren sich, Tools laufen auf deinem Rechner.",
+        "unbottled.ai ist dein Cloud-Gehirn. Füge eine lokale Instanz hinzu und deine KI arbeitet auf beiden - Erinnerungen synchronisieren sich, Tools laufen auf deinem Rechner.",
       benefit1: "Erinnerungen synchronisieren sich bidirektional, automatisch",
       benefit2: "Cloud-KI entdeckt und führt deine lokalen Tools aus",
       benefit3: "Delegiere Aufgaben von der Cloud an deinen Rechner",
       feature1Title: "Deine Tools, dein Rechner",
       feature1Body:
-        "SSH, lokale Dateien, Code-Ausführung — die Cloud-KI entdeckt und führt deine lokalen Tools automatisch aus. Kein Port-Forwarding. Kein VPN.",
+        "SSH, lokale Dateien, Code-Ausführung - die Cloud-KI entdeckt und führt deine lokalen Tools automatisch aus. Kein Port-Forwarding. Kein VPN.",
       feature2Title: "Geteiltes Gedächtnis",
       feature2Body:
         "Alles, was du der KI hier sagst, synchronisiert sich mit deiner lokalen Instanz. Kontext reist mit dir.",
@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
       quickstartCta: "Quickstart-Anleitung",
       alreadyHaveLocal: "Hast du bereits eine lokale Instanz?",
       alreadyHaveLocalSub:
-        "Verbinde dich von deinem lokalen Rechner — öffne dort Fernverbindungen und verknüpfe sie mit dieser Cloud-Instanz.",
+        "Verbinde dich von deinem lokalen Rechner - öffne dort Fernverbindungen und verknüpfe sie mit dieser Cloud-Instanz.",
       connectSectionTitle: "Lokale Instanz verknüpfen",
     },
     local: {

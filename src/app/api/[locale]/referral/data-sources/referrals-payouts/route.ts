@@ -1,5 +1,5 @@
 /**
- * Referrals Payouts — Route
+ * Referrals Payouts - Route
  * Server-only.
  */
 

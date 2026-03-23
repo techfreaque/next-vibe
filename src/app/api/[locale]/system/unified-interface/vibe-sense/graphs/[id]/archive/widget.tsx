@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Archive Widget
+ * Vibe Sense - Archive Widget
  * Confirmation UI with archive button and success feedback.
  */
 

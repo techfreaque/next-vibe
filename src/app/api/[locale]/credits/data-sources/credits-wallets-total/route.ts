@@ -1,5 +1,5 @@
 /**
- * Credits Wallets Total — Route
+ * Credits Wallets Total - Route
  * Server-only.
  */
 

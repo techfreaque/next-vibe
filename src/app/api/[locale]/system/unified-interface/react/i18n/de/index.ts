@@ -54,17 +54,17 @@ export const translations: typeof enTranslations = {
         executing: "Wird ausgeführt...",
         complete: "Abgeschlossen",
         sentToBackground: "Im Hintergrund gesendet",
-        wakeUpBackground: "Hintergrundaufgabe — KI wird mit Ergebnis geweckt",
+        wakeUpBackground: "Hintergrundaufgabe - KI wird mit Ergebnis geweckt",
         waitingForRemote: "Wartet auf Remote...",
         deferred: "Async-Ergebnis",
         confirmed: "Von Ihnen bestätigt",
-        confirmedWakeUp: "Bestätigt — läuft im Hintergrund",
+        confirmedWakeUp: "Bestätigt - läuft im Hintergrund",
         waitingForConfirmation: "Wartet auf Bestätigung",
         waitingForConfirmationWakeUp: "Bestätigen zum Ausführen im Hintergrund",
         pendingConfirmation: "Bestätigung ausstehend",
         pendingCancellation: "Stornierung ausstehend",
         denied: "Abgelehnt",
-        deniedWakeUp: "Abgelehnt — wird nicht im Hintergrund ausgeführt",
+        deniedWakeUp: "Abgelehnt - wird nicht im Hintergrund ausgeführt",
         notRun: "Nicht ausgeführt",
       },
       sections: {
@@ -84,7 +84,7 @@ export const translations: typeof enTranslations = {
         confirmationRequired:
           "Parameter prüfen und bearbeiten, dann bestätigen.",
         confirmationRequiredWakeUp:
-          "Parameter prüfen und bearbeiten, dann bestätigen — Ergebnis weckt KI auf.",
+          "Parameter prüfen und bearbeiten, dann bestätigen - Ergebnis weckt KI auf.",
       },
       actions: {
         confirm: "Bestätigen",

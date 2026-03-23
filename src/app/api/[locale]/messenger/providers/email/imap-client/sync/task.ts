@@ -1,6 +1,6 @@
 /**
  * IMAP Sync Task
- * Pure metadata — dispatches to emails/imap-client/sync POST route via pulse runner.
+ * Pure metadata - dispatches to emails/imap-client/sync POST route via pulse runner.
  */
 import "server-only";
 

@@ -1,6 +1,6 @@
 /**
  * Unified Inbox Mark-Read Repository
- * Routes markRead through the MessengerProvider interface — channel-agnostic.
+ * Routes markRead through the MessengerProvider interface - channel-agnostic.
  */
 
 import "server-only";

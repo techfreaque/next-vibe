@@ -1,5 +1,5 @@
 /**
- * Credits Refunded — Route
+ * Credits Refunded - Route
  * Server-only.
  */
 

@@ -7,23 +7,25 @@
 import "server-only";
 
 import { eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
 
 import { messengerAccounts } from "../accounts/db";
-import { MessengerProvider as MessengerProviderEnum } from "../accounts/enum";
-import { MessageChannel } from "../accounts/enum";
+import {
+  MessageChannel,
+  MessengerProvider as MessengerProviderEnum,
+} from "../accounts/enum";
 import { resendProvider } from "./email/resend";
 import { smtpProvider } from "./email/smtp";
 import { scopedTranslation as providerScopedTranslation } from "./i18n";
+import type { MessengerProvider } from "./provider";
 import { SmsMessengerProvider } from "./sms/twilio";
 import { TelegramMessengerProvider } from "./telegram/telegram-bot";
-import type { MessengerProvider } from "./provider";
 import { WhatsAppMessengerProvider } from "./whatsapp/whatsapp-business";
 
 /**
@@ -98,7 +100,7 @@ function resolveProviderFromAccount(
 }
 
 /**
- * Get provider by channel — returns the default provider for that channel.
+ * Get provider by channel - returns the default provider for that channel.
  * For SMS/WhatsApp/Telegram, caller must supply an accountId.
  */
 export function getProviderByChannel(

@@ -77,11 +77,11 @@ export function useVoiceRecording({
   // Track which voice mode was used when starting recording
   const voiceModeRef = useRef<RecordingSubmitMode>("toInput");
 
-  // Stable ref for currentValue — avoids onTranscript depending on it
+  // Stable ref for currentValue - avoids onTranscript depending on it
   const currentValueRef = useRef(currentValue);
   currentValueRef.current = currentValue;
 
-  // Stable callbacks for useEdenAISpeech — must not be inline arrows
+  // Stable callbacks for useEdenAISpeech - must not be inline arrows
   const onTranscript = useCallback(
     (text: string) => {
       const mode = voiceModeRef.current;

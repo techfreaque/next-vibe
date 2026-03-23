@@ -2,8 +2,8 @@
 
 import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
 import type { Route } from "next";
-import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
+import Link from "next/link";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -174,7 +174,7 @@ export const Markdown = memo(function Markdown({
         sectionType: "thinking" as const,
         sectionIndex: index,
       };
-      // Determine current state — must match the formula in isThinkingExpanded exactly
+      // Determine current state - must match the formula in isThinkingExpanded exactly
       const autoCollapsed = !isStreaming && (hasContent || hasContentAfter);
       const currentState = collapseState.isCollapsed(key, autoCollapsed);
       collapseState.toggleCollapse(key, currentState);

@@ -27,9 +27,9 @@ import type { CliRequestData } from "../../../cli/runtime/cli-request-data";
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
 import type { JsonValue } from "../../../tasks/unified-runner/types";
 import type { EndpointLogger } from "../../logger/endpoint";
-import type { GenericHandlerBase } from "./handler";
 import type { Platform } from "../../types/platform";
 import { splitArgs } from "../../utils/split-args";
+import type { GenericHandlerBase } from "./handler";
 
 /**
  * Base execution context
@@ -64,9 +64,9 @@ export class RouteExecutionExecutor {
     locale: CountryLanguage;
     logger: EndpointLogger;
     platform: CliCompatiblePlatform | Platform.AI;
-    /** Stream context — rootFolderId, threadId, aiMessageId, etc. */
+    /** Stream context - rootFolderId, threadId, aiMessageId, etc. */
     streamContext: ToolExecutionContext;
-    /** Pre-loaded route handler — avoids a second dynamic import when caller already loaded it */
+    /** Pre-loaded route handler - avoids a second dynamic import when caller already loaded it */
     preloadedHandler?: GenericHandlerBase | null;
   }): Promise<ResponseType<TResult>> {
     const { t } = systemScopedTranslation.scopedT(params.locale);
@@ -89,7 +89,7 @@ export class RouteExecutionExecutor {
 
       // Split args: if urlPathParams was not provided by the caller, derive it
       // automatically from data using the endpoint schema.
-      // Cast to CliRequestData at the boundary — both CliRequestData and
+      // Cast to CliRequestData at the boundary - both CliRequestData and
       // Record<string, JsonValue> are structurally compatible at runtime.
       let resolvedData: CliRequestData = params.data as CliRequestData;
       let resolvedUrlPathParams: CliRequestData =

@@ -31,7 +31,7 @@ function ContentBlockItem({ block }: { block: ContentBlock }): JSX.Element {
     return <Span className="text-sm whitespace-pre-wrap">{block.text}</Span>;
   }
 
-  // Image block — render base64 as data URI
+  // Image block - render base64 as data URI
   return <Base64Image data={block.data} mimeType={block.mimeType} />;
 }
 

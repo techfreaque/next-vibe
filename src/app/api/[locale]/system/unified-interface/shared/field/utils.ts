@@ -17,6 +17,10 @@ import type {
   ObjectChildrenConstraint,
   UnionObjectWidgetConfigConstrain,
 } from "../../unified-ui/widgets/_shared/types";
+import type {
+  CustomWidgetObjectConfig,
+  CustomWidgetPrimitiveConfig,
+} from "../../unified-ui/widgets/containers/custom/types";
 import type { IconKey } from "../../unified-ui/widgets/form-fields/icon-field/icons";
 import type { NavigateButtonWidgetConfig } from "../../unified-ui/widgets/interactive/navigate-button/types";
 import type { SubmitButtonWidgetConfig } from "../../unified-ui/widgets/interactive/submit-button/types";
@@ -32,10 +36,6 @@ import type {
   ObjectWidgetConfig,
   RequestResponseWidgetConfig,
 } from "../widgets/configs";
-import type {
-  CustomWidgetObjectConfig,
-  CustomWidgetPrimitiveConfig,
-} from "../../unified-ui/widgets/containers/custom/types";
 
 // ============================================================================
 // TYPE GUARDS
@@ -565,7 +565,7 @@ export type InferObjectType<C, Usage extends FieldUsage> =
  * @param userRoles - Optional caller roles for field-level visibility enforcement.
  *   When provided, fields with `visibleFor` set are excluded from the schema unless
  *   the caller has at least one matching role. This is the schema-level security
- *   guarantee — excluded fields are stripped by Zod's default `.strip()` behaviour
+ *   guarantee - excluded fields are stripped by Zod's default `.strip()` behaviour
  *   and never reach the handler, regardless of what the client sends.
  */
 export function generateSchemaForUsage<F, Usage extends FieldUsage>(
@@ -606,7 +606,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
    * Check if a field is visible for the current caller's roles.
    * If `visibleFor` is absent the field is visible to all.
    * If `visibleFor` is present and `userRoles` is provided, the caller must
-   * have at least one matching role — otherwise the field is excluded.
+   * have at least one matching role - otherwise the field is excluded.
    * When `userRoles` is undefined (static schema build at startup) the
    * visibility constraint is ignored so the static schema stays permissive.
    */
@@ -615,10 +615,10 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   }
   const isVisibleForRoles = (childField: FieldWithVisibleFor): boolean => {
     if (childField.visibleFor === undefined) {
-      return true; // no constraint — always visible
+      return true; // no constraint - always visible
     }
     if (!userRoles) {
-      return true; // no caller context — static build, skip enforcement
+      return true; // no caller context - static build, skip enforcement
     }
     if (childField.visibleFor.length === 0) {
       return false; // explicitly empty → no one sees it

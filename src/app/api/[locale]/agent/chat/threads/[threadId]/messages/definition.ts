@@ -52,7 +52,7 @@ const { GET } = createEndpoint({
 
   // WebSocket events for real-time message streaming.
   // Emitted by ai-stream repository, consumed by clients subscribed to this channel.
-  // All 16 StreamEventType events — kebab-case keys match enqueue() directly.
+  // All 16 StreamEventType events - kebab-case keys match enqueue() directly.
   events: {
     "message-created": z.object({
       messageId: z.string(),
@@ -193,7 +193,7 @@ const { GET } = createEndpoint({
       threadId: z.string(),
       title: z.string(),
     }),
-    // Stream lifecycle — definitive "stream is completely done" signal
+    // Stream lifecycle - definitive "stream is completely done" signal
     "stream-finished": z.object({
       threadId: z.string(),
       reason: z.enum(["completed", "cancelled", "error", "timeout"]),
@@ -393,7 +393,7 @@ const { GET } = createEndpoint({
     description: "get.success.description",
   },
 
-  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  // Route to client (localStorage) for incognito threads - caller passes rootFolderId
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {
@@ -621,7 +621,7 @@ const { POST } = createEndpoint({
     description: "post.success.description",
   },
 
-  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  // Route to client (localStorage) for incognito threads - caller passes rootFolderId
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {
@@ -658,7 +658,7 @@ export type MessageCreateUrlParamsTypeOutput =
   typeof POST.types.UrlVariablesOutput;
 export type MessageCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Extract WS event types for typed emit/subscribe — owned by messages, used by ai-stream
+// Extract WS event types for typed emit/subscribe - owned by messages, used by ai-stream
 export type MessagesWsEvents = typeof GET.types.Events;
 
 /**

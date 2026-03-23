@@ -197,7 +197,7 @@ export class EnvKeysGeneratorRepository {
 /**
  * Serializable metadata for a single env key.
  * Imported by settings definition to build flat requestFields.
- * NOT server-only — safe to import in client context.
+ * NOT server-only - safe to import in client context.
  */
 export type EnvFieldType =
   | "text"
@@ -223,7 +223,7 @@ export interface EnvKeyMeta {
 
 /**
  * All configured env keys with their metadata.
- * Auto-generated — do not edit manually.
+ * Auto-generated - do not edit manually.
  */
 export const ENV_KEYS = ${keysTs} as const satisfies readonly EnvKeyMeta[];
 

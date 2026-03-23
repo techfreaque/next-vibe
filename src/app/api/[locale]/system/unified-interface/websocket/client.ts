@@ -20,7 +20,7 @@ import type { EventHandler, WsWireMessage } from "./types";
 // ============================================================================
 
 /**
- * Internal wire handler — accepts wire-protocol data (WsWireMessage["data"]).
+ * Internal wire handler - accepts wire-protocol data (WsWireMessage["data"]).
  * This is the widest Zod output type; consumers narrow it via generics.
  */
 type WireHandler = EventHandler<WsWireMessage["data"]>;
@@ -95,7 +95,7 @@ function connect(channel: string, state: ConnectionState): void {
         handler(msg);
       }
     } catch {
-      // Invalid JSON — ignore
+      // Invalid JSON - ignore
     }
   };
 
@@ -165,7 +165,7 @@ export function subscribeToChannel<T extends WsWireMessage["data"]>(
   handler: EventHandler<T>,
 ): () => void {
   const state = getOrCreateConnection(channel);
-  // Caller's generic T narrows the wire data — safe since the WS protocol
+  // Caller's generic T narrows the wire data - safe since the WS protocol
   // guarantees the event name correlates with the correct payload shape.
   return addListener(state, event, handler as WireHandler);
 }
@@ -174,7 +174,7 @@ export function subscribeToChannel<T extends WsWireMessage["data"]>(
  * Pre-warm a WS channel so the connection is established before handlers
  * are added.  Call this just before starting a stream so the first WS
  * events are not delayed by connection setup.
- * Safe to call multiple times — returns existing connection if already open.
+ * Safe to call multiple times - returns existing connection if already open.
  */
 export function preWarmChannel(channel: string): void {
   getOrCreateConnection(channel);
@@ -240,7 +240,7 @@ export function useWebSocket(channel: string | null): UseWebSocketReturn {
       setConnected(state.ws?.readyState === WebSocket.OPEN);
     }, 500);
 
-    // Track last event via wildcard listener — receives full WsWireMessage
+    // Track last event via wildcard listener - receives full WsWireMessage
     const unsub = addWildcardListener(state, (msg: WsWireMessage) => {
       setLastEvent(msg);
     });

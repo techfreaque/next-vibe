@@ -1,7 +1,7 @@
 /**
  * Task Sync Settings Endpoint
- * GET  — get current sync enabled state
- * PATCH — enable or disable the task-sync-pull cron task
+ * GET  - get current sync enabled state
+ * PATCH - enable or disable the task-sync-pull cron task
  *
  * Admin-only. The sync task is disabled by default and must be explicitly
  * enabled via this endpoint.

@@ -1,5 +1,5 @@
 /**
- * @next-vibe/checker — Package Manifest
+ * @next-vibe/checker - Package Manifest
  *
  * Standalone code quality checker package built from the next-vibe monorepo.
  * Exposes `vibe-check` CLI command and MCP tool with the same UX as
@@ -35,7 +35,7 @@ const manifest: PackageManifest = {
   defaultEndpoint: VIBE_CHECK_ALIAS,
 
   exports: {
-    // Library exports — importable from the package
+    // Library exports - importable from the package
     ".": "src/app/api/[locale]/system/check/vibe-check/repository.ts",
     "./oxlint": "src/app/api/[locale]/system/check/oxlint/repository.ts",
     "./lint": "src/app/api/[locale]/system/check/lint/repository.ts",
@@ -43,7 +43,7 @@ const manifest: PackageManifest = {
     // Types used by check.config.ts (imported as @next-vibe/checker/system/check/config/types)
     "./system/check/config/types":
       "src/app/api/[locale]/system/check/config/types.ts",
-    // Custom oxlint JS plugins — referenced in check.config.ts jsPlugins array
+    // Custom oxlint JS plugins - referenced in check.config.ts jsPlugins array
     "./oxlint-plugins/restricted-syntax":
       "src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",
     "./oxlint-plugins/jsx-capitalization":

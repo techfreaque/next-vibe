@@ -156,7 +156,7 @@ export const translations: typeof enTranslations = {
     graphSettings: "Graph-Einstellungen",
     canvasEmpty: "Canvas ist leer",
     canvasEmptyHint: "Knoten aus der Palette hierher ziehen",
-    shortcutDelete: "Del — Knoten loeschen",
-    shortcutSave: "⌘S — speichern",
+    shortcutDelete: "Del - Knoten loeschen",
+    shortcutSave: "⌘S - speichern",
   },
 };

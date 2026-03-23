@@ -10,7 +10,7 @@
 /**
  * Serializable metadata for a single env key.
  * Imported by settings definition to build flat requestFields.
- * NOT server-only — safe to import in client context.
+ * NOT server-only - safe to import in client context.
  */
 export type EnvFieldType =
   | "text"
@@ -36,7 +36,7 @@ export interface EnvKeyMeta {
 
 /**
  * All configured env keys with their metadata.
- * Auto-generated — do not edit manually.
+ * Auto-generated - do not edit manually.
  */
 export const ENV_KEYS = [
   {
@@ -139,7 +139,7 @@ export const ENV_KEYS = [
     key: "JWT_SECRET_KEY",
     module: "env",
     comment:
-      "JWT signing secret — MUST be at least 64 random characters in production. Generate with: openssl rand -hex 32",
+      "JWT signing secret - MUST be at least 64 random characters in production. Generate with: openssl rand -hex 32",
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     sensitive: true,
     fieldType: "text",
@@ -151,7 +151,7 @@ export const ENV_KEYS = [
   {
     key: "CRON_SECRET",
     module: "env",
-    comment: "Cron job secret — generate with: openssl rand -hex 32",
+    comment: "Cron job secret - generate with: openssl rand -hex 32",
     example: "REPLACE_WITH_openssl_rand_hex_32_output",
     sensitive: true,
     fieldType: "text",
@@ -257,7 +257,7 @@ export const ENV_KEYS = [
     key: "DEV_WATCHER_CONTINUOUS",
     module: "env",
     comment:
-      "Enable continuous file watching during development. When false (default), generators run once on startup and again when you press 'r' in the terminal — no CPU overhead. When true, generators re-run automatically on every file change. WARNING: continuous mode requires a high-end workstation (64 GB+ RAM, fast multi-core CPU). On less powerful machines it will cause noticeable slowdowns and may make the dev server unresponsive.",
+      "Enable continuous file watching during development. When false (default), generators run once on startup and again when you press 'r' in the terminal - no CPU overhead. When true, generators re-run automatically on every file change. WARNING: continuous mode requires a high-end workstation (64 GB+ RAM, fast multi-core CPU). On less powerful machines it will cause noticeable slowdowns and may make the dev server unresponsive.",
     example: "false",
     sensitive: false,
     fieldType: "boolean",
@@ -277,7 +277,7 @@ export const ENV_KEYS = [
     key: "CLAUDE_CODE_ENABLED",
     module: "agent",
     comment:
-      "Claude Code provider enabled — set true/false to override, or leave unset for auto-detection (checks if `claude` CLI is installed)",
+      "Claude Code provider enabled - set true/false to override, or leave unset for auto-detection (checks if `claude` CLI is installed)",
     example: "true",
     sensitive: false,
     fieldType: "boolean",
@@ -289,7 +289,7 @@ export const ENV_KEYS = [
     key: "OPENROUTER_API_KEY",
     module: "agent",
     comment:
-      "OpenRouter API key — access 200+ AI models. Get yours at https://openrouter.ai/keys",
+      "OpenRouter API key - access 200+ AI models. Get yours at https://openrouter.ai/keys",
     example: "sk-or-v1-...",
     sensitive: true,
     fieldType: "text",
@@ -518,7 +518,7 @@ export const ENV_KEYS = [
   {
     key: "LEADS_IMAP_HOST",
     module: "leadsCampaigns",
-    comment: "Lead campaigns IMAP (inbound) — leave blank if same host as SMTP",
+    comment: "Lead campaigns IMAP (inbound) - leave blank if same host as SMTP",
     example: "imap.example.com",
     sensitive: false,
     fieldType: "text",
@@ -626,7 +626,7 @@ export const ENV_KEYS = [
   {
     key: "IMAP_HOST",
     module: "messenger",
-    comment: "System IMAP (inbound) — leave blank if same host as SMTP",
+    comment: "System IMAP (inbound) - leave blank if same host as SMTP",
     example: "imap.example.com",
     sensitive: false,
     fieldType: "text",
@@ -771,7 +771,7 @@ export const ENV_KEYS = [
     key: "NOWPAYMENTS_API_URL",
     module: "payment",
     comment:
-      "NOWPayments API endpoint — sandbox for testing, production for live payments",
+      "NOWPayments API endpoint - sandbox for testing, production for live payments",
     example: "https://api-sandbox.nowpayments.io/v1",
     sensitive: false,
     fieldType: "select",
@@ -1028,7 +1028,7 @@ export const ENV_KEYS = [
   {
     key: "WHATSAPP_PHONE_NUMBER_ID",
     module: "sms",
-    comment: "WhatsApp Business provider — phone number ID from Meta dashboard",
+    comment: "WhatsApp Business provider - phone number ID from Meta dashboard",
     example: "123456789012345",
     sensitive: false,
     fieldType: "text",
@@ -1037,7 +1037,7 @@ export const ENV_KEYS = [
   {
     key: "WHATSAPP_ACCESS_TOKEN",
     module: "sms",
-    comment: "WhatsApp Business provider — permanent access token",
+    comment: "WhatsApp Business provider - permanent access token",
     example: "EAAxxxxxxxx",
     sensitive: true,
     fieldType: "text",
@@ -1046,7 +1046,7 @@ export const ENV_KEYS = [
   {
     key: "TELEGRAM_BOT_TOKEN",
     module: "sms",
-    comment: "Telegram Bot provider — token from BotFather",
+    comment: "Telegram Bot provider - token from BotFather",
     example: "123456789:AAFxxxxxxxx",
     sensitive: true,
     fieldType: "text",

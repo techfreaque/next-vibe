@@ -13,7 +13,7 @@ export interface LinkProps {
 }
 
 /**
- * TanStack Start implementation of Link — uses @tanstack/react-router Link.
+ * TanStack Start implementation of Link - uses @tanstack/react-router Link.
  */
 export function Link({
   className,

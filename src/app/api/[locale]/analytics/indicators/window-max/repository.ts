@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Window Maximum Compute
+ * Vibe Sense - Window Maximum Compute
  * Server-only pure computation. No DB access.
  */
 

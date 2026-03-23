@@ -2,7 +2,7 @@
  * Error Log Persistence
  * Fire-and-forget write of truncated error logs to the database.
  *
- * IMPORTANT: This module must never throw — logging persistence is best-effort.
+ * IMPORTANT: This module must never throw - logging persistence is best-effort.
  * All errors during persistence are silently swallowed to avoid cascading failures.
  *
  * Auto-registers itself as the global error sink when imported.
@@ -107,7 +107,7 @@ function computeFingerprint(
 
 /**
  * Persist an error log to the database (fire-and-forget).
- * Never throws — all errors are silently caught.
+ * Never throws - all errors are silently caught.
  */
 export function persistErrorLog(
   level: ErrorLogLevel,
@@ -115,7 +115,7 @@ export function persistErrorLog(
   error: LoggerMetadata | undefined,
   extraMeta: LoggerMetadata[],
 ): void {
-  // Fire-and-forget — do not await
+  // Fire-and-forget - do not await
   void (async (): Promise<void> => {
     try {
       // Dynamic import to avoid circular dependencies and module-level DB init
@@ -128,7 +128,7 @@ export function persistErrorLog(
 
       // Collect all metadata: include the error object itself when it's a plain
       // object (not an Error instance) so structured context isn't lost.
-      // Error instances are captured via stackTrace/message — no need to duplicate.
+      // Error instances are captured via stackTrace/message - no need to duplicate.
       const allMeta: LoggerMetadata[] = [];
       if (
         error !== null &&
@@ -177,7 +177,7 @@ export function persistErrorLog(
           },
         });
     } catch {
-      // Silently swallow — logging persistence must never cascade
+      // Silently swallow - logging persistence must never cascade
     }
   })();
 }

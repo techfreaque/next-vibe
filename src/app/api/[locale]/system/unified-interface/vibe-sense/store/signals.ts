@@ -1,8 +1,8 @@
 /**
- * Vibe Sense — Signals Store
+ * Vibe Sense - Signals Store
  *
  * Evaluator signal read/write.
- * Signals are always persisted — they are the audit trail.
+ * Signals are always persisted - they are the audit trail.
  */
 
 import "server-only";

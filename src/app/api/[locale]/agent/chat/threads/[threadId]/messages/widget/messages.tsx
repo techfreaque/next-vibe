@@ -152,7 +152,7 @@ export function ChatMessages({
   );
 
   // Read messages reactively from the React Query / apiClient cache via useEndpoint.
-  // staleTime: Infinity — data is managed via updateEndpointData/upsertMessage; never auto-refetch.
+  // staleTime: Infinity - data is managed via updateEndpointData/upsertMessage; never auto-refetch.
   const messagesEndpointOptions = useMemo(
     () => ({
       read: {
@@ -192,7 +192,7 @@ export function ChatMessages({
     }));
   }, [messagesEndpoint.read?.data, activeThreadId]);
 
-  // Settings — pass SSR initialData so no client fetch on hydration
+  // Settings - pass SSR initialData so no client fetch on hydration
   const { settings } = useChatSettings(user, logger, initialSettingsData);
   const defaults = ChatSettingsRepositoryClient.getDefaults();
   const effectiveSettings = settings ?? defaults;
@@ -231,7 +231,7 @@ export function ChatMessages({
   const chatInput = useChatInputStore((s) => s.input);
   const chatInputRef = useChatInputStore((s) => s.inputRef);
 
-  // leafMessageId — read from nav store (single source of truth, syncs URL)
+  // leafMessageId - read from nav store (single source of truth, syncs URL)
   // Written by setLeafMessageId which updates both the form field and the nav store.
   const navLeafMessageId = useChatNavigationStore((s) => s.leafMessageId);
   const navSetLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
@@ -281,8 +281,8 @@ export function ChatMessages({
   leafMessageIdRef.current = leafMessageId;
 
   /**
-   * Branch chunk load — fires when activeThreadId changes.
-   * Boot thread: skipped — messages are pre-seeded via initialData on EndpointsPage.
+   * Branch chunk load - fires when activeThreadId changes.
+   * Boot thread: skipped - messages are pre-seeded via initialData on EndpointsPage.
    * Navigated threads: fetch via pathDefinitions.GET, upsert into messages cache.
    */
   useEffect(() => {
@@ -336,9 +336,9 @@ export function ChatMessages({
             setLeafMessageId(resolvedLeaf);
           }
         } else if (!response.success && response.errorType?.errorCode === 404) {
-          // Thread not yet persisted (new thread just created) — skip silently.
+          // Thread not yet persisted (new thread just created) - skip silently.
           // Messages will arrive via WS events as they are created.
-          logger.debug("Chat: Branch load skipped — thread not found yet", {
+          logger.debug("Chat: Branch load skipped - thread not found yet", {
             threadId: activeThreadId,
           });
         }
@@ -622,7 +622,7 @@ export function ChatMessages({
   );
 
   /**
-   * Invalidate thread — refetch messages from server.
+   * Invalidate thread - refetch messages from server.
    * Called by useMessagesSubscription when a remote stream completes.
    */
   const invalidateThread = useCallback(
@@ -634,7 +634,7 @@ export function ChatMessages({
     [activeThreadId, messagesEndpoint.read],
   );
 
-  // Branch management — derives branchIndices from leafMessageId + loaded messages
+  // Branch management - derives branchIndices from leafMessageId + loaded messages
   const { branchIndices, handleSwitchBranch } = useBranchManagement({
     activeThreadMessages,
     leafMessageId,
@@ -717,7 +717,7 @@ export function ChatMessages({
   );
   const setRetrying = useMessageEditorStore((s) => s.setRetrying);
 
-  // Async startRetry — loads attachments then sets retrying state
+  // Async startRetry - loads attachments then sets retrying state
   const startRetry = useCallback(
     async (message: ChatMessage) => {
       cancelEditorAction();
@@ -765,7 +765,7 @@ export function ChatMessages({
   // Whether user is actively touching (suppresses our instant-scroll during gesture)
   const touchActiveRef = useRef<boolean>(false);
 
-  // All messages from cache are real messages — no merge or sentinel filtering needed.
+  // All messages from cache are real messages - no merge or sentinel filtering needed.
   const realMessages = activeThreadMessages;
 
   // Flat view: sorted messages by timestamp (memoized)
@@ -826,7 +826,7 @@ export function ChatMessages({
   const prevCompactionCountRef = useRef(compactionCount);
   useEffect(() => {
     if (compactionCount > prevCompactionCountRef.current) {
-      // New compaction just appeared — reset render window to show from latest compaction
+      // New compaction just appeared - reset render window to show from latest compaction
       setRenderWindowExpansions(0);
     }
     prevCompactionCountRef.current = compactionCount;
@@ -841,7 +841,7 @@ export function ChatMessages({
       return;
     }
 
-    const BOTTOM_THRESHOLD = 80; // px — snap back to sticky when this close to bottom
+    const BOTTOM_THRESHOLD = 80; // px - snap back to sticky when this close to bottom
 
     const handleScroll = (): void => {
       const { scrollTop, scrollHeight, clientHeight } = container;
@@ -893,7 +893,7 @@ export function ChatMessages({
 
   // Sticky-bottom: after every render, if we're pinned and not mid-touch, snap to bottom.
   // useLayoutEffect fires synchronously after DOM commit so scrollHeight is up to date.
-  // This is the single source of truth for auto-scroll — no separate streaming detection.
+  // This is the single source of truth for auto-scroll - no separate streaming detection.
   useLayoutEffect(() => {
     // Initial scroll-to-bottom once per thread (not just during streaming)
     const currentThreadId = activeThreadId ?? null;
@@ -939,11 +939,11 @@ export function ChatMessages({
       prevScrollRef.current;
     const heightDiff = container.scrollHeight - prevScrollHeight;
     if (heightDiff > 0) {
-      // New content inserted above — shift scrollTop by the height increase
+      // New content inserted above - shift scrollTop by the height increase
       container.scrollTop = prevScrollTop + heightDiff;
       prevScrollRef.current = null;
     }
-    // If heightDiff <= 0, content not yet rendered — keep ref so next render can adjust.
+    // If heightDiff <= 0, content not yet rendered - keep ref so next render can adjust.
   });
 
   return (
@@ -997,7 +997,7 @@ export function ChatMessages({
               : "pt-15",
           )}
         >
-          {/* Loading spinner for older history — shown while request is in-flight */}
+          {/* Loading spinner for older history - shown while request is in-flight */}
           {isLoadingOlderHistory && (
             <Div className="flex justify-center py-2">
               <Div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -1011,7 +1011,7 @@ export function ChatMessages({
           {realMessages.length === 0 && !isLoading && !isLoadingBranch ? (
             <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
               <Div className="flex items-center justify-center h-full">
-                {/* Empty state — no messages and not loading */}
+                {/* Empty state - no messages and not loading */}
               </Div>
             </Div>
           ) : realMessages.length === 0 && (isLoading || isLoadingBranch) ? (
@@ -1107,7 +1107,7 @@ export function ChatMessages({
 
               return (
                 <>
-                  {/* Load older history button — shown when oldest message has hasOlderHistory flag */}
+                  {/* Load older history button - shown when oldest message has hasOlderHistory flag */}
                   {realPath[0]?.metadata?.hasOlderHistory === true &&
                     !isLoadingOlderHistory &&
                     oldestLoadedId && (
@@ -1242,7 +1242,7 @@ export function ChatMessages({
             })()
           )}
 
-          {/* Loading spinner for newer history — shown while request is in-flight */}
+          {/* Loading spinner for newer history - shown while request is in-flight */}
           {isLoadingNewerHistory && (
             <Div className="flex justify-center py-2">
               <Div className="flex items-center gap-2 text-xs text-muted-foreground">

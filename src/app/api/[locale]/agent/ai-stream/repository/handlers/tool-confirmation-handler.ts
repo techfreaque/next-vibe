@@ -4,8 +4,8 @@
 
 import "server-only";
 
-import { and, eq, gt, ne } from "drizzle-orm";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
+import { and, eq, gt, ne } from "drizzle-orm";
 import {
   type ErrorResponseType,
   ErrorResponseTypes,
@@ -13,8 +13,8 @@ import {
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
-import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
@@ -22,15 +22,15 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { db } from "../../../../system/db";
-import { walkToLeafMessage } from "../core/branch-utils";
+import { publishWsEvent } from "../../../../system/unified-interface/websocket/emitter";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall, ToolCallResult } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
 import { buildMessagesChannel } from "../../../chat/threads/[threadId]/messages/channel";
 import { createStreamEvent } from "../../../chat/threads/[threadId]/messages/events";
-import { publishWsEvent } from "../../../../system/unified-interface/websocket/emitter";
 import type { AiStreamT } from "../../stream/i18n";
+import { walkToLeafMessage } from "../core/branch-utils";
 
 export class ToolConfirmationHandler {
   /**
@@ -111,7 +111,7 @@ export class ToolConfirmationHandler {
     if (toolConfirmation.confirmed) {
       // Execute tool with updated args.
       // For execute-tool: check the original callbackMode before overriding.
-      // If wakeUp: fire-and-forget — confirm returns immediately, revival delivers result.
+      // If wakeUp: fire-and-forget - confirm returns immediately, revival delivers result.
       // Otherwise: override callbackMode to 'wait' so the inner tool executes inline.
       const baseArgs = toolConfirmation.updatedArgs
         ? {
@@ -143,7 +143,7 @@ export class ToolConfirmationHandler {
         "callbackMode" in baseArgs
           ? {
               ...(baseArgs as Record<string, string | number | boolean | null>),
-              // wakeUp: keep wakeUp semantics — execute-tool will fire-and-forget.
+              // wakeUp: keep wakeUp semantics - execute-tool will fire-and-forget.
               // wait/other: override to wait so the inner tool executes inline.
               callbackMode: isWakeUpConfirm ? CallbackMode.WAKE_UP : "wait",
             }
@@ -254,12 +254,12 @@ export class ToolConfirmationHandler {
       // wakeUp confirm: execute-tool returned {taskId, status:'pending'} immediately.
       // Two sub-cases depending on whether the wakeUp result arrived before or after confirm:
       //
-      // Case A — wakeUp completed BEFORE confirm (newer sequence exists from revival AI turn):
+      // Case A - wakeUp completed BEFORE confirm (newer sequence exists from revival AI turn):
       //   The deferred result is already in a new sequence. Confirm should insert another
       //   deferred message as the leaf child (handled below in the non-wakeUp deferred path).
       //
-      // Case B — confirm fires BEFORE wakeUp completes (no newer sequence yet, goroutine running):
-      //   DO NOT touch the tool message — setting isDeferred=true here would race with
+      // Case B - confirm fires BEFORE wakeUp completes (no newer sequence yet, goroutine running):
+      //   DO NOT touch the tool message - setting isDeferred=true here would race with
       //   resume-stream's idempotency check and cause it to skip the revival entirely.
       //   Just update the task row so handleTaskCompletion backfills the right message,
       //   then return wakeUpPending=true so the confirm stream skips this tool (revival handles it).
@@ -293,9 +293,9 @@ export class ToolConfirmationHandler {
 
           if (newerSequenceMessage.length === 0) {
             // Case B: goroutine still running.
-            // Clear waitingForConfirmation so the UI shows the wakeUp state ("Running — result
+            // Clear waitingForConfirmation so the UI shows the wakeUp state ("Running - result
             // will wake up AI") instead of the stale "Pending Confirmation" badge.
-            // Do NOT set isDeferred or result — resume-stream owns that when the task completes.
+            // Do NOT set isDeferred or result - resume-stream owns that when the task completes.
             const clearedToolCall: ToolCall = {
               ...toolCall,
               waitingForConfirmation: false,
@@ -306,8 +306,8 @@ export class ToolConfirmationHandler {
               .set({ metadata: { toolCall: clearedToolCall } })
               .where(eq(chatMessages.id, toolConfirmation.messageId));
             // Re-emit message-created so the client updates the existing bubble's badge
-            // (waitingForConfirmation=false → shows "Running — result will wake up AI").
-            // Do NOT emit tool-result — there is no result yet; resume-stream delivers it later.
+            // (waitingForConfirmation=false → shows "Running - result will wake up AI").
+            // Do NOT emit tool-result - there is no result yet; resume-stream delivers it later.
             publishWsEvent(
               {
                 channel: buildMessagesChannel(toolMessage.threadId),
@@ -352,7 +352,7 @@ export class ToolConfirmationHandler {
             }
 
             logger.info(
-              "[Tool Confirmation] wakeUp confirm (Case B) — goroutine running, resume-stream handles revival",
+              "[Tool Confirmation] wakeUp confirm (Case B) - goroutine running, resume-stream handles revival",
               { toolMessageId: toolConfirmation.messageId, pendingTaskId },
             );
 
@@ -365,23 +365,23 @@ export class ToolConfirmationHandler {
               },
             };
           }
-          // Case A: wakeUp already completed — fall through to the deferred insertion path below.
+          // Case A: wakeUp already completed - fall through to the deferred insertion path below.
           logger.info(
-            "[Tool Confirmation] wakeUp confirm (Case A) — wakeUp already landed, inserting confirm deferred after revival",
+            "[Tool Confirmation] wakeUp confirm (Case A) - wakeUp already landed, inserting confirm deferred after revival",
             { toolMessageId: toolConfirmation.messageId },
           );
         }
       }
 
       // Non-wakeUp pending: remote task (queue path).
-      // The execution returned {status:'pending'} immediately — the remote task was just created.
+      // The execution returned {status:'pending'} immediately - the remote task was just created.
       // Per spec: no polling. The /report path → handleTaskCompletion → resume-stream handles revival.
       // Store the pending result as-is; the stream will be revived with the real result when done.
 
       const confirmedToolCallBase: Omit<ToolCall, "isDeferred"> = {
         ...toolCall,
         // Keep original args (with original callbackMode='approve') so AI sees what it actually called.
-        // finalArgs overrides callbackMode to 'wait' for execution only — don't expose that to AI.
+        // finalArgs overrides callbackMode to 'wait' for execution only - don't expose that to AI.
         args: baseArgs as ToolCallResult,
         result: toolResult,
         error: toolError,
@@ -431,7 +431,7 @@ export class ToolConfirmationHandler {
           : [{ id: "sentinel" }]; // no sequenceId → treat as different sequence
 
         if (newerSequenceMessage.length === 0) {
-          // Same sequence — update the original message in-place (no superseding needed)
+          // Same sequence - update the original message in-place (no superseding needed)
           const inPlaceToolCall: ToolCall = {
             ...confirmedToolCallBase,
             isDeferred: false,
@@ -440,7 +440,7 @@ export class ToolConfirmationHandler {
             .update(chatMessages)
             .set({ metadata: { toolCall: inPlaceToolCall } })
             .where(eq(chatMessages.id, toolConfirmation.messageId));
-          logger.debug("[Tool Confirmation] Tool executed — updated in-place", {
+          logger.debug("[Tool Confirmation] Tool executed - updated in-place", {
             messageId: toolConfirmation.messageId,
             hasResult: !!toolResult,
             hasError: !!toolError,
@@ -454,7 +454,7 @@ export class ToolConfirmationHandler {
           };
         }
 
-        // Different sequence — find the true current tip of the thread and append there.
+        // Different sequence - find the true current tip of the thread and append there.
         // Walk forward from toolMessage.parentId (the assistant that issued the tool calls)
         // to reach the leaf of whatever chain has grown since (e.g. wakeUp revival messages).
         // This keeps the thread linear: confirm result is appended after the revival, not
@@ -517,7 +517,7 @@ export class ToolConfirmationHandler {
           logger,
         );
         logger.debug(
-          "[Tool Confirmation] Tool executed — deferred confirm message inserted",
+          "[Tool Confirmation] Tool executed - deferred confirm message inserted",
           {
             originalMessageId: toolConfirmation.messageId,
             deferredId,
@@ -589,7 +589,7 @@ export class ToolConfirmationHandler {
           : [{ id: "sentinel" }];
 
         if (newerSequenceMessage.length === 0) {
-          // Same sequence — update the original message in-place
+          // Same sequence - update the original message in-place
           const inPlaceRejected: ToolCall = {
             ...rejectedToolCallBase,
             isDeferred: false,
@@ -598,7 +598,7 @@ export class ToolConfirmationHandler {
             .update(chatMessages)
             .set({ metadata: { toolCall: inPlaceRejected } })
             .where(eq(chatMessages.id, toolConfirmation.messageId));
-          logger.debug("[Tool Confirmation] Tool rejected — updated in-place", {
+          logger.debug("[Tool Confirmation] Tool rejected - updated in-place", {
             messageId: toolConfirmation.messageId,
           });
           return {
@@ -610,7 +610,7 @@ export class ToolConfirmationHandler {
           };
         }
 
-        // Different sequence — find the true current tip of the thread and append there.
+        // Different sequence - find the true current tip of the thread and append there.
         // Walk forward from toolMessage.parentId (the assistant that issued the tool calls)
         // to reach the leaf of whatever chain has grown since (e.g. wakeUp revival messages).
         // This keeps the thread linear: reject result is appended after the revival, not
@@ -672,7 +672,7 @@ export class ToolConfirmationHandler {
           },
           logger,
         );
-        logger.debug("[Tool Confirmation] Tool rejected — deferred inserted", {
+        logger.debug("[Tool Confirmation] Tool rejected - deferred inserted", {
           originalMessageId: toolConfirmation.messageId,
           deferredId,
         });

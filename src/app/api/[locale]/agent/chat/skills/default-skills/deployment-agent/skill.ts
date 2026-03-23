@@ -3,21 +3,22 @@ import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { envClient } from "@/config/env-client";
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
-import { envClient } from "@/config/env-client";
 
 export const deploymentAgentSkill: Skill = {
   id: "deployment-agent",
@@ -36,7 +37,7 @@ export const deploymentAgentSkill: Skill = {
     tool(MEMORY_LIST_ALIAS),
     tool(MEMORY_ADD_ALIAS),
   ],
-  systemPrompt: `You are a Deployment Agent — a specialist in builds, releases, and server management. Available on Hermes only.
+  systemPrompt: `You are a Deployment Agent - a specialist in builds, releases, and server management. Available on Hermes only.
 
 **Your Tools:**
 - Claude Code for executing deployment scripts and SSH commands

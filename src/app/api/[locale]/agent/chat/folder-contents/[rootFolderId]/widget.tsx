@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * FolderContentsWidget — the real renderer for folder-contents endpoint.
+ * FolderContentsWidget - the real renderer for folder-contents endpoint.
  *
  * Renders a flat list of items (folders + threads) for the current level.
  * When a folder is expanded (activeFolderId === item.id), renders a child
@@ -12,16 +12,16 @@
  * root-folder tabs, new-chat button, search, and the top-level EndpointsPage call.
  */
 
-import { success } from "next-vibe/shared/types/response.schema";
-import { cn } from "next-vibe/shared/utils";
-import { AlertDialog } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogAction } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogCancel } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogContent } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogDescription } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogFooter } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogHeader } from "next-vibe-ui/ui/alert-dialog";
-import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "next-vibe-ui/ui/alert-dialog";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -30,14 +30,16 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
-import { DropdownMenu } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuContent } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSeparator } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSub } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSubContent } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuSubTrigger } from "next-vibe-ui/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "next-vibe-ui/ui/dropdown-menu";
 import { Archive } from "next-vibe-ui/ui/icons/Archive";
 import { ArchiveRestore } from "next-vibe-ui/ui/icons/ArchiveRestore";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
@@ -53,6 +55,8 @@ import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
+import { success } from "next-vibe/shared/types/response.schema";
+import { cn } from "next-vibe/shared/utils";
 import { useMemo, useState } from "react";
 
 import {
@@ -637,7 +641,7 @@ function FolderRow({
 
   const handleToggleExpanded = (): void => {
     if (isExpanded) {
-      // collapse — go up to parent or root, preserve active thread
+      // collapse - go up to parent or root, preserve active thread
       setNavigation({
         currentRootFolderId: activeRootFolderId,
         currentSubFolderId: item.parentId ?? null,
@@ -648,7 +652,7 @@ function FolderRow({
         buildFolderUrl(locale, activeRootFolderId, item.parentId),
       );
     } else {
-      // expand — set subfolder and navigate to new thread in that folder
+      // expand - set subfolder and navigate to new thread in that folder
       setNavigation({
         currentRootFolderId: activeRootFolderId,
         currentSubFolderId: item.id,
@@ -1209,7 +1213,7 @@ function getTimeGroup(updatedAt: Date | string): Exclude<TimeGroup, "pinned"> {
 }
 
 // ---------------------------------------------------------------------------
-// ItemSection — renders a labeled group of items with show-more support
+// ItemSection - renders a labeled group of items with show-more support
 // ---------------------------------------------------------------------------
 
 function ItemSection({
@@ -1275,7 +1279,7 @@ function ItemSection({
 }
 
 // ---------------------------------------------------------------------------
-// FolderContentsWidget — the real renderer
+// FolderContentsWidget - the real renderer
 // ---------------------------------------------------------------------------
 
 interface CustomWidgetProps {

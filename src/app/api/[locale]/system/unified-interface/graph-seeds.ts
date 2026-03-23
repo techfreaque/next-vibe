@@ -1,5 +1,5 @@
 /**
- * System Domain — Vibe Sense Graph Seeds
+ * System Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for system health monitoring.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,19 +7,19 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import type { GraphConfig, GraphSeedEntry } from "./vibe-sense/graph/types";
-import { GraphResolution } from "./vibe-sense/enum";
-import { CRON_EXECUTIONS_TOTAL_ALIAS } from "./data-sources/cron-executions-total/constants";
-import { CRON_EXECUTIONS_FAILED_ALIAS } from "./data-sources/cron-executions-failed/constants";
-import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "./data-sources/cron-executions-succeeded/constants";
-import { ERROR_LOGS_TOTAL_ALIAS } from "./data-sources/error-logs-total/constants";
-import { ERROR_LOGS_ERRORS_ALIAS } from "./data-sources/error-logs-errors/constants";
-import { ERROR_LOGS_WARNINGS_ALIAS } from "./data-sources/error-logs-warnings/constants";
+import { EVALUATOR_THRESHOLD_ALIAS } from "../../analytics/evaluators/threshold/constants";
 import { EMA_ALIAS } from "../../analytics/indicators/ema/constants";
 import { WINDOW_AVG_ALIAS } from "../../analytics/indicators/window-avg/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../../analytics/evaluators/threshold/constants";
+import { CRON_EXECUTIONS_FAILED_ALIAS } from "./data-sources/cron-executions-failed/constants";
+import { CRON_EXECUTIONS_SUCCEEDED_ALIAS } from "./data-sources/cron-executions-succeeded/constants";
+import { CRON_EXECUTIONS_TOTAL_ALIAS } from "./data-sources/cron-executions-total/constants";
+import { ERROR_LOGS_ERRORS_ALIAS } from "./data-sources/error-logs-errors/constants";
+import { ERROR_LOGS_TOTAL_ALIAS } from "./data-sources/error-logs-total/constants";
+import { ERROR_LOGS_WARNINGS_ALIAS } from "./data-sources/error-logs-warnings/constants";
 import { COMPLETE_TASK_ALIAS } from "./tasks/complete-task/constants";
+import { GraphResolution } from "./vibe-sense/enum";
+import type { GraphConfig, GraphSeedEntry } from "./vibe-sense/graph/types";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 
@@ -302,7 +302,7 @@ const platformHealthOverviewConfig: GraphConfig = {
         taskId: "vibe-sense-alert",
         status: "status.completed",
         summary:
-          "CRITICAL: Platform health degraded — cron success rate dropped below 70% (12-period window). Combined with error volume, system stability is at risk. Check infrastructure, database, and external service dependencies.",
+          "CRITICAL: Platform health degraded - cron success rate dropped below 70% (12-period window). Combined with error volume, system stability is at risk. Check infrastructure, database, and external service dependencies.",
       },
     },
     action_notify_error_storm: {
@@ -313,7 +313,7 @@ const platformHealthOverviewConfig: GraphConfig = {
         taskId: "vibe-sense-alert",
         status: "status.completed",
         summary:
-          "CRITICAL: Error storm detected — over 100 errors/hour (EMA). Platform is experiencing widespread failures. Initiate incident response and check all service endpoints.",
+          "CRITICAL: Error storm detected - over 100 errors/hour (EMA). Platform is experiencing widespread failures. Initiate incident response and check all service endpoints.",
       },
     },
   },

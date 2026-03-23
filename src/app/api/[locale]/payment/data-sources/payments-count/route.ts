@@ -1,5 +1,5 @@
 /**
- * Payments Count — Route
+ * Payments Count - Route
  * Server-only.
  */
 

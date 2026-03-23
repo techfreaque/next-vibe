@@ -1,5 +1,5 @@
 /**
- * Chat Threads Active Total — Endpoint Definition
+ * Chat Threads Active Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

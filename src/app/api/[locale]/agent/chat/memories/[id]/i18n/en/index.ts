@@ -7,7 +7,7 @@ export const translations = {
   patch: {
     title: "Update Memory",
     description:
-      "Update an existing memory. All fields are optional — omit any field to keep its current value. To update only tags or priority, simply omit content. IMPORTANT: never pass an empty string for content — it will be ignored and the existing content preserved. To remove a memory entirely, use the delete endpoint instead.",
+      "Update an existing memory. All fields are optional - omit any field to keep its current value. To update only tags or priority, simply omit content. IMPORTANT: never pass an empty string for content - it will be ignored and the existing content preserved. To remove a memory entirely, use the delete endpoint instead.",
     container: {
       title: "Update Memory",
       description: "Modify an existing memory",
@@ -19,7 +19,7 @@ export const translations = {
     content: {
       label: "Memory Content",
       description:
-        "The updated fact to store. Optional — omit or leave undefined to keep the current content. Empty strings are ignored (content is never overwritten with blank).",
+        "The updated fact to store. Optional - omit or leave undefined to keep the current content. Empty strings are ignored (content is never overwritten with blank).",
     },
     tags: {
       memories: "Memories",

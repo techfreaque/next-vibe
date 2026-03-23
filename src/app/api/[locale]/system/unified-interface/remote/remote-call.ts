@@ -2,7 +2,7 @@
  * Remote Call
  *
  * Pure HTTP execution primitive for calling endpoints on a remote instance.
- * Stateless — no session file access, no singletons.
+ * Stateless - no session file access, no singletons.
  * Caller is responsible for providing token, leadId, and remoteUrl.
  *
  * Used by:
@@ -28,7 +28,7 @@ import type { EndpointLogger } from "../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Methods } from "../shared/types/enums";
 
-/** Data shape for remote calls — matches the serialisable subset used by endpoints */
+/** Data shape for remote calls - matches the serialisable subset used by endpoints */
 export type RemoteCallData = Record<
   string,
   | string
@@ -46,7 +46,7 @@ export interface RemoteCallParams {
   definition: CreateApiEndpointAny;
   data: RemoteCallData;
   urlPathParams?: RemoteCallData;
-  /** Raw JWT token — sourced by caller (session file, user config, etc.) */
+  /** Raw JWT token - sourced by caller (session file, user config, etc.) */
   token: string;
   leadId?: string;
   remoteUrl: string;
@@ -120,7 +120,7 @@ interface RemoteResponseShape {
 
 /**
  * Execute an endpoint on a remote host via HTTP.
- * Returns ResponseType<T> — never throws.
+ * Returns ResponseType<T> - never throws.
  */
 export async function executeRemote<T>(
   params: RemoteCallParams,
@@ -193,14 +193,14 @@ export async function executeRemote<T>(
 }
 
 /**
- * Fire-and-forget remote call — returns void immediately, logs failures.
+ * Fire-and-forget remote call - returns void immediately, logs failures.
  * Never throws. Do NOT await this.
  */
 export function fireAndForgetRemote(params: RemoteCallParams): void {
   void executeRemote(params).then((result) => {
     if (!result.success) {
       params.logger.warn(
-        `[REMOTE] Fire-and-forget failed: ${params.definition.path.join("/")} — ${result.message}`,
+        `[REMOTE] Fire-and-forget failed: ${params.definition.path.join("/")} - ${result.message}`,
       );
     }
     return result;

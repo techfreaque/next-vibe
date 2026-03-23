@@ -31,7 +31,7 @@ import manifest from "./package";
 // Absolute path where scoped generated files are written during preBuild
 const GENERATED_DIR = resolve(process.cwd(), ".dist/checker/generated");
 
-// Bun resolver plugin — redirects the global generated imports to the scoped ones
+// Bun resolver plugin - redirects the global generated imports to the scoped ones
 // baked into .dist/checker/generated/ at preBuild time.
 const scopedGeneratedPlugin: BunPlugin = {
   name: "scoped-generated-redirect",
@@ -50,7 +50,7 @@ const scopedGeneratedPlugin: BunPlugin = {
 };
 
 const config: BuildConfig = {
-  // Clean bin/ and copied assets but NOT generated/ — preBuild writes there before clean runs
+  // Clean bin/ and copied assets but NOT generated/ - preBuild writes there before clean runs
   foldersToClean: [".dist/checker/bin", ".dist/checker/oxlint-plugins"],
 
   hooks: {
@@ -113,12 +113,12 @@ const config: BuildConfig = {
       input: "src/app/api/[locale]/LICENSE",
       output: ".dist/checker/LICENSE",
     },
-    // Bootstrap template — copied to user's project by `vibe-check config`
+    // Bootstrap template - copied to user's project by `vibe-check config`
     {
       input: "check.config.ts",
       output: ".dist/checker/check.config.ts",
     },
-    // Custom oxlint JS plugins — referenced in check.config.ts jsPlugins paths
+    // Custom oxlint JS plugins - referenced in check.config.ts jsPlugins paths
     {
       input:
         "src/app/api/[locale]/system/check/oxlint/plugins/restricted-syntax/src/index.ts",

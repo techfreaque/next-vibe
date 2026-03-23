@@ -72,7 +72,7 @@ function flattenMessage(msg: ModelMessage): string {
           );
         }
       } else if (part.type === "image") {
-        // images count as tokens but we can't measure them well — use a fixed overhead
+        // images count as tokens but we can't measure them well - use a fixed overhead
         parts.push("[image]");
       } else if (part.type === "reasoning" && typeof part.text === "string") {
         parts.push(part.text);
@@ -377,7 +377,7 @@ export class AbortErrorHandler {
         // Write interruption error message to DB (non-incognito) + emit SSE (always).
         // emitErrorMessage already skips DB writes for incognito internally.
         // Store the plain translation key as content so the bubble renders it without
-        // an error type label or error code — it's an informational stop, not an error.
+        // an error type label or error code - it's an informational stop, not an error.
         await ctx.dbWriter.emitErrorMessage({
           threadId,
           errorType: "STREAM_ERROR",
@@ -415,7 +415,7 @@ export class AbortErrorHandler {
     if (isWaitingAbort) {
       await setStreamingStateWaiting(threadId);
       // Emit WS event so live clients update the stop button.
-      // REMOTE_TOOL_WAIT: escalateToTask already fires this early — emitting again is harmless (idempotent on client).
+      // REMOTE_TOOL_WAIT: escalateToTask already fires this early - emitting again is harmless (idempotent on client).
       // STREAM_TIMEOUT: no prior emission, so this is the first signal.
       void (async (): Promise<void> => {
         try {

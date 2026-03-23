@@ -6,14 +6,14 @@ const nextConfig: NextConfig = {
   experimental: {
     workerThreads: false,
     // Cap page-data collection workers. Next.js default is min(cpuCount, freemem/1GB)
-    // which hits 23 workers locally — each worker loads the full module graph causing
+    // which hits 23 workers locally - each worker loads the full module graph causing
     // 14+ GB peak. 4 workers keeps peak under control with acceptable build time.
     cpus: 1,
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
     serverSourceMaps: false,
     // Soft memory hint for Turbopack's Rust engine (NapiTurboEngineOptions.memoryLimit).
-    // Does NOT cap peak RSS — Turbopack still peaks at ~12 GB while building the module graph.
+    // Does NOT cap peak RSS - Turbopack still peaks at ~12 GB while building the module graph.
     // May reduce memory after compilation phase. Unit: bytes.
     turbopackMemoryLimit: 8 * 1024 * 1024 * 1024, // 8 GB
     // parallelServerBuildTraces: true,
@@ -95,7 +95,7 @@ const nextConfig: NextConfig = {
       "src/app/api/**/electron/build/**": {
         loaders: ["ignore-loader"],
       },
-      // Generators use dynamic import(variable) for definition scanning — not bundler-safe
+      // Generators use dynamic import(variable) for definition scanning - not bundler-safe
       "src/app/api/**/generators/**": {
         loaders: ["ignore-loader"],
       },
@@ -132,7 +132,7 @@ const nextConfig: NextConfig = {
     ];
 
     // react-joyride uses removed React 16 APIs (unmountComponentAtNode).
-    // Webpack errors on missing named exports from react-dom — downgrade to warning.
+    // Webpack errors on missing named exports from react-dom - downgrade to warning.
     config.module.parser = {
       ...config.module.parser,
       javascript: {
@@ -141,7 +141,7 @@ const nextConfig: NextConfig = {
       },
     };
 
-    // Mirror the Turbopack ignore rules — CLI/native/generator code webpack should not compile.
+    // Mirror the Turbopack ignore rules - CLI/native/generator code webpack should not compile.
     // Applied to both server and client bundles.
     config.module.rules.push(
       { test: /\.native\.(tsx?|jsx?)$/, loader: "null-loader" },
@@ -157,7 +157,7 @@ const nextConfig: NextConfig = {
           test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize)[\\/]/,
           loader: "null-loader",
         },
-        // CLI/MCP renderers use React hooks — stub them out for server builds
+        // CLI/MCP renderers use React hooks - stub them out for server builds
         // (Turbopack handles these via resolveAlias stubs; webpack needs explicit rules)
         {
           test: /[\\/]unified-ui[\\/]renderers[\\/](cli|mcp)[\\/](?!.*\.stub\.)/,
@@ -168,12 +168,12 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // External packages — excluded from Turbopack/webpack module graph.
+  // External packages - excluded from Turbopack/webpack module graph.
   // Turbopack holds the entire module graph in RAM before writing to disk;
   // each of the 398 routes imports db → pg + drizzle-orm, making the graph huge.
   // Marking these as external means they're require()'d at runtime instead of traced.
   serverExternalPackages: [
-    // Database — pulled in by every route via db/index.ts
+    // Database - pulled in by every route via db/index.ts
     "pg",
     "pg-native",
     "drizzle-orm",
@@ -201,7 +201,7 @@ const nextConfig: NextConfig = {
     "module",
     // ssh2 uses native crypto bindings incompatible with ESM bundling
     "ssh2",
-    // argon2 uses native .node binary — webpack minifier crashes on it
+    // argon2 uses native .node binary - webpack minifier crashes on it
     "argon2",
   ],
 

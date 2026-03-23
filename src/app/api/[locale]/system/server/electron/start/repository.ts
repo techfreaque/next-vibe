@@ -4,7 +4,7 @@
  * 1. Compiles main.ts + preload.ts with `bun build --target=node`
  * 2. Launches `electron dist/electron/main.js` (detached)
  *
- * The electron process is detached — this call returns once Electron opens.
+ * The electron process is detached - this call returns once Electron opens.
  * Electron main.ts handles spawning vibe start internally.
  */
 
@@ -71,7 +71,7 @@ export class ElectronStartRepository {
         });
       }
 
-      // Step 2: launch electron (detached — keeps running after this call returns)
+      // Step 2: launch electron (detached - keeps running after this call returns)
       output.push("");
       output.push("2️⃣  Launching Electron window...");
 

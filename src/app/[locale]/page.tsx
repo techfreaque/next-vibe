@@ -42,7 +42,7 @@ export async function tanstackLoader({
     redirect(`/${locale}/threads/${defaultFolder}`);
   }
 
-  // Dev and prod: check auth — logged-in users go straight to chat
+  // Dev and prod: check auth - logged-in users go straight to chat
   const logger = createEndpointLogger(false, Date.now(), locale);
   const userResponse = await UserRepository.getUserByAuth(
     {

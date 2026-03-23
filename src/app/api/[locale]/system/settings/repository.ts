@@ -5,9 +5,8 @@
 
 import "server-only";
 
-import { existsSync } from "node:fs";
+import { constants, existsSync } from "node:fs";
 import { access, readFile, writeFile } from "node:fs/promises";
-import { constants } from "node:fs";
 import { join } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -108,7 +107,7 @@ export class SystemSettingsRepository {
     return examples.find((e) => e.key === key);
   }
   /**
-   * GET — Read all env modules with metadata
+   * GET - Read all env modules with metadata
    */
   static async getSettings(
     logger: EndpointLogger,
@@ -276,7 +275,7 @@ export class SystemSettingsRepository {
   }
 
   /**
-   * PATCH — Update .env file with new values
+   * PATCH - Update .env file with new values
    */
   static async updateSettings(
     data: { settings: Record<string, string> },
@@ -371,7 +370,7 @@ export class SystemSettingsRepository {
           continue;
         }
 
-        // Plain comment or description line — check if it belongs to a key we're updating
+        // Plain comment or description line - check if it belongs to a key we're updating
         if (trimmed.startsWith("#")) {
           // Look ahead past all consecutive comment lines to find the next real line
           let j = i + 1;
@@ -387,7 +386,7 @@ export class SystemSettingsRepository {
           const nextKey = nextKeyMatch ? nextKeyMatch[1] : null;
 
           if (nextKey && keysToUpdate.has(nextKey)) {
-            // Skip this comment line — formatEnvLine() will write a fresh comment block
+            // Skip this comment line - formatEnvLine() will write a fresh comment block
             i++;
             continue;
           }
@@ -516,7 +515,7 @@ export class SystemSettingsRepository {
   }
 
   /**
-   * Check if a value equals the schema default — skip writing if so.
+   * Check if a value equals the schema default - skip writing if so.
    * This keeps .env clean and lets defaults evolve without stale overrides.
    */
   private static isDefaultValue(

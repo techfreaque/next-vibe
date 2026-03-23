@@ -1,5 +1,5 @@
 /**
- * LocalStateProvider — abstract base for providers that manage inbox state
+ * LocalStateProvider - abstract base for providers that manage inbox state
  * in the local DB only, with no remote server to sync against.
  *
  * All inbox operations (listInbox, listFolders, moveMessage, markRead) are
@@ -12,21 +12,22 @@ import "server-only";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { and, eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { emails, messengerFolders } from "../messages/db";
 import { messengerAccounts } from "../accounts/db";
 import type { MessageChannelValue } from "../accounts/enum";
+import { emails, messengerFolders } from "../messages/db";
+import { scopedTranslation as providerScopedTranslation } from "./i18n";
 import type {
   InboxFolder,
   InboxMessage,
@@ -34,14 +35,13 @@ import type {
   SendMessageInput,
   SendMessageResult,
 } from "./provider";
-import { scopedTranslation as providerScopedTranslation } from "./i18n";
 
 export abstract class LocalStateProvider implements MessengerProvider {
   abstract readonly channel: typeof MessageChannelValue;
   abstract readonly name: string;
 
   /**
-   * No remote folder sync — all inbox ops use local DB state.
+   * No remote folder sync - all inbox ops use local DB state.
    * Override to true in providers that sync with a remote server (e.g. IMAP).
    */
   readonly supportsRemoteFolders: boolean = false;
@@ -173,7 +173,7 @@ export abstract class LocalStateProvider implements MessengerProvider {
   }
 
   /**
-   * Move a message to a different folder — DB only.
+   * Move a message to a different folder - DB only.
    * Providers with remote sync (e.g. IMAP) override this to also apply on server.
    */
   async moveMessage(
@@ -227,7 +227,7 @@ export abstract class LocalStateProvider implements MessengerProvider {
   }
 
   /**
-   * Mark a message read/unread — DB only.
+   * Mark a message read/unread - DB only.
    * Providers with remote sync (e.g. IMAP) override this to also apply on server.
    */
   async markRead(

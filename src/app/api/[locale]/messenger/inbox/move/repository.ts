@@ -1,6 +1,6 @@
 /**
  * Unified Inbox Move Repository
- * Routes moveMessage through the MessengerProvider interface — channel-agnostic.
+ * Routes moveMessage through the MessengerProvider interface - channel-agnostic.
  */
 
 import "server-only";

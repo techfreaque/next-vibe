@@ -51,7 +51,7 @@ export const translations = {
           q4: {
             question: "Is my data private and secure?",
             answer:
-              "Yes! Private folders are only visible to you, incognito mode keeps chats out of our servers, and we're fully GDPR compliant. Your conversations are yours — we never sell your data. End-to-end encryption is coming soon.",
+              "Yes! Private folders are only visible to you, incognito mode keeps chats out of our servers, and we're fully GDPR compliant. Your conversations are yours - we never sell your data. End-to-end encryption is coming soon.",
           },
         },
       },

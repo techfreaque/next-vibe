@@ -41,7 +41,7 @@ export class FinishStepHandler {
     }
 
     // endLoop: abort only when no more tool-calls are pending (supports sequential tool calls).
-    // shouldStopLoop persists across steps — once set it stays true until abort.
+    // shouldStopLoop persists across steps - once set it stays true until abort.
     // Only abort when pendingToolMessages is empty (all tool steps done, AI response turn next).
     if (ctx.shouldStopLoop && ctx.pendingToolMessages.size === 0) {
       logger.info(
@@ -54,7 +54,7 @@ export class FinishStepHandler {
     }
 
     // APPROVE: abort after ALL tool-call steps complete (supports sequential tool calls).
-    // stepHasToolsAwaitingConfirmation persists across steps — once set, it stays true
+    // stepHasToolsAwaitingConfirmation persists across steps - once set, it stays true
     // until the stream aborts. Only abort when no more tool-calls are pending
     // (pendingToolMessages is empty), meaning the AI has finished all tool steps and
     // would start the AI-response turn next. This prevents the AI from processing
@@ -64,7 +64,7 @@ export class FinishStepHandler {
       ctx.pendingToolMessages.size === 0
     ) {
       logger.info(
-        "[AI Stream] APPROVE — all tool steps complete, aborting before AI response turn",
+        "[AI Stream] APPROVE - all tool steps complete, aborting before AI response turn",
       );
       streamAbortController.abort(
         new StreamAbortError(AbortReason.TOOL_CONFIRMATION),
@@ -73,18 +73,18 @@ export class FinishStepHandler {
     }
 
     // Remote queue / wait-for-task: if a tool set pendingTimeoutMs, start the timeout timer.
-    // The timer fires AbortReason.STREAM_TIMEOUT so the stream dies cleanly — revival handles
+    // The timer fires AbortReason.STREAM_TIMEOUT so the stream dies cleanly - revival handles
     // continuation when /report delivers the result. Clears itself if stream aborts first.
     const { streamContext } = params;
     if (streamContext.pendingTimeoutMs) {
       const timeoutMs = streamContext.pendingTimeoutMs;
-      streamContext.pendingTimeoutMs = undefined; // consume — only fire once
+      streamContext.pendingTimeoutMs = undefined; // consume - only fire once
       logger.info(
         "[AI Stream] Starting stream timeout timer (remote result pending)",
         { timeoutMs },
       );
       const timer = setTimeout(() => {
-        logger.info("[AI Stream] Stream timeout reached — aborting stream", {
+        logger.info("[AI Stream] Stream timeout reached - aborting stream", {
           timeoutMs,
         });
         streamAbortController.abort(

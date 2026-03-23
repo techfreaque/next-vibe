@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Fenster-Minimum",
     description:
-      "Gleitendes Fensterminimum — verfolgt den niedrigsten Wert in einem festen Fenster",
+      "Gleitendes Fensterminimum - verfolgt den niedrigsten Wert in einem festen Fenster",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

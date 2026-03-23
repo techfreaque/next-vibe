@@ -41,8 +41,7 @@ import {
   SpeedLevel,
 } from "../../skills/enum";
 import { SKILL_CREATE_ALIAS } from "../constants";
-import { CategoryOptions } from "../enum";
-import { SkillCategory, SkillCategoryDB } from "../enum";
+import { CategoryOptions, SkillCategory, SkillCategoryDB } from "../enum";
 import type { SkillsTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";
 import { SkillsRepositoryClient } from "../repository-client";
@@ -313,7 +312,7 @@ const { POST } = createEndpoint({
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
-      // Tool configuration — which tools this skill can use (null = use global settings default)
+      // Tool configuration - which tools this skill can use (null = use global settings default)
       availableTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -330,7 +329,7 @@ const { POST } = createEndpoint({
           .optional(),
       }),
 
-      // Pinned tools — tools that are always shown in the toolbar for this skill
+      // Pinned tools - tools that are always shown in the toolbar for this skill
       pinnedTools: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -509,7 +508,7 @@ export type SkillCreateRequestOutput = typeof POST.types.RequestOutput;
 export type SkillCreateResponseInput = typeof POST.types.ResponseInput;
 export type SkillCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Skill field type aliases — anchored to ModelSelectionSimple for type identity
+// Skill field type aliases - anchored to ModelSelectionSimple for type identity
 export type SkillModelSelection = ModelSelectionSimple;
 
 // Type for filter-based model selection

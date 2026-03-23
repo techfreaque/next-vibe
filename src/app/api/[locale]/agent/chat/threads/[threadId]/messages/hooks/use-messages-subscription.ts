@@ -19,27 +19,27 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { disconnectChannel } from "@/app/api/[locale]/system/unified-interface/websocket/client";
 
-import { useChatStore } from "../../../../hooks/store";
 import type { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole } from "../../../../enum";
 import folderContentsDefinition from "../../../../folder-contents/[rootFolderId]/definition";
+import { useChatStore } from "../../../../hooks/store";
 import threadsDefinition from "../../../definition";
 import { buildMessagesChannel } from "../channel";
+import messagesDefinition from "../definition";
 import type { CreditsDeductedEventData } from "../events";
 import { StreamEventType } from "../events";
+import pathDefinitions from "../path/definition";
 import { createMessageEventHandlers } from "./event-handlers";
 import { upsertMessage } from "./update-messages";
 import { subscribeToMessages } from "./use-messages-ws";
-import messagesDefinition from "../definition";
-import pathDefinitions from "../path/definition";
 
 /**
  * Options for the messages subscription hook.
  */
 export interface MessagesSubscriptionOptions {
-  /** Called when CREDITS_DEDUCTED fires — for optimistic UI credit updates */
+  /** Called when CREDITS_DEDUCTED fires - for optimistic UI credit updates */
   onCreditsDeducted?: (data: CreditsDeductedEventData) => void;
-  /** Called when remote stream finishes — to invalidate lazy branch cache */
+  /** Called when remote stream finishes - to invalidate lazy branch cache */
   invalidateThread?: (threadId: string) => void;
   /** Called when a stream starts (local or remote) */
   onStreamStarted?: () => void;
@@ -52,7 +52,7 @@ export interface MessagesSubscriptionOptions {
    * If "waiting", sets the waitingThreadIds flag in the store immediately.
    */
   initialStreamingState?: "idle" | "streaming" | "aborting" | "waiting";
-  /** Whether TTS audio chunks should be played — guards against cross-client audio bleed */
+  /** Whether TTS audio chunks should be played - guards against cross-client audio bleed */
   ttsAutoplay?: boolean;
 }
 
@@ -105,7 +105,7 @@ export function useMessagesSubscription(
     const cleanup = subscribeToMessages(
       threadId,
       {
-        // Message creation — also detect remote streams
+        // Message creation - also detect remote streams
         [StreamEventType.MESSAGE_CREATED]: (e) => {
           messageHandlers[StreamEventType.MESSAGE_CREATED]?.(e);
 
@@ -149,7 +149,7 @@ export function useMessagesSubscription(
           optionsRef.current.onCreditsDeducted?.(e);
         },
 
-        // Reasoning events — suppressed during drain
+        // Reasoning events - suppressed during drain
         [StreamEventType.REASONING_DELTA]: (e) => {
           if (store().isDraining(threadId)) {
             return;
@@ -159,7 +159,7 @@ export function useMessagesSubscription(
         [StreamEventType.REASONING_DONE]:
           messageHandlers[StreamEventType.REASONING_DONE],
 
-        // Content delta — suppressed during drain
+        // Content delta - suppressed during drain
         [StreamEventType.CONTENT_DELTA]: (e) => {
           if (store().isDraining(threadId)) {
             return;
@@ -171,7 +171,7 @@ export function useMessagesSubscription(
         [StreamEventType.CONTENT_DONE]:
           messageHandlers[StreamEventType.CONTENT_DONE],
 
-        // Compacting events — delta suppressed during drain
+        // Compacting events - delta suppressed during drain
         [StreamEventType.COMPACTING_DELTA]: (e) => {
           if (store().isDraining(threadId)) {
             return;
@@ -186,7 +186,7 @@ export function useMessagesSubscription(
           messageHandlers[StreamEventType.ERROR]?.(e);
         },
 
-        // Audio chunk — suppressed during drain or when call mode is off on this client
+        // Audio chunk - suppressed during drain or when call mode is off on this client
         [StreamEventType.AUDIO_CHUNK]: (e) => {
           if (store().isDraining(threadId)) {
             return;
@@ -208,7 +208,7 @@ export function useMessagesSubscription(
           }
         },
 
-        // Thread title update — update sidebar cache immediately
+        // Thread title update - update sidebar cache immediately
         [StreamEventType.THREAD_TITLE_UPDATED]: (e) => {
           apiClient.updateEndpointData(
             threadsDefinition.GET,
@@ -253,7 +253,7 @@ export function useMessagesSubscription(
           );
         },
 
-        // TASK_COMPLETED: task finished — remove from backgroundTasks cache + handle deferred message
+        // TASK_COMPLETED: task finished - remove from backgroundTasks cache + handle deferred message
         [StreamEventType.TASK_COMPLETED]: (e) => {
           // Remove the completed task from the backgroundTasks list in the messages cache
           apiClient.updateEndpointData(
@@ -342,7 +342,7 @@ export function useMessagesSubscription(
 
           // Seed the path cache with the messages already in the messages cache.
           // This prevents the path endpoint from refetching from the server when
-          // isPendingCreate clears — we already have all messages optimistically.
+          // isPendingCreate clears - we already have all messages optimistically.
           const existingMessages = apiClient.getEndpointData(
             messagesDefinition.GET,
             logger,
@@ -398,7 +398,7 @@ export function useMessagesSubscription(
           // The effect cleanup below handles the disconnect on unmount.
         },
       },
-      // keepAlive: true — channel cleanup is handled by the effect cleanup below
+      // keepAlive: true - channel cleanup is handled by the effect cleanup below
       true,
     );
 
@@ -407,12 +407,12 @@ export function useMessagesSubscription(
       // If a local stream is still running when the component unmounts,
       // stop it in the store AND fire onStreamFinished so the nav store
       // patches the sidebar threads cache back to "idle".
-      // (STREAM_FINISHED won't arrive after unmount — WS is being disconnected.)
+      // (STREAM_FINISHED won't arrive after unmount - WS is being disconnected.)
       if (store().isLocalStream(threadId)) {
         store().stopStream(threadId);
         optionsRef.current.onStreamFinished?.();
       }
-      // Always disconnect the channel on unmount — the thread is no longer viewed.
+      // Always disconnect the channel on unmount - the thread is no longer viewed.
       disconnectChannel(buildMessagesChannel(threadId));
     };
   }, [threadId, rootFolderId, logger, subFolderId]);

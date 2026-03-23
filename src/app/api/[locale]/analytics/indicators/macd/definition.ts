@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — MACD (Moving Average Convergence Divergence) Endpoint Definition
+ * Vibe Sense - MACD (Moving Average Convergence Divergence) Endpoint Definition
  *
  * Client+server safe. No server imports.
  */
@@ -28,8 +28,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
 import { MACD_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,

@@ -321,7 +321,7 @@ export const SkillCategoryDB = [
 
 /**
  * Skill Type Enum
- * Drives runtime behavior — separate axis from category (which is for display/discovery)
+ * Drives runtime behavior - separate axis from category (which is for display/discovery)
  */
 export const {
   enum: SkillType,

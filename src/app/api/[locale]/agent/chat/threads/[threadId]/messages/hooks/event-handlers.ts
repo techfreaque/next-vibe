@@ -15,19 +15,19 @@ import { clearDraft } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage, MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
-import { DefaultFolderId } from "../../../../config";
+import messagesDefinition from "../definition";
 import type { StreamEventDataMap } from "../events";
 import { StreamEventType } from "../events";
-import { useMessageEditorStore } from "./use-message-editor-store";
 import {
   patchMessage,
   removeMessage,
   updateMessages,
   upsertMessage,
 } from "./update-messages";
-import messagesDefinition from "../definition";
+import { useMessageEditorStore } from "./use-message-editor-store";
 import type { MessagesEventHandlers } from "./use-messages-ws";
 
 // ============================================================================
@@ -91,7 +91,7 @@ export function addErrorMessageToChat(
     logger,
   );
 
-  // If WS already placed an error — update it in place instead of adding a duplicate.
+  // If WS already placed an error - update it in place instead of adding a duplicate.
   if (leafMsg?.role === ChatMessageRole.ERROR) {
     patchMessage(threadId, rootFolderId, logger, leafMsg.id, {
       content,
@@ -133,7 +133,7 @@ export function addErrorMessageToChat(
     searchVector: null,
   });
 
-  // Remove ?message= from URL — error messages are client-only
+  // Remove ?message= from URL - error messages are client-only
   if (typeof window !== "undefined") {
     const url = new URL(window.location.href);
     url.searchParams.delete("message");
@@ -171,7 +171,7 @@ function handleMessageCreated(
     );
     const leaf = sorted[0];
     if (leaf?.role === ChatMessageRole.ERROR) {
-      // HTTP error already added one — update in place
+      // HTTP error already added one - update in place
       patchMessage(e.threadId, rootFolderId, logger, leaf.id, {
         content: e.content || leaf.content,
         errorType: "STREAM_ERROR",
@@ -249,7 +249,7 @@ function handleContentDelta(
   updateMessages(threadId, rootFolderId, logger, (msgs) => {
     const idx = msgs.findIndex((m) => m.id === e.messageId);
     if (idx === -1) {
-      // Message not yet in cache (rare race) — add a stub
+      // Message not yet in cache (rare race) - add a stub
       return [
         ...msgs,
         {
@@ -495,7 +495,7 @@ function handleError(
     logger,
   );
 
-  // If HTTP error path already added an error — update in place.
+  // If HTTP error path already added an error - update in place.
   if (leafMsg?.role === ChatMessageRole.ERROR) {
     patchMessage(threadId, rootFolderId, logger, leafMsg.id, {
       content: errorMessage,
@@ -583,7 +583,7 @@ export function createMessageEventHandlers(
       handleReasoningDone(e, threadId, rootFolderId, logger);
     },
     [StreamEventType.TOOL_CALL]: () => {
-      // Informational — TOOL_RESULT carries the actual data
+      // Informational - TOOL_RESULT carries the actual data
     },
     [StreamEventType.TOOL_WAITING]: () => {
       // Handled at the ai-stream level if needed

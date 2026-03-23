@@ -94,7 +94,7 @@ export async function getCliUser(
   locale: CountryLanguage,
 ): Promise<ResponseType<JwtPayloadType>> {
   // Step 1: Check for existing session from .vibe.session file.
-  // readSessionToken reads even locally-expired files — DB is the source of truth.
+  // readSessionToken reads even locally-expired files - DB is the source of truth.
   try {
     const { readSessionToken, writeSessionFile } =
       await import("./session-file");
@@ -113,7 +113,7 @@ export async function getCliUser(
       );
 
       if (verifyResult.success && verifyResult.data) {
-        // validateSession checks DB — this is the authoritative expiry check
+        // validateSession checks DB - this is the authoritative expiry check
         const dbValid = await AuthRepository.validateSession(
           sessionData.token,
           verifyResult.data.id,
@@ -126,7 +126,7 @@ export async function getCliUser(
           const localExpired = new Date(sessionData.expiresAt) < new Date();
           if (localExpired) {
             logger.debug(
-              "[CLI AUTH] Local session file expired but DB session valid — refreshing local file",
+              "[CLI AUTH] Local session file expired but DB session valid - refreshing local file",
             );
             await writeSessionFile(
               {

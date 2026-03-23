@@ -2,9 +2,9 @@
  * System Prompt Fragment Types
  *
  * Each fragment lives in its module's system-prompt/ folder:
- *   <module>/system-prompt/prompt.ts   — isomorphic build fn (pure, no DB, no server imports)
- *   <module>/system-prompt/server.ts   — server-only data loader (import "server-only")
- *   <module>/system-prompt/client.ts   — React hook returning the same data shape
+ *   <module>/system-prompt/prompt.ts   - isomorphic build fn (pure, no DB, no server imports)
+ *   <module>/system-prompt/server.ts   - server-only data loader (import "server-only")
+ *   <module>/system-prompt/client.ts   - React hook returning the same data shape
  *
  * Types flow outward from prompt.ts: the PromptData type declared there is the
  * contract that both server.ts and client.ts must satisfy.
@@ -20,7 +20,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 /**
  * Standard params passed to every server-side fragment data loader.
- * All loaders accept this same shape — they ignore fields they don't need.
+ * All loaders accept this same shape - they ignore fields they don't need.
  * This is the superset of all per-loader params so builder.ts can call them uniformly.
  */
 export interface SystemPromptServerParams {
@@ -45,7 +45,7 @@ export interface SystemPromptServerParams {
 
 /**
  * Standard params passed to every client-side fragment data hook.
- * All hooks accept this same shape — they ignore fields they don't need.
+ * All hooks accept this same shape - they ignore fields they don't need.
  */
 export interface SystemPromptClientParams {
   user: JwtPayloadType;
@@ -70,13 +70,13 @@ export interface SystemPromptClientParams {
 /**
  * A fragment that contributes content to the leading or trailing system prompt.
  *
- * TData — the data type this fragment needs. Must be derivable from params
+ * TData - the data type this fragment needs. Must be derivable from params
  * already loaded by builder.ts (server) / hook.ts (client). Never do async
- * work inside `build` — that belongs in server.ts / client.ts.
+ * work inside `build` - that belongs in server.ts / client.ts.
  *
  * placement:
- * - "leading"  — static system prompt, sent as the `system` param. Cacheable.
- * - "trailing" — dynamic system message, injected before [Context:] each turn.
+ * - "leading"  - static system prompt, sent as the `system` param. Cacheable.
+ * - "trailing" - dynamic system message, injected before [Context:] each turn.
  */
 export interface SystemPromptFragment<TData> {
   id: string;

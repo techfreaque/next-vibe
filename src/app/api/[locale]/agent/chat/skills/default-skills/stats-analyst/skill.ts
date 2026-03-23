@@ -1,6 +1,6 @@
-import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/messenger/messages/stats/constants";
 import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/constants";
 import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/constants";
+import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/messenger/messages/stats/constants";
 import { REFERRAL_STATS_ALIAS } from "@/app/api/[locale]/referral/stats/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/constants";
@@ -13,13 +13,14 @@ import { MEMORY_LIST_ALIAS } from "../../../memories/constants";
 import { MEMORY_ADD_ALIAS } from "../../../memories/create/constants";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -45,7 +46,7 @@ export const statsAnalystSkill: Skill = {
     tool(MEMORY_LIST_ALIAS),
     tool(MEMORY_ADD_ALIAS),
   ],
-  systemPrompt: `You are a Stats Analyst — a data specialist focused on platform analytics and reporting.
+  systemPrompt: `You are a Stats Analyst - a data specialist focused on platform analytics and reporting.
 
 **Your Tools:**
 - Leads statistics and list for lead pipeline analysis

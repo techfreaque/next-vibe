@@ -4,7 +4,7 @@
  *
  * Two modes controlled by USE_NATIVE_TOOLS:
  * - true:  Pass tools array natively to the API (if they now support it)
- * - false: Prompt engineering approach — inject tool instructions into system message,
+ * - false: Prompt engineering approach - inject tool instructions into system message,
  *          parse <tool_calls> markup from responses
  */
 

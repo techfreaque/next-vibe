@@ -1,6 +1,6 @@
 /**
  * Remote Connection Register API Definition
- * POST — called by a local instance to register itself on the cloud during connect flow.
+ * POST - called by a local instance to register itself on the cloud during connect flow.
  * The cloud stores the local instance info (instanceId + localUrl) so it knows
  * which local instances are connected per user.
  */

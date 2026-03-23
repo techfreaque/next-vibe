@@ -7,7 +7,7 @@
  * The messages endpoint owns the complete event lifecycle:
  *   definition (Zod schemas) → emission (emitter.ts) → channel (channel.ts) → consumption (this file)
  *
- * Types flow directly from StreamEventDataMap — no casts, no assertions.
+ * Types flow directly from StreamEventDataMap - no casts, no assertions.
  */
 
 import {
@@ -19,7 +19,7 @@ import { buildMessagesChannel } from "../channel";
 import { type StreamEventDataMap, StreamEventType } from "../events";
 
 /**
- * Handler map — one optional callback per event type.
+ * Handler map - one optional callback per event type.
  * Each handler receives the correctly typed data for that event.
  */
 export type MessagesEventHandlers = {

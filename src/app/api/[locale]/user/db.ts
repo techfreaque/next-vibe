@@ -134,7 +134,7 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
 }));
 
 /**
- * Login attempts table — DB-backed rate limiting, safe across restarts and instances.
+ * Login attempts table - DB-backed rate limiting, safe across restarts and instances.
  *
  * Each failed login attempt is recorded here. The login repository queries this
  * table to count recent failures and lock out accounts, replacing the old in-memory Map.

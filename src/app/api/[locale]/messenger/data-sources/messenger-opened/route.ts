@@ -1,5 +1,5 @@
 /**
- * Messenger Opened — Route
+ * Messenger Opened - Route
  * Server-only.
  */
 

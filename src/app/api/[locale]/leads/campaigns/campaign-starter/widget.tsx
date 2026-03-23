@@ -5,6 +5,7 @@
 
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
@@ -22,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "next-vibe-ui/ui/select";
-import { Button } from "next-vibe-ui/ui/button";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
@@ -50,12 +50,12 @@ import {
   useWidgetLocale,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { CountryLanguageValues } from "@/i18n/core/config";
 
 import type definition from "./definition";
@@ -111,7 +111,7 @@ export function CampaignStarterConfigContainer({
         )}
       </Div>
 
-      {/* Guidance — shown before first save */}
+      {/* Guidance - shown before first save */}
       {!hasBeenSaved && !isPending && (
         <Div className="rounded-lg border border-dashed bg-muted/30 p-5 flex flex-col gap-3">
           <Div className="flex items-start gap-3">
@@ -130,7 +130,7 @@ export function CampaignStarterConfigContainer({
 
       <FormAlertWidget field={{}} />
 
-      {/* Section 1 — General */}
+      {/* Section 1 - General */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -147,7 +147,7 @@ export function CampaignStarterConfigContainer({
         </CardContent>
       </Card>
 
-      {/* Section 2 — Schedule */}
+      {/* Section 2 - Schedule */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -178,7 +178,7 @@ export function CampaignStarterConfigContainer({
         </CardContent>
       </Card>
 
-      {/* Section 3 — Quotas (per locale) */}
+      {/* Section 3 - Quotas (per locale) */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -240,7 +240,7 @@ export function CampaignStarterConfigContainer({
         </CardContent>
       </Card>
 
-      {/* Section 4 — Advanced */}
+      {/* Section 4 - Advanced */}
       <Card className="border-dashed">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">

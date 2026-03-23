@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Shared Enums
+ * Vibe Sense - Shared Enums
  */
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";

@@ -1,5 +1,5 @@
 /**
- * Referrals Earnings Volume — Route
+ * Referrals Earnings Volume - Route
  * Server-only.
  */
 

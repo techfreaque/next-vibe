@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Backtest Store
+ * Vibe Sense - Backtest Store
  *
  * Backtest run metadata + result read/write.
  */
@@ -10,13 +10,13 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
-import { BacktestActionMode } from "../enum";
 import { pipelineBacktestResults, pipelineBacktestRuns } from "../db";
+import { BacktestActionMode } from "../enum";
 import type {
-  TimeRange,
   DataPoint,
   Resolution,
   SignalEvent,
+  TimeRange,
 } from "../shared/fields";
 
 // ─── Create Run ───────────────────────────────────────────────────────────────

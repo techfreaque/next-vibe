@@ -5,7 +5,7 @@
 # a minimal staging directory with a clean package.json (no dependencies) to
 # avoid electron-builder's bun workspace traversal bug. See build/repository.ts.
 #
-# The AppImage is a thin Electron shell — it does NOT bundle Next.js or
+# The AppImage is a thin Electron shell - it does NOT bundle Next.js or
 # node_modules. It must be run from the next-vibe project directory where
 # `vibe build` has already been run. The shell spawns `bun run vibe start`
 # which serves the pre-built Next.js from the project's .next-prod/.

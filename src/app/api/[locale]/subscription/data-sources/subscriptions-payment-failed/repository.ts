@@ -1,5 +1,5 @@
 /**
- * Subscriptions Payment Failed — Repository
+ * Subscriptions Payment Failed - Repository
  * Server-only. DB access.
  * Count of subscriptions with failed payments per resolution bucket (grouped by paymentFailedAt).
  */
@@ -17,9 +17,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import { resolutionBucketExpr } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/query-utils";
 import { fillGaps } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/range";
 
-import type { DataPoint } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { TimeRange } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
-import type { Resolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
+import type {
+  DataPoint,
+  Resolution,
+  TimeRange,
+} from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { subscriptions } from "../../db";
 
 export class QuerySubscriptionsPaymentFailedRepository {

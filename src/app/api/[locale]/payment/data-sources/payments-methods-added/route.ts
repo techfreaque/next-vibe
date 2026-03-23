@@ -1,5 +1,5 @@
 /**
- * Payments Methods Added — Route
+ * Payments Methods Added - Route
  * Server-only.
  */
 

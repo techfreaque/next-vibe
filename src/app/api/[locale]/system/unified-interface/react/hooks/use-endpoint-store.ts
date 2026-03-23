@@ -31,7 +31,7 @@ interface ValueEntry {
 
 const valueRegistry = new Map<string, ValueEntry>();
 
-// Stable empty fallback — prevents useSyncExternalStore tearing loop when entry not yet set
+// Stable empty fallback - prevents useSyncExternalStore tearing loop when entry not yet set
 const EMPTY_ENDPOINT_RETURN = {} as EndpointReturn<AnyEndpointMap>;
 
 function getEntry(key: string): ValueEntry | undefined {
@@ -86,7 +86,7 @@ function subscribeToKey(key: string, listener: () => void): () => void {
 }
 
 // ---------------------------------------------------------------------------
-// Ref-count store — ownership + cleanup tracking only
+// Ref-count store - ownership + cleanup tracking only
 // ---------------------------------------------------------------------------
 
 interface RefCountEntry {
@@ -288,7 +288,7 @@ export function useEndpointManaged<
   }
   const isOwner = isOwnerRef.current;
 
-  // Always call useEndpointOriginal unconditionally — same hook order every render.
+  // Always call useEndpointOriginal unconditionally - same hook order every render.
   // Owner's result gets published; subscriber's result is discarded.
   const ownResult = useEndpointOriginal(
     endpoints,
@@ -298,7 +298,7 @@ export function useEndpointManaged<
   );
 
   // Owner: write latest value into registry during render (no setState = no loop).
-  // Do NOT notify listeners here — defer to useEffect to avoid render-phase side effects.
+  // Do NOT notify listeners here - defer to useEffect to avoid render-phase side effects.
   if (isOwner) {
     setEntryValue(
       instanceKey,
@@ -329,7 +329,7 @@ export function useEndpointManaged<
     if (meaningfullyChanged) {
       prevReadDataRef.current = readData;
       prevReadIsLoadingRef.current = readIsLoading;
-      // Defer notification outside render phase — avoids setState-during-render loops
+      // Defer notification outside render phase - avoids setState-during-render loops
       queueMicrotask(() => {
         notifyListeners(instanceKey);
       });

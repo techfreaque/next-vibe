@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Execution Runs Store
+ * Vibe Sense - Execution Runs Store
  *
  * Tracks every scheduled and on-demand graph execution.
  * Answers "when did this graph last run? did it succeed?"
@@ -11,8 +11,8 @@ import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 
-import { RunStatus, type RunStatusType } from "../enum";
 import { pipelineRuns } from "../db";
+import { RunStatus, type RunStatusType } from "../enum";
 
 // ─── Write ───────────────────────────────────────────────────────────────────
 

@@ -48,7 +48,7 @@ if (!g.__ssh_session_pool__) {
 if (!g.__ssh_session_pool_drain_registered__) {
   g.__ssh_session_pool_drain_registered__ = true;
   process.on("exit", () => {
-    // Synchronous cleanup — clear all timers so the event loop can drain
+    // Synchronous cleanup - clear all timers so the event loop can drain
     for (const session of g.__ssh_session_pool__.values()) {
       try {
         clearTimeout(session.idleTimer);
@@ -76,7 +76,7 @@ export function drainSessionPool(): void {
         session.proc.kill("SIGTERM");
       }
     } catch {
-      // Best-effort — process may already be dead
+      // Best-effort - process may already be dead
     }
     sessionPool.delete(id);
   }

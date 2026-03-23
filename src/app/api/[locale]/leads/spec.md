@@ -1,18 +1,18 @@
 # Lead & User System Specification
 
-> next-vibe — censorship-resistant AI chat (mainstream + uncensored models) with a public forum layer, credit-based monetization, and full lead-to-revenue tracking.
+> next-vibe - censorship-resistant AI chat (mainstream + uncensored models) with a public forum layer, credit-based monetization, and full lead-to-revenue tracking.
 
 ---
 
 ## Core concepts
 
-**Lead** — a device-level identity created silently on first visit, before any account exists. Has a credit wallet, active campaigns, and engagement history. First-class citizen even without a user.
+**Lead** - a device-level identity created silently on first visit, before any account exists. Has a credit wallet, active campaigns, and engagement history. First-class citizen even without a user.
 
-**User** — an authenticated identity. Has exactly one primary lead (the one used to sign up). Inherits that lead's free credits on creation.
+**User** - an authenticated identity. Has exactly one primary lead (the one used to sign up). Inherits that lead's free credits on creation.
 
-**Lead group** — a set of leads identified as the same real person across devices/sessions. Shares a single free-credit pool (max 20/month).
+**Lead group** - a set of leads identified as the same real person across devices/sessions. Shares a single free-credit pool (max 20/month).
 
-**Credit wallet** — every lead and user has one. Immutable transaction log. Lead wallets hold only free credits; user wallets hold paid credits.
+**Credit wallet** - every lead and user has one. Immutable transaction log. Lead wallets hold only free credits; user wallets hold paid credits.
 
 ---
 
@@ -32,7 +32,7 @@ Source is set at creation and never changes. Status only moves forward (except S
 | `SUBSCRIPTION_CONFIRMED` | Active paying subscriber             | SIGNED_UP (churn), UNSUBSCRIBED, BOUNCED, INVALID                            |
 | `UNSUBSCRIBED`           | Opted out of all email (terminal)    | BOUNCED, INVALID                                                             |
 | `BOUNCED`                | Email undeliverable (terminal)       | INVALID                                                                      |
-| `INVALID`                | Junk / banned (terminal)             | —                                                                            |
+| `INVALID`                | Junk / banned (terminal)             | -                                                                            |
 
 ---
 
@@ -73,7 +73,7 @@ Lead gives email:
 
 ### Referral (`REFERRAL`)
 
-Same as website visitor. Referral code captured from link and stored on lead at first touch — immutable. On signup, referrer is credited.
+Same as website visitor. Referral code captured from link and stored on lead at first touch - immutable. On signup, referrer is credited.
 
 ### API (`API`)
 
@@ -105,8 +105,8 @@ Links are created when two leads are identified as the same person.
 
 **Triggers:**
 
-- Signup — converting lead becomes the primary lead (reason: `signup`)
-- Login on new device — device lead linked to user (reason: `login`)
+- Signup - converting lead becomes the primary lead (reason: `signup`)
+- Login on new device - device lead linked to user (reason: `login`)
 - Admin merge (reason: `merge`)
 
 **What happens:**
@@ -132,9 +132,9 @@ Campaign state lives in `lead_campaigns` (one row per lead+campaignType): campai
 
 ### Campaign types
 
-**COLD** — CSV_IMPORT leads. Entry: Campaign Starter cron. Stages: NOT_STARTED → INITIAL → FOLLOWUP_1 → FOLLOWUP_2 → FOLLOWUP_3 → NURTURE → REACTIVATION.
+**COLD** - CSV_IMPORT leads. Entry: Campaign Starter cron. Stages: NOT_STARTED → INITIAL → FOLLOWUP_1 → FOLLOWUP_2 → FOLLOWUP_3 → NURTURE → REACTIVATION.
 
-**NEWSLETTER_NURTURE** — NEWSLETTER_SUBSCRIBER leads with no user. Entry: status → NEWSLETTER_SUBSCRIBER.
+**NEWSLETTER_NURTURE** - NEWSLETTER_SUBSCRIBER leads with no user. Entry: status → NEWSLETTER_SUBSCRIBER.
 
 - INITIAL (24h): welcome, free credits
 - FOLLOWUP_1 (day 3): forum highlight
@@ -143,7 +143,7 @@ Campaign state lives in `lead_campaigns` (one row per lead+campaignType): campai
 - NURTURE (day 30): credits waiting
 - REACTIVATION (day 60): last chance
 
-**SIGNUP_NURTURE** — SIGNED_UP leads with no payment. Entry: user created.
+**SIGNUP_NURTURE** - SIGNED_UP leads with no payment. Entry: user created.
 
 - INITIAL (2h): welcome, platform overview
 - FOLLOWUP_1 (day 2): feature highlights
@@ -152,9 +152,9 @@ Campaign state lives in `lead_campaigns` (one row per lead+campaignType): campai
 - NURTURE (day 20): testimonial
 - REACTIVATION (day 45): discounted first subscription offer
 
-**RETENTION** — SUBSCRIPTION_CONFIRMED leads. Entry: status → SUBSCRIPTION_CONFIRMED. Monthly touches: tips, referral push, anniversary.
+**RETENTION** - SUBSCRIPTION_CONFIRMED leads. Entry: status → SUBSCRIPTION_CONFIRMED. Monthly touches: tips, referral push, anniversary.
 
-**WINBACK** — churned subscribers (SUBSCRIPTION_CONFIRMED → SIGNED_UP). Entry: churn event.
+**WINBACK** - churned subscribers (SUBSCRIPTION_CONFIRMED → SIGNED_UP). Entry: churn event.
 
 - CHURN_1 (day 3): we miss you
 - CHURN_2 (day 7): limited credit offer
@@ -172,8 +172,8 @@ Halt is synchronous on status update. Cron skips halted rows.
 | → SUBSCRIPTION_CONFIRMED | SIGNUP_NURTURE           | enqueue RETENTION              |
 | → SIGNED_UP (from churn) | RETENTION                | enqueue WINBACK                |
 | → UNSUBSCRIBED           | all                      | add to global suppression list |
-| → BOUNCED                | all                      | —                              |
-| → INVALID                | all                      | —                              |
+| → BOUNCED                | all                      | -                              |
+| → INVALID                | all                      | -                              |
 
 ### SMTP routing
 
@@ -215,19 +215,19 @@ Multiple accounts with selection criteria: campaign type, journey variant, count
 
 ## Lead data model
 
-**Identity** — email (unique), business name, contact name, phone, website, country, language, IP (latest), user agent (latest)
+**Identity** - email (unique), business name, contact name, phone, website, country, language, IP (latest), user agent (latest)
 
-**Status & source** — status, source, referral code (first-touch, immutable)
+**Status & source** - status, source, referral code (first-touch, immutable)
 
-**Linking** — primary user id, lead group id
+**Linking** - primary user id, lead group id
 
-**Engagement aggregates** — emails opened, emails clicked, last engagement at (any channel), website visits count, last website visit at, forum posts count, last forum post at
+**Engagement aggregates** - emails opened, emails clicked, last engagement at (any channel), website visits count, last website visit at, forum posts count, last forum post at
 
-**Conversion** — signed up at, subscription confirmed at, converted user id
+**Conversion** - signed up at, subscription confirmed at, converted user id
 
-**Scoring** — lead score (0–100), last scored at
+**Scoring** - lead score (0–100), last scored at
 
-**Metadata** (JSONB) — industry, company size, budget range, custom tags
+**Metadata** (JSONB) - industry, company size, budget range, custom tags
 
 ---
 
@@ -267,45 +267,45 @@ Filters: status, source, campaign type, has user, has subscription, lead score r
 
 ### Lead detail
 
-- **Identity** — contact fields, source, referral code, created at, last active, lead score with breakdown
-- **Lead group** — all linked leads with device/IP/last seen; shared credit pool usage; linked user
-- **Campaigns** — per campaign type: stage, variant, email timeline (sent/opened/clicked/bounced), next scheduled
-- **Engagement feed** — chronological across all channels, filterable
-- **Credits & revenue** — wallet balance, all transactions, total consumed/paid, estimated LTV, subscription + payment history from linked user
-- **Chat activity** — thread counts, models used, tokens, forum posts with votes, recent previews
-- **Referrals** — code used to acquire this lead, code they generated, referrals made, earnings
+- **Identity** - contact fields, source, referral code, created at, last active, lead score with breakdown
+- **Lead group** - all linked leads with device/IP/last seen; shared credit pool usage; linked user
+- **Campaigns** - per campaign type: stage, variant, email timeline (sent/opened/clicked/bounced), next scheduled
+- **Engagement feed** - chronological across all channels, filterable
+- **Credits & revenue** - wallet balance, all transactions, total consumed/paid, estimated LTV, subscription + payment history from linked user
+- **Chat activity** - thread counts, models used, tokens, forum posts with votes, recent previews
+- **Referrals** - code used to acquire this lead, code they generated, referrals made, earnings
 
 ### User detail
 
-- **Profile** — name, email, avatar, locale, joined at, roles, ban status, Stripe id
-- **Lead connections** — primary lead + all linked leads with source, campaign at conversion, days to convert
-- **Credits & billing** — subscription status, wallet breakdown, consumption graph, payment history
-- **Chat usage** — thread/message counts, top models, tokens, memories, token budget this month
-- **Referrals** — referral code, referred users count, earnings
-- **Security** — login history (last 10), 2FA status
+- **Profile** - name, email, avatar, locale, joined at, roles, ban status, Stripe id
+- **Lead connections** - primary lead + all linked leads with source, campaign at conversion, days to convert
+- **Credits & billing** - subscription status, wallet breakdown, consumption graph, payment history
+- **Chat usage** - thread/message counts, top models, tokens, memories, token budget this month
+- **Referrals** - referral code, referred users count, earnings
+- **Security** - login history (last 10), 2FA status
 
 ### Stats dashboard
 
-- **Acquisition** — new leads by source/day/week; lead→user conversion rate by source and variant; avg days to signup; referral %
-- **Campaign** — open/click/unsubscribe rate per stage per campaign type; best variant; avg days per stage
-- **Revenue** — MRR/ARR; new/expansion/churned MRR; ARPU; credits sold vs consumed; top models by consumption
-- **Engagement** — DAU/MAU; messages/user/day; forum posts and votes/day; leads with ≥1 engagement this month
-- **Lead scoring** — score histogram; high-score leads with no active campaign; leads stuck >30 days at same stage
+- **Acquisition** - new leads by source/day/week; lead→user conversion rate by source and variant; avg days to signup; referral %
+- **Campaign** - open/click/unsubscribe rate per stage per campaign type; best variant; avg days per stage
+- **Revenue** - MRR/ARR; new/expansion/churned MRR; ARPU; credits sold vs consumed; top models by consumption
+- **Engagement** - DAU/MAU; messages/user/day; forum posts and votes/day; leads with ≥1 engagement this month
+- **Lead scoring** - score histogram; high-score leads with no active campaign; leads stuck >30 days at same stage
 
 ---
 
 ## Build priority
 
-1. `lead_campaigns` table — decouple campaign state from lead row; one row per lead+campaignType
-2. Campaign halting — synchronous on status update; cron skips halted rows
-3. Lead-to-lead linking — fingerprint match, email match, login-on-new-device, admin merge
-4. Lead-to-user linking — group cascade, wallet freeze + transfer, campaign halt + re-enqueue
-5. Newsletter ↔ lead sync — subscribe → NEWSLETTER_SUBSCRIBER + enqueue; unsubscribe → UNSUBSCRIBED + suppress
+1. `lead_campaigns` table - decouple campaign state from lead row; one row per lead+campaignType
+2. Campaign halting - synchronous on status update; cron skips halted rows
+3. Lead-to-lead linking - fingerprint match, email match, login-on-new-device, admin merge
+4. Lead-to-user linking - group cascade, wallet freeze + transfer, campaign halt + re-enqueue
+5. Newsletter ↔ lead sync - subscribe → NEWSLETTER_SUBSCRIBER + enqueue; unsubscribe → UNSUBSCRIBED + suppress
 6. NEWSLETTER_NURTURE campaign
 7. SIGNUP_NURTURE campaign
-8. Cross-channel `lastEngagementAt` — updated by email, visit, chat, forum, payment
+8. Cross-channel `lastEngagementAt` - updated by email, visit, chat, forum, payment
 9. Atomic group credit pool check
-10. Lead score computation — nightly batch + event-triggered
+10. Lead score computation - nightly batch + event-triggered
 11. RETENTION campaign
 12. WINBACK campaign
 13. Engagement feed on lead detail

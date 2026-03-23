@@ -1,12 +1,12 @@
 /**
- * Vibe Sense — Admin Dashboard Page
+ * Vibe Sense - Admin Dashboard Page
  * Lists all pipeline graphs visible to the current admin
  */
 
 import type { JSX } from "react";
 
-import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { VibeSenseClient } from "./page-client";

@@ -20,7 +20,7 @@ import type { JsonValue } from "./unified-runner/types";
 
 /**
  * Upsert all cron tasks from the task registry into the DB.
- * Upserts by id (primary key) — each task has a hardcoded stable identity.
+ * Upserts by id (primary key) - each task has a hardcoded stable identity.
  * Task runners are excluded (dev-only infrastructure tasks).
  */
 async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
@@ -42,11 +42,11 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
 
   const taskRows: NewCronTask<Record<string, JsonValue>>[] = cronTaskDefs.map(
     (task) => ({
-      // id: stable identity — multiple tasks can share the same routeId (endpoint)
+      // id: stable identity - multiple tasks can share the same routeId (endpoint)
       id: task.id,
       // shortId: system tasks mirror their id (already a short slug like "db-health")
       shortId: task.id,
-      // routeId: which endpoint to call — first alias or canonical path
+      // routeId: which endpoint to call - first alias or canonical path
       routeId: getPreferredToolName(task.definition),
       displayName: task.name,
       description: task.description,
@@ -67,7 +67,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   );
 
   // Upsert by id (primary key).
-  // Do NOT overwrite enabled/schedule/priority/timeout/taskInput — those are user-overridable.
+  // Do NOT overwrite enabled/schedule/priority/timeout/taskInput - those are user-overridable.
   // Preserve displayName if DB already has one (may be a translated string vs code's translation key).
   for (const row of taskRows) {
     await db

@@ -46,7 +46,7 @@ export const SKILL_TIERS: Record<SkillTier, SkillTierConfig> = {
     title: "Agent Skill Manifest",
     subtitle: "All Available Tools (Public + Authenticated)",
     description:
-      "All tools available to agents — both public endpoints (no auth needed) and " +
+      "All tools available to agents - both public endpoints (no auth needed) and " +
       "authenticated endpoints (requires Bearer token or session). " +
       "This is the default manifest to load. Start here.",
     requiresAuthentication: false,
@@ -117,7 +117,7 @@ function renderJsonSchemaAsMarkdown(
       const prop = value;
       const isRequired = required.includes(key);
       const typeStr = formatType(prop);
-      const descStr = prop.description ? ` — ${prop.description}` : "";
+      const descStr = prop.description ? ` - ${prop.description}` : "";
       // Only show defaults that are meaningful (not i18n keys, not objects)
       const showDefault =
         prop.default !== undefined &&
@@ -169,7 +169,7 @@ function formatType(prop: JsonSchemaObject): string {
     ];
     return parts.join(" | ");
   }
-  // Empty schema {} from transforms/pipelines — show as "string" (most common)
+  // Empty schema {} from transforms/pipelines - show as "string" (most common)
   if (!prop.type && !prop.enum && !prop.anyOf) {
     return "string";
   }
@@ -266,7 +266,7 @@ async function renderEndpointFromMeta(
   const requiresAuth = !ep.allowedRoles.includes(ROLE_PUBLIC);
   const authNote = requiresAuth
     ? "🔒 *Requires authentication (Bearer token)*"
-    : "🌐 *Public — no authentication required*";
+    : "🌐 *Public - no authentication required*";
 
   // Aliases (all aliases from meta + any remaining)
   const allAliases = ep.aliases;
@@ -375,15 +375,15 @@ const AI_RUN_PARAMS_TABLE = `
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | \`prompt\` | \`string\` | ✅ | Your task or question for the skill |
-| \`skill\` | \`string\` | — | Skill ID. Omit to use the default assistant |
-| \`model\` | \`string\` | — | Model ID (e.g. \`claude-sonnet-4-6\`). Skill may have a preferred model |
-| \`instructions\` | \`string\` | — | Extra system-level instructions appended after the skill's system prompt |
-| \`availableTools\` | \`array\` | — | Restrict which tools the AI may call. Omit to use the skill's full tool set |
-| \`maxTurns\` | \`number\` | — | Max agentic turns before stopping. Omit for no limit |
-| \`preCalls\` | \`array\` | — | Endpoints to call before the prompt — results are injected as context |
-| \`rootFolderId\` | \`string\` | — | Where to store the thread: \`"cron"\` (persisted), \`"incognito"\` (no persistence), \`"private"\`, \`"public"\` |
-| \`appendThreadId\` | \`string\` | — | UUID of an existing thread to continue |
-| \`excludeMemories\` | \`boolean\` | — | Set \`true\` to skip injecting the skill's stored memories |
+| \`skill\` | \`string\` | - | Skill ID. Omit to use the default assistant |
+| \`model\` | \`string\` | - | Model ID (e.g. \`claude-sonnet-4-6\`). Skill may have a preferred model |
+| \`instructions\` | \`string\` | - | Extra system-level instructions appended after the skill's system prompt |
+| \`availableTools\` | \`array\` | - | Restrict which tools the AI may call. Omit to use the skill's full tool set |
+| \`maxTurns\` | \`number\` | - | Max agentic turns before stopping. Omit for no limit |
+| \`preCalls\` | \`array\` | - | Endpoints to call before the prompt - results are injected as context |
+| \`rootFolderId\` | \`string\` | - | Where to store the thread: \`"cron"\` (persisted), \`"incognito"\` (no persistence), \`"private"\`, \`"public"\` |
+| \`appendThreadId\` | \`string\` | - | UUID of an existing thread to continue |
+| \`excludeMemories\` | \`boolean\` | - | Set \`true\` to skip injecting the skill's stored memories |
 `.trim();
 
 const AI_RUN_RESPONSE_TABLE = `
@@ -400,7 +400,7 @@ const AI_RUN_RESPONSE_TABLE = `
 
 /**
  * Renders a compact "Use via AI Run" section embedded into skill files.
- * Self-contained — agents can act immediately without loading a separate guide.
+ * Self-contained - agents can act immediately without loading a separate guide.
  */
 function renderInlineAiRunSection(opts: {
   runUrl: string;
@@ -425,8 +425,8 @@ function renderInlineAiRunSection(opts: {
   const characterLine = skillId ? `\n  "skill": "${skillId}",` : "";
   const folderNote =
     exampleFolder === "incognito"
-      ? "> 💡 `incognito` — no thread stored, context-saving for stateless queries."
-      : "> 💡 `cron` — thread persisted for auditing agentic tool calls.";
+      ? "> 💡 `incognito` - no thread stored, context-saving for stateless queries."
+      : "> 💡 `cron` - thread persisted for auditing agentic tool calls.";
 
   const delegateTarget = skillId ? "this skill" : "an AI skill";
 
@@ -471,7 +471,7 @@ function renderInlineAiRunSection(opts: {
 }
 
 // ============================================================================
-// TIER AI RUN GENERATOR (lean pointer — skill file is self-contained)
+// TIER AI RUN GENERATOR (lean pointer - skill file is self-contained)
 // ============================================================================
 
 export async function generateTierAiRunMarkdown(
@@ -491,9 +491,9 @@ export async function generateTierAiRunMarkdown(
     : "";
 
   return [
-    `# AI Run Quick Reference — ${config.title}`,
+    `# AI Run Quick Reference - ${config.title}`,
     "",
-    `> The **[${config.filename}](${skillUrl})** skill file is self-contained — it includes tool schemas and this AI Run section inline.`,
+    `> The **[${config.filename}](${skillUrl})** skill file is self-contained - it includes tool schemas and this AI Run section inline.`,
     `> Load that file for the full reference. This file is a quick standalone guide for \`POST ${runUrl}\`.`,
     "",
     "---",
@@ -513,7 +513,7 @@ export async function generateTierAiRunMarkdown(
     "}",
     "```",
     "",
-    "> 💡 `incognito` — no thread stored, ideal for stateless one-shot queries.",
+    "> 💡 `incognito` - no thread stored, ideal for stateless one-shot queries.",
     "",
     "## With a Specific Skill",
     "",
@@ -604,10 +604,10 @@ export async function generateSkillAiRunMarkdown(
     : "";
 
   return [
-    `# ${charInfo.name} — AI Run Quick Reference`,
+    `# ${charInfo.name} - AI Run Quick Reference`,
     `## ${charInfo.tagline}`,
     "",
-    `> The **[${skillId}-skill.md](${skillUrl})** skill file is self-contained — it includes the tool listing and this AI Run section inline.`,
+    `> The **[${skillId}-skill.md](${skillUrl})** skill file is self-contained - it includes the tool listing and this AI Run section inline.`,
     `> Load that file for the full reference. This file is a quick standalone guide for \`POST ${runUrl}\`.`,
     "",
     "---",
@@ -629,8 +629,8 @@ export async function generateSkillAiRunMarkdown(
     "```",
     "",
     exampleFolder === "incognito"
-      ? "> 💡 `incognito` — no thread stored, context-saving for stateless queries."
-      : "> 💡 `cron` — thread persisted for auditing agentic tool calls.",
+      ? "> 💡 `incognito` - no thread stored, context-saving for stateless queries."
+      : "> 💡 `cron` - thread persisted for auditing agentic tool calls.",
     ...(hasTools && charInfo.availableTools
       ? [
           "",
@@ -710,7 +710,7 @@ export async function generateSkillMarkdown(
   lines.push(`| **Total tools** | ${tierEndpoints.length} |`);
   lines.push(`| **Categories** | ${grouped.size} |`);
   lines.push(
-    `| **Authentication** | ${config.requiresAuthentication ? "Required (Bearer JWT)" : "Optional — some tools public, some require Bearer JWT"} |`,
+    `| **Authentication** | ${config.requiresAuthentication ? "Required (Bearer JWT)" : "Optional - some tools public, some require Bearer JWT"} |`,
   );
   lines.push(`| **Base URL** | \`${apiBase}\` |`);
   lines.push(`| **Generated** | \`${now}\` |`);
@@ -750,7 +750,7 @@ export async function generateSkillMarkdown(
     );
   } else {
     lines.push(
-      "Tools in this manifest are **publicly accessible** — no authentication required.",
+      "Tools in this manifest are **publicly accessible** - no authentication required.",
     );
     lines.push("");
     lines.push(
@@ -824,7 +824,7 @@ export async function generateSkillMarkdown(
   lines.push("");
   lines.push(
     `*This manifest was auto-generated from live endpoint definitions on ${now}. ` +
-      `Do not edit manually — it will be regenerated on the next request.*`,
+      `Do not edit manually - it will be regenerated on the next request.*`,
   );
   lines.push("");
 
@@ -923,7 +923,7 @@ export async function getSkillSkillInfo(
     };
   }
 
-  // Fall back to DB — only PUBLIC custom skills are accessible without auth
+  // Fall back to DB - only PUBLIC custom skills are accessible without auth
   const { db } = await import("@/app/api/[locale]/system/db");
   const { customSkills } =
     await import("@/app/api/[locale]/agent/chat/skills/db");
@@ -1009,7 +1009,7 @@ export async function generateSkillSkillMarkdown(
           : ep;
       });
   } else {
-    // No availableTools — generic skill, use full public-user tier
+    // No availableTools - generic skill, use full public-user tier
     endpoints = filterForTier(allRemoteSkill, "public-user");
   }
 
@@ -1030,7 +1030,7 @@ export async function generateSkillSkillMarkdown(
   const lines: string[] = [];
 
   // ── Header ──────────────────────────────────────────────────────────────────
-  lines.push(`# ${charInfo.name} — Skill Manifest`);
+  lines.push(`# ${charInfo.name} - Skill Manifest`);
   lines.push(`## ${charInfo.tagline}`);
   lines.push("");
   lines.push(`> ${charInfo.description}`);
@@ -1057,7 +1057,7 @@ export async function generateSkillSkillMarkdown(
     lines.push("## Authentication");
     lines.push("");
     lines.push(
-      "🌐 This skill's tools are publicly accessible — no authentication required.",
+      "🌐 This skill's tools are publicly accessible - no authentication required.",
     );
     lines.push("");
     lines.push(
@@ -1092,7 +1092,7 @@ export async function generateSkillSkillMarkdown(
     lines.push("## No tools available");
     lines.push("");
     lines.push(
-      "No tools are available for this skill. All tools are included by default — add `UserRole.SKILL_OFF` to exclude an endpoint.",
+      "No tools are available for this skill. All tools are included by default - add `UserRole.SKILL_OFF` to exclude an endpoint.",
     );
     return lines.join("\n");
   }
@@ -1159,7 +1159,7 @@ export async function generateSkillSkillMarkdown(
   lines.push("");
   lines.push(
     `*This manifest was auto-generated for skill **${charInfo.name}** on ${now}. ` +
-      `Do not edit manually — it will be regenerated on the next request.*`,
+      `Do not edit manually - it will be regenerated on the next request.*`,
   );
   lines.push("");
 

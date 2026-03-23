@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
     notConfigured: {
       title: "NOWPayments nicht konfiguriert",
       description:
-        "NOWPayments ist nicht konfiguriert — setze NOWPAYMENTS_API_KEY und NOWPAYMENTS_IPN_SECRET in deiner .env",
+        "NOWPayments ist nicht konfiguriert - setze NOWPAYMENTS_API_KEY und NOWPAYMENTS_IPN_SECRET in deiner .env",
     },
     webhookVerificationFailed: {
       title: "Webhook-Verifizierung fehlgeschlagen",

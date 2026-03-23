@@ -13,14 +13,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatActionCommand,
   formatDatabase,
   formatDuration,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
+import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 import type { GenerateResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -86,7 +86,7 @@ export class DatabaseGenerateRepository {
       }
 
       // Interactive mode (vibe dgen):
-      // - stdin: inherit (real terminal — arrow keys, enter work)
+      // - stdin: inherit (real terminal - arrow keys, enter work)
       // - stdout/stderr: pipe + FORCE_COLOR so we get colors in buffer
       // - Wait up to 6s for "No schema changes" → suppress entirely
       // - After 6s without it → flush buffer to stdout and pipe live from then on

@@ -128,7 +128,7 @@ export function ImportJobStatusContainer({
           </Span>
           {info?.fileName && (
             <Span className="text-sm text-muted-foreground">
-              — {info.fileName}
+              - {info.fileName}
             </Span>
           )}
         </Div>

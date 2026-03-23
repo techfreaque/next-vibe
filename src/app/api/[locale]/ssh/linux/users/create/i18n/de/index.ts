@@ -21,12 +21,12 @@ export const translations = {
     userAlreadyExists: "Ein Benutzer mit diesem Namen existiert bereits",
     connectionNotFound: "SSH-Verbindung nicht gefunden",
     encryptionFailed:
-      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
+      "Verschlüsselung fehlgeschlagen - SSH_SECRET_KEY möglicherweise ungültig",
     connectTimeout: "Verbindung hat Zeitlimit überschritten",
     sshAuthFailed: "SSH-Authentifizierung fehlgeschlagen",
     sshConnectionFailed: "SSH-Verbindung fehlgeschlagen",
     sudoAuthFailed:
-      "Sudo-Authentifizierung fehlgeschlagen — falsches Passwort oder unzureichende sudo-Rechte",
+      "Sudo-Authentifizierung fehlgeschlagen - falsches Passwort oder unzureichende sudo-Rechte",
     permissionDenied:
       "Zugriff verweigert: Geben Sie Ihr sudo-Passwort an, um OS-Benutzer zu erstellen",
     fingerprintMismatch:

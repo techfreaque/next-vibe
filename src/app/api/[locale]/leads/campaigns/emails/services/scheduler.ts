@@ -187,7 +187,7 @@ export class CampaignSchedulerService {
           source: lead.source || undefined,
         });
 
-      // Upsert lead_campaigns row — one row per lead+campaignType
+      // Upsert lead_campaigns row - one row per lead+campaignType
       const now = new Date();
 
       // Update lead with assigned journey variant (kept for backwards compat / denormalized view)
@@ -488,7 +488,7 @@ export class CampaignSchedulerService {
    * Halt a campaign for a lead.
    * Marks the lead_campaigns row as halted and cancels all pending email sends
    * for that campaign type. If no campaignType is given, halts all campaigns.
-   * Does NOT require a TFunction — safe to call from any server context.
+   * Does NOT require a TFunction - safe to call from any server context.
    */
   async haltCampaign(
     leadId: string,
@@ -574,7 +574,7 @@ export class CampaignSchedulerService {
       case LeadStatus.UNSUBSCRIBED:
       case LeadStatus.BOUNCED:
       case LeadStatus.INVALID:
-        // halt all — pass undefined to haltCampaign
+        // halt all - pass undefined to haltCampaign
         haltTargets.push(undefined);
         break;
       default:

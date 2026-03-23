@@ -1,5 +1,5 @@
 /**
- * Users 2FA Enabled — Endpoint Definition
+ * Users 2FA Enabled - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

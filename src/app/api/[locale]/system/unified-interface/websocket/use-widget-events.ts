@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * useWidgetEvents — Typed WebSocket event hook for widgets.
+ * useWidgetEvents - Typed WebSocket event hook for widgets.
  *
  * Derives the channel from the widget's endpoint definition + URL path params,
  * and provides a typed `on()` function that only accepts event names

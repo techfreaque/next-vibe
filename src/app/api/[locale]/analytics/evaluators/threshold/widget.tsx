@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Threshold Evaluator Widget
+ * Vibe Sense - Threshold Evaluator Widget
  * Op selector + value input for the node inspector.
  */
 

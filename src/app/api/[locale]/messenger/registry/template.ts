@@ -129,7 +129,7 @@ export interface EmailRenderProps<
   urlPathParams: TUrlVariables;
   responseData: TResponse;
   user: InferJwtPayloadTypeFromRoles<TUserRoles>;
-  // Method shorthand — bivariant under strictFunctionTypes.
+  // Method shorthand - bivariant under strictFunctionTypes.
   // Allows a template with render(props: EmailRenderProps<..., NarrowKey>) to be
   // assigned to EmailHandler.template which expects EmailRenderProps<..., TranslationKey>.
   t(key: TScopedTranslationKey, params?: TParams): TranslatedKeyType;
@@ -156,11 +156,11 @@ export interface EmailTemplateDefinition<
   TProps,
   // TScopedTranslation: the createScopedTranslation result for this template.
   // The constraint uses ScopedTResult (method shorthand for `t`) so TypeScript checks `t`
-  // bivariantly — allowing concrete templates with narrower key unions to satisfy it.
+  // bivariantly - allowing concrete templates with narrower key unions to satisfy it.
   TScopedTranslation extends {
     scopedT: (locale: CountryLanguage) => ScopedTResult;
   },
-  // TRequest, TResponse, TUrlVariables — the endpoint types this template's render handles.
+  // TRequest, TResponse, TUrlVariables - the endpoint types this template's render handles.
   TRequest,
   TResponse,
   TUrlVariables,
@@ -180,7 +180,7 @@ export interface EmailTemplateDefinition<
   }) => ReactElement;
   exampleProps: TProps;
   /**
-   * Render function — business logic that maps endpoint context to EmailResolvedData.
+   * Render function - business logic that maps endpoint context to EmailResolvedData.
    * Lives here so email.tsx files only export EmailTemplateDefinition objects.
    * Routes reference it as: email: [{ template: xEmailTemplate, ignoreErrors: true }]
    */
@@ -239,9 +239,9 @@ export interface TemplateExport<
  *
  * When `template` is `AnyEmailTemplate` (a union), TypeScript widens both
  * `template.schema.parse(rawProps)` and `t` to intersections of all union
- * members — making them unusable directly at call sites. These helpers seal the
+ * members - making them unusable directly at call sites. These helpers seal the
  * schema.parse + component call (and the subject lookup) inside a dispatch
- * boundary. The `as never` casts are intentional and unavoidable — they exist
+ * boundary. The `as never` casts are intentional and unavoidable - they exist
  * solely here so that every caller gets full structural type safety with zero
  * assertions of their own.
  */

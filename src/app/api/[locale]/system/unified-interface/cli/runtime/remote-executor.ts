@@ -196,7 +196,7 @@ export class RemoteExecutor {
   /**
    * Execute an endpoint on a remote host via HTTP.
    * Session is always read from remote_connections DB table.
-   * userId is required — remote execution requires an authenticated local user.
+   * userId is required - remote execution requires an authenticated local user.
    */
   static async execute(params: {
     endpoint: CreateApiEndpointAny;

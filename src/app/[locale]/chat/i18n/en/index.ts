@@ -126,15 +126,15 @@ export const translations = {
       enabledLabel: "allowed",
       totalLabel: "total",
       activeTooltip:
-        "Pinned tools are always in context — the AI sees them every turn",
+        "Pinned tools are always in context - the AI sees them every turn",
       enabledTooltip:
         "Allowed tools can be called on demand when help is enabled",
       legendActive: "Always in context (pinned)",
       legendConfirm: "Asks before running",
-      activeOn: "Pinned — always in context. Click to unpin",
-      activeOff: "Not pinned — AI can still call on demand. Click to pin",
-      confirmOn: "Asks for confirmation — click to disable",
-      confirmOff: "Runs automatically — click to require confirmation",
+      activeOn: "Pinned - always in context. Click to unpin",
+      activeOff: "Not pinned - AI can still call on demand. Click to pin",
+      confirmOn: "Asks for confirmation - click to disable",
+      confirmOff: "Runs automatically - click to require confirmation",
     },
   },
 
@@ -752,7 +752,7 @@ export const translations = {
     welcome: {
       title: "Think of us as your AI team.",
       line1:
-        "Your companion handles everyday chat. Specialists step in for coding, research, writing — whatever the task needs.",
+        "Your companion handles everyday chat. Specialists step in for coding, research, writing - whatever the task needs.",
       line2: "The AI switches between them automatically. You just talk.",
       line3: "Let's get you set up in under a minute.",
       continue: "Get Started",
@@ -763,7 +763,7 @@ export const translations = {
       line1:
         "Your settings, companion, and chat history are saved locally on this device only.",
       line2:
-        "Sign in to keep everything synced across devices — and make sure you never lose your setup.",
+        "Sign in to keep everything synced across devices - and make sure you never lose your setup.",
       signIn: "Sign In / Create Account",
       continueAnyway: "Continue as Guest",
       note: "You can sign in later from the menu at any time.",
@@ -783,11 +783,11 @@ export const translations = {
         },
         brilliant: {
           label: "Brilliant",
-          desc: "Best quality — great for complex questions, writing, and analysis",
+          desc: "Best quality - great for complex questions, writing, and analysis",
         },
         max: {
           label: "Max",
-          desc: "Highest reasoning, no compromises — for when it really matters",
+          desc: "Highest reasoning, no compromises - for when it really matters",
         },
       },
     },
@@ -798,7 +798,7 @@ export const translations = {
         "We'll add the right specialists to your AI's toolkit automatically.",
       saving: "Setting up...",
       start: "Start Chatting",
-      skip: "Skip — I'll set it up later",
+      skip: "Skip - I'll set it up later",
       coding: {
         label: "Coding & Tech",
         hint: "Vibe Coder, Coder",

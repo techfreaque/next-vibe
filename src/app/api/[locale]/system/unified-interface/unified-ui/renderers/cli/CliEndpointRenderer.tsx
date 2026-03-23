@@ -13,7 +13,7 @@
  */
 
 import { Box, Text, useInput } from "ink";
-import React, {
+import {
   type JSX,
   useCallback,
   useEffect,
@@ -111,7 +111,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   const onFormChangeRef = useRef(onFormChange);
   onFormChangeRef.current = onFormChange;
 
-  // Extract schema defaults (same as React's useApiForm) — stable, only depends on schema
+  // Extract schema defaults (same as React's useApiForm) - stable, only depends on schema
   const schemaDefaults = useMemo(() => {
     const extracted = extractSchemaDefaults<
       TEndpoint["types"]["RequestOutput"]
@@ -141,7 +141,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     } as Partial<TEndpoint["types"]["RequestOutput"]>;
   }, [schemaDefaults, endpoint.options, data]);
 
-  // Form state management — initialized with merged defaults
+  // Form state management - initialized with merged defaults
   const [formValues, setFormValues] =
     useState<Partial<TEndpoint["types"]["RequestOutput"]>>(mergedDefaults);
   const [formErrors, setFormErrors] = useState<
@@ -197,7 +197,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   // If it returns false, submit is aborted.
   const preSubmitRef = useRef<(() => Promise<boolean>) | undefined>(undefined);
 
-  // Handle submit — awaits preSubmit hook if set.
+  // Handle submit - awaits preSubmit hook if set.
   // Reads formValuesRef.current so async preSubmit mutations are visible.
   const handleSubmit = useCallback((): void => {
     logger.debug("[InkEndpointRenderer] handleSubmit called", {
@@ -257,7 +257,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     void doSubmit();
   }, [onSubmit, isSubmitting, logger, endpoint.requestSchema]);
 
-  // Focus management — extract request field names for tab navigation
+  // Focus management - extract request field names for tab navigation
   // Keep request fields focusable even after response (for re-filtering/re-submitting)
   // Excludes hidden fields (e.g. token, leadId) that have no visible UI
   const requestFieldNames = useMemo(() => {
@@ -270,7 +270,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         if (isResponseField(field)) {
           return false;
         }
-        // Skip hidden fields — they have no visible input to focus
+        // Skip hidden fields - they have no visible input to focus
         if ("hidden" in field && field.hidden === true) {
           return false;
         }

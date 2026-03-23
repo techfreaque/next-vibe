@@ -12,17 +12,17 @@ A `repository.ts` file **must contain only**:
 
 **Nothing else is allowed at module level.** Specifically:
 
-| ❌ Forbidden                                                       | ✅ Instead                                                   |
+| ❌ Forbidden                                                        | ✅ Instead                                                    |
 | ------------------------------------------------------------------ | ------------------------------------------------------------ |
 | `type ModuleT = FooT`                                              | Use `FooT` directly in signatures                            |
 | `type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"]` | Export `FooT` from `i18n/index.ts`, import and use directly  |
-| `export interface IFooRepository`                                  | Delete it — static classes need no interface                 |
+| `export interface IFooRepository`                                  | Delete it - static classes need no interface                 |
 | `export const fooRepository = new FooImpl()`                       | Use `FooRepository.method()` statically                      |
 | `export const SOME_CONSTANT = ...`                                 | Move inside class as `private static readonly`               |
 | `interface SomeHelper { ... }` (non-exported)                      | Move inside class or to a `types.ts` file                    |
 | `export function someHelper()`                                     | Move inside class as `private static someHelper()`           |
 | `export type SomeType = ...`                                       | Move to `definition.ts` or `types.ts`                        |
-| `private static readonly MESSAGES = { FOO: "hardcoded string" }`   | Use `t("key")` — **never bypass i18n with string constants** |
+| `private static readonly MESSAGES = { FOO: "hardcoded string" }`   | Use `t("key")` - **never bypass i18n with string constants** |
 
 ## Core Principles
 
@@ -48,10 +48,10 @@ export const userRepository = new UserRepositoryImpl();
 
 Internal methods marked `private static`. Pass `t` (or `locale`) through to helpers that produce error messages.
 
-**Import the named `T` type directly from `./i18n` — never inline `ReturnType<...>` and never create a `type ModuleT = FooT` alias:**
+**Import the named `T` type directly from `./i18n` - never inline `ReturnType<...>` and never create a `type ModuleT = FooT` alias:**
 
 ```typescript
-// ✅ CORRECT — import the named type, use it directly
+// ✅ CORRECT - import the named type, use it directly
 import type { AuthT } from "./i18n"; // i18n/index.ts exports: export type AuthT = ReturnType<typeof scopedTranslation.scopedT>["t"]
 
 export class AuthRepository {
@@ -71,7 +71,7 @@ export class AuthRepository {
     logger: EndpointLogger,
     t: AuthT,
   ): Promise<ResponseType<ValidatedUser>> {
-    // Internal logic — use t() in fail() messages
+    // Internal logic - use t() in fail() messages
   }
 
   private static async createSession(
@@ -83,11 +83,11 @@ export class AuthRepository {
   }
 }
 
-// ❌ WRONG — inline ReturnType
+// ❌ WRONG - inline ReturnType
 import type { scopedTranslation } from "./i18n";
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"]; // ← never do this
 
-// ❌ WRONG — alias-of-alias
+// ❌ WRONG - alias-of-alias
 import type { AuthT } from "./i18n";
 type ModuleT = AuthT; // ← never do this, use AuthT directly
 ```
@@ -151,12 +151,12 @@ export class ItemRepository {
 }
 ```
 
-### 4. Never Hardcode Strings — Always Use `t()`
+### 4. Never Hardcode Strings - Always Use `t()`
 
-**All user-facing messages MUST go through the scoped `t()` function.** Hardcoded string constants are strictly forbidden, even when hidden inside a `private static readonly MESSAGES` object — they bypass i18n and make the platform untranslatable.
+**All user-facing messages MUST go through the scoped `t()` function.** Hardcoded string constants are strictly forbidden, even when hidden inside a `private static readonly MESSAGES` object - they bypass i18n and make the platform untranslatable.
 
 ```typescript
-// ❌ STRICTLY FORBIDDEN — string constants masquerading as i18n
+// ❌ STRICTLY FORBIDDEN - string constants masquerading as i18n
 export class BuildRepository {
   private static readonly MESSAGES = {
     BUILD_START: "🚀 Starting application build...",
@@ -173,7 +173,7 @@ export class BuildRepository {
   }
 }
 
-// ✅ CORRECT — all strings go through t()
+// ✅ CORRECT - all strings go through t()
 export class BuildRepository {
   static async build(logger: EndpointLogger, t: BuildT) {
     logger.info(t("build.start"));
@@ -185,14 +185,14 @@ export class BuildRepository {
 }
 ```
 
-**Why this matters:** A `MESSAGES` constant looks organized but silently breaks i18n. The `t()` function is the only approved way to produce any message string — log messages, error messages, status strings, everything.
+**Why this matters:** A `MESSAGES` constant looks organized but silently breaks i18n. The `t()` function is the only approved way to produce any message string - log messages, error messages, status strings, everything.
 
-### 5. Never Throw — Use `fail()`
+### 5. Never Throw - Use `fail()`
 
-**Never use `throw` in a repository.** No exceptions. If something fails, return `fail()` — even in private helpers and inner catch blocks. Callers check `.success`, not try/catch.
+**Never use `throw` in a repository.** No exceptions. If something fails, return `fail()` - even in private helpers and inner catch blocks. Callers check `.success`, not try/catch.
 
 ```typescript
-// ✅ CORRECT — inner catch returns fail(), caller checks .success
+// ✅ CORRECT - inner catch returns fail(), caller checks .success
 private static async insertRecord(
   data: SomeType,
   logger: EndpointLogger,
@@ -210,7 +210,7 @@ private static async insertRecord(
   }
 }
 
-// ❌ WRONG — inner catch re-throws to outer catch
+// ❌ WRONG - inner catch re-throws to outer catch
 private static async insertRecord(...) {
   try {
     const [record] = await db.insert(table).values(data).returning();
@@ -220,7 +220,7 @@ private static async insertRecord(...) {
   }
 }
 
-// ❌ WRONG — throwing to force the outer catch to handle it
+// ❌ WRONG - throwing to force the outer catch to handle it
 try {
   const result = await this.insertRecord(data, logger, t);
   // ...
@@ -230,12 +230,12 @@ try {
 }
 ```
 
-### 6. Always Use `success()` / `fail()` — Never Raw Objects
+### 6. Always Use `success()` / `fail()` - Never Raw Objects
 
-ALL methods, including private static helpers, must return using `success(data)` or `fail({ message, errorType })`. Never return a raw object that mimics the shape of `ResponseType` — doing so bypasses the contract, breaks type inference, and silently hides errors from callers.
+ALL methods, including private static helpers, must return using `success(data)` or `fail({ message, errorType })`. Never return a raw object that mimics the shape of `ResponseType` - doing so bypasses the contract, breaks type inference, and silently hides errors from callers.
 
 ```typescript
-// ❌ WRONG — raw object, bypasses ResponseType contract
+// ❌ WRONG - raw object, bypasses ResponseType contract
 return { success: false, error: String(error) };
 return { success: true, data: result };
 
@@ -247,7 +247,7 @@ return fail({
 return success(result);
 ```
 
-This applies everywhere — public methods, `private static` helpers, inner catch blocks, and split-folder helper classes (`queries.ts`, `validation.ts`, etc.). If the return type is `ResponseType<T>`, the value must come from `success()` or `fail()`, full stop.
+This applies everywhere - public methods, `private static` helpers, inner catch blocks, and split-folder helper classes (`queries.ts`, `validation.ts`, etc.). If the return type is `ResponseType<T>`, the value must come from `success()` or `fail()`, full stop.
 
 ### 7. Type Alignment - CRITICAL
 
@@ -437,14 +437,14 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { MyT } from "./i18n"; // ✅ named type — never `import type { scopedTranslation }`
+import type { MyT } from "./i18n"; // ✅ named type - never `import type { scopedTranslation }`
 import { myTable } from "./db";
 import type {
   MyGetResponseOutput,
   MyGetUrlVariablesOutput,
 } from "./definition";
 
-// ✅ NO module-level type aliases — use MyT directly in signatures
+// ✅ NO module-level type aliases - use MyT directly in signatures
 
 export class MyRepository {
   static async getById(
@@ -777,5 +777,5 @@ export class OrderRepository {
 - [Route Patterns](route.md)
 - [Definition Patterns](definition.md)
 - [Database Patterns](database.md)
-- [Client Repository](repository.client.md) — localStorage/client-side utilities, incognito mode, pure helpers used by hooks/widgets
-- [Native Repository Patterns](repository.native.md) — HTTP-based implementation for React Native
+- [Client Repository](repository.client.md) - localStorage/client-side utilities, incognito mode, pure helpers used by hooks/widgets
+- [Native Repository Patterns](repository.native.md) - HTTP-based implementation for React Native

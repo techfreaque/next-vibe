@@ -1,5 +1,5 @@
 /**
- * Payments Disputes Count — Route
+ * Payments Disputes Count - Route
  * Server-only.
  */
 

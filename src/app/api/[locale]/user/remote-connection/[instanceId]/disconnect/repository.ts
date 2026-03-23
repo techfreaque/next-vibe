@@ -1,6 +1,6 @@
 /**
  * Remote Connection Disconnect Repository
- * DELETE — remove the connection record and notify remote
+ * DELETE - remove the connection record and notify remote
  */
 
 import "server-only";
@@ -32,7 +32,7 @@ export class RemoteConnectionDisconnectRepository {
     instanceId: string,
     locale: CountryLanguage,
   ): Promise<ResponseType<RemoteConnectionDisconnectDeleteResponseOutput>> {
-    // Fetch full record before deleting — need remoteUrl + token to notify cloud
+    // Fetch full record before deleting - need remoteUrl + token to notify cloud
     const [row] = await db
       .select()
       .from(remoteConnections)
@@ -72,7 +72,7 @@ export class RemoteConnectionDisconnectRepository {
       const selfId = row.remoteInstanceId;
       if (!selfId) {
         logger.warn(
-          "No remoteInstanceId on connection — skipping remote disconnect",
+          "No remoteInstanceId on connection - skipping remote disconnect",
           { instanceId },
         );
         return success({ disconnected: true });
@@ -90,7 +90,7 @@ export class RemoteConnectionDisconnectRepository {
       })
         .then((res) => {
           if (!res.ok) {
-            logger.warn("Remote disconnect failed — cloud record may remain", {
+            logger.warn("Remote disconnect failed - cloud record may remain", {
               instanceId,
               status: res.status,
             });
@@ -103,7 +103,7 @@ export class RemoteConnectionDisconnectRepository {
         })
         .catch((err) => {
           logger.warn(
-            "Remote disconnect request errored — cloud record may remain",
+            "Remote disconnect request errored - cloud record may remain",
             {
               instanceId,
               error: String(err),

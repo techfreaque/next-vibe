@@ -7,12 +7,12 @@ import "server-only";
 
 import type { ModelMessage } from "ai";
 import { eq } from "drizzle-orm";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
@@ -57,7 +57,7 @@ import { ToolConfirmationProcessor } from "./handlers/tool-confirmation-processo
 import { UserMessageHandler } from "./handlers/user-message-handler";
 import { buildSystemPrompt } from "./system-prompt/builder";
 
-/** Normalize DB tool config items — ensures requiresConfirmation is always boolean */
+/** Normalize DB tool config items - ensures requiresConfirmation is always boolean */
 function normalizeToolConfig(
   items:
     | Array<{ toolId: string; requiresConfirmation?: boolean | null }>
@@ -149,11 +149,11 @@ export interface StreamSetupResult {
   provider: ReturnType<typeof ProviderFactoryClass.getProviderForModel>;
   /** Abort controller for stream timeout and cancellation */
   streamAbortController: AbortController;
-  /** Rich context for tool executions — rootFolderId, threadId, aiMessageId, etc. */
+  /** Rich context for tool executions - rootFolderId, threadId, aiMessageId, etc. */
   streamContext: ToolExecutionContext;
   /**
    * When true, all tool confirmations were wakeUp-pending (goroutines still running).
-   * The AI turn should be skipped — resume-stream will handle revival for each task.
+   * The AI turn should be skipped - resume-stream will handle revival for each task.
    */
   skipAiTurn?: boolean;
 }
@@ -479,7 +479,7 @@ export async function setupAiStream(params: {
         }
       }
 
-      // 2. Check skill compactTrigger (custom skills only — UUIDs)
+      // 2. Check skill compactTrigger (custom skills only - UUIDs)
       if (data.skill) {
         // Only query DB for UUIDs (custom skills); default/config skills have no DB row
         const uuidPattern =
@@ -518,7 +518,7 @@ export async function setupAiStream(params: {
   });
 
   // Resolve tool config cascade: favorite → skill → settings → client-provided → null (all allowed)
-  // null means "no restriction" — model can call any tool
+  // null means "no restriction" - model can call any tool
   const resolvedToolConfig = await (async (): Promise<{
     availableTools: Array<{
       toolId: string;
@@ -530,7 +530,7 @@ export async function setupAiStream(params: {
     }> | null;
     /** Union of skill-level + favorite-level denied tools. Applied as a hard block. */
     deniedToolIds: Set<string>;
-    /** Text from the active favorite's promptAppend — appended to system prompt. */
+    /** Text from the active favorite's promptAppend - appended to system prompt. */
     promptAppend: string | null;
     /** Resolved memory token limit from cascade: favorite → skill → settings → null */
     memoryLimit: number | null;
@@ -630,7 +630,7 @@ export async function setupAiStream(params: {
       const uuidPattern =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (uuidPattern.test(data.skill)) {
-        // Custom skill (DB-stored, UUID) — availableTools/pinnedTools only (deniedTools already fetched above)
+        // Custom skill (DB-stored, UUID) - availableTools/pinnedTools only (deniedTools already fetched above)
         const [char] = await db
           .select({
             availableTools: customSkills.availableTools,
@@ -757,7 +757,7 @@ export async function setupAiStream(params: {
   const aiMessageId = crypto.randomUUID();
   const aiMessageCreatedAt = new Date();
 
-  // Build the rich stream context — passed through to all tool executions
+  // Build the rich stream context - passed through to all tool executions
   const streamContext: ToolExecutionContext = {
     rootFolderId: data.rootFolderId,
     threadId: threadResult.data.threadId,
@@ -765,7 +765,7 @@ export async function setupAiStream(params: {
     skillId: data.skill,
     modelId: data.model,
     headless: params.headless,
-    // favoriteId: from headless override (run endpoint) — lets resume-stream reload full context
+    // favoriteId: from headless override (run endpoint) - lets resume-stream reload full context
     favoriteId: params.favoriteIdOverride,
     currentToolMessageId: undefined,
     callerToolCallId: undefined,
@@ -823,7 +823,7 @@ export async function setupAiStream(params: {
   });
 
   // Apply deniedTools filter: strip blocked tools from both visible and active sets.
-  // This is a hard block — denied tools cannot be seen or executed regardless of cascade.
+  // This is a hard block - denied tools cannot be seen or executed regardless of cascade.
   const applyDeniedFilter = <T extends { toolId: string }>(
     tools: T[] | null | undefined,
   ): T[] | null | undefined => {
@@ -888,7 +888,7 @@ export async function setupAiStream(params: {
   // the 90s stream timeout for long-running tools (SSH, claude-code, etc.).
   //
   // The stream aborts via REMOTE_TOOL_WAIT (same as remote queue wait) so the UI
-  // stays in a visible, cancellable waiting state — not a silent STREAM_TIMEOUT.
+  // stays in a visible, cancellable waiting state - not a silent STREAM_TIMEOUT.
   // User cancel fires onEscalatedTaskCancel which marks the task CANCELLED.
   streamContext.escalateToTask = async (options?: {
     callbackMode?: string;
@@ -945,7 +945,7 @@ export async function setupAiStream(params: {
       userId: user.id,
     });
 
-    // Always abort via REMOTE_TOOL_WAIT — stream dies, thread → waiting.
+    // Always abort via REMOTE_TOOL_WAIT - stream dies, thread → waiting.
     // revival (via handleTaskCompletion) delivers the result and resumes the thread.
     // callbackMode controls what happens ON revival (backfill vs deferred), not how the stream stops.
     streamContext.waitingForRemoteResult = true;
@@ -958,7 +958,7 @@ export async function setupAiStream(params: {
     }
     // escalateTimeoutMs === 0 → no timer (long-running tool, wait forever)
 
-    // Mark thread as "waiting" — task is in flight, stream will die soon.
+    // Mark thread as "waiting" - task is in flight, stream will die soon.
     // Clients subscribe to STREAMING_STATE_CHANGED and show the stop button.
     if (taskThreadId) {
       const { chatThreads: chatThreadsTable } =
@@ -1053,7 +1053,7 @@ export async function setupAiStream(params: {
       const finalOutput: Record<string, JsonValue> | null =
         result.success && result.data ? result.data : null;
 
-      // Determine effective callbackMode — default to WAKE_UP for backward compat
+      // Determine effective callbackMode - default to WAKE_UP for backward compat
       const effectiveMode =
         callbackMode === CM.WAIT
           ? CM.WAIT

@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
   },
   tags: ["tags.ai", "tags.chat"],
 
-  // No events — run emits to the messages channel directly.
+  // No events - run emits to the messages channel directly.
 
   fields: customWidgetObject({
     render: AiRunWidget,
@@ -146,7 +146,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      // ── Pre-calls — executed before the prompt, results injected as context ──
+      // ── Pre-calls - executed before the prompt, results injected as context ──
       preCalls: requestDataArrayOptionalField(
         scopedTranslation,
         {
@@ -464,7 +464,7 @@ const { POST } = createEndpoint({
 
   examples: {
     requests: {
-      // Simple: just prompt — no pre-calls, default skill
+      // Simple: just prompt - no pre-calls, default skill
       simple: {
         model: ModelId["CLAUDE_HAIKU_4_5"],
         prompt: "Write a 3-sentence summary of what unbottled.ai is.",

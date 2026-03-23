@@ -15,8 +15,8 @@ import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as builderScopedTranslation } from "../../builder/i18n";
+import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { GenerateAllRepository } from "../../generators/generate-all/repository";
@@ -42,7 +42,7 @@ export class BuildRepository {
     try {
       output.push(t("post.repository.messages.buildStart"));
 
-      // Generate API endpoints first — package build (vibe-runtime) bundles
+      // Generate API endpoints first - package build (vibe-runtime) bundles
       // interactive.cli.tsx which statically imports generated/endpoints-meta/en,
       // so generated files must exist before the package build runs.
       if (!data.generate) {
@@ -190,9 +190,10 @@ export class BuildRepository {
 
         // Run Next.js build command using bun (works in both dev and Docker)
         const { spawnSync } = await import("node:child_process");
-        const buildArgs = data.webpack === true
-          ? ["next", "build", "--webpack"]
-          : ["next", "build"];
+        const buildArgs =
+          data.webpack === true
+            ? ["next", "build", "--webpack"]
+            : ["next", "build"];
         const buildResult = spawnSync("bunx", buildArgs, {
           stdio: "inherit",
           cwd: process.cwd(),
@@ -212,7 +213,7 @@ export class BuildRepository {
           const isOom =
             exitSignal === "SIGKILL" || exitCode === 137 || exitCode === 134;
           const detail = isOom
-            ? `Next.js build killed by OS (likely OOM) — signal: ${exitSignal ?? exitCode}`
+            ? `Next.js build killed by OS (likely OOM) - signal: ${exitSignal ?? exitCode}`
             : `Next.js build exited with code ${exitCode ?? "unknown"}`;
           const errorMsg = `${t("post.repository.messages.nextjsBuildFailed")}: ${detail}`;
           steps.push({ label: "Next.js", ok: false, skipped: false });
@@ -425,7 +426,7 @@ export class BuildRepository {
         }
       } catch {
         if (attempt === maxAttempts) {
-          logger.warn("Preview DB connection timeout — continuing anyway");
+          logger.warn("Preview DB connection timeout - continuing anyway");
         }
       }
     }

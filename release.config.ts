@@ -42,7 +42,7 @@ const releaseConfig: ReleaseFileConfig = {
 
   // Package configurations
   packages: [
-    // Main next-vibe package — runs first so its build (which cleans .dist/) runs before checker
+    // Main next-vibe package - runs first so its build (which cleans .dist/) runs before checker
     {
       directory: "./",
       updateDeps: true,
@@ -115,7 +115,7 @@ const releaseConfig: ReleaseFileConfig = {
         postPublish: {
           command:
             // Guard: skip deploy when VPS_HOST is not set (local release)
-            'if [ -z "$VPS_HOST" ]; then echo "No VPS_HOST set — skipping deploy (local mode)"; exit 0; fi && ' +
+            'if [ -z "$VPS_HOST" ]; then echo "No VPS_HOST set - skipping deploy (local mode)"; exit 0; fi && ' +
             // Write SSH key to temp file, SSH in, run the deploy script, clean up key
             'KEY=$(mktemp) && echo "$VPS_SSH_KEY" > "$KEY" && chmod 600 "$KEY" && ' +
             'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$KEY" ' +
@@ -127,7 +127,7 @@ const releaseConfig: ReleaseFileConfig = {
       },
     },
 
-    // @next-vibe/checker — runs after main so .dist/ is already cleaned before checker builds into .dist/checker/
+    // @next-vibe/checker - runs after main so .dist/ is already cleaned before checker builds into .dist/checker/
     {
       directory: ".dist/checker",
       updateDeps: false,

@@ -1,5 +1,5 @@
 /**
- * Subscription Domain — Vibe Sense Graph Seeds
+ * Subscription Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the subscription domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,22 +7,22 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
+import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import { SUBSCRIPTIONS_ACTIVE_ALIAS } from "./data-sources/subscriptions-active/constants";
-import { SUBSCRIPTIONS_NEW_ALIAS } from "./data-sources/subscriptions-new/constants";
 import { SUBSCRIPTIONS_CANCELLED_ALIAS } from "./data-sources/subscriptions-cancelled/constants";
 import { SUBSCRIPTIONS_CHURNED_ALIAS } from "./data-sources/subscriptions-churned/constants";
-import { SUBSCRIPTIONS_TRIALING_ALIAS } from "./data-sources/subscriptions-trialing/constants";
+import { SUBSCRIPTIONS_NEW_ALIAS } from "./data-sources/subscriptions-new/constants";
 import { SUBSCRIPTIONS_PAYMENT_FAILED_ALIAS } from "./data-sources/subscriptions-payment-failed/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { SUBSCRIPTIONS_TRIALING_ALIAS } from "./data-sources/subscriptions-trialing/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 

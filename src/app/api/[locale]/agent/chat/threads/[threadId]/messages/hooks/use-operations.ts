@@ -15,22 +15,22 @@ import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadI
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
 import type { StartStreamFn } from "../../../../../ai-stream/stream/hooks/shared";
-
-type CancelStreamFn = UseAIStreamReturn["cancelStream"];
+import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../config";
 import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import type { ToolConfigItem } from "../../../../settings/definition";
 import messagesDefinition from "../definition";
-import { removeMessage, patchMessage } from "./update-messages";
+import { patchMessage, removeMessage } from "./update-messages";
+
+type CancelStreamFn = UseAIStreamReturn["cancelStream"];
 
 /**
  * Message operations interface
@@ -88,7 +88,7 @@ interface MessageOperationsDeps {
   activeThreadId: string | null;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
-  /** leafMessageId — must be passed as prop, not read from nav store, to support nested AI streams */
+  /** leafMessageId - must be passed as prop, not read from nav store, to support nested AI streams */
   leafMessageId: string | null;
   settings: {
     selectedModel: ModelId;

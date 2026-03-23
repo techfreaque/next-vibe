@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Skript",
     description:
-      "Skript — wendet eine benutzerdefinierte Sandbox-Funktion auf eine Zeitreihe an",
+      "Skript - wendet eine benutzerdefinierte Sandbox-Funktion auf eine Zeitreihe an",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       fn: {

@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Neu bauen & Neustarten",
     description:
-      "Anwendung neu bauen und den laufenden Next.js-Server hot-restarten. Führt 6 Schritte sequentiell aus: 1) Code-Generierung, 2) Vibe-Check (Code-Qualitäts-Gate), 3) Next.js-Produktions-Build, 4) Datenbank-Migrationen, 5) Datenbank-Seeding, 6) Hot-Restart via SIGUSR1. Der Vibe-Check blockiert den Build bei Fehlern — verwende 'vibe check' oder das MCP-Check-Tool für Details. WARNUNG: Die HTTP-Antwort kann abgeschnitten werden, da der Server vor Abschluss der Antwort neu startet.",
+      "Anwendung neu bauen und den laufenden Next.js-Server hot-restarten. Führt 6 Schritte sequentiell aus: 1) Code-Generierung, 2) Vibe-Check (Code-Qualitäts-Gate), 3) Next.js-Produktions-Build, 4) Datenbank-Migrationen, 5) Datenbank-Seeding, 6) Hot-Restart via SIGUSR1. Der Vibe-Check blockiert den Build bei Fehlern - verwende 'vibe check' oder das MCP-Check-Tool für Details. WARNUNG: Die HTTP-Antwort kann abgeschnitten werden, da der Server vor Abschluss der Antwort neu startet.",
     form: {
       title: "Neu bauen & Neustarten",
       description: "Anwendung neu bauen und Server neustarten",
@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
       migrationFailed: "Migration fehlgeschlagen: {{error}}",
       seedingFailed: "Seeding fehlgeschlagen: {{error}}",
       restartFailed: "Server-Neustart fehlgeschlagen: {{error}}",
-      noPidFile: "Keine .vibe-pid-Datei gefunden — läuft vibe start gerade?",
+      noPidFile: "Keine .vibe-pid-Datei gefunden - läuft vibe start gerade?",
       invalidPid: "Ungültige PID in .vibe-pid: {{pid}}",
       processNotRunning: "Prozess {{pid}} läuft nicht",
       signalFailed: "SIGUSR1 konnte nicht gesendet werden: {{error}}",

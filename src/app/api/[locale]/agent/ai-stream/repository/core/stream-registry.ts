@@ -1,5 +1,5 @@
 /**
- * StreamRegistry — Server-side in-memory registry of active AI streams.
+ * StreamRegistry - Server-side in-memory registry of active AI streams.
  *
  * Keyed by threadId so the cancel endpoint can find and abort a running stream.
  * The Map lives for the lifetime of the server process.
@@ -13,9 +13,9 @@ import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { buildMessagesChannel } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/channel";
 import { createStreamEvent } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/events";
 import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 
 import { AbortReason, StreamAbortError } from "./constants";
@@ -118,7 +118,7 @@ export async function clearStreamingState(
   StreamRegistry.unregister(threadId);
   const now = new Date();
 
-  // Check for active tasks tied to this thread — if any are still running,
+  // Check for active tasks tied to this thread - if any are still running,
   // set "waiting" instead of "idle" so the stop button stays visible.
   const [activeTask] = await db
     .select({ id: cronTasks.id })

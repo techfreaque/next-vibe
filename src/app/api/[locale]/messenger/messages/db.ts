@@ -2,8 +2,8 @@
  * Messenger Messages Database Schema
  * Unified table for all channels: email, SMS, WhatsApp, Telegram.
  *
- * messenger_folders — inbox folders (IMAP or any channel that has folders)
- * messenger_messages — all sent/received messages across all channels
+ * messenger_folders - inbox folders (IMAP or any channel that has folders)
+ * messenger_messages - all sent/received messages across all channels
  */
 
 import { relations } from "drizzle-orm";
@@ -134,7 +134,7 @@ export const emails = pgTable(
     userId: uuid("user_id"),
     leadId: uuid("lead_id"),
 
-    // Channel — single discriminator
+    // Channel - single discriminator
     channel: text("channel", { enum: MessageChannelDB })
       .notNull()
       .default(MessageChannel.EMAIL),

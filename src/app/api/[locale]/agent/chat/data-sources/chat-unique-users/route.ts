@@ -1,5 +1,5 @@
 /**
- * Chat Unique Users — Route
+ * Chat Unique Users - Route
  * Server-only.
  */
 

@@ -29,7 +29,7 @@ async function handler(
   const { locale: rawLocale } = await params;
   const logger = createEndpointLogger(false, Date.now(), rawLocale);
 
-  // Dynamically import the generated router — only exists if tRPC is enabled
+  // Dynamically import the generated router - only exists if tRPC is enabled
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let appRouter: any;
   try {

@@ -31,7 +31,7 @@ export interface SerializableToolMetadata {
   credits?: number;
   /** Raw examples from the endpoint definition (requests + urlPathParams merged, responses keyed by example name) */
   examples?: {
-    /** Merged request data + url path params — what the caller passes as flat args */
+    /** Merged request data + url path params - what the caller passes as flat args */
     inputs?: Record<string, CliRequestData>;
     responses?: Record<string, CliRequestData>;
   };

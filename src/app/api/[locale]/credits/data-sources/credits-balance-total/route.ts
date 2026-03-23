@@ -1,5 +1,5 @@
 /**
- * Credits Balance Total — Route
+ * Credits Balance Total - Route
  * Server-only.
  */
 

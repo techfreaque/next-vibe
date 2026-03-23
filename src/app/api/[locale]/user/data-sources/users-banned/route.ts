@@ -1,5 +1,5 @@
 /**
- * Users Banned — Route
+ * Users Banned - Route
  * Server-only.
  */
 

@@ -64,7 +64,7 @@ export class SshExecRepository {
     }
     const truncated = buf.subarray(0, maxBytes).toString("utf8");
     return {
-      value: `${truncated}\n[output truncated — use ssh_files_read_GET to retrieve full output]`,
+      value: `${truncated}\n[output truncated - use ssh_files_read_GET to retrieve full output]`,
       truncated: true,
     };
   }
@@ -110,7 +110,7 @@ export class SshExecRepository {
           logger,
           user,
           t,
-          // No streamContext — run inline without escalation loop
+          // No streamContext - run inline without escalation loop
         );
         await onComplete({
           success: result.success,
@@ -131,9 +131,9 @@ export class SshExecRepository {
         });
       })();
 
-      // Return immediately — AI will receive the real result via wakeUp revival.
+      // Return immediately - AI will receive the real result via wakeUp revival.
       return success({
-        stdout: `[Task escalated — result will be injected when complete. taskId=${taskId}]`,
+        stdout: `[Task escalated - result will be injected when complete. taskId=${taskId}]`,
         stderr: "",
         exitCode: 0,
         status: SshCommandStatus.SUCCESS,
@@ -213,7 +213,7 @@ export class SshExecRepository {
         });
       }
 
-      // Non-zero exit code — still a valid result
+      // Non-zero exit code - still a valid result
       const rawStdout = error.stdout ?? "";
       const rawStderr = error.stderr ?? String(parseError(error));
       const { value: stdout, truncated: stdoutTruncated } =

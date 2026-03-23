@@ -3,8 +3,8 @@
  * Delegates execution to RouteExecutionExecutor.executeGenericHandler.
  * Auth is enforced by the target route handler.
  *
- * On success: returns success(result.data) — model gets the target's data flat.
- * On failure: propagates the target's fail() — model gets the error.
+ * On success: returns success(result.data) - model gets the target's data flat.
+ * On failure: propagates the target's fail() - model gets the error.
  *
  * Remote execution (instanceId provided):
  * Creates a one-shot cron task targeting the remote instance and returns
@@ -61,13 +61,13 @@ import type {
 export class RouteExecuteRepository {
   /**
    * Execute a tool directly on a remote instance via HTTP.
-   * Used when isDirectlyAccessible=true — skips task-queue, gets result in ms.
+   * Used when isDirectlyAccessible=true - skips task-queue, gets result in ms.
    * Returns the parsed JSON response body (tool result) or null on network error.
    *
    * The tool's route path is derived from its toolName (which IS the routeId / path).
    * Auth: Bearer token from the stored connection.
    *
-   * For wait/endLoop: blocking — caller awaits the result.
+   * For wait/endLoop: blocking - caller awaits the result.
    * For detach/wakeUp: caller ignores the returned promise (fire-and-forget).
    */
   private static async executeRemoteDirect(params: {
@@ -125,11 +125,11 @@ export class RouteExecuteRepository {
   ): Promise<ResponseType<RouteExecuteResponseInput>> {
     try {
       // Bail out immediately if the stream was cancelled before tool execution started.
-      // The abort signal fires when StreamRegistry.cancel() is called — any DB writes
+      // The abort signal fires when StreamRegistry.cancel() is called - any DB writes
       // or network calls after this point would create orphaned rows.
       if (streamContext?.abortSignal?.aborted) {
         logger.info(
-          "[RouteExecute] Stream was cancelled before tool execution started — skipping",
+          "[RouteExecute] Stream was cancelled before tool execution started - skipping",
           { toolName: data.toolName },
         );
         return fail({
@@ -150,9 +150,9 @@ export class RouteExecuteRepository {
 
       const { input } = data;
 
-      // Remote execution path — create a one-shot task for the target instance
+      // Remote execution path - create a one-shot task for the target instance
       // Circuit breaker: headless streams (resume-stream revival) must not create
-      // new remote WAIT tasks — this causes an infinite loop where each revival
+      // new remote WAIT tasks - this causes an infinite loop where each revival
       // calls execute-tool, creates a task, waits, resume-streams again, etc.
       if (instanceId && streamContext?.headless) {
         const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
@@ -168,7 +168,7 @@ export class RouteExecuteRepository {
         }
       }
       if (instanceId && !user.isPublic) {
-        // Strip instanceId from input — the remote instance executes the tool locally.
+        // Strip instanceId from input - the remote instance executes the tool locally.
         // If we leave it in, endpoints like tool-help interpret it as "proxy to another
         // remote instance" and enter a self-referential lookup returning unfiltered results.
         // eslint-disable-next-line no-unused-vars
@@ -198,7 +198,7 @@ export class RouteExecuteRepository {
 
           if (existing) {
             logger.info(
-              "[RouteExecute] Remote task already exists for toolMessageId — skipping duplicate creation",
+              "[RouteExecute] Remote task already exists for toolMessageId - skipping duplicate creation",
               { toolName, instanceId, existingTaskId: existing.id },
             );
             return success({
@@ -222,11 +222,11 @@ export class RouteExecuteRepository {
           );
 
         if (connInfo === null || connInfo.capabilities === null) {
-          // Capability snapshot not yet synced — fail closed.
+          // Capability snapshot not yet synced - fail closed.
           // Allowing through would let any tool name pass before the first sync,
           // creating a window where an attacker could call arbitrary remote endpoints.
           logger.warn(
-            "[RouteExecute] no capability snapshot for instance — rejecting",
+            "[RouteExecute] no capability snapshot for instance - rejecting",
             {
               toolName,
               instanceId,
@@ -272,9 +272,9 @@ export class RouteExecuteRepository {
         // call it via HTTP instead of going through the task-queue. This drops
         // latency from ~1 min to milliseconds.
         //
-        // wait / endLoop: blocking call — await result, return inline to AI.
+        // wait / endLoop: blocking call - await result, return inline to AI.
         //   If direct call fails (network error), fall through to task-queue.
-        // detach / wakeUp: fire-and-forget — return pending immediately.
+        // detach / wakeUp: fire-and-forget - return pending immediately.
         //   Result arrives via /report when the remote finishes (same as queue path).
         // approve: not applicable here (handled above before this block).
         if (connInfo.isDirectlyAccessible && connInfo.token) {
@@ -297,12 +297,12 @@ export class RouteExecuteRepository {
                 logger,
               });
             if (directResult !== null) {
-              // Result returned inline — loop continues normally (wait/endLoop).
+              // Result returned inline - loop continues normally (wait/endLoop).
               return success({ result: directResult });
             }
-            // Direct call failed — fall through to task-queue path below.
+            // Direct call failed - fall through to task-queue path below.
             logger.warn(
-              "[RouteExecute] Direct HTTP failed — falling back to task-queue",
+              "[RouteExecute] Direct HTTP failed - falling back to task-queue",
               { toolName, instanceId },
             );
           } else if (
@@ -334,7 +334,7 @@ export class RouteExecuteRepository {
 
               if (directResult === null) {
                 logger.warn(
-                  "[RouteExecute] Remote direct async call failed — no completion fired",
+                  "[RouteExecute] Remote direct async call failed - no completion fired",
                   { toolName, instanceId, callbackMode, directTaskId },
                 );
                 return;
@@ -388,13 +388,13 @@ export class RouteExecuteRepository {
           routeId: toolName,
           displayName: `Remote: ${toolName}`,
           category: TaskCategory.SYSTEM,
-          schedule: "* * * * *", // run every minute — runOnce disables after first execution
+          schedule: "* * * * *", // run every minute - runOnce disables after first execution
           priority: CronTaskPriority.HIGH,
           enabled: true,
           runOnce: true,
-          // Tool execution input only — no routing context mixed in.
+          // Tool execution input only - no routing context mixed in.
           taskInput: strippedInput ?? {},
-          // Revival context in typed columns — read by handleTaskCompletion on completion.
+          // Revival context in typed columns - read by handleTaskCompletion on completion.
           wakeUpCallbackMode: callbackMode,
           wakeUpThreadId: effectiveThreadId ?? null,
           wakeUpToolMessageId: effectiveToolMessageId ?? null,
@@ -512,7 +512,7 @@ export class RouteExecuteRepository {
         }
 
         // WAIT or END_LOOP (remote queue): abort stream after parallel batch.
-        // handleTaskCompletion (via /report) delivers the result. Clean abort — no error shown.
+        // handleTaskCompletion (via /report) delivers the result. Clean abort - no error shown.
         // - WAIT: revival fires after completion (backfills original tool message, AI continues)
         // - END_LOOP: no revival, just backfill + deferred message, TASK_COMPLETED WS event
         if (
@@ -554,14 +554,14 @@ export class RouteExecuteRepository {
 
       const callbackMode = data.callbackMode ?? null;
 
-      // APPROVE: return immediately — the stream-part-handler already set
+      // APPROVE: return immediately - the stream-part-handler already set
       // stepHasToolsAwaitingConfirmation=true which aborts at finish-step.
       // This result is a placeholder; the real result is injected by resume-stream
       // after the user confirms/cancels (which could be days later).
-      // The stream fully ends after finish-step abort — no lingering state.
+      // The stream fully ends after finish-step abort - no lingering state.
       if (callbackMode === CallbackMode.APPROVE) {
         logger.info(
-          "[RouteExecute] APPROVE mode — returning placeholder (stream aborts at finish-step)",
+          "[RouteExecute] APPROVE mode - returning placeholder (stream aborts at finish-step)",
           { toolName },
         );
         return success({
@@ -611,7 +611,7 @@ export class RouteExecuteRepository {
           userId: user.id,
         });
 
-        // Fire-and-forget goroutine — returns {taskId, pending} immediately to the AI.
+        // Fire-and-forget goroutine - returns {taskId, pending} immediately to the AI.
         // The goroutine handles execution, DB persistence, and task completion notification.
         void (async (): Promise<void> => {
           try {
@@ -626,7 +626,7 @@ export class RouteExecuteRepository {
               platform: Platform.MCP,
               streamContext: {
                 ...streamContext,
-                // Reset per-call fields — detach goroutine is independent of parent stream
+                // Reset per-call fields - detach goroutine is independent of parent stream
                 currentToolMessageId: undefined,
                 callerToolCallId: undefined,
                 callerCallbackMode: CallbackMode.DETACH,
@@ -660,7 +660,7 @@ export class RouteExecuteRepository {
               config: {},
             });
 
-            // detach: result stays in task history only — never injected into thread.
+            // detach: result stays in task history only - never injected into thread.
             // Keep the task row (disabled + completed) so wait-for-task can find the result
             // if the AI later decides to block on it. Emit TASK_COMPLETED WS for UI bubble.
             await db
@@ -753,7 +753,7 @@ export class RouteExecuteRepository {
         // Priority: (1) DB lookup by toolCallId (authoritative, avoids race with stream-part-handler)
         //           (2) pendingToolMessages map (set by tools-loader before execute() if no race)
         //           (3) currentToolMessageId (set by stream-part-handler, may have timing issues)
-        //           (4) aiMessageId (placeholder assistant — last resort, almost always wrong for wakeUp)
+        //           (4) aiMessageId (placeholder assistant - last resort, almost always wrong for wakeUp)
         // The DB lookup is safe because tool-call-handler writes the tool message row before
         // returning, and execute() is called asynchronously after that write.
         const pendingEntry = streamContext?.callerToolCallId
@@ -806,7 +806,7 @@ export class RouteExecuteRepository {
         });
 
         // Insert as RUNNING so cron pulse never picks it up.
-        // Revival context in typed columns — taskInput holds only tool execution input.
+        // Revival context in typed columns - taskInput holds only tool execution input.
         await db.insert(cronTasks).values({
           id: taskId,
           shortId: taskId,
@@ -837,7 +837,7 @@ export class RouteExecuteRepository {
         // the stream is no longer active.
         void (async (): Promise<void> => {
           const startedAt = new Date();
-          // Goroutine-local streamContext — mutable, used to detect self-escalation.
+          // Goroutine-local streamContext - mutable, used to detect self-escalation.
           // escalateToTask is inherited from the parent so long-running tools (like
           // interactive claude-code) can call it to set waitingForRemoteResult=true
           // and manage their own revival via complete-task. When that happens we skip
@@ -860,7 +860,7 @@ export class RouteExecuteRepository {
             : undefined;
           const goroutineStreamContext: typeof streamContext = {
             ...streamContext,
-            // Reset per-call fields — wakeUp goroutine is independent of parent stream
+            // Reset per-call fields - wakeUp goroutine is independent of parent stream
             currentToolMessageId: undefined,
             callerToolCallId: undefined,
             callerCallbackMode: CallbackMode.WAKE_UP,
@@ -900,7 +900,7 @@ export class RouteExecuteRepository {
             });
 
             // Skip handleTaskCompletion if the tool self-escalated via escalateToTask.
-            // Revival is managed by complete-task — we must not fire an early revival here.
+            // Revival is managed by complete-task - we must not fire an early revival here.
             if (selfEscalated) {
               logger.info(
                 "[RouteExecute] wakeUp: tool self-escalated, skipping handleTaskCompletion",
@@ -944,7 +944,7 @@ export class RouteExecuteRepository {
           }
         })();
 
-        // Return taskId immediately — AI completes current turn while task runs in background.
+        // Return taskId immediately - AI completes current turn while task runs in background.
         return success({
           taskId,
           status: CronTaskStatus.PENDING,
@@ -988,11 +988,11 @@ export class RouteExecuteRepository {
       });
 
       // Discard result if stream was cancelled during tool execution.
-      // The abort signal may have fired while the tool was running — any result
+      // The abort signal may have fired while the tool was running - any result
       // returned after cancellation should be ignored to prevent ghost responses.
       if (streamContext?.abortSignal?.aborted) {
         logger.info(
-          "[RouteExecute] Stream was cancelled during tool execution — discarding result",
+          "[RouteExecute] Stream was cancelled during tool execution - discarding result",
           { toolName },
         );
         return fail({

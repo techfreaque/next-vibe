@@ -2,8 +2,8 @@
  * Remote Connection Database Schema
  *
  * Two tables:
- * - `instance_identities` — per-user self-identity records (who am I?)
- * - `remote_connections`  — actual outbound connections with tokens (who do I talk to?)
+ * - `instance_identities` - per-user self-identity records (who am I?)
+ * - `remote_connections`  - actual outbound connections with tokens (who do I talk to?)
  */
 
 import { relations } from "drizzle-orm";
@@ -47,12 +47,12 @@ type JsonArray = JsonValue[];
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
 
 /**
- * Zod schema for a serialized tool manifest entry — one per tool on the remote instance.
+ * Zod schema for a serialized tool manifest entry - one per tool on the remote instance.
  * Stored in the capabilities jsonb column.
  *
  * `fields` is the serialized definition fields (render refs stripped, all translatable
  * strings pre-resolved for the target locale).
- * `instanceId` is tagged by the receiving side at sync time — not set by the generator.
+ * `instanceId` is tagged by the receiving side at sync time - not set by the generator.
  */
 export const RemoteToolCapabilitySchema = z.object({
   toolName: z.string(),
@@ -66,13 +66,13 @@ export const RemoteToolCapabilitySchema = z.object({
   category: z.string().optional(),
   /** Pre-translated tag labels */
   tags: z.array(z.string()).optional(),
-  /** Tool aliases (e.g. ["web-search"]) — first alias is preferred name */
+  /** Tool aliases (e.g. ["web-search"]) - first alias is preferred name */
   aliases: z.array(z.string()).optional(),
   /** Credit cost per invocation (0 = free). Defaults to 0 when absent. */
   credits: z.number().optional(),
 });
 
-/** Inferred type from schema — single source of truth */
+/** Inferred type from schema - single source of truth */
 export type RemoteToolCapability = z.infer<typeof RemoteToolCapabilitySchema>;
 
 // ─── Shared Types ─────────────────────────────────────────────────────────────
@@ -136,7 +136,7 @@ export type NewInstanceIdentity = z.infer<typeof insertInstanceIdentitySchema>;
 
 // ─── Remote Connections ───────────────────────────────────────────────────────
 // Actual outbound connections with encrypted JWT tokens.
-// No more token="self" rows — those live in instance_identities.
+// No more token="self" rows - those live in instance_identities.
 
 export const remoteConnections = pgTable(
   "remote_connections",
@@ -183,7 +183,7 @@ export const remoteConnections = pgTable(
     // Last time a sync was triggered
     lastSyncedAt: timestamp("last_synced_at"),
 
-    // Tool manifest snapshot — updated on capability version change
+    // Tool manifest snapshot - updated on capability version change
     capabilities: jsonb("capabilities").$type<RemoteToolCapability[]>(),
 
     // Build version string from remote (git SHA / package version)
@@ -195,7 +195,7 @@ export const remoteConnections = pgTable(
     // Last memoriesHash received from the remote side
     remoteMemoriesHash: text("remote_memories_hash"),
 
-    // ISO timestamp — return REMOTE_TOOL_CALL tasks after this cursor
+    // ISO timestamp - return REMOTE_TOOL_CALL tasks after this cursor
     taskCursor: text("task_cursor"),
 
     // Timestamps

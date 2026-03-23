@@ -95,7 +95,7 @@ export class TaskExecuteRepository {
       }
     }
 
-    // 3. Overlap prevention — skip if still running
+    // 3. Overlap prevention - skip if still running
     if (task.lastExecutionStatus === CronTaskStatus.RUNNING) {
       return fail({
         message: t("errors.alreadyRunning"),
@@ -382,14 +382,14 @@ export class TaskExecuteRepository {
     // 8. If task has callback context (set by execute-tool AI path), emit
     //    TASK_COMPLETED WS event + insert deferred result message for endLoop,
     //    or schedule resume-stream for wakeUp/wait.
-    // Read from typed wakeUp* columns — not from untyped taskInput JSON blob.
+    // Read from typed wakeUp* columns - not from untyped taskInput JSON blob.
     const taskCallbackMode =
       (task.wakeUpCallbackMode as CallbackModeValue | null) ?? null;
     const taskThreadId = task.wakeUpThreadId ?? null;
     const taskToolMessageId = task.wakeUpToolMessageId ?? null;
     const completionUserId = taskUserContext?.user.id ?? currentUserId ?? null;
 
-    // Skip handleTaskCompletion for remote tasks (targetInstance set) — the
+    // Skip handleTaskCompletion for remote tasks (targetInstance set) - the
     // originator receives the result via /report and runs handleTaskCompletion
     // there. Running it here would create resume-stream on the wrong instance
     // and try to backfill a toolMessageId that doesn't exist locally.
@@ -470,7 +470,7 @@ export class TaskExecuteRepository {
     logger: EndpointLogger,
   ): Promise<{ user: JwtPrivatePayloadType; locale: CountryLanguage } | null> {
     if (!taskUserId) {
-      // System task — use admin account
+      // System task - use admin account
       const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
       if (!adminEmail) {
         return null;
@@ -486,7 +486,7 @@ export class TaskExecuteRepository {
       return { user: authResult.data, locale };
     }
 
-    // User task — resolve their locale and roles
+    // User task - resolve their locale and roles
     let userLocale: CountryLanguage = locale;
     const ownerRow = await db
       .select({ locale: usersTable.locale })

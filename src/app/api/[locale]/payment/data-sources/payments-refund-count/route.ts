@@ -1,5 +1,5 @@
 /**
- * Payments Refund Count — Route
+ * Payments Refund Count - Route
  * Server-only.
  */
 

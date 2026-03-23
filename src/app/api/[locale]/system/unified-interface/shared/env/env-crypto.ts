@@ -2,7 +2,7 @@
  * Env Value Encryption
  *
  * Encrypts sensitive .env values at rest using AES-256-GCM.
- * Key stored in ~/.vibe/keys/<sha256(cwd)>.key — outside the project, never committed.
+ * Key stored in ~/.vibe/keys/<sha256(cwd)>.key - outside the project, never committed.
  *
  * Format: vibe:enc:<ivHex>:<tagHex>:<ctHex>
  */
@@ -15,8 +15,13 @@ import {
   createHash,
   randomBytes,
 } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { chmodSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -32,13 +37,13 @@ export function getKeyFilePath(cwd: string): string {
 /**
  * Loads the encryption key using priority order:
  *
- * 1. `VIBE_SECRET_KEY` env var (64-char hex) — explicit prod override (Docker/CI)
- * 2. Derive from `JWT_SECRET_KEY` via SHA256 — prod fallback, no extra config needed
- * 3. Key file at `~/.vibe/keys/<sha256(cwd)>.key` — local dev default
+ * 1. `VIBE_SECRET_KEY` env var (64-char hex) - explicit prod override (Docker/CI)
+ * 2. Derive from `JWT_SECRET_KEY` via SHA256 - prod fallback, no extra config needed
+ * 3. Key file at `~/.vibe/keys/<sha256(cwd)>.key` - local dev default
  *
  * Security note: derivation from JWT_SECRET_KEY protects against passive file reads
  * (backups, volume snapshots, AI file-read-only scenarios). It does NOT protect
- * against full shell access — that is an accepted tradeoff for zero-extra-config prod.
+ * against full shell access - that is an accepted tradeoff for zero-extra-config prod.
  */
 export function loadOrCreateKey(cwd: string = process.cwd()): Buffer {
   // 1. Explicit override (Docker/CI/prod)
@@ -47,17 +52,17 @@ export function loadOrCreateKey(cwd: string = process.cwd()): Buffer {
     return Buffer.from(explicit.slice(0, 64), "hex");
   }
 
-  // 2. Derive from JWT_SECRET_KEY (prod fallback — no extra config needed)
+  // 2. Derive from JWT_SECRET_KEY (prod fallback - no extra config needed)
   const jwtKey = process.env["JWT_SECRET_KEY"];
   if (jwtKey && jwtKey.length >= 32) {
-    // SHA256("vibe-env-encryption-v1:" + jwtKey) — deterministic, not reversible without JWT key
+    // SHA256("vibe-env-encryption-v1:" + jwtKey) - deterministic, not reversible without JWT key
     return createHash("sha256")
       .update("vibe-env-encryption-v1:")
       .update(jwtKey)
       .digest();
   }
 
-  // 3. Key file (local dev — ~/.vibe/keys/<hash>.key)
+  // 3. Key file (local dev - ~/.vibe/keys/<hash>.key)
   const keyPath = getKeyFilePath(cwd);
 
   if (existsSync(keyPath)) {
@@ -145,9 +150,9 @@ export function decryptEnvObject(
     if (v !== undefined && isEncryptedValue(v)) {
       const decrypted = decryptEnvValue(v, key);
       if (decrypted === null) {
-        // Decryption failed — treat as unset, not a crash
+        // Decryption failed - treat as unset, not a crash
         process.stderr.write(
-          `[vibe:env] Warning: failed to decrypt ${k} — key file may be missing or corrupted. Re-enter this value via settings.\n`,
+          `[vibe:env] Warning: failed to decrypt ${k} - key file may be missing or corrupted. Re-enter this value via settings.\n`,
         );
         result[k] = undefined;
       } else {

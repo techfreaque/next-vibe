@@ -128,16 +128,16 @@ export const translations: typeof enTranslations = {
       enabledLabel: "erlaubt",
       totalLabel: "gesamt",
       activeTooltip:
-        "Angepinnte Tools sind immer im Kontext — die KI sieht sie bei jeder Anfrage",
+        "Angepinnte Tools sind immer im Kontext - die KI sieht sie bei jeder Anfrage",
       enabledTooltip:
         "Erlaubte Tools können bei Bedarf aufgerufen werden, wenn Hilfe aktiviert ist",
       legendActive: "Immer im Kontext (angepinnt)",
       legendConfirm: "Fragt vor dem Ausführen",
-      activeOn: "Angepinnt — immer im Kontext. Klicken zum Lösen",
+      activeOn: "Angepinnt - immer im Kontext. Klicken zum Lösen",
       activeOff:
-        "Nicht angepinnt — KI kann trotzdem bei Bedarf aufrufen. Klicken zum Anpinnen",
-      confirmOn: "Fragt nach Bestätigung — klicken zum Deaktivieren",
-      confirmOff: "Läuft automatisch — klicken um Bestätigung zu verlangen",
+        "Nicht angepinnt - KI kann trotzdem bei Bedarf aufrufen. Klicken zum Anpinnen",
+      confirmOn: "Fragt nach Bestätigung - klicken zum Deaktivieren",
+      confirmOff: "Läuft automatisch - klicken um Bestätigung zu verlangen",
     },
   },
 
@@ -758,7 +758,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Stell dir uns als dein KI-Team vor.",
       line1:
-        "Dein Begleiter kümmert sich um alltägliche Gespräche. Spezialisten übernehmen für Coding, Recherche, Schreiben — was auch immer gebraucht wird.",
+        "Dein Begleiter kümmert sich um alltägliche Gespräche. Spezialisten übernehmen für Coding, Recherche, Schreiben - was auch immer gebraucht wird.",
       line2: "Die KI wechselt automatisch zwischen ihnen. Du redest einfach.",
       line3: "Lass uns dich in unter einer Minute einrichten.",
       continue: "Los geht's",
@@ -769,7 +769,7 @@ export const translations: typeof enTranslations = {
       line1:
         "Deine Einstellungen, dein Begleiter und dein Chatverlauf werden nur lokal auf diesem Gerät gespeichert.",
       line2:
-        "Melde dich an, um alles geräteübergreifend zu synchronisieren — und dein Setup nie zu verlieren.",
+        "Melde dich an, um alles geräteübergreifend zu synchronisieren - und dein Setup nie zu verlieren.",
       signIn: "Anmelden / Konto erstellen",
       continueAnyway: "Als Gast fortfahren",
       note: "Du kannst dich jederzeit über das Menü anmelden.",
@@ -789,11 +789,11 @@ export const translations: typeof enTranslations = {
         },
         brilliant: {
           label: "Brilliant",
-          desc: "Beste Qualität — ideal für komplexe Fragen, Schreiben und Analysen",
+          desc: "Beste Qualität - ideal für komplexe Fragen, Schreiben und Analysen",
         },
         max: {
           label: "Max",
-          desc: "Höchstes Denkvermögen, keine Kompromisse — für wenn es wirklich darauf ankommt",
+          desc: "Höchstes Denkvermögen, keine Kompromisse - für wenn es wirklich darauf ankommt",
         },
       },
     },
@@ -804,7 +804,7 @@ export const translations: typeof enTranslations = {
         "Wir fügen automatisch die richtigen Spezialisten zu deinem KI-Toolkit hinzu.",
       saving: "Einrichtung...",
       start: "Chat starten",
-      skip: "Überspringen — ich richte es später ein",
+      skip: "Überspringen - ich richte es später ein",
       coding: {
         label: "Coding & Technik",
         hint: "Vibe Coder, Coder",

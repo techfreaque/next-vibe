@@ -180,7 +180,7 @@ export class LintRepository {
 
   /**
    * Run ESLint once with all target paths (files and/or directories).
-   * ESLint handles directory traversal natively — no manual file discovery needed.
+   * ESLint handles directory traversal natively - no manual file discovery needed.
    */
   private static async executeEslint(
     data: LintRequestOutput,

@@ -1,5 +1,5 @@
 /**
- * Vibe Frame Admin Test Page — Client
+ * Vibe Frame Admin Test Page - Client
  *
  * Interactive test page for mounting vibe-frame endpoints.
  * Each widget is an independent config: endpoint, placement, styles, trigger, display.
@@ -61,7 +61,7 @@ interface BridgeEvent {
   data?: Record<string, string>;
 }
 
-/** Each widget is a fully independent config — like the original widget engine */
+/** Each widget is a fully independent config - like the original widget engine */
 interface WidgetConfig {
   id: string;
   endpoint: string;
@@ -617,7 +617,7 @@ function MockHostPage({
           <Div className="h-4 w-80 max-w-full rounded bg-slate-200 dark:bg-slate-700" />
         </Div>
 
-        {/* Mock content paragraphs — inline widgets injected between them */}
+        {/* Mock content paragraphs - inline widgets injected between them */}
         {MOCK_PARAGRAPHS.map((text, pIdx) => (
           <Div key={pIdx}>
             <p className="text-xs text-slate-400 dark:text-slate-500 mb-4 leading-relaxed">
@@ -954,7 +954,7 @@ ${widgetConfigs}
         <Div>
           <H2 className="text-xl font-bold">Vibe Frame Test</H2>
           <P className="text-sm text-muted-foreground">
-            Configure N independent widgets — each with its own endpoint,
+            Configure N independent widgets - each with its own endpoint,
             placement, trigger, and style.
           </P>
         </Div>
@@ -1096,7 +1096,7 @@ ${widgetConfigs}
         </Div>
       </Div>
 
-      {/* ── Full-width Live Preview — simulated example page ──────── */}
+      {/* ── Full-width Live Preview - simulated example page ──────── */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -1111,7 +1111,7 @@ ${widgetConfigs}
               </Badge>
             )}
             <Span className="text-[10px] text-muted-foreground ml-auto">
-              Simulated host page — widgets render in their configured display
+              Simulated host page - widgets render in their configured display
               mode
             </Span>
           </CardTitle>

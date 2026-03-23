@@ -20,12 +20,12 @@ export const translations = {
       "Invalid username: must start with a letter, then lowercase letters, digits, or hyphens (max 32 chars)",
     userAlreadyExists: "A user with that username already exists",
     connectionNotFound: "SSH connection not found",
-    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    encryptionFailed: "Encryption failed - SSH_SECRET_KEY may be invalid",
     connectTimeout: "Connection timed out",
     sshAuthFailed: "SSH authentication failed",
     sshConnectionFailed: "SSH connection failed",
     sudoAuthFailed:
-      "Sudo authentication failed — wrong password or insufficient sudo privileges",
+      "Sudo authentication failed - wrong password or insufficient sudo privileges",
     permissionDenied:
       "Permission denied: provide your sudo password to create OS users",
     fingerprintMismatch:

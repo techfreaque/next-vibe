@@ -75,7 +75,7 @@ export class ServerStartRepository {
 
   /**
    * Patch NEXT_PUBLIC_APP_URL in process.env so the running port is reflected.
-   * Only patches localhost URLs — production URLs are left untouched.
+   * Only patches localhost URLs - production URLs are left untouched.
    * Child processes inherit process.env so they automatically get the correct URL.
    */
   private static patchPublicUrlPort(port: number): void {
@@ -95,7 +95,7 @@ export class ServerStartRepository {
         Object.assign(process.env, { NEXT_PUBLIC_APP_URL: parsed.toString() });
       }
     } catch {
-      // Not a valid URL — leave it as-is
+      // Not a valid URL - leave it as-is
     }
   }
 
@@ -242,7 +242,7 @@ export class ServerStartRepository {
         });
       }
 
-      // Deploy db-functions (idempotent — runs after every migration)
+      // Deploy db-functions (idempotent - runs after every migration)
       const { deployDbFunctions } =
         await import("@/app/api/[locale]/system/db/db-functions/deploy");
       await deployDbFunctions(logger);
@@ -276,7 +276,7 @@ export class ServerStartRepository {
 
       UnifiedTaskRunnerRepository.environment = "production";
 
-      // manageRunner("start") blocks forever — must NOT await
+      // manageRunner("start") blocks forever - must NOT await
       void UnifiedTaskRunnerRepository.manageRunner(
         { action: "start", taskFilter: "cron", dryRun: false },
         user,
@@ -374,7 +374,7 @@ export class ServerStartRepository {
       logger.vibe(formatSkip("Database setup skipped"));
     }
 
-    // Start task runner if enabled (non-blocking — fires before Next.js)
+    // Start task runner if enabled (non-blocking - fires before Next.js)
     if (runTasks) {
       void ServerStartRepository.startTaskRunnerIfEnabled(user, locale, logger);
     } else {
@@ -395,7 +395,7 @@ export class ServerStartRepository {
       process.on("SIGINT", handleShutdown);
       process.on("SIGTERM", handleShutdown);
       return await new Promise<never>(() => {
-        /* runs forever — only signal handlers exit */
+        /* runs forever - only signal handlers exit */
       });
     }
 
@@ -459,7 +459,7 @@ export class ServerStartRepository {
 
     // SIGUSR1: hot-restart Next.js (triggered by `vibe rebuild`)
     process.on("SIGUSR1", () => {
-      logger.info("🔄 Received SIGUSR1 — restarting server...");
+      logger.info("🔄 Received SIGUSR1 - restarting server...");
 
       if (ServerStartRepository.wsServerHandle) {
         ServerStartRepository.wsServerHandle.stop();
@@ -524,7 +524,7 @@ export class ServerStartRepository {
               } else {
                 process.stdout.write(
                   // eslint-disable-next-line i18next/no-literal-string
-                  "⚠️  No .cpuprofile found — try running with --profile again\n",
+                  "⚠️  No .cpuprofile found - try running with --profile again\n",
                 );
               }
 
@@ -537,9 +537,9 @@ export class ServerStartRepository {
       });
     }
 
-    // Keep the process alive indefinitely — only signal handlers exit
+    // Keep the process alive indefinitely - only signal handlers exit
     return await new Promise<never>(() => {
-      /* runs forever — only signal handlers exit */
+      /* runs forever - only signal handlers exit */
     });
   }
 
@@ -584,7 +584,7 @@ export class ServerStartRepository {
         }
       } catch {
         if (attempt === maxAttempts) {
-          logger.warn("Database connection timeout — continuing anyway");
+          logger.warn("Database connection timeout - continuing anyway");
           return;
         }
       }
@@ -662,7 +662,7 @@ export class ServerStartRepository {
       // Brief wait for process to exit
       execSync("sleep 0.5");
     } catch {
-      // No process on port or kill failed — both are fine
+      // No process on port or kill failed - both are fine
     }
   }
 
@@ -720,7 +720,7 @@ export class ServerStartRepository {
       );
       if (!distExists) {
         logger.error(
-          "No .next-prod build found — did 'vibe build' run during Docker build?",
+          "No .next-prod build found - did 'vibe build' run during Docker build?",
         );
         return fail({
           message: t("post.errors.nextBuildNotFound"),
@@ -755,11 +755,11 @@ export class ServerStartRepository {
       nextProcess.on("exit", (code, signal) => {
         if (code !== 0 && code !== null) {
           logger.error(
-            `Next.js exited unexpectedly with code ${code} — shutting down`,
+            `Next.js exited unexpectedly with code ${code} - shutting down`,
           );
           process.exit(1);
         } else if (signal && signal !== "SIGTERM") {
-          logger.error(`Next.js killed by signal ${signal} — shutting down`);
+          logger.error(`Next.js killed by signal ${signal} - shutting down`);
           process.exit(1);
         }
       });
@@ -805,7 +805,7 @@ export class ServerStartRepository {
           return;
         }
       } catch {
-        // Connection refused — server not ready yet
+        // Connection refused - server not ready yet
       }
 
       await new Promise<void>((resolve) => {
@@ -818,7 +818,7 @@ export class ServerStartRepository {
     }
 
     logger.warn(
-      `Next.js did not respond within ${timeoutMs}ms — continuing anyway`,
+      `Next.js did not respond within ${timeoutMs}ms - continuing anyway`,
     );
   }
 

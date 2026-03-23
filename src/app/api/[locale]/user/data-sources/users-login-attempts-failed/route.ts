@@ -1,5 +1,5 @@
 /**
- * Users Login Attempts Failed — Route
+ * Users Login Attempts Failed - Route
  * Server-only.
  */
 

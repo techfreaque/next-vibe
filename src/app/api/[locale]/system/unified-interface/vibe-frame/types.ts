@@ -1,5 +1,5 @@
 /**
- * Vibe Frame — Type Definitions
+ * Vibe Frame - Type Definitions
  *
  * Shared types for the vibe-frame system. Zero server dependencies.
  * Used by both the standalone embed script and the Next.js server.
@@ -25,7 +25,7 @@ export interface FrameMountConfig {
   authToken?: string;
   /**
    * Lead ID for visitor tracking (cross-origin).
-   * Provided by the host page — embed script cannot read our domain cookies.
+   * Provided by the host page - embed script cannot read our domain cookies.
    */
   leadId?: string;
   /** Theme: "light" | "dark" | "system" */
@@ -34,9 +34,9 @@ export interface FrameMountConfig {
   cssVars?: Record<string, string>;
   /** Max height in px (default: unlimited, uses auto-resize) */
   maxHeight?: number;
-  /** Trigger config — when/how the frame appears */
+  /** Trigger config - when/how the frame appears */
   trigger?: FrameTriggerConfig;
-  /** Display frequency — how often the frame can appear */
+  /** Display frequency - how often the frame can appear */
   displayFrequency?: FrameDisplayFrequency;
   /** Iframe sandbox permissions override */
   sandbox?: string;
@@ -383,7 +383,7 @@ export interface FrameHydrationData {
 }
 
 // ─── Global Config ────────────────────────────────────────────────────────────
-// Declarative pattern — host page sets window.vibeFrameConfig BEFORE the script.
+// Declarative pattern - host page sets window.vibeFrameConfig BEFORE the script.
 // The script auto-mounts all integrations on DOMContentLoaded.
 // After init, window.vibeFrameConfig is backed by a signal; mutating it triggers
 // reactive re-sync of the running frames.
@@ -407,7 +407,7 @@ export interface FrameHydrationData {
 //   import { VibeFrame } from "next-vibe/vibe-frame";
 //   VibeFrame.mount({ serverUrl, endpoint, target });
 
-/** Per-integration config — shared fields come from VibeFrameGlobalConfig */
+/** Per-integration config - shared fields come from VibeFrameGlobalConfig */
 export interface VibeFrameIntegrationConfig extends Omit<
   FrameMountConfig,
   "authToken" | "locale" | "serverUrl"
@@ -422,7 +422,7 @@ export interface VibeFrameIntegrationConfig extends Omit<
   leadId?: string;
 }
 
-/** Global config — the single source of truth, backed by a signal after init */
+/** Global config - the single source of truth, backed by a signal after init */
 export interface VibeFrameGlobalConfig {
   /** Base URL of the vibe-frame server */
   serverUrl: string;
@@ -431,7 +431,7 @@ export interface VibeFrameGlobalConfig {
   /** Auth token applied to all integrations unless overridden per-integration */
   authToken?: string;
   /**
-   * Lead ID for visitor tracking — applied to all integrations unless overridden.
+   * Lead ID for visitor tracking - applied to all integrations unless overridden.
    * The host page is responsible for providing this (e.g. from their own session).
    * The embed script is always cross-origin and cannot read our domain cookies.
    */
@@ -441,7 +441,7 @@ export interface VibeFrameGlobalConfig {
 }
 
 // ─── Window Augmentation ─────────────────────────────────────────────────────
-// Typed window properties — no casts needed anywhere in embed.ts.
+// Typed window properties - no casts needed anywhere in embed.ts.
 // Mirrors widget-engine WidgetEngineContext pattern exactly.
 
 declare global {
@@ -493,7 +493,7 @@ export interface VibeFrameSharedOptions {
   leadId?: string;
 }
 
-/** Per-config overrides for batch mount — shared options fill the rest */
+/** Per-config overrides for batch mount - shared options fill the rest */
 export type VibeFrameBatchConfig = Omit<
   FrameMountConfig,
   "authToken" | "locale" | "serverUrl"

@@ -1,19 +1,26 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
-import { type JSX, memo, useEffect, useMemo } from "react";
-import { useCallback, useRef, useState } from "react";
+import { cn } from "next-vibe/shared/utils";
+import {
+  type JSX,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { FieldValues } from "react-hook-form";
 
 import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
 import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
-import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
-import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useSkill } from "@/app/api/[locale]/agent/chat/skills/[id]/hooks";
 import {
   calculateCreditCost,
   getModelById,
@@ -22,9 +29,9 @@ import {
   processMessageGroupForCopy,
   processMessageGroupForTTS,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
+import { type TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { type TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -66,7 +73,7 @@ interface GroupedAssistantMessageProps {
   ttsVoice: typeof TtsVoiceValue | undefined;
   /** Extra class on root element */
   className?: string;
-  /** Vote callback — null when voting is not available */
+  /** Vote callback - null when voting is not available */
   onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
   userVote: "up" | "down" | null;
   voteScore: number;
@@ -377,7 +384,7 @@ const MessagesList = memo(function MessagesList({
         // Pass the tool message's parentId as the confirm stream's parent.
         // All approve tools in a batch share the same parentId (children of the
         // same assistant placeholder). Using this ensures the confirm stream
-        // always continues from the correct branch — even if a wakeUp revival
+        // always continues from the correct branch - even if a wakeUp revival
         // has added new messages to the thread since the approve was issued.
         // If parentId is null (incognito / root), send-message falls back to leafMessageId.
         const confirmParentId =
@@ -497,7 +504,7 @@ const MessagesList = memo(function MessagesList({
             : null;
           return (
             <Div key={message.id}>
-              {/* Batch confirmation status banner — rendered just above the first pending tool */}
+              {/* Batch confirmation status banner - rendered just above the first pending tool */}
               {toolsWaitingForConfirmation.length > 1 &&
                 index === firstPendingToolIndex && (
                   <BatchConfirmationBanner
@@ -575,7 +582,7 @@ const MessagesList = memo(function MessagesList({
         return null;
       })}
 
-      {/* Show streaming placeholder when no content yet — skip for compacting groups
+      {/* Show streaming placeholder when no content yet - skip for compacting groups
           since the compacting card already renders its own spinner */}
       {!allMessages.some((m) => m.metadata?.isCompacting) && (
         <LoadingIndicator isStreaming={isGroupStreaming} />
@@ -750,7 +757,7 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
       ? primary.skill
       : null;
 
-  // Fetch character name from character ID — seed from SSR boot data to avoid hydration mismatch
+  // Fetch character name from character ID - seed from SSR boot data to avoid hydration mismatch
   const { initialSkillData } = useChatBootContext();
   const skillInitialData =
     character && initialSkillData ? initialSkillData : null;
@@ -821,7 +828,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   );
 
   // True when any message in the group is still streaming (metadata.isStreaming).
-  // Derived from the messages props — no separate store subscription needed.
+  // Derived from the messages props - no separate store subscription needed.
   const isGroupStreaming = allMessages.some((m) => m.metadata?.isStreaming);
 
   // Calculate group totals by summing all messages in the sequence
@@ -851,7 +858,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
       if (msg.metadata?.cachedInputTokens && msg.metadata.promptTokens) {
         totalCachedInputTokens += msg.metadata.cachedInputTokens;
       }
-      // cacheWriteTokens: sum across all steps — each step can write new tokens to cache
+      // cacheWriteTokens: sum across all steps - each step can write new tokens to cache
       if (msg.metadata?.cacheWriteTokens) {
         totalCacheWriteTokens += msg.metadata.cacheWriteTokens;
       }
@@ -872,7 +879,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
         totalCachedInputTokens > 0 ? totalCachedInputTokens : null,
       cacheWriteTokens:
         totalCacheWriteTokens > 0 ? totalCacheWriteTokens : null,
-      // Server-computed credit cost (preferred — accounts for cache pricing correctly)
+      // Server-computed credit cost (preferred - accounts for cache pricing correctly)
       creditCost: hasAnyCreditCost ? totalCreditCost : null,
       timeToFirstToken,
     };

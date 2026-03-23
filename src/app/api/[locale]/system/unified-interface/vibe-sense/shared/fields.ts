@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Standard Field Helpers
+ * Vibe Sense - Standard Field Helpers
  *
  * Client+server safe. No server imports.
  *
@@ -106,7 +106,7 @@ interface AnyScoped {
 
 // ─── Standard Field Helpers ───────────────────────────────────────────────────
 
-/** Input time series — one per logical input port. Renders as an input handle. */
+/** Input time series - one per logical input port. Renders as an input handle. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function timeSeriesRequestField<TST extends AnyScoped>(
   st: TST,
@@ -124,7 +124,7 @@ export function timeSeriesRequestField<TST extends AnyScoped>(
   });
 }
 
-/** Resolution selector — defaults to 1d. */
+/** Resolution selector - defaults to 1d. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function resolutionRequestField<TST extends AnyScoped>(
   st: TST,
@@ -146,7 +146,7 @@ export function resolutionRequestField<TST extends AnyScoped>(
   });
 }
 
-/** Time range — from/to. */
+/** Time range - from/to. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function rangeRequestField<TST extends AnyScoped>(
   st: TST,
@@ -164,7 +164,7 @@ export function rangeRequestField<TST extends AnyScoped>(
   });
 }
 
-/** Lookback periods — extra bars before range.from for warm-up. */
+/** Lookback periods - extra bars before range.from for warm-up. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function lookbackRequestField<TST extends AnyScoped>(
   st: TST,
@@ -182,7 +182,7 @@ export function lookbackRequestField<TST extends AnyScoped>(
   });
 }
 
-/** Output time series — renders as an output handle. */
+/** Output time series - renders as an output handle. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function timeSeriesResponseField<TST extends AnyScoped>(
   st: TST,
@@ -200,7 +200,7 @@ export function timeSeriesResponseField<TST extends AnyScoped>(
   });
 }
 
-/** Output signals — evaluator result. Renders as an output handle. */
+/** Output signals - evaluator result. Renders as an output handle. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function signalsResponseField<TST extends AnyScoped>(
   st: TST,
@@ -218,7 +218,7 @@ export function signalsResponseField<TST extends AnyScoped>(
   });
 }
 
-/** Input signals — single signal stream. Renders as an input handle. */
+/** Input signals - single signal stream. Renders as an input handle. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function signalsRequestField<TST extends AnyScoped>(
   st: TST,
@@ -236,7 +236,7 @@ export function signalsRequestField<TST extends AnyScoped>(
   });
 }
 
-/** Input signal streams — multiple signal arrays. Renders as an input handle. */
+/** Input signal streams - multiple signal arrays. Renders as an input handle. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function signalStreamsRequestField<TST extends AnyScoped>(
   st: TST,
@@ -254,7 +254,7 @@ export function signalStreamsRequestField<TST extends AnyScoped>(
   });
 }
 
-/** Node execution metadata — strictly typed. */
+/** Node execution metadata - strictly typed. */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function nodeMetaResponseField<TST extends AnyScoped>(
   st: TST,

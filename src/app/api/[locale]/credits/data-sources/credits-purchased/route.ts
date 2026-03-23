@@ -1,5 +1,5 @@
 /**
- * Credits Purchased — Route
+ * Credits Purchased - Route
  * Server-only.
  */
 

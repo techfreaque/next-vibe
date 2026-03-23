@@ -76,7 +76,7 @@ export class DefinitionLoader implements IDefinitionLoader {
       }
 
       // Validate endpoint access using consolidated method
-      // Skip for remote execution — the remote server handles its own auth
+      // Skip for remote execution - the remote server handles its own auth
       if (!skipAccessValidation) {
         const accessValidation = permissionsRegistry.validateEndpointAccess(
           endpoint,

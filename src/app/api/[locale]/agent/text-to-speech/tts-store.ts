@@ -7,7 +7,7 @@
  * playing/loading state is visible when hovering back over a message.
  *
  * Mutable refs (audio elements, abort controllers, timers) live in a
- * module-level Map — they cannot go in Zustand and don't need to trigger
+ * module-level Map - they cannot go in Zustand and don't need to trigger
  * re-renders.
  */
 

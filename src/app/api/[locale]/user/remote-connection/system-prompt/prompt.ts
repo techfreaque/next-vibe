@@ -51,7 +51,7 @@ export const systemContextFragment: SystemPromptFragment<RemoteInstancesData> =
         lines.push(`- **Environment:** development (NODE_ENV=development)`);
         lines.push(`- **Models available:** ${TOTAL_MODEL_COUNT}`);
         lines.push(
-          `- **Note:** Dev mode — hot reload active, DB may contain test data, errors are verbose.`,
+          `- **Note:** Dev mode - hot reload active, DB may contain test data, errors are verbose.`,
         );
       }
 
@@ -81,7 +81,7 @@ export const systemContextFragment: SystemPromptFragment<RemoteInstancesData> =
         }
         lines.push(``);
         lines.push(
-          `**Hermes** is the local dev instance that runs Claude Code for automated task execution. If the user hasn't set up Hermes yet, proactively suggest it — it enables scheduled code tasks, automated PR reviews, and local-only agent work.`,
+          `**Hermes** is the local dev instance that runs Claude Code for automated task execution. If the user hasn't set up Hermes yet, proactively suggest it - it enables scheduled code tasks, automated PR reviews, and local-only agent work.`,
         );
         lines.push(
           `Setup: connect your local instance via cloud sync in the user settings (Settings → Remote Connection).`,
@@ -98,15 +98,15 @@ export const systemContextFragment: SystemPromptFragment<RemoteInstancesData> =
         lines.push(``);
         lines.push(`**Operational context:**`);
         lines.push(
-          `- Built/production server: ${appUrl} — this is where you run`,
+          `- Built/production server: ${appUrl} - this is where you run`,
         );
         if (isDev) {
           lines.push(
-            `- Dev server (hot-reload): also running — use for testing UI changes`,
+            `- Dev server (hot-reload): also running - use for testing UI changes`,
           );
         }
         lines.push(
-          `- **Claude Code** is your primary tool for code execution — use it to make codebase changes`,
+          `- **Claude Code** is your primary tool for code execution - use it to make codebase changes`,
         );
         lines.push(
           `- Check the **cron dashboard** for tasks delegated from production`,
@@ -142,9 +142,9 @@ export const remoteInstancesFragment: SystemPromptFragment<RemoteInstancesData> 
 
       const lines = remoteConnections.map(
         (c) =>
-          `- "${c.instanceId}" — use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
+          `- "${c.instanceId}" - use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
       );
 
-      return `## Remote Instances\n\nUser has ${remoteConnections.length} connected local instance${remoteConnections.length === 1 ? "" : "s"}:\n\n${lines.join("\n")}\n\nRemote tools use the same callbackMode system as local tools. Default is "wait" — the tool result arrives automatically once the remote instance finishes execution. No special handling needed.`;
+      return `## Remote Instances\n\nUser has ${remoteConnections.length} connected local instance${remoteConnections.length === 1 ? "" : "s"}:\n\n${lines.join("\n")}\n\nRemote tools use the same callbackMode system as local tools. Default is "wait" - the tool result arrives automatically once the remote instance finishes execution. No special handling needed.`;
     },
   };

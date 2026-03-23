@@ -6,7 +6,7 @@ CLI widgets are **Ink-based React components** that override the default definit
 
 ## When to Write a CLI Widget
 
-Only create `widget.cli.tsx` when the default field-driven output is **insufficient for terminal display**. Most endpoints do NOT need one — the CLI renderer handles `WidgetType.TEXT`, `BADGE`, `FORM_FIELD`, etc. automatically.
+Only create `widget.cli.tsx` when the default field-driven output is **insufficient for terminal display**. Most endpoints do NOT need one - the CLI renderer handles `WidgetType.TEXT`, `BADGE`, `FORM_FIELD`, etc. automatically.
 
 Write a CLI widget when:
 
@@ -20,12 +20,12 @@ Write a CLI widget when:
 
 ```
 src/app/api/[locale]/<category>/<feature>/
-  definition.ts        — endpoint definition (references widget.tsx)
-  widget.tsx           — React (web) widget
-  widget.cli.tsx       — Ink (CLI/MCP) override  ← this file
+  definition.ts        - endpoint definition (references widget.tsx)
+  widget.tsx           - React (web) widget
+  widget.cli.tsx       - Ink (CLI/MCP) override  ← this file
 ```
 
-The CLI Bun plugin automatically substitutes `widget.cli.tsx` for `widget.tsx` when running in the CLI process. **No import change needed in `definition.ts`** — it always imports `widget.tsx`; the plugin intercepts the resolution.
+The CLI Bun plugin automatically substitutes `widget.cli.tsx` for `widget.tsx` when running in the CLI process. **No import change needed in `definition.ts`** - it always imports `widget.tsx`; the plugin intercepts the resolution.
 
 If no `widget.cli.tsx` exists, the plugin stubs out `widget.tsx` with a no-op so React imports don't crash in the CLI context.
 
@@ -57,15 +57,15 @@ export function MyResponseWidget({ field }: CliWidgetProps): React.JSX.Element {
   );
 }
 
-// REQUIRED — marks this as a CLI widget, disables stub fallback
+// REQUIRED - marks this as a CLI widget, disables stub fallback
 MyResponseWidget.cliWidget = true as const;
 ```
 
 **Rules:**
 
-- Props are always `{ field: { value: T | null | undefined }, fieldName: string }` — no other props
+- Props are always `{ field: { value: T | null | undefined }, fieldName: string }` - no other props
 - Export the component as a **named export** (not default)
-- Always set `ComponentName.cliWidget = true as const` on the export — the renderer checks this flag
+- Always set `ComponentName.cliWidget = true as const` on the export - the renderer checks this flag
 - Return `<Box />` (not `null`) for empty state
 
 ---
@@ -82,13 +82,13 @@ import {
   useInkWidgetLogger, // EndpointLogger
   useInkWidgetForm, // form state (interactive mode)
   useInkWidgetResponse, // full response object
-  useInkWidgetResponseOnly, // boolean — response-only mode
+  useInkWidgetResponseOnly, // boolean - response-only mode
   useInkWidgetTranslation, // scoped t() function
   useInkWidgetShowLabels, // false for MCP (suppress labels)
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 ```
 
-Never use React `useWidgetForm`, `useWidgetData`, etc. — those are web-only.
+Never use React `useWidgetForm`, `useWidgetData`, etc. - those are web-only.
 
 ---
 
@@ -130,9 +130,9 @@ MyWidget.cliWidget = true as const;
 
 **MCP rules:**
 
-- No `chalk` — MCP consumers are AI agents, ANSI escape codes are noise
-- No `terminalLink` — hyperlinks don't render in AI context
-- Compact output — one meaningful line per item, no decorative borders
+- No `chalk` - MCP consumers are AI agents, ANSI escape codes are noise
+- No `terminalLink` - hyperlinks don't render in AI context
+- Compact output - one meaningful line per item, no decorative borders
 - Use `<Text wrap="end">` for multi-line plain text blocks
 
 ---
@@ -170,7 +170,7 @@ export function IssueListWidget({ field }: CliWidgetProps): React.JSX.Element {
 IssueListWidget.cliWidget = true as const;
 ```
 
-Always guard `terminalLink` with `process.stdout.isTTY` — non-TTY contexts (pipes, CI) don't support hyperlinks.
+Always guard `terminalLink` with `process.stdout.isTTY` - non-TTY contexts (pipes, CI) don't support hyperlinks.
 
 ---
 
@@ -190,16 +190,16 @@ src/app/api/[locale]/system/check/
     widget.cli.tsx              ← imports from _shared
 ```
 
-The shared file is a regular `.cli.tsx` file (not a `widget.cli.tsx` override). Name it `widget-components.cli.tsx` or similar to signal CLI-only usage. Import flows inward only — shared components never import from individual widget files.
+The shared file is a regular `.cli.tsx` file (not a `widget.cli.tsx` override). Name it `widget-components.cli.tsx` or similar to signal CLI-only usage. Import flows inward only - shared components never import from individual widget files.
 
 ---
 
 ## Connection to `definition.ts`
 
-The CLI widget is connected to the definition the same way as the web widget — via `customWidgetObject` with `render:` pointing to the component from `widget.tsx`:
+The CLI widget is connected to the definition the same way as the web widget - via `customWidgetObject` with `render:` pointing to the component from `widget.tsx`:
 
 ```typescript
-// definition.ts — unchanged, always imports widget.tsx
+// definition.ts - unchanged, always imports widget.tsx
 import { CheckResultWidget } from "./widget";  // plugin redirects to widget.cli.tsx in CLI
 
 fields: customWidgetObject({
@@ -219,7 +219,7 @@ The `definition.ts` never imports `widget.cli.tsx` directly. The Bun plugin hand
 // ❌ Default export
 export default function MyWidget(...) {}
 
-// ❌ Missing cliWidget flag — renderer treats it as a stub
+// ❌ Missing cliWidget flag - renderer treats it as a stub
 export function MyWidget(...) {}
 // (no MyWidget.cliWidget = true)
 
@@ -230,7 +230,7 @@ import { useWidgetForm } from "...";  // web-only, crashes in CLI
 const isMcp = platform === Platform.MCP;
 // then using chalk.red(...) regardless of isMcp
 
-// ❌ Returning null — use <Box /> for empty state
+// ❌ Returning null - use <Box /> for empty state
 if (!value) return null;  // ❌
 if (!value) return <Box />;  // ✅
 ```
@@ -246,12 +246,12 @@ if (!value) return <Box />;  // ✅
 - [ ] Empty state returns `<Box />` not `null`
 - [ ] MCP vs CLI divergence handled via `useInkWidgetPlatform()`
 - [ ] No chalk/terminal-links in MCP path
-- [ ] `definition.ts` unchanged — still imports from `widget.tsx`
+- [ ] `definition.ts` unchanged - still imports from `widget.tsx`
 - [ ] Shared components use `.cli.tsx` suffix and canonical owner folder
 
 ---
 
 ## Related
 
-- [widget.md](widget.md) — React web widget pattern
-- [definition.md](definition.md) — `customWidgetObject` connection
+- [widget.md](widget.md) - React web widget pattern
+- [definition.md](definition.md) - `customWidgetObject` connection

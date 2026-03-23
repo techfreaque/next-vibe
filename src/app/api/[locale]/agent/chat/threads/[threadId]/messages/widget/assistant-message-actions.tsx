@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
@@ -11,16 +10,17 @@ import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type React from "react";
 
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   prepareTextForTTS,
   stripThinkTags,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
-import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import type { TtsVoice } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -60,7 +60,7 @@ interface AssistantMessageActionsProps {
   ttsVoice: (typeof TtsVoice)[keyof typeof TtsVoice] | undefined;
   /** Credit deduction callback (null in read-only mode) */
   deductCredits: ((creditCost: number, feature: string) => void) | null;
-  /** Vote callback — null when voting is not available */
+  /** Vote callback - null when voting is not available */
   onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
   userVote: "up" | "down" | null;
   voteScore: number;

@@ -43,7 +43,7 @@ export class SkillVoteRepository {
         });
       }
 
-      // Fetch the skill — must exist and be a published custom skill
+      // Fetch the skill - must exist and be a published custom skill
       const [skill] = await db
         .select({
           id: customSkills.id,

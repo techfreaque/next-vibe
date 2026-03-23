@@ -1,9 +1,9 @@
 /**
- * DB Functions — Definition with Drizzle Query Compilation
+ * DB Functions - Definition with Drizzle Query Compilation
  *
  * `defineDbFunction()` creates type-safe PostgreSQL functions where:
  * - **Queries** are written in Drizzle (type-checked against db.ts schemas)
- * - **Logic** is a typed TypeScript function — full IDE support, no raw strings
+ * - **Logic** is a typed TypeScript function - full IDE support, no raw strings
  * - **Compilation** happens at deploy time: Drizzle → SQL → embedded in PL/v8
  * - **Execution** is a single typed `.call()` from repository.ts
  *
@@ -56,7 +56,7 @@ import type {
 // Public types
 // ---------------------------------------------------------------------------
 
-/** Placeholder proxy — passed to the `queries` factory so Drizzle gets sql.placeholder() values */
+/** Placeholder proxy - passed to the `queries` factory so Drizzle gets sql.placeholder() values */
 type PlaceholderProxy<TParams extends Record<string, PgType>> = {
   [K in keyof TParams]: ReturnType<typeof sql.placeholder>;
 };
@@ -80,10 +80,10 @@ export interface DbFunctionDef<
   /** Drizzle table references this function is allowed to touch */
   tables: TTables;
 
-  /** Parameter definitions — becomes SQL signature + TS call-site type */
+  /** Parameter definitions - becomes SQL signature + TS call-site type */
   params: TParams;
 
-  /** Return type — becomes SQL RETURNS + TS result type */
+  /** Return type - becomes SQL RETURNS + TS result type */
   returns: TReturn;
 
   /** Function volatility (default: VOLATILE) */
@@ -104,17 +104,17 @@ export interface DbFunctionDef<
   queries: (p: PlaceholderProxy<TParams>) => TQueries;
 
   /**
-   * Typed logic function — runs inside PostgreSQL's V8 engine.
+   * Typed logic function - runs inside PostgreSQL's V8 engine.
    *
    * Receives:
-   * - `q` — typed query proxy: `q.wallets()` returns typed row arrays
-   * - `params` — typed function parameters
+   * - `q` - typed query proxy: `q.wallets()` returns typed row arrays
+   * - `params` - typed function parameters
    *
    * Must return an object matching the `returns` declaration.
    *
    * Available globals (PL/v8 runtime):
-   * - `plv8.execute(sql, params)` — raw SQL escape hatch
-   * - `plv8.elog(NOTICE, msg)` — logging
+   * - `plv8.execute(sql, params)` - raw SQL escape hatch
+   * - `plv8.elog(NOTICE, msg)` - logging
    *
    * At deploy time this function is serialized via .toString() and embedded
    * into the PL/v8 function body. The `q` param becomes `__q` at runtime.
@@ -219,7 +219,7 @@ export function defineDbFunction<
 
         const queryText = `SELECT * FROM ${def.name}(${castParts.join(", ")})`;
 
-        // Inline values into sql.raw() — Drizzle's sql.raw doesn't support $N params
+        // Inline values into sql.raw() - Drizzle's sql.raw doesn't support $N params
         const inlinedSql = inlineParams(queryText, values);
         const result = await db.execute(sql.raw(inlinedSql));
 
@@ -283,8 +283,8 @@ export function defineDbFunction<
  * Extract the body of the logic function for embedding in PL/v8.
  *
  * The logic function is defined as:
- *   (q, params) => { ... }         — arrow function
- *   function(q, params) { ... }    — function expression
+ *   (q, params) => { ... }         - arrow function
+ *   function(q, params) { ... }    - function expression
  *
  * We serialize it with .toString(), then:
  * 1. Extract the body (everything between the outer braces)
@@ -332,7 +332,7 @@ function extractLogicBody(
   const qParamName = qParamMatch?.[1] ?? "q";
 
   // Replace the query proxy param name with __q (the runtime variable).
-  // Only replace `q.something` usages — not standalone `q` references.
+  // Only replace `q.something` usages - not standalone `q` references.
   if (qParamName !== "__q" && qParamName !== "_") {
     body = body.replace(
       new RegExp(`\\b${escapeRegex(qParamName)}\\.`, "g"),
@@ -344,7 +344,7 @@ function extractLogicBody(
   // as individual variables (p_user_id, p_amount, etc.).
   //
   // If using destructuring `(q, { p_user_id })`: the body already uses `p_user_id`
-  // directly — works perfectly with PL/v8's scope.
+  // directly - works perfectly with PL/v8's scope.
   //
   // If using named object `(q, params)`: the body uses `params.p_user_id` which
   // won't work. We inject a shim: `var params = __params;`
@@ -353,7 +353,7 @@ function extractLogicBody(
   );
   const paramsParamName = secondParamMatch?.[1];
   if (paramsParamName && paramsParamName !== "_") {
-    // Named params object — inject a shim using the __params object from generateBody
+    // Named params object - inject a shim using the __params object from generateBody
     body = `var ${paramsParamName} = __params;\n${body}`;
   }
 

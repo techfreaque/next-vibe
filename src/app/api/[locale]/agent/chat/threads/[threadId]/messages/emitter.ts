@@ -5,8 +5,8 @@
  * Events are defined on the messages GET endpoint (definition.ts) and emitted by
  * ai-stream repository during streaming.
  *
- * The channel is derived from the messages endpoint path — no hardcoded strings.
- * The payload is typed via StreamEvent — a discriminated union correlating type + data.
+ * The channel is derived from the messages endpoint path - no hardcoded strings.
+ * The payload is typed via StreamEvent - a discriminated union correlating type + data.
  */
 
 import "server-only";
@@ -19,7 +19,7 @@ import type { StreamEvent } from "./events";
 
 /**
  * Callback for broadcasting stream events over WebSocket.
- * Accepts a full StreamEvent — discriminated union preserves type correlation.
+ * Accepts a full StreamEvent - discriminated union preserves type correlation.
  */
 export type WsEmitCallback = (event: StreamEvent) => void;
 

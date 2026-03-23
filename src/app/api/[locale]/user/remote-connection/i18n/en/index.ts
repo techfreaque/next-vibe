@@ -18,7 +18,7 @@ export const translations = {
     notConnected: {
       title: "Connect your cloud account",
       description:
-        "Connect to your cloud account (e.g. unbottled.ai) to sync your memories and use AI tools from your terminal — from anywhere.",
+        "Connect to your cloud account (e.g. unbottled.ai) to sync your memories and use AI tools from your terminal - from anywhere.",
       benefit1:
         "Your memories automatically sync between this device and your cloud account",
       benefit2: "Run AI tools from the command line with",

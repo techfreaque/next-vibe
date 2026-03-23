@@ -1,6 +1,6 @@
 /**
  * Error Logs Database Schema
- * Single table for all error monitoring — one row per unique error (fingerprint).
+ * Single table for all error monitoring - one row per unique error (fingerprint).
  * Privacy-first: messages and stack traces are truncated on write.
  * Cleaned up by a daily task (6-month / 100K row retention).
  */
@@ -30,7 +30,7 @@ export const MAX_STACK_LENGTH = 1000;
 /**
  * Error Logs Table
  * One row per unique error (fingerprint). Occurrences are counted, not duplicated.
- * On write: upsert by fingerprint — increment occurrences, update timestamp.
+ * On write: upsert by fingerprint - increment occurrences, update timestamp.
  * Resolve/reopen: flip the resolved flag on the single row.
  */
 export const errorLogs = pgTable(
@@ -44,13 +44,13 @@ export const errorLogs = pgTable(
     /** Error type classification (e.g. "INTERNAL_ERROR", "Error") */
     errorType: text("error_type"),
 
-    /** Truncated stack trace — first few frames only (max 1000 chars) */
+    /** Truncated stack trace - first few frames only (max 1000 chars) */
     stackTrace: text("stack_trace"),
 
     /** Raw logger metadata payload */
     metadata: jsonb("metadata").$type<LoggerMetadata[]>().default([]),
 
-    /** Deduplication fingerprint — hash of errorType + message prefix (unique) */
+    /** Deduplication fingerprint - hash of errorType + message prefix (unique) */
     fingerprint: text("fingerprint").notNull().unique(),
 
     /** Number of occurrences this row represents (>1 after dedup merges) */

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Run Config Route
+ * Vibe Sense - Run Config Route
  */
 
 import "server-only";

@@ -1,12 +1,12 @@
 /**
  * Help Endpoint Definition
- * One endpoint for all platforms — tool discovery, CLI help, interactive mode.
+ * One endpoint for all platforms - tool discovery, CLI help, interactive mode.
  *
  * Platforms:
- *   Web   — full widget: search, categories, enable/disable toggles
- *   AI    — compact tool list with pagination (low token usage)
- *   MCP   — same as AI
- *   CLI   — response mode (default) or interactive mode (--interactive flag)
+ *   Web   - full widget: search, categories, enable/disable toggles
+ *   AI    - compact tool list with pagination (low token usage)
+ *   MCP   - same as AI
+ *   CLI   - response mode (default) or interactive mode (--interactive flag)
  */
 
 import { z } from "zod";
@@ -37,7 +37,7 @@ const HelpToolsWidget = lazyCliWidget(() =>
 
 // Serializable tool metadata returned in response
 const aiToolMetadataSchema = z.object({
-  // Always present — `name` is the preferred call name (use this in execute-tool toolName param)
+  // Always present - `name` is the preferred call name (use this in execute-tool toolName param)
   name: z.string(),
   title: z.string(),
   description: z.string(),
@@ -50,7 +50,7 @@ const aiToolMetadataSchema = z.object({
   aliases: z.array(z.string()).optional(),
   // Only present in detail mode (toolName param)
   requiresConfirmation: z.boolean().optional(),
-  /** Credit cost — only present when > 0 */
+  /** Credit cost - only present when > 0 */
   credits: z.number().optional(),
   /** Platforms this tool is available on (admin only) */
   platforms: z.array(z.enum(Platform)).optional(),

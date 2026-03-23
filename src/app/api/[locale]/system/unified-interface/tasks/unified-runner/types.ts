@@ -162,12 +162,12 @@ export interface CronTaskRunResult {
 // ─── Core Task Types ─────────────────────────────────────────────────────────
 
 /**
- * Cron Task — fully generic, inferred from endpoint definition.
- * Not used directly — use `createCronTask()` factory instead.
+ * Cron Task - fully generic, inferred from endpoint definition.
+ * Not used directly - use `createCronTask()` factory instead.
  *
  * `taskInput` is a flat merge of all default inputs (body + urlPathParams).
  * At execution time, `splitTaskArgs()` splits them by schema into
- * `{ data, urlPathParams }` — no need to track them separately at type level.
+ * `{ data, urlPathParams }` - no need to track them separately at type level.
  */
 export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
   type: "cron";
@@ -234,7 +234,7 @@ export interface CronTaskAny {
 }
 
 /**
- * Task Runner — long-running background process with graceful shutdown support.
+ * Task Runner - long-running background process with graceful shutdown support.
  */
 export interface TaskRunner<TScopedTranslationKey extends string> {
   type: "task-runner";
@@ -273,7 +273,7 @@ export type Task = CronTaskAny | TaskRunner<string>;
 // ─── Factory Functions ───────────────────────────────────────────────────────
 
 /**
- * Create a type-safe cron task — types are fully inferred from definition + route.
+ * Create a type-safe cron task - types are fully inferred from definition + route.
  * Returns Task (erased) for collection compatibility.
  *
  * Usage: `createCronTask(definitions.POST, tools.POST, { name: "...", ... })`
@@ -298,11 +298,11 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
     timeout?: number;
     outputMode?: (typeof TaskOutputMode)[keyof typeof TaskOutputMode];
     /**
-     * Flat merged default args — body fields + URL path params in one object.
+     * Flat merged default args - body fields + URL path params in one object.
      * Types are fully inferred from the endpoint definition.
      * splitTaskArgs() splits them by schema at execution time.
      */
-    // required — type inferred from endpoint; undefined for no-input endpoints
+    // required - type inferred from endpoint; undefined for no-input endpoints
     taskInput: CronTaskInput<T>;
     /** When true, task disables itself after first execution (success or failure) */
     runOnce?: boolean;
@@ -322,7 +322,7 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
 }
 
 /**
- * Create a task runner — long-running background process.
+ * Create a task runner - long-running background process.
  *
  * Usage: `createTaskRunner({ name: "pulse", run: async ({ signal }) => { ... } })`
  */

@@ -5,7 +5,7 @@
  */
 
 interface VibeElectronAPI {
-  /** Full server restart — kills vibe start, respawns, waits for health check */
+  /** Full server restart - kills vibe start, respawns, waits for health check */
   restart: () => Promise<boolean>;
   /** Hot-restart Next.js via SIGUSR1 (same as `vibe rebuild`) */
   hotRestart: () => Promise<void>;

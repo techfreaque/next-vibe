@@ -46,7 +46,7 @@ function Button({
   const accessibilityHint = type === "submit" ? "Submit form" : undefined;
   // suppressHydrationWarning is web-only SSR prop - use in condition to satisfy linter
   const isHydrated = !suppressHydrationWarning;
-  // draggable/onDragStart are web-only drag props — void to satisfy linter
+  // draggable/onDragStart are web-only drag props - void to satisfy linter
   void draggable;
   void onDragStart;
   const nativeStyle = style ? convertCSSToViewStyle(style) : undefined;

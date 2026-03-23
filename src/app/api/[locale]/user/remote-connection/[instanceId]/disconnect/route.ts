@@ -1,6 +1,6 @@
 /**
  * Remote Connection Disconnect Route Handler
- * DELETE — remove the connection record
+ * DELETE - remove the connection record
  */
 
 import "server-only";

@@ -7,9 +7,9 @@
 // Side-effect: registers global error sink so all logger.error() calls persist to error_logs
 import "../shared/logger/error-persist";
 
-import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { NextRequest } from "next-vibe-ui/lib/request";
 import { NextResponse } from "next-vibe-ui/lib/request";
+import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
@@ -57,21 +57,21 @@ const MUTATING_METHODS = new Set([
  *
  * Rules (fail-open for non-browser contexts):
  * - Skip if method is GET/HEAD/OPTIONS
- * - Skip if no csrf_token cookie present (server-to-server, CLI, native — no cookie)
- * - Skip if Authorization header present (bearer-token auth — not cookie-based)
+ * - Skip if no csrf_token cookie present (server-to-server, CLI, native - no cookie)
+ * - Skip if Authorization header present (bearer-token auth - not cookie-based)
  * - Reject if csrf_token cookie present but X-CSRF-Token header is missing or mismatched
  */
 function validateCsrf(request: NextRequest, method: Methods): boolean {
   if (!MUTATING_METHODS.has(method)) {
     return true;
   }
-  // Bearer-token auth (React Native, server-to-server) — not vulnerable to CSRF
+  // Bearer-token auth (React Native, server-to-server) - not vulnerable to CSRF
   if (request.headers.get("authorization")) {
     return true;
   }
   const cookieToken = request.cookies.get(CSRF_TOKEN_COOKIE_NAME)?.value;
   if (!cookieToken) {
-    // No CSRF cookie — must be a non-browser client (CLI, MCP, server). Allow.
+    // No CSRF cookie - must be a non-browser client (CLI, MCP, server). Allow.
     return true;
   }
   const headerToken = request.headers.get(CSRF_TOKEN_HEADER_NAME);

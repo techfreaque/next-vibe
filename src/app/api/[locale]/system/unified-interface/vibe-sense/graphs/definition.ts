@@ -1,11 +1,10 @@
 /**
- * Vibe Sense — Graphs List + Create Endpoint Definitions
+ * Vibe Sense - Graphs List + Create Endpoint Definitions
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { graphConfigSchema } from "../graph/schema";
 import {
   customWidgetObject,
   objectField,
@@ -21,9 +20,10 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { graphConfigSchema } from "../graph/schema";
 
-import { scopedTranslation } from "./i18n";
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+import { scopedTranslation } from "./i18n";
 
 const GraphListContainer = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.GraphListContainer })),

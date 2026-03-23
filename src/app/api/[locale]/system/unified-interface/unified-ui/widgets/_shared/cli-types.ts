@@ -22,6 +22,7 @@ import type {
 } from "./types";
 
 // Re-export for convenience
+// Re-export for convenience
 export type { FieldUsageConfig };
 
 /**
@@ -45,7 +46,7 @@ export type InkWidgetContext<TEndpoint extends CreateApiEndpointAny> =
     form?: InkFormState<TEndpoint["types"]["RequestOutput"]>;
     onSubmit?: () => void;
     isSubmitting?: boolean;
-    /** Currently focused field name — only this field should accept input */
+    /** Currently focused field name - only this field should accept input */
     focusedField?: string;
     /** Move focus to the next/previous field */
     moveFocus?: (direction: "next" | "prev") => void;
@@ -61,13 +62,13 @@ export type InkWidgetContext<TEndpoint extends CreateApiEndpointAny> =
 /**
  * Props for InkWidgetRenderer component.
  * Receives fields WITH values already added by the endpoint renderer.
- * field is DispatchField — UnifiedField union + value for switch-based dispatch.
- * fieldName is `string` (not Path) — CLI forms use plain string keys, not
+ * field is DispatchField - UnifiedField union + value for switch-based dispatch.
+ * fieldName is `string` (not Path) - CLI forms use plain string keys, not
  * react-hook-form branded paths.
  */
 export interface InkWidgetRendererProps {
   fieldName: string;
-  // TKey is string at the dispatch boundary — individual widgets narrow to ScopedKey
+  // TKey is string at the dispatch boundary - individual widgets narrow to ScopedKey
   field: DispatchField<
     string,
     z.ZodTypeAny,

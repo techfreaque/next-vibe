@@ -2,7 +2,7 @@ export const translations = {
   tags: { vibeSense: "vibe-sense" },
   post: {
     title: "Window Avg",
-    description: "Rolling window average — smooths values over a fixed window",
+    description: "Rolling window average - smooths values over a fixed window",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

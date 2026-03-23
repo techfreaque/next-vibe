@@ -1,5 +1,5 @@
 /**
- * Chat Tool Calls Total — Route
+ * Chat Tool Calls Total - Route
  * Server-only.
  */
 

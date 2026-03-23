@@ -25,10 +25,13 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
-import { CHANNEL_TO_PROVIDERS, MessengerProviderOptions } from "../../enum";
+import {
+  CHANNEL_TO_PROVIDERS,
+  MessageChannel,
+  MessengerProviderOptions,
+} from "../../enum";
 import type definition from "./definition";
 import type { MessengerAccountEditPUTResponseOutput } from "./definition";
-import { MessageChannel } from "../../enum";
 
 interface CustomWidgetProps {
   field: {
@@ -265,7 +268,7 @@ export function MessengerAccountEditContainer({
           </SectionCard>
         )}
 
-        {/* IMAP inbound — open by default if already configured */}
+        {/* IMAP inbound - open by default if already configured */}
         {isSmtp && (
           <CollapsibleSection
             title={t("sections.imap")}
@@ -318,7 +321,7 @@ export function MessengerAccountEditContainer({
           </CollapsibleSection>
         )}
 
-        {/* Email routing — open by default */}
+        {/* Email routing - open by default */}
         {isEmail && (
           <CollapsibleSection
             title={t("sections.routing")}

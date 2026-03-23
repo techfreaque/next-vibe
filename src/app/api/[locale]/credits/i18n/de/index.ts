@@ -145,7 +145,7 @@ export const translations: typeof enTranslations = {
       adminTitle: "Ausgabenlimit",
       description: "Nutzen Sie Ihre Credits bei {{modelCount}} KI-Modellen",
       adminDescription:
-        "Credits wirken als Ausgabenlimit — kontrollieren Sie die erlaubte KI-Nutzung aller Benutzer.",
+        "Credits wirken als Ausgabenlimit - kontrollieren Sie die erlaubte KI-Nutzung aller Benutzer.",
       credit: "{{count}} Credit",
       credits: "{{count}} Credits",
       expiring: {
@@ -156,7 +156,7 @@ export const translations: typeof enTranslations = {
       permanent: {
         title: "Permanente Credits",
         description: "Laufen nie ab – gehören Ihnen",
-        adminDescription: "Permanente Credits — laufen nie ab",
+        adminDescription: "Permanente Credits - laufen nie ab",
       },
       free: {
         title: "Kostenlose Credits",
@@ -435,7 +435,7 @@ export const translations: typeof enTranslations = {
   email: {
     creditPack: {
       user: {
-        subject: "Ihr Guthaben-Paket ist bereit — {{appName}}",
+        subject: "Ihr Guthaben-Paket ist bereit - {{appName}}",
         title: "Credits wurden Ihrem Konto hinzugefügt",
         previewText: "{{credits}} Credits wurden Ihrem Konto hinzugefügt",
         greeting: "Hallo {{privateName}},",
@@ -444,7 +444,7 @@ export const translations: typeof enTranslations = {
         signoff: "Vielen Dank für Ihren Kauf!\n\nDas {{appName}}-Team",
       },
       admin: {
-        subject: "[{{appName}}] Guthaben-Paket gekauft — {{credits}} Credits",
+        subject: "[{{appName}}] Guthaben-Paket gekauft - {{credits}} Credits",
         title: "Guthaben-Paket-Kauf",
         preview: "Ein Benutzer hat ein Guthaben-Paket gekauft",
         body: "Ein Benutzer hat ein Guthaben-Paket gekauft.",

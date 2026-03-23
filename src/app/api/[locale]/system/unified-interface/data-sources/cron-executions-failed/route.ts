@@ -1,5 +1,5 @@
 /**
- * Cron Executions Failed — Route
+ * Cron Executions Failed - Route
  * Server-only.
  */
 

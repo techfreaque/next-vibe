@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "In unbottled.ai investieren",
     description:
-      "Investitionen ab 5.000 $ willkommen. Die offene KI-Plattform auf next-vibe — 42 Modelle, produktionsbereit, strukturell unzensierbar.",
+      "Investitionen ab 5.000 $ willkommen. Die offene KI-Plattform auf next-vibe - 42 Modelle, produktionsbereit, strukturell unzensierbar.",
     category: "Investieren",
     imageAlt: "In unbottled.ai investieren",
     keywords:

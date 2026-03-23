@@ -13,7 +13,7 @@ export const translations = {
     sshSecretKeyNotSet:
       "Zmienna SSH_SECRET_KEY nie jest ustawiona. Dodaj 32-bajtową wartość hex.",
     encryptionFailed:
-      "Szyfrowanie nie powiodło się — SSH_SECRET_KEY może być nieprawidłowy",
+      "Szyfrowanie nie powiodło się - SSH_SECRET_KEY może być nieprawidłowy",
     noRowReturned: "Brak wiersza zwróconego z wstawienia",
   },
 

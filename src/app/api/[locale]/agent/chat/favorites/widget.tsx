@@ -59,16 +59,16 @@ import {
   Icon,
   type IconKey,
 } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { DEFAULT_SKILLS } from "../skills/config";
-import { SkillCategory } from "../skills/enum";
-import { NO_SKILL_ID } from "../skills/constants";
+import { scopedTranslation as ttsScopedTranslation } from "../../text-to-speech/i18n";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
+import { DEFAULT_SKILLS } from "../skills/config";
+import { NO_SKILL_ID } from "../skills/constants";
+import { SkillCategory } from "../skills/enum";
 import definition, {
   type FavoriteCard,
   type FavoritesListResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
-import { scopedTranslation as ttsScopedTranslation } from "../../text-to-speech/i18n";
 import reorderDefinition from "./reorder/definition";
 
 /**
@@ -83,7 +83,7 @@ interface CustomWidgetProps {
 const FAVORITES_FIELD = "favorites";
 
 /**
- * Skill group — favorites grouped by skillId
+ * Skill group - favorites grouped by skillId
  */
 interface SkillGroup {
   id: string; // "group-{skillId}"
@@ -104,7 +104,7 @@ const GROUP_PREFIX = "group-";
 function groupBySkill(favorites: FavoriteCard[]): SkillGroup[] {
   const map = new Map<string, FavoriteCard[]>();
   for (const fav of favorites) {
-    // Default (model-only) favorites are never grouped — each gets its own entry
+    // Default (model-only) favorites are never grouped - each gets its own entry
     const groupKey = fav.skillId === NO_SKILL_ID ? fav.id : fav.skillId;
     const group = map.get(groupKey);
     if (group) {
@@ -164,7 +164,7 @@ function getSectionType(group: SkillGroup): FavoriteSectionType {
 const SECTION_ORDER: FavoriteSectionType[] = ["companion", "skills", "model"];
 
 // ============================================================================
-// Full card — used for single-item groups (no own useSortable — parent handles it)
+// Full card - used for single-item groups (no own useSortable - parent handles it)
 // ============================================================================
 
 /**
@@ -352,7 +352,7 @@ const FullCard = React.memo(function FullCard({
 });
 
 // ============================================================================
-// Compact variant row — used inside multi-item groups
+// Compact variant row - used inside multi-item groups
 // ============================================================================
 
 /**
@@ -485,7 +485,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
           </Div>
         </Div>
 
-        {/* Action buttons — visible on hover */}
+        {/* Action buttons - visible on hover */}
         <Div
           className={cn(
             "flex gap-0.5 shrink-0",
@@ -524,7 +524,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
 });
 
 // ============================================================================
-// Sortable Group — wraps a character group
+// Sortable Group - wraps a character group
 // ============================================================================
 
 /**
@@ -631,7 +631,7 @@ const SortableGroup = React.memo(function SortableGroup({
       }}
     >
       <Div className="rounded-lg border overflow-hidden">
-        {/* Group header — matches full card layout */}
+        {/* Group header - matches full card layout */}
         <Div className="group relative flex items-start gap-4 px-4 pt-4 pb-2">
           <Div className="flex items-center justify-center rounded-lg bg-primary/10 w-12 h-12 shrink-0">
             <Icon icon={group.icon} className="h-6 w-6" />
@@ -679,7 +679,7 @@ const SortableGroup = React.memo(function SortableGroup({
           </Div>
         </Div>
 
-        {/* Variant rows — indented to align with text content past icon */}
+        {/* Variant rows - indented to align with text content past icon */}
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -720,7 +720,7 @@ const SortableGroup = React.memo(function SortableGroup({
 // ============================================================================
 
 /**
- * Custom container widget for favorites list — grouped by character
+ * Custom container widget for favorites list - grouped by character
  */
 export function FavoritesListContainer({
   field,
@@ -803,7 +803,7 @@ export function FavoritesListContainer({
    */
   const persistPositions = useCallback(
     (updatedItems: FavoriteCard[]) => {
-      // Set local override immediately — prevents snap-back
+      // Set local override immediately - prevents snap-back
       setDragOverride(updatedItems);
 
       // Update store + fire API, then clear override
@@ -835,7 +835,7 @@ export function FavoritesListContainer({
         )
         .then(() => {
           logger.info("Favorites positions updated successfully");
-          // Clear override — store now has the correct data
+          // Clear override - store now has the correct data
           setDragOverride(null);
           return undefined;
         })
@@ -844,7 +844,7 @@ export function FavoritesListContainer({
             errorMessage:
               error instanceof Error ? error.message : String(error),
           });
-          // Still clear — optimistic update stays in store
+          // Still clear - optimistic update stays in store
           setDragOverride(null);
         });
     },
@@ -852,7 +852,7 @@ export function FavoritesListContainer({
   );
 
   /**
-   * Handle group-level drag end — reorder entire groups
+   * Handle group-level drag end - reorder entire groups
    */
   const handleGroupDragEnd = useCallback(
     (event: DragEndEvent): void => {
@@ -874,7 +874,7 @@ export function FavoritesListContainer({
   );
 
   /**
-   * Handle item-level drag end — reorder within a group
+   * Handle item-level drag end - reorder within a group
    */
   const handleItemDragEnd = useCallback(
     (groupId: string, event: DragEndEvent): void => {
@@ -928,7 +928,7 @@ export function FavoritesListContainer({
         </Button>
       </Div>
 
-      {/* Favorites List — grouped by character */}
+      {/* Favorites List - grouped by character */}
       <Div className="px-4 pt-4 pb-4 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
         {!field.value ? (
           <Div className="h-[300px] flex items-center justify-center">
@@ -947,7 +947,7 @@ export function FavoritesListContainer({
               <Div className="flex flex-col gap-3">
                 {sections.map((section, sectionIdx) => (
                   <Div key={section.type}>
-                    {/* Section header — only shown when multiple sections exist */}
+                    {/* Section header - only shown when multiple sections exist */}
                     {sections.length > 1 && (
                       <Div
                         className={cn(

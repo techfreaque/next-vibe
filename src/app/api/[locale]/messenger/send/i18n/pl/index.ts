@@ -39,12 +39,12 @@ export const translations: typeof enTranslations = {
   text: {
     label: "Wiadomość",
     description:
-      "Treść tekstowa — dla SMS/WhatsApp/Telegram; zapasowa dla e-mail",
+      "Treść tekstowa - dla SMS/WhatsApp/Telegram; zapasowa dla e-mail",
     placeholder: "Wprowadź wiadomość...",
   },
   html: {
     label: "Treść HTML",
-    description: "Treść HTML (tylko e-mail, opcjonalna — zapasowa tekst)",
+    description: "Treść HTML (tylko e-mail, opcjonalna - zapasowa tekst)",
     placeholder: "<p>Wprowadź treść HTML e-maila...</p>",
   },
   senderName: {

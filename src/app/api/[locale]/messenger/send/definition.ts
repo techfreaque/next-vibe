@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  objectField,
   objectOptionalField,
   requestField,
   responseField,
-  objectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
-      // Content — text is the universal body; subject + html are email-only
+      // Content - text is the universal body; subject + html are email-only
       subject: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

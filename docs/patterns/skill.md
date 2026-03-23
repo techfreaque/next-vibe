@@ -4,40 +4,40 @@ Guide to defining AI skills (`skill.ts`) that ship with the platform.
 
 ## Overview
 
-Each skill is a **self-contained module** in its own folder with a `skill.ts` file. Skills define an AI persona or tool configuration — a system prompt, model selection filters, suggested prompts, and optional tool overrides.
+Each skill is a **self-contained module** in its own folder with a `skill.ts` file. Skills define an AI persona or tool configuration - a system prompt, model selection filters, suggested prompts, and optional tool overrides.
 
 Skills are **auto-indexed**: the generator scans all `skill.ts` files anywhere under `src/app/api/[locale]/` and regenerates `system/generated/skills-index.ts`. Never manually edit the index.
 
 ## Where Skills Live
 
-Skills can live anywhere in the API tree — not just in `default-skills/`:
+Skills can live anywhere in the API tree - not just in `default-skills/`:
 
 ```
 src/app/api/[locale]/agent/chat/skills/
   default-skills/
     <skill-id>/
-      skill.ts                       — Platform-wide built-in skills
+      skill.ts                       - Platform-wide built-in skills
 
 src/app/api/[locale]/<module>/
   <feature>/
-    skill.ts                         — Module-level skill (scoped to a feature)
+    skill.ts                         - Module-level skill (scoped to a feature)
 ```
 
 **Default skills** (`default-skills/*/skill.ts`) are the standard home for platform-wide built-in skills.
 
-**Module-level skills** (e.g., `memories/skill.ts`, `favorites/skill.ts`) make sense when a skill is tightly coupled to a specific module's capabilities — tool bundles that activate module-specific tools, persona skills that are only relevant to a particular context, etc.
+**Module-level skills** (e.g., `memories/skill.ts`, `favorites/skill.ts`) make sense when a skill is tightly coupled to a specific module's capabilities - tool bundles that activate module-specific tools, persona skills that are only relevant to a particular context, etc.
 
 ## File Structure
 
 ```
 src/app/api/[locale]/agent/chat/skills/
-  config.ts                          — Skill interface definition + NO_SKILL constant
-  enum.ts                            — SkillCategory, SkillOwnershipType, ModelSelectionType, etc.
-  constants.ts                       — NO_SKILL_ID and alias constants
+  config.ts                          - Skill interface definition + NO_SKILL constant
+  enum.ts                            - SkillCategory, SkillOwnershipType, ModelSelectionType, etc.
+  constants.ts                       - NO_SKILL_ID and alias constants
   default-skills/
     <skill-id>/
-      skill.ts                       — The skill definition (one per folder)
-  system-prompt/                     — System prompt fragment for skills context
+      skill.ts                       - The skill definition (one per folder)
+  system-prompt/                     - System prompt fragment for skills context
 ```
 
 ## Minimal Skill Example
@@ -162,7 +162,7 @@ modelSelection: {
 
 ## Companion Personas (PERSONA type)
 
-Companion personas include a `companionPrompt` — a short soul fragment (50–200 tokens) prepended to sub-agent system prompts when this companion invokes `ai-run`:
+Companion personas include a `companionPrompt` - a short soul fragment (50–200 tokens) prepended to sub-agent system prompts when this companion invokes `ai-run`:
 
 ```typescript
 export const theaSkill: Skill = {
@@ -179,7 +179,7 @@ export const theaSkill: Skill = {
 ### Default (platform-wide) skill
 
 1. Create `default-skills/<skill-id>/skill.ts`
-2. Export a `const <skillId>Skill: Skill = { ... }` — named export matching the folder
+2. Export a `const <skillId>Skill: Skill = { ... }` - named export matching the folder
 3. Add translation keys to `skills/i18n/en/index.ts` (and de/, pl/)
 4. Run the skills-index generator: `vibe generate-skills-index` (or `vibe generate-all`)
 
@@ -187,10 +187,10 @@ export const theaSkill: Skill = {
 
 1. Create `<module>/<feature>/skill.ts` (e.g., `memories/skill.ts`)
 2. Export a `const <skillId>Skill: Skill = { ... }` with a unique `id`
-3. Add translation keys to `skills/i18n/en/index.ts` (and de/, pl/) — same i18n namespace
+3. Add translation keys to `skills/i18n/en/index.ts` (and de/, pl/) - same i18n namespace
 4. Run the skills-index generator: `vibe generate-skills-index` (or `vibe generate-all`)
 
-The generator scans all `skill.ts` files under `src/app/api/[locale]/` automatically — no manual registration needed.
+The generator scans all `skill.ts` files under `src/app/api/[locale]/` automatically - no manual registration needed.
 
 ## i18n Keys
 
@@ -207,14 +207,14 @@ Skill translation keys follow this pattern (all in `skills/i18n/`):
 "skills.friendly.suggestedPrompts.3": "What should I know today?",
 ```
 
-This applies to all skills regardless of where they live — module-level skills still add their keys to the shared `skills/i18n/` namespace.
+This applies to all skills regardless of where they live - module-level skills still add their keys to the shared `skills/i18n/` namespace.
 
 ## Auto-generated Index
 
-`system/generated/skills-index.ts` is auto-generated — **never edit it manually**:
+`system/generated/skills-index.ts` is auto-generated - **never edit it manually**:
 
 ```typescript
-// GENERATED — do not edit
+// GENERATED - do not edit
 import { friendlySkill } from "../../agent/chat/skills/default-skills/friendly/skill";
 // ... all skills (including module-level ones)
 

@@ -1,12 +1,12 @@
 /**
  * CLI request data schema and type.
- * Client-safe — no Node.js or CLI dependencies.
+ * Client-safe - no Node.js or CLI dependencies.
  */
 
 import { z } from "zod";
 
 /**
- * CLI request data — a recursive record for request/response examples.
+ * CLI request data - a recursive record for request/response examples.
  */
 export interface CliRequestData {
   [key: string]:

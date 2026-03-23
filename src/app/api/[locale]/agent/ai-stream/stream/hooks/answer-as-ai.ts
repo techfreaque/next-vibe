@@ -8,8 +8,8 @@ import { parseError } from "next-vibe/shared/utils";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
+import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
@@ -22,7 +22,7 @@ export interface AnswerAsAIDeps {
   startStream: StartStreamFn;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
-  /** Active thread ID — needed to look up message in apiClient cache */
+  /** Active thread ID - needed to look up message in apiClient cache */
   activeThreadId: string | null;
   settings: {
     selectedModel: ModelId;

@@ -44,7 +44,7 @@ export const translations = {
       token: "Token",
       id: "Session ID",
       name: "Name",
-      message: "Copy this token — it will not be shown again",
+      message: "Copy this token - it will not be shown again",
     },
     success: {
       title: "Session created",

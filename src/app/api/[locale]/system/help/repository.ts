@@ -270,7 +270,7 @@ export class HelpRepository {
               try {
                 prop.description = t(field.description);
               } catch {
-                /* missing translation — skip */
+                /* missing translation - skip */
               }
             }
           }
@@ -350,7 +350,7 @@ export class HelpRepository {
     return getEndpoint(tool.toolName);
   }
   /**
-   * Start interactive CLI session — Ink-based route navigator.
+   * Start interactive CLI session - Ink-based route navigator.
    */
   static async startInteractive(
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
@@ -568,14 +568,14 @@ export class HelpRepository {
         description: cap.description,
         category: cap.category ?? t("category"),
         tags: cap.tags ?? [],
-        // Keep aliases bare (no prefix) — CLI calls them with the prefix anyway
+        // Keep aliases bare (no prefix) - CLI calls them with the prefix anyway
         aliases: cap.aliases,
         executionMode: "via-execute-route" as const,
         instanceId,
       };
     });
 
-    // Apply query filter if provided — also match bare tool name (without instanceId prefix)
+    // Apply query filter if provided - also match bare tool name (without instanceId prefix)
     const lowerQuery = query?.toLowerCase();
     const filtered = lowerQuery
       ? allTools.filter((tool) => {
@@ -659,7 +659,7 @@ export class HelpRepository {
 
     const paginationHint =
       totalPages > 1
-        ? ` Page ${safePage}/${totalPages} — pass page= to continue.`
+        ? ` Page ${safePage}/${totalPages} - pass page= to continue.`
         : "";
     return success({
       tools: pageSlice,
@@ -675,7 +675,7 @@ export class HelpRepository {
     locale: CountryLanguage,
     platform: Platform,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
-    // Remote instance tool discovery — bypass local registry
+    // Remote instance tool discovery - bypass local registry
     if (data.instanceId) {
       return HelpRepository.getToolsFromRemoteInstance(
         data.instanceId,
@@ -708,9 +708,9 @@ export class HelpRepository {
     );
     const allMeta: EndpointMeta[] = metaModule.endpointsMeta;
 
-    // Discovery platform — what platform context are we listing tools for?
+    // Discovery platform - what platform context are we listing tools for?
     // Admin can override with data.platform filter; non-admins get their actual platform.
-    // MCP uses CLI semantics (opt-out, not MCP_VISIBLE opt-in) — execute-tool reaches all CLI tools.
+    // MCP uses CLI semantics (opt-out, not MCP_VISIBLE opt-in) - execute-tool reaches all CLI tools.
     const platformFilter = isAdmin ? data.platform : undefined;
     let discoveryPlatform: Platform;
 
@@ -718,7 +718,7 @@ export class HelpRepository {
       const mapped = HelpRepository.mapFilterToPlatform(platformFilter);
       discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
     } else {
-      // Use actual calling platform — each platform has its own correct access rules
+      // Use actual calling platform - each platform has its own correct access rules
       discoveryPlatform = platform;
     }
 
@@ -734,7 +734,7 @@ export class HelpRepository {
       user.isPublic,
     );
 
-    // Admin platform badges — derived directly from allowedRoles in meta
+    // Admin platform badges - derived directly from allowedRoles in meta
     const getToolPlatforms = (tool: EndpointMeta): Platform[] | undefined => {
       if (!isAdmin) {
         return undefined;
@@ -772,7 +772,7 @@ export class HelpRepository {
 
     // statsFilter: web/human platforms can filter by pinned or allowed tools.
     // null in DB = user has default settings (never stored when default).
-    // Direct DB query — compact platforms (AI/MCP/CRON) skip this entirely.
+    // Direct DB query - compact platforms (AI/MCP/CRON) skip this entirely.
     const statsFilter = data.statsFilter ?? "pinned";
     // Server-side counts for the stats filter buttons (web only)
     let pinnedCount: number | undefined;
@@ -841,7 +841,7 @@ export class HelpRepository {
           );
         }
       } catch {
-        // Settings fetch failed — fall through with unfiltered list
+        // Settings fetch failed - fall through with unfiltered list
       }
     }
 
@@ -860,7 +860,7 @@ export class HelpRepository {
         }
       : {};
 
-    // Detail mode — single tool with full parameter schema
+    // Detail mode - single tool with full parameter schema
     if (data.toolName) {
       const needle = data.toolName.toLowerCase().trim();
       const matchedTool = platformFilteredMeta.find(
@@ -1009,7 +1009,7 @@ export class HelpRepository {
       }
       const paginationHint =
         totalPages > 1
-          ? ` Page ${safePage}/${totalPages} — pass page=${safePage + 1} to continue.`
+          ? ` Page ${safePage}/${totalPages} - pass page=${safePage + 1} to continue.`
           : "";
       return success({
         tools: pageSlice.map((m) =>
@@ -1018,7 +1018,7 @@ export class HelpRepository {
         totalCount,
         matchedCount,
         categories,
-        hint: `${matchedCount} tools — showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName="<name>" for detail on one tool. To call any tool: execute-tool toolName="<name>".${paginationHint}`,
+        hint: `${matchedCount} tools - showing names only. Narrow your search to ≤5 results to auto-expand full schemas, or pass toolName="<name>" for detail on one tool. To call any tool: execute-tool toolName="<name>".${paginationHint}`,
         currentPage: safePage,
         effectivePageSize,
         totalPages,
@@ -1064,7 +1064,7 @@ export class HelpRepository {
       categories,
       hint:
         totalPages > 1
-          ? `Page ${safePage}/${totalPages} — ${matchedCount} tools match. Use vibe help <name> for full details.`
+          ? `Page ${safePage}/${totalPages} - ${matchedCount} tools match. Use vibe help <name> for full details.`
           : `${matchedCount} tools matched. Use vibe help <name> for full details.`,
       currentPage: safePage,
       effectivePageSize,

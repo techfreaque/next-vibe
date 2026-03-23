@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Scalanie",
     description:
-      "Scalanie — sumuje dwie serie czasowe wyrównane według znacznika czasu",
+      "Scalanie - sumuje dwie serie czasowe wyrównane według znacznika czasu",
     fields: {
       a: { label: "Seria A", description: "Pierwsza wejściowa seria czasowa" },
       b: { label: "Seria B", description: "Druga wejściowa seria czasowa" },

@@ -1,12 +1,12 @@
 /**
  * System Prompt Assembler
  *
- * Isomorphic — no server-only imports. Works on both client and server.
+ * Isomorphic - no server-only imports. Works on both client and server.
  * Joins pre-built leading fragments into the final system prompt string.
  * Also builds the trailing system message injected before [Context:] each turn.
  *
  * All content lives in each module's system-prompt/prompt.ts.
- * This file only assembles — no hardcoded prompt content here.
+ * This file only assembles - no hardcoded prompt content here.
  */
 
 export const CONTINUE_CONVERSATION_PROMPT =
@@ -39,7 +39,7 @@ export function buildTrailingSystemMessage(params: {
         ? ` (confidence: ${Math.round(confidence * 100)}%)`
         : "";
     currentParts.push(
-      `[STT] The preceding user message was transcribed from speech${confidenceNote}. It may contain transcription errors — interpret with flexibility for homophones, mis-heard words, missing punctuation, and minor word substitutions.`,
+      `[STT] The preceding user message was transcribed from speech${confidenceNote}. It may contain transcription errors - interpret with flexibility for homophones, mis-heard words, missing punctuation, and minor word substitutions.`,
     );
   }
 

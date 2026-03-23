@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "NOT",
     description:
-      "Odwraca strumień sygnałów — aktywny staje się nieaktywny i odwrotnie",
+      "Odwraca strumień sygnałów - aktywny staje się nieaktywny i odwrotnie",
     fields: {
       signal: {
         label: "Sygnał",

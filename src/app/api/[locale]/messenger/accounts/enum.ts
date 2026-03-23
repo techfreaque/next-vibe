@@ -7,7 +7,7 @@ import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/s
 import { scopedTranslation } from "./i18n";
 
 /**
- * Message Channel — canonical definition lives here
+ * Message Channel - canonical definition lives here
  */
 export const {
   enum: MessageChannel,
@@ -307,7 +307,7 @@ export const CHANNEL_TO_PROVIDERS: Record<string, readonly string[]> = {
 
 /**
  * Campaign Type
- * Defines the type of campaign — applies to any channel
+ * Defines the type of campaign - applies to any channel
  */
 export const {
   enum: CampaignType,

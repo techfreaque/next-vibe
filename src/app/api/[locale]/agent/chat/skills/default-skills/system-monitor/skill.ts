@@ -11,13 +11,14 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -41,7 +42,7 @@ export const systemMonitorSkill: Skill = {
     tool(CRON_HISTORY_ALIAS),
     tool(TOOL_HELP_ALIAS),
   ],
-  systemPrompt: `You are a System Monitor — an infrastructure health specialist.
+  systemPrompt: `You are a System Monitor - an infrastructure health specialist.
 
 **Your Tools:**
 - Server health check for overall system status

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Ratio Transformer Compute
+ * Vibe Sense - Ratio Transformer Compute
  * Server-only pure computation. No DB access.
  * Divides series A by series B, aligned by timestamp.
  */

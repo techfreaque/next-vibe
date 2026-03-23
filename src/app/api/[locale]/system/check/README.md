@@ -1,18 +1,18 @@
 # @next-vibe/checker
 
-Standalone code quality checker for [next-vibe](https://github.com/next-vibe/next-vibe) projects — oxlint + ESLint + TypeScript in one command.
+Standalone code quality checker for [next-vibe](https://github.com/next-vibe/next-vibe) projects - oxlint + ESLint + TypeScript in one command.
 
 The same checker that powers [unbottled.ai](https://unbottled.ai) and the next-vibe framework, packaged as a standalone tool you can drop into any TypeScript project.
 
 ## Features
 
-- **Fast** — oxlint, ESLint, and TypeScript run in parallel
-- **TypeScript-aware** — full type checking via `tsc` or `tsgo`
-- **MCP server** — expose checks as AI tools (Claude Code, Cursor, etc.)
-- **Single config** — one `check.config.ts` controls everything
-- **Auto-fix** — fixable issues auto-corrected on every run
-- **VSCode integration** — auto-generates `.vscode/settings.json`
-- **Extensive mode** — include test and generated files for release validation
+- **Fast** - oxlint, ESLint, and TypeScript run in parallel
+- **TypeScript-aware** - full type checking via `tsc` or `tsgo`
+- **MCP server** - expose checks as AI tools (Claude Code, Cursor, etc.)
+- **Single config** - one `check.config.ts` controls everything
+- **Auto-fix** - fixable issues auto-corrected on every run
+- **VSCode integration** - auto-generates `.vscode/settings.json`
+- **Extensive mode** - include test and generated files for release validation
 
 ## Installation
 
@@ -83,8 +83,8 @@ vibe-check help                # List available commands
 
 The checker exposes two MCP tools:
 
-- **`check`** — Run oxlint + ESLint + TypeScript checks
-- **`config-create`** — Create a `check.config.ts` configuration file
+- **`check`** - Run oxlint + ESLint + TypeScript checks
+- **`config-create`** - Create a `check.config.ts` configuration file
 
 Add to your MCP client config (e.g. `.claude.json` or Claude Desktop `config.json`):
 
@@ -106,7 +106,7 @@ Add to your MCP client config (e.g. `.claude.json` or Claude Desktop `config.jso
 
 Run `vibe-check config` to scaffold a `check.config.ts`, or create it manually.
 
-The config exports a function (not a plain object) — run `vibe-check config` to scaffold the full template. Structure:
+The config exports a function (not a plain object) - run `vibe-check config` to scaffold the full template. Structure:
 
 ```ts
 import type {
@@ -189,7 +189,7 @@ const oxlint: CheckConfig["oxlint"] = {
 
 ### Extensive Mode
 
-By default, `**/generated/**`, `**/*.test.ts`, and `**/*.test.tsx` are excluded from checks. Pass `--extensive` (or set `vibeCheck.extensive: true`) to include them — useful for release validation.
+By default, `**/generated/**`, `**/*.test.ts`, and `**/*.test.tsx` are excluded from checks. Pass `--extensive` (or set `vibeCheck.extensive: true`) to include them - useful for release validation.
 
 ### VSCode Integration
 

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Ratio Transformer Route
+ * Vibe Sense - Ratio Transformer Route
  * Server-only.
  */
 

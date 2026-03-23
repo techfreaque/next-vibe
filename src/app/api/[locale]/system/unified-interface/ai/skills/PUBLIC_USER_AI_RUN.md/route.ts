@@ -3,7 +3,7 @@
  * GET /api/[locale]/system/unified-interface/ai/skills/PUBLIC_USER_AI_RUN.md
  *
  * Focused guide for using POST /agent/ai-stream/run without a specific character.
- * Covers the full public+authenticated tool set. No tool listing — see PUBLIC_USER_SKILL.md
+ * Covers the full public+authenticated tool set. No tool listing - see PUBLIC_USER_SKILL.md
  * for the HTTP endpoint reference.
  */
 

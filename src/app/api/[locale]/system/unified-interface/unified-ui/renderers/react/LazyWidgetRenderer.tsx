@@ -6,7 +6,7 @@
  *
  * When an endpoint uses a custom widget at the root (customWidgetObject with render),
  * EndpointRenderer renders the custom component directly, and this module
- * is never imported — avoiding the cost of loading every widget type.
+ * is never imported - avoiding the cost of loading every widget type.
  */
 
 "use client";

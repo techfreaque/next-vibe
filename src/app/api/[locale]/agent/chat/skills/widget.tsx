@@ -6,11 +6,9 @@
 
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Input } from "next-vibe-ui/ui/input";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
-import { ThumbsUp } from "next-vibe-ui/ui/icons/ThumbsUp";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { MoreHorizontal } from "next-vibe-ui/ui/icons/MoreHorizontal";
@@ -18,9 +16,11 @@ import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Star } from "next-vibe-ui/ui/icons/Star";
+import { ThumbsUp } from "next-vibe-ui/ui/icons/ThumbsUp";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import { Input } from "next-vibe-ui/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -53,10 +53,9 @@ import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
 import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
-import type { SkillListItem } from "./definition";
-import { SkillOwnershipType, SkillTrustLevel } from "./enum";
 import type definition from "./definition";
-import type { SkillListResponseOutput } from "./definition";
+import type { SkillListItem, SkillListResponseOutput } from "./definition";
+import { SkillOwnershipType, SkillTrustLevel } from "./enum";
 
 /**
  * Props for custom widget
@@ -107,7 +106,7 @@ export function SkillsListContainer({
     return map;
   }, [favorites]);
 
-  // When query is active: server already filtered — flatten all sections into a
+  // When query is active: server already filtered - flatten all sections into a
   // single ranked list (VERIFIED first, then by voteCount desc).
   // When no query: return sections as-is.
   const filteredSections = useMemo(() => {
@@ -118,7 +117,7 @@ export function SkillsListContainer({
     if (!searchQuery.trim()) {
       return sections;
     }
-    // Server already filtered — just flatten and rank
+    // Server already filtered - just flatten and rank
     const allSkills = sections.flatMap((section) => section.skills);
     const ranked = allSkills.toSorted((a, b) => {
       const aVerified = a.trustLevel === SkillTrustLevel.VERIFIED ? 0 : 1;

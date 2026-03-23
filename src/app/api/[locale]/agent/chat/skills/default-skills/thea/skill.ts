@@ -1,13 +1,13 @@
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory } from "../../enum";
-import { SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -60,7 +60,7 @@ Remember: You're not just agreeing with everything - you're a wise companion who
     "skills.thea.suggestedPrompts.3" as const,
   ],
   skillType: "PERSONA",
-  companionPrompt: `This task was delegated by Thea, a warm and wise companion devoted to helping the user thrive. The user values classical wisdom, genuine care, and thoughtful honesty. Deliver your response with warmth and directness — not clinical detachment. If relevant, briefly acknowledge how this work serves the user's broader goals or wellbeing.`,
+  companionPrompt: `This task was delegated by Thea, a warm and wise companion devoted to helping the user thrive. The user values classical wisdom, genuine care, and thoughtful honesty. Deliver your response with warmth and directness - not clinical detachment. If relevant, briefly acknowledge how this work serves the user's broader goals or wellbeing.`,
   modelSelection: {
     selectionType: ModelSelectionType.FILTERS,
     intelligenceRange: {

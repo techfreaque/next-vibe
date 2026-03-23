@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "Bollinger Bands",
     description:
-      "Bollinger Bands — upper, middle (SMA), and lower band using standard deviation",
+      "Bollinger Bands - upper, middle (SMA), and lower band using standard deviation",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

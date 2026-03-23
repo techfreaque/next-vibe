@@ -1,16 +1,16 @@
 "use client";
 
 /**
- * updateMessages — single source of truth for message cache writes.
+ * updateMessages - single source of truth for message cache writes.
  *
  * Two-layer cache architecture for O(1) per-delta re-renders:
  *
  * Layer 1: apiClient cache keyed by { threadId, rootFolderId }
- *   - { messages: ChatMessage[] } — the full list, used for path building / branch loading
+ *   - { messages: ChatMessage[] } - the full list, used for path building / branch loading
  *   - All list-level operations (branch navigation, send, retry) read/write here
  *
  * Layer 2: per-message queryClient cache keyed by ['message-item', messageId]
- *   - Single ChatMessage — seeded automatically by updateMessages on every write
+ *   - Single ChatMessage - seeded automatically by updateMessages on every write
  *   - Used by per-message components (streaming indicator, TTS, actions) via useMessageItem()
  *   - O(1) per delta: only the changed message's observer re-renders, not all N messages
  *
@@ -37,7 +37,7 @@ import messagesDefinition from "../definition";
 
 /**
  * React Query cache key for a single message.
- * Kept stable and opaque — use seedMessageItemCache / useMessageItem to interact.
+ * Kept stable and opaque - use seedMessageItemCache / useMessageItem to interact.
  */
 export function messageItemQueryKey(messageId: string): [string, string] {
   return ["message-item", messageId];
@@ -45,10 +45,10 @@ export function messageItemQueryKey(messageId: string): [string, string] {
 
 /**
  * Seed the per-item cache for a single message.
- * Called automatically by updateMessages — not needed externally.
+ * Called automatically by updateMessages - not needed externally.
  *
  * Uses replaceEqualDeep (React Query default) so unchanged fields preserve
- * their object references — components using useMessageItem() only re-render
+ * their object references - components using useMessageItem() only re-render
  * when their specific message's data actually changes.
  */
 export function seedMessageItemCache(message: ChatMessage): void {
@@ -91,7 +91,7 @@ export function updateMessages(
   if (result.length > 0) {
     // Seed per-item cache for every message in the updated list.
     // React Query's replaceEqualDeep means unchanged messages keep their
-    // existing references — only the actually-changed message triggers re-renders.
+    // existing references - only the actually-changed message triggers re-renders.
     for (const msg of result[0]!) {
       seedMessageItemCache(msg);
     }

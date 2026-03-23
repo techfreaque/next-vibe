@@ -2,8 +2,8 @@
 /* eslint-disable react-compiler/react-compiler -- Complex mount-only effect requires intentional dependency exclusion */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ACTIONS, EVENTS, Joyride, STATUS } from "react-joyride";
 import type { EventData } from "react-joyride";
+import { ACTIONS, EVENTS, Joyride, STATUS } from "react-joyride";
 
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
@@ -232,7 +232,7 @@ export function WelcomeTour({
 
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
-  // Helper to navigate based on tour target — uses Zustand store as source of truth
+  // Helper to navigate based on tour target - uses Zustand store as source of truth
   const navigateForTarget = useCallback(
     (target: string): void => {
       const navigateToFolder = (folderId: DefaultFolderId): void => {

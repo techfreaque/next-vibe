@@ -42,7 +42,7 @@ const baseFields = {
       }),
     example: "true",
     comment:
-      "Claude Code provider enabled — set true/false to override, or leave unset for auto-detection (checks if `claude` CLI is installed)",
+      "Claude Code provider enabled - set true/false to override, or leave unset for auto-detection (checks if `claude` CLI is installed)",
     commented: true,
     fieldType: "boolean" as const,
     onboardingStep: 4,
@@ -52,7 +52,7 @@ const baseFields = {
     schema: z.string().optional(),
     example: "sk-or-v1-...",
     comment:
-      "OpenRouter API key — access 200+ AI models. Get yours at https://openrouter.ai/keys",
+      "OpenRouter API key - access 200+ AI models. Get yours at https://openrouter.ai/keys",
     commented: true,
     sensitive: true,
     onboardingRequired: true,

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Archive Route
+ * Vibe Sense - Graph Archive Route
  */
 
 import "server-only";

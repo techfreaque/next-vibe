@@ -11,7 +11,7 @@
  * hasChildren / hasChild accept structural `{ schemaType: SchemaTypes }`
  * so that BaseWidgetFieldProps<TWidgetConfig> (an intersection that always
  * carries schemaType from BaseWidgetConfig) satisfies the input in generic
- * context — unlike UnifiedField which requires resolved conditional types.
+ * context - unlike UnifiedField which requires resolved conditional types.
  */
 
 import type z from "zod";

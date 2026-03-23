@@ -428,7 +428,7 @@ export class TypecheckRepository {
         mainTsConfig.exclude,
         prefix,
       ),
-      // Extra excludes from non-extensive mode — passed as-is (relative to project root,
+      // Extra excludes from non-extensive mode - passed as-is (relative to project root,
       // adjusted with prefix so they resolve correctly from the temp config location)
       ...(extraExcludePatterns ?? []).map((p) =>
         TypecheckRepository.adjustPath(p, prefix),
@@ -823,7 +823,7 @@ export class TypecheckRepository {
         logger.debug(
           "[TYPESCRIPT] Creating temp tsconfig for full project with extra excludes",
         );
-        // Empty filesToCheck — original tsconfig includes already cover the full project.
+        // Empty filesToCheck - original tsconfig includes already cover the full project.
         // The temp config just carries the extra excludes on top of those.
         const createResult = TypecheckRepository.createTempTsConfig(
           [],

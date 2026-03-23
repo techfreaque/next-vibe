@@ -1,6 +1,6 @@
 /**
  * SSH Files Read Endpoint Definition
- * GET /ssh/files/read — Read a text file
+ * GET /ssh/files/read - Read a text file
  */
 
 import { z } from "zod";

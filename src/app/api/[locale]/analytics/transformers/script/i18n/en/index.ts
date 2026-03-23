@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "Script",
     description:
-      "Script — applies a custom sandboxed function to a time series",
+      "Script - applies a custom sandboxed function to a time series",
     fields: {
       source: { label: "Source", description: "Input time series" },
       fn: {

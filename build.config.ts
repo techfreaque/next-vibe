@@ -111,7 +111,7 @@ const config: BuildConfig = {
       },
     },
     // ── Vibe Frame: ESM package (npm / bundler import) ───────────────────────
-    // Library entry — no auto-init, no window exposure, full type exports.
+    // Library entry - no auto-init, no window exposure, full type exports.
     {
       input:
         "src/app/api/[locale]/system/unified-interface/vibe-frame/embed-package.ts",
@@ -159,10 +159,10 @@ const config: BuildConfig = {
           "next/link": "src/packages/next-vibe-ui/tanstack/ui/link.tsx",
           "next/image": "src/packages/next-vibe-ui/tanstack/ui/image.tsx",
           "next/script": "src/packages/next-vibe-ui/tanstack/ui/script.tsx",
-          // server-only throws in Vite SSR (no Next.js boundaries) — stub it out
+          // server-only throws in Vite SSR (no Next.js boundaries) - stub it out
           "server-only":
             "src/packages/next-vibe-ui/tanstack/lib/server-only.ts",
-          // next/headers — cookies()/headers() backed by TanStack getWebRequest()
+          // next/headers - cookies()/headers() backed by TanStack getWebRequest()
           "next/headers": "src/packages/next-vibe-ui/tanstack/lib/headers.ts",
         },
       },

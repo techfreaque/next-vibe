@@ -18,7 +18,7 @@ export const translations = {
       leadId: {
         label: "Lead-ID",
         description:
-          "Besucher-Lead-ID von der Host-Seite (Cross-Origin — kann nicht aus Cookies gelesen werden)",
+          "Besucher-Lead-ID von der Host-Seite (Cross-Origin - kann nicht aus Cookies gelesen werden)",
       },
       authToken: {
         label: "Auth-Token",

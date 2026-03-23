@@ -1,5 +1,5 @@
 /**
- * Users Domain — Vibe Sense Graph Seeds
+ * Users Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the users domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,26 +7,26 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
+import { LEADS_CREATED_ALIAS } from "../leads/data-sources/leads-created/constants";
+import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import { USERS_REGISTERED_ALIAS } from "./data-sources/users-registered/constants";
 import { USERS_ACTIVE_TOTAL_ALIAS } from "./data-sources/users-active-total/constants";
 import { USERS_BANNED_ALIAS } from "./data-sources/users-banned/constants";
 import { USERS_EMAIL_VERIFIED_ALIAS } from "./data-sources/users-email-verified/constants";
+import { USERS_LOGIN_ATTEMPTS_FAILED_ALIAS } from "./data-sources/users-login-attempts-failed/constants";
+import { USERS_LOGIN_ATTEMPTS_TOTAL_ALIAS } from "./data-sources/users-login-attempts-total/constants";
+import { USERS_MARKETING_CONSENT_ALIAS } from "./data-sources/users-marketing-consent/constants";
+import { USERS_REGISTERED_ALIAS } from "./data-sources/users-registered/constants";
 import { USERS_TWO_FA_ENABLED_ALIAS } from "./data-sources/users-two-fa-enabled/constants";
 import { USERS_WITH_STRIPE_ALIAS } from "./data-sources/users-with-stripe/constants";
-import { USERS_LOGIN_ATTEMPTS_TOTAL_ALIAS } from "./data-sources/users-login-attempts-total/constants";
-import { USERS_LOGIN_ATTEMPTS_FAILED_ALIAS } from "./data-sources/users-login-attempts-failed/constants";
-import { USERS_MARKETING_CONSENT_ALIAS } from "./data-sources/users-marketing-consent/constants";
-import { LEADS_CREATED_ALIAS } from "../leads/data-sources/leads-created/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { WINDOW_AVG_ALIAS } from "../analytics/indicators/window-avg/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 
@@ -275,7 +275,7 @@ const securityLoginMonitoringConfig: GraphConfig = {
         taskId: "vibe-sense-alert",
         status: "status.completed",
         summary:
-          "SECURITY ALERT: Login attempt flood detected — >100 failed attempts per minute (15-min avg). High-volume brute-force attack. Review IP blocklist and WAF rules immediately.",
+          "SECURITY ALERT: Login attempt flood detected - >100 failed attempts per minute (15-min avg). High-volume brute-force attack. Review IP blocklist and WAF rules immediately.",
       },
     },
   },

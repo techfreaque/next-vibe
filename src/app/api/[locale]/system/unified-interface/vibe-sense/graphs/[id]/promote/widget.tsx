@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Promote Widget
+ * Vibe Sense - Promote Widget
  * Confirmation UI with graph info and big promote button.
  * Shows promoted ID on success with navigation link.
  */
@@ -7,6 +7,7 @@
 "use client";
 
 import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { Check } from "next-vibe-ui/ui/icons/Check";
@@ -14,7 +15,6 @@ import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React, { useCallback } from "react";
-import { Button } from "next-vibe-ui/ui/button";
 
 import {
   useWidgetNavigation,

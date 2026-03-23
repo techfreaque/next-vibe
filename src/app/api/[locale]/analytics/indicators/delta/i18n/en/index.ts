@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "Delta",
     description:
-      "Difference between consecutive values — measures rate of change",
+      "Difference between consecutive values - measures rate of change",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

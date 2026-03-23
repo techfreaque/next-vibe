@@ -17,11 +17,10 @@
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
@@ -37,22 +36,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/recording-input-area";
+import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
+import { WidgetChatInput } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-input";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
 import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
-import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
+import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import { getModelById, ModelId } from "@/app/api/[locale]/agent/models/models";
-import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/recording-input-area";
-import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   useWidgetContext,
   useWidgetDisabled,
@@ -63,7 +63,7 @@ import {
   useWidgetOnSubmit,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { WidgetChatInput } from "@/app/api/[locale]/agent/ai-stream/stream/widget/chat-input";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
 import type definition from "./definition";
 import type { RunResponseOutput } from "./definition";
@@ -79,7 +79,7 @@ interface WidgetProps {
 }
 
 // ---------------------------------------------------------------------------
-// Fake boot context — minimal values so GroupedAssistantMessage doesn't throw
+// Fake boot context - minimal values so GroupedAssistantMessage doesn't throw
 // ---------------------------------------------------------------------------
 
 const FAKE_BOOT_VALUE: ChatBootValue = {
@@ -103,7 +103,7 @@ const FAKE_BOOT_VALUE: ChatBootValue = {
 };
 
 // ---------------------------------------------------------------------------
-// Helpers — construct minimal ChatMessage objects
+// Helpers - construct minimal ChatMessage objects
 // ---------------------------------------------------------------------------
 
 let _msgCounter = 0;
@@ -169,7 +169,7 @@ function makeAssistantMessage(
 }
 
 // ---------------------------------------------------------------------------
-// Model selector — 3 Claude Code models with friendly display names
+// Model selector - 3 Claude Code models with friendly display names
 // ---------------------------------------------------------------------------
 
 const CLAUDE_CODE_MODELS = [
@@ -458,7 +458,7 @@ export function ClaudeCodeWidget({ field }: WidgetProps): JSX.Element {
                 <Span className="hidden @md:inline text-muted-foreground">
                   Interactive
                 </Span>
-                {/* Visual-only switch track — no Radix button, no event conflicts */}
+                {/* Visual-only switch track - no Radix button, no event conflicts */}
                 <Span
                   className={cn(
                     "inline-flex items-center shrink-0 rounded-full border-2 border-transparent transition-colors",
@@ -478,8 +478,8 @@ export function ClaudeCodeWidget({ field }: WidgetProps): JSX.Element {
             </TooltipTrigger>
             <TooltipContent>
               {interactiveMode
-                ? "Interactive terminal mode — click to switch to batch"
-                : "Batch mode — click to switch to interactive terminal"}
+                ? "Interactive terminal mode - click to switch to batch"
+                : "Batch mode - click to switch to interactive terminal"}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

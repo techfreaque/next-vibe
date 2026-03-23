@@ -9,7 +9,7 @@ Native repositories (`repository.native.ts`) provide the same interface as serve
 > Is this method called from a `page.tsx` or server component?
 
 - **Yes** → Implement it using `nativeEndpoint()` to fetch the data via HTTP
-- **No** → `throw new Error("X is not implemented on native")` — loud failure is intentional
+- **No** → `throw new Error("X is not implemented on native")` - loud failure is intentional
 
 Do NOT return `fail()` for unimplemented methods. Throwing causes the app to crash immediately and visibly, making missing implementations obvious during development.
 
@@ -153,7 +153,7 @@ static async get(
 }
 ```
 
-**Important:** `nativeEndpoint` uses `data` (not `requestData`) for request body fields. Both keys are optional — omit `data` if the endpoint has no request body fields, omit `urlPathParams` if there are no path params.
+**Important:** `nativeEndpoint` uses `data` (not `requestData`) for request body fields. Both keys are optional - omit `data` if the endpoint has no request body fields, omit `urlPathParams` if there are no path params.
 
 ```typescript
 // GET with no params
@@ -174,7 +174,7 @@ await nativeEndpoint(
 await nativeEndpoint(endpoint, { data: { name, description } }, logger, locale);
 ```
 
-### 5. Not Implemented Methods — Throw Loudly
+### 5. Not Implemented Methods - Throw Loudly
 
 For methods not used in `page.tsx` or server components, always throw:
 
@@ -196,7 +196,7 @@ static async adminOnlyMethod(
 
 - Prefix ALL unused parameters with `_` and add `// oxlint-disable-next-line no-unused-vars` before each
 - Add `// oxlint-disable-next-line restricted-syntax` before the throw
-- Do NOT return `fail()` — the throw is intentional to surface missing implementations loudly
+- Do NOT return `fail()` - the throw is intentional to surface missing implementations loudly
 
 ## File Naming
 
@@ -220,10 +220,10 @@ feature/
 
 ## Real Examples
 
-- `src/app/api/[locale]/user/repository.native.ts` — `getUserByAuth()` implemented, rest throw
-- `src/app/api/[locale]/subscription/repository.native.ts` — `getSubscription()` implemented, rest throw
-- `src/app/api/[locale]/credits/repository.native.ts` — `getCreditBalanceForUser()` implemented, rest throw
-- `src/app/api/[locale]/agent/chat/folders/[id]/repository.native.ts` — `getFolder()` with `urlPathParams`
+- `src/app/api/[locale]/user/repository.native.ts` - `getUserByAuth()` implemented, rest throw
+- `src/app/api/[locale]/subscription/repository.native.ts` - `getSubscription()` implemented, rest throw
+- `src/app/api/[locale]/credits/repository.native.ts` - `getCreditBalanceForUser()` implemented, rest throw
+- `src/app/api/[locale]/agent/chat/folders/[id]/repository.native.ts` - `getFolder()` with `urlPathParams`
 
 ## See Also
 

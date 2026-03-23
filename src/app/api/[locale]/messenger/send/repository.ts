@@ -1,6 +1,6 @@
 /**
  * Unified Messenger Send Repository
- * Routes all sends through the MessengerProvider interface — channel-agnostic.
+ * Routes all sends through the MessengerProvider interface - channel-agnostic.
  * Caller supplies accountId (from messenger_accounts); provider is resolved automatically.
  */
 

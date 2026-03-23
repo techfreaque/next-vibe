@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Clamp Compute
+ * Vibe Sense - Clamp Compute
  * Server-only pure computation. No DB access.
  */
 

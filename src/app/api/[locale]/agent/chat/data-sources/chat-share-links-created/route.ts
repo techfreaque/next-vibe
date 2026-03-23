@@ -1,5 +1,5 @@
 /**
- * Chat Share Links Created — Route
+ * Chat Share Links Created - Route
  * Server-only.
  */
 

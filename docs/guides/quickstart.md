@@ -61,7 +61,7 @@ npm install
 
 ### 3. First-Run Setup
 
-**Option A — Web UI (recommended for new users):**
+**Option A - Web UI (recommended for new users):**
 
 ```bash
 vibe dev
@@ -69,7 +69,7 @@ vibe dev
 
 Start the dev server, then open http://localhost:3000 and log in with the default admin credentials (`admin@example.com` / `change-me-now`). You'll be redirected automatically to the Settings page where the setup wizard walks you through configuration step by step.
 
-**Option B — CLI wizard:**
+**Option B - CLI wizard:**
 
 ```bash
 vibe init
@@ -77,14 +77,14 @@ vibe init
 
 Runs the interactive terminal wizard directly:
 
-1. **Admin Account** — email + password
-2. **Database** — PostgreSQL connection URL
-3. **Security Keys** — JWT secret + cron secret (auto-generated, confirm or replace)
-4. **AI Provider** — OpenRouter API key (get free at openrouter.ai/keys) and/or Claude Code (auto-detects if `claude` CLI is installed)
+1. **Admin Account** - email + password
+2. **Database** - PostgreSQL connection URL
+3. **Security Keys** - JWT secret + cron secret (auto-generated, confirm or replace)
+4. **AI Provider** - OpenRouter API key (get free at openrouter.ai/keys) and/or Claude Code (auto-detects if `claude` CLI is installed)
 
 Sensitive values are encrypted at rest. After the wizard, `.env` is written and you're ready to go.
 
-You can also edit `.env` directly — `.env.example` documents every variable. Use `vibe system-settings` to view the current config with health indicators.
+You can also edit `.env` directly - `.env.example` documents every variable. Use `vibe system-settings` to view the current config with health indicators.
 
 ### 4. Start Development Server
 
@@ -151,7 +151,7 @@ vibe start                  # Start production server
 vibe rebuild                # Rebuild & hot-restart (zero-downtime)
 ```
 
-`vibe rebuild` regenerates code, builds Next.js, runs migrations, and hot-restarts the running `vibe start` process — zero downtime.
+`vibe rebuild` regenerates code, builds Next.js, runs migrations, and hot-restarts the running `vibe start` process - zero downtime.
 
 ### React Native (Milestone 3 - In Progress)
 
@@ -308,7 +308,7 @@ vibe hello_world --name="John"
 
 - 🌐 API endpoint: `POST /api/en-GLOBAL/hello/world`
 - 💻 CLI command: `vibe hello:world --name="John"`
-- 🔌 tRPC procedure: `trpc.hello.world.mutate({ name: "John" })` _(opt-in — run the tRPC generator to enable)_
+- 🔌 tRPC procedure: `trpc.hello.world.mutate({ name: "John" })` _(opt-in - run the tRPC generator to enable)_
 - ⚛️ React hook: `useEndpoint(definitions)`
 
 ---

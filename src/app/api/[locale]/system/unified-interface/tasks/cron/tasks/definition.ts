@@ -10,8 +10,8 @@ import type { CronTaskRecentExecution } from "@/app/api/[locale]/system/unified-
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   objectField,
   requestField,
   responseArrayField,
@@ -26,6 +26,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import {
   CronTaskEnabledFilter,
   CronTaskEnabledFilterDB,
@@ -47,13 +48,12 @@ import {
 import { taskInputSchema } from "../db";
 import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 
 const CronTasksContainer = lazyCliWidget(() =>
   import("./widget").then((m) => ({ default: m.CronTasksContainer })),
 );
 
-/** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
+/** Reusable task response shape - keep in sync with CronTaskResponse in repository.ts */
 export const cronTaskResponseSchema = z.object({
   id: z.string(),
   shortId: z.string(),
@@ -794,7 +794,7 @@ export type CronTaskCreateRequestOutput = typeof POST.types.RequestOutput;
 export type CronTaskCreateResponseInput = typeof POST.types.ResponseInput;
 export type CronTaskCreateResponseOutput = typeof POST.types.ResponseOutput;
 
-// Individual task type — derived from canonical schema (includes all fields)
+// Individual task type - derived from canonical schema (includes all fields)
 export type CronTaskResponseType = z.infer<typeof cronTaskResponseSchema>;
 
 export type CronTaskItem = Pick<

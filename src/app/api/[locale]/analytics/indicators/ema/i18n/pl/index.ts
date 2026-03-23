@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "EMA",
     description:
-      "Wykładnicza średnia krocząca — nadaje większą wagę ostatnim cenom",
+      "Wykładnicza średnia krocząca - nadaje większą wagę ostatnim cenom",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       resolution: {

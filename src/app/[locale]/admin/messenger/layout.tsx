@@ -1,6 +1,6 @@
 /**
  * Emails Admin Layout
- * Server layout for all email admin pages — unified Gmail-style sidebar
+ * Server layout for all email admin pages - unified Gmail-style sidebar
  */
 
 import type { JSX, ReactNode } from "react";

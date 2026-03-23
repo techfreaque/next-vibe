@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — EMA Route
+ * Vibe Sense - EMA Route
  * Server-only.
  */
 

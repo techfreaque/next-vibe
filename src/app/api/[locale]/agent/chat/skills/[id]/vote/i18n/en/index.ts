@@ -6,7 +6,7 @@ export const translations = {
   post: {
     title: "Vote for Skill",
     description:
-      "Toggle upvote on a community skill. Idempotent — call again to remove your vote.",
+      "Toggle upvote on a community skill. Idempotent - call again to remove your vote.",
     dynamicTitle: "Vote: {{name}}",
     errors: {
       validation: { title: "Validation Error", description: "Invalid request" },

@@ -116,7 +116,7 @@ export interface ChildrenFilterConfig<TData = WidgetData> {
   responseOnly?: boolean;
   /** Only include request fields (for form mode) */
   requestOnly?: boolean;
-  /** User's permission roles — used to enforce visibleFor field-level role whitelist */
+  /** User's permission roles - used to enforce visibleFor field-level role whitelist */
   userRoles?: readonly (typeof UserPermissionRoleValue)[];
   /** Custom predicate to filter children */
   predicate?: (

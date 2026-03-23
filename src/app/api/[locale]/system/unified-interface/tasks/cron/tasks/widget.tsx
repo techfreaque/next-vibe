@@ -20,11 +20,11 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
 import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
-import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Circle } from "next-vibe-ui/ui/icons/Circle";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { History } from "next-vibe-ui/ui/icons/History";
 import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
@@ -62,8 +62,8 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 
 import type {
   CronTaskPriorityDB,
-  TaskCategoryDB,
   CronTaskPriorityFilterValue,
+  TaskCategoryDB,
 } from "../../enum";
 import {
   CronTaskEnabledFilter,
@@ -701,7 +701,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     return "ALL";
   }, [enabledValue, serverStatus]);
 
-  // ── Tab counts — from server response (accurate across full DB) ──────────
+  // ── Tab counts - from server response (accurate across full DB) ──────────
   const counts = useMemo(() => {
     return {
       all: countsByStatus?.all ?? totalTasks,
@@ -750,7 +750,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         .mutateAsync({ requestData: { ids, action } })
         .then(async () => {
           handleClearSelection();
-          // Update caches optimistically — no refetch needed
+          // Update caches optimistically - no refetch needed
           const { apiClient } =
             await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
           const tasksDef = await import("./definition");
@@ -839,7 +839,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     [selectedIds, bulkMutation, handleClearSelection, logger],
   );
 
-  // ── Helper: update form fields — auto-submit handles the refetch ─────────
+  // ── Helper: update form fields - auto-submit handles the refetch ─────────
   const patchForm = useCallback(
     (
       patch: Partial<(typeof endpoints.GET)["types"]["RequestOutput"]>,
@@ -879,7 +879,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     [form],
   );
 
-  // ── Status tab handler — updates server-side filters and refetches ───────
+  // ── Status tab handler - updates server-side filters and refetches ───────
   type RequestOutput = (typeof endpoints.GET)["types"]["RequestOutput"];
 
   const handleStatusTabChange = useCallback(
@@ -1295,7 +1295,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           />
         </Div>
 
-        {/* Priority filter — server-side */}
+        {/* Priority filter - server-side */}
         <Select
           value={activePriority || "ALL"}
           onValueChange={(v) =>
@@ -1319,7 +1319,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           </SelectContent>
         </Select>
 
-        {/* Category filter — server-side */}
+        {/* Category filter - server-side */}
         <Select
           value={activeCategory || "ALL"}
           onValueChange={(v) =>

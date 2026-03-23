@@ -1,5 +1,5 @@
 /**
- * Vibe Frame — Database Schema
+ * Vibe Frame - Database Schema
  *
  * Exchange tokens: short-lived (30s), single-use tokens that the config API
  * mints server-side and embeds in iframe URLs. Middleware redeems them on first
@@ -25,13 +25,13 @@ export const frameExchangeTokens = pgTable("frame_exchange_tokens", {
   /** Opaque random token embedded in ?et= URL param */
   token: text("token").notNull().unique(),
 
-  /** JWT auth token to set as cookie on redemption (optional — public users have none) */
+  /** JWT auth token to set as cookie on redemption (optional - public users have none) */
   authToken: text("auth_token"),
 
   /** Token expires 30 seconds after minting */
   expiresAt: timestamp("expires_at").notNull(),
 
-  /** Set when token is redeemed — prevents replay */
+  /** Set when token is redeemed - prevents replay */
   usedAt: timestamp("used_at"),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),

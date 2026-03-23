@@ -1,5 +1,5 @@
 /**
- * SSH Exec Widget — Command Runner
+ * SSH Exec Widget - Command Runner
  * Split-pane UI: command input top, output bottom.
  */
 

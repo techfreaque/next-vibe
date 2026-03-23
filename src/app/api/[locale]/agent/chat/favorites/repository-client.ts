@@ -27,12 +27,12 @@ import {
   DEFAULT_TTS_VOICE,
   type TtsVoiceValue,
 } from "../../text-to-speech/enum";
+import { STORAGE_KEYS } from "../constants";
+import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
 import { ModelSelectionType } from "../skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
 import { SkillsRepositoryClient } from "../skills/repository-client";
-import { STORAGE_KEYS } from "../constants";
-import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import type {
   FavoriteGetModelSelection,
   FavoriteGetResponseOutput,
@@ -391,7 +391,7 @@ export class ChatFavoritesRepositoryClient {
       };
     }
 
-    // Flattened structure — translate default character keys using characters scope
+    // Flattened structure - translate default character keys using characters scope
     return {
       skillId: stored.skillId,
       icon: stored.customIcon ?? character.icon,

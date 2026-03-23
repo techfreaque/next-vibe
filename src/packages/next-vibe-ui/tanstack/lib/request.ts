@@ -1,7 +1,7 @@
 /**
  * TanStack Start implementation of NextRequest / NextResponse.
  *
- * Shared code imports from `next-vibe-ui/lib/request` — vibe-ui resolves
+ * Shared code imports from `next-vibe-ui/lib/request` - vibe-ui resolves
  * tanstack/lib first so this file is used instead of next/server in Vite/TanStack.
  */
 

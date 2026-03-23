@@ -23,7 +23,6 @@ import type {
   EmailResolvedData,
   EmailTemplateDefinition,
 } from "@/app/api/[locale]/messenger/registry/template";
-import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type {
@@ -46,16 +45,16 @@ import {
   createTrackingContext,
   type TrackingContext,
 } from "../../../messenger/providers/email/smtp-client/components/tracking_context.email";
+import userCreateDefinition, {
+  type UserCreateRequestOutput,
+  type UserCreateResponseOutput,
+} from "../../../users/create/definition";
 import { UserDetailLevel } from "../../enum";
 import { UserRepository } from "../../repository";
 import signupDefinition, {
   type SignupPostRequestOutput,
   type SignupPostResponseOutput,
 } from "./definition";
-import userCreateDefinition, {
-  type UserCreateRequestOutput,
-  type UserCreateResponseOutput,
-} from "../../../users/create/definition";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -424,7 +423,7 @@ export const signupWelcomeEmailTemplate: EmailTemplateDefinition<
 // ============================================================================
 
 // ============================================================================
-// SHARED RENDER LOGIC (Private helpers — not exported)
+// SHARED RENDER LOGIC (Private helpers - not exported)
 // ============================================================================
 
 async function renderWelcomeEmailByEmail(
@@ -941,7 +940,7 @@ async function renderAdminNotificationByEmail(
   }
   const user = userResponse.data;
 
-  // Fetch credit balances (non-blocking — omit from email if unavailable)
+  // Fetch credit balances (non-blocking - omit from email if unavailable)
   const [userBalanceResult, leadBalanceResult] = await Promise.all([
     CreditRepository.getBalance({ userId: user.id }, logger, creditsT, locale),
     user.leadId

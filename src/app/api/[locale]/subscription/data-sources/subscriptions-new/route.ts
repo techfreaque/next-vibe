@@ -1,5 +1,5 @@
 /**
- * Subscriptions New — Route
+ * Subscriptions New - Route
  * Server-only.
  */
 

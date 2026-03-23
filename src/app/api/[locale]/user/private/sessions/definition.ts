@@ -71,7 +71,7 @@ const SESSION_ERROR_TYPES = {
   },
 } as const;
 
-// ── GET /user/private/sessions — list sessions ──────────────────────────────
+// ── GET /user/private/sessions - list sessions ──────────────────────────────
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -118,7 +118,7 @@ const { GET } = createEndpoint({
   },
 });
 
-// ── POST /user/private/sessions — create named session ──────────────────────
+// ── POST /user/private/sessions - create named session ──────────────────────
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,

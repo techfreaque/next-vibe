@@ -42,7 +42,7 @@ export const chatSettings = pgTable("chat_settings", {
   // UI preferences - only store if different from default
   viewMode: jsonb("view_mode").$type<typeof ViewModeValue>(),
 
-  // Tool configuration — DB columns are active_tools/visible_tools
+  // Tool configuration - DB columns are active_tools/visible_tools
   // null = default (all allowed, default pinned set); array = user customized
   availableTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
   pinnedTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),

@@ -95,7 +95,7 @@ export function useNavigation(
     (threadId: string): void => {
       logger.debug("Navigation: Navigating to thread", { threadId });
 
-      // Update store — single source of truth
+      // Update store - single source of truth
       const thread = threads[threadId];
       setNavigation({
         activeThreadId: threadId,

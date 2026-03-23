@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Fenster-Maximum",
     description:
-      "Gleitendes Fenstermaximum — verfolgt den höchsten Wert in einem festen Fenster",
+      "Gleitendes Fenstermaximum - verfolgt den höchsten Wert in einem festen Fenster",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

@@ -4,7 +4,7 @@
  * Computed once at boot per role. The server picks the right count
  * for the current user and passes a single number to the frontend.
  *
- * Uses endpoints-meta (pure static data) — no full definition loading.
+ * Uses endpoints-meta (pure static data) - no full definition loading.
  */
 
 import "server-only";
@@ -72,7 +72,7 @@ function ensureComputed(): void {
     roles: [UserRole.ADMIN],
   });
 
-  // Max across all platforms for admin — deduped by path+method
+  // Max across all platforms for admin - deduped by path+method
   const allPlatforms = Object.values(Platform);
   const seen = new Set<string>();
   const adminUser = {
@@ -103,7 +103,7 @@ function ensureComputed(): void {
 
 /**
  * Get the default active tool count for this user's role.
- * Returns a single number — the count of the role-appropriate DEFAULT_TOOL_IDS.
+ * Returns a single number - the count of the role-appropriate DEFAULT_TOOL_IDS.
  */
 export function getDefaultActiveToolCount(user: JwtPayloadType): number {
   if (user.isPublic) {

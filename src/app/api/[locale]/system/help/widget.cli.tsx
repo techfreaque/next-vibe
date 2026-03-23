@@ -10,8 +10,8 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   useInkWidgetLocale,
   useInkWidgetPlatform,
@@ -103,7 +103,7 @@ function renderDetailCli(tool: HelpToolItem): string {
   }
   if (tool.requiresConfirmation) {
     lines.push(
-      `${chalk.dim("Confirm")}   ${chalk.red("Yes — requires confirmation")}`,
+      `${chalk.dim("Confirm")}   ${chalk.red("Yes - requires confirmation")}`,
     );
   }
   lines.push(`${chalk.dim("Call as")}   vibe ${chalk.green(tool.name)}`);
@@ -121,7 +121,7 @@ function renderDetailCli(tool: HelpToolItem): string {
         const typeStr = prop.type ?? "any";
         const reqLabel = isRequired ? chalk.red("*") : " ";
         const desc = prop.description
-          ? chalk.dim(` — ${prop.description}`)
+          ? chalk.dim(` - ${prop.description}`)
           : "";
         lines.push(
           `  ${reqLabel} ${chalk.blue(key)} ${chalk.dim(typeStr)}${desc}`,
@@ -148,7 +148,7 @@ function renderDetailCli(tool: HelpToolItem): string {
 
 function renderDetailMcp(tool: HelpToolItem): string {
   const lines: string[] = [];
-  lines.push(`${tool.name} — ${tool.description}`);
+  lines.push(`${tool.name} - ${tool.description}`);
   if (tool.aliases?.length) {
     lines.push(`Aliases: ${tool.aliases.join(", ")}`);
   }
@@ -173,7 +173,7 @@ function renderDetailMcp(tool: HelpToolItem): string {
       for (const [key, prop] of Object.entries(props)) {
         const isRequired = required.includes(key);
         const typeStr = prop.type ?? "any";
-        const desc = prop.description ? ` — ${prop.description}` : "";
+        const desc = prop.description ? ` - ${prop.description}` : "";
         lines.push(
           `  ${key} (${typeStr}${isRequired ? ", required" : ""})${desc}`,
         );
@@ -287,12 +287,12 @@ function renderToolListCli(
   if (currentPage && totalPages && totalPages > 1) {
     lines.push(
       chalk.dim(
-        `Page ${currentPage}/${totalPages} — vibe help --page=${currentPage + 1}`,
+        `Page ${currentPage}/${totalPages} - vibe help --page=${currentPage + 1}`,
       ),
     );
   }
 
-  // Footer — use server hint if available, fallback to default
+  // Footer - use server hint if available, fallback to default
   lines.push(chalk.dim(hint ?? `Use: vibe help <name> for full details`));
 
   return lines.join("\n");
@@ -309,13 +309,13 @@ function renderToolListMcp(
   for (const tool of tools) {
     const credits = formatCredits(tool.credits);
     const creditsStr = credits ? ` (${credits})` : "";
-    lines.push(`${tool.name} — ${tool.description}${creditsStr}`);
+    lines.push(`${tool.name} - ${tool.description}${creditsStr}`);
   }
 
   if (currentPage && totalPages && totalPages > 1) {
     lines.push("");
     lines.push(
-      `Page ${currentPage}/${totalPages} — use page=${currentPage + 1} for next`,
+      `Page ${currentPage}/${totalPages} - use page=${currentPage + 1} for next`,
     );
   }
 
@@ -351,7 +351,7 @@ export function HelpToolsWidget({ field }: CliWidgetProps): JSX.Element {
       hint,
     } = value;
 
-    // Mode 1: Detail — single tool OR multiple tools with full schemas (≤5 auto-expand)
+    // Mode 1: Detail - single tool OR multiple tools with full schemas (≤5 auto-expand)
     const hasFullSchemas =
       tools.length > 0 &&
       tools.every(

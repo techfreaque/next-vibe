@@ -1,5 +1,5 @@
 /**
- * Error Logs Total — Route
+ * Error Logs Total - Route
  * Server-only.
  */
 

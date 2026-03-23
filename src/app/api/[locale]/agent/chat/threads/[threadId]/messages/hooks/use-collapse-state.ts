@@ -69,7 +69,7 @@ export interface CollapseStateStore {
 }
 
 /**
- * Global Zustand store for collapse state — shared across all view modes.
+ * Global Zustand store for collapse state - shared across all view modes.
  * Replaces the previous useState-based useCollapseState() hook.
  */
 export const useCollapseState = create<CollapseStateStore>((set, get) => ({

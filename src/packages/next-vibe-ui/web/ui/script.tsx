@@ -11,7 +11,7 @@ interface ScriptProps {
 }
 
 /**
- * Web (Next.js) implementation — wraps next/script.
+ * Web (Next.js) implementation - wraps next/script.
  */
 export function Script(props: ScriptProps): JSX.Element {
   return <NextScript {...props} />;

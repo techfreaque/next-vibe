@@ -94,7 +94,7 @@ export function buildExampleCommand(
 export function formatValidationErrorDetails(
   messageParams: Record<string, string | number> | undefined,
   endpoint: CreateApiEndpointAny | null | undefined,
-  /** Already-provided input values — used to pre-fill the --interactive hint */
+  /** Already-provided input values - used to pre-fill the --interactive hint */
   inputData?: Record<string, string> | undefined,
 ): string | null {
   if (

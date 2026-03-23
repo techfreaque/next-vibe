@@ -1,5 +1,5 @@
 /**
- * Chat Errors Total — Route
+ * Chat Errors Total - Route
  * Server-only.
  */
 

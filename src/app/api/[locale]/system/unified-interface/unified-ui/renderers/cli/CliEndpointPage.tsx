@@ -43,7 +43,7 @@ export interface InkEndpointPageProps<
   user: JwtPayloadType;
   /** Enable debug logging */
   debug?: boolean;
-  /** Submit handler — executes the endpoint */
+  /** Submit handler - executes the endpoint */
   onSubmit?: (data: WidgetData) => Promise<ResponseType<WidgetData>>;
   /** Initial data from CLI args to prefill request fields */
   initialData?: WidgetData;
@@ -160,7 +160,7 @@ export function InkEndpointPage<
     endpoint.PATCH ??
     endpoint.DELETE;
 
-  // Stable logger — useRef so it doesn't cause re-renders
+  // Stable logger - useRef so it doesn't cause re-renders
   const loggerRef = useRef(createEndpointLogger(debug, Date.now(), locale));
   const logger = loggerRef.current;
 
@@ -192,7 +192,7 @@ export function InkEndpointPage<
     }
   }, [shouldAutoFetch, onSubmit, response, handleSubmit, initialData]);
 
-  // Quit handler — Escape only (not "q" which would fire while typing in text fields)
+  // Quit handler - Escape only (not "q" which would fire while typing in text fields)
   useInput(
     // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
     (_, key) => {
@@ -203,7 +203,7 @@ export function InkEndpointPage<
     { isActive: !isSubmitting },
   );
 
-  // Example CLI command based on current form input — must be before early return
+  // Example CLI command based on current form input - must be before early return
   const exampleCommand = useMemo(
     () =>
       activeEndpoint ? buildExampleCommand(activeEndpoint, formValues) : "",
@@ -220,7 +220,7 @@ export function InkEndpointPage<
     );
   }
 
-  // Response data for widgets — mirrors React EndpointsPage pattern
+  // Response data for widgets - mirrors React EndpointsPage pattern
   const responseData = response?.success === true ? response.data : initialData;
 
   // Full-takeover CLI widget: skip header/border, render directly
@@ -280,7 +280,7 @@ export function InkEndpointPage<
         </Box>
       </Box>
 
-      {/* Endpoint fields — rendered by the widget system */}
+      {/* Endpoint fields - rendered by the widget system */}
       <Box
         borderStyle="round"
         borderColor={response?.success === false ? "red" : "green"}

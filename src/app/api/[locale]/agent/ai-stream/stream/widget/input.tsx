@@ -5,13 +5,12 @@
  * Main input area for sending messages with voice support
  */
 
-import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import { Phone } from "next-vibe-ui/ui/icons/Phone";
-import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Square } from "next-vibe-ui/ui/icons/Square";
 import { X } from "next-vibe-ui/ui/icons/X";
@@ -25,28 +24,29 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-config";
 import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
-import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
+import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
-import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
-import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
-import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
-import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
+import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { useMessageOperations } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-operations";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import { useApiQuery } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-query";
+import { endpoints as cronIdEndpoints } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import {
   useWidgetLocale,
   useWidgetLogger,
@@ -108,7 +108,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     ? (threads[activeThreadId] ?? null)
     : null;
 
-  // Settings — pass SSR initialData so no client fetch on hydration
+  // Settings - pass SSR initialData so no client fetch on hydration
   const { settings, setTTSAutoplay } = useChatSettings(
     user,
     logger,
@@ -129,7 +129,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   );
   const deductCredits = creditsHook?.deductCredits ?? noopDeduct;
 
-  // Draft key — unique per thread/folder context
+  // Draft key - unique per thread/folder context
   const draftKey = getDraftKey(
     activeThreadId,
     currentRootFolderId,
@@ -180,10 +180,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     const loadDraftForContext = async (): Promise<void> => {
       const draft = await loadDraft(draftKey, logger);
       const draftAttachments = await loadDraftAttachments(draftKey, logger);
-      // Skip the next autosave triggered by these resets — they are loads, not user edits
+      // Skip the next autosave triggered by these resets - they are loads, not user edits
       skipNextInputSaveRef.current = true;
       skipNextAttachmentsSaveRef.current = true;
-      // Always reset on context switch — clear stale input from previous thread
+      // Always reset on context switch - clear stale input from previous thread
       rawSetInput(draft);
       rawSetAttachments(draftAttachments);
     };
@@ -212,7 +212,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     [rawSetAttachments, draftKey, logger],
   );
 
-  // AI stream — destructure callbacks directly so they are stable useCallback refs
+  // AI stream - destructure callbacks directly so they are stable useCallback refs
   const { startStream: aiStartStream, cancelStream: aiCancelStream } =
     useAIStream();
 
@@ -265,7 +265,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // Message operations
   const messageOps = useMessageOperations(messageOpsDeps);
 
-  // Forward sendMessage — streaming state is managed optimistically in useInputHandlers
+  // Forward sendMessage - streaming state is managed optimistically in useInputHandlers
   const sendMessageWithStreamNotify = messageOps.sendMessage;
 
   // Input handlers
@@ -295,7 +295,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     }
     return rootFolderPermissions.canCreateThread;
   }, [activeThread, currentSubFolderId, folders, rootFolderPermissions]);
-  const noPermissionReason = undefined; // Simplified — full logic can be restored later
+  const noPermissionReason = undefined; // Simplified - full logic can be restored later
 
   const { t } = simpleT(locale);
   const voiceRuntime = useVoiceRuntimeState();
@@ -305,7 +305,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const isInputDisabled = isLoading || !canPost;
 
-  // Aborting state — user clicked cancel but STREAM_FINISHED hasn't arrived yet
+  // Aborting state - user clicked cancel but STREAM_FINISHED hasn't arrived yet
   const isAborting = useAIStreamStore((s) =>
     activeThreadId ? s.isAborting(activeThreadId) : false,
   );

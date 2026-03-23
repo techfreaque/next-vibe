@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Verhältnis",
     description:
-      "Verhältnis — dividiert Reihe A durch Reihe B, zeitlich ausgerichtet",
+      "Verhältnis - dividiert Reihe A durch Reihe B, zeitlich ausgerichtet",
     fields: {
       a: { label: "Zähler (A)", description: "Dividenden-Zeitreihe" },
       b: { label: "Nenner (B)", description: "Divisor-Zeitreihe" },

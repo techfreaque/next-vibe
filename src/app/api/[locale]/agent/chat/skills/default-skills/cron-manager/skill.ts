@@ -17,13 +17,14 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import { tool } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
   SpeedLevel,
 } from "../../enum";
 
@@ -49,7 +50,7 @@ export const cronManagerSkill: Skill = {
     tool(PULSE_EXECUTE_ALIAS, true),
     tool(TOOL_HELP_ALIAS),
   ],
-  systemPrompt: `You are a Cron Manager — a specialist in scheduling, monitoring, and managing automated tasks.
+  systemPrompt: `You are a Cron Manager - a specialist in scheduling, monitoring, and managing automated tasks.
 
 **Your Tools:**
 - List, create, get, update, and delete cron tasks

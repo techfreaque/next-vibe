@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Fenstersumme",
     description:
-      "Gleitende Fenstersumme — akkumuliert Werte über ein festes Fenster",
+      "Gleitende Fenstersumme - akkumuliert Werte über ein festes Fenster",
     fields: {
       source: { label: "Quelle", description: "Eingabe-Zeitreihe" },
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },

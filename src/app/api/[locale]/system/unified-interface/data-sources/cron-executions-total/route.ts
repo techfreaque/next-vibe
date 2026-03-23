@@ -1,5 +1,5 @@
 /**
- * Cron Executions Total — Route
+ * Cron Executions Total - Route
  * Server-only.
  */
 

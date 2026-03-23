@@ -153,7 +153,7 @@ export const translations: typeof enTranslations = {
     notConfigured: {
       title: "Stripe nicht konfiguriert",
       description:
-        "Stripe ist nicht konfiguriert — setze STRIPE_SECRET_KEY in deiner .env",
+        "Stripe ist nicht konfiguriert - setze STRIPE_SECRET_KEY in deiner .env",
     },
     stripeCliNotInstalled: "Stripe CLI ist nicht installiert",
     listenerFailed: "Stripe Webhook-Listener konnte nicht gestartet werden",

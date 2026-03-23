@@ -1,4 +1,4 @@
-# Remote Connection — Feature Spec
+# Remote Connection - Feature Spec
 
 ## Overview
 
@@ -13,11 +13,11 @@ Connects a local next-vibe instance to a cloud instance (e.g. unbottled.ai). Onc
 | Direction                            | Mechanism                            | Fallback                                           |
 | ------------------------------------ | ------------------------------------ | -------------------------------------------------- |
 | Local → Cloud (sync, tasks, results) | Direct HTTP                          | None needed                                        |
-| Cloud → Local (task delivery)        | `tasks` array in task-sync response  | —                                                  |
+| Cloud → Local (task delivery)        | `tasks` array in task-sync response  | -                                                  |
 | Cloud → Local (result push)          | Direct POST to stored `localUrl`     | Result stays in cloud DB; local reads on next pull |
-| Local → Cloud (task delivery)        | `outboundTasks` in task-sync request | —                                                  |
+| Local → Cloud (task delivery)        | `outboundTasks` in task-sync request | -                                                  |
 
-- Local **always initiates** — pulls from cloud via pulse cron (every 60s)
+- Local **always initiates** - pulls from cloud via pulse cron (every 60s)
 - Cloud **pushes results to local** via `localUrl`; if unreachable, local reads on next pull
 
 ---
@@ -30,9 +30,9 @@ User provides: `instanceId`, `friendlyName`, `remoteUrl`, `email`, `password`.
 
 1. Reject if `instanceId` already in use locally (CONFLICT)
 2. SSRF-protect `remoteUrl` (reject private IPs unless dev)
-3. Bootstrap `leadId` — GET remote root, extract from `Set-Cookie`
-4. Remote login — POST email/password, extract JWT
-5. Register on remote — POST `instanceId + localUrl` to `/user/remote-connection/register`
+3. Bootstrap `leadId` - GET remote root, extract from `Set-Cookie`
+4. Remote login - POST email/password, extract JWT
+5. Register on remote - POST `instanceId + localUrl` to `/user/remote-connection/register`
 6. Store locally: `remoteUrl`, `token`, `leadId`, `remoteInstanceId`
 7. Enable `DEFAULT_REMOTE_TOOL_IDS` prefixed with `instanceId` in user's tool settings
 8. Invalidate `getLocalInstanceId()` cache
@@ -42,17 +42,17 @@ Cloud `register`:
 1. Reject if `instanceId` already registered for this user (CONFLICT 409)
 2. Store: `token=null`, `localUrl`, `instanceId="hermes"`
 3. Upsert own self-identity record (`token="self"`) so `getLocalInstanceId()` resolves
-4. Return `{ registered: true, remoteInstanceId: "thea" }` — local stores as `remoteInstanceId`
+4. Return `{ registered: true, remoteInstanceId: "thea" }` - local stores as `remoteInstanceId`
 
-**`remoteInstanceId`** — what the cloud calls itself. Used by system prompt builder and by `pullFromRemote` to select outbound tasks for this connection.
+**`remoteInstanceId`** - what the cloud calls itself. Used by system prompt builder and by `pullFromRemote` to select outbound tasks for this connection.
 
 ### CRUD
 
 All require `CUSTOMER` or `ADMIN`. GET/PATCH/DELETE at `/user/remote-connection/[instanceId]`.
 
-- **GET** — `isConnected`, `friendlyName`, `remoteUrl`, `isActive`, `lastSyncedAt`
-- **PATCH** — rename (`friendlyName`)
-- **DELETE** — clears locally, fire-and-forget DELETE to cloud
+- **GET** - `isConnected`, `friendlyName`, `remoteUrl`, `isActive`, `lastSyncedAt`
+- **PATCH** - rename (`friendlyName`)
+- **DELETE** - clears locally, fire-and-forget DELETE to cloud
 
 On 401: `isActive: false`, cron skips, user must reconnect.
 
@@ -69,7 +69,7 @@ POST /system/unified-interface/tasks/task-sync
 { instanceId, memoriesHash, capabilitiesVersion, capabilitiesJson, taskCursor, outboundTasks }
 ```
 
-`outboundTasks` — `SyncedCronTask[]` where `targetInstance = remoteInstanceId` and `lastExecutionStatus IS NULL`.
+`outboundTasks` - `SyncedCronTask[]` where `targetInstance = remoteInstanceId` and `lastExecutionStatus IS NULL`.
 
 ### Response (cloud → local)
 
@@ -77,7 +77,7 @@ POST /system/unified-interface/tasks/task-sync
 { memoriesHash, memories, remoteCapabilitiesVersion, capabilities, tasks, serverTime }
 ```
 
-`tasks` — `SyncedCronTask[]` targeting `instanceId="hermes"`. `null` for memories/capabilities when hashes/versions match.
+`tasks` - `SyncedCronTask[]` targeting `instanceId="hermes"`. `null` for memories/capabilities when hashes/versions match.
 
 ### Cloud-side handler
 
@@ -90,9 +90,9 @@ POST /system/unified-interface/tasks/task-sync
 
 ### Cursors and hashes
 
-- `memoriesHash` — SHA256 of sorted `id:updatedAt` pairs (shared + tombstones)
-- `capabilitiesVersion` — local build version; cloud stores per connection
-- `taskCursor` — ISO timestamp; advanced to `serverTime` each sync. `null` = fetch from epoch
+- `memoriesHash` - SHA256 of sorted `id:updatedAt` pairs (shared + tombstones)
+- `capabilitiesVersion` - local build version; cloud stores per connection
+- `taskCursor` - ISO timestamp; advanced to `serverTime` each sync. `null` = fetch from epoch
 
 ---
 
@@ -124,10 +124,10 @@ Steps:
 
 1. Parse `instanceId` from prefix or prop
 2. Normalize `toolName` via `getPreferredName()` (alias → canonical)
-3. Validate capability snapshot exists — reject fail-closed if missing
-4. Validate `toolName` in snapshot — reject `tool_not_found` if absent
+3. Validate capability snapshot exists - reject fail-closed if missing
+4. Validate `toolName` in snapshot - reject `tool_not_found` if absent
 5. Insert one-shot cron task: `targetInstance`, `routeId`, `runOnce=true`, `taskInput` = input + `__callbackMode`, `__threadId`, `__messageId`
-6. Return `{ taskId, status: "pending" }` — stream pauses or ends per `callbackMode`
+6. Return `{ taskId, status: "pending" }` - stream pauses or ends per `callbackMode`
 
 **Cloud→Local**: task in sync `tasks` → local pulse executes → `pushStatusToRemote` → POST to cloud `/report`.
 
@@ -156,7 +156,7 @@ One `TOOL` role message per tool call. Fields in `metadata.toolCall`:
 ```
 
 - Created immediately when AI fires the tool (status=`pending`)
-- Backfilled in-place when result arrives: `handleTaskCompletion` writes `status` + `result` via `sortObjectKeys` (cache-stable — matches what `ToolResultHandler` would write, no AI SDK prompt cache miss)
+- Backfilled in-place when result arrives: `handleTaskCompletion` writes `status` + `result` via `sortObjectKeys` (cache-stable - matches what `ToolResultHandler` would write, no AI SDK prompt cache miss)
 - `streamContext.currentToolMessageId` = DB row ID of this message; set by `stream-part-handler` after `tool-call` event, before `execute()` runs. Remote tasks read this to store `__messageId` in `taskInput` so `/report` knows which row to backfill.
 
 **UI rendering**: tool bubble shows args + status indicator. Status updates in real time via `TASK_COMPLETED` WS event carrying `toolCallMessageId`.
@@ -171,8 +171,8 @@ One `TOOL` role message per tool call. Fields in `metadata.toolCall`:
    b. Emits `TASK_COMPLETED` WS event (UI updates tool bubble)
    c. Schedules `resume-stream` one-shot cron task (`runOnce=true`, `userId` = task owner) with `taskInput: { threadId, modelId, characterId }`
 3. `resume-stream` fires on next pulse:
-   - `isStreaming=true` → result already in DB, live loop picks it up — no-op
-   - `isStreaming=false` → `runHeadlessAiStream(threadMode:"append", threadId)` — finds last message in thread, uses `answer-as-ai` operation to continue. AI sees backfilled tool result in history and responds naturally.
+   - `isStreaming=true` → result already in DB, live loop picks it up - no-op
+   - `isStreaming=false` → `runHeadlessAiStream(threadMode:"append", threadId)` - finds last message in thread, uses `answer-as-ai` operation to continue. AI sees backfilled tool result in history and responds naturally.
 
 **modelId + characterId flow**: `execute-tool/repository.ts` stores them in `taskInput` → `handleTaskCompletion` reads and forwards to `resume-stream` task.
 
@@ -182,7 +182,7 @@ One `TOOL` role message per tool call. Fields in `metadata.toolCall`:
 
 Format: `{instanceId}__{toolName}`. Double underscore is unambiguous (local IDs use single underscores). Capability entries store bare `toolName` without prefix.
 
-Default tools on connect (from `agent/chat/constants.ts`): `agent_claude-code_POST`, cron list/create, `ssh_exec_POST`, ssh read/write, memories GET/create — all prefixed with `instanceId`.
+Default tools on connect (from `agent/chat/constants.ts`): `agent_claude-code_POST`, cron list/create, `ssh_exec_POST`, ssh read/write, memories GET/create - all prefixed with `instanceId`.
 
 ---
 

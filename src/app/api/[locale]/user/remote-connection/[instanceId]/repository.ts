@@ -1,6 +1,6 @@
 /**
  * Remote Connection by Instance ID Repository
- * GET — status of this connection
+ * GET - status of this connection
  */
 
 import "server-only";

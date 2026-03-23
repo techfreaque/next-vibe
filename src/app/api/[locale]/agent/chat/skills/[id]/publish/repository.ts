@@ -43,7 +43,7 @@ export class SkillPublishRepository {
         });
       }
 
-      // Fetch the skill — must belong to caller
+      // Fetch the skill - must belong to caller
       const [skill] = await db
         .select({
           id: customSkills.id,

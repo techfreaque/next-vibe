@@ -106,7 +106,7 @@ export class StreamingTTSHandler {
    * Add a text delta to the buffer.
    * May trigger TTS generation if a boundary is detected.
    *
-   * Buffer manipulation is synchronous and fast — TTS generation runs in
+   * Buffer manipulation is synchronous and fast - TTS generation runs in
    * the background via `generationChain`, so this never blocks on the
    * Eden AI API.
    */
@@ -166,7 +166,7 @@ export class StreamingTTSHandler {
       bufferPreview: this.buffer.substring(0, 100),
     });
 
-    // Check if we should emit a chunk (non-blocking — generation runs in background)
+    // Check if we should emit a chunk (non-blocking - generation runs in background)
     this.checkAndEmit();
   }
 
@@ -179,7 +179,7 @@ export class StreamingTTSHandler {
    *
    * Because generation is sequential (one API call at a time), we get exactly
    * one chunk of look-ahead: while chunk N plays on the client, chunk N+1's
-   * generation is already running — but N+2 won't start until N+1 finishes.
+   * generation is already running - but N+2 won't start until N+1 finishes.
    */
   private checkAndEmit(): void {
     const cleanBuffer = this.stripSpecialTags(this.buffer).trim();
@@ -222,7 +222,7 @@ export class StreamingTTSHandler {
 
   /**
    * Generate TTS audio for a chunk and emit it over WebSocket.
-   * Runs inside `generationChain` — sequential, one at a time.
+   * Runs inside `generationChain` - sequential, one at a time.
    */
   private async generateAndEmitChunk(
     text: string,
@@ -524,7 +524,7 @@ export class StreamingTTSHandler {
     this.isCancelled = true;
     this.buffer = "";
     this.logger.info(
-      "[Streaming TTS] Cancelled — no further chunks will generate",
+      "[Streaming TTS] Cancelled - no further chunks will generate",
     );
   }
 

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Wybór pola",
     description:
-      "Wybór pola — wyodrębnia nazwane pole (przestarzałe, zwraca pustą tablicę)",
+      "Wybór pola - wyodrębnia nazwane pole (przestarzałe, zwraca pustą tablicę)",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       field: {

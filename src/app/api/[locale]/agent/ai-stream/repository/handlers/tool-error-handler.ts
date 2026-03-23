@@ -102,10 +102,10 @@ export class ToolErrorHandler {
     // Step 1: Check if tool is allowed (activeToolNames permission layer).
     // null = all tools allowed. If set and tool not in it, it's disabled for this user.
     if (activeToolNames !== null && !activeToolNames.has(part.toolName)) {
-      // Could be unknown tool or just disabled — check if it exists at all
+      // Could be unknown tool or just disabled - check if it exists at all
       const unknownEndpoint = await getEndpoint(part.toolName);
       if (!unknownEndpoint) {
-        // Tool doesn't exist at all — emit the original error
+        // Tool doesn't exist at all - emit the original error
         return this.emitOriginalError({
           part,
           toolMessageId,
@@ -124,7 +124,7 @@ export class ToolErrorHandler {
       }
 
       logger.info(
-        "[AI Stream] Tool not in availableTools — returning disabled error to model",
+        "[AI Stream] Tool not in availableTools - returning disabled error to model",
         {
           toolName: part.toolName,
           toolCallId: part.toolCallId,
@@ -173,7 +173,7 @@ export class ToolErrorHandler {
 
     if (requiresConfirmation) {
       logger.info(
-        "[AI Stream] Fallback tool requires confirmation — emitting TOOL_WAITING",
+        "[AI Stream] Fallback tool requires confirmation - emitting TOOL_WAITING",
         {
           toolName: part.toolName,
           toolCallId: part.toolCallId,
@@ -270,7 +270,7 @@ export class ToolErrorHandler {
       };
     }
 
-    // Execution failed with a known error — emit it as a tool result so the model can retry
+    // Execution failed with a known error - emit it as a tool result so the model can retry
     if (fallbackResult && "error" in fallbackResult) {
       logger.warn("[AI Stream] Emitting tool error result to model", {
         toolName: part.toolName,
@@ -308,7 +308,7 @@ export class ToolErrorHandler {
       };
     }
 
-    // Unknown failure — emit original SDK error
+    // Unknown failure - emit original SDK error
     return this.emitOriginalError({
       part,
       toolMessageId,
@@ -427,7 +427,7 @@ export class ToolErrorHandler {
     } = params;
 
     // Build a proper ErrorResponseType from the SDK error.
-    // The SDK's part.error is JSONValue — it may be a string, object, or anything.
+    // The SDK's part.error is JSONValue - it may be a string, object, or anything.
     // We never trust it to be ErrorResponseType; always wrap via fail().
     const sdkError = "error" in part ? part.error : undefined;
     const sdkErrorMessage =

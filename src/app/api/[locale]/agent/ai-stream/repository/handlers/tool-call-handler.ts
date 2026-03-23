@@ -145,7 +145,7 @@ export class ToolCallHandler {
     // Get tool arguments from the AI SDK part.input
     const toolCallArgs = (part.input as ToolCallResult) || {};
 
-    // Read callbackMode from tool args — any tool can pass this to control loop behavior
+    // Read callbackMode from tool args - any tool can pass this to control loop behavior
     const callbackModeArg =
       typeof toolCallArgs === "object" &&
       toolCallArgs !== null &&
@@ -157,7 +157,7 @@ export class ToolCallHandler {
         : null;
 
     // endLoop: stop the AI loop after this step completes.
-    // wakeUp does NOT stop the loop — the AI gets {taskId, hint} back immediately
+    // wakeUp does NOT stop the loop - the AI gets {taskId, hint} back immediately
     // and continues its turn (generates acknowledgement text), then ends naturally.
     // The revival happens later when the background task completes.
     if (callbackModeArg === CallbackMode.END_LOOP) {

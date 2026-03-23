@@ -1,7 +1,7 @@
 /**
  * Vibe Sense Seeds
  *
- * Ensures system seed graphs exist in the DB. Idempotent — safe to call
+ * Ensures system seed graphs exist in the DB. Idempotent - safe to call
  * on every startup. Uses the auto-generated graph seeds index which
  * discovers graph-seeds.ts files colocated with their domain modules.
  */
@@ -21,8 +21,8 @@ import {
   formatSense,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
-import { GraphOwnerType } from "./enum";
 import { pipelineGraphs } from "./db";
+import { GraphOwnerType } from "./enum";
 
 /**
  * Ensure all seed graphs exist. Inserts missing ones, updates existing.

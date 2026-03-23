@@ -316,7 +316,7 @@ export class LeadAuthRepository {
       monthStart.setDate(1);
       monthStart.setHours(0, 0, 0, 0);
 
-      // Cap at 20 — beyond that we already have enough pool links.
+      // Cap at 20 - beyond that we already have enough pool links.
       // A large unbounded VALUES clause overflows Drizzle's query AST stack.
       const sameIpLeads = await db
         .select({ id: leads.id })
@@ -356,7 +356,7 @@ export class LeadAuthRepository {
         linkedCount: sameIpLeads.length,
       });
     } catch (error) {
-      // Non-critical — don't fail lead creation if IP linking fails
+      // Non-critical - don't fail lead creation if IP linking fails
       logger.error("Failed to link leads by IP", parseError(error).message);
     }
   }

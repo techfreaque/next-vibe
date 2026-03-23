@@ -18,13 +18,13 @@ import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type { MessageListResponseOutput } from "../definition";
 import type definitions from "../definition";
+import type { MessageListResponseOutput } from "../definition";
 import { LinearMessageView } from "./linear-view/view";
 import { ChatMessages } from "./messages";
 
 /**
- * Props for custom widget — matches the customWidgetObject pattern
+ * Props for custom widget - matches the customWidgetObject pattern
  */
 interface MessagesWidgetProps {
   field: {
@@ -57,7 +57,7 @@ export const MessagesWidget = React.memo(function MessagesWidget({
 });
 
 /**
- * Interactive messages — renders the full ChatMessages component.
+ * Interactive messages - renders the full ChatMessages component.
  * Reads settings and messages from scoped stores directly.
  */
 function InteractiveMessages(): React.JSX.Element {
@@ -65,7 +65,7 @@ function InteractiveMessages(): React.JSX.Element {
 }
 
 /**
- * Read-only messages — renders LinearMessageView with all callbacks null.
+ * Read-only messages - renders LinearMessageView with all callbacks null.
  * Used by ai-stream/run embeds where no ChatBootProvider exists.
  */
 function ReadOnlyMessages({

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Delta Compute
+ * Vibe Sense - Delta Compute
  * Server-only pure computation. No DB access.
  */
 

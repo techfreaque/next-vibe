@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Script Evaluator Route
+ * Vibe Sense - Script Evaluator Route
  * Server-only.
  */
 

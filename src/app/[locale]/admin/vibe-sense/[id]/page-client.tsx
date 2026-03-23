@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph Detail Client Component
+ * Vibe Sense - Graph Detail Client Component
  * Uses EndpointsPage with GET for graph viewing
  */
 
@@ -7,9 +7,9 @@
 
 import type { JSX } from "react";
 
-import graphDataDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/data/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { GraphResolution } from "@/app/api/[locale]/system/unified-interface/vibe-sense/enum";
+import graphDataDefinitions from "@/app/api/[locale]/system/unified-interface/vibe-sense/graphs/[id]/data/definition";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 

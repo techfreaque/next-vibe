@@ -17,11 +17,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { CRON_SCHEDULES, TASK_TIMEOUTS } from "../../constants";
 import { cronTasks } from "../../cron/db";
 import { CronTaskPriority, TaskCategory } from "../../enum";
+import { TASK_SYNC_ALIAS } from "../pull/constants";
 import type {
   TaskSyncSettingsGetOutput,
   TaskSyncSettingsPatchResponseOutput,
 } from "./definition";
-import { TASK_SYNC_ALIAS } from "../pull/constants";
 
 export class TaskSyncSettingsRepository {
   private static readonly TASK_SYNC_PULL_ID = "task-sync-pull";
@@ -66,12 +66,12 @@ export class TaskSyncSettingsRepository {
           target: [cronTasks.id],
           set: { enabled: true, updatedAt: new Date() },
         });
-      logger.info("Task sync enabled — row inserted");
+      logger.info("Task sync enabled - row inserted");
     } else {
       await db
         .delete(cronTasks)
         .where(eq(cronTasks.id, TaskSyncSettingsRepository.TASK_SYNC_PULL_ID));
-      logger.info("Task sync disabled — row deleted");
+      logger.info("Task sync disabled - row deleted");
     }
 
     return success({ updated: true });

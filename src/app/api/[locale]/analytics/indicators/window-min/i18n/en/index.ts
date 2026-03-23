@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "Window Min",
     description:
-      "Rolling window minimum — tracks the lowest value in a fixed window",
+      "Rolling window minimum - tracks the lowest value in a fixed window",
     fields: {
       source: { label: "Source", description: "Input time series" },
       resolution: { label: "Resolution", description: "Computation timeframe" },

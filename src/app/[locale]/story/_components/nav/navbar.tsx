@@ -37,7 +37,7 @@ export function Navbar({
           <Logo locale={locale} pathName="" />
         </Div>
 
-        {/* Desktop Navigation — overflow-aware, hidden on mobile */}
+        {/* Desktop Navigation - overflow-aware, hidden on mobile */}
         <Div role="navigation" className="hidden md:flex flex-1 min-w-0 mx-4">
           <OverflowNav navigationItems={navigationItems} locale={locale} />
         </Div>

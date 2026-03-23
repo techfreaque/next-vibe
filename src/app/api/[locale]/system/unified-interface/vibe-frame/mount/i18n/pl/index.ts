@@ -18,7 +18,7 @@ export const translations = {
       leadId: {
         label: "Lead ID",
         description:
-          "ID odwiedzającego ze strony hosta (cross-origin — nie można odczytać z ciasteczek)",
+          "ID odwiedzającego ze strony hosta (cross-origin - nie można odczytać z ciasteczek)",
       },
       authToken: {
         label: "Token uwierzytelniania",

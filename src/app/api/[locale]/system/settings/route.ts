@@ -10,7 +10,7 @@ import endpoints from "./definition";
 import { SystemSettingsRepository } from "./repository";
 
 /**
- * PATCH handler — assembles flat env key fields into settings record.
+ * PATCH handler - assembles flat env key fields into settings record.
  * Typed as any because the definition uses dynamic children (one field per env key)
  * which cannot be statically typed through the generic createEndpoint machinery.
  */

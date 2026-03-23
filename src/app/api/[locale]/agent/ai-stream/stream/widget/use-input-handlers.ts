@@ -93,7 +93,7 @@ export function useInputHandlers({
       // so the stop button appears before the first WS chunk arrives.
       startStream(navActiveThreadId ?? "new", logger);
 
-      // Snapshot navigation state before sending — needed to revert on failure
+      // Snapshot navigation state before sending - needed to revert on failure
       // These closure values are captured at render time (pre-navigation state).
       const preNavSnapshot = {
         activeThreadId: navActiveThreadId,
@@ -118,7 +118,7 @@ export function useInputHandlers({
             currentSubFolderId: subFolderId,
           });
 
-          // New thread — clear ?message= since it starts fresh (no branch to track)
+          // New thread - clear ?message= since it starts fresh (no branch to track)
           setLeafMessageId(null);
 
           // Build URL with proper subfolder path if present (no ?message= for new threads)
@@ -126,7 +126,7 @@ export function useInputHandlers({
             ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
             : `/${locale}/threads/${rootFolderId}/${threadId}`;
 
-          // Synchronous URL update — Zustand store is source of truth
+          // Synchronous URL update - Zustand store is source of truth
           window.history.replaceState(null, "", url);
         },
       );
@@ -138,7 +138,7 @@ export function useInputHandlers({
           setNavigation(preNavSnapshot);
           logger.warn(
             "Chat",
-            "Stream failed — reverted navigation store to pre-send state",
+            "Stream failed - reverted navigation store to pre-send state",
           );
         }
       }
@@ -209,7 +209,7 @@ export function useInputHandlers({
               currentRootFolderId: rootFolderId,
               currentSubFolderId: subFolderId,
             });
-            // New thread — clear ?message= since it starts fresh
+            // New thread - clear ?message= since it starts fresh
             setLeafMessageId(null);
             const url = subFolderId
               ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
@@ -298,7 +298,7 @@ export function useInputHandlers({
             currentRootFolderId: rootFolderId,
             currentSubFolderId: subFolderId,
           });
-          // New thread — clear ?message= since it starts fresh
+          // New thread - clear ?message= since it starts fresh
           setLeafMessageId(null);
           // Build URL with proper subfolder path if present (same as text flow)
           const url = subFolderId

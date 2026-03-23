@@ -1,5 +1,5 @@
 /**
- * Leads Email Clicks — Route
+ * Leads Email Clicks - Route
  * Server-only.
  */
 

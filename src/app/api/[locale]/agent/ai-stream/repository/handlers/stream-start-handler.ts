@@ -26,7 +26,7 @@ export class StreamStartHandler {
   /**
    * Initialize stream context, TTS handler, and emit tool confirmation events.
    *
-   * User MESSAGE_CREATED is NOT emitted here — it happens in index.ts after
+   * User MESSAGE_CREATED is NOT emitted here - it happens in index.ts after
    * the compacting check so event ordering is always correct:
    *   [compacting →] user → AI
    */
@@ -67,7 +67,7 @@ export class StreamStartHandler {
     user: JwtPayloadType;
     logger: EndpointLogger;
     wsEmit?: WsEmitCallback | null;
-    /** Force a specific sequenceId — used by wakeUp revival to share sequence with deferred tool pair */
+    /** Force a specific sequenceId - used by wakeUp revival to share sequence with deferred tool pair */
     sequenceIdOverride?: string;
   }): {
     ctx: StreamContext;
@@ -107,7 +107,7 @@ export class StreamStartHandler {
 
     // Pre-set stepHasToolsAwaitingConfirmation if the loaded message history already
     // contains a waiting_for_confirmation tool result. This happens in wakeUp revival
-    // streams where the approve tool's placeholder is in the DB history — the tool-call
+    // streams where the approve tool's placeholder is in the DB history - the tool-call
     // handler never fires for history messages so the flag would stay false, causing
     // the AI SDK stopWhen predicate to never trigger and spawning extra turns.
     const hasHistoryPendingConfirmation = messages.some((msg) => {

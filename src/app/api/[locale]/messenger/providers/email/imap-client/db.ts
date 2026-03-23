@@ -12,7 +12,7 @@ import type { ImapAuthMethodValue, ImapSyncStatusValue } from "./enum";
 import { ImapAuthMethod, ImapSyncStatus } from "./enum";
 
 /**
- * ImapAccountShape — normalized view of a MessengerAccount's IMAP fields.
+ * ImapAccountShape - normalized view of a MessengerAccount's IMAP fields.
  * Used everywhere the old ImapAccount type was used in IMAP services.
  */
 export interface ImapAccountShape {

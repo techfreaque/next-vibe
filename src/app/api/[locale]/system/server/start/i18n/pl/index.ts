@@ -116,11 +116,11 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił konflikt danych",
       },
       tanstackBuildNotFound:
-        "Nie znaleziono buildu TanStack Start — czy uruchomiono 'vibe build --tanstack'?",
+        "Nie znaleziono buildu TanStack Start - czy uruchomiono 'vibe build --tanstack'?",
       tanstackServerExited:
         "Serwer TanStack Start zakończył działanie natychmiast",
       nextBuildNotFound:
-        "Nie znaleziono buildu .next-prod — czy uruchomiono 'vibe build'?",
+        "Nie znaleziono buildu .next-prod - czy uruchomiono 'vibe build'?",
       startFailed: "Nie udało się uruchomić serwera",
     },
     success: {

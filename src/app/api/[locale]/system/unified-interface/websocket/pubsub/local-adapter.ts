@@ -1,7 +1,7 @@
 /**
  * Local Pub/Sub Adapter
  *
- * In-process broadcasting — the default for single-instance deployments.
+ * In-process broadcasting - the default for single-instance deployments.
  * publish() calls broadcastLocal() directly. subscribe()/unsubscribe() are no-ops
  * because in-process delivery is handled by the channel registry in server.ts.
  */

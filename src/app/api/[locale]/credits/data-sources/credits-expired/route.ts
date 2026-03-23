@@ -1,5 +1,5 @@
 /**
- * Credits Expired — Route
+ * Credits Expired - Route
  * Server-only.
  */
 

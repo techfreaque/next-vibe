@@ -1,22 +1,22 @@
 /**
- * Vibe Sense — Run Config Repository
+ * Vibe Sense - Run Config Repository
  * Executes a graph from an inline config without DB persistence
  */
 
 import "server-only";
 
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { graphConfigSchema } from "../graph/schema";
 import { runGraph } from "../engine/runner";
+import { graphConfigSchema } from "../graph/schema";
 
 import type {
   RunConfigRequestOutput,

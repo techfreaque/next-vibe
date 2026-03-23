@@ -142,7 +142,7 @@ export const leadsSortingFields = {
 } as const;
 
 /**
- * Batch filter fields — scalar (single-select) variants for batch PATCH/DELETE.
+ * Batch filter fields - scalar (single-select) variants for batch PATCH/DELETE.
  * These are kept hidden in the batch widget (prefilled from list).
  * Schema uses arrays to match the list filter format for easy prefilling.
  */

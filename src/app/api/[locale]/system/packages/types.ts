@@ -1,7 +1,7 @@
 /**
  * Package Manifest Types
  *
- * Defines the shape of package.ts files — the source-of-truth for standalone
+ * Defines the shape of package.ts files - the source-of-truth for standalone
  * distributable packages built from the next-vibe monorepo.
  *
  * Each package.ts lives colocated with its feature folder and declares:
@@ -18,7 +18,7 @@ export type PackagePlatform = "cli" | "mcp";
 export type PackageExports = Record<string, string>;
 
 /**
- * PackageManifest — the typed config format for distributable packages.
+ * PackageManifest - the typed config format for distributable packages.
  *
  * Colocate a `package.ts` file in the feature folder to declare a package.
  * The builder reads this to generate scoped endpoint registries and produce
@@ -37,8 +37,8 @@ export interface PackageManifest {
 
   /**
    * Version strategy.
-   * - "source" — inherit version from root package.json at build time
-   * - Any semver string — pin this package to that version independently
+   * - "source" - inherit version from root package.json at build time
+   * - Any semver string - pin this package to that version independently
    */
   version: "source" | string;
 
@@ -69,7 +69,7 @@ export interface PackageManifest {
   defaultEndpoint?: string;
 
   /**
-   * Library exports — repository modules that become importable from the package.
+   * Library exports - repository modules that become importable from the package.
    * Keys are npm subpath exports (e.g. "." or "./lint").
    * Values are source file paths relative to project root.
    *

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Computation Cache
+ * Vibe Sense - Computation Cache
  *
  * DB (pipeline_snapshots) cache for on-demand computation.
  * First render pays computation cost; subsequent renders within TTL are instant.
@@ -16,7 +16,7 @@ import { eq, lt } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 
 import { pipelineSnapshots } from "../db";
-import type { DataPoint, TimeRange, Resolution } from "../shared/fields";
+import type { DataPoint, Resolution, TimeRange } from "../shared/fields";
 
 // ─── Cache Key ────────────────────────────────────────────────────────────────
 
@@ -46,7 +46,7 @@ async function getFromDbCache(key: string): Promise<DataPoint[] | null> {
     return null;
   }
   if (row.expiresAt < new Date()) {
-    // Expired — delete and return null
+    // Expired - delete and return null
     await db
       .delete(pipelineSnapshots)
       .where(eq(pipelineSnapshots.cacheKey, key));

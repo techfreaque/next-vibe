@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Graph List Widget
+ * Vibe Sense - Graph List Widget
  * Summary stats + search + card grid showing all pipeline graphs
  */
 

@@ -2,11 +2,11 @@
  * Adapters for Next.js API route conventions in TanStack Start.
  *
  * Pages and layouts use tanstackLoader + TanstackPage exports directly (no wrapper needed).
- * API routes use wrapNextApiRoute — bridges $param → param and method dispatch.
+ * API routes use wrapNextApiRoute - bridges $param → param and method dispatch.
  */
 
-import type { ReactNode } from "react";
 import { NextRequest } from "next-vibe-ui/lib/request";
+import type { ReactNode } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,7 +47,7 @@ interface TanstackHandlerCtx {
 }
 
 // ---------------------------------------------------------------------------
-// Shared helper — exported so generated routes can import it
+// Shared helper - exported so generated routes can import it
 // ---------------------------------------------------------------------------
 
 /** Strip TanStack $name prefix → plain Next.js param names */

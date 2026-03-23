@@ -1,5 +1,5 @@
 /**
- * Referrals Signups — Route
+ * Referrals Signups - Route
  * Server-only.
  */
 

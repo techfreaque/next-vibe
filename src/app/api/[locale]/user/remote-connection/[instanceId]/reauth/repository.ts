@@ -1,6 +1,6 @@
 /**
  * Remote Connection Re-authenticate Repository
- * POST — refresh token for an existing connection
+ * POST - refresh token for an existing connection
  */
 
 import "server-only";
@@ -23,8 +23,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import loginEndpoints, {
   type LoginPostResponseOutput,
 } from "../../../public/login/definition";
-import registerEndpoints from "../../register/definition";
 import { remoteConnections } from "../../db";
+import registerEndpoints from "../../register/definition";
 import { RemoteConnectionRepository } from "../../repository";
 import type {
   RemoteConnectionReauthPostRequestInput,
@@ -165,7 +165,7 @@ export class RemoteConnectionReauthRepository {
           instanceId,
         });
       } catch (err) {
-        // Non-fatal — main token is already updated
+        // Non-fatal - main token is already updated
         logger.warn("[REAUTH] Failed to push reverseToken to remote", {
           error: String(err),
         });

@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — MACD Compute
+ * Vibe Sense - MACD Compute
  * Server-only pure computation. No DB access.
  */
 

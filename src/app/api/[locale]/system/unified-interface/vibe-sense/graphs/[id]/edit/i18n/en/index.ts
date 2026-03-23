@@ -138,7 +138,7 @@ export const translations = {
     graphSettings: "Graph Settings",
     canvasEmpty: "Canvas is empty",
     canvasEmptyHint: "Drag nodes from the palette to get started",
-    shortcutDelete: "Del — delete node",
-    shortcutSave: "⌘S — save",
+    shortcutDelete: "Del - delete node",
+    shortcutSave: "⌘S - save",
   },
 };

@@ -3,7 +3,7 @@ export const translations = {
   post: {
     title: "JSON Path",
     description:
-      "JSON Path — extracts a value via dot-notation path (superseded, returns empty)",
+      "JSON Path - extracts a value via dot-notation path (superseded, returns empty)",
     fields: {
       source: { label: "Source", description: "Input time series" },
       path: {

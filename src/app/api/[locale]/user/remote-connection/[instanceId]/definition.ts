@@ -1,14 +1,14 @@
 /**
  * Remote Connection by Instance ID
- * GET — status of this connection
+ * GET - status of this connection
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  customWidgetObject,
   backButton,
+  customWidgetObject,
   requestUrlPathParamsField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";

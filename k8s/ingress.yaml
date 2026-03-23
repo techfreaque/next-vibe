@@ -25,7 +25,7 @@ spec:
     - host: your-domain.com
       http:
         paths:
-          # WebSocket sidecar — must come before the catch-all
+          # WebSocket sidecar - must come before the catch-all
           - path: /ws
             pathType: Prefix
             backend:

@@ -5,8 +5,8 @@
 
 import { scopedTranslation as cliScopedTranslation } from "@/app/api/[locale]/system/unified-interface/cli/i18n";
 import type { RouteExecutionResult } from "@/app/api/[locale]/system/unified-interface/cli/runtime/route-executor";
-import { formatValidationErrorDetails } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { formatValidationErrorDetails } from "@/app/api/[locale]/system/unified-interface/shared/utils/format-validation-error";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
@@ -27,7 +27,7 @@ export class CliErrorFormatter {
     const { t } = simpleT(locale);
     const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
-    // Format validation errors nicely — each field on its own line
+    // Format validation errors nicely - each field on its own line
     const errorParams = result.errorParams;
     const isValidationError =
       errorParams && "error" in errorParams && "errorCount" in errorParams;
@@ -47,11 +47,11 @@ export class CliErrorFormatter {
         result.inputData,
       );
       if (details) {
-        // Skip the redundant "Validation Error" title — details are self-explanatory
+        // Skip the redundant "Validation Error" title - details are self-explanatory
         detailedError = details;
       }
     } else if (errorParams && Object.keys(errorParams).length > 0) {
-      // Generic params — show as before
+      // Generic params - show as before
       // eslint-disable-next-line i18next/no-literal-string
       detailedError += "\n\nDetails:";
       for (const [key, value] of Object.entries(errorParams)) {

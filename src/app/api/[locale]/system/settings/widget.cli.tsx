@@ -208,7 +208,7 @@ interface FlatSetting extends Setting {
   moduleName: string;
 }
 
-/** A row in the editor list — either a module header separator or a real setting */
+/** A row in the editor list - either a module header separator or a real setting */
 type EditorRow =
   | { kind: "header"; label: string }
   | { kind: "setting"; setting: FlatSetting };
@@ -340,7 +340,7 @@ function CliEditor({ value, onDone }: EditorProps): JSX.Element {
       }
       if (key.escape || input === "q") {
         if (Object.keys(edits).length > 0) {
-          // Unsaved edits — just quit without saving (matches web cancel semantics)
+          // Unsaved edits - just quit without saving (matches web cancel semantics)
         }
         onDone();
         return;
@@ -624,7 +624,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
     if (fieldIdx < stepFields.length - 1) {
       setFieldIdx((i) => i + 1);
     } else {
-      // End of step fields — save and advance to next step
+      // End of step fields - save and advance to next step
       void saveStep().then(() => {
         if (stepIdx < totalSteps - 1) {
           setStepIdx((s) => s + 1);
@@ -725,7 +725,7 @@ function CliWizard({ value, onDone }: WizardProps): JSX.Element {
           marginBottom={1}
         >
           {currentField.key === "CLAUDE_CODE_ENABLED" ? (
-            /* Special Claude Code display — no text input, just status */
+            /* Special Claude Code display - no text input, just status */
             <Box flexDirection="column" gap={1}>
               <Text bold color="cyan">
                 {t("wizard.ai.claudeCodeTitle")}
@@ -944,7 +944,7 @@ export function SystemSettingsPatchWidget(): JSX.Element {
         });
         if (result.success) {
           const value = result.data as SystemSettingsGetResponseOutput;
-          // Always open wizard when invoked via `vibe init` — either because
+          // Always open wizard when invoked via `vibe init` - either because
           // onboarding is required, or because the user explicitly ran init.
           // When already configured, open wizard anyway (they asked for it).
           // Editor is reachable from the idle menu via [e].

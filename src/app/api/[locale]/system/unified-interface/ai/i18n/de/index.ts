@@ -36,7 +36,7 @@ export const translations: typeof enTranslations = {
       },
       response: {
         result:
-          "Das von der Zielroute zurückgegebene Ergebnis. Bei Fehler ist dieses Feld nicht vorhanden — die Antwort selbst enthält den Fehler.",
+          "Das von der Zielroute zurückgegebene Ergebnis. Bei Fehler ist dieses Feld nicht vorhanden - die Antwort selbst enthält den Fehler.",
         resultLabel: "Ergebnis",
       },
       errors: {
@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
   },
   tools: {
     get: {
-      title: "Tool-Hilfe — Verfügbare Tools entdecken",
+      title: "Tool-Hilfe - Verfügbare Tools entdecken",
       description:
         "Durchsuchen und entdecken Sie alle verfügbaren KI-Tools. Verwenden Sie query für die Suche, category für die Filterung.",
       category: "KI-Tools",

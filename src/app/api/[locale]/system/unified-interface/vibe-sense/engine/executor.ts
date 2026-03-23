@@ -1,8 +1,8 @@
 /**
- * Vibe Sense — Node Executor
+ * Vibe Sense - Node Executor
  *
  * All nodes are endpoint nodes dispatched via RouteExecutionExecutor.
- * No switch on node type — single execution path for everything.
+ * No switch on node type - single execution path for everything.
  */
 
 import "server-only";
@@ -146,7 +146,7 @@ export async function executeNode(
   }
 
   // If this node expects upstream series (has incoming edges) but none resolved,
-  // skip execution — calling the endpoint with missing source would fail validation.
+  // skip execution - calling the endpoint with missing source would fail validation.
   if (incomingEdges.length > 0 && !("source" in inputs)) {
     const hasAnyInput = incomingEdges.some((e) => {
       const toField = e.toHandle ?? "source";
@@ -233,7 +233,7 @@ export async function executeNode(
     // Trimming to requestedRange is only needed for display/UI, not pipeline use.
     ctx.resolvedSeries.set(nodeId, maybeScaleUp(points, resolution, ctx));
   } else if (nodeConfig.outputField !== undefined) {
-    // Scalar output — store single datapoint at range end
+    // Scalar output - store single datapoint at range end
     const scalar = response[nodeConfig.outputField];
     const numVal =
       typeof scalar === "number"

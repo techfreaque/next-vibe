@@ -7,8 +7,7 @@ import {
   AccordionTrigger,
 } from "next-vibe-ui/ui/accordion";
 import { Button } from "next-vibe-ui/ui/button";
-import { Card } from "next-vibe-ui/ui/card";
-import { CardContent } from "next-vibe-ui/ui/card";
+import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
@@ -67,7 +66,7 @@ export function DefaultErrorFallback({
   const componentStack =
     errorInfo?.componentStack || "No component stack available";
 
-  // Extract component names from stack — strip bundle URLs, keep "at ComponentName"
+  // Extract component names from stack - strip bundle URLs, keep "at ComponentName"
   const componentStackLines = componentStack
     .split("\n")
     .map((l) => l.trim())
@@ -98,7 +97,7 @@ export function DefaultErrorFallback({
           </Button>
         </Div>
 
-        {/* Component stack shown first — most useful for infinite loop / update depth errors */}
+        {/* Component stack shown first - most useful for infinite loop / update depth errors */}
         {topComponents && (
           <Div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
             <Span className="text-xs font-semibold text-destructive uppercase tracking-wide block mb-1">
@@ -188,7 +187,7 @@ export class ErrorBoundary extends Component<
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // If this error was already caught and re-thrown by an inner boundary,
-    // let it propagate up to Next.js — don't swallow it here.
+    // let it propagate up to Next.js - don't swallow it here.
     if (handledErrors.has(error)) {
       // eslint-disable-next-line no-restricted-syntax -- Required by React error boundary contract: re-throw to propagate to parent boundary
       throw error;
@@ -213,7 +212,7 @@ export class ErrorBoundary extends Component<
 
     // In dev: re-throw so Next.js dev overlay shows the real error origin.
     // Mark it first so getDerivedStateFromError in parent boundaries re-throws
-    // instead of catching — letting it propagate all the way to Next.js.
+    // instead of catching - letting it propagate all the way to Next.js.
     if (envClient.NODE_ENV !== "production") {
       handledErrors.add(error);
       // eslint-disable-next-line no-restricted-syntax -- Required by React error boundary contract: re-throw in dev to surface original error in Next.js overlay

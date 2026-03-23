@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Trigger Widget
+ * Vibe Sense - Trigger Widget
  * Form with date range picker + submit, shows results on success.
  */
 

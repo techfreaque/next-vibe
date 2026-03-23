@@ -10,9 +10,9 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
 import folderContentsDefinition from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
+import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import pathDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
-import type { ToolConfigItem } from "@/app/api/[locale]/agent/chat/settings/definition";
 import threadsDefinition from "@/app/api/[locale]/agent/chat/threads/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
@@ -20,8 +20,8 @@ import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hoo
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import { createAndSendUserMessage } from "./shared";
 import type { StartStreamFn } from "./shared";
+import { createAndSendUserMessage } from "./shared";
 
 export interface SendMessageParams {
   content: string;
@@ -42,7 +42,7 @@ export interface SendMessageDeps {
   activeThreadId: string | null;
   currentRootFolderId: DefaultFolderId;
   currentSubFolderId: string | null;
-  /** leafMessageId from the navigation store — used as starting point for branch-aware parent resolution */
+  /** leafMessageId from the navigation store - used as starting point for branch-aware parent resolution */
   leafMessageId: string | null;
   user: JwtPayloadType;
   settings: {
@@ -164,7 +164,7 @@ export async function sendMessage(
         }
       }
 
-      // Server threads: never send messageHistory — server fetches from DB.
+      // Server threads: never send messageHistory - server fetches from DB.
       // Incognito: send full message history.
       messageHistory =
         currentRootFolderId === DefaultFolderId.INCOGNITO
@@ -222,7 +222,7 @@ export async function sendMessage(
         );
       }
       // Optimistically add new thread to sidebar cache.
-      // urlPathParams must match what the sidebar passes — { rootFolderId, subFolderId, search }.
+      // urlPathParams must match what the sidebar passes - { rootFolderId, subFolderId, search }.
       const now = new Date();
       apiClient.updateEndpointData(
         threadsDefinition.GET,
@@ -335,10 +335,10 @@ export async function sendMessage(
       return { success: false, createdThreadId: createdThreadIdForNewThread };
     }
 
-    // Snapshot URL before navigation — needed for revert on failure
+    // Snapshot URL before navigation - needed for revert on failure
     const preNavigationUrl = window.location.href;
 
-    // Navigate immediately BEFORE creating messages — only for new threads
+    // Navigate immediately BEFORE creating messages - only for new threads
     if (onThreadCreated && createdThreadIdForNewThread) {
       onThreadCreated(finalThreadId, currentRootFolderId, currentSubFolderId);
     }
@@ -367,7 +367,7 @@ export async function sendMessage(
 
     // If stream failed and we created a new thread optimistically, revert everything
     if (!streamStarted && createdThreadIdForNewThread) {
-      logger.warn("Stream failed — reverting optimistic new thread", {
+      logger.warn("Stream failed - reverting optimistic new thread", {
         threadId: createdThreadIdForNewThread,
       });
 

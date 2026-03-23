@@ -1,9 +1,9 @@
 /**
- * Vibe Frame — Trigger System
+ * Vibe Frame - Trigger System
  *
  * Data-driven trigger evaluation. Detects scroll, time, exit-intent, click,
  * hover, and viewport conditions. Mirrors widget-engine widget-triggers.ts.
- * Framework-agnostic — no React or Preact dependency.
+ * Framework-agnostic - no React or Preact dependency.
  */
 
 import type { FrameTriggerConfig } from "./types";
@@ -98,7 +98,7 @@ function initSharedState(): void {
     { passive: true },
   );
 
-  // Exit intent — mouse leaves through top of viewport
+  // Exit intent - mouse leaves through top of viewport
   document.addEventListener("mouseleave", (event) => {
     if (event.clientY <= 0) {
       sharedState = { ...sharedState, exit: true };
@@ -118,7 +118,7 @@ function initSharedState(): void {
   };
   window.addEventListener("resize", updateViewport, { passive: true });
 
-  // Time — updated every second
+  // Time - updated every second
   setInterval(() => {
     sharedState = { ...sharedState, time: Date.now() - startTime };
   }, 1000);
@@ -185,7 +185,7 @@ function scrollTrigger(percent: number, callback: () => void): () => void {
     }
   }
 
-  // Poll — relies on shared state being updated by scroll listener
+  // Poll - relies on shared state being updated by scroll listener
   const interval = setInterval(check, 200);
 
   // Check immediately (page may already be scrolled)

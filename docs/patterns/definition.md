@@ -27,7 +27,7 @@ Definition files (`definition.ts`) are the single source of truth that automatic
 
 ### Core Principle: Always use scoped field functions
 
-All field functions come in **scoped** and non-scoped variants. Always use the scoped versions — they validate translation key strings against the module's i18n schema at compile time.
+All field functions come in **scoped** and non-scoped variants. Always use the scoped versions - they validate translation key strings against the module's i18n schema at compile time.
 
 Import from `utils-new` (not `utils`):
 
@@ -50,7 +50,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 ```
 
-Pass `scopedTranslation` as the first argument to every scoped field function. This is type-inference only — it enables the compiler to validate your translation key strings.
+Pass `scopedTranslation` as the first argument to every scoped field function. This is type-inference only - it enables the compiler to validate your translation key strings.
 
 ### Core Principle: No naked z.object()
 
@@ -63,7 +63,7 @@ Pass `scopedTranslation` as the first argument to every scoped field function. T
 | `requestField(st, config)`               | Request body or query param field                                 | `{ request: "data" }`                 |
 | `requestUrlPathParamsField(st, config)`  | URL path parameter                                                | `{ request: "urlPathParams" }`        |
 | `responseField(st, config)`              | Response-only display field                                       | `{ response: true }`                  |
-| `requestResponseField(st, config)`       | Appears in both request AND response — single field, dual purpose | mixed (routing hint + response value) |
+| `requestResponseField(st, config)`       | Appears in both request AND response - single field, dual purpose | mixed (routing hint + response value) |
 | `objectField(st, config)`                | Nested object / container                                         | any context                           |
 | `responseArrayField(st, config)`         | Response array                                                    | `{ response: true }`                  |
 | `requestDataArrayField(st, config)`      | Request array                                                     | `{ request: "data" }`                 |
@@ -78,7 +78,7 @@ requestField(st, { schema: z.string().optional(), ... })
 
 **Optional objects:** Use `responseArrayOptionalField` for optional arrays. For optional nested objects, use `objectField` and set `.optional()` on the inner Zod schema. `objectOptionalField` is FORBIDDEN (legacy 4-param API).
 
-### Flat API — objectField
+### Flat API - objectField
 
 Config is a single object containing `usage` + `children`:
 
@@ -105,7 +105,7 @@ fields: objectField(scopedTranslation, {
 }),
 ```
 
-### Arrays — responseArrayField
+### Arrays - responseArrayField
 
 Config contains `child` (not `children`):
 
@@ -125,7 +125,7 @@ items: responseArrayField(scopedTranslation, {
 }),
 ```
 
-### Optional arrays — responseArrayOptionalField
+### Optional arrays - responseArrayOptionalField
 
 For nullable arrays, use the flat API with `child` inside the config object:
 
@@ -147,7 +147,7 @@ For common field types, use specialized field functions from `@/app/api/[locale]
 ```typescript
 import { currencyField, languageField, countryField, timezoneField } from "@/app/api/[locale]/system/unified-interface/shared/field/specialized";
 
-// Currency selection — specialized helpers use scoped keys directly
+// Currency selection - specialized helpers use scoped keys directly
 currency: currencyField(
   "post.currency.label",        // scoped key
   "post.currency.description",
@@ -381,7 +381,7 @@ objectField(st, {
 // ❌ WRONG - Don't use nested layout object
 objectField(st, {
   type: WidgetType.CONTAINER,
-  layout: { type: LayoutType.GRID, columns: 2 },  // ❌ Invalid — use top-level layoutType/columns
+  layout: { type: LayoutType.GRID, columns: 2 },  // ❌ Invalid - use top-level layoutType/columns
 })
 ```
 
@@ -456,7 +456,7 @@ category: requestField(st, {
 // ❌ WRONG - Don't use nested layout object
 requestField(st, {
   type: WidgetType.FORM_FIELD,
-  layout: { columns: 6 }, // ❌ Invalid — use top-level columns
+  layout: { columns: 6 }, // ❌ Invalid - use top-level columns
 });
 ```
 
@@ -707,7 +707,7 @@ status: requestField(st, {
 
 ## Translation Keys
 
-All translation keys are **short, scoped** relative to the module's i18n scope. The old global `"app.api.*"` format is **FORBIDDEN** in new code — a refactor agent will migrate existing usages.
+All translation keys are **short, scoped** relative to the module's i18n scope. The old global `"app.api.*"` format is **FORBIDDEN** in new code - a refactor agent will migrate existing usages.
 
 ### Key Structure
 
@@ -754,7 +754,7 @@ All translation keys are **short, scoped** relative to the module's i18n scope. 
 ### Enum Translation Keys
 
 ```typescript
-// In enum.ts — short scoped keys, pass scopedTranslation
+// In enum.ts - short scoped keys, pass scopedTranslation
 export const { enum: LeadStatus, options: LeadStatusOptions } =
   createEnumOptions(scopedTranslation, {
     NEW: "enums.leadStatus.new",
@@ -790,7 +790,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-// Local imports — always use ./i18n (module-local scope)
+// Local imports - always use ./i18n (module-local scope)
 import { scopedTranslation } from "./i18n";
 import { MyEnum, MyEnumOptions } from "./enum";
 import { MyWidget } from "./widget"; // if using customWidgetObject
@@ -800,7 +800,7 @@ import { MyWidget } from "./widget"; // if using customWidgetObject
 
 1. Use `@/` for absolute imports from project root
 2. Import from `utils-new` not `utils` (scoped API)
-3. Import `scopedTranslation` from `./i18n` — never from a parent scope
+3. Import `scopedTranslation` from `./i18n` - never from a parent scope
 4. Import enums from `./enum` not `./definition` (avoid circular deps)
 5. Import `UserRole` from `@/app/api/[locale]/user/user-roles/enum`
 
@@ -823,7 +823,7 @@ export const {
   ACTIVE: "enums.leadStatus.active",
 });
 
-// Database enum array for Drizzle — explicit, as const
+// Database enum array for Drizzle - explicit, as const
 export const LeadStatusDB = [
   LeadStatus.NEW,
   LeadStatus.PENDING,
@@ -986,12 +986,12 @@ export type UserGetUrlParamsTypeOutput = typeof GET.types.UrlVariablesOutput;
 export type SomeStatus = UserGetRequestInput["status"];
 ```
 
-### `useClientRoute` — placement matters
+### `useClientRoute` - placement matters
 
 `useClientRoute` checks request data to decide whether to route to `route-client.ts`. TypeScript infers the `data` type from `fields`, so `useClientRoute` **must appear AFTER `successTypes`** in the `createEndpoint` config object (i.e. after `fields` is fully defined). Place it anywhere before that and TypeScript cannot infer `data`, making it `never`.
 
 ```typescript
-// ✅ CORRECT — after successTypes
+// ✅ CORRECT - after successTypes
 const { GET } = createEndpoint({
   scopedTranslation,
   fields: objectField(st, {
@@ -1010,7 +1010,7 @@ const { GET } = createEndpoint({
   examples: { ... },
 });
 
-// ❌ WRONG — before fields (data is never)
+// ❌ WRONG - before fields (data is never)
 const { GET } = createEndpoint({
   useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO, // TS error: data is never
   fields: ...,
@@ -1018,14 +1018,14 @@ const { GET } = createEndpoint({
 });
 ```
 
-The `rootFolderId` field is optional (`.optional()`) so callers that don't care about routing simply omit it — they always hit the server. Only callers that explicitly set `rootFolderId: DefaultFolderId.INCOGNITO` get routed to the client.
+The `rootFolderId` field is optional (`.optional()`) so callers that don't care about routing simply omit it - they always hit the server. Only callers that explicitly set `rootFolderId: DefaultFolderId.INCOGNITO` get routed to the client.
 
-### `requestResponseField` — when to use it
+### `requestResponseField` - when to use it
 
 Use `requestResponseField` when a field must appear in **both the request input and the response output** from a single definition. This avoids the duplicate-key error that results from defining the same field name as both `requestField` and `responseField` in the same `children` object.
 
 ```typescript
-// ✅ CORRECT — single field covers both request (routing hint) and response (returned value)
+// ✅ CORRECT - single field covers both request (routing hint) and response (returned value)
 rootFolderId: requestResponseField(scopedTranslation, {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.SELECT,
@@ -1035,7 +1035,7 @@ rootFolderId: requestResponseField(scopedTranslation, {
   schema: z.enum(DefaultFolderId),
 }),
 
-// ❌ WRONG — duplicate key: TypeScript TS1117 / eslint no-dupe-keys
+// ❌ WRONG - duplicate key: TypeScript TS1117 / eslint no-dupe-keys
 children: {
   rootFolderId: requestField(st, { ... }),   // key already used
   rootFolderId: responseField(st, { ... }),  // ← TS error
@@ -1082,9 +1082,9 @@ verbose: requestField(st, { schema: z.boolean().default(false), ... })
 
 **Clean definition files:**
 
-- `src/app/api/[locale]/agent/chat/skills/create/definition.ts` — POST with `customWidgetObject`
-- `src/app/api/[locale]/agent/chat/folders/definition.ts` — GET with `responseArrayField`
-- `src/app/api/[locale]/agent/chat/threads/[threadId]/permissions/definition.ts` — GET + PATCH with urlPathParams
+- `src/app/api/[locale]/agent/chat/skills/create/definition.ts` - POST with `customWidgetObject`
+- `src/app/api/[locale]/agent/chat/folders/definition.ts` - GET with `responseArrayField`
+- `src/app/api/[locale]/agent/chat/threads/[threadId]/permissions/definition.ts` - GET + PATCH with urlPathParams
 
 ---
 

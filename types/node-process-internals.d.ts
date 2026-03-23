@@ -9,7 +9,7 @@ declare global {
   namespace NodeJS {
     interface Process {
       /**
-       * Path to the resources directory — only defined when running inside
+       * Path to the resources directory - only defined when running inside
        * a packaged Electron app (electron-builder sets this at runtime).
        * @see https://www.electronjs.org/docs/latest/api/process#processresourcespath-readonly
        */

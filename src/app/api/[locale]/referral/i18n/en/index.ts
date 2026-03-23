@@ -160,7 +160,7 @@ export const translations = {
       availableBalance: "Available Balance",
       availableBalanceDescription: "Available balance ready for payout",
       availableBalanceDescriptionLow:
-        "Spend on AI chats — other credits used first. Earn $40 to unlock withdrawal.",
+        "Spend on AI chats - other credits used first. Earn $40 to unlock withdrawal.",
       totalRevenueCredits: "Total Revenue (Credits)",
       totalEarnedCredits: "Total Earned (Credits)",
       totalPaidOutCredits: "Total Paid Out (Credits)",

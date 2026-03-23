@@ -212,7 +212,7 @@ export class RouteDelegationHandler {
     const resolvedCommand = command || `${TOOL_HELP_ALIAS} --interactive`;
 
     try {
-      // Load route handler first — route.ts imports definition.ts transitively,
+      // Load route handler first - route.ts imports definition.ts transitively,
       // so after this resolves, definition.ts is already in Bun's module cache.
       // getEndpoint() then returns near-instantly with no TDZ risk.
       logger.debug("[ROUTE] endpoint load start");
@@ -271,7 +271,7 @@ export class RouteDelegationHandler {
       }
 
       // Get endpoint definition for CLI-specific features (interactive forms, arg parsing)
-      // For remote execution, skip access validation — the remote server handles its own auth
+      // For remote execution, skip access validation - the remote server handles its own auth
       const endpointResult = await loader.load<CreateApiEndpointAny>({
         identifier: resolvedCommand,
         platform: options.platform,
@@ -302,7 +302,7 @@ export class RouteDelegationHandler {
           logger,
         );
 
-        // Render interactive Ink UI — waits until user exits
+        // Render interactive Ink UI - waits until user exits
         await renderInkEndpointPage({
           endpoint: { [endpoint.method]: endpoint },
           locale: options.locale,
@@ -344,7 +344,7 @@ export class RouteDelegationHandler {
           initialData: inputData.data,
         });
 
-        // Ink handled all rendering — return empty output
+        // Ink handled all rendering - return empty output
         return {
           success: true,
           data: undefined,

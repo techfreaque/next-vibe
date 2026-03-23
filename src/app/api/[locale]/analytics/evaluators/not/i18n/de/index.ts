@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "NICHT",
     description:
-      "Invertiert einen Signalstrom — gefeuert wird nicht-gefeuert und umgekehrt",
+      "Invertiert einen Signalstrom - gefeuert wird nicht-gefeuert und umgekehrt",
     fields: {
       signal: {
         label: "Signal",

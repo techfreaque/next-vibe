@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Window Average Compute
+ * Vibe Sense - Window Average Compute
  * Server-only pure computation. No DB access.
  */
 

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Clamp",
     description:
-      "Ograniczenie wartości do zakresu [min, max] — przycina wartości odstające",
+      "Ograniczenie wartości do zakresu [min, max] - przycina wartości odstające",
     fields: {
       source: { label: "Źródło", description: "Wejściowa seria czasowa" },
       resolution: {

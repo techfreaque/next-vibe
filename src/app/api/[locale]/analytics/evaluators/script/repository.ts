@@ -1,5 +1,5 @@
 /**
- * Vibe Sense — Script Evaluator Pure Computation
+ * Vibe Sense - Script Evaluator Pure Computation
  * Server-only. Admin-only sandboxed custom evaluation.
  */
 

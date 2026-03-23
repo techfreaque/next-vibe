@@ -1,5 +1,5 @@
 /**
- * Users Registered — Endpoint Definition
+ * Users Registered - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

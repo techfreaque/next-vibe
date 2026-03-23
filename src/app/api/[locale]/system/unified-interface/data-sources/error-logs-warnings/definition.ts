@@ -1,5 +1,5 @@
 /**
- * Error Logs Warnings — Endpoint Definition
+ * Error Logs Warnings - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

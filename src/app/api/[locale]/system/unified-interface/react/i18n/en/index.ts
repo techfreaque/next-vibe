@@ -53,17 +53,17 @@ export const translations = {
         executing: "Executing...",
         complete: "Complete",
         sentToBackground: "Sent to background",
-        wakeUpBackground: "Background task — AI will wake up with result",
+        wakeUpBackground: "Background task - AI will wake up with result",
         waitingForRemote: "Waiting for remote...",
         deferred: "Async result",
         confirmed: "Confirmed by you",
-        confirmedWakeUp: "Confirmed — running in background",
+        confirmedWakeUp: "Confirmed - running in background",
         waitingForConfirmation: "Waiting for confirmation",
         waitingForConfirmationWakeUp: "Confirm to run in background",
         pendingConfirmation: "Pending Confirmation",
         pendingCancellation: "Pending Cancellation",
         denied: "Denied",
-        deniedWakeUp: "Denied — won't run in background",
+        deniedWakeUp: "Denied - won't run in background",
         notRun: "Not run",
       },
       sections: {
@@ -83,7 +83,7 @@ export const translations = {
         confirmationRequired:
           "Review and edit parameters, then confirm to execute.",
         confirmationRequiredWakeUp:
-          "Review and edit parameters, then confirm to run in background — result will wake up AI.",
+          "Review and edit parameters, then confirm to run in background - result will wake up AI.",
       },
       actions: {
         confirm: "Confirm",

@@ -1,6 +1,6 @@
 /**
  * Remote Connection Self Rename
- * PATCH — update the friendly name of the current instance's own identity
+ * PATCH - update the friendly name of the current instance's own identity
  */
 
 import { z } from "zod";

@@ -13,7 +13,7 @@ export const translations = {
     sshSecretKeyNotSet:
       "SSH_SECRET_KEY Umgebungsvariable nicht gesetzt. Fügen Sie einen 32-Byte-Hex-Wert hinzu.",
     encryptionFailed:
-      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
+      "Verschlüsselung fehlgeschlagen - SSH_SECRET_KEY möglicherweise ungültig",
     noRowReturned: "Kein Datensatz von der Einfügung zurückgegeben",
   },
 

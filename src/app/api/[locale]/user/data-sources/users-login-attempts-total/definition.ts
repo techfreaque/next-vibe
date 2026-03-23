@@ -1,5 +1,5 @@
 /**
- * Users Login Attempts Total — Endpoint Definition
+ * Users Login Attempts Total - Endpoint Definition
  * Client+server safe. No server imports.
  */
 

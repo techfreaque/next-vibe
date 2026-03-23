@@ -1,5 +1,5 @@
 /**
- * Credits Domain — Vibe Sense Graph Seeds
+ * Credits Domain - Vibe Sense Graph Seeds
  *
  * Colocated pipeline graph seed definitions for the credits domain.
  * Auto-discovered by the Graph Seeds Index Generator.
@@ -7,32 +7,32 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
+import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
+import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
+import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
 import type {
   GraphConfig,
   GraphSeedEntry,
 } from "../system/unified-interface/vibe-sense/graph/types";
-import { GraphResolution } from "../system/unified-interface/vibe-sense/enum";
-import { CREDITS_SPENT_TOTAL_ALIAS } from "./data-sources/credits-spent-total/constants";
-import { CREDITS_PURCHASED_ALIAS } from "./data-sources/credits-purchased/constants";
+import { CREDITS_AVG_TRANSACTION_ALIAS } from "./data-sources/credits-avg-transaction/constants";
+import { CREDITS_BALANCE_TOTAL_ALIAS } from "./data-sources/credits-balance-total/constants";
+import { CREDITS_EARNED_ALIAS } from "./data-sources/credits-earned/constants";
 import { CREDITS_EXPIRED_ALIAS } from "./data-sources/credits-expired/constants";
 import { CREDITS_FREE_GRANTS_ALIAS } from "./data-sources/credits-free-grants/constants";
-import { CREDITS_SUBSCRIPTION_REVENUE_ALIAS } from "./data-sources/credits-subscription-revenue/constants";
-import { CREDITS_EARNED_ALIAS } from "./data-sources/credits-earned/constants";
-import { CREDITS_REFUNDED_ALIAS } from "./data-sources/credits-refunded/constants";
-import { CREDITS_BALANCE_TOTAL_ALIAS } from "./data-sources/credits-balance-total/constants";
-import { CREDITS_TRANSFER_VOLUME_ALIAS } from "./data-sources/credits-transfer-volume/constants";
-import { CREDITS_SPENT_BY_USERS_ALIAS } from "./data-sources/credits-spent-by-users/constants";
-import { CREDITS_SPENT_BY_LEADS_ALIAS } from "./data-sources/credits-spent-by-leads/constants";
 import { CREDITS_FREE_POOL_UTILIZATION_ALIAS } from "./data-sources/credits-free-pool-utilization/constants";
-import { CREDITS_TRANSACTIONS_COUNT_ALIAS } from "./data-sources/credits-transactions-count/constants";
-import { CREDITS_AVG_TRANSACTION_ALIAS } from "./data-sources/credits-avg-transaction/constants";
-import { CREDITS_WALLETS_TOTAL_ALIAS } from "./data-sources/credits-wallets-total/constants";
-import { CREDITS_USAGE_WITH_FEATURE_ALIAS } from "./data-sources/credits-usage-with-feature/constants";
 import { CREDITS_PACKS_CREATED_ALIAS } from "./data-sources/credits-packs-created/constants";
-import { EMA_ALIAS } from "../analytics/indicators/ema/constants";
-import { TRANSFORMER_RATIO_ALIAS } from "../analytics/transformers/ratio/constants";
-import { EVALUATOR_THRESHOLD_ALIAS } from "../analytics/evaluators/threshold/constants";
-import { COMPLETE_TASK_ALIAS } from "../system/unified-interface/tasks/complete-task/constants";
+import { CREDITS_PURCHASED_ALIAS } from "./data-sources/credits-purchased/constants";
+import { CREDITS_REFUNDED_ALIAS } from "./data-sources/credits-refunded/constants";
+import { CREDITS_SPENT_BY_LEADS_ALIAS } from "./data-sources/credits-spent-by-leads/constants";
+import { CREDITS_SPENT_BY_USERS_ALIAS } from "./data-sources/credits-spent-by-users/constants";
+import { CREDITS_SPENT_TOTAL_ALIAS } from "./data-sources/credits-spent-total/constants";
+import { CREDITS_SUBSCRIPTION_REVENUE_ALIAS } from "./data-sources/credits-subscription-revenue/constants";
+import { CREDITS_TRANSACTIONS_COUNT_ALIAS } from "./data-sources/credits-transactions-count/constants";
+import { CREDITS_TRANSFER_VOLUME_ALIAS } from "./data-sources/credits-transfer-volume/constants";
+import { CREDITS_USAGE_WITH_FEATURE_ALIAS } from "./data-sources/credits-usage-with-feature/constants";
+import { CREDITS_WALLETS_TOTAL_ALIAS } from "./data-sources/credits-wallets-total/constants";
 
 // ─── Color palette (consistent across graphs) ──────────────────────────────
 
