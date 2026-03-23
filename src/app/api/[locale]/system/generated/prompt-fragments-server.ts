@@ -30,20 +30,20 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/prompt";
 import { favoritesFragment } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
 import { memoriesFragment } from "@/app/api/[locale]/agent/chat/memories/system-prompt/prompt";
-import { skillFragment } from "@/app/api/[locale]/agent/chat/skills/system-prompt/prompt";
-import { tasksFragment } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
 import {
   remoteInstancesFragment,
   systemContextFragment,
 } from "@/app/api/[locale]/user/remote-connection/system-prompt/prompt";
+import { skillFragment } from "@/app/api/[locale]/agent/chat/skills/system-prompt/prompt";
+import { tasksFragment } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
 
 // Server loaders - from each module's system-prompt/server.ts
 import { loadPromptContextData } from "@/app/api/[locale]/agent/ai-stream/system-prompt/server";
 import { loadFavoritesData } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/server";
 import { loadMemoriesData } from "@/app/api/[locale]/agent/chat/memories/system-prompt/server";
+import { loadRemoteInstancesData } from "@/app/api/[locale]/user/remote-connection/system-prompt/server";
 import { loadSkillData } from "@/app/api/[locale]/agent/chat/skills/system-prompt/server";
 import { loadTasksData } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/server";
-import { loadRemoteInstancesData } from "@/app/api/[locale]/user/remote-connection/system-prompt/server";
 
 /**
  * Combined server loader - loads all fragment data in parallel, builds strings, returns results.

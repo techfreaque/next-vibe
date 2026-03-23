@@ -36,7 +36,11 @@ import {
 import { DefaultFolderId } from "../../config";
 import { ThreadStatusDB, ThreadStatusOptions } from "../../enum";
 import { scopedTranslation } from "./i18n";
-import { FolderContentsWidget } from "./widget";
+import { lazy } from "react";
+
+const FolderContentsWidget = lazy(() =>
+  import("./widget").then((m) => ({ default: m.FolderContentsWidget })),
+);
 
 const { GET } = createEndpoint({
   scopedTranslation,

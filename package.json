@@ -188,6 +188,7 @@
     "@shopify/flash-list": "2.3.0",
     "@stripe/stripe-js": "8.11.0",
     "@tailwindcss/postcss": "4.2.2",
+    "@tailwindcss/vite": "^4.2.2",
     "@tanstack/query-sync-storage-persister": "5.95.2",
     "@tanstack/react-query": "5.95.2",
     "@tanstack/react-query-persist-client": "5.95.2",

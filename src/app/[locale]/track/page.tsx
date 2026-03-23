@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

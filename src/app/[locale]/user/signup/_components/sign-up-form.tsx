@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
+import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

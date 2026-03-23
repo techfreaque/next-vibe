@@ -416,7 +416,7 @@ export function startWebSocketServer(
               return;
             }
             if (!shuttingDown) {
-              logger.error("[Proxy] Failed to reach Next.js", {
+              logger.error("[Proxy] Server unreachable", {
                 error: err.message,
                 path: url.pathname,
               });

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";

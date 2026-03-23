@@ -3,8 +3,10 @@
  * Handles /subscription/overview, /subscription/buy, /subscription/history
  */
 
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
-import { notFound } from "next/navigation";
+import { notFound } from "next-vibe-ui/lib/not-found";
 import type { JSX } from "react";
 
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";

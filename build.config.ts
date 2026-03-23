@@ -157,9 +157,6 @@ const config: BuildConfig = {
           // server-only throws in Vite SSR (no Next.js boundaries) - stub it out
           "server-only":
             "src/packages/next-vibe-ui/tanstack/lib/server-only.ts",
-          // Override web Head with TanStack version (injects HeadContent + blocking theme script)
-          "next-vibe-ui/ui/head":
-            "src/packages/next-vibe-ui/tanstack/ui/head.tsx",
         },
       },
     },

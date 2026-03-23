@@ -6,7 +6,7 @@
 export const dynamic = "force-dynamic";
 
 import { ArrowLeft } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound } from "next-vibe-ui/lib/not-found";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";

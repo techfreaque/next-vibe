@@ -29,7 +29,11 @@ import { DefaultFolderId } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 import { scopedTranslation } from "./i18n";
-import { MessagesWidget } from "./widget/widget";
+import { lazy } from "react";
+
+const MessagesWidget = lazy(() =>
+  import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),
+);
 
 /**
  * Get Messages List Endpoint (GET)

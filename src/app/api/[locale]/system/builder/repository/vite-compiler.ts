@@ -14,7 +14,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { OutputOptions, RolldownOptions } from "rolldown";
+import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import type { BuildOptions, InlineConfig, Plugin, PluginOption } from "vite";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -94,8 +94,18 @@ export class ViteCompiler {
     // Run Vite build - dynamic import prevents Turbopack from tracing vite's
     // entire dependency graph (caniuse-lite, postcss, browserslist, etc.) into
     // every route that touches the builder.
-    const { build: viteBuild } = await import("vite");
-    await viteBuild(viteConfig);
+    if (fileConfig.type === "tanstack-start") {
+      // TanStack Start uses the multi-environment builder API so that Nitro's
+      // `buildApp` hook runs - this triggers the server (Nitro) build in
+      // addition to the client build.  The simple `build()` only builds the
+      // first environment and never fires `buildApp`.
+      const { createBuilder } = await import("vite");
+      const builder = await createBuilder(viteConfig);
+      await builder.buildApp();
+    } else {
+      const { build: viteBuild } = await import("vite");
+      await viteBuild(viteConfig);
+    }
 
     // Track built files
     if (fileConfig.packageConfig?.isPackage) {
@@ -474,18 +484,14 @@ export class ViteCompiler {
     const { nitro } = (await import(/* webpackIgnore: true */ nitroPkg)) as {
       nitro: (opts?: {
         output?: { dir?: string; publicDir?: string; serverDir?: string };
+        rollupConfig?: { external?: (id: string) => boolean };
       }) => PluginOption;
     };
 
+    const tailwindVite = (await import("@tailwindcss/vite")).default;
     const react = (await import("@vitejs/plugin-react")).default;
 
-    const tsconfigPathsPkg = "vite-tsconfig-paths";
-    const tsconfigPaths = (
-      await import(/* webpackIgnore: true */ tsconfigPathsPkg)
-    ).default;
-
     const srcDirectory = fileConfig.input;
-    const tsconfigProject = resolve(ROOT_DIR, "tsconfig.tanstack.json");
 
     const srcDir = resolve(ROOT_DIR, "src");
     const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
@@ -520,7 +526,7 @@ export class ViteCompiler {
     return {
       root: ROOT_DIR,
       plugins: [
-        tsconfigPaths({ projects: [tsconfigProject] }) as PluginOption,
+        tailwindVite(),
         tanstackStart({
           srcDirectory,
           importProtection: {
@@ -533,6 +539,17 @@ export class ViteCompiler {
             dir: resolve(ROOT_DIR, fileConfig.output),
             publicDir: resolve(ROOT_DIR, fileConfig.output, "public"),
             serverDir: resolve(ROOT_DIR, fileConfig.output, "server"),
+          },
+          // Externalize build-time-only packages so Nitro's server bundle
+          // doesn't try to bundle native binaries (lightningcss, oxide, etc.)
+          rollupConfig: {
+            external: (id: string) =>
+              id.startsWith("@tailwindcss/") ||
+              id.startsWith("lightningcss") ||
+              id === "vite" ||
+              id === "@vitejs/plugin-react" ||
+              id === "vite-plugin-css-injected-by-js" ||
+              id === "vite-plugin-dts",
           },
         }),
         {
@@ -587,7 +604,45 @@ export class ViteCompiler {
               /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\n\/\/|$)/,
               "\n",
             );
-            return { code: result, map: null };
+            // Remove imports whose bindings are no longer referenced.
+            const lines = result.split("\n");
+            const nonImportCode = lines
+              .filter((l) => !l.trimStart().startsWith("import "))
+              .join("\n");
+            const filteredLines = lines.filter((line) => {
+              const trimmed = line.trimStart();
+              if (
+                !trimmed.startsWith("import ") ||
+                trimmed.startsWith("import type ")
+              ) {
+                return true;
+              }
+              const namedMatch = /import\s*\{([^}]+)\}/.exec(trimmed);
+              const defaultMatch = /import\s+(\w+)\s+from/.exec(trimmed);
+              const bindings: string[] = [];
+              if (namedMatch?.[1]) {
+                for (const part of namedMatch[1].split(",")) {
+                  const alias = part
+                    .trim()
+                    .split(/\s+as\s+/)
+                    .pop()
+                    ?.trim();
+                  if (alias) {
+                    bindings.push(alias);
+                  }
+                }
+              } else if (defaultMatch?.[1]) {
+                bindings.push(defaultMatch[1]);
+              }
+              if (bindings.length === 0) {
+                return true;
+              }
+              return bindings.some((b) => {
+                const re = new RegExp(`\\b${b}\\b`);
+                return re.test(nonImportCode);
+              });
+            });
+            return { code: filteredLines.join("\n"), map: null };
           },
         } as Plugin,
         {
@@ -602,6 +657,7 @@ export class ViteCompiler {
         } as Plugin,
         // In the client environment, mark node:* built-ins as external so
         // server-only modules that import them don't cause Rollup to fail.
+        // Also covers bare built-in names (util, net, fs, etc.) used by pg/nodemailer.
         {
           name: "client-node-externals",
           enforce: "pre",
@@ -609,14 +665,121 @@ export class ViteCompiler {
             return env.name === "client";
           },
           resolveId(id: string) {
-            if (id.startsWith("node:") || id === "node-gyp-build") {
+            const NODE_BUILTINS = new Set([
+              "assert",
+              "buffer",
+              "child_process",
+              "cluster",
+              "crypto",
+              "dgram",
+              "dns",
+              "domain",
+              "events",
+              "fs",
+              "http",
+              "https",
+              "module",
+              "net",
+              "os",
+              "path",
+              "perf_hooks",
+              "process",
+              "punycode",
+              "querystring",
+              "readline",
+              "repl",
+              "stream",
+              "string_decoder",
+              "timers",
+              "tls",
+              "tty",
+              "url",
+              "util",
+              "v8",
+              "vm",
+              "zlib",
+            ]);
+            // Build-time-only packages pulled in via vite-compiler dynamic
+            // imports - they are never used in the browser.
+            const BUILD_TOOLS = new Set([
+              "vite",
+              "@vitejs/plugin-react",
+              "@tailwindcss/vite",
+              "vite-plugin-css-injected-by-js",
+              "vite-plugin-dts",
+              "nitro/vite",
+              "rolldown",
+              "esbuild",
+              "lightningcss",
+            ]);
+            if (
+              id.startsWith("node:") ||
+              id === "node-gyp-build" ||
+              NODE_BUILTINS.has(id) ||
+              BUILD_TOOLS.has(id)
+            ) {
               return { id, external: true };
             }
             return null;
           },
         } as Plugin,
+        // Externalize build-tool packages in every environment (client, SSR,
+        // Nitro) so vite-compiler.ts dynamic imports don't cause UNRESOLVED_IMPORT.
+        {
+          name: "build-tools-externals",
+          enforce: "pre",
+          resolveId(id: string) {
+            const BUILD_TOOLS = new Set([
+              "vite-plugin-css-injected-by-js",
+              "vite-plugin-dts",
+              "@tailwindcss/postcss",
+              "nitro/vite",
+            ]);
+            if (BUILD_TOOLS.has(id)) {
+              return { id, external: true };
+            }
+            return null;
+          },
+        } as Plugin,
+        // Log bundle size summary after client build so large chunks are visible.
+        {
+          name: "bundle-size-reporter",
+          enforce: "post",
+          applyToEnvironment(env: { name: string }) {
+            return env.name === "client";
+          },
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars -- required positional param
+          generateBundle(_opts: OutputOptions, bundle: OutputBundle) {
+            const chunks: Array<{ name: string; size: number }> = [];
+            for (const [name, chunk] of Object.entries(bundle)) {
+              const size =
+                chunk.type === "chunk"
+                  ? (chunk.code?.length ?? 0)
+                  : typeof chunk.source === "string"
+                    ? chunk.source.length
+                    : (chunk.source?.byteLength ?? 0);
+              chunks.push({ name, size });
+            }
+            chunks.sort((a, b) => b.size - a.size);
+            const top = chunks.slice(0, 15);
+            const totalSize = chunks.reduce((s, c) => s + c.size, 0);
+            // eslint-disable-next-line no-console -- intentional build log
+            console.log(
+              `\n  Bundle top ${String(top.length)} chunks (total ${ViteCompiler.fmtKb(totalSize)}):`,
+            );
+            for (const { name, size } of top) {
+              const indicator =
+                size > 500 * 1024 ? "⚠" : size > 200 * 1024 ? "⚡" : " ";
+              // eslint-disable-next-line no-console -- intentional build log
+              console.log(
+                `    ${indicator} ${ViteCompiler.fmtKb(size).padStart(9)}  ${name}`,
+              );
+            }
+          },
+        } as Plugin,
       ],
       resolve: {
+        tsconfigPaths: true,
         alias: [
           { find: /^@\//, replacement: `${srcDir}/` },
           { find: /^next-vibe\//, replacement: `${nextVibeDir}/` },
@@ -663,13 +826,7 @@ export class ViteCompiler {
 
       const react = (await import("@vitejs/plugin-react")).default;
 
-      const tsconfigPathsPkg = "vite-tsconfig-paths";
-      const tsconfigPaths = (
-        await import(/* webpackIgnore: true */ tsconfigPathsPkg)
-      ).default;
-
       const srcDirectory = fileConfig.input;
-      const tsconfigProject = resolve(ROOT_DIR, "tsconfig.tanstack.json");
 
       const srcDir = resolve(ROOT_DIR, "src");
       const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
@@ -685,7 +842,6 @@ export class ViteCompiler {
       const server = await createServer({
         root: ROOT_DIR,
         plugins: [
-          tsconfigPaths({ projects: [tsconfigProject] }) as PluginOption,
           tanstackStart({
             srcDirectory,
             // Mark `server-only` as denied on the client env.
@@ -816,9 +972,10 @@ export class ViteCompiler {
               if (!code.includes("tanstackLoader")) {
                 return undefined;
               }
-              // Strip server-only exports using regex (simpler, no AST deps).
+              // Strip server-only exports and their exclusive imports.
               // Remove: export async function tanstackLoader(...) { ... }
               // Remove: export default async function ...(...) { ... }
+              // Remove: imports whose bindings are no longer referenced after stripping
               // Keep: TanstackPage, interfaces, type exports, client imports
               let result = code;
               // Remove export default async function (Next.js server component)
@@ -831,7 +988,53 @@ export class ViteCompiler {
                 /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\n\/\/|$)/,
                 "\n",
               );
-              return { code: result, map: null };
+              // Remove import lines whose bindings are no longer referenced.
+              // Parse each `import { ... } from "..."` line, check if any of the
+              // imported names appear in the remaining non-import code, and drop
+              // the whole import line if none do.
+              const lines = result.split("\n");
+              const nonImportCode = lines
+                .filter((l) => !l.trimStart().startsWith("import "))
+                .join("\n");
+              const filteredLines = lines.filter((line) => {
+                const trimmed = line.trimStart();
+                // Only process value imports (not `import type`)
+                if (
+                  !trimmed.startsWith("import ") ||
+                  trimmed.startsWith("import type ")
+                ) {
+                  return true;
+                }
+                // Extract named bindings: import { Foo, Bar as Baz } from "..."
+                const namedMatch = /import\s*\{([^}]+)\}/.exec(trimmed);
+                // Default import: import Foo from "..."
+                const defaultMatch = /import\s+(\w+)\s+from/.exec(trimmed);
+                const bindings: string[] = [];
+                if (namedMatch?.[1]) {
+                  for (const part of namedMatch[1].split(",")) {
+                    const alias = part
+                      .trim()
+                      .split(/\s+as\s+/)
+                      .pop()
+                      ?.trim();
+                    if (alias) {
+                      bindings.push(alias);
+                    }
+                  }
+                } else if (defaultMatch?.[1]) {
+                  bindings.push(defaultMatch[1]);
+                }
+                // Keep the import if any binding is still used in non-import code
+                if (bindings.length === 0) {
+                  return true;
+                }
+                return bindings.some((b) => {
+                  // Use word-boundary check to avoid false matches
+                  const re = new RegExp(`\\b${b}\\b`);
+                  return re.test(nonImportCode);
+                });
+              });
+              return { code: filteredLines.join("\n"), map: null };
             },
           } as Plugin,
           // React Refresh adds `_c = TanstackPage` assignments without `var _c`
@@ -951,6 +1154,7 @@ export class ViteCompiler {
           } as Plugin,
         ],
         resolve: {
+          tsconfigPaths: true,
           alias: [
             { find: /^@\//, replacement: `${srcDir}/` },
             { find: /^next-vibe\//, replacement: `${nextVibeDir}/` },
@@ -1008,6 +1212,15 @@ export class ViteCompiler {
         ssr: {
           optimizeDeps: {
             include: [
+              // Pre-bundle React in SSR so jsx-dev-runtime is fully initialized
+              // before any user module runs. Without this, circular imports in
+              // page.tsx files cause TDZ: "Cannot access '__vite_ssr_import_N__'
+              // before initialization" because React's ESM exports are partially
+              // evaluated when the circular module fires.
+              "react",
+              "react/jsx-dev-runtime",
+              "react/jsx-runtime",
+              "react-dom",
               "framer-motion",
               "react-intersection-observer",
               "react-joyride",
@@ -1149,6 +1362,11 @@ export class ViteCompiler {
       return statSync(fullPath).size;
     }
     return 0;
+  }
+
+  /** Format bytes as kilobytes string, e.g. "123.4 kB". */
+  private static fmtKb(bytes: number): string {
+    return `${(bytes / 1024).toFixed(1)} kB`;
   }
 }
 

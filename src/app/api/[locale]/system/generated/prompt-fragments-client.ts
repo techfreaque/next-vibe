@@ -30,20 +30,20 @@ import {
 } from "@/app/api/[locale]/agent/ai-stream/system-prompt/prompt";
 import { favoritesFragment } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/prompt";
 import { memoriesFragment } from "@/app/api/[locale]/agent/chat/memories/system-prompt/prompt";
-import { skillFragment } from "@/app/api/[locale]/agent/chat/skills/system-prompt/prompt";
-import { tasksFragment } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
 import {
   remoteInstancesFragment,
   systemContextFragment,
 } from "@/app/api/[locale]/user/remote-connection/system-prompt/prompt";
+import { skillFragment } from "@/app/api/[locale]/agent/chat/skills/system-prompt/prompt";
+import { tasksFragment } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/prompt";
 
 // Client hooks - from each module's system-prompt/client.ts
 import { usePromptContextData } from "@/app/api/[locale]/agent/ai-stream/system-prompt/client";
 import { useFavoritesData } from "@/app/api/[locale]/agent/chat/favorites/system-prompt/client";
 import { useMemoriesData } from "@/app/api/[locale]/agent/chat/memories/system-prompt/client";
+import { useRemoteInstancesData } from "@/app/api/[locale]/user/remote-connection/system-prompt/client";
 import { useSkillData } from "@/app/api/[locale]/agent/chat/skills/system-prompt/client";
 import { useTasksData } from "@/app/api/[locale]/system/unified-interface/tasks/cron/system-prompt/client";
-import { useRemoteInstancesData } from "@/app/api/[locale]/user/remote-connection/system-prompt/client";
 
 /**
  * Combined hook - calls every fragment's client hook, builds strings, returns results.

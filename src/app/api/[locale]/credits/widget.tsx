@@ -5,7 +5,7 @@
 
 "use client";
 
-import Link from "next/link";
+import { Link } from "next-vibe-ui/ui/link";
 import { Badge } from "next-vibe-ui/ui/badge";
 import {
   Card,

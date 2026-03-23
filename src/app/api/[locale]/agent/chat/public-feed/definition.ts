@@ -26,7 +26,11 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
-import { PublicFeedContainer } from "./widget/widget";
+import { lazy } from "react";
+
+const PublicFeedContainer = lazy(() =>
+  import("./widget/widget").then((m) => ({ default: m.PublicFeedContainer })),
+);
 
 export const {
   enum: FeedSortMode,

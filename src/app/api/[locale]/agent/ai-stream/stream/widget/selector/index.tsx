@@ -12,7 +12,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useMemo } from "react";
 
-import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-config";
+import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import {

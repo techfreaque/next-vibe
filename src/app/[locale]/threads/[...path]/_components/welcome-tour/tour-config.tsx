@@ -9,6 +9,17 @@ import type { Step } from "react-joyride";
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import {
+  getFolderTourAttr,
+  getTourSelector,
+  TOUR_DATA_ATTRS,
+} from "./tour-attrs";
+export type { TourDataAttr } from "./tour-attrs";
+export {
+  getFolderTourAttr,
+  getTourSelector,
+  TOUR_DATA_ATTRS,
+} from "./tour-attrs";
+import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
@@ -20,54 +31,6 @@ export interface TourStepConfig extends Step {
   requiresAuth?: boolean;
   hideBeforeAuth?: boolean;
 }
-
-// Data-tour attribute constants
-export const TOUR_DATA_ATTRS = {
-  MODEL_SELECTOR: "model-selector",
-  MODEL_SELECTOR_FAVORITES: "model-selector-favorites",
-  MODEL_SELECTOR_SHOW_ALL: "model-selector-show-all",
-  MODEL_SELECTOR_SEARCH: "model-selector-search",
-  MODEL_SELECTOR_GROUP: "model-selector-group",
-  SKILL_SELECTOR: "skill-selector",
-  SKILL_SELECTOR_FAVORITES: "skill-selector-favorites",
-  SKILL_SELECTOR_SHOW_ALL: "skill-selector-show-all",
-  SKILL_SELECTOR_SEARCH: "skill-selector-search",
-  SKILL_SELECTOR_GROUP: "skill-selector-group",
-  SIDEBAR_TOGGLE: "sidebar-toggle",
-  ROOT_FOLDERS: "root-folders",
-  INCOGNITO_FOLDER: "incognito-folder",
-  PUBLIC_FOLDER: "public-folder",
-  PRIVATE_FOLDER: "private-folder",
-  SHARED_FOLDER: "shared-folder",
-  NEW_CHAT_BUTTON: "new-chat-button",
-  SIDEBAR_LOGIN: "sidebar-login",
-  SUBSCRIPTION_BUTTON: "subscription-button",
-  CHAT_INPUT: "chat-input",
-  SPEECH_INPUT: "speech-input",
-  CALL_MODE_BUTTON: "call-mode-button",
-} as const;
-
-// Type for tour data attribute keys
-export type TourDataAttr =
-  (typeof TOUR_DATA_ATTRS)[keyof typeof TOUR_DATA_ATTRS];
-
-// Helper function to generate type-safe CSS selector for tour targets
-export const getTourSelector = (attr: TourDataAttr): string => {
-  return `[data-tour="${attr}"]`;
-};
-
-// Helper function to map folder IDs to tour data attributes (type-safe)
-export const getFolderTourAttr = (
-  folderId: string,
-): TourDataAttr | undefined => {
-  const folderMap: Record<string, TourDataAttr> = {
-    private: TOUR_DATA_ATTRS.PRIVATE_FOLDER,
-    shared: TOUR_DATA_ATTRS.SHARED_FOLDER,
-    public: TOUR_DATA_ATTRS.PUBLIC_FOLDER,
-    incognito: TOUR_DATA_ATTRS.INCOGNITO_FOLDER,
-  };
-  return folderMap[folderId];
-};
 
 // Tour route constants
 export const TOUR_ROUTES = {

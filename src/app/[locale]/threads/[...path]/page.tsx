@@ -11,6 +11,8 @@
  * - Thread view (specific thread selected, sidebar + chat messages)
  */
 
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";

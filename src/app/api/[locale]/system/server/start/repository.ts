@@ -592,7 +592,7 @@ export class ServerStartRepository {
   }
 
   /**
-   * Start TanStack Start production server (.output/server/index.mjs).
+   * Start TanStack Start production server (.dist-tanstack/server/index.mjs).
    * Spawns the Nitro server output produced by `vibe build --tanstack`.
    */
   private static async startTanstackServer(
@@ -604,7 +604,7 @@ export class ServerStartRepository {
 
     const { existsSync: fsExistsSync } = await import("node:fs");
     // Use join to prevent Turbopack from statically analyzing this as a module import
-    const outputFile = [".output", "server", "index.mjs"].join("/");
+    const outputFile = [".dist-tanstack", "server", "index.mjs"].join("/");
     if (!fsExistsSync(outputFile)) {
       return fail({
         message: t("post.errors.tanstackBuildNotFound"),
@@ -612,7 +612,7 @@ export class ServerStartRepository {
       });
     }
 
-    const tanstackProcess = spawn("node", [outputFile], {
+    const tanstackProcess = spawn("bun", [outputFile], {
       stdio: "pipe",
       env: {
         ...process.env,

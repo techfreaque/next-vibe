@@ -3,6 +3,8 @@
  * Layout for admin pages with navigation
  */
 
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type React from "react";

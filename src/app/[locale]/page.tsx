@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";

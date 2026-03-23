@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";

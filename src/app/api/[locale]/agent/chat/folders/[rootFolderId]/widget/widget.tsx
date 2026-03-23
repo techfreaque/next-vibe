@@ -32,7 +32,7 @@ import { useMemo, useRef, useState } from "react";
 import {
   getFolderTourAttr,
   TOUR_DATA_ATTRS,
-} from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-config";
+} from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import {
   DEFAULT_FOLDER_CONFIGS,
   DefaultFolderId,
