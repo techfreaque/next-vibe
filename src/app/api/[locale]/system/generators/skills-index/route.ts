@@ -4,7 +4,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import endpoints from "./definition";
 import { SkillsIndexGeneratorRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) =>

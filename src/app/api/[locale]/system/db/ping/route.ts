@@ -11,7 +11,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import pingEndpoints from "./definition";
 import { DatabasePingRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: pingEndpoints,
   [Methods.POST]: {
     handler: ({ data, t, logger }) => {

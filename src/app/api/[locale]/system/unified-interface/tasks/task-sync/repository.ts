@@ -396,14 +396,14 @@ export class TaskSyncRepository {
 
             const capFileImport =
               roleSlug === "admin"
-                ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin").catch(
+                ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin.json").catch(
                     () => null,
                   )
                 : roleSlug === "customer"
-                  ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/customer").catch(
+                  ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/customer.json").catch(
                       () => null,
                     )
-                  : await import("@/app/api/[locale]/system/generated/remote-capabilities/en/public").catch(
+                  : await import("@/app/api/[locale]/system/generated/remote-capabilities/en/public.json").catch(
                       () => null,
                     );
             if (capFileImport) {
@@ -411,9 +411,9 @@ export class TaskSyncRepository {
               const tagged = (
                 (
                   capFileImport as {
-                    remoteCapabilities?: RemoteToolCapability[];
+                    default?: RemoteToolCapability[];
                   }
-                ).remoteCapabilities ?? []
+                ).default ?? []
               ).map((c: RemoteToolCapability) => ({
                 ...c,
                 instanceId: localInstanceId,
@@ -1069,20 +1069,19 @@ export class TaskSyncRepository {
 
       const capFileImport =
         roleSlug === "admin"
-          ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin").catch(
+          ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin.json").catch(
               () => null,
             )
           : roleSlug === "customer"
-            ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/customer").catch(
+            ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/customer.json").catch(
                 () => null,
               )
-            : await import("@/app/api/[locale]/system/generated/remote-capabilities/en/public").catch(
+            : await import("@/app/api/[locale]/system/generated/remote-capabilities/en/public.json").catch(
                 () => null,
               );
       if (capFileImport) {
         capabilitiesPayload = JSON.stringify(
-          (capFileImport as { remoteCapabilities?: RemoteToolCapability[] })
-            .remoteCapabilities ?? [],
+          (capFileImport as { default?: RemoteToolCapability[] }).default ?? [],
         );
       }
     }

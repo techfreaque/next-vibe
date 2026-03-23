@@ -11,7 +11,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import generateAllEndpoints from "./definition";
 import { GenerateAllRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: generateAllEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger, locale }) =>

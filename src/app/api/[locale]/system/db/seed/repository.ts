@@ -3,129 +3,79 @@
  * Handles run database seeds operations
  */
 
+import { parseError } from "next-vibe/shared/utils";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { defaultLocale } from "@/i18n/core/config";
 
 import type { SeedRequestOutput, SeedResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 import type { SeedT } from "./i18n";
 import { seedDatabase } from "./seed-manager";
+import type { EnvironmentSeeds } from "./seed-manager";
 
 /**
  * Run database seeds Repository
  */
 export class SeedRepository {
-  static async execute(
-    data: SeedRequestOutput,
-    locale: CountryLanguage,
+  static async runSeed(
+    environment: keyof EnvironmentSeeds,
     t: SeedT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SeedResponseOutput>> {
     const startTime = Date.now();
 
-    logger.debug("🚀 Seed repository execute method called", {
-      dryRun: data.dryRun,
-      verbose: data.verbose,
-      locale,
-    });
-
     try {
-      if (data.dryRun) {
-        // For dry run, return mock data without executing seeds
-        const mockCollections = [
-          { name: "users", recordCount: 10 },
-          { name: "roles", recordCount: 5 },
-          { name: "permissions", recordCount: 25 },
-        ];
+      logger.info(`🌱 Starting database seeding (${environment})...`);
 
-        const collections = mockCollections.map((col) => ({
-          name: col.name,
-          status: "skipped" as const,
-          recordsCreated: 0,
-        }));
-
-        const duration = Date.now() - startTime;
-
-        const response: SeedResponseOutput = {
-          success: true,
-          isDryRun: true,
-          seedsExecuted: 0,
-          collections,
-          totalRecords: 0,
-          duration,
-        };
-
-        return success(response);
-      }
-
-      // Execute real seeds using the seed manager
-      logger.info("🌱 Starting database seeding...");
-
-      // Use development environment for seeding (can be extended later)
-      const environment = "dev";
-      logger.info(`Environment: ${environment}, Locale: ${locale}`);
-
-      // Run the actual seeds
-      logger.info("Calling seedDatabase function...");
-      try {
-        await seedDatabase(environment, logger, locale);
-        logger.info("seedDatabase function completed");
-      } catch (seedError) {
-        const error = parseError(seedError);
-        logger.error("❌ seedDatabase function failed:", error);
-        return fail({
-          message: t("post.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: error.message },
-        });
-      }
+      await seedDatabase(environment, logger, defaultLocale);
 
       const duration = Date.now() - startTime;
-
       logger.debug("✅ Database seeding completed successfully");
 
-      // Return success response with actual seed execution
-      const response: SeedResponseOutput = {
+      return success({
         success: true,
-        isDryRun: false,
-        seedsExecuted: 1, // At least one seed module was executed
-        collections: [
-          {
-            name: "users",
-            status: "success" as const,
-            recordsCreated: 1, // CLI user + other users
-          },
-          {
-            name: "roles",
-            status: "success" as const,
-            recordsCreated: 6, // All user roles for CLI user
-          },
-          {
-            name: "sessions",
-            status: "success" as const,
-            recordsCreated: 1, // CLI session
-          },
-        ],
-        totalRecords: 8, // Approximate total
+        seedsExecuted: 1,
+        collections: [],
+        totalRecords: 0,
         duration,
-      };
-
-      return success(response);
+      });
     } catch (error) {
-      logger.error("❌ Database seeding failed:", parseError(error));
-      parseError(error);
-
+      const parsed = parseError(error);
+      logger.error("❌ Database seeding failed:", parsed);
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parsed.message },
       });
     }
+  }
+
+  /**
+   * Called from route handler with data parsed from request.
+   */
+  static async execute(
+    data: SeedRequestOutput,
+    t: SeedT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SeedResponseOutput>> {
+    return SeedRepository.runSeed(data.environment, t, logger);
+  }
+
+  /**
+   * Convenience wrapper for dev/start/build/rebuild repositories.
+   */
+  static async seed(
+    environment: keyof EnvironmentSeeds,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<SeedResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
+    return SeedRepository.runSeed(environment, t, logger);
   }
 }

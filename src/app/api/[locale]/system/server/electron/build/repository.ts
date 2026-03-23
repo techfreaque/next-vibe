@@ -34,6 +34,11 @@ export class ElectronBuildRepository {
   private static readonly ELECTRON_DIR =
     "src/app/api/[locale]/system/unified-interface/electron";
   private static readonly STAGE_DIR = "dist/electron-stage";
+  // Defer cwd resolution to runtime — prevents Turbopack from statically
+  // resolving path.join(cwd, STAGE_DIR) to project root and globbing 12k files
+  private static cwd(): string {
+    return process.cwd();
+  }
   private static readonly PLATFORM_FLAG: Record<string, string> = {
     current: "",
     linux: "--linux",
@@ -60,7 +65,7 @@ export class ElectronBuildRepository {
         try {
           execSync("bun run vibe build", {
             encoding: "utf-8",
-            cwd: process.cwd(),
+            cwd: ElectronBuildRepository.cwd(),
             env: { ...process.env },
             stdio: ["ignore", "pipe", "pipe"],
           });
@@ -89,7 +94,7 @@ export class ElectronBuildRepository {
             `bun build ${ElectronBuildRepository.ELECTRON_DIR}/main.ts --outdir=dist/electron --target=node --external=electron`,
             `bun build ${ElectronBuildRepository.ELECTRON_DIR}/preload.ts --outdir=dist/electron --target=node --external=electron`,
           ].join(" && "),
-          { encoding: "utf-8", cwd: process.cwd(), env: { ...process.env } },
+          { encoding: "utf-8", cwd: ElectronBuildRepository.cwd(), env: { ...process.env } },
         );
         output.push("   ✅ main.js + preload.js compiled to dist/electron/");
       } catch (err) {
@@ -110,7 +115,7 @@ export class ElectronBuildRepository {
       // clean dir with an empty dependencies object, we bypass that entirely.
       output.push("");
       output.push("3️⃣  Preparing staging directory...");
-      const stageDir = path.join(process.cwd(), ElectronBuildRepository.STAGE_DIR);
+      const stageDir = path.join(ElectronBuildRepository.cwd(), ElectronBuildRepository.STAGE_DIR);
       const stageElectronDir = path.join(stageDir, "dist", "electron");
       mkdirSync(stageElectronDir, { recursive: true });
 
@@ -120,11 +125,11 @@ export class ElectronBuildRepository {
       execSync(
         `cp dist/electron/main.js dist/electron/preload.js ${stageElectronDir}/`,
         {
-          cwd: process.cwd(),
+          cwd: ElectronBuildRepository.cwd(),
         },
       );
       execSync(`cp ${ElectronBuildRepository.ELECTRON_DIR}/assets/icon.png ${stageAssetsDir}/`, {
-        cwd: process.cwd(),
+        cwd: ElectronBuildRepository.cwd(),
       });
 
       // Minimal package.json — no dependencies so electron-builder skips traversal.
@@ -198,7 +203,7 @@ export class ElectronBuildRepository {
       try {
         execSync(builderCmd, {
           encoding: "utf-8",
-          cwd: process.cwd(),
+          cwd: ElectronBuildRepository.cwd(),
           env: { ...process.env },
         });
         output.push("   ✅ Electron app packaged → dist/electron-release/");

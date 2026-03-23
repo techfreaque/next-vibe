@@ -11,7 +11,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import guardDestroyEndpoints from "./definition";
 import { GuardDestroyRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: guardDestroyEndpoints,
   [Methods.POST]: {
     email: undefined,

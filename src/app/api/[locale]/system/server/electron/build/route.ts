@@ -10,7 +10,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import electronBuildDefinition from "./definition";
 import { ElectronBuildRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: electronBuildDefinition,
   [Methods.POST]: {
     handler: ({ data, logger, t }) => {

@@ -80,15 +80,19 @@ export class ServerStartRepository {
    */
   private static patchPublicUrlPort(port: number): void {
     const current = process.env["NEXT_PUBLIC_APP_URL"];
+    // Use Object.assign to avoid Next.js inlining NEXT_PUBLIC_* vars at build time,
+    // which would turn the assignment into `"literal string" = value` (invalid JS).
     if (!current) {
-      process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
+      Object.assign(process.env, {
+        NEXT_PUBLIC_APP_URL: `http://localhost:${String(port)}`,
+      });
       return;
     }
     try {
       const parsed = new URL(current);
       if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
         parsed.port = String(port);
-        process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+        Object.assign(process.env, { NEXT_PUBLIC_APP_URL: parsed.toString() });
       }
     } catch {
       // Not a valid URL — leave it as-is
@@ -224,24 +228,18 @@ export class ServerStartRepository {
       }
 
       // Run migrations
-      const migrateStart = Date.now();
-      try {
-        const migrateResult = execSync("bunx drizzle-kit migrate", {
-          encoding: "utf-8",
-          cwd: process.cwd(),
-          env: { ...process.env },
-        });
-        logger.debug("Migrations completed", { output: migrateResult.trim() });
-        logger.info(
-          formatDatabase(
-            `Migrations done in ${formatDuration(Date.now() - migrateStart)}`,
-            "🗄️ ",
+      const { DatabaseMigrationRepository } =
+        await import("../../db/migrate/repository");
+      const migrateResult = await DatabaseMigrationRepository.migrate(logger);
+      if (!migrateResult.success) {
+        logger.vibe(
+          formatError(
+            `Migration failed: ${migrateResult.message ?? "unknown error"}`,
           ),
         );
-      } catch (migrateError) {
-        const migrateMsg = parseError(migrateError).message;
-        logger.vibe(formatError(`Migration failed: ${migrateMsg}`));
-        logger.error("Migration failed during start", { error: migrateMsg });
+        logger.error("Migration failed during start", {
+          error: migrateResult.message,
+        });
       }
 
       // Deploy db-functions (idempotent — runs after every migration)
@@ -251,9 +249,9 @@ export class ServerStartRepository {
 
       // Seed database if enabled
       if (runSeed) {
-        const { seedDatabase } =
-          await import("@/app/api/[locale]/system/db/seed/seed-manager");
-        await seedDatabase("prod", logger, locale);
+        const { SeedRepository } =
+          await import("@/app/api/[locale]/system/db/seed/repository");
+        await SeedRepository.seed("prod", logger);
       } else {
         logger.vibe(formatSkip("Database seeding skipped"));
       }

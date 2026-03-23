@@ -6,20 +6,18 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import { closeDatabase } from "@/app/api/[locale]/system/db";
-import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
+import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import teardown from "./global-teardown";
 import { startServer } from "./test-server";
 
 export default async function setup(
   logger: EndpointLogger,
-  locale: CountryLanguage,
 ): Promise<() => Promise<void>> {
   try {
     await startServer(logger);
-    await seedDatabase("test", logger, locale);
+    await SeedRepository.seed("test", logger);
 
     // Return a teardown function that will be run after all tests
     return async (): Promise<void> => {

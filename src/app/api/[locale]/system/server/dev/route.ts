@@ -10,7 +10,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import endpoints from "./definition";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, locale, logger }) => {

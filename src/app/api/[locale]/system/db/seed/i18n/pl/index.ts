@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "seed",
   post: {
     title: "Zasiew bazy danych",
-    description: "Wypełnij bazę danych danymi testowymi",
+    description: "Wypełnij bazę danych danymi",
     form: {
       title: "Konfiguracja zasiewu",
       description: "Skonfiguruj parametry zasiewu",
@@ -63,19 +63,12 @@ export const translations: typeof enTranslations = {
     },
   },
   fields: {
-    verbose: {
-      title: "Szczegółowe wyjście",
-      description: "Pokaż szczegółowe wyjście podczas zasiewu",
-    },
-    dryRun: {
-      title: "Próbny przebieg",
-      description: "Symuluj zasiew bez wprowadzania zmian",
+    environment: {
+      title: "Środowisko",
+      description: "Docelowe środowisko zasiewu (dev, test, prod)",
     },
     success: {
       title: "Status sukcesu",
-    },
-    isDryRun: {
-      title: "Tryb próbny",
     },
     seedsExecuted: {
       title: "Wykonane seedy",

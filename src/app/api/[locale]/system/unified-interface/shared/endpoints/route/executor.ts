@@ -19,7 +19,6 @@ import {
   isStreamingResponse,
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
-import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
 import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]/system/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -75,7 +74,9 @@ export class RouteExecutionExecutor {
       const handlerResult =
         params.preloadedHandler !== undefined
           ? params.preloadedHandler
-          : await getRouteHandler(params.toolName);
+          : await import("@/app/api/[locale]/system/generated/route-handlers").then(
+              (m) => m.getRouteHandler(params.toolName),
+            );
 
       if (!handlerResult) {
         return fail({

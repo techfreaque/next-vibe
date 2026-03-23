@@ -344,6 +344,8 @@
     "ignore-loader": "^0.1.2",
     "jsdom": "28.1.0",
     "module-alias": "2.3.4",
+    "node-loader": "^2.1.0",
+    "null-loader": "^4.0.1",
     "oxfmt": "^0.37.0",
     "oxlint": "1.52.0",
     "patch-package": "8.0.1",

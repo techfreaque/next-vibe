@@ -18,7 +18,6 @@ import {
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { db } from "@/app/api/[locale]/system/db";
-import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
 import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -171,7 +170,11 @@ export class TaskExecuteRepository {
 
     // 6. Resolve routeId → handler
     const path = getFullPath(task.routeId);
-    const handler = path ? await getRouteHandler(path) : null;
+    const handler = path
+      ? await import("@/app/api/[locale]/system/generated/route-handlers").then(
+          (m) => m.getRouteHandler(path),
+        )
+      : null;
 
     if (!path || !handler) {
       await db

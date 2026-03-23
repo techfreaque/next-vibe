@@ -43,8 +43,6 @@ import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import { getRouteHandler } from "../../../generated/route-handlers";
 import type { CallbackModeValue } from "../../ai/execute-tool/constants";
 import { Platform } from "../../shared/types/platform";
 import { getFullPath } from "../../shared/utils/path";
@@ -613,7 +611,11 @@ export class PulseHealthRepository {
 
         // Resolve routeId → endpoint path → handler
         const path = getFullPath(dbTask.routeId);
-        const handler = path ? await getRouteHandler(path) : null;
+        const handler = path
+          ? await import("../../../generated/route-handlers").then((m) =>
+              m.getRouteHandler(path),
+            )
+          : null;
         let taskSucceeded = false;
 
         if (!path || !handler) {

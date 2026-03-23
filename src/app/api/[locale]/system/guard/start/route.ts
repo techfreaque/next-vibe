@@ -11,7 +11,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import guardStartEndpoints from "./definition";
 import { GuardStartRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: guardStartEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger, t }) => {

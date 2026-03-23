@@ -9,7 +9,6 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
-import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
@@ -218,6 +217,8 @@ export class RouteDelegationHandler {
       // getEndpoint() then returns near-instantly with no TDZ risk.
       logger.debug("[ROUTE] endpoint load start");
       const endpointLoadStart = Date.now();
+      const { getRouteHandler } =
+        await import("@/app/api/[locale]/system/generated/route-handlers");
       const routeHandler = await getRouteHandler(resolvedCommand);
       const peekedEndpoint = await getEndpoint(resolvedCommand);
       const endpointLoadMs = Date.now() - endpointLoadStart;

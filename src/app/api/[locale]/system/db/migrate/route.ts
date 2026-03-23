@@ -11,11 +11,11 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import migrateEndpoints from "./definition";
 import { DatabaseMigrationRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: migrateEndpoints,
   [Methods.POST]: {
-    handler: ({ data, t, logger }) => {
-      return DatabaseMigrationRepository.runMigrations(data, t, logger);
+    handler: ({ t, logger }) => {
+      return DatabaseMigrationRepository.runMigrations(t, logger);
     },
   },
 });

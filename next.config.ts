@@ -2,8 +2,20 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
+  productionBrowserSourceMaps: false,
   experimental: {
-    // webpackBuildWorker: true,
+    workerThreads: false,
+    // Cap page-data collection workers. Next.js default is min(cpuCount, freemem/1GB)
+    // which hits 23 workers locally — each worker loads the full module graph causing
+    // 14+ GB peak. 4 workers keeps peak under control with acceptable build time.
+    cpus: 1,
+    webpackBuildWorker: true,
+    webpackMemoryOptimizations: true,
+    serverSourceMaps: false,
+    // Soft memory hint for Turbopack's Rust engine (NapiTurboEngineOptions.memoryLimit).
+    // Does NOT cap peak RSS — Turbopack still peaks at ~12 GB while building the module graph.
+    // May reduce memory after compilation phase. Unit: bytes.
+    turbopackMemoryLimit: 8 * 1024 * 1024 * 1024, // 8 GB
     // parallelServerBuildTraces: true,
     // parallelServerCompiles: true,
     // turbopackFileSystemCacheForDev: true,
@@ -97,8 +109,74 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // External packages that use dynamic imports incompatible with Next.js bundling
+  webpack(config, { isServer }) {
+    // Webpack in Next.js 16 doesn't handle node: URI scheme.
+    // Register node: builtins as externals so webpack skips bundling them.
+    const existingExternals = config.externals ?? [];
+    const externalsArray = Array.isArray(existingExternals)
+      ? existingExternals
+      : [existingExternals];
+    config.externals = [
+      ...externalsArray,
+      (
+        { request }: { request?: string },
+        callback: (err?: Error | null, result?: string) => void,
+      ): void => {
+        if (request?.startsWith("node:")) {
+          // Rewrite node: scheme to bare module name for Node.js runtime
+          callback(null, `commonjs ${request.slice(5)}`);
+          return;
+        }
+        callback();
+      },
+    ];
+
+    // react-joyride uses removed React 16 APIs (unmountComponentAtNode).
+    // Webpack errors on missing named exports from react-dom — downgrade to warning.
+    config.module.parser = {
+      ...config.module.parser,
+      javascript: {
+        ...(config.module.parser?.javascript ?? {}),
+        exportsPresence: "warn",
+      },
+    };
+
+    // Mirror the Turbopack ignore rules — CLI/native/generator code webpack should not compile.
+    // Applied to both server and client bundles.
+    config.module.rules.push(
+      { test: /\.native\.(tsx?|jsx?)$/, loader: "null-loader" },
+      { test: /\.cli\.(tsx?|jsx?)$/, loader: "null-loader" },
+      // Any native/ directory (covers next-vibe-ui/native, app-native, etc.)
+      { test: /[\\/]native[\\/]/, loader: "null-loader" },
+      { test: /[\\/]src[\\/]app-native[\\/]/, loader: "null-loader" },
+    );
+
+    if (isServer) {
+      config.module.rules.push(
+        {
+          test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize)[\\/]/,
+          loader: "null-loader",
+        },
+        // CLI/MCP renderers use React hooks — stub them out for server builds
+        // (Turbopack handles these via resolveAlias stubs; webpack needs explicit rules)
+        {
+          test: /[\\/]unified-ui[\\/]renderers[\\/](cli|mcp)[\\/](?!.*\.stub\.)/,
+          loader: "null-loader",
+        },
+      );
+    }
+    return config;
+  },
+
+  // External packages — excluded from Turbopack/webpack module graph.
+  // Turbopack holds the entire module graph in RAM before writing to disk;
+  // each of the 398 routes imports db → pg + drizzle-orm, making the graph huge.
+  // Marking these as external means they're require()'d at runtime instead of traced.
   serverExternalPackages: [
+    // Database — pulled in by every route via db/index.ts
+    "pg",
+    "pg-native",
+    "drizzle-orm",
     // Vite and related packages for builder tool
     "vite",
     "rollup",
@@ -123,6 +201,8 @@ const nextConfig: NextConfig = {
     "module",
     // ssh2 uses native crypto bindings incompatible with ESM bundling
     "ssh2",
+    // argon2 uses native .node binary — webpack minifier crashes on it
+    "argon2",
   ],
 
   images: {

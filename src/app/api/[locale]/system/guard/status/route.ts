@@ -11,7 +11,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import guardStatusEndpoints from "./definition";
 import { GuardStatusRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: guardStatusEndpoints,
   [Methods.POST]: {
     email: undefined,

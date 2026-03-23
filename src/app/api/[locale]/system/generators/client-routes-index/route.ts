@@ -7,7 +7,7 @@ import { Methods } from "../../unified-interface/shared/types/enums";
 import definitions from "./definition";
 import { ClientRoutesIndexGeneratorRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) => {

@@ -49,34 +49,19 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
-      verbose: requestField(scopedTranslation, {
+      environment: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "fields.verbose.title",
-        description: "fields.verbose.description",
+        fieldType: FieldDataType.TEXT,
+        label: "fields.environment.title",
+        description: "fields.environment.description",
         columns: 6,
-        schema: z.boolean().default(false),
-      }),
-
-      dryRun: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "fields.dryRun.title",
-        description: "fields.dryRun.description",
-        columns: 6,
-        schema: z.boolean().default(false),
+        schema: z.enum(["dev", "test", "prod"]).default("dev"),
       }),
 
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.title",
-        schema: z.boolean(),
-      }),
-
-      isDryRun: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "fields.isDryRun.title",
         schema: z.boolean(),
       }),
 
@@ -179,23 +164,12 @@ const { POST } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: {
-        verbose: false,
-        dryRun: false,
-      },
-      verbose: {
-        verbose: true,
-        dryRun: false,
-      },
-      dryRun: {
-        verbose: false,
-        dryRun: true,
-      },
+      default: { environment: "dev" as const },
+      prod: { environment: "prod" as const },
     },
     responses: {
       default: {
         success: true,
-        isDryRun: false,
         seedsExecuted: 12,
         collections: [
           { name: "users", status: "success", recordsCreated: 10 },
@@ -204,39 +178,6 @@ const { POST } = createEndpoint({
         ],
         totalRecords: 260,
         duration: 2500,
-      },
-      verbose: {
-        success: true,
-        isDryRun: false,
-        seedsExecuted: 12,
-        collections: [
-          { name: "users", status: "success", recordsCreated: 10 },
-          { name: "roles", status: "success", recordsCreated: 5 },
-          { name: "permissions", status: "success", recordsCreated: 25 },
-          { name: "profiles", status: "success", recordsCreated: 10 },
-          { name: "settings", status: "success", recordsCreated: 50 },
-          { name: "business-data", status: "success", recordsCreated: 20 },
-          { name: "social-accounts", status: "success", recordsCreated: 15 },
-          { name: "email-templates", status: "success", recordsCreated: 30 },
-          { name: "notifications", status: "success", recordsCreated: 40 },
-          { name: "webhooks", status: "success", recordsCreated: 8 },
-          { name: "api-keys", status: "success", recordsCreated: 12 },
-          { name: "audit-logs", status: "success", recordsCreated: 35 },
-        ],
-        totalRecords: 260,
-        duration: 2800,
-      },
-      dryRun: {
-        success: true,
-        isDryRun: true,
-        seedsExecuted: 0,
-        collections: [
-          { name: "users", status: "skipped", recordsCreated: 0 },
-          { name: "roles", status: "skipped", recordsCreated: 0 },
-          { name: "permissions", status: "skipped", recordsCreated: 0 },
-        ],
-        totalRecords: 0,
-        duration: 500,
       },
     },
   },

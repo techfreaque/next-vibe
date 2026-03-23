@@ -8,7 +8,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import definition from "./definition";
 import { EmailTemplateGeneratorRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: definition,
   [Methods.POST]: {
     email: undefined,

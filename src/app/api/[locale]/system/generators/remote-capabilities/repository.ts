@@ -52,7 +52,6 @@ import { simpleT } from "@/i18n/core/shared";
 import {
   findFilesRecursively,
   generateFileHeader,
-  jsonToTs,
   writeGeneratedFile,
 } from "../shared/utils";
 import type { RemoteCapabilitiesT } from "./i18n";
@@ -241,12 +240,10 @@ export class RemoteCapabilitiesGeneratorRepository {
               locale,
             );
 
-          const outputFile = join(localeDir, `${roleName}.ts`);
+          const outputFile = join(localeDir, `${roleName}.json`);
           const content =
             RemoteCapabilitiesGeneratorRepository.renderCapabilitiesFile(
               capabilities,
-              locale,
-              role,
             );
           await writeGeneratedFile(outputFile, content, data.dryRun);
           filesWritten++;
@@ -513,25 +510,8 @@ export class RemoteCapabilitiesGeneratorRepository {
 
   private static renderCapabilitiesFile(
     capabilities: RemoteToolCapability[],
-    locale: CountryLanguage,
-    role: typeof UserPermissionRoleValue,
   ): string {
-    // eslint-disable-next-line i18next/no-literal-string
-    const header = generateFileHeader(
-      "AUTO-GENERATED FILE - DO NOT EDIT",
-      "generators/remote-capabilities",
-      { locale, role, entries: capabilities.length },
-    );
-
-    const capTs = jsonToTs(capabilities);
-
-    // eslint-disable-next-line i18next/no-literal-string
-    return `${header}
-
-import type { RemoteToolCapability } from "@/app/api/[locale]/user/remote-connection/db";
-
-export const remoteCapabilities: RemoteToolCapability[] = ${capTs};
-`;
+    return JSON.stringify(capabilities, null, 2);
   }
 
   private static renderVersionFile(version: string): string {

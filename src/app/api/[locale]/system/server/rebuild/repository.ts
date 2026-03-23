@@ -23,14 +23,13 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { VibeCheckRepository } from "@/app/api/[locale]/system/check/vibe-check/repository";
-import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
+import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import { GenerateAllRepository } from "@/app/api/[locale]/system/generators/generate-all/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as checkScopedTranslation } from "../../check/vibe-check/i18n";
-import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { VIBE_START_PID_FILE } from "../pid";
 import type { RebuildResponseOutput, RebuildStep } from "./definition";
@@ -154,15 +153,14 @@ export class RebuildRepository {
             ...process.env,
             NODE_ENV: "production",
             NEXT_DIST_DIR: stagingDir,
+            NODE_OPTIONS: "--max-old-space-size=16144",
           },
         });
         if (buildResult.status !== 0) {
           const exitCode = buildResult.status ?? null;
           const exitSignal = buildResult.signal ?? null;
           const isOom =
-            exitSignal === "SIGKILL" ||
-            exitCode === 137 ||
-            exitCode === 134;
+            exitSignal === "SIGKILL" || exitCode === 137 || exitCode === 134;
           const detail = isOom
             ? `Next.js build killed by OS (likely OOM) — signal: ${exitSignal ?? exitCode}`
             : `Next.js build exited with code ${exitCode ?? "unknown"}`;
@@ -214,12 +212,7 @@ export class RebuildRepository {
 
       // Step 4: Database migrations
       const migrateOk = await runStep(t("post.steps.migrate"), async () => {
-        const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-        const migrateResult = await DatabaseMigrationRepository.runMigrations(
-          { generate: false, dryRun: false, redo: false, schema: "public" },
-          migrateT,
-          logger,
-        );
+        const migrateResult = await DatabaseMigrationRepository.migrate(logger);
         return migrateResult.success
           ? null
           : (migrateResult.message ?? "Migrations failed");
@@ -235,7 +228,7 @@ export class RebuildRepository {
       // Step 5: Database seeding
       const seedOk = await runStep(t("post.steps.seed"), async () => {
         try {
-          await seedDatabase("prod", logger, locale);
+          await SeedRepository.seed("prod", logger);
           return null;
         } catch (error) {
           return t("post.steps.seedingFailed", {

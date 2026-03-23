@@ -1,21 +1,16 @@
-/**
- * Open database studio Route
- * API route for open database studio
- */
-
 import "server-only";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import studioEndpoints from "./definition";
-import { StudioRepository } from "./repository";
+import generateEndpoints from "./definition";
+import { DatabaseGenerateRepository } from "./repository";
 
 export const { tools } = endpointsHandler({
-  endpoint: studioEndpoints,
+  endpoint: generateEndpoints,
   [Methods.POST]: {
-    handler: ({ data, t, logger }) => {
-      return StudioRepository.execute(data, t, logger);
+    handler: ({ logger }) => {
+      return DatabaseGenerateRepository.runGenerate(logger);
     },
   },
 });

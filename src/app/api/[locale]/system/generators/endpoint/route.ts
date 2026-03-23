@@ -8,7 +8,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import definitions from "./definition";
 import { EndpointGeneratorRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     handler: async (props) => {

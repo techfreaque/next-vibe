@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "seed",
   post: {
     title: "Datenbank-Seed",
-    description: "Datenbank mit Testdaten befüllen",
+    description: "Datenbank mit Daten befüllen",
     form: {
       title: "Seed-Konfiguration",
       description: "Seed-Parameter konfigurieren",
@@ -63,19 +63,12 @@ export const translations: typeof enTranslations = {
     },
   },
   fields: {
-    verbose: {
-      title: "Ausführliche Ausgabe",
-      description: "Detaillierte Ausgabe während des Seedings anzeigen",
-    },
-    dryRun: {
-      title: "Testlauf",
-      description: "Seeding simulieren ohne Änderungen vorzunehmen",
+    environment: {
+      title: "Umgebung",
+      description: "Ziel-Seed-Umgebung (dev, test, prod)",
     },
     success: {
       title: "Erfolgsstatus",
-    },
-    isDryRun: {
-      title: "Testlauf-Modus",
     },
     seedsExecuted: {
       title: "Ausgeführte Seeds",

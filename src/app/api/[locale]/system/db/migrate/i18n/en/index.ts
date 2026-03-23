@@ -1,5 +1,3 @@
-import { translations as taskManagementTranslations } from "../../task-management/i18n/en";
-
 export const translations = {
   category: "Database Operations",
 
@@ -70,10 +68,6 @@ export const translations = {
     schema: {
       title: "Database Schema",
       description: "Target database schema (default: public)",
-    },
-    dryRun: {
-      title: "Dry Run",
-      description: "Preview migrations without applying them",
     },
     success: {
       title: "Success Status",
@@ -149,7 +143,6 @@ export const translations = {
     staging: "Staging",
     production: "Production",
   },
-  taskManagement: taskManagementTranslations,
   messages: {
     dryRun: "DRY RUN: Would run migrations",
     generatingMigrations: "Migration Generation:\n{{output}}\n",

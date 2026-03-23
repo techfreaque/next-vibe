@@ -11,7 +11,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import generateTrpcRouterEndpoints from "./definition";
 import { GenerateTrpcRouterRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: generateTrpcRouterEndpoints,
   [Methods.POST]: {
     handler: ({ data, logger, locale }) => {

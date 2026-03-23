@@ -11,12 +11,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
+import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
-import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
 import { scopedTranslation as builderScopedTranslation } from "../../builder/i18n";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
@@ -191,13 +190,18 @@ export class BuildRepository {
 
         // Run Next.js build command using bun (works in both dev and Docker)
         const { spawnSync } = await import("node:child_process");
-        const buildResult = spawnSync("bunx", ["next", "build"], {
+        // --webpack: Use webpack instead of Turbopack for production builds.
+        // Webpack peaks at ~7.5 GB (JS heap, V8) vs Turbopack's ~12 GB (Rust, outside V8).
+        // --max-old-space-size raises the V8 heap cap for the webpack worker process;
+        // without it the worker OOMs at the default 4 GB limit mid-build.
+        const buildResult = spawnSync("bunx", ["next", "build", "--webpack"], {
           stdio: "inherit",
           cwd: process.cwd(),
           env: {
             ...process.env,
             NODE_ENV: "production",
             NEXT_DIST_DIR: ".next-prod",
+            NODE_OPTIONS: "--max-old-space-size=10000",
           },
         });
         if (buildResult.status === 0) {
@@ -207,9 +211,7 @@ export class BuildRepository {
           const exitCode = buildResult.status ?? null;
           const exitSignal = buildResult.signal ?? null;
           const isOom =
-            exitSignal === "SIGKILL" ||
-            exitCode === 137 ||
-            exitCode === 134;
+            exitSignal === "SIGKILL" || exitCode === 137 || exitCode === 134;
           const detail = isOom
             ? `Next.js build killed by OS (likely OOM) — signal: ${exitSignal ?? exitCode}`
             : `Next.js build exited with code ${exitCode ?? "unknown"}`;
@@ -296,18 +298,8 @@ export class BuildRepository {
         output.push(t("post.repository.messages.prodDbStart"));
         try {
           if (data.migrate) {
-            const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
             const migrateResult =
-              await DatabaseMigrationRepository.runMigrations(
-                {
-                  generate: false,
-                  dryRun: false,
-                  redo: false,
-                  schema: "public",
-                },
-                migrateT,
-                logger,
-              );
+              await DatabaseMigrationRepository.migrate(logger);
 
             if (!migrateResult.success) {
               steps.push({ label: "Migrate", ok: false, skipped: false });
@@ -328,7 +320,7 @@ export class BuildRepository {
           }
 
           if (data.seed) {
-            await seedDatabase("prod", logger, locale);
+            await SeedRepository.seed("prod", logger);
             steps.push({ label: "Seed", ok: true, skipped: false });
           }
 

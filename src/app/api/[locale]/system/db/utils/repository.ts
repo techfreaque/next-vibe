@@ -15,9 +15,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as resetScopedTranslation } from "../reset/i18n";
 // Logger will be provided by the route handler
 import type { DbUtilsRequestOutput, DbUtilsResponseOutput } from "./definition";
 import type { UtilsT } from "./i18n";
@@ -188,98 +186,5 @@ export class DbUtilsRepository {
         messageParams: { error: parseError(error).message },
       });
     }
-  }
-
-  /**
-   * Manage the database (reset or initialize)
-   */
-  static async manageDatabase(
-    options: {
-      runMigrations?: boolean;
-      initialize?: boolean;
-      hard?: boolean;
-      fastDbReset?: boolean;
-    } = {},
-    logger: EndpointLogger,
-    t: UtilsT,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<boolean>> {
-    try {
-      const {
-        runMigrations = false,
-        initialize = false,
-        hard = false,
-      } = options;
-
-      // eslint-disable-next-line i18next/no-literal-string
-      const operation = initialize ? "Initialize" : "Reset";
-      logger.info(`${operation} database...`);
-
-      if (hard) {
-        logger.warn("Hard reset requested - this will delete all data!");
-      }
-
-      try {
-        // Import reset functionality from the reset subdomain
-        const { DatabaseResetRepository } = await import("../reset/repository");
-        const { t: resetT } = resetScopedTranslation.scopedT(locale);
-
-        const resetResult = await DatabaseResetRepository.resetDatabase(
-          {
-            force: true,
-            skipMigrations: !runMigrations,
-            skipSeeds: false,
-            dryRun: false,
-          },
-          resetT,
-          logger,
-        );
-
-        if (resetResult.success) {
-          logger.info(`Database ${operation.toLowerCase()} completed`);
-          return success(true);
-        }
-        const errorMessage = t("errors.reset_operation_failed");
-        logger.error("Failed to reset database:", errorMessage);
-        return fail({
-          message: t("errors.reset_failed"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: errorMessage },
-          cause: resetResult,
-        });
-      } catch (error) {
-        logger.error("Failed to reset database:", parseError(error));
-        return fail({
-          message: t("errors.reset_failed"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: { error: parseError(error).message },
-        });
-      }
-    } catch (error) {
-      logger.error("Failed to manage database:", parseError(error));
-      return fail({
-        message: t("errors.manage_failed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
-      });
-    }
-  }
-
-  /**
-   * Reset the database by truncating all tables
-   * @deprecated Use manageDatabase() instead
-   */
-  static async resetDatabase(
-    runMigrations = false,
-    logger: EndpointLogger,
-    t: UtilsT,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<boolean>> {
-    return await DbUtilsRepository.manageDatabase(
-      { runMigrations },
-      logger,
-      t,
-      locale,
-    );
   }
 }

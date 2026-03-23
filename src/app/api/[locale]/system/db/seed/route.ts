@@ -11,12 +11,11 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import seedEndpoints from "./definition";
 import { SeedRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: seedEndpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, t, logger }) => {
-      logger.debug("🎯 Seed route handler called", { data, locale });
-      return SeedRepository.execute(data, locale, t, logger);
+    handler: ({ data, t, logger }) => {
+      return SeedRepository.execute(data, t, logger);
     },
   },
 });

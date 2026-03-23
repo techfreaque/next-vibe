@@ -15,7 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { OutputOptions, RollupOptions } from "rollup";
 import type { BuildOptions, InlineConfig, Plugin, PluginOption } from "vite";
-import { build as viteBuild } from "vite";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -91,7 +90,10 @@ export class ViteCompiler {
       profile,
     );
 
-    // Run Vite build
+    // Run Vite build — dynamic import prevents Turbopack from tracing vite's
+    // entire dependency graph (caniuse-lite, postcss, browserslist, etc.) into
+    // every route that touches the builder.
+    const { build: viteBuild } = await import("vite");
     await viteBuild(viteConfig);
 
     // Track built files
@@ -788,7 +790,8 @@ export class ViteCompiler {
       await server.listen();
       const resolvedPort = server.config.server.port ?? port ?? 3001;
       const url = `http://localhost:${resolvedPort}`;
-      logger.info(`TanStack Start dev server ready at ${url}`);
+      const publicUrl = publicPort ? `http://localhost:${publicPort}` : url;
+      logger.info(`TanStack Start dev server ready at ${publicUrl}`);
 
       const stop = (): void => {
         void server.close();

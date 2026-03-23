@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
+import { SeedRepository } from "@/app/api/[locale]/system/db/seed/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   createNextjsFormatter,
@@ -33,7 +33,7 @@ import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/uni
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
+import { DatabaseGenerateRepository } from "../../db/generate/repository";
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as dockerScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { DockerOperationsRepository } from "../../db/utils/docker-operations/repository";
@@ -82,15 +82,19 @@ export class DevRepository {
    */
   private static patchPublicUrlPort(port: number): void {
     const current = process.env["NEXT_PUBLIC_APP_URL"];
+    // Use Object.assign to avoid Next.js inlining NEXT_PUBLIC_* vars at build time,
+    // which would turn the assignment into `"literal string" = value` (invalid JS).
     if (!current) {
-      process.env["NEXT_PUBLIC_APP_URL"] = `http://localhost:${String(port)}`;
+      Object.assign(process.env, {
+        NEXT_PUBLIC_APP_URL: `http://localhost:${String(port)}`,
+      });
       return;
     }
     try {
       const parsed = new URL(current);
       if (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
         parsed.port = String(port);
-        process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+        Object.assign(process.env, { NEXT_PUBLIC_APP_URL: parsed.toString() });
       }
     } catch {
       // Not a valid URL — leave it as-is
@@ -484,17 +488,22 @@ export class DevRepository {
         if (data.skipMigrations) {
           logger.vibe(formatSkip("Migrations skipped"));
         } else {
-          const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-          const migrateResult = await DatabaseMigrationRepository.runMigrations(
-            {
-              generate: !data.skipMigrationGeneration,
-              redo: false,
-              schema: "public",
-              dryRun: false,
-            },
-            migrateT,
-            logger,
-          );
+          if (!data.skipMigrationGeneration) {
+            const generateResult = await DatabaseGenerateRepository.runGenerate(
+              logger,
+              true,
+            );
+            if (!generateResult.success) {
+              DevRepository.logDatabaseError(
+                new Error(generateResult.message ?? "Generation failed"),
+                logger,
+              );
+              cleanupPidFile(VIBE_DEV_PID_FILE);
+              process.exit(1);
+            }
+          }
+          const migrateResult =
+            await DatabaseMigrationRepository.migrate(logger);
           if (!migrateResult.success) {
             DevRepository.logDatabaseError(
               new Error(migrateResult.message ?? "Migration failed"),
@@ -515,7 +524,7 @@ export class DevRepository {
       if (data.skipSeeding) {
         logger.vibe(formatSkip("Database seeding skipped"));
       } else {
-        await seedDatabase("dev", logger, locale);
+        await SeedRepository.seed("dev", logger);
       }
 
       return true;
@@ -549,17 +558,21 @@ export class DevRepository {
     if (data.skipMigrations) {
       logger.vibe(formatSkip("Migrations skipped"));
     } else {
-      const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
-      const migrateResult = await DatabaseMigrationRepository.runMigrations(
-        {
-          generate: !data.skipMigrationGeneration,
-          redo: false,
-          schema: "public",
-          dryRun: false,
-        },
-        migrateT,
-        logger,
-      );
+      if (!data.skipMigrationGeneration) {
+        const generateResult = await DatabaseGenerateRepository.runGenerate(
+          logger,
+          true,
+        );
+        if (!generateResult.success) {
+          DevRepository.logDatabaseError(
+            new Error(generateResult.message ?? "Generation failed"),
+            logger,
+          );
+          cleanupPidFile(VIBE_DEV_PID_FILE);
+          process.exit(1);
+        }
+      }
+      const migrateResult = await DatabaseMigrationRepository.migrate(logger);
       if (!migrateResult.success) {
         DevRepository.logDatabaseError(
           new Error(migrateResult.message ?? "Migration failed"),

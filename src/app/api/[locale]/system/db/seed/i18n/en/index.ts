@@ -4,7 +4,7 @@ export const translations = {
   tag: "seed",
   post: {
     title: "Database Seed",
-    description: "Seed database with test data",
+    description: "Seed database with data",
     form: {
       title: "Seed Configuration",
       description: "Configure seeding parameters",
@@ -61,19 +61,12 @@ export const translations = {
     },
   },
   fields: {
-    verbose: {
-      title: "Verbose Output",
-      description: "Show detailed output during seeding",
-    },
-    dryRun: {
-      title: "Dry Run",
-      description: "Simulate seeding without making changes",
+    environment: {
+      title: "Environment",
+      description: "Target seed environment (dev, test, prod)",
     },
     success: {
       title: "Success Status",
-    },
-    isDryRun: {
-      title: "Dry Run Mode",
     },
     seedsExecuted: {
       title: "Seeds Executed",

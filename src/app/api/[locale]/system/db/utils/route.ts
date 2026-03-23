@@ -11,7 +11,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import dbUtilsHealthEndpoint from "./definition";
 import { DbUtilsRepository } from "./repository";
 
-export const { GET, tools } = endpointsHandler({
+export const { tools } = endpointsHandler({
   endpoint: dbUtilsHealthEndpoint,
   [Methods.GET]: {
     handler: async ({ data, t, logger }) => {

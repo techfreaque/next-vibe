@@ -5,9 +5,9 @@
  */
 
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -33,9 +33,11 @@ async function handler(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let appRouter: any;
   try {
-    // @ts-expect-error -- Doesnt exist if tRPC is not enabled
     // turbopack-ignore-next-line
-    const routerModule = await import(/* turbopackIgnore: true */ "./router");
+    const routerModule = await import(
+      // @ts-expect-error -- Doesnt exist if tRPC is not enabled
+      /* turbopackIgnore: true */ /* webpackIgnore: true */ "./router"
+    );
     appRouter = routerModule.appRouter;
   } catch {
     return new Response(

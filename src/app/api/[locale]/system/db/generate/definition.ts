@@ -1,5 +1,5 @@
 /**
- * Database Migration Endpoint Definition
+ * Database Generate Endpoint Definition
  */
 
 import { z } from "zod";
@@ -22,19 +22,19 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "db", "migrate"],
+  path: ["system", "db", "generate"],
   title: "post.title",
   description: "post.description",
   category: "app.endpointCategories.systemDatabase",
   tags: ["tag"],
-  icon: "arrow-right",
+  icon: "file-plus",
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,
     UserRole.AI_TOOL_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["migrate", "db:migrate", "m"],
+  aliases: ["dgen", "db:generate"],
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -44,18 +44,11 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      // === REQUEST FIELDS ===
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "fields.success.title",
         schema: z.boolean(),
-      }),
-
-      migrationsRun: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "fields.migrationsRun.title",
-        schema: z.coerce.number(),
       }),
 
       output: responseField(scopedTranslation, {
@@ -124,9 +117,8 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        migrationsRun: 3,
-        output: "✅ Database migrations completed successfully",
-        duration: 1250,
+        output: "✅ Migration files generated successfully",
+        duration: 450,
       },
     },
   },
@@ -135,7 +127,7 @@ const { POST } = createEndpoint({
 const endpoints = { POST };
 export default endpoints;
 
-export type MigrateRequestInput = typeof POST.types.RequestInput;
-export type MigrateRequestOutput = typeof POST.types.RequestOutput;
-export type MigrateResponseInput = typeof POST.types.ResponseInput;
-export type MigrateResponseOutput = typeof POST.types.ResponseOutput;
+export type GenerateRequestInput = typeof POST.types.RequestInput;
+export type GenerateRequestOutput = typeof POST.types.RequestOutput;
+export type GenerateResponseInput = typeof POST.types.ResponseInput;
+export type GenerateResponseOutput = typeof POST.types.ResponseOutput;

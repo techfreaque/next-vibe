@@ -1,4 +1,3 @@
-import { translations as taskManagementTranslations } from "../../task-management/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -72,10 +71,6 @@ export const translations: typeof enTranslations = {
     schema: {
       title: "Datenbankschema",
       description: "Ziel-Datenbankschema (Standard: public)",
-    },
-    dryRun: {
-      title: "Testlauf",
-      description: "Migrationen vorab anzeigen ohne sie anzuwenden",
     },
     success: {
       title: "Erfolgsstatus",
@@ -152,7 +147,6 @@ export const translations: typeof enTranslations = {
     staging: "Staging",
     production: "Produktion",
   },
-  taskManagement: taskManagementTranslations,
   messages: {
     dryRun: "TESTLAUF: Würde Migrationen ausführen",
     generatingMigrations: "Migrationsgenerierung:\n{{output}}\n",
