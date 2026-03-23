@@ -8,14 +8,14 @@
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
-    EndpointErrorTypes,
-    LayoutType,
-    Methods,
-    WidgetType,
+  EndpointErrorTypes,
+  LayoutType,
+  Methods,
+  WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-    signalsRequestField,
-    signalsResponseField,
+  signalsRequestField,
+  signalsResponseField,
 } from "@/app/api/[locale]/system/unified-interface/vibe-sense/shared/fields";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { EVALUATOR_NOT_ALIAS } from "./constants";

@@ -18,10 +18,10 @@ import type { TourStepConfig } from "./tour-config";
 import {
   getJoyrideLabels,
   getNewChatUrl,
+  getTourColors,
   getTourSelector,
   getTourSteps,
   TOUR_AUTH_PENDING_KEY,
-  TOUR_COLORS,
   TOUR_DATA_ATTRS,
   TOUR_IN_PROGRESS_KEY,
   TOUR_LAST_STEP_KEY,
@@ -512,6 +512,8 @@ export function WelcomeTour({
     return null;
   }
 
+  const tourColors = getTourColors();
+
   return (
     <Joyride
       steps={steps}
@@ -525,11 +527,11 @@ export function WelcomeTour({
         skipScroll: false,
         overlayClickAction: false,
         blockTargetInteraction: true,
-        primaryColor: TOUR_COLORS.PRIMARY,
+        primaryColor: tourColors.PRIMARY,
         zIndex: TOUR_SPACING.Z_INDEX,
-        overlayColor: TOUR_COLORS.BACKGROUND,
-        backgroundColor: TOUR_COLORS.BACKGROUND,
-        textColor: TOUR_COLORS.TEXT,
+        overlayColor: tourColors.OVERLAY,
+        backgroundColor: tourColors.BACKGROUND,
+        textColor: tourColors.TEXT,
       }}
       styles={{
         overlay: {},
@@ -543,18 +545,18 @@ export function WelcomeTour({
           textAlign: TOUR_TEXT_ALIGN.LEFT,
         },
         buttonPrimary: {
-          backgroundColor: TOUR_COLORS.PRIMARY,
+          backgroundColor: tourColors.PRIMARY,
           borderRadius: TOUR_SPACING.BUTTON_BORDER_RADIUS,
           padding: TOUR_SPACING.BUTTON_PADDING,
           fontSize: TOUR_SPACING.BUTTON_FONT_SIZE,
           fontWeight: TOUR_SPACING.BUTTON_FONT_WEIGHT,
         },
         buttonBack: {
-          color: TOUR_COLORS.MUTED,
+          color: tourColors.MUTED,
           marginRight: TOUR_SPACING.BUTTON_MARGIN_RIGHT,
         },
         buttonSkip: {
-          color: TOUR_COLORS.MUTED,
+          color: tourColors.MUTED,
         },
       }}
       locale={getJoyrideLabels(t)}

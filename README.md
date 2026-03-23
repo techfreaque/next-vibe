@@ -104,8 +104,8 @@ You build a contact form. Then support wants a CLI command. Then the AI agent ne
 
 **NextVibe's answer:** describe your feature once - its inputs, outputs, validation, permissions, UI hints, error types, translations, and examples - and every platform renders it natively.
 
-| #   | Platform             | Status       | What it does                                                                                                      |
-| --- | -------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| #   | Platform             | Status        | What it does                                                                                                      |
+| --- | -------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
 | 1   | **Web API**          | ✅ Production | RESTful endpoint, full type safety                                                                                |
 | 2   | **React UI**         | ✅ Production | Data-driven forms and display widgets from the definition                                                         |
 | 3   | **CLI**              | ✅ Production | Every endpoint is a command with auto-generated flags                                                             |
@@ -118,7 +118,7 @@ You build a contact form. Then support wants a CLI command. Then the AI agent ne
 | 10  | **React Native**     | 🚧 Beta       | Same contract on iOS/Android - NativeWind 5 + Expo Router                                                         |
 | 11  | **Electron**         | 🚧 Beta       | Desktop app - macOS, Linux, Windows from the same build                                                           |
 | 12  | **Vibe Frame**       | 🚧 Beta       | Embed any endpoint as an iframe widget on any website. Federated widgets (any remote NextVibe instance) included. |
-| 13  | **tRPC**             | ⏸ Inactive   | Type-safe client-server calls - available but unused, replaced by a custom RPC layer                              |
+| 13  | **tRPC**             | ⏸ Inactive    | Type-safe client-server calls - available but unused, replaced by a custom RPC layer                              |
 
 There is no "API for humans" and "API for AI." There's just the tool.
 

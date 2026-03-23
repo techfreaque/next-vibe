@@ -123,13 +123,34 @@ export const getJoyrideLabels = (
   skip: t("components.welcomeTour.buttons.skip"),
 });
 
-// Tour style constants
-export const TOUR_COLORS = {
-  PRIMARY: "#3b82f6",
-  BACKGROUND: "#1f2937",
-  TEXT: "#f3f4f6",
-  MUTED: "#9ca3af",
-} as const;
+// Read a Tailwind color token from the document root (resolved, theme-aware).
+// Uses --color-* tokens which are pre-resolved to valid CSS color values in globals.css.
+function getCssColor(token: string): string {
+  if (typeof window === "undefined") {return "";}
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(token)
+    .trim();
+}
+
+// Tour style constants — resolved at runtime from CSS variables so they work
+// in both light and dark themes without any JS theme-detection imports.
+export const getTourColors = (): {
+  PRIMARY: string;
+  BACKGROUND: string;
+  OVERLAY: string;
+  TEXT: string;
+  MUTED: string;
+} => ({
+  PRIMARY: getCssColor("--color-primary"),
+  BACKGROUND: getCssColor("--color-popover"),
+  // Use the page background color at 60% opacity so it works in both themes.
+  // getComputedStyle returns a resolved rgb(...) string; we convert to rgba.
+  OVERLAY: getCssColor("--color-background")
+    .replace(/^rgb\(/, "rgba(")
+    .replace(/\)$/, ", 0.6)"),
+  TEXT: getCssColor("--color-popover-foreground"),
+  MUTED: getCssColor("--color-muted-foreground"),
+});
 
 export const TOUR_SPACING = {
   TOOLTIP_BORDER_RADIUS: 8,

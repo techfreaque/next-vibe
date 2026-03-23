@@ -12,7 +12,7 @@ A `repository.ts` file **must contain only**:
 
 **Nothing else is allowed at module level.** Specifically:
 
-| ❌ Forbidden                                                        | ✅ Instead                                                    |
+| ❌ Forbidden                                                       | ✅ Instead                                                   |
 | ------------------------------------------------------------------ | ------------------------------------------------------------ |
 | `type ModuleT = FooT`                                              | Use `FooT` directly in signatures                            |
 | `type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"]` | Export `FooT` from `i18n/index.ts`, import and use directly  |
