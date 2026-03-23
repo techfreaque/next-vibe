@@ -16,32 +16,40 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
-import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import type { FolderContentsResponseOutput } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import { scopedTranslation as folderContentsScopedTranslation } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/i18n";
 import { FolderContentsRepository } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/repository";
+import type { FolderListResponseOutput } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
 import { scopedTranslation as foldersScopedTranslation } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/i18n";
 import { ChatFoldersRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/repository";
 import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/repository";
 import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/repository";
-import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { RootFolderPermissions } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import type { PublicFeedGetResponseOutput } from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import { FeedSortMode } from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import { scopedTranslation as publicFeedScopedTranslation } from "@/app/api/[locale]/agent/chat/public-feed/i18n";
 import { PublicFeedRepository } from "@/app/api/[locale]/agent/chat/public-feed/repository";
+import type { ChatSettingsGetResponseOutput } from "@/app/api/[locale]/agent/chat/settings/definition";
 import { scopedTranslation as settingsScopedTranslation } from "@/app/api/[locale]/agent/chat/settings/i18n";
 import { ChatSettingsRepository } from "@/app/api/[locale]/agent/chat/settings/repository";
+import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
+import { SkillsRepository } from "@/app/api/[locale]/agent/chat/skills/repository";
+import type { MessageListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
 import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/i18n";
+import type { PathGetResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
 import { scopedTranslation as pathScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/i18n";
 import { pathRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/repository";
 import { MessagesRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository";
 import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
+import type { ThreadListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/definition";
 import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
-import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { EnvAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -54,14 +62,6 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { FolderContentsResponseOutput } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
-import type { FolderListResponseOutput } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
-import type { PublicFeedGetResponseOutput } from "@/app/api/[locale]/agent/chat/public-feed/definition";
-import type { ChatSettingsGetResponseOutput } from "@/app/api/[locale]/agent/chat/settings/definition";
-import type { MessageListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import type { PathGetResponseOutput } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/definition";
-import type { SkillGetResponseOutput } from "@/app/api/[locale]/agent/chat/skills/[id]/definition";
-import type { ThreadListResponseOutput } from "@/app/api/[locale]/agent/chat/threads/definition";
 
 import { ChatInterface } from "./_components/chat-interface";
 
@@ -120,9 +120,6 @@ export async function tanstackLoader({
   // Determine root folder early so we can redirect unauthenticated users
   // away from private/incognito folders before doing any DB work
   const { initialRootFolderId: earlyRootFolderId } = parseChatUrl(path);
-  const isPrivateFolder =
-    earlyRootFolderId === DefaultFolderId.PRIVATE ||
-    earlyRootFolderId === DefaultFolderId.INCOGNITO;
 
   if (user?.isPublic && earlyRootFolderId === DefaultFolderId.PRIVATE) {
     redirect(`/${locale}/threads/incognito`);
