@@ -350,7 +350,7 @@ export class LeadsImportRepository {
               taskInput: {
                 dryRun: false,
                 maxJobsPerRun: 1,
-                maxRetriesPerJob: 0,
+                maxRetriesPerJob: 1,
                 selfTaskId: taskId,
               },
               outputMode: TaskOutputMode.STORE_ONLY,
