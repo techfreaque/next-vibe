@@ -190,11 +190,10 @@ export class BuildRepository {
 
         // Run Next.js build command using bun (works in both dev and Docker)
         const { spawnSync } = await import("node:child_process");
-        // --webpack: Use webpack instead of Turbopack for production builds.
-        // Webpack peaks at ~7.5 GB (JS heap, V8) vs Turbopack's ~12 GB (Rust, outside V8).
-        // --max-old-space-size raises the V8 heap cap for the webpack worker process;
-        // without it the worker OOMs at the default 4 GB limit mid-build.
-        const buildResult = spawnSync("bunx", ["next", "build", "--webpack"], {
+        const buildArgs = data.webpack === true
+          ? ["next", "build", "--webpack"]
+          : ["next", "build"];
+        const buildResult = spawnSync("bunx", buildArgs, {
           stdio: "inherit",
           cwd: process.cwd(),
           env: {

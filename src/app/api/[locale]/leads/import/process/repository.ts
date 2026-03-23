@@ -105,34 +105,34 @@ export class LeadsImportProcessRepository {
         }
       }
 
-      // Re-create next task if more pending jobs remain (the current task has runOnce:true
-      // so Pulse will disable it after execution; no explicit self-delete needed)
+      // Re-create tasks for any jobs that still need processing. Each job gets its
+      // own dedicated task ID (leads-import-${jobId}) so re-inserts are idempotent.
+      // The current task has runOnce:true so Pulse disables it after execution.
       if (!dryRun) {
         const { cronTasks } =
           await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
         const { CronTaskPriority, TaskCategory, TaskOutputMode } =
           await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
 
-        const [summaryStats] = await db
-          .select({
-            pending: db.$count(
-              csvImportJobs,
+        const stillPendingJobs = await db
+          .select({ id: csvImportJobs.id })
+          .from(csvImportJobs)
+          .where(
+            and(
               eq(csvImportJobs.status, CsvImportJobStatus.PENDING),
+              sql`${csvImportJobs.retryCount} <= ${maxRetriesPerJob}`,
             ),
-          })
-          .from(csvImportJobs);
+          );
 
-        const hasPendingJobs = (summaryStats?.pending || 0) > 0;
-
-        if (hasPendingJobs) {
-          const nextTaskId = `leads-import-next-${Date.now()}`;
+        for (const job of stillPendingJobs) {
+          const nextTaskId = `leads-import-${job.id}`;
           await db
             .insert(cronTasks)
             .values({
               id: nextTaskId,
               shortId: nextTaskId,
               routeId: "leads_import_process_POST",
-              displayName: "Process pending import jobs",
+              displayName: `Process import job ${job.id}`,
               category: TaskCategory.MAINTENANCE,
               schedule: "* * * * *",
               priority: CronTaskPriority.MEDIUM,
@@ -146,7 +146,7 @@ export class LeadsImportProcessRepository {
               },
               outputMode: TaskOutputMode.STORE_ONLY,
               notificationTargets: [],
-              tags: ["leads-import"],
+              tags: ["leads-import", job.id],
             })
             .onConflictDoNothing();
           logger.info("tasks.csv_processor.next_task_created", { nextTaskId });

@@ -61,6 +61,11 @@ export const translations: typeof enTranslations = {
         title: "TanStack-Build",
         description: "TanStack/Vite-App statt Next.js erstellen",
       },
+      webpack: {
+        title: "Webpack verwenden",
+        description:
+          "Webpack statt Turbopack verwenden. Geringerer Speicherverbrauch (~7,5 GB vs ~12 GB). Standardmäßig aktiv in Docker-Produktions-Builds.",
+      },
       skipEndpoints: {
         title: "Endpunkt-Generierung überspringen",
         description: "Generierung von Endpunkt-Dateien überspringen",

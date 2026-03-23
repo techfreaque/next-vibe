@@ -59,6 +59,11 @@ export const translations = {
         title: "TanStack Build",
         description: "Build TanStack/Vite app instead of Next.js",
       },
+      webpack: {
+        title: "Use Webpack",
+        description:
+          "Use webpack instead of Turbopack. Lower memory usage (~7.5 GB vs ~12 GB). Enabled by default in production Docker builds.",
+      },
       skipEndpoints: {
         title: "Skip Endpoints Generation",
         description: "Skip generating endpoint files",

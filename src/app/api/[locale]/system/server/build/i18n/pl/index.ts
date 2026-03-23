@@ -62,6 +62,11 @@ export const translations: typeof enTranslations = {
         title: "Budowanie TanStack",
         description: "Buduj aplikację TanStack/Vite zamiast Next.js",
       },
+      webpack: {
+        title: "Użyj Webpack",
+        description:
+          "Użyj webpack zamiast Turbopack. Mniejsze użycie pamięci (~7,5 GB vs ~12 GB). Domyślnie włączone w produkcyjnych buildach Docker.",
+      },
       skipEndpoints: {
         title: "Pomiń generowanie punktów końcowych",
         description: "Pomiń generowanie plików punktów końcowych",

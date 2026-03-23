@@ -147,7 +147,7 @@ async function deployFile(
   const relativePath = relative(projectRoot, filePath);
 
   try {
-    const mod = (await import(filePath)) as Record<
+    const mod = (await import(/* turbopackIgnore: true */ filePath)) as Record<
       string,
       DbFunctionLike | undefined
     >;
