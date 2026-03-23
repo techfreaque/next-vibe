@@ -105,51 +105,33 @@ export class LeadsImportProcessRepository {
         }
       }
 
-      // Re-create tasks for any jobs that still need processing. Each job gets its
-      // own dedicated task ID (leads-import-${jobId}) so re-inserts are idempotent.
-      // The current task has runOnce:true so Pulse disables it after execution.
-      if (!dryRun) {
-        const { cronTasks } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
-        const { CronTaskPriority, TaskCategory, TaskOutputMode } =
-          await import("@/app/api/[locale]/system/unified-interface/tasks/enum");
-
-        const stillPendingJobs = await db
+      // If this task was assigned a specific job (selfTaskId = "leads-import-${jobId}"),
+      // re-enable it for the next batch if the job is still pending.
+      // runOnce disables the task after each execution — re-enabling lets Pulse pick it
+      // up again next minute without creating duplicate tasks.
+      if (!dryRun && data.selfTaskId) {
+        const jobId = data.selfTaskId.replace(/^leads-import-/, "");
+        const [stillPending] = await db
           .select({ id: csvImportJobs.id })
           .from(csvImportJobs)
           .where(
             and(
+              eq(csvImportJobs.id, jobId),
               eq(csvImportJobs.status, CsvImportJobStatus.PENDING),
-              sql`${csvImportJobs.retryCount} <= ${maxRetriesPerJob}`,
             ),
-          );
+          )
+          .limit(1);
 
-        for (const job of stillPendingJobs) {
-          const nextTaskId = `leads-import-${job.id}`;
+        if (stillPending) {
+          const { cronTasks } =
+            await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
           await db
-            .insert(cronTasks)
-            .values({
-              id: nextTaskId,
-              shortId: nextTaskId,
-              routeId: "leads_import_process_POST",
-              displayName: `Process import job ${job.id}`,
-              category: TaskCategory.MAINTENANCE,
-              schedule: "* * * * *",
-              priority: CronTaskPriority.MEDIUM,
-              enabled: true,
-              runOnce: true,
-              taskInput: {
-                dryRun: false,
-                maxJobsPerRun: 1,
-                maxRetriesPerJob: 1,
-                selfTaskId: nextTaskId,
-              },
-              outputMode: TaskOutputMode.STORE_ONLY,
-              notificationTargets: [],
-              tags: ["leads-import", job.id],
-            })
-            .onConflictDoNothing();
-          logger.info("tasks.csv_processor.next_task_created", { nextTaskId });
+            .update(cronTasks)
+            .set({ enabled: true, updatedAt: new Date() })
+            .where(eq(cronTasks.id, data.selfTaskId));
+          logger.info("tasks.csv_processor.task_re_enabled", {
+            taskId: data.selfTaskId,
+          });
         }
       }
 
