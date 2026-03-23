@@ -22,11 +22,11 @@ export async function tanstackLoader({
   params,
 }: ThreadsRootPageProps): Promise<ThreadsRootPageData> {
   const { locale } = await params;
-  return { locale };
+  // Redirect to private folder by default
+  redirect(`/${locale}/threads/private`);
 }
 
 export function TanstackPage({ locale }: ThreadsRootPageData): JSX.Element {
-  // Redirect to private folder by default
   redirect(`/${locale}/threads/private`);
 }
 

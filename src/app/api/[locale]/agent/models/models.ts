@@ -1,6 +1,6 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
-import { STANDARD_MARKUP_PERCENTAGE } from "../../products/repository-client";
+import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import {
   ContentLevel,
   type ContentLevelValue,

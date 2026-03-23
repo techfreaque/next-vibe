@@ -14,6 +14,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import type * as IconsLibrary from "next-vibe-ui/ui/icons";
+import { loadIconModule } from "next-vibe-ui/ui/icons/loader";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
@@ -39,14 +40,11 @@ type IconLoader = (name: string) => Promise<{ [key: string]: IconComponent }>;
 
 /**
  * Lazy loader for a single icon by its PascalCase library name.
- * Using a function instead of a static map of 300 entries eliminates
- * the compile-time cost of registering 300 dynamic import() boundaries.
+ * Delegates to loadIconModule which uses import.meta.glob so both
+ * Vite (TanStack) and webpack (Next.js) can statically analyze the imports.
  */
-const loadIcon: IconLoader = async (name: string) =>
-  import(
-    /* webpackMode: "lazy-once" */
-    `next-vibe-ui/ui/icons/${name}`
-  ) as Promise<{ [key: string]: IconComponent }>;
+const loadIcon: IconLoader = (name: string) =>
+  loadIconModule(name) as Promise<{ [key: string]: IconComponent }>;
 
 /**
  * Helper to create emoji icon components

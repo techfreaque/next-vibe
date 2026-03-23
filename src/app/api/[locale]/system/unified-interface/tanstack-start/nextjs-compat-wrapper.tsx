@@ -6,6 +6,7 @@
  */
 
 import type { ReactNode } from "react";
+import { NextRequest } from "next-vibe-ui/lib/request";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,7 +94,10 @@ export function wrapNextApiRoute(
         return new Response("Method Not Allowed", { status: 405 });
       }
       const nextParams = toNextParams(ctx.params ?? {});
-      return handler(ctx.request, { params: Promise.resolve(nextParams) });
+      // Wrap the request as NextRequest so handlers can use .cookies / .nextUrl.
+      // Pass ctx.request directly (not a clone) to preserve the body stream.
+      const nextRequest = new NextRequest(ctx.request);
+      return handler(nextRequest, { params: Promise.resolve(nextParams) });
     };
   }
   return handlers;

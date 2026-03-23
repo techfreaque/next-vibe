@@ -11,22 +11,40 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SshTabsNav } from "./_components/ssh-tabs-nav";
 
-interface SshAdminLayoutProps {
-  children: ReactNode;
-  params: Promise<{ locale: CountryLanguage }>;
+export interface SshAdminLayoutData {
+  locale: CountryLanguage;
+  children?: ReactNode;
 }
 
-export default async function SshAdminLayout({
-  children,
+export async function tanstackLoader({
   params,
-}: SshAdminLayoutProps): Promise<JSX.Element> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<Omit<SshAdminLayoutData, "children">> {
   const { locale } = await params;
   await requireAdminUser(locale, `/${locale}/admin/ssh`);
+  return { locale };
+}
 
+export function TanstackPage({
+  locale,
+  children,
+}: SshAdminLayoutData): JSX.Element {
   return (
     <Div className="p-6 flex flex-col gap-6">
       <SshTabsNav locale={locale} />
       {children}
     </Div>
   );
+}
+
+export default async function SshAdminLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data}>{children}</TanstackPage>;
 }

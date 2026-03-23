@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import type { z } from "zod";
 
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";

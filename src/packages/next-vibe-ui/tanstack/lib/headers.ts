@@ -4,11 +4,12 @@
  * Next.js `cookies()` and `headers()` read from an async request context.
  * In TanStack Start / Vite SSR, the request is available via `getRequest()`.
  *
- * This shim returns read-only cookie/header stores backed by the current request.
- * Write operations (set/delete) on cookies are no-ops in SSR — they must go
- * through the response, which TanStack handles separately.
+ * Read ops use the incoming request cookies.
+ * Write ops (set/delete) call TanStack's setCookie/deleteCookie to write
+ * Set-Cookie headers on the response.
  */
 
+import { deleteCookie, setCookie } from "@tanstack/start-server-core";
 import { getRequest } from "@tanstack/start-server-core";
 
 // ── Types matching next/headers public surface ──────────────────────────────
@@ -18,12 +19,25 @@ interface RequestCookie {
   value: string;
 }
 
+interface CookieSetOptions {
+  name?: string;
+  value?: string;
+  httpOnly?: boolean;
+  path?: string;
+  secure?: boolean;
+  sameSite?: "lax" | "strict" | "none";
+  maxAge?: number;
+  expires?: Date;
+  domain?: string;
+}
+
 interface ReadonlyRequestCookies {
   get(name: string): RequestCookie | undefined;
   getAll(): RequestCookie[];
   has(name: string): boolean;
-  set(...args: string[]): void;
-  delete(...args: string[]): void;
+  set(name: string, value: string, options?: CookieSetOptions): void;
+  set(options: CookieSetOptions & { name: string; value: string }): void;
+  delete(name: string | { name: string }): void;
 }
 
 interface ReadonlyHeaders {
@@ -78,14 +92,32 @@ export async function cookies(): Promise<ReadonlyRequestCookies> {
     has(name: string) {
       return map.has(name);
     },
-    // Write ops are no-ops in SSR — responses handled by TanStack
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    set(...args: string[]) {
-      /* no-op — SSR can't set response cookies here */
+    set(
+      nameOrOptions:
+        | string
+        | (CookieSetOptions & { name: string; value: string }),
+      value?: string,
+      options?: CookieSetOptions,
+    ) {
+      const name =
+        typeof nameOrOptions === "string" ? nameOrOptions : nameOrOptions.name;
+      const val =
+        typeof nameOrOptions === "string" ? (value ?? "") : nameOrOptions.value;
+      const opts = typeof nameOrOptions === "string" ? options : nameOrOptions;
+      setCookie(name, val, {
+        httpOnly: opts?.httpOnly,
+        path: opts?.path ?? "/",
+        secure: opts?.secure,
+        sameSite: opts?.sameSite,
+        maxAge: opts?.maxAge,
+        expires: opts?.expires,
+        domain: opts?.domain,
+      });
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    delete(...args: string[]) {
-      /* no-op */
+    delete(nameOrOptions: string | { name: string }) {
+      const name =
+        typeof nameOrOptions === "string" ? nameOrOptions : nameOrOptions.name;
+      deleteCookie(name);
     },
   };
 }

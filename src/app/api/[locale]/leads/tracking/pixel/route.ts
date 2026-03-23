@@ -3,7 +3,7 @@
  * Handles 1x1 pixel requests for email open tracking
  */
 
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

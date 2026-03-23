@@ -11,7 +11,7 @@ import {
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";

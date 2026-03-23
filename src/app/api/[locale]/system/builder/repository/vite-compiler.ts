@@ -4,6 +4,7 @@
  */
 
 import { existsSync, mkdirSync, statSync } from "node:fs";
+import type { Server as NodeHttpServer } from "node:http";
 import { basename, dirname, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -460,11 +461,20 @@ export class ViteCompiler {
     const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
     const { tanstackStart } = (await import(
       /* webpackIgnore: true */ tanstackStartPkg
-    )) as { tanstackStart: (opts: { srcDirectory: string }) => PluginOption };
+    )) as {
+      tanstackStart: (opts: {
+        srcDirectory: string;
+        importProtection?: {
+          client?: { specifiers?: string[] };
+        };
+      }) => PluginOption;
+    };
 
     const nitroPkg = "nitro/vite";
     const { nitro } = (await import(/* webpackIgnore: true */ nitroPkg)) as {
-      nitro: () => PluginOption;
+      nitro: (opts?: {
+        output?: { dir?: string; publicDir?: string; serverDir?: string };
+      }) => PluginOption;
     };
 
     const react = (await import("@vitejs/plugin-react")).default;
@@ -477,14 +487,145 @@ export class ViteCompiler {
     const srcDirectory = fileConfig.input;
     const tsconfigProject = resolve(ROOT_DIR, "tsconfig.tanstack.json");
 
+    const srcDir = resolve(ROOT_DIR, "src");
+    const nextVibeDir = resolve(ROOT_DIR, "src/app/api/[locale]");
+    const tanstackUiDir = resolve(
+      ROOT_DIR,
+      "src/packages/next-vibe-ui/tanstack",
+    );
+    const webUiDir = resolve(ROOT_DIR, "src/packages/next-vibe-ui/web");
+    const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
+
+    const exts = [
+      ".ts",
+      ".tsx",
+      ".js",
+      ".jsx",
+      "/index.ts",
+      "/index.tsx",
+      "/index.js",
+    ];
+    const tryResolve = (bases: string[], sub: string): string | null => {
+      for (const base of bases) {
+        for (const ext of exts) {
+          const candidate = resolve(base, sub + ext);
+          if (existsSync(candidate) && statSync(candidate).isFile()) {
+            return candidate;
+          }
+        }
+      }
+      return null;
+    };
+
     return {
       root: ROOT_DIR,
       plugins: [
         tsconfigPaths({ projects: [tsconfigProject] }) as PluginOption,
-        tanstackStart({ srcDirectory }),
+        tanstackStart({
+          srcDirectory,
+          importProtection: {
+            client: { specifiers: ["server-only"] },
+          },
+        }),
         react(),
-        nitro(),
+        nitro({
+          output: {
+            dir: resolve(ROOT_DIR, fileConfig.output),
+            publicDir: resolve(ROOT_DIR, fileConfig.output, "public"),
+            serverDir: resolve(ROOT_DIR, fileConfig.output, "server"),
+          },
+        }),
+        {
+          name: "next-vibe-ui-ssr-resolver",
+          enforce: "pre",
+          resolveId(id: string): string | null {
+            if (id.startsWith("next-vibe-ui/")) {
+              const sub = id.slice("next-vibe-ui/".length);
+              return tryResolve([tanstackUiDir, webUiDir], sub);
+            }
+            if (id in moduleAliases) {
+              const rel = moduleAliases[id];
+              if (rel) {
+                return resolve(ROOT_DIR, rel);
+              }
+            }
+            return null;
+          },
+        } satisfies PluginOption,
+        // Strip server-only exports from layout/page files for the client bundle.
+        // Same as the dev server plugin — required for production builds too.
+        {
+          name: "tanstack-layout-client-strip",
+          enforce: "pre",
+          async transform(
+            code: string,
+            id: string,
+            opts,
+          ): Promise<{ code: string; map: null } | undefined> {
+            if (
+              opts?.ssr ||
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vite 6 environments API
+              (this as any).environment?.name === "ssr"
+            ) {
+              return undefined;
+            }
+            if (
+              !id.includes("/src/app/") ||
+              (!id.endsWith("/layout.tsx") && !id.endsWith("/page.tsx"))
+            ) {
+              return undefined;
+            }
+            if (!code.includes("tanstackLoader")) {
+              return undefined;
+            }
+            let result = code;
+            result = result.replace(
+              /\nexport default async function\s+\w+[\s\S]*?(?=\nexport |\n\/\/|$)/,
+              "\n",
+            );
+            result = result.replace(
+              /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\n\/\/|$)/,
+              "\n",
+            );
+            return { code: result, map: null };
+          },
+        } as Plugin,
+        {
+          name: "native-node-externals",
+          enforce: "pre",
+          resolveId(id: string) {
+            if (id.endsWith(".node")) {
+              return { id, external: true };
+            }
+            return null;
+          },
+        } as Plugin,
+        // In the client environment, mark node:* built-ins as external so
+        // server-only modules that import them don't cause Rollup to fail.
+        {
+          name: "client-node-externals",
+          enforce: "pre",
+          applyToEnvironment(env: { name: string }) {
+            return env.name === "client";
+          },
+          resolveId(id: string) {
+            if (id.startsWith("node:") || id === "node-gyp-build") {
+              return { id, external: true };
+            }
+            return null;
+          },
+        } as Plugin,
       ],
+      resolve: {
+        alias: [
+          { find: /^@\//, replacement: `${srcDir}/` },
+          { find: /^next-vibe\//, replacement: `${nextVibeDir}/` },
+          ...Object.entries(moduleAliases).map(([specifier, relativePath]) => ({
+            find: specifier,
+            replacement: resolve(ROOT_DIR, relativePath),
+          })),
+        ],
+      },
       logLevel: verbose ? "info" : "warn",
     };
   }
@@ -642,6 +783,91 @@ export class ViteCompiler {
               } as never);
             },
           } as Plugin,
+          // Strip server-only exports (tanstackLoader, default) and their exclusive
+          // imports from layout.tsx / page.tsx files when serving to the client.
+          // This allows lazy(() => import("layout.tsx").then(m => m.TanstackPage))
+          // to work in the browser without pulling in pg, drizzle, etc.
+          // The plugin is the client-side mirror of TanStack's createServerFn stripping.
+          {
+            name: "tanstack-layout-client-strip",
+            enforce: "pre",
+            async transform(
+              code: string,
+              id: string,
+              opts,
+            ): Promise<{ code: string; map: null } | undefined> {
+              // Only run for client (not SSR). Check both opts.ssr (Vite classic)
+              // and this.environment.name (Vite 6 environments API).
+              if (
+                opts?.ssr ||
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vite 6 environments API
+                (this as any).environment?.name === "ssr"
+              ) {
+                return undefined;
+              }
+              // Only target layout.tsx and page.tsx in src/app/[locale]
+              if (
+                !id.includes("/src/app/") ||
+                (!id.endsWith("/layout.tsx") && !id.endsWith("/page.tsx"))
+              ) {
+                return undefined;
+              }
+              // Only process files that export tanstackLoader
+              if (!code.includes("tanstackLoader")) {
+                return undefined;
+              }
+              // Strip server-only exports using regex (simpler, no AST deps).
+              // Remove: export async function tanstackLoader(...) { ... }
+              // Remove: export default async function ...(...) { ... }
+              // Keep: TanstackPage, interfaces, type exports, client imports
+              let result = code;
+              // Remove export default async function (Next.js server component)
+              result = result.replace(
+                /\nexport default async function\s+\w+[\s\S]*?(?=\nexport |\n\/\/|$)/,
+                "\n",
+              );
+              // Remove export async function tanstackLoader
+              result = result.replace(
+                /\nexport async function tanstackLoader[\s\S]*?(?=\nexport |\n\/\/|$)/,
+                "\n",
+              );
+              return { code: result, map: null };
+            },
+          } as Plugin,
+          // React Refresh adds `_c = TanstackPage` assignments without `var _c`
+          // declarations for our stripped layout/page files. In lazy-loaded ESM
+          // modules (strict mode) this throws ReferenceError. Fix: patch bare
+          // `_c = ` assignments into `var _c = ` after React Refresh runs.
+          {
+            name: "tanstack-layout-refresh-fix",
+            enforce: "post",
+            transform(
+              code: string,
+              id: string,
+              opts,
+            ): { code: string; map: null } | undefined {
+              if (
+                opts?.ssr ||
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vite 6 environments API
+                (this as any).environment?.name === "ssr"
+              ) {
+                return undefined;
+              }
+              if (
+                !id.includes("/src/app/") ||
+                (!id.endsWith("/layout.tsx") && !id.endsWith("/page.tsx"))
+              ) {
+                return undefined;
+              }
+              // Only patch files that went through our strip plugin (have _c = but no var _c)
+              if (!code.includes("_c = ") || code.includes("var _c")) {
+                return undefined;
+              }
+              // Replace bare `_c = Foo` with `var _c = Foo`
+              const patched = code.replace(/\n(_c\d*) = /g, "\nvar $1 = ");
+              return { code: patched, map: null };
+            },
+          } as Plugin,
           // Polyfill CommonJS `require()` for SSR — the i18n lazy-loader pattern
           // uses `() => require("./de").translations` which breaks in Vite ESM SSR.
           // apply:"serve" prevents this from running during esbuild dep pre-bundling.
@@ -743,15 +969,21 @@ export class ViteCompiler {
         define: {
           "process.env.NEXT_PUBLIC_APP_URL": JSON.stringify(
             process.env["NEXT_PUBLIC_APP_URL"] ??
-              `http://localhost:${String(port ?? 3001)}`,
+              `http://localhost:${String(publicPort ?? port ?? 3001)}`,
           ),
         },
         server: {
           port: port ?? 3001,
           host: "127.0.0.1",
           watch: {
-            // Ignore .tmp dir — contains bracket paths ([locale]) that crash inotify on Linux
-            ignored: ["**/.tmp/**"],
+            // Ignore .tmp dir — contains bracket paths ([locale]) that crash inotify on Linux.
+            // Ignore routeTree.gen.ts — regenerated by TanStack Start plugin, not user source.
+            // Ignore app-tanstack/routes — auto-generated, touching them shouldn't trigger CSS HMR.
+            ignored: [
+              "**/.tmp/**",
+              "**/routeTree.gen.ts",
+              "**/app-tanstack/routes/**",
+            ],
           },
           // When running behind a proxy (e.g. Bun WS proxy on publicPort), tell Vite's
           // injected HMR client to connect to the proxy port instead of the internal port.
@@ -768,29 +1000,129 @@ export class ViteCompiler {
         // the Next.js Vite cache in node_modules/.vite/deps/
         cacheDir: resolve(ROOT_DIR, "node_modules/.vite-tanstack"),
         logLevel: "info",
-        // Disable dep pre-bundling for all environments (client + ssr).
-        // Our app has thousands of deps; esbuild pre-bundling causes multi-minute
-        // startup freezes. noDiscovery=true + include=[] is the Vite 5+ API.
-        // Exception: CJS-only packages that need pre-bundling for named ESM exports.
+        // Pre-bundle animation/observer packages for SSR too.
+        // Without this the SSR module runner loads their raw ESM which has
+        // internal circular exports — Vite's circular detection fires and
+        // returns partial exports of the importing page before all const
+        // __vite_ssr_import_N__ assignments are done, causing TDZ errors.
+        ssr: {
+          optimizeDeps: {
+            include: [
+              "framer-motion",
+              "react-intersection-observer",
+              "react-joyride",
+            ],
+          },
+        },
+        // Disable auto-discovery: scanning src/app/** pulls in server-only deps
+        // (ssh2, react-native, lightningcss, .node binaries) into the client
+        // optimizeDeps scan and causes esbuild errors. Instead, list only the
+        // CJS packages that are actually needed client-side.
         optimizeDeps: {
           noDiscovery: true,
-          // use-sync-external-store/shim: CJS package needs pre-bundling for named ESM exports.
-          include: ["use-sync-external-store/shim"],
-        },
-        environments: {
-          client: {
-            optimizeDeps: {
-              noDiscovery: true,
-              include: ["use-sync-external-store/shim"],
-            },
-          },
-          ssr: {
-            optimizeDeps: { noDiscovery: true, include: [] },
-          },
+          include: [
+            // Mirrored from .vite/deps/_metadata.json (Next.js pre-bundle list),
+            // minus server-only packages (pg, ssh2, argon2, drizzle, etc.)
+            "react",
+            "react-dom",
+            "react/jsx-dev-runtime",
+            "react/jsx-runtime",
+            "react-dom/client",
+            "@ai-sdk/openai/internal",
+            "@anthropic-ai/claude-agent-sdk",
+            "@dnd-kit/core",
+            "@dnd-kit/sortable",
+            "@hookform/resolvers/zod",
+            "@icons-pack/react-simple-icons",
+            "@openrouter/ai-sdk-provider",
+            "@radix-ui/react-accordion",
+            "@radix-ui/react-alert-dialog",
+            "@radix-ui/react-aspect-ratio",
+            "@radix-ui/react-avatar",
+            "@radix-ui/react-checkbox",
+            "@radix-ui/react-collapsible",
+            "@radix-ui/react-context-menu",
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-hover-card",
+            "@radix-ui/react-label",
+            "@radix-ui/react-menubar",
+            "@radix-ui/react-navigation-menu",
+            "@radix-ui/react-popover",
+            "@radix-ui/react-progress",
+            "@radix-ui/react-radio-group",
+            "@radix-ui/react-scroll-area",
+            "@radix-ui/react-select",
+            "@radix-ui/react-separator",
+            "@radix-ui/react-slider",
+            "@radix-ui/react-slot",
+            "@radix-ui/react-switch",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-toast",
+            "@radix-ui/react-toggle",
+            "@radix-ui/react-toggle-group",
+            "@radix-ui/react-tooltip",
+            "@react-email/components",
+            "@react-email/render",
+            "@tanstack/react-query",
+            "@tanstack/react-table",
+            "@xyflow/react",
+            "ai",
+            "class-variance-authority",
+            "clsx",
+            "cmdk",
+            "date-fns",
+            "date-fns/locale",
+            "embla-carousel-react",
+            "framer-motion",
+            "input-otp",
+            "lightweight-charts",
+            "lucide-react",
+            "nanoid",
+            "next-themes",
+            "react-day-picker",
+            "react-hook-form",
+            "react-intersection-observer",
+            "react-joyride",
+            "react-markdown",
+            "react-syntax-highlighter",
+            "react-syntax-highlighter/dist/cjs/styles/prism",
+            "remark-breaks",
+            "remark-gfm",
+            "sonner",
+            "tailwind-merge",
+            "turndown",
+            "uuid",
+            "vaul",
+            "victory",
+            "zod",
+            "zod/v4",
+            "zustand",
+            "zustand/middleware",
+            "cron-parser",
+            // Additional CJS packages not in Next.js list
+            "style-to-js",
+            "debug",
+            "extend",
+            "use-sync-external-store",
+            "use-sync-external-store/shim",
+            "lowlight",
+            "highlight.js",
+            "@babel/runtime/regenerator",
+          ],
         },
       });
 
       await server.listen();
+      // Disable Node.js HTTP server timeouts — SSR renders can take >5s on
+      // first load (cold module evaluation) and the default keepAliveTimeout
+      // (5s) / headersTimeout (60s) would close the socket mid-render.
+      if (server.httpServer) {
+        const httpServer = server.httpServer as NodeHttpServer;
+        httpServer.keepAliveTimeout = 0;
+        httpServer.headersTimeout = 0;
+        httpServer.timeout = 0;
+      }
       const resolvedPort = server.config.server.port ?? port ?? 3001;
       const url = `http://localhost:${resolvedPort}`;
       const publicUrl = publicPort ? `http://localhost:${publicPort}` : url;

@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @source "../..";
 @source not "../../**/i18n/**";
+@source not "../../app-tanstack/**";
+@source not "../../**/generated/**";
+@source not "../../**/*.route.ts";
 
 @plugin 'tailwindcss-animate';
 

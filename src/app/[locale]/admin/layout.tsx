@@ -10,20 +10,25 @@ import type { ReactNode } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
 import { UserByIdRepository } from "@/app/api/[locale]/users/user/[id]/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { AdminLayoutClient } from "./_components/admin-layout-client";
 
-interface AdminLayoutProps {
-  children: ReactNode;
-  params: Promise<{ locale: CountryLanguage }>;
+export interface AdminLayoutData {
+  locale: CountryLanguage;
+  user: JwtPayloadType;
+  userData: UserGetResponseOutput;
+  children?: ReactNode;
 }
 
-export default async function AdminLayout({
-  children,
+export async function tanstackLoader({
   params,
-}: AdminLayoutProps): Promise<React.JSX.Element> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<Omit<AdminLayoutData, "children">> {
   const { locale } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -39,15 +44,31 @@ export default async function AdminLayout({
     redirect(`/${locale}/`);
   }
 
+  return { locale, user: minimalUser, userData: userResponse.data };
+}
+
+export function TanstackPage({
+  locale,
+  user,
+  userData,
+  children,
+}: AdminLayoutData): React.JSX.Element {
   return (
     <PageLayout scrollable={true}>
-      <AdminLayoutClient
-        locale={locale}
-        user={minimalUser}
-        userData={userResponse.data}
-      >
+      <AdminLayoutClient locale={locale} user={user} userData={userData}>
         {children}
       </AdminLayoutClient>
     </PageLayout>
   );
+}
+
+export default async function AdminLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<React.JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data}>{children}</TanstackPage>;
 }

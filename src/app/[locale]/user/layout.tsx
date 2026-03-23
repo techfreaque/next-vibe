@@ -40,11 +40,17 @@ export async function generateMetadata({
   });
 }
 
-export default function UserLayout({
-  children,
-}: {
-  children: ReactNode;
-}): JSX.Element {
+export interface UserLayoutData {
+  children?: ReactNode;
+}
+
+export async function tanstackLoader(): Promise<
+  Omit<UserLayoutData, "children">
+> {
+  return {};
+}
+
+export function TanstackPage({ children }: UserLayoutData): JSX.Element {
   return (
     <PageLayout scrollable={true}>
       <Div className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -52,4 +58,12 @@ export default function UserLayout({
       </Div>
     </PageLayout>
   );
+}
+
+export default function UserLayout({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element {
+  return <TanstackPage>{children}</TanstackPage>;
 }

@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import { parseError } from "../../../shared/utils";
 import type { EndpointLogger } from "../shared/logger/endpoint";

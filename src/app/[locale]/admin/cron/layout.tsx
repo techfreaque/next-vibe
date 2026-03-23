@@ -1,6 +1,6 @@
 /**
- * Admin Users Layout
- * Shared layout for all admin users pages with navigation
+ * Admin Cron Layout
+ * Shared layout for all admin cron pages with navigation
  */
 
 import type { JSX, ReactNode } from "react";
@@ -8,19 +8,31 @@ import type { JSX, ReactNode } from "react";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-interface AdminUsersLayoutProps {
-  children: ReactNode;
-  params: Promise<{ locale: CountryLanguage }>;
+export interface AdminCronLayoutData {
+  children?: ReactNode;
 }
 
-export default async function AdminUsersLayout({
+export async function tanstackLoader({
+  params,
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<Omit<AdminCronLayoutData, "children">> {
+  const { locale } = await params;
+  await requireAdminUser(locale, `/${locale}/admin/cron`);
+  return {};
+}
+
+export function TanstackPage({ children }: AdminCronLayoutData): JSX.Element {
+  return <>{children}</>;
+}
+
+export default async function AdminCronLayout({
   children,
   params,
-}: AdminUsersLayoutProps): Promise<JSX.Element> {
-  const { locale } = await params;
-
-  // Require admin user authentication
-  await requireAdminUser(locale, `/${locale}/admin/cron`);
-
-  return <>{children}</>;
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data}>{children}</TanstackPage>;
 }

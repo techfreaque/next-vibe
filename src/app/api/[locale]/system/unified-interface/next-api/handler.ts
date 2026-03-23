@@ -8,8 +8,8 @@
 import "../shared/logger/error-persist";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
+import { NextResponse } from "next-vibe-ui/lib/request";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";

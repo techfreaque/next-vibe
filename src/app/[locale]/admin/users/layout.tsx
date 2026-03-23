@@ -11,21 +11,37 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { AdminUsersLayoutClient } from "./_components/admin-users-layout-client";
 
-interface AdminUsersLayoutProps {
-  children: ReactNode;
+export interface AdminUsersLayoutData {
+  locale: CountryLanguage;
+  children?: ReactNode;
+}
+
+export async function tanstackLoader({
+  params,
+}: {
   params: Promise<{ locale: CountryLanguage }>;
+}): Promise<Omit<AdminUsersLayoutData, "children">> {
+  const { locale } = await params;
+  await requireAdminUser(locale, `/${locale}/admin/users`);
+  return { locale };
+}
+
+export function TanstackPage({
+  locale,
+  children,
+}: AdminUsersLayoutData): React.JSX.Element {
+  return (
+    <AdminUsersLayoutClient locale={locale}>{children}</AdminUsersLayoutClient>
+  );
 }
 
 export default async function AdminUsersLayout({
   children,
   params,
-}: AdminUsersLayoutProps): Promise<React.JSX.Element> {
-  const { locale } = await params;
-
-  // Require admin user authentication
-  await requireAdminUser(locale, `/${locale}/admin/users`);
-
-  return (
-    <AdminUsersLayoutClient locale={locale}>{children}</AdminUsersLayoutClient>
-  );
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<React.JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data}>{children}</TanstackPage>;
 }

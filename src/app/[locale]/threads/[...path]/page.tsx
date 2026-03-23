@@ -116,6 +116,18 @@ export async function tanstackLoader({
   );
 
   const user = userResponse.success ? userResponse.data : undefined;
+
+  // Determine root folder early so we can redirect unauthenticated users
+  // away from private/incognito folders before doing any DB work
+  const { initialRootFolderId: earlyRootFolderId } = parseChatUrl(path);
+  const isPrivateFolder =
+    earlyRootFolderId === DefaultFolderId.PRIVATE ||
+    earlyRootFolderId === DefaultFolderId.INCOGNITO;
+
+  if (user?.isPublic && earlyRootFolderId === DefaultFolderId.PRIVATE) {
+    redirect(`/${locale}/threads/incognito`);
+  }
+
   if (!user) {
     return {
       locale,

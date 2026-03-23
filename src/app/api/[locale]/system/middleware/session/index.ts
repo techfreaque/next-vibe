@@ -5,8 +5,8 @@
  * Invalid or expired sessions are cleared to prevent stale tokens.
  */
 
-import type { NextRequest, NextResponse } from "next/server";
-import { NextResponse as NextResponseClass } from "next/server";
+import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe-ui/lib/request";
 
 import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";

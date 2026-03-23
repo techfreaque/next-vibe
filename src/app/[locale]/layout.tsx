@@ -5,6 +5,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Body } from "next-vibe-ui/ui/body";
 import { inter } from "next-vibe-ui/ui/font";
+import { Head } from "next-vibe-ui/ui/head";
 import { Html } from "next-vibe-ui/ui/html";
 import { Outlet } from "next-vibe-ui/ui/outlet";
 import { Script } from "next-vibe-ui/ui/script";
@@ -76,7 +77,7 @@ export async function tanstackLoader({
   params,
 }: {
   params: Promise<{ locale: CountryLanguage }>;
-}): Promise<RootLayoutData> {
+}): Promise<Omit<RootLayoutData, "children">> {
   const { locale } = await params;
   const { t } = simpleT(locale);
   const structuredData = {
@@ -116,11 +117,11 @@ export function TanstackPage({
 }: RootLayoutData): JSX.Element {
   return (
     <Html lang={locale} suppressHydrationWarning>
-      <head>
+      <Head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/images/apple-icon.png" />
         <link rel="manifest" href={`/api/${locale}/manifest`} />
-      </head>
+      </Head>
       <Body className={inter.className}>
         <RootProviders locale={locale}>
           <Outlet>{children}</Outlet>

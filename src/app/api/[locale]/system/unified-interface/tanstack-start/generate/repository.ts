@@ -169,7 +169,8 @@ export class GenerateTanstackRoutesRepository {
         )
       : [];
 
-    // Generate layout files
+    // Generate layout files — track written flat names to skip duplicate route groups
+    const writtenLayoutNames = new Set<string>();
     for (const relPath of allLayouts) {
       const dir = dirname(relPath);
       // Root layout (dir === ".") is handled by __root.tsx — skip it here
@@ -182,6 +183,17 @@ export class GenerateTanstackRoutesRepository {
         result.skipped.push(relPath);
         continue;
       }
+      // Skip if this dir (after route group stripping) maps to an already-written flat name
+      const { flatName } = GenerateTanstackRoutesRepository.buildPaths(
+        dir,
+        GenerateTanstackRoutesRepository.UI_DIR,
+        "layout",
+      );
+      if (writtenLayoutNames.has(flatName)) {
+        result.skipped.push(relPath);
+        continue;
+      }
+      writtenLayoutNames.add(flatName);
       try {
         const outFile = GenerateTanstackRoutesRepository.emitLayoutFile(
           dir,
@@ -209,6 +221,7 @@ export class GenerateTanstackRoutesRepository {
           dir,
           srcFile,
           GenerateTanstackRoutesRepository.UI_DIR,
+          writtenLayoutNames,
         );
         if (outFile) {
           result.created.push(outFile);
@@ -315,32 +328,92 @@ export class GenerateTanstackRoutesRepository {
     const hasTanstackLoader =
       GenerateTanstackRoutesRepository.hasTanstackLoaderExport(srcFile);
     const isClientComponent =
-      GenerateTanstackRoutesRepository.hasUseClientDirective(srcFile);
+      GenerateTanstackRoutesRepository.hasUseClientDirective(srcFile) ||
+      GenerateTanstackRoutesRepository.hasSyncDefaultExport(srcFile);
 
     let content: string;
     if (hasTanstackLoader) {
-      content = [
+      const hasSearch =
+        GenerateTanstackRoutesRepository.hasSearchParamsInLoader(srcFile);
+      const hasParams =
+        GenerateTanstackRoutesRepository.hasParamsInLoader(srcFile);
+
+      const layoutLines: string[] = [
         `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
         `import { lazy } from "react";`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
-        `import { createServerFn } from "@tanstack/react-start";`,
-        `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
+      ];
+
+      if (hasParams || hasSearch) {
+        layoutLines.push(
+          `import { createServerFn } from "@tanstack/react-start";`,
+          `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
+        );
+      } else {
+        layoutLines.push(
+          `import { createServerFn } from "@tanstack/react-start";`,
+        );
+      }
+
+      layoutLines.push(
         ``,
         `const TanstackLayout = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
         ``,
         `const loadData = createServerFn({ method: "GET" })`,
-        `  .inputValidator((params: Record<string, string>) => params)`,
-        `  .handler(async ({ data: params }) => {`,
-        `    const { tanstackLoader } = await import("${importPath}");`,
-        `    return tanstackLoader({ params: Promise.resolve(toNextParams(params)) });`,
-        `  });`,
-        ``,
-        `export const Route = createFileRoute("${routePath}")({`,
-        `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-        `  component: () => <TanstackLayout {...Route.useLoaderData()}><Outlet /></TanstackLayout>,`,
-        `});`,
-        ``,
-      ].join("\n");
+      );
+
+      if (hasParams || hasSearch) {
+        layoutLines.push(
+          `  .inputValidator((data: ${hasSearch ? "{ params: Record<string, string>; search: Record<string, string> }" : "Record<string, string>"}) => data)`,
+          `  .handler(async ({ data }) => {`,
+          `    const { tanstackLoader } = await import("${importPath}");`,
+          `    return tanstackLoader({ params: Promise.resolve(toNextParams(${hasSearch ? "data.params" : "data"}))${hasSearch ? ", searchParams: Promise.resolve(data.search)" : ""} });`,
+          `  });`,
+        );
+      } else {
+        layoutLines.push(
+          `  .inputValidator((data: Record<string, string>) => data)`,
+          `  .handler(async () => {`,
+          `    const { tanstackLoader } = await import("${importPath}");`,
+          `    return tanstackLoader();`,
+          `  });`,
+        );
+      }
+
+      layoutLines.push(``);
+
+      if (hasSearch) {
+        layoutLines.push(
+          `export const Route = createFileRoute("${routePath}")({`,
+          `  staleTime: 0,`,
+          `  validateSearch: (search: Record<string, string>) => search,`,
+          `  loaderDeps: ({ search }) => ({ search }),`,
+          `  loader: ({ params, deps: { search } }) => Promise.all([loadData({ data: { params: params as Record<string, string>, search } }), import("${importPath}")]).then(([data]) => data),`,
+          `  component: () => <TanstackLayout {...Route.useLoaderData()}><Outlet /></TanstackLayout>,`,
+          `});`,
+          ``,
+        );
+      } else if (hasParams) {
+        layoutLines.push(
+          `export const Route = createFileRoute("${routePath}")({`,
+          `  staleTime: 0,`,
+          `  loader: ({ params }) => Promise.all([loadData({ data: params as Record<string, string> }), import("${importPath}")]).then(([data]) => data),`,
+          `  component: () => <TanstackLayout {...Route.useLoaderData()}><Outlet /></TanstackLayout>,`,
+          `});`,
+          ``,
+        );
+      } else {
+        layoutLines.push(
+          `export const Route = createFileRoute("${routePath}")({`,
+          `  staleTime: 0,`,
+          `  loader: () => Promise.all([loadData(), import("${importPath}")]).then(([data]) => data),`,
+          `  component: () => <TanstackLayout {...Route.useLoaderData()}><Outlet /></TanstackLayout>,`,
+          `});`,
+          ``,
+        );
+      }
+
+      content = layoutLines.join("\n");
     } else if (isClientComponent) {
       // "use client" layout: safe to import and use directly as a wrapper.
       content = [
@@ -382,9 +455,29 @@ export class GenerateTanstackRoutesRepository {
     dir: string,
     srcFile: string,
     sourceDir: string,
+    writtenLayoutNames: Set<string> = new Set(),
   ): string | null {
-    const { flatName, routePath, importPath } =
+    // Detect catch-all segment — Next.js [...name] maps to TanStack splat ($)
+    const catchAllName =
+      GenerateTanstackRoutesRepository.getCatchAllParamName(dir);
+
+    let { flatName, routePath, importPath } =
       GenerateTanstackRoutesRepository.buildPaths(dir, sourceDir, "page");
+
+    // For catch-all pages, override flat name/route to use TanStack splat ($)
+    // instead of a named param (which only matches a single segment).
+    // Splat routes are emitted as layout-style files (no .index suffix).
+    // e.g. threads/[...path]/page.tsx → $locale.threads.$.tsx, route /$locale/threads/$
+    if (catchAllName) {
+      // Replace $catchAllName.index with $ (splat, no index suffix)
+      flatName = flatName
+        .replace(new RegExp(`\\.\\$${catchAllName}\\.index$`), ".$")
+        .replace(new RegExp(`^\\$${catchAllName}\\.index$`), "$");
+      routePath = routePath
+        .replace(new RegExp(`/\\$${catchAllName}/$`), "/$")
+        .replace(new RegExp(`/\\$${catchAllName}$`), "/$");
+    }
+
     const outPath = join(
       GenerateTanstackRoutesRepository.ROUTES_DIR,
       `${flatName}.tsx`,
@@ -394,28 +487,136 @@ export class GenerateTanstackRoutesRepository {
       srcFile,
     ).replace(/\\/g, "/");
 
-    const content = [
+    const hasSearch =
+      GenerateTanstackRoutesRepository.hasSearchParamsInLoader(srcFile);
+
+    // Detect a skipped route-group layout that should wrap this page inline
+    const skippedGroupLayoutImport =
+      GenerateTanstackRoutesRepository.findSkippedGroupLayout(
+        dir,
+        sourceDir,
+        writtenLayoutNames,
+      );
+
+    const lines = [
       `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
       `import { lazy } from "react";`,
       `import { createFileRoute } from "@tanstack/react-router";`,
       `import { createServerFn } from "@tanstack/react-start";`,
       `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
-      ``,
-      `const TanstackPage = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
-      ``,
-      `const loadData = createServerFn({ method: "GET" })`,
-      `  .inputValidator((params: Record<string, string>) => params)`,
-      `  .handler(async ({ data: params }) => {`,
-      `    const { tanstackLoader } = await import("${importPath}");`,
-      `    return tanstackLoader({ params: Promise.resolve(toNextParams(params)) });`,
-      `  });`,
-      ``,
-      `export const Route = createFileRoute("${routePath}")({`,
-      `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
-      `  component: () => <TanstackPage {...Route.useLoaderData()} />,`,
-      `});`,
-      ``,
-    ].join("\n");
+    ];
+
+    if (skippedGroupLayoutImport) {
+      lines.push(
+        `import { TanstackPage as GroupLayout } from "${skippedGroupLayoutImport}";`,
+      );
+    }
+
+    if (catchAllName) {
+      // Splat route: params contains _splat (the joined path after the prefix)
+      // We re-map _splat → the original catch-all param name as a string[] for Next.js
+      const inputType = hasSearch
+        ? "{ params: Record<string, string>; search: Record<string, string> }"
+        : "Record<string, string>";
+      const paramsExpr = hasSearch ? "data.params" : "data";
+      lines.push(
+        `import type { CountryLanguage } from "@/i18n/core/config";`,
+        ``,
+        `const TanstackPage = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
+        ``,
+        `const loadData = createServerFn({ method: "GET" })`,
+        `  .inputValidator((data: ${inputType}) => data)`,
+        `  .handler(async ({ data }) => {`,
+        `    const { tanstackLoader } = await import("${importPath}");`,
+        `    const p = toNextParams(${paramsExpr});`,
+        `    return tanstackLoader({`,
+        `      params: Promise.resolve({`,
+        `        ...p,`,
+        `        ${catchAllName}: (p["_splat"] ?? "").split("/").filter(Boolean),`,
+        `      } as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
+        hasSearch
+          ? `      searchParams: Promise.resolve(data.search),`
+          : `      searchParams: Promise.resolve({}),`,
+        `    });`,
+        `  });`,
+        ``,
+      );
+
+      const componentJsx = skippedGroupLayoutImport
+        ? `<GroupLayout><TanstackPage {...Route.useLoaderData()} /></GroupLayout>`
+        : `<TanstackPage {...Route.useLoaderData()} />`;
+
+      if (hasSearch) {
+        lines.push(
+          `export const Route = createFileRoute("${routePath}")({`,
+          `  staleTime: 0,`,
+          `  validateSearch: (search: Record<string, string>) => search,`,
+          `  loaderDeps: ({ search }) => ({ search }),`,
+          `  loader: ({ params, deps: { search } }) => Promise.all([loadData({ data: { params: params as Record<string, string>, search } }), import("${importPath}")]).then(([data]) => data),`,
+          `  component: () => ${componentJsx},`,
+          `});`,
+          ``,
+        );
+      } else {
+        lines.push(
+          `export const Route = createFileRoute("${routePath}")({`,
+          `  staleTime: 0,`,
+          `  loader: ({ params }) => Promise.all([loadData({ data: params as Record<string, string> }), import("${importPath}")]).then(([data]) => data),`,
+          `  component: () => ${componentJsx},`,
+          `});`,
+          ``,
+        );
+      }
+    } else {
+      // Normal (non-splat) page
+      const inputType = hasSearch
+        ? "{ params: Record<string, string>; search: Record<string, string> }"
+        : "Record<string, string>";
+      const handlerBody = hasSearch
+        ? `    return tanstackLoader({ params: Promise.resolve(toNextParams(data.params)), searchParams: Promise.resolve(data.search) });`
+        : `    return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });`;
+
+      lines.push(
+        ``,
+        `const TanstackPage = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
+        ``,
+        `const loadData = createServerFn({ method: "GET" })`,
+        `  .inputValidator((data: ${inputType}) => data)`,
+        `  .handler(async ({ data }) => {`,
+        `    const { tanstackLoader } = await import("${importPath}");`,
+        `    ${handlerBody}`,
+        `  });`,
+        ``,
+      );
+
+      const componentJsx = skippedGroupLayoutImport
+        ? `<GroupLayout><TanstackPage {...Route.useLoaderData()} /></GroupLayout>`
+        : `<TanstackPage {...Route.useLoaderData()} />`;
+
+      if (hasSearch) {
+        lines.push(
+          `export const Route = createFileRoute("${routePath}")({`,
+          `  staleTime: 0,`,
+          `  validateSearch: (search: Record<string, string>) => search,`,
+          `  loaderDeps: ({ search }) => ({ search }),`,
+          `  loader: ({ params, deps: { search } }) => Promise.all([loadData({ data: { params: params as Record<string, string>, search } }), import("${importPath}")]).then(([data]) => data),`,
+          `  component: () => ${componentJsx},`,
+          `});`,
+          ``,
+        );
+      } else {
+        lines.push(
+          `export const Route = createFileRoute("${routePath}")({`,
+          `  staleTime: 0,`,
+          `  loader: ({ params }) => Promise.all([loadData({ data: params as Record<string, string> }), import("${importPath}")]).then(([data]) => data),`,
+          `  component: () => ${componentJsx},`,
+          `});`,
+          ``,
+        );
+      }
+    }
+
+    const content = lines.join("\n");
 
     writeFileSync(outPath, content, "utf-8");
     return relative(
@@ -568,6 +769,62 @@ export class GenerateTanstackRoutesRepository {
     return segment;
   }
 
+  /**
+   * If `dir` contains a catch-all segment `[...name]`, returns the param name.
+   * Used to generate correct splat param handling in the server function.
+   */
+  private static getCatchAllParamName(dir: string): string | null {
+    for (const segment of dir.split("/")) {
+      const m = /^\[\.\.\.(.+)\]$/.exec(segment);
+      if (m) {
+        return m[1];
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Find a route-group layout that was skipped because its flat name collided
+   * with a sibling (non-group) layout. Returns the import path of that layout,
+   * or null if no such layout exists.
+   *
+   * For example, given dir = "user/(other)/login", this checks if
+   * "user/(other)/layout.tsx" exists and would have been skipped because
+   * "user/layout.tsx" already wrote the flat name "$locale.user".
+   */
+  private static findSkippedGroupLayout(
+    dir: string,
+    sourceDir: string,
+    writtenLayoutNames: Set<string>,
+  ): string | null {
+    const segments = dir === "." ? [] : dir.split("/");
+    // Walk from innermost to outermost ancestor looking for a route group with a layout
+    for (let i = segments.length - 1; i >= 0; i--) {
+      const seg = segments[i];
+      if (!seg.startsWith("(") || !seg.endsWith(")")) {
+        continue;
+      }
+      // Found a route group ancestor — check if it has a layout.tsx
+      const groupDir = segments.slice(0, i + 1).join("/");
+      const layoutFile = join(sourceDir, groupDir, "layout.tsx");
+      if (!existsSync(layoutFile)) {
+        continue;
+      }
+      // Compute what flat name this layout would have had
+      const { flatName, importPath } =
+        GenerateTanstackRoutesRepository.buildPaths(
+          groupDir,
+          sourceDir,
+          "layout",
+        );
+      // If this flat name was already taken, this layout was skipped
+      if (writtenLayoutNames.has(flatName)) {
+        return importPath;
+      }
+    }
+    return null;
+  }
+
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------
@@ -642,6 +899,27 @@ export class GenerateTanstackRoutesRepository {
     }
   }
 
+  /**
+   * Returns true if the layout has a sync (non-async) default export function.
+   * Such layouts contain no server-only APIs and can be imported directly in TanStack.
+   */
+  private static hasSyncDefaultExport(filePath: string): boolean {
+    if (!existsSync(filePath)) {
+      return false;
+    }
+    try {
+      const content = readFileSync(filePath, "utf-8");
+      // Matches: export default function Foo or export default function(
+      // but NOT: export default async function
+      return (
+        /\bexport\s+default\s+function\s+\w/.test(content) &&
+        !/\bexport\s+default\s+async\s+function\b/.test(content)
+      );
+    } catch {
+      return false;
+    }
+  }
+
   private static hasUseClientDirective(filePath: string): boolean {
     if (!existsSync(filePath)) {
       return false;
@@ -667,6 +945,36 @@ export class GenerateTanstackRoutesRepository {
     try {
       const content = readFileSync(filePath, "utf-8");
       return /\bexport\s+(async\s+)?function\s+tanstackLoader\b/.test(content);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Returns true if tanstackLoader accepts a params argument (i.e. uses { params } in its signature).
+   * No-data layouts define tanstackLoader() with no args — those should be called without params.
+   */
+  private static hasParamsInLoader(filePath: string): boolean {
+    if (!existsSync(filePath)) {
+      return false;
+    }
+    try {
+      const content = readFileSync(filePath, "utf-8");
+      // Match tanstackLoader({ or tanstackLoader( followed by { params within ~100 chars
+      return /\btanstackLoader\s*\(\s*\{[\s\S]{0,100}\bparams\b/.test(content);
+    } catch {
+      return false;
+    }
+  }
+
+  private static hasSearchParamsInLoader(filePath: string): boolean {
+    if (!existsSync(filePath)) {
+      return false;
+    }
+    try {
+      const content = readFileSync(filePath, "utf-8");
+      // Check if tanstackLoader function destructures searchParams from its argument
+      return /\btanstackLoader\b[\s\S]{0,300}searchParams/.test(content);
     } catch {
       return false;
     }

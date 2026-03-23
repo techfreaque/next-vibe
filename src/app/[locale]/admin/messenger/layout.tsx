@@ -9,20 +9,38 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EmailsAdminLayoutClient } from "./_components/emails-admin-layout-client";
 
-interface EmailsAdminLayoutProps {
-  children: ReactNode;
-  params: Promise<{ locale: CountryLanguage }>;
+export interface EmailsAdminLayoutData {
+  locale: CountryLanguage;
+  children?: ReactNode;
 }
 
-export default async function EmailsAdminLayout({
-  children,
+export async function tanstackLoader({
   params,
-}: EmailsAdminLayoutProps): Promise<JSX.Element> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<Omit<EmailsAdminLayoutData, "children">> {
   const { locale } = await params;
+  return { locale };
+}
 
+export function TanstackPage({
+  locale,
+  children,
+}: EmailsAdminLayoutData): JSX.Element {
   return (
     <EmailsAdminLayoutClient locale={locale}>
       {children}
     </EmailsAdminLayoutClient>
   );
+}
+
+export default async function EmailsAdminLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params });
+  return <TanstackPage {...data}>{children}</TanstackPage>;
 }

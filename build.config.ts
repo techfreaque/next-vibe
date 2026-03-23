@@ -144,11 +144,11 @@ const config: BuildConfig = {
     // ── TanStack Start (SSR) ─────────────────────────────────────────────────
     // Full-stack SSR build using @tanstack/react-start + nitro.
     // `input` = srcDirectory for tanstackStart plugin (src/app-tanstack).
-    // `output` = .output (Nitro outputs .output/server/index.mjs).
+    // `output` = .dist-tanstack (Nitro outputs .dist-tanstack/server/index.mjs).
     {
       disabled: true,
       input: "src/app-tanstack",
-      output: ".output",
+      output: ".dist-tanstack",
       type: ViteBuildTypeEnum.TANSTACK_START,
       viteOptions: {
         // Map Next.js imports → TanStack equivalents.

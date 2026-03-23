@@ -4,7 +4,7 @@
  */
 
 import { initTRPC } from "@trpc/server";
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import { ZodError } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";

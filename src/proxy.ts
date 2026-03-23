@@ -4,7 +4,7 @@
  * This file implements the middleware for the application.
  */
 
-import type { NextRequest, NextResponse } from "next/server";
+import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
 
 // we have to use relative paths as vercel cant resolve import aliases from here
 import { middleware } from "./app/api/[locale]/system/middleware";
@@ -39,6 +39,6 @@ export const config = {
   matcher: [
     // Match all paths except static files and specific API routes
     "/",
-    "/((?!_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml|vibe-frame|api/[^/]+/manifest).*)",
+    "/((?!_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml|vibe-frame|api/[^/]+/manifest|_serverFn).*)",
   ],
 };

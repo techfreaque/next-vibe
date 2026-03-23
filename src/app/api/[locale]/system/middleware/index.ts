@@ -4,8 +4,8 @@
  * This file exports the middleware system for Next.js applications.
  */
 
-import type { NextRequest, NextResponse } from "next/server";
-import { NextResponse as NextResponseClass } from "next/server";
+import type { NextRequest, NextResponse } from "next-vibe-ui/lib/request";
+import { NextResponse as NextResponseClass } from "next-vibe-ui/lib/request";
 import { Environment } from "next-vibe/shared/utils";
 
 import {

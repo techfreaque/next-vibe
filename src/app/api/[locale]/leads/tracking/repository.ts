@@ -6,7 +6,7 @@
 import "server-only";
 
 import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,

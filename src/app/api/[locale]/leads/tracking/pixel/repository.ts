@@ -3,7 +3,7 @@
  * Handles pixel tracking requests and engagement recording
  */
 
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 

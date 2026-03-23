@@ -4,7 +4,7 @@
  * All validation is handled by genericHandler
  */
 
-import { NextResponse } from "next/server";
+import { NextResponse } from "next-vibe-ui/lib/request";
 import type {
   ErrorResponseType,
   ResponseType,

@@ -12,7 +12,7 @@ import {
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
-import type { NextRequest } from "next/server";
+import type { NextRequest } from "next-vibe-ui/lib/request";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
