@@ -770,6 +770,7 @@ export class PulseHealthRepository {
                     result: typedResult.success
                       ? (typedResult.data ?? null)
                       : null,
+                    error: !typedResult.success ? typedResult : null,
                     retryAttempt: attempt,
                     parentExecutionId: firstExecutionId,
                     triggeredBy: "pulse",
