@@ -114,7 +114,7 @@ export class AuthRepository {
     }
 
     try {
-      const { cookies } = await import("next/headers");
+      const { cookies } = await import("next-vibe-ui/lib/headers");
 
       const cookieStore = await cookies();
       cookieStore.set({
@@ -139,6 +139,16 @@ export class AuthRepository {
   }
 
   /**
+   * Deduplicates concurrent lead-creation requests for the same stale cookie value.
+   * Key: stale leadId string. Value: in-flight promise resolving to the new leadId.
+   * Cleared after resolution so memory doesn't grow unbounded.
+   */
+  private static readonly pendingLeadCreations = new Map<
+    string,
+    Promise<string>
+  >();
+
+  /**
    * Get leadId from database (platform-agnostic)
    * Note: This method should not access cookies directly - platform handlers manage storage
    * Returns both the leadId and a flag indicating if the cookie should be updated
@@ -160,7 +170,7 @@ export class AuthRepository {
 
     // For public users, use the platform handler to check cookies first
     // This prevents creating duplicate leads on every page load
-    const { cookies } = await import("next/headers");
+    const { cookies } = await import("next-vibe-ui/lib/headers");
     const cookieStore = await cookies();
     const existingLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
 
@@ -175,18 +185,29 @@ export class AuthRepository {
       }
       logger.warn(
         "Invalid leadId in cookie (possibly after DB reset), creating new one",
-        {
-          invalidLeadId: existingLeadId,
-          platform,
-        },
+        { invalidLeadId: existingLeadId, platform },
       );
     }
 
-    // No valid leadId in cookie, create a new one and flag that cookie needs update
-    const newLeadId = await AuthRepository.getLeadIdForPublicUser(
+    // Deduplicate concurrent requests carrying the same stale cookie:
+    // if another request is already creating a lead for this cookie value,
+    // reuse that promise instead of spawning a redundant DB insert.
+    const dedupeKey = existingLeadId ?? `__no_cookie__${locale}`;
+    const inflight = AuthRepository.pendingLeadCreations.get(dedupeKey);
+    if (inflight) {
+      const newLeadId = await inflight;
+      return { leadId: newLeadId, shouldUpdateCookie: true };
+    }
+
+    const creationPromise = AuthRepository.getLeadIdForPublicUser(
       locale,
       logger,
-    );
+    ).finally(() => {
+      AuthRepository.pendingLeadCreations.delete(dedupeKey);
+    });
+    AuthRepository.pendingLeadCreations.set(dedupeKey, creationPromise);
+
+    const newLeadId = await creationPromise;
     logger.info("Created new lead for public user, cookie will be updated", {
       leadId: newLeadId,
       platform,

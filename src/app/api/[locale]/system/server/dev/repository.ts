@@ -1173,13 +1173,31 @@ export class DevRepository {
 
     try {
       process.kill(pidOnPort, "SIGTERM");
-      logger.info(`Killed stale process on port ${port}`);
+      logger.debug(`Killed stale process on port ${port}`);
     } catch {
       // Already dead
     }
 
-    // Wait until the port is actually released (up to 5 seconds)
-    const deadline = Date.now() + 5000;
+    // Wait up to 2s for graceful shutdown, then SIGKILL
+    const gracePeriod = Date.now() + 2000;
+    while (Date.now() < gracePeriod) {
+      try {
+        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+        execSync("sleep 0.1");
+      } catch {
+        return; // port released
+      }
+    }
+
+    // Still alive — force kill
+    try {
+      process.kill(pidOnPort, "SIGKILL");
+    } catch {
+      // Already dead
+    }
+
+    // Wait up to 3 more seconds for port release after SIGKILL
+    const deadline = Date.now() + 3000;
     while (Date.now() < deadline) {
       try {
         execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });

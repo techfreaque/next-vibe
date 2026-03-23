@@ -6,7 +6,7 @@
 import "server-only";
 
 import { eq, lt, or } from "drizzle-orm";
-import { cookies } from "next/headers";
+import { cookies } from "next-vibe-ui/lib/headers";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,

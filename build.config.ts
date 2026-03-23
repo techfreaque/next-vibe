@@ -154,16 +154,12 @@ const config: BuildConfig = {
         // Map Next.js imports → TanStack equivalents.
         // Applied as resolve.alias so they work in both client and SSR module runner.
         moduleAliases: {
-          "next/navigation":
-            "src/packages/next-vibe-ui/tanstack/hooks/use-navigation.tsx",
-          "next/link": "src/packages/next-vibe-ui/tanstack/ui/link.tsx",
-          "next/image": "src/packages/next-vibe-ui/tanstack/ui/image.tsx",
-          "next/script": "src/packages/next-vibe-ui/tanstack/ui/script.tsx",
           // server-only throws in Vite SSR (no Next.js boundaries) - stub it out
           "server-only":
             "src/packages/next-vibe-ui/tanstack/lib/server-only.ts",
-          // next/headers - cookies()/headers() backed by TanStack getWebRequest()
-          "next/headers": "src/packages/next-vibe-ui/tanstack/lib/headers.ts",
+          // Override web Head with TanStack version (injects HeadContent + blocking theme script)
+          "next-vibe-ui/ui/head":
+            "src/packages/next-vibe-ui/tanstack/ui/head.tsx",
         },
       },
     },

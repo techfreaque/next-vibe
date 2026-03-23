@@ -5,10 +5,24 @@ export interface HeadProps {
   children: ReactNode;
 }
 
+// Mirrors next-themes' inline script (attribute="class", storageKey="theme",
+// defaultTheme="system", enableSystem=true). Must run before any stylesheet
+// so the correct dark/light class is on <html> before first paint.
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("theme")||"system";var d=document.documentElement;if(t==="system")t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";d.classList.remove("light","dark");d.classList.add(t);d.style.colorScheme=t;}catch(e){}})()`;
+
 /**
  * Platform-agnostic Head wrapper component (Web implementation)
  * Wraps HTML <head> tag with platform-agnostic interface
  */
 export function Head({ children }: HeadProps): JSX.Element {
-  return <head>{children}</head>;
+  return (
+    <head>
+      {/* eslint-disable-next-line react/no-danger -- blocking inline script must run before stylesheet to prevent FOUC */}
+      <script
+        dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+        suppressHydrationWarning
+      />
+      {children}
+    </head>
+  );
 }

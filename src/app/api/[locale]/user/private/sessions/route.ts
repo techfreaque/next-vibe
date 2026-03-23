@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies } from "next-vibe-ui/lib/headers";
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";

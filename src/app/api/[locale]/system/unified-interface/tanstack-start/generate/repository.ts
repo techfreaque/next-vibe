@@ -997,8 +997,6 @@ export class GenerateTanstackRoutesRepository {
   }
 
   private static findFiles(dir: string, pattern: string): string[] {
-    return findFilesByName(dir, pattern)
-      .map((r) => relative(dir, r.fullPath))
-      .filter((p) => !p.includes("/i18n/"));
+    return findFilesByName(dir, pattern).map((r) => relative(dir, r.fullPath));
   }
 }

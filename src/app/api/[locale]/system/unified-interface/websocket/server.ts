@@ -251,7 +251,7 @@ export function startWebSocketServer(
     port,
     hostname,
     reusePort: true, // allow re-binding after restart without waiting for TIME_WAIT
-    idleTimeout: 0, // disable idle timeout - dev builds can take >10s
+    idleTimeout: 255, // max value — disables effective timeout for long SSR renders
 
     async fetch(req, bunServer): Promise<Response> {
       const url = new URL(req.url);
@@ -438,7 +438,7 @@ export function startWebSocketServer(
         // Next.js not ready yet - wait before retrying
         const delay = PROXY_RETRY_DELAYS[attempt] ?? 8000;
         if (!shuttingDown) {
-          logger.warn("[Proxy] Next.js not ready, retrying", {
+          logger.warn("[Proxy] Server not ready, retrying", {
             attempt: attempt + 1,
             delayMs: delay,
             path: url.pathname,
@@ -536,7 +536,7 @@ export function startWebSocketServer(
     },
   });
 
-  logger.debug(`[WS] Proxy server on :${port} → Next.js on :${nextPort}`);
+  logger.debug(`[WS] Proxy server started on :${port}`);
 
   return {
     stop: (): void => {
