@@ -28,6 +28,7 @@ import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
 import { platform } from "@/config/env-client";
 
 import type definition from "../definition";
@@ -154,49 +155,51 @@ function AiStreamChatArea(): JSX.Element {
           platform.isReactNative ? { paddingTop: insets.top + 60 } : undefined
         }
       >
-        <Div
-          className={
-            platform.isReactNative
-              ? "flex-1 flex flex-col min-w-0 relative w-full"
-              : "w-full h-screen max-h-screen"
-          }
-        >
-          {/* Toolbar */}
-          {activeThreadId && activeThreadId !== NEW_MESSAGE_ID && (
+        <InputHeightProvider height={inputHeight}>
+          <Div
+            className={
+              platform.isReactNative
+                ? "flex-1 flex flex-col min-w-0 relative w-full"
+                : "w-full h-screen max-h-screen"
+            }
+          >
+            {/* Toolbar */}
+            {activeThreadId && activeThreadId !== NEW_MESSAGE_ID && (
+              <ErrorBoundary locale={locale}>
+                <ChatToolbar locale={locale} />
+              </ErrorBoundary>
+            )}
+
+            {/* Messages area */}
             <ErrorBoundary locale={locale}>
-              <ChatToolbar locale={locale} />
+              <Div className="max-w-screen overflow-hidden h-screen h-max-screen">
+                {threadIdToRender ? (
+                  <EndpointsPage
+                    key={threadIdToRender}
+                    endpoint={{ GET: messagesDefinition.GET }}
+                    endpointOptions={messagesEndpointOptions}
+                    endpointInstance={messagesEndpointInstance}
+                    className="h-full"
+                    locale={locale}
+                    user={user}
+                  />
+                ) : (
+                  <ChatEmptyState locale={locale} inputHeight={inputHeight} />
+                )}
+              </Div>
             </ErrorBoundary>
-          )}
 
-          {/* Messages area */}
-          <ErrorBoundary locale={locale}>
-            <Div className="max-w-screen overflow-hidden h-screen h-max-screen">
-              {threadIdToRender ? (
-                <EndpointsPage
-                  key={threadIdToRender}
-                  endpoint={{ GET: messagesDefinition.GET }}
-                  endpointOptions={messagesEndpointOptions}
-                  endpointInstance={messagesEndpointInstance}
-                  className="h-full"
-                  locale={locale}
-                  user={user}
-                />
-              ) : (
-                <ChatEmptyState locale={locale} inputHeight={inputHeight} />
-              )}
-            </Div>
-          </ErrorBoundary>
+            {/* Input */}
+            <ErrorBoundary locale={locale}>
+              <ChatInputContainer inputContainerRef={inputContainerRef} />
+            </ErrorBoundary>
 
-          {/* Input */}
-          <ErrorBoundary locale={locale}>
-            <ChatInputContainer inputContainerRef={inputContainerRef} />
-          </ErrorBoundary>
-
-          {/* AI Tools Modal */}
-          <ErrorBoundary locale={locale}>
-            <AIToolsModal locale={locale} user={user} />
-          </ErrorBoundary>
-        </Div>
+            {/* AI Tools Modal */}
+            <ErrorBoundary locale={locale}>
+              <AIToolsModal locale={locale} user={user} />
+            </ErrorBoundary>
+          </Div>
+        </InputHeightProvider>
       </Div>
     </KeyboardAvoidingView>
   );

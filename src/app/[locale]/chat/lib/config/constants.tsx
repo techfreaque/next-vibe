@@ -3,6 +3,36 @@
  * Local constants for chat UI layout and behavior
  */
 
+import { createContext, useContext } from "react";
+import type { JSX, ReactNode } from "react";
+import React from "react";
+
+/**
+ * Context for the current input overlay height, set by the chat layout and
+ * read by ChatMessages to add bottom padding behind the floating input.
+ * Supports nesting: each chat layout wraps its own subtree with a provider.
+ */
+// Default is 0: no provider = no overlay input = no bottom padding needed.
+// Providers initialize at LAYOUT.DEFAULT_INPUT_HEIGHT (120) so SSR is sane
+// before ResizeObserver fires on the client.
+const InputHeightContext = createContext<number>(0);
+
+export function InputHeightProvider({
+  height,
+  children,
+}: {
+  height: number;
+  children: ReactNode;
+}): JSX.Element {
+  return (
+    <InputHeightContext.Provider value={height}>
+      {children}
+    </InputHeightContext.Provider>
+  );
+}
+
+export const useInputHeight = (): number => useContext(InputHeightContext);
+
 /**
  * DOM element IDs used for scrolling and targeting
  */

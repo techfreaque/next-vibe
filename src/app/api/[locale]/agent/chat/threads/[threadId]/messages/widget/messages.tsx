@@ -3,6 +3,7 @@
 import { Button } from "next-vibe-ui/ui/button";
 import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Span } from "next-vibe-ui/ui/span";
 import { success } from "next-vibe/shared/types/response.schema";
 import { cn } from "next-vibe/shared/utils";
@@ -22,6 +23,7 @@ import {
   DOM_IDS,
   LAYOUT,
   QUOTE_CHARACTER,
+  useInputHeight,
 } from "@/app/[locale]/chat/lib/config/constants";
 import {
   buildMessagePath,
@@ -119,15 +121,12 @@ function computeRenderWindowStart(
 }
 
 interface ChatMessagesProps {
-  inputHeight?: number;
   /** Whether to show the branding logo (sticky inside scroll container) */
   showBranding: boolean;
 }
 
-export function ChatMessages({
-  inputHeight = LAYOUT.DEFAULT_INPUT_HEIGHT,
-  showBranding,
-}: ChatMessagesProps): JSX.Element {
+export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
+  const inputHeight = useInputHeight();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
@@ -764,6 +763,17 @@ export function ChatMessages({
   const stickyBottomRef = useRef<boolean>(true);
   // Whether user is actively touching (suppresses our instant-scroll during gesture)
   const touchActiveRef = useRef<boolean>(false);
+  // Whether to show the scroll-to-bottom button (user has scrolled up)
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  const scrollToBottom = useCallback((): void => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+      stickyBottomRef.current = true;
+      setShowScrollButton(false);
+    }
+  }, []);
 
   // All messages from cache are real messages - no merge or sentinel filtering needed.
   const realMessages = activeThreadMessages;
@@ -849,6 +859,7 @@ export function ChatMessages({
       const atBottom = distFromBottom < BOTTOM_THRESHOLD;
 
       stickyBottomRef.current = atBottom;
+      setShowScrollButton(!atBottom);
     };
 
     const handleTouchStart = (): void => {
@@ -886,6 +897,7 @@ export function ChatMessages({
       renderWindowThreadRef.current = currentThreadId;
       // New thread: start sticky
       stickyBottomRef.current = true;
+      setShowScrollButton(false);
     }
   }, [activeThreadId]);
 
@@ -1257,6 +1269,28 @@ export function ChatMessages({
           <Div ref={messagesEndRef} />
         </Div>
       </Div>
+
+      {/* Scroll-to-bottom button: appears when user has scrolled up */}
+      {showScrollButton && !platform.isReactNative && (
+        <Div className="sticky bottom-0 left-0 right-0 pointer-events-none">
+          <Div
+            style={{
+              paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING + 8}px`,
+            }}
+          >
+            <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex justify-end">
+              <Button
+                variant="secondary"
+                size="icon"
+                className="pointer-events-auto rounded-full shadow-md h-8 w-8"
+                onClick={scrollToBottom}
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </Div>
+          </Div>
+        </Div>
+      )}
     </Div>
   );
 }

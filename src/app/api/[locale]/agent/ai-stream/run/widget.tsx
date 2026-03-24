@@ -13,7 +13,7 @@ import type { AutocompleteOption } from "next-vibe-ui/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe-ui/ui/autocomplete-field";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
+import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
@@ -22,7 +22,13 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
@@ -62,6 +68,9 @@ import {
   type ToolEntry,
   ToolsConfigEdit,
 } from "../../tools/widget/tools-config-widget";
+import { InputHeightProvider } from "@/app/[locale]/chat/lib/config/constants";
+import { platform } from "@/config/env-client";
+
 import cancelEndpoints from "../cancel/definition";
 import { WidgetChatInput } from "../stream/widget/chat-input";
 import { EmbeddedMessagesView } from "../stream/widget/embedded-messages";
@@ -70,6 +79,37 @@ import type {
   AiStreamRunPostRequestOutput,
   AiStreamRunPostResponseOutput,
 } from "./definition";
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function useInputHeight(
+  inputContainerRef: React.RefObject<DivRefObject | null>,
+): number {
+  const [inputHeight, setInputHeight] = useState<number>(120);
+
+  useEffect(() => {
+    if (platform.isReactNative) {
+      return;
+    }
+    if (!inputContainerRef.current) {
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setInputHeight(entry.contentRect.height);
+      }
+    });
+
+    resizeObserver.observe(inputContainerRef.current as Element);
+
+    return (): void => {
+      resizeObserver.disconnect();
+    };
+  }, [inputContainerRef]);
+
+  return inputHeight;
+}
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -330,6 +370,9 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   const isDisabled = useWidgetDisabled();
   const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
+  const inputContainerRef = useRef<DivRefObject>(null);
+  const inputHeight = useInputHeight(inputContainerRef);
+
   // ── Tools cascade: user settings → skill → form (explicit) ───────────
   const skillId = form.watch("skill") ?? undefined;
   const skillEndpoint = useSkill(skillId, user, logger);
@@ -521,112 +564,123 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   }, [completedThreadId, rootFolderValue, logger]);
 
   return (
-    <Div className="flex flex-col h-[500px] min-h-[300px]">
-      <FormAlertWidget field={emptyField} />
+    <InputHeightProvider height={inputHeight}>
+      <Div className="relative h-[600px]">
+        <FormAlertWidget field={emptyField} />
 
-      {/* Messages area - flex-grow + scroll so input stays at bottom */}
-      <Div className="flex-1 overflow-y-auto min-h-0">
-        {/* Loading state */}
-        {isSubmitting && !displayThreadId && (
-          <Div className="flex items-center justify-center h-full">
-            <Div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+        {/* Messages area - full height, scrollable, padded below floating input */}
+        <Div className="h-full overflow-y-auto">
+          <Div style={{ paddingBottom: `${inputHeight + 16}px` }}>
+            {/* Loading state */}
+            {isSubmitting && !displayThreadId && (
+              <Div className="flex items-center justify-center h-full">
+                <Div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+              </Div>
+            )}
+
+            {/* Response thread messages - real threadId OR mock incognito data */}
+            {(displayThreadId ?? mockMessagesInitialData) && (
+              <ChatNavigationProvider
+                activeThreadId={displayThreadId ?? "mock"}
+                currentRootFolderId={DefaultFolderId.PRIVATE}
+                currentSubFolderId={null}
+                leafMessageId={null}
+                isEmbedded
+              >
+                <EmbeddedMessagesView
+                  threadId={displayThreadId ?? "mock"}
+                  rootFolderId={rootFolderValue}
+                  locale={locale}
+                  user={user}
+                  className="rounded-lg bg-background"
+                  refetchInterval={isSubmitting ? 2000 : false}
+                  initialData={mockMessagesInitialData}
+                />
+              </ChatNavigationProvider>
+            )}
           </Div>
-        )}
+        </Div>
 
-        {/* Response thread messages - real threadId OR mock incognito data */}
-        {(displayThreadId ?? mockMessagesInitialData) && (
-          <ChatNavigationProvider
-            activeThreadId={displayThreadId ?? "mock"}
-            currentRootFolderId={DefaultFolderId.PRIVATE}
-            currentSubFolderId={null}
-            leafMessageId={null}
-            isEmbedded
-          >
-            <EmbeddedMessagesView
-              threadId={displayThreadId ?? "mock"}
-              rootFolderId={rootFolderValue}
+        {/* Chat-like input - absolute overlay at bottom */}
+        <Div
+          ref={inputContainerRef}
+          className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
+        >
+          <Div className="pointer-events-auto">
+            <WidgetChatInput
+              content={promptValue}
+              onContentChange={handleContentChange}
+              modelId={modelValue}
+              skillId={skillValue}
+              onModelChange={handleModelChange}
+              onSkillChange={handleSkillChange}
               locale={locale}
-              user={user}
-              className="rounded-lg bg-background"
-              refetchInterval={isSubmitting ? 2000 : false}
-              initialData={mockMessagesInitialData}
-            />
-          </ChatNavigationProvider>
-        )}
-      </Div>
-
-      {/* Chat-like input - sticky at bottom */}
-      <WidgetChatInput
-        content={promptValue}
-        onContentChange={handleContentChange}
-        modelId={modelValue}
-        skillId={skillValue}
-        onModelChange={handleModelChange}
-        onSkillChange={handleSkillChange}
-        locale={locale}
-        user={user}
-        logger={logger}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting ?? false}
-        disabled={isDisabled}
-        threadHref={threadHref}
-        onCancel={handleCancel}
-        className="rounded-b-lg"
-        advancedContent={
-          <>
-            {/* Instructions */}
-            <TextareaFieldWidget
-              fieldName="instructions"
-              field={children.instructions}
-            />
-
-            {/* Pre-Calls */}
-            <PreCallsEditor
-              preCalls={preCalls}
-              onChange={handlePreCallsChange}
-              toolOptions={toolOptions}
-              locale={locale}
-              user={user}
-            />
-
-            {/* Tools config */}
-            <ToolsConfigEdit
-              value={toolsValue}
-              onChange={handleToolsChange}
               user={user}
               logger={logger}
-              label="Allowed to execute + pinned to context"
-              skillAvailableTools={fallbackAllowedTools}
-              skillPinnedTools={fallbackPinnedTools}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting ?? false}
+              disabled={isDisabled}
+              threadHref={threadHref}
+              onCancel={handleCancel}
+              className="rounded-b-lg"
+              advancedContent={
+                <>
+                  {/* Instructions */}
+                  <TextareaFieldWidget
+                    fieldName="instructions"
+                    field={children.instructions}
+                  />
+
+                  {/* Pre-Calls */}
+                  <PreCallsEditor
+                    preCalls={preCalls}
+                    onChange={handlePreCallsChange}
+                    toolOptions={toolOptions}
+                    locale={locale}
+                    user={user}
+                  />
+
+                  {/* Tools config */}
+                  <ToolsConfigEdit
+                    value={toolsValue}
+                    onChange={handleToolsChange}
+                    user={user}
+                    logger={logger}
+                    label="Allowed to execute + pinned to context"
+                    skillAvailableTools={fallbackAllowedTools}
+                    skillPinnedTools={fallbackPinnedTools}
+                  />
+
+                  {/* Max Turns & Thread ID */}
+                  <Div className="grid grid-cols-2 gap-3">
+                    <NumberFieldWidget
+                      fieldName="maxTurns"
+                      field={children.maxTurns}
+                    />
+                    <TextFieldWidget
+                      fieldName="appendThreadId"
+                      field={children.appendThreadId}
+                    />
+                  </Div>
+
+                  {/* Folder settings */}
+                  <Div className="grid grid-cols-2 gap-3">
+                    <SelectFieldWidget
+                      fieldName="rootFolderId"
+                      field={children.rootFolderId}
+                    />
+                    <TextFieldWidget
+                      fieldName="subFolderId"
+                      field={children.subFolderId}
+                    />
+                  </Div>
+                </>
+              }
             />
-
-            {/* Max Turns & Thread ID */}
-            <Div className="grid grid-cols-2 gap-3">
-              <NumberFieldWidget
-                fieldName="maxTurns"
-                field={children.maxTurns}
-              />
-              <TextFieldWidget
-                fieldName="appendThreadId"
-                field={children.appendThreadId}
-              />
-            </Div>
-
-            {/* Folder settings */}
-            <Div className="grid grid-cols-2 gap-3">
-              <SelectFieldWidget
-                fieldName="rootFolderId"
-                field={children.rootFolderId}
-              />
-              <TextFieldWidget
-                fieldName="subFolderId"
-                field={children.subFolderId}
-              />
-            </Div>
-          </>
-        }
-      />
-    </Div>
+          </Div>
+        </Div>
+      </Div>
+    </InputHeightProvider>
   );
 }
 

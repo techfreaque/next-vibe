@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
     cpus: 1,
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
-    serverSourceMaps: false,
     // Soft memory hint for Turbopack's Rust engine (NapiTurboEngineOptions.memoryLimit).
     // Does NOT cap peak RSS - Turbopack still peaks at ~12 GB while building the module graph.
     // May reduce memory after compilation phase. Unit: bytes.
