@@ -594,6 +594,8 @@ export class ServerStartRepository {
   /**
    * Start TanStack Start production server (.dist-tanstack/server/index.mjs).
    * Spawns the Nitro server output produced by `vibe build --tanstack`.
+   * NEXT_PUBLIC_APP_URL is inlined at build time via Vite's `define` config,
+   * so no runtime patching is needed here.
    */
   private static async startTanstackServer(
     port: number,
@@ -604,7 +606,8 @@ export class ServerStartRepository {
 
     const { existsSync: fsExistsSync } = await import("node:fs");
     // Use join to prevent Turbopack from statically analyzing this as a module import
-    const outputFile = [".dist-tanstack", "server", "index.mjs"].join("/");
+    const distDir = [".dist-tanstack"].join("");
+    const outputFile = [distDir, "server", "index.mjs"].join("/");
     if (!fsExistsSync(outputFile)) {
       return fail({
         message: t("post.errors.tanstackBuildNotFound"),

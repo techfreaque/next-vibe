@@ -46,6 +46,17 @@ const { POST } = createEndpoint({
     render: CampaignStarterConfigContainer,
     usage: { request: "data", response: true } as const,
     children: {
+      // Hidden field — browser timezone, defaulted client-side automatically
+      timezone: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.timezone.label",
+        description: "post.fields.timezone.description",
+        schema: z
+          .string()
+          .optional()
+          .default(() => Intl.DateTimeFormat().resolvedOptions().timeZone),
+      }),
       // Run-specific fields
       dryRun: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -281,6 +292,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
+        timezone: "UTC",
         dryRun: false,
         force: false,
         minAgeHours: 0,
@@ -333,13 +345,20 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.leadsCampaigns",
   tags: ["tag"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.title",
-    description: "get.description",
-    layoutType: LayoutType.STACKED,
-    usage: { response: true },
+  fields: customWidgetObject({
+    render: CampaignStarterConfigContainer,
+    usage: { request: "data", response: true } as const,
     children: {
+      timezone: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.timezone.label",
+        description: "get.fields.timezone.description",
+        schema: z
+          .string()
+          .optional()
+          .default(() => Intl.DateTimeFormat().resolvedOptions().timeZone),
+      }),
       dryRun: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.dryRun",
@@ -443,6 +462,11 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      default: {
+        timezone: "UTC",
+      },
+    },
     responses: {
       default: {
         dryRun: false,

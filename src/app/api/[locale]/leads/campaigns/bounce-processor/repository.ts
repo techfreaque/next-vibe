@@ -25,6 +25,7 @@ import {
 import { SpecialFolderType as ImapSpecialUseType } from "@/app/api/[locale]/messenger/messages/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
   cronTasks,
   type NewCronTask,
@@ -94,7 +95,7 @@ export class BounceProcessorRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<BounceProcessorConfigGetResponseOutput>> {
     try {
-      logger.info("Fetching bounce processor config", { userId: user.id });
+      logger.debug("Fetching bounce processor config", { userId: user.id });
 
       const [existing] = await db
         .select()
@@ -141,7 +142,7 @@ export class BounceProcessorRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<BounceProcessorPostRequestOutput>> {
     try {
-      logger.info("Updating bounce processor config", {
+      logger.debug("Updating bounce processor config", {
         userId: user.id,
         enabled: data.enabled,
         dryRun: data.dryRun,
@@ -367,16 +368,29 @@ export class BounceProcessorRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
     t: BounceProcessorT,
+    platform?: string,
   ): Promise<ResponseType<BounceProcessorPostResponseOutput>> {
     try {
-      const saveResult = await BounceProcessorRepository.updateConfig(
-        data,
-        user,
-        t,
-        logger,
-      );
-      if (!saveResult.success) {
-        return saveResult;
+      // When called as a cron task, skip config update — use existing DB config instead
+      if (platform === Platform.CRON) {
+        const configResult = await BounceProcessorRepository.getConfig(
+          user,
+          t,
+          logger,
+        );
+        if (configResult.success && configResult.data) {
+          data = { ...data, ...configResult.data };
+        }
+      } else {
+        const saveResult = await BounceProcessorRepository.updateConfig(
+          data,
+          user,
+          t,
+          logger,
+        );
+        if (!saveResult.success) {
+          return saveResult;
+        }
       }
 
       const { dryRun, batchSize } = data;

@@ -18,6 +18,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import {
   cronTasks,
@@ -47,6 +48,82 @@ import type {
   CampaignStarterPostResponseOutput,
 } from "./definition";
 import type { CampaignsCampaignStarterT } from "./i18n";
+
+// ─── Timezone helpers ─────────────────────────────────────────────────────────
+
+/** Get the current UTC offset in whole hours for an IANA timezone (e.g. "Europe/Berlin" → 2 in summer). */
+function getUtcOffsetHours(timezone: string): number {
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const localHour =
+    Number(
+      new Intl.DateTimeFormat([], {
+        timeZone: timezone,
+        hour: "2-digit",
+        hourCycle: "h23",
+      })
+        .formatToParts(now)
+        .find((p) => p.type === "hour")?.value ?? "0",
+    ) % 24;
+  let offset = localHour - utcHour;
+  if (offset > 12) {
+    offset -= 24;
+  }
+  if (offset < -12) {
+    offset += 24;
+  }
+  return offset;
+}
+
+function localHourToUtc(localHour: number, timezone: string): number {
+  return (((localHour - getUtcOffsetHours(timezone)) % 24) + 24) % 24;
+}
+
+function utcHourToLocal(utcHour: number, timezone: string): number {
+  return (((utcHour + getUtcOffsetHours(timezone)) % 24) + 24) % 24;
+}
+
+function convertLocaleConfigToUtc(
+  localeConfig: CampaignStarterConfigGetResponseOutput["localeConfig"],
+  timezone: string | undefined,
+): CampaignStarterConfigGetResponseOutput["localeConfig"] {
+  if (!timezone) {
+    return localeConfig;
+  }
+  return Object.fromEntries(
+    Object.entries(localeConfig).map(([locale, entry]) => [
+      locale,
+      {
+        ...entry,
+        enabledHours: {
+          start: localHourToUtc(entry.enabledHours.start, timezone),
+          end: localHourToUtc(entry.enabledHours.end, timezone),
+        },
+      },
+    ]),
+  );
+}
+
+function convertLocaleConfigFromUtc(
+  localeConfig: CampaignStarterConfigGetResponseOutput["localeConfig"],
+  timezone: string | undefined,
+): CampaignStarterConfigGetResponseOutput["localeConfig"] {
+  if (!timezone) {
+    return localeConfig;
+  }
+  return Object.fromEntries(
+    Object.entries(localeConfig).map(([locale, entry]) => [
+      locale,
+      {
+        ...entry,
+        enabledHours: {
+          start: utcHourToLocal(entry.enabledHours.start, timezone),
+          end: utcHourToLocal(entry.enabledHours.end, timezone),
+        },
+      },
+    ]),
+  );
+}
 
 // ─── Default config helpers ───────────────────────────────────────────────────
 
@@ -93,6 +170,7 @@ export class CampaignStarterRepository {
 
   private static async formatConfigResponse(
     dbConfig: CampaignStarterConfig,
+    timezone: string | undefined,
   ): Promise<CampaignStarterConfigGetResponseOutput> {
     const defaults = getDefaultCampaignConfig();
     const [cronTask] = await db
@@ -101,11 +179,16 @@ export class CampaignStarterRepository {
       .where(eq(cronTasks.routeId, "campaign-starter"))
       .limit(1);
 
+    const localeConfig = convertLocaleConfigFromUtc(
+      dbConfig.localeConfig,
+      timezone,
+    );
+
     if (!cronTask) {
       return {
         dryRun: dbConfig.dryRun === 1,
         minAgeHours: dbConfig.minAgeHours,
-        localeConfig: dbConfig.localeConfig,
+        localeConfig,
         schedule: defaults.schedule,
         enabled: defaults.enabled,
         priority: defaults.priority,
@@ -118,7 +201,7 @@ export class CampaignStarterRepository {
     return {
       dryRun: dbConfig.dryRun === 1,
       minAgeHours: dbConfig.minAgeHours,
-      localeConfig: dbConfig.localeConfig,
+      localeConfig,
       schedule: cronTask.schedule,
       enabled: cronTask.enabled ?? false,
       priority: cronTask.priority,
@@ -137,7 +220,7 @@ export class CampaignStarterRepository {
       .where(eq(cronTasks.routeId, "campaign-starter"))
       .limit(1);
 
-    const taskInput: CampaignStarterPostRequestOutput = {
+    const taskInput = {
       dryRun: config.dryRun,
       force: false,
       minAgeHours: config.minAgeHours,
@@ -150,7 +233,9 @@ export class CampaignStarterRepository {
       retryDelay: config.retryDelay,
     };
 
-    const cronData: NewCronTask<CampaignStarterPostRequestOutput> = {
+    const cronData: NewCronTask<
+      Omit<CampaignStarterPostRequestOutput, "timezone">
+    > = {
       id: "campaign-starter",
       shortId: "campaign-starter",
       routeId: "campaign-starter",
@@ -189,6 +274,7 @@ export class CampaignStarterRepository {
       dryRun: config.dryRun ? 1 : 0,
       minAgeHours: config.minAgeHours,
       localeConfig: config.localeConfig,
+      localeAccumulators: {},
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -196,14 +282,16 @@ export class CampaignStarterRepository {
 
   static async getConfig(
     user: { id: string },
+    timezone: string | undefined,
     t: CampaignsCampaignStarterT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
     try {
       const environment = CampaignStarterRepository.getCurrentEnvironment();
-      logger.info("Fetching campaign starter config", {
+      logger.debug("Fetching campaign starter config", {
         environment,
         userId: user.id,
+        timezone,
       });
 
       const [existingConfig] = await db
@@ -213,8 +301,10 @@ export class CampaignStarterRepository {
         .limit(1);
 
       if (existingConfig) {
-        const config =
-          await CampaignStarterRepository.formatConfigResponse(existingConfig);
+        const config = await CampaignStarterRepository.formatConfigResponse(
+          existingConfig,
+          timezone,
+        );
         return success(config);
       }
 
@@ -229,22 +319,29 @@ export class CampaignStarterRepository {
   }
 
   static async updateConfig(
-    data: CampaignStarterConfigGetResponseOutput,
+    data: CampaignStarterPostRequestOutput,
+    timezone: string | undefined,
     user: { id: string },
     t: CampaignsCampaignStarterT,
     logger: EndpointLogger,
   ): Promise<ResponseType<void>> {
     try {
       const environment = CampaignStarterRepository.getCurrentEnvironment();
-      logger.info("Updating campaign starter config", {
+      logger.debug("Updating campaign starter config", {
         environment,
         userId: user.id,
         dryRun: data.dryRun,
         enabled: data.enabled,
+        timezone,
       });
 
+      const dataWithUtcHours = {
+        ...data,
+        localeConfig: convertLocaleConfigToUtc(data.localeConfig, timezone),
+      };
+
       const dbConfig = CampaignStarterRepository.formatConfigForDb(
-        data,
+        dataWithUtcHours,
         environment,
       );
 
@@ -266,7 +363,7 @@ export class CampaignStarterRepository {
         });
       }
 
-      await CampaignStarterRepository.saveCronTaskSettings(data);
+      await CampaignStarterRepository.saveCronTaskSettings(dataWithUtcHours);
 
       return success();
     } catch (error) {
@@ -285,7 +382,7 @@ export class CampaignStarterRepository {
   ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
     try {
       const environment = CampaignStarterRepository.getCurrentEnvironment();
-      logger.info("Ensuring config exists", {
+      logger.debug("Ensuring config exists", {
         environment,
         userId: user.id,
         locale,
@@ -298,8 +395,10 @@ export class CampaignStarterRepository {
         .limit(1);
 
       if (existingConfig) {
-        const config =
-          await CampaignStarterRepository.formatConfigResponse(existingConfig);
+        const config = await CampaignStarterRepository.formatConfigResponse(
+          existingConfig,
+          "UTC",
+        );
         return success(config);
       }
 
@@ -646,7 +745,7 @@ export class CampaignStarterRepository {
     enabledDays: number[],
     enabledHours: { start: number; end: number },
     logger: EndpointLogger,
-  ): { perRunBudget: number; totalRunsPerWeek: number } {
+  ): { exactBudget: number; perRunBudget: number; totalRunsPerWeek: number } {
     const frequencyMinutes = getCronFrequencyMinutes(schedule, logger);
     const runsPerHour = 60 / frequencyMinutes;
     const enabledHoursCount = Math.max(
@@ -656,28 +755,36 @@ export class CampaignStarterRepository {
     const enabledDaysCount = enabledDays.length;
     const totalRunsPerWeek = runsPerHour * enabledHoursCount * enabledDaysCount;
     if (totalRunsPerWeek <= 0) {
-      return { perRunBudget: 0, totalRunsPerWeek: 0 };
+      return { exactBudget: 0, perRunBudget: 0, totalRunsPerWeek: 0 };
     }
+    const exactBudget = weeklyQuota / totalRunsPerWeek;
     return {
-      perRunBudget: Math.floor(weeklyQuota / totalRunsPerWeek),
+      exactBudget,
+      perRunBudget: Math.floor(exactBudget),
       totalRunsPerWeek,
     };
   }
 
   static async run(
     data: CampaignStarterPostRequestOutput,
+    timezone: string | undefined,
     user: { id: string },
     t: CampaignsCampaignStarterT,
     logger: EndpointLogger,
+    platform?: string,
   ): Promise<ResponseType<CampaignStarterPostResponseOutput>> {
-    const saveResult = await CampaignStarterRepository.updateConfig(
-      data,
-      user,
-      t,
-      logger,
-    );
-    if (!saveResult.success) {
-      return saveResult as never;
+    // When called as a cron task, skip config update — use existing DB config instead
+    if (platform !== Platform.CRON) {
+      const saveResult = await CampaignStarterRepository.updateConfig(
+        data,
+        timezone,
+        user,
+        t,
+        logger,
+      );
+      if (!saveResult.success) {
+        return saveResult as never;
+      }
     }
 
     const locale = (Object.keys(data.localeConfig)[0] ??
@@ -709,6 +816,19 @@ export class CampaignStarterRepository {
         quotaDetails: [],
       });
     }
+
+    // Fetch current fractional accumulators from DB
+    const environment = CampaignStarterRepository.getCurrentEnvironment();
+    const [configRow] = await db
+      .select({ localeAccumulators: campaignStarterConfigs.localeAccumulators })
+      .from(campaignStarterConfigs)
+      .where(eq(campaignStarterConfigs.environment, environment))
+      .limit(1);
+    const localeAccumulators: Record<string, number> =
+      configRow?.localeAccumulators ?? {};
+    const updatedAccumulators: Record<string, number> = {
+      ...localeAccumulators,
+    };
 
     const startTime = Date.now();
     const now = new Date();
@@ -784,7 +904,7 @@ export class CampaignStarterRepository {
         continue;
       }
 
-      const { perRunBudget, totalRunsPerWeek } =
+      const { exactBudget, perRunBudget, totalRunsPerWeek } =
         CampaignStarterRepository.calculatePerRunBudget(
           weeklyQuotaNum,
           config.schedule,
@@ -793,16 +913,49 @@ export class CampaignStarterRepository {
           logger,
         );
 
-      if (perRunBudget <= 0) {
-        logger.debug("Campaign starter skipped locale: per-run budget is 0", {
-          locale: localeValue,
-          weeklyQuota: weeklyQuotaNum,
-          totalRunsPerWeek,
-        });
+      // Accumulate fractional budget across runs
+      const carry = localeAccumulators[localeValue] ?? 0;
+      const combined = exactBudget + carry;
+      const accumulatedBudget = Math.floor(combined);
+      const newCarry = combined - accumulatedBudget;
+      updatedAccumulators[localeValue] = newCarry;
+
+      logger.debug("Campaign starter fractional accumulator", {
+        locale: localeValue,
+        exactBudget,
+        carry,
+        combined,
+        accumulatedBudget,
+        newCarry,
+      });
+
+      if (accumulatedBudget <= 0) {
+        logger.debug(
+          "Campaign starter skipped locale: accumulated budget is 0",
+          {
+            locale: localeValue,
+            weeklyQuota: weeklyQuotaNum,
+            totalRunsPerWeek,
+            carry,
+            exactBudget,
+          },
+        );
+        result.quotaDetails = [
+          ...(result.quotaDetails ?? []),
+          {
+            locale: localeValue,
+            weeklyQuota: weeklyQuotaNum,
+            leadsStartedThisWeek: startedThisWeek,
+            remainingQuota,
+            totalRunsPerWeek,
+            perRunBudget,
+            dispatched: 0,
+          },
+        ];
         continue;
       }
 
-      const leadsThisRun = Math.min(perRunBudget, remainingQuota);
+      const leadsThisRun = Math.min(accumulatedBudget, remainingQuota);
 
       const failedLeadsCountResult =
         await CampaignStarterRepository.getFailedLeadsCount(
@@ -850,6 +1003,14 @@ export class CampaignStarterRepository {
           t,
         );
       }
+    }
+
+    // Persist updated fractional accumulators (skip on dry run — don't mutate state)
+    if (!config.dryRun) {
+      await db
+        .update(campaignStarterConfigs)
+        .set({ localeAccumulators: updatedAccumulators, updatedAt: new Date() })
+        .where(eq(campaignStarterConfigs.environment, environment));
     }
 
     result.executionTimeMs = Date.now() - startTime;

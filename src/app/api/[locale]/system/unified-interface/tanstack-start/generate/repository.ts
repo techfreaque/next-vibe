@@ -340,7 +340,6 @@ export class GenerateTanstackRoutesRepository {
 
       const layoutLines: string[] = [
         `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
-        `import { lazy } from "react";`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
       ];
 
@@ -356,8 +355,7 @@ export class GenerateTanstackRoutesRepository {
       }
 
       layoutLines.push(
-        ``,
-        `const TanstackLayout = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
+        `import { TanstackPage as Layout } from "${importPath}";`,
         ``,
         `const loadData = createServerFn({ method: "GET" })`,
       );
@@ -388,8 +386,8 @@ export class GenerateTanstackRoutesRepository {
           `  staleTime: 0,`,
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
-          `  loader: ({ params, deps: { search } }) => Promise.all([loadData({ data: { params: params as Record<string, string>, search } }), import("${importPath}")]).then(([data]) => data),`,
-          `  component: () => <TanstackLayout {...Route.useLoaderData()}><Outlet /></TanstackLayout>,`,
+          `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
+          `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
           `});`,
           ``,
         );
@@ -397,8 +395,8 @@ export class GenerateTanstackRoutesRepository {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: 0,`,
-          `  loader: ({ params }) => Promise.all([loadData({ data: params as Record<string, string> }), import("${importPath}")]).then(([data]) => data),`,
-          `  component: () => <TanstackLayout {...Route.useLoaderData()}><Outlet /></TanstackLayout>,`,
+          `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
+          `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
           `});`,
           ``,
         );
@@ -406,8 +404,8 @@ export class GenerateTanstackRoutesRepository {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: 0,`,
-          `  loader: () => Promise.all([loadData(), import("${importPath}")]).then(([data]) => data),`,
-          `  component: () => <TanstackLayout {...Route.useLoaderData()}><Outlet /></TanstackLayout>,`,
+          `  loader: () => loadData(),`,
+          `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
           `});`,
           ``,
         );
@@ -500,10 +498,10 @@ export class GenerateTanstackRoutesRepository {
 
     const lines = [
       `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
-      `import { lazy } from "react";`,
       `import { createFileRoute } from "@tanstack/react-router";`,
       `import { createServerFn } from "@tanstack/react-start";`,
       `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
+      `import { TanstackPage as Page } from "${importPath}";`,
     ];
 
     if (skippedGroupLayoutImport) {
@@ -521,8 +519,6 @@ export class GenerateTanstackRoutesRepository {
       const paramsExpr = hasSearch ? "data.params" : "data";
       lines.push(
         `import type { CountryLanguage } from "@/i18n/core/config";`,
-        ``,
-        `const TanstackPage = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
         ``,
         `const loadData = createServerFn({ method: "GET" })`,
         `  .inputValidator((data: ${inputType}) => data)`,
@@ -542,9 +538,9 @@ export class GenerateTanstackRoutesRepository {
         ``,
       );
 
-      const componentJsx = skippedGroupLayoutImport
-        ? `<GroupLayout><TanstackPage {...Route.useLoaderData()} /></GroupLayout>`
-        : `<TanstackPage {...Route.useLoaderData()} />`;
+      const componentFn = skippedGroupLayoutImport
+        ? `() => <GroupLayout><Page {...Route.useLoaderData()} /></GroupLayout>`
+        : `() => <Page {...Route.useLoaderData()} />`;
 
       if (hasSearch) {
         lines.push(
@@ -552,8 +548,8 @@ export class GenerateTanstackRoutesRepository {
           `  staleTime: 0,`,
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
-          `  loader: ({ params, deps: { search } }) => Promise.all([loadData({ data: { params: params as Record<string, string>, search } }), import("${importPath}")]).then(([data]) => data),`,
-          `  component: () => ${componentJsx},`,
+          `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
+          `  component: ${componentFn},`,
           `});`,
           ``,
         );
@@ -561,8 +557,8 @@ export class GenerateTanstackRoutesRepository {
         lines.push(
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: 0,`,
-          `  loader: ({ params }) => Promise.all([loadData({ data: params as Record<string, string> }), import("${importPath}")]).then(([data]) => data),`,
-          `  component: () => ${componentJsx},`,
+          `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
+          `  component: ${componentFn},`,
           `});`,
           ``,
         );
@@ -578,8 +574,6 @@ export class GenerateTanstackRoutesRepository {
 
       lines.push(
         ``,
-        `const TanstackPage = lazy(() => import("${importPath}").then((m) => ({ default: m.TanstackPage })));`,
-        ``,
         `const loadData = createServerFn({ method: "GET" })`,
         `  .inputValidator((data: ${inputType}) => data)`,
         `  .handler(async ({ data }) => {`,
@@ -589,9 +583,9 @@ export class GenerateTanstackRoutesRepository {
         ``,
       );
 
-      const componentJsx = skippedGroupLayoutImport
-        ? `<GroupLayout><TanstackPage {...Route.useLoaderData()} /></GroupLayout>`
-        : `<TanstackPage {...Route.useLoaderData()} />`;
+      const componentFn = skippedGroupLayoutImport
+        ? `() => <GroupLayout><Page {...Route.useLoaderData()} /></GroupLayout>`
+        : `() => <Page {...Route.useLoaderData()} />`;
 
       if (hasSearch) {
         lines.push(
@@ -599,8 +593,8 @@ export class GenerateTanstackRoutesRepository {
           `  staleTime: 0,`,
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
-          `  loader: ({ params, deps: { search } }) => Promise.all([loadData({ data: { params: params as Record<string, string>, search } }), import("${importPath}")]).then(([data]) => data),`,
-          `  component: () => ${componentJsx},`,
+          `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
+          `  component: ${componentFn},`,
           `});`,
           ``,
         );
@@ -608,8 +602,8 @@ export class GenerateTanstackRoutesRepository {
         lines.push(
           `export const Route = createFileRoute("${routePath}")({`,
           `  staleTime: 0,`,
-          `  loader: ({ params }) => Promise.all([loadData({ data: params as Record<string, string> }), import("${importPath}")]).then(([data]) => data),`,
-          `  component: () => ${componentJsx},`,
+          `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
+          `  component: ${componentFn},`,
           `});`,
           ``,
         );

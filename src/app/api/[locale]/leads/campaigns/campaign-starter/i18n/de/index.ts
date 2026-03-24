@@ -83,6 +83,10 @@ export const translations: typeof enTranslations = {
       },
     },
     fields: {
+      timezone: {
+        label: "Zeitzone",
+        description: "Browser-Zeitzone zur Stundenumrechnung",
+      },
       dryRun: {
         label: "Testlauf",
         description: "Ausführen ohne Änderungen vorzunehmen",
@@ -138,6 +142,12 @@ export const translations: typeof enTranslations = {
       unsavedChanges: {
         title: "Ungespeicherte Änderungen",
         description: "Es gibt ungespeicherte Änderungen",
+      },
+    },
+    fields: {
+      timezone: {
+        label: "Zeitzone",
+        description: "Browser-Zeitzone zur Stundenumrechnung",
       },
     },
     response: {
@@ -258,6 +268,12 @@ export const translations: typeof enTranslations = {
     runButton: "Kampagnen starten",
     running: "Läuft...",
     done: "Fertig",
+    perRunBudget:
+      "~{{perRunBudget}} Leads/Lauf · {{totalRunsPerWeek}} Läufe/Woche",
+    perRunBudgetFractional:
+      "{{exactBudget}}/Lauf · {{totalRunsPerWeek}} Läufe/Woche (gebrochen — akkumuliert über Läufe)",
+    perRunBudgetZeroHint:
+      "— Leads/Woche erhöhen oder Zeitplanfrequenz reduzieren",
     sections: {
       general: "Allgemein",
       generalDescription:

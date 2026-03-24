@@ -26,21 +26,55 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
-// ─── Timezone helpers ─────────────────────────────────────────────────────────
-
-/** Returns the browser's UTC offset in whole hours (e.g. UTC+2 → 2, UTC-5 → -5). */
-function getBrowserUtcOffsetHours(): number {
-  return -new Date().getTimezoneOffset() / 60;
+function getBrowserTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
-/** Converts a UTC hour (0-23) to browser local hour, wrapping within 0-23. */
-function utcHourToLocal(utcHour: number): number {
-  return (((utcHour + getBrowserUtcOffsetHours()) % 24) + 24) % 24;
+/** Best-effort parse of a cron expression to get frequency in minutes. Returns 5 as fallback. */
+function parseCronFrequencyMinutes(schedule: string): number {
+  try {
+    const parts = schedule.trim().split(/\s+/);
+    if (parts.length < 5) {
+      return 5;
+    }
+    const [minutePart] = parts;
+    // Handle */N
+    if (minutePart?.startsWith("*/")) {
+      const n = parseInt(minutePart.slice(2), 10);
+      if (!Number.isNaN(n) && n > 0) {
+        return n;
+      }
+    }
+    // Handle single numeric minute — runs once per hour
+    if (minutePart && /^\d+$/.test(minutePart)) {
+      return 60;
+    }
+    return 5;
+  } catch {
+    return 5;
+  }
 }
 
-/** Converts a browser local hour (0-23) to UTC hour, wrapping within 0-23. */
-function localHourToUtc(localHour: number): number {
-  return (((localHour - getBrowserUtcOffsetHours()) % 24) + 24) % 24;
+function calcPerRunBudget(
+  leadsPerWeek: number,
+  schedule: string,
+  enabledDays: number[],
+  enabledHours: { start: number; end: number },
+): { exactBudget: number; perRunBudget: number; totalRunsPerWeek: number } {
+  const frequencyMinutes = parseCronFrequencyMinutes(schedule);
+  const runsPerHour = 60 / frequencyMinutes;
+  const enabledHoursCount = Math.max(0, enabledHours.end - enabledHours.start);
+  const enabledDaysCount = enabledDays.length;
+  const totalRunsPerWeek = runsPerHour * enabledHoursCount * enabledDaysCount;
+  if (totalRunsPerWeek <= 0) {
+    return { exactBudget: 0, perRunBudget: 0, totalRunsPerWeek: 0 };
+  }
+  const exactBudget = leadsPerWeek / totalRunsPerWeek;
+  return {
+    exactBudget,
+    perRunBudget: Math.floor(exactBudget),
+    totalRunsPerWeek,
+  };
 }
 
 import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
@@ -195,6 +229,7 @@ export function CampaignStarterConfigContainer({
               key={loc}
               loc={loc}
               localeConfig={localeConfig}
+              schedule={form.watch("schedule") ?? "*/5 * * * *"}
               form={form}
               t={t}
             />
@@ -234,7 +269,7 @@ export function CampaignStarterConfigContainer({
           )}
           <Span className="text-xs text-muted-foreground">
             {t("widget.sections.hoursTimezoneNote", {
-              offset: `UTC${getBrowserUtcOffsetHours() >= 0 ? "+" : ""}${getBrowserUtcOffsetHours()}`,
+              offset: getBrowserTimezone(),
             })}
           </Span>
         </CardContent>
@@ -285,14 +320,60 @@ interface LocaleEntry {
   enabledHours: { start: number; end: number };
 }
 
+function PerRunBudgetHint({
+  leadsPerWeek,
+  schedule,
+  enabledDays,
+  enabledHours,
+  t,
+}: {
+  leadsPerWeek: number;
+  schedule: string;
+  enabledDays: number[];
+  enabledHours: { start: number; end: number };
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.POST>>;
+}): React.JSX.Element {
+  const { exactBudget, perRunBudget, totalRunsPerWeek } = calcPerRunBudget(
+    leadsPerWeek,
+    schedule,
+    enabledDays,
+    enabledHours,
+  );
+
+  const isZero = perRunBudget <= 0 && leadsPerWeek > 0;
+
+  return (
+    <Div
+      className={`flex items-center gap-1.5 text-xs rounded px-2 py-1 ${isZero ? "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400" : "bg-muted/40 text-muted-foreground"}`}
+    >
+      <Span>
+        {isZero
+          ? t("widget.perRunBudgetFractional", {
+              exactBudget: exactBudget.toFixed(3),
+              totalRunsPerWeek: Math.round(totalRunsPerWeek),
+            })
+          : t("widget.perRunBudget", {
+              perRunBudget,
+              totalRunsPerWeek: Math.round(totalRunsPerWeek),
+            })}
+      </Span>
+      {isZero && (
+        <Span className="font-medium">{t("widget.perRunBudgetZeroHint")}</Span>
+      )}
+    </Div>
+  );
+}
+
 function LocaleConfigRow({
   loc,
   localeConfig,
+  schedule,
   form,
   t,
 }: {
   loc: string;
   localeConfig: Record<string, LocaleEntry>;
+  schedule: string;
   form: ReturnType<typeof useWidgetForm<typeof definition.POST>>;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.POST>>;
 }): React.JSX.Element {
@@ -301,9 +382,6 @@ function LocaleConfigRow({
     enabledDays: [1, 2, 3, 4, 5],
     enabledHours: { start: 7, end: 15 },
   };
-
-  const localStart = Math.round(utcHourToLocal(entry.enabledHours.start));
-  const localEnd = Math.round(utcHourToLocal(entry.enabledHours.end));
 
   function updateEntry(patch: Partial<LocaleEntry>): void {
     const current = form.getValues("localeConfig") ?? {};
@@ -383,14 +461,11 @@ function LocaleConfigRow({
           min={0}
           max={23}
           className="w-16 h-7 text-sm"
-          value={localStart}
+          value={entry.enabledHours.start}
           onChange={(e) => {
-            const local = Math.max(0, Math.min(23, Number(e.target.value)));
+            const val = Math.max(0, Math.min(23, Number(e.target.value)));
             updateEntry({
-              enabledHours: {
-                ...entry.enabledHours,
-                start: Math.round(localHourToUtc(local)),
-              },
+              enabledHours: { ...entry.enabledHours, start: val },
             });
           }}
         />
@@ -402,18 +477,22 @@ function LocaleConfigRow({
           min={0}
           max={23}
           className="w-16 h-7 text-sm"
-          value={localEnd}
+          value={entry.enabledHours.end}
           onChange={(e) => {
-            const local = Math.max(0, Math.min(23, Number(e.target.value)));
-            updateEntry({
-              enabledHours: {
-                ...entry.enabledHours,
-                end: Math.round(localHourToUtc(local)),
-              },
-            });
+            const val = Math.max(0, Math.min(23, Number(e.target.value)));
+            updateEntry({ enabledHours: { ...entry.enabledHours, end: val } });
           }}
         />
       </Div>
+
+      {/* Per-run budget preview */}
+      <PerRunBudgetHint
+        leadsPerWeek={entry.leadsPerWeek}
+        schedule={schedule}
+        enabledDays={entry.enabledDays}
+        enabledHours={entry.enabledHours}
+        t={t}
+      />
     </Div>
   );
 }

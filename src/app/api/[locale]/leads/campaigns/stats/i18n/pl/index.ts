@@ -82,6 +82,11 @@ export const translations = {
     uniquePersonsTooltip: "Leady minus wtórne powiązane leady (duplikaty)",
     activeCampaigns: "Aktywne kampanie",
     sendPerformance: "Wydajność wysyłki",
+    perRunBudget:
+      "~{{perRunBudget}}/uruchomienie · {{totalRunsPerWeek}} uruchomień/tydz.",
+    perRunBudgetZero:
+      "0/uruchomienie — zwiększ kontyngent lub zmniejsz częstotliwość",
+    accumulator: "następny lead: {{pct}}%",
     cronHealth: {
       title: "Zdrowie Crona",
       healthy: "Zdrowy",

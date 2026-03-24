@@ -789,6 +789,16 @@ export class ViteCompiler {
           })),
         ],
       },
+      // Inline env vars at build time so the compiled bundle has the correct
+      // values without any runtime patching.  NEXT_PUBLIC_APP_URL defaults to
+      // http://localhost:3000 if not set - set it in your build environment to
+      // produce a build that targets a different origin.
+      define: {
+        "process.env.NEXT_PUBLIC_APP_URL": JSON.stringify(
+          process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000",
+        ),
+        "process.env.NODE_ENV": JSON.stringify("production"),
+      },
       logLevel: verbose ? "info" : "warn",
     };
   }
@@ -1071,24 +1081,39 @@ export class ViteCompiler {
               return { code: patched, map: null };
             },
           } as Plugin,
-          // Polyfill CommonJS `require()` for SSR - the i18n lazy-loader pattern
-          // uses `() => require("./de").translations` which breaks in Vite ESM SSR.
+          // Polyfill CommonJS `require()` for the i18n lazy-loader pattern:
+          // `() => require("./de").translations` — SSR gets node:module createRequire,
+          // client gets require() calls rewritten to static import references.
           // apply:"serve" prevents this from running during esbuild dep pre-bundling.
           {
             name: "cjs-require-polyfill",
             apply: "serve",
             transform(code, id, opts) {
-              if (!opts?.ssr) {
-                return undefined;
-              }
               if (!id.includes("/src/")) {
                 return undefined;
               }
               if (!code.includes("require(")) {
                 return undefined;
               }
-              const shim = `import { createRequire as __createRequire } from "node:module";\nconst require = __createRequire(${JSON.stringify(id)});\n`;
-              return { code: shim + code, map: null };
+              if (opts?.ssr) {
+                const shim = `import { createRequire as __createRequire } from "node:module";\nconst require = __createRequire(${JSON.stringify(id)});\n`;
+                return { code: shim + code, map: null };
+              }
+              // Client: rewrite `require("./X")` → `__cjsImport_X` and add static imports.
+              const imports: string[] = [];
+              let counter = 0;
+              const rewritten = code.replace(
+                /\brequire\((['"`])(\.\/[^'"` )]+)\1\)/g,
+                (_match, _q, specifier) => {
+                  const varName = `__cjsImport_${counter++}`;
+                  imports.push(
+                    `import * as ${varName} from ${JSON.stringify(specifier)};`,
+                  );
+                  return varName;
+                },
+              );
+              if (imports.length === 0) {return undefined;}
+              return { code: imports.join("\n") + "\n" + rewritten, map: null };
             },
           } as Plugin,
           // Resolve next-vibe-ui/* multi-path alias: tanstack/ first, then web/ fallback.

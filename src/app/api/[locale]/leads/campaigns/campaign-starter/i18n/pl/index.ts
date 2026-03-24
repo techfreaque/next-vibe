@@ -83,6 +83,10 @@ export const translations: typeof enTranslations = {
       },
     },
     fields: {
+      timezone: {
+        label: "Strefa czasowa",
+        description: "Strefa czasowa przeglądarki do przeliczania godzin",
+      },
       dryRun: {
         label: "Próbny przebieg",
         description: "Uruchom bez wprowadzania zmian",
@@ -138,6 +142,12 @@ export const translations: typeof enTranslations = {
       unsavedChanges: {
         title: "Niezapisane zmiany",
         description: "Są niezapisane zmiany",
+      },
+    },
+    fields: {
+      timezone: {
+        label: "Strefa czasowa",
+        description: "Strefa czasowa przeglądarki do przeliczania godzin",
       },
     },
     response: {
@@ -257,6 +267,12 @@ export const translations: typeof enTranslations = {
     runButton: "Uruchom kampanie",
     running: "Uruchamianie...",
     done: "Gotowe",
+    perRunBudget:
+      "~{{perRunBudget}} leadów/uruchomienie · {{totalRunsPerWeek}} uruchomień/tydzień",
+    perRunBudgetFractional:
+      "{{exactBudget}}/uruchomienie · {{totalRunsPerWeek}} uruchomień/tydz. (ułamkowe — akumuluje między uruchomieniami)",
+    perRunBudgetZeroHint:
+      "— zwiększ liczbę leadów/tydzień lub zmniejsz częstotliwość harmonogramu",
     sections: {
       general: "Ogólne",
       generalDescription:

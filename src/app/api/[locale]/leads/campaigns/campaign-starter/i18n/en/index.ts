@@ -78,6 +78,10 @@ export const translations = {
       },
     },
     fields: {
+      timezone: {
+        label: "Timezone",
+        description: "Browser timezone for hour conversion",
+      },
       dryRun: {
         label: "Dry Run",
         description: "Run without making changes",
@@ -130,6 +134,12 @@ export const translations = {
       unsavedChanges: {
         title: "Unsaved Changes",
         description: "You have unsaved changes",
+      },
+    },
+    fields: {
+      timezone: {
+        label: "Timezone",
+        description: "Browser timezone for hour conversion",
       },
     },
     response: {
@@ -249,6 +259,11 @@ export const translations = {
     runButton: "Start Campaigns",
     running: "Running...",
     done: "Done",
+    perRunBudget:
+      "~{{perRunBudget}} leads/run · {{totalRunsPerWeek}} runs/week",
+    perRunBudgetFractional:
+      "{{exactBudget}}/run · {{totalRunsPerWeek}} runs/week (fractional — accumulates across runs)",
+    perRunBudgetZeroHint: "— increase leads/week or reduce schedule frequency",
     sections: {
       general: "General",
       generalDescription:

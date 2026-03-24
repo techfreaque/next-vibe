@@ -99,53 +99,58 @@ export class BuildRepository {
         }
       }
 
-      if (data.package) {
-        // Build package using the builder with build.config.ts
-        output.push(t("post.repository.messages.packageBuildStart"));
-        const { builderRepository } = await import("../../builder/repository");
-        const { t: builderT } = builderScopedTranslation.scopedT(locale);
-        const builderResult = await builderRepository.execute(
-          {
-            configPath: "build.config.ts",
-          },
-          logger,
-          builderT,
-        );
-        if (builderResult.success && builderResult.data) {
-          output.push(builderResult.data.output);
-          output.push(t("post.repository.messages.packageBuildSuccess"));
-          steps.push({ label: "Package", ok: true, skipped: false });
-        } else {
-          steps.push({ label: "Package", ok: false, skipped: false });
-          errors.push(t("post.repository.messages.packageBuildFailed"));
-          if (!builderResult.success) {
-            const detail =
-              builderResult.messageParams &&
-              typeof builderResult.messageParams["error"] === "string"
-                ? builderResult.messageParams["error"]
-                : builderResult.message;
-            if (detail) {
-              errors.push(detail);
-            }
-          }
-          if (!data.force) {
-            const response: BuildResponseType = {
-              success: false,
-              output: output.join("\n"),
-              duration: Date.now() - startTime,
-              errors,
-              steps,
-            };
-            return success(response);
-          }
-        }
-      }
-
       if (!data.nextBuild) {
         output.push(t("post.repository.messages.skipNextBuild"));
         steps.push({ label: "Next.js", ok: true, skipped: true });
+        if (data.package) {
+          // Still run the package build (CLI + browser files) when nextBuild is skipped
+          output.push(t("post.repository.messages.packageBuildStart"));
+          try {
+            const { builderRepository } =
+              await import("../../builder/repository");
+            const { t: builderT } = builderScopedTranslation.scopedT(locale);
+            const builderResult = await builderRepository.execute(
+              { configPath: "build.config.ts" },
+              logger,
+              builderT,
+            );
+            if (builderResult.success && builderResult.data) {
+              output.push(builderResult.data.output);
+              output.push(t("post.repository.messages.packageBuildSuccess"));
+              steps.push({ label: "Package", ok: true, skipped: false });
+            } else {
+              steps.push({ label: "Package", ok: false, skipped: false });
+              errors.push(t("post.repository.messages.packageBuildFailed"));
+              if (!data.force) {
+                const response: BuildResponseType = {
+                  success: false,
+                  output: output.join("\n"),
+                  duration: Date.now() - startTime,
+                  errors,
+                  steps,
+                };
+                return success(response);
+              }
+            }
+          } catch (buildError) {
+            const parsedError = parseError(buildError);
+            steps.push({ label: "Package", ok: false, skipped: false });
+            errors.push(
+              `${t("post.repository.messages.packageBuildFailed")}: ${parsedError.message}`,
+            );
+            if (!data.force) {
+              return fail({
+                message: t("post.errors.server.title"),
+                errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: parsedError.message },
+              });
+            }
+          }
+        }
       } else if (data.tanstack) {
-        // Build TanStack Start (SSR) via vibe builder (uses build.config.ts)
+        // Build TanStack Start (SSR) via vibe builder (uses build.config.ts).
+        // build.config.ts already includes both the CLI/browser files (package)
+        // and tanstack-start, so a single run covers both - no separate package build needed.
         output.push("Building TanStack Start (SSR)...");
         try {
           const { builderRepository } =
@@ -160,6 +165,9 @@ export class BuildRepository {
             output.push(tanstackBuildResult.data.output);
             output.push("✅ TanStack Start (SSR) build completed successfully");
             steps.push({ label: "TanStack", ok: true, skipped: false });
+            if (data.package) {
+              steps.push({ label: "Package", ok: true, skipped: false });
+            }
           } else {
             steps.push({ label: "TanStack", ok: false, skipped: false });
             errors.push("TanStack Start build failed");
@@ -176,6 +184,50 @@ export class BuildRepository {
           const errorMsg = `TanStack Start build failed: ${parsedError.message}`;
           steps.push({ label: "TanStack", ok: false, skipped: false });
           errors.push(errorMsg);
+          if (!data.force) {
+            return fail({
+              message: t("post.errors.server.title"),
+              errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: { error: parsedError.message },
+            });
+          }
+        }
+      } else if (data.package) {
+        // Next.js build + package build (CLI + browser files) - run as one
+        output.push(t("post.repository.messages.packageBuildStart"));
+        try {
+          const { builderRepository } =
+            await import("../../builder/repository");
+          const { t: builderT } = builderScopedTranslation.scopedT(locale);
+          const builderResult = await builderRepository.execute(
+            { configPath: "build.config.ts" },
+            logger,
+            builderT,
+          );
+          if (builderResult.success && builderResult.data) {
+            output.push(builderResult.data.output);
+            output.push(t("post.repository.messages.packageBuildSuccess"));
+            steps.push({ label: "Package", ok: true, skipped: false });
+          } else {
+            steps.push({ label: "Package", ok: false, skipped: false });
+            errors.push(t("post.repository.messages.packageBuildFailed"));
+            if (!data.force) {
+              const response: BuildResponseType = {
+                success: false,
+                output: output.join("\n"),
+                duration: Date.now() - startTime,
+                errors,
+                steps,
+              };
+              return success(response);
+            }
+          }
+        } catch (buildError) {
+          const parsedError = parseError(buildError);
+          steps.push({ label: "Package", ok: false, skipped: false });
+          errors.push(
+            `${t("post.repository.messages.packageBuildFailed")}: ${parsedError.message}`,
+          );
           if (!data.force) {
             return fail({
               message: t("post.errors.server.title"),

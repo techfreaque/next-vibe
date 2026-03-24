@@ -144,7 +144,7 @@ export class CampaignQueueRepository {
           : new Date().toISOString(),
       }));
 
-      logger.info("campaign.queue.retrieved", {
+      logger.debug("Campaign queue retrieved", {
         total,
         page,
         pageSize,

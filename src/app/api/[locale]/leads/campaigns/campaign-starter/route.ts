@@ -15,12 +15,19 @@ export const { POST, GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, t, logger }) =>
-      CampaignStarterRepository.run(data, user, t, logger),
+    handler: ({ data, user, t, logger, platform }) =>
+      CampaignStarterRepository.run(
+        data,
+        data.timezone,
+        user,
+        t,
+        logger,
+        platform,
+      ),
   },
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, t, logger }) =>
-      CampaignStarterRepository.getConfig(user, t, logger),
+    handler: ({ data, user, t, logger }) =>
+      CampaignStarterRepository.getConfig(user, data.timezone, t, logger),
   },
 });

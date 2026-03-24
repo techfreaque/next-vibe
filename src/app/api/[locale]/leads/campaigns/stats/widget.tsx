@@ -690,14 +690,30 @@ export function CampaignStatsWidget({
                   : 0;
               const isAlmostFull = pct >= 0.9;
               const barColor = isAlmostFull ? "#22c55e" : "#3b82f6";
+              const isZeroBudget = q.perRunBudget <= 0 && q.weeklyQuota > 0;
+              const accPct = Math.min(1, q.accumulator ?? 0);
               return (
                 <Div key={q.locale} className="flex flex-col gap-1">
                   <Div className="flex items-center justify-between">
                     <Span className="text-xs font-medium">{q.locale}</Span>
-                    <Span className="text-xs text-muted-foreground tabular-nums">
-                      {q.startedThisWeek.toLocaleString()} /{" "}
-                      {q.weeklyQuota.toLocaleString()}
-                    </Span>
+                    <Div className="flex items-center gap-2">
+                      {isZeroBudget ? (
+                        <Span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                          {t("widget.perRunBudgetZero")}
+                        </Span>
+                      ) : q.perRunBudget > 0 ? (
+                        <Span className="text-xs text-muted-foreground tabular-nums">
+                          {t("widget.perRunBudget", {
+                            perRunBudget: q.perRunBudget,
+                            totalRunsPerWeek: q.totalRunsPerWeek,
+                          })}
+                        </Span>
+                      ) : null}
+                      <Span className="text-xs text-muted-foreground tabular-nums">
+                        {q.startedThisWeek.toLocaleString()} /{" "}
+                        {q.weeklyQuota.toLocaleString()}
+                      </Span>
+                    </Div>
                   </Div>
                   <Div className="h-2 bg-muted rounded-full overflow-hidden">
                     <Div
@@ -709,6 +725,25 @@ export function CampaignStatsWidget({
                       }}
                     />
                   </Div>
+                  {q.weeklyQuota > 0 && (
+                    <Div className="flex items-center gap-1.5">
+                      <Div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
+                        <Div
+                          style={{
+                            width: `${accPct * 100}%`,
+                            height: "100%",
+                            borderRadius: "9999px",
+                            backgroundColor: "#a855f7",
+                          }}
+                        />
+                      </Div>
+                      <Span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
+                        {t("widget.accumulator", {
+                          pct: Math.round(accPct * 100),
+                        })}
+                      </Span>
+                    </Div>
+                  )}
                 </Div>
               );
             })}

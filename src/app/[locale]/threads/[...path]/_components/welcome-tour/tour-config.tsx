@@ -9,23 +9,19 @@ import type { Step } from "react-joyride";
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import {
-  getFolderTourAttr,
-  getTourSelector,
-  TOUR_DATA_ATTRS,
-} from "./tour-attrs";
-export type { TourDataAttr } from "./tour-attrs";
-export {
-  getFolderTourAttr,
-  getTourSelector,
-  TOUR_DATA_ATTRS,
-} from "./tour-attrs";
-import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatCurrency } from "@/i18n/core/localization-utils";
+import { getTourSelector, TOUR_DATA_ATTRS } from "./tour-attrs";
+export {
+  getFolderTourAttr,
+  getTourSelector,
+  TOUR_DATA_ATTRS,
+} from "./tour-attrs";
+export type { TourDataAttr } from "./tour-attrs";
 
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;

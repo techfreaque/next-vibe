@@ -24,6 +24,7 @@ import {
   cronTaskExecutions,
   cronTasks,
 } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import { getCronFrequencyMinutes } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import { CronTasksRepository } from "@/app/api/[locale]/system/unified-interface/tasks/cron/repository";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
@@ -258,10 +259,34 @@ export class CampaignStatsRepository {
         weeklyQuota: number;
         startedThisWeek: number;
         remaining: number;
+        perRunBudget: number;
+        totalRunsPerWeek: number;
+        accumulator: number;
       }> = [];
+
+      const [starterCronTask] = await db
+        .select({ schedule: cronTasks.schedule })
+        .from(cronTasks)
+        .where(eq(cronTasks.routeId, "campaign-starter"))
+        .limit(1);
+      const starterSchedule = starterCronTask?.schedule ?? "*/5 * * * *";
+      const frequencyMinutes = getCronFrequencyMinutes(starterSchedule, logger);
+      const runsPerHour = 60 / frequencyMinutes;
 
       for (const localeValue of Object.values(CountryLanguageValues)) {
         const weeklyQuota = weeklyQuotaByLocale[localeValue] ?? 0;
+        const localeEntry = starterConfig?.localeConfig[localeValue];
+        const enabledHours = localeEntry?.enabledHours ?? { start: 0, end: 0 };
+        const enabledDays = localeEntry?.enabledDays ?? [];
+        const enabledHoursCount = Math.max(
+          0,
+          enabledHours.end - enabledHours.start,
+        );
+        const totalRunsPerWeek =
+          runsPerHour * enabledHoursCount * enabledDays.length;
+        const perRunBudget =
+          totalRunsPerWeek > 0 ? Math.floor(weeklyQuota / totalRunsPerWeek) : 0;
+
         const languageCode = getLanguageFromLocale(localeValue);
         const [weekRow] = await db
           .select({ count: sql<number>`COUNT(*)::int` })
@@ -273,11 +298,15 @@ export class CampaignStatsRepository {
             ),
           );
         const startedThisWeek = Number(weekRow?.count ?? 0);
+        const accumulator = starterConfig?.localeAccumulators[localeValue] ?? 0;
         quotaProgress.push({
           locale: localeValue,
           weeklyQuota,
           startedThisWeek,
           remaining: Math.max(0, weeklyQuota - startedThisWeek),
+          perRunBudget,
+          totalRunsPerWeek: Math.round(totalRunsPerWeek),
+          accumulator,
         });
       }
 

@@ -37,7 +37,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.PRODUCTION_OFF,
   ],
-  aliases: ["sql", "db:sql"],
+  aliases: ["sql", "db:sql", "db:query"],
   cli: {
     firstCliArgKey: "query",
   },

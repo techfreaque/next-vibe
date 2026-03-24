@@ -1,9 +1,9 @@
 "use client";
 import type { Route } from "next";
-import type { RouteType } from "next/dist/lib/load-custom-routes";
 import { usePathname, useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { setCookie } from "next-vibe-ui/lib/cookies";
 import { storage } from "next-vibe-ui/lib/storage";
+import type { RouteType } from "next/dist/lib/load-custom-routes";
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -70,7 +70,7 @@ export const TranslationContext = createContext<TranslationContextType>({
 // Translation provider props
 interface TranslationProviderProps {
   children: ReactNode;
-  currentLocale?: CountryLanguage;
+  currentLocale: CountryLanguage;
 }
 
 // Translation provider component
@@ -179,11 +179,14 @@ export function TranslationProvider({
 
       // Update document language for accessibility (web only)
       if (typeof document !== "undefined") {
-        document.documentElement.lang = language;
+        const newLocale = savedLocale ?? currentLocale;
+        if (newLocale !== document.documentElement.lang) {
+          document.documentElement.lang = newLocale;
+        }
       }
     }
     void initializeLocale();
-  }, [currentLocale, language]);
+  }, [currentLocale, language, country]);
 
   // Type-safe translation function with parameter support
   const t: TFunction = <K extends TranslationKey>(

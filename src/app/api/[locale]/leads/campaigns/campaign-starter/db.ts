@@ -36,6 +36,10 @@ export const campaignStarterConfigs = pgTable("campaign_starter_configs", {
       >
     >()
     .notNull(), // locale -> { leadsPerWeek, enabledDays, enabledHours }
+  localeAccumulators: jsonb("locale_accumulators")
+    .$type<Record<string, number>>()
+    .notNull()
+    .default({}), // locale -> fractional carry (0 ≤ x < 1) across runs
 
   // Metadata
   createdAt: timestamp("created_at").defaultNow().notNull(),

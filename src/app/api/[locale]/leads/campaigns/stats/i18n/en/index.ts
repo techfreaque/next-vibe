@@ -84,6 +84,9 @@ export const translations = {
       "Leads minus secondary linked leads (same-person duplicates)",
     activeCampaigns: "Active Campaigns",
     sendPerformance: "Send Performance",
+    perRunBudget: "~{{perRunBudget}}/run · {{totalRunsPerWeek}} runs/week",
+    perRunBudgetZero: "0/run — increase quota or reduce frequency",
+    accumulator: "next lead: {{pct}}%",
     cronHealth: {
       title: "Cron Health",
       healthy: "Healthy",

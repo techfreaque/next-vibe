@@ -25,6 +25,7 @@ export function Html({
       className={className}
       style={style}
       suppressHydrationWarning={suppressHydrationWarning}
+      data-scroll-behavior="smooth"
     >
       {children}
     </html>

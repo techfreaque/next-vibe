@@ -221,6 +221,21 @@ const { GET } = createEndpoint({
               content: "get.response.pending",
               schema: z.number(),
             }),
+            perRunBudget: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.quotaProgress",
+              schema: z.number(),
+            }),
+            totalRunsPerWeek: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.quotaProgress",
+              schema: z.number(),
+            }),
+            accumulator: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.quotaProgress",
+              schema: z.number(),
+            }),
           },
         }),
       }),

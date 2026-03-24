@@ -15,8 +15,8 @@ export const { POST, GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger, t }) =>
-      BounceProcessorRepository.run(data, user, logger, t),
+    handler: ({ data, user, logger, t, platform }) =>
+      BounceProcessorRepository.run(data, user, logger, t, platform),
   },
   [Methods.GET]: {
     email: undefined,

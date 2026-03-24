@@ -1,0 +1,1 @@
+ALTER TABLE "campaign_starter_configs" ADD COLUMN "locale_accumulators" jsonb DEFAULT '{}'::jsonb NOT NULL;

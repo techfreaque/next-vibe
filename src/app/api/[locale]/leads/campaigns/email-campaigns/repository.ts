@@ -158,7 +158,7 @@ export class EmailCampaignsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailCampaignsPostRequestOutput>> {
     try {
-      logger.info("Updating email campaigns config", {
+      logger.debug("Updating email campaigns config", {
         userId: user.id,
         enabled: data.enabled,
         dryRun: data.dryRun,
