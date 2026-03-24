@@ -123,13 +123,15 @@ export function SidebarFooter({
             <Div className="flex flex-col gap-0.5">
               {/* Login/Signup - shown when logged out (hidden in local mode: no self-signup) */}
               {!isLoggedIn && !envClient.NEXT_PUBLIC_LOCAL_MODE && (
-                <Div className="flex flex-row gap-1.5 py-1">
+                <Div
+                  className="flex flex-row gap-1.5 py-1"
+                  data-tour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
+                >
                   <Link href={`/${locale}/user/login`} className="flex-1">
                     <Button
                       variant="outline"
                       size="sm"
                       className="w-full"
-                      data-tour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
                       aria-label="Login to your account"
                     >
                       <User className="h-3.5 w-3.5 mr-1.5" />

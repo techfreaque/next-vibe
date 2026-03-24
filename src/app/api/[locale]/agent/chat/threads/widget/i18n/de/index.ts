@@ -93,13 +93,13 @@ export const translations: typeof enTranslations = {
       welcome: {
         title: "Willkommen bei {{appName}}!",
         description:
-          "Ihre datenschutzorientierte KI-Plattform mit 40+ Modellen, benutzergesteuerter Inhaltsfilterung und freier Meinungsfreiheit.",
+          "Ihre datenschutzorientierte KI-Plattform mit {{modelCount}}+ Modellen, benutzergesteuerter Inhaltsfilterung und freier Meinungsfreiheit.",
         subtitle: "Machen Sie eine kurze Tour, um loszulegen.",
       },
       aiCompanion: {
         title: "Wählen Sie Ihren KI-Begleiter",
         description:
-          "Wählen Sie aus 40+ KI-Modellen, darunter Mainstream, Open-Source und zensurfreie Optionen.",
+          "Wählen Sie aus {{modelCount}}+ KI-Modellen, darunter Mainstream, Open-Source und zensurfreie Optionen.",
         tip: "Klicken Sie, um den Modellselektor zu öffnen und Ihren Begleiter auszuwählen.",
       },
       rootFolders: {
@@ -182,10 +182,10 @@ export const translations: typeof enTranslations = {
         },
       },
       callMode: {
-        title: "Anrufmodus",
+        title: "Anrufmodus — die KI antwortet laut",
         description:
-          "Aktivieren Sie den Anrufmodus für ein freihändiges, sprachgesteuertes Gesprächserlebnis mit Echtzeit-KI-Antworten.",
-        tip: "Perfekt für unterwegs oder wenn Sie lieber sprechen als tippen.",
+          "Telefon-Symbol antippen und einfach sprechen. Die KI hört zu, antwortet laut und hält sich kurz — wie ein echtes Gespräch.",
+        tip: "Kein Tippen. Kein Lesen. Einfach reden.",
       },
       complete: {
         title: "Alles erledigt!",

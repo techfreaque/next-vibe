@@ -2482,9 +2482,10 @@ export class CreditRepository {
       }
 
       // Find current lead's wallet (may not exist if user has no lead on this device)
-      const currentLeadWallet = updatedPool.leadWallets.find(
-        (w) => w.leadId === leadId,
-      );
+      // When leadId is empty (admin view with no specific lead), treat all lead wallets as current
+      const currentLeadWallet = leadId
+        ? updatedPool.leadWallets.find((w) => w.leadId === leadId)
+        : undefined;
 
       // Use the wallet's actual freePeriodId for consistency
       const currentPeriodId = updatedPool.userWallet.freePeriodId;
@@ -2546,9 +2547,15 @@ export class CreditRepository {
       const adjustedLimit = hasSummaryEntry && offset === 0 ? limit - 1 : limit;
 
       // Fetch transactions from current lead wallet (if exists) AND user wallet
-      const walletIds = currentLeadWallet
-        ? [currentLeadWallet.id, updatedPool.userWallet.id]
-        : [updatedPool.userWallet.id];
+      // When no specific lead (admin view), include all lead wallets
+      const walletIds = leadId
+        ? currentLeadWallet
+          ? [currentLeadWallet.id, updatedPool.userWallet.id]
+          : [updatedPool.userWallet.id]
+        : [
+            updatedPool.userWallet.id,
+            ...updatedPool.leadWallets.map((w) => w.id),
+          ];
       const transactions = await db
         .select()
         .from(creditTransactions)
@@ -2636,9 +2643,9 @@ export class CreditRepository {
       : ((user.roles?.includes(UserRole.ADMIN) &&
           (data.targetLeadId ?? data.targetUserId)) ??
         false);
-    const effectiveLeadId = isAdmin
-      ? (data.targetLeadId ?? user.leadId)
-      : user.leadId;
+    // When admin views a specific user, use the target lead if provided,
+    // otherwise pass empty string so getTransactions shows all leads in the user's pool
+    const effectiveLeadId = isAdmin ? data.targetLeadId : user.leadId;
     const effectiveUserId =
       (isAdmin ? data.targetUserId : user.id) || undefined;
 

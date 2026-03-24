@@ -275,7 +275,7 @@ export class SmtpRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
-      logger.info("Getting total sending capacity", { userId: user.id, data });
+      logger.debug("Getting total sending capacity", { userId: user.id, data });
 
       const rows = await db
         .select()

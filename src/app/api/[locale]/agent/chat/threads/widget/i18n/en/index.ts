@@ -91,13 +91,13 @@ export const translations = {
       welcome: {
         title: "Welcome to {{appName}}!",
         description:
-          "Your privacy-first AI platform with 40+ models, user-controlled content filtering, and free speech principles.",
+          "Your privacy-first AI platform with {{modelCount}}+ models, user-controlled content filtering, and free speech principles.",
         subtitle: "Let's take a quick tour to get you started.",
       },
       aiCompanion: {
         title: "Choose Your AI Companion",
         description:
-          "Select from 40+ AI models including mainstream, open-source, and uncensored options.",
+          "Select from {{modelCount}}+ AI models including mainstream, open-source, and uncensored options.",
         tip: "Click to open the model selector and pick your companion.",
       },
       rootFolders: {
@@ -178,10 +178,10 @@ export const translations = {
         },
       },
       callMode: {
-        title: "Call Mode",
+        title: "Call Mode — AI Talks Back",
         description:
-          "Enable Call Mode for a hands-free, voice-driven conversation experience with real-time AI responses.",
-        tip: "Perfect for when you're on the go or prefer speaking over typing.",
+          "Tap the phone button and just speak. The AI listens, answers out loud, and keeps it short — like a real conversation.",
+        tip: "No typing. No reading. Just talk.",
       },
       complete: {
         title: "You're All Set!",

@@ -98,6 +98,9 @@ export const translations = {
   payment: {
     stripeCustomerId: "Stripe Customer ID",
     activeSubscription: "Active Subscription",
+    subscriptionPlan: "Plan",
+    subscriptionStatus: "Subscription Status",
+    nextBilling: "Next Billing",
   },
   common: {
     yes: "Yes",
@@ -128,6 +131,7 @@ export const translations = {
     credits: "Credits",
     referrals: "Referrals",
     earnings: "Earnings",
+    connections: "Connections",
   },
   modelUsage: {
     title: "Model Usage",
@@ -135,6 +139,25 @@ export const translations = {
     spent: "Credits Spent",
     messages: "Messages",
     noUsage: "No model usage data",
+  },
+  connections: {
+    title: "Connections",
+    leadsTitle: "Connected Leads",
+    usersTitle: "Connected Users",
+    noLeads: "No connected leads",
+    noUsers: "No connected users",
+    leadEmail: "Email",
+    leadBusiness: "Business",
+    leadStatus: "Status",
+    ipAddress: "IP Address",
+    device: "Device",
+    linkReason: "Link Reason",
+    linkedAt: "Linked At",
+    userId: "User ID",
+    userEmail: "Email",
+    userPublicName: "Username",
+    viewLead: "View Lead",
+    viewUser: "View User",
   },
   ban: {
     banUser: "Ban User",

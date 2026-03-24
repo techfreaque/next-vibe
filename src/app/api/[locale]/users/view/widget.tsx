@@ -64,7 +64,7 @@ interface CustomWidgetProps {
   } & (typeof definition.GET)["fields"];
 }
 
-type TabId = "overview" | "credits" | "referrals" | "earnings";
+type TabId = "overview" | "credits" | "referrals" | "earnings" | "connections";
 
 /**
  * Format currency cents to dollars
@@ -192,6 +192,34 @@ export function UserViewContainer({
     });
   }, [navigate, userId]);
 
+  const handleBan = useCallback(async (): Promise<void> => {
+    if (!userId) {
+      return;
+    }
+    const userDefs = await import("../user/[id]/definition");
+    navigate(userDefs.default.PUT, {
+      urlPathParams: { id: userId },
+      data: { isBanned: true },
+      prefillFromGet: true,
+      getEndpoint: userDefs.default.GET,
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate, userId]);
+
+  const handleUnban = useCallback(async (): Promise<void> => {
+    if (!userId) {
+      return;
+    }
+    const userDefs = await import("../user/[id]/definition");
+    navigate(userDefs.default.PUT, {
+      urlPathParams: { id: userId },
+      data: { isBanned: false, bannedReason: null },
+      prefillFromGet: true,
+      getEndpoint: userDefs.default.GET,
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate, userId]);
+
   const handleCopyUserId = useCallback((): void => {
     if (!userId) {
       return;
@@ -269,6 +297,8 @@ export function UserViewContainer({
     roles,
     recentActivity,
     modelUsageStats,
+    connectedLeads,
+    connectedUsers,
   } = data;
 
   const tabs: { id: TabId; label: string }[] = [
@@ -276,6 +306,7 @@ export function UserViewContainer({
     { id: "credits", label: t("tabs.credits") },
     { id: "referrals", label: t("tabs.referrals") },
     { id: "earnings", label: t("tabs.earnings") },
+    { id: "connections", label: t("tabs.connections") },
   ];
 
   return (
@@ -316,6 +347,29 @@ export function UserViewContainer({
               <Trash2 className="h-4 w-4" />
               {t("widget.actions.delete")}
             </Button>
+            {basicInfo.isBanned ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleUnban()}
+                className="gap-1 text-green-600 hover:text-green-700"
+              >
+                <CheckCircle className="h-4 w-4" />
+                {t("ban.unbanUser")}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleBan()}
+                className="gap-1 text-destructive hover:text-destructive"
+              >
+                <XCircle className="h-4 w-4" />
+                {t("ban.banUser")}
+              </Button>
+            )}
           </>
         )}
       </Div>
@@ -548,6 +602,15 @@ export function UserViewContainer({
           locale={locale}
           user={user}
           endpointOptions={earningsEndpointOptions}
+        />
+      )}
+
+      {activeTab === "connections" && (
+        <ConnectionsTab
+          connectedLeads={connectedLeads}
+          connectedUsers={connectedUsers}
+          t={t}
+          navigate={navigate}
         />
       )}
     </Div>
@@ -810,6 +873,40 @@ function OverviewTab({
                 )}
               </Div>
             </Div>
+            {paymentStats.subscriptionPlan && (
+              <Div>
+                <P className="text-xs text-muted-foreground mb-1">
+                  {t("payment.subscriptionPlan")}
+                </P>
+                <P className="text-sm">
+                  {paymentStats.subscriptionPlan}
+                  {paymentStats.subscriptionInterval
+                    ? ` / ${paymentStats.subscriptionInterval}`
+                    : ""}
+                </P>
+              </Div>
+            )}
+            {paymentStats.subscriptionStatus &&
+              !paymentStats.hasActiveSubscription && (
+                <Div>
+                  <P className="text-xs text-muted-foreground mb-1">
+                    {t("payment.subscriptionStatus")}
+                  </P>
+                  <Badge variant="secondary" className="text-xs">
+                    {paymentStats.subscriptionStatus}
+                  </Badge>
+                </Div>
+              )}
+            {paymentStats.subscriptionNextBilling && (
+              <Div>
+                <P className="text-xs text-muted-foreground mb-1">
+                  {t("payment.nextBilling")}
+                </P>
+                <P className="text-sm">
+                  {formatDate(paymentStats.subscriptionNextBilling)}
+                </P>
+              </Div>
+            )}
           </Div>
         </CardContent>
       </Card>
@@ -945,6 +1042,173 @@ function OverviewTab({
               </P>
             </Div>
           </Div>
+        </CardContent>
+      </Card>
+    </Div>
+  );
+}
+
+/**
+ * Connections tab - shows connected leads and users
+ */
+function ConnectionsTab({
+  connectedLeads,
+  connectedUsers,
+  t,
+  navigate,
+}: {
+  connectedLeads: UserViewResponseOutput["connectedLeads"];
+  connectedUsers: UserViewResponseOutput["connectedUsers"];
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+}): React.JSX.Element {
+  const handleViewLead = useCallback(
+    async (leadId: string): Promise<void> => {
+      const leadDefs = await import("../../leads/lead/[id]/definition");
+      navigate(leadDefs.default.GET, {
+        urlPathParams: { id: leadId },
+      });
+    },
+    [navigate],
+  );
+
+  const handleViewUser = useCallback(
+    async (userId: string): Promise<void> => {
+      const userViewDef = await import("./definition");
+      navigate(userViewDef.GET, {
+        data: { userId },
+      });
+    },
+    [navigate],
+  );
+
+  return (
+    <Div className="flex flex-col gap-6">
+      {/* Connected Leads */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="h-4 w-4" />
+            {t("connections.leadsTitle")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {connectedLeads.length === 0 ? (
+            <P className="text-sm text-muted-foreground">
+              {t("connections.noLeads")}
+            </P>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("connections.leadEmail")}</TableHead>
+                  <TableHead>{t("connections.leadBusiness")}</TableHead>
+                  <TableHead>{t("connections.leadStatus")}</TableHead>
+                  <TableHead>{t("connections.ipAddress")}</TableHead>
+                  <TableHead>{t("connections.device")}</TableHead>
+                  <TableHead>{t("connections.linkReason")}</TableHead>
+                  <TableHead>{t("connections.linkedAt")}</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {connectedLeads.map((lead) => (
+                  <TableRow key={lead.id}>
+                    <TableCell className="text-sm">
+                      {lead.email ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {lead.businessName}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs">
+                        {lead.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm font-mono text-muted-foreground">
+                      {lead.ipAddress ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {[lead.deviceType, lead.browser, lead.os]
+                        .filter(Boolean)
+                        .join(" · ") || "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {lead.linkReason ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {formatDate(lead.linkedAt)}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => void handleViewLead(lead.id)}
+                        className="gap-1"
+                      >
+                        {t("connections.viewLead")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Connected Users */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <User className="h-4 w-4" />
+            {t("connections.usersTitle")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {connectedUsers.length === 0 ? (
+            <P className="text-sm text-muted-foreground">
+              {t("connections.noUsers")}
+            </P>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("connections.userEmail")}</TableHead>
+                  <TableHead>{t("connections.userPublicName")}</TableHead>
+                  <TableHead>{t("connections.linkReason")}</TableHead>
+                  <TableHead>{t("connections.linkedAt")}</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {connectedUsers.map((u) => (
+                  <TableRow key={u.id}>
+                    <TableCell className="text-sm">{u.email}</TableCell>
+                    <TableCell className="text-sm">@{u.publicName}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {u.linkReason ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {formatDate(u.linkedAt)}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => void handleViewUser(u.id)}
+                        className="gap-1"
+                      >
+                        {t("connections.viewUser")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </Div>

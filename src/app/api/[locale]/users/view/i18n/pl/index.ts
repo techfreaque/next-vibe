@@ -102,6 +102,9 @@ export const translations: typeof enTranslations = {
   payment: {
     stripeCustomerId: "ID klienta Stripe",
     activeSubscription: "Aktywna subskrypcja",
+    subscriptionPlan: "Plan",
+    subscriptionStatus: "Status subskrypcji",
+    nextBilling: "Następna płatność",
   },
   common: {
     yes: "Tak",
@@ -132,6 +135,7 @@ export const translations: typeof enTranslations = {
     credits: "Kredyty",
     referrals: "Polecenia",
     earnings: "Zarobki",
+    connections: "Połączenia",
   },
   modelUsage: {
     title: "Użycie modeli",
@@ -139,6 +143,25 @@ export const translations: typeof enTranslations = {
     spent: "Wydane kredyty",
     messages: "Wiadomości",
     noUsage: "Brak danych o użyciu modeli",
+  },
+  connections: {
+    title: "Połączenia",
+    leadsTitle: "Powiązane leady",
+    usersTitle: "Powiązani użytkownicy",
+    noLeads: "Brak powiązanych leadów",
+    noUsers: "Brak powiązanych użytkowników",
+    leadEmail: "E-mail",
+    leadBusiness: "Firma",
+    leadStatus: "Status",
+    ipAddress: "Adres IP",
+    device: "Urządzenie",
+    linkReason: "Powód powiązania",
+    linkedAt: "Powiązano",
+    userId: "ID użytkownika",
+    userEmail: "E-mail",
+    userPublicName: "Nazwa użytkownika",
+    viewLead: "Zobacz lead",
+    viewUser: "Zobacz użytkownika",
   },
   ban: {
     banUser: "Zablokuj użytkownika",

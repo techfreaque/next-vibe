@@ -147,10 +147,9 @@ async function deployFile(
   const relativePath = relative(projectRoot, filePath);
 
   try {
-    const mod = (await import(/* turbopackIgnore: true */ filePath)) as Record<
-      string,
-      DbFunctionLike | undefined
-    >;
+    const mod = (await import(
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ filePath
+    )) as Record<string, DbFunctionLike | undefined>;
     let count = 0;
 
     for (const [exportName, value] of Object.entries(mod)) {

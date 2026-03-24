@@ -29,7 +29,7 @@ export function SelectorOnboarding({
   const [selectedCompanionId, setSelectedCompanionId] = useState<string | null>(
     null,
   );
-  const [selectedBudget, setSelectedBudget] = useState<BudgetTier>("brilliant");
+  const [selectedBudget, setSelectedBudget] = useState<BudgetTier>("smart");
 
   const goToNext = useCallback(
     (current: OnboardingStep) => {

@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, inArray, sql, sum } from "drizzle-orm";
+import { and, count, desc, eq, inArray, or, sql, sum } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -28,6 +28,11 @@ import {
   CreditPackType,
   CreditTransactionTypeDB,
 } from "@/app/api/[locale]/credits/enum";
+import {
+  leadLeadLinks,
+  leads,
+  userLeadLinks,
+} from "@/app/api/[locale]/leads/db";
 import { newsletterSubscriptions } from "@/app/api/[locale]/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/app/api/[locale]/newsletter/enum";
 import {
@@ -91,6 +96,7 @@ export class UserViewRepository {
         userRolesResult,
         recentActivityResult,
         modelUsageStatsResult,
+        connectionsResult,
       ] = await Promise.all([
         // Chat Statistics
         this.getChatStats(userId),
@@ -108,6 +114,8 @@ export class UserViewRepository {
         this.getRecentActivity(userId),
         // Model Usage Statistics
         this.getModelUsageStats(userId),
+        // Connected leads and users
+        this.getConnections(userId),
       ]);
 
       logger.debug("User view data fetched successfully", { userId });
@@ -137,6 +145,8 @@ export class UserViewRepository {
         roles: userRolesResult,
         recentActivity: recentActivityResult,
         modelUsageStats: modelUsageStatsResult,
+        connectedLeads: connectionsResult.connectedLeads,
+        connectedUsers: connectionsResult.connectedUsers,
       });
     } catch (error) {
       logger.error("Error fetching user view data", parseError(error), {
@@ -250,6 +260,7 @@ export class UserViewRepository {
 
   /**
    * Get credit information for user
+   * freeCreditsRemaining sums across all linked lead wallets (user wallet itself holds 0 free credits)
    */
   private static async getCreditInfo(userId: string): Promise<{
     currentBalance: number;
@@ -287,6 +298,20 @@ export class UserViewRepository {
         nextExpiry: null,
       };
     }
+
+    // Sum free credits across all linked lead wallets (user wallet never holds free credits)
+    const linkedLeads = await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId));
+    const linkedLeadIds = linkedLeads.map((l) => l.leadId);
+    const leadFreeCredits =
+      linkedLeadIds.length > 0
+        ? await db
+            .select({ freeCreditsRemaining: creditWallets.freeCreditsRemaining })
+            .from(creditWallets)
+            .where(inArray(creditWallets.leadId, linkedLeadIds))
+        : [];
 
     // Get transaction totals and pack breakdown in parallel
     const [[earnedResult], [spentResult], [purchasedResult], packBreakdown] =
@@ -349,9 +374,14 @@ export class UserViewRepository {
       }
     }
 
+    const totalFreeCredits = leadFreeCredits.reduce(
+      (acc, lw) => acc + (Number(lw.freeCreditsRemaining) || 0),
+      0,
+    );
+
     return {
       currentBalance: Number(wallet.balance) || 0,
-      freeCreditsRemaining: Number(wallet.freeCreditsRemaining) || 0,
+      freeCreditsRemaining: totalFreeCredits,
       totalCreditsEarned: Math.abs(Number(earnedResult?.total) || 0),
       totalCreditsSpent: Math.abs(Number(spentResult?.total) || 0),
       totalCreditsPurchased: Number(purchasedResult?.total) || 0,
@@ -377,6 +407,10 @@ export class UserViewRepository {
     lastPaymentAt: Date | null;
     stripeCustomerId: string | null;
     hasActiveSubscription: boolean;
+    subscriptionPlan: string | null;
+    subscriptionInterval: string | null;
+    subscriptionNextBilling: Date | null;
+    subscriptionStatus: string | null;
   }> {
     // Get payment totals
     const [[revenueResult], [paymentsCount], [successfulCount], [failedCount]] =
@@ -425,13 +459,17 @@ export class UserViewRepository {
       .orderBy(desc(paymentTransactions.createdAt))
       .limit(1);
 
-    // Check for active subscription
+    // Get most recent subscription (any status) for plan details
     const [subscription] = await db
-      .select()
+      .select({
+        status: subscriptions.status,
+        planId: subscriptions.planId,
+        billingInterval: subscriptions.billingInterval,
+        currentPeriodEnd: subscriptions.currentPeriodEnd,
+      })
       .from(subscriptions)
-      .where(
-        sql`${subscriptions.userId} = ${userId} AND ${subscriptions.status} = ${SubscriptionStatusDB[0]}`,
-      )
+      .where(eq(subscriptions.userId, userId))
+      .orderBy(desc(subscriptions.createdAt))
       .limit(1);
 
     // Get user's Stripe customer ID
@@ -449,6 +487,9 @@ export class UserViewRepository {
       (Number(refundResult?.total) || 0) * 100,
     );
 
+    const isActive =
+      subscription?.status === SubscriptionStatusDB[3]; // ACTIVE
+
     return {
       totalRevenueCents,
       totalPayments: paymentsCount?.count ?? 0,
@@ -457,7 +498,11 @@ export class UserViewRepository {
       totalRefundsCents,
       lastPaymentAt: lastPayment?.createdAt ?? null,
       stripeCustomerId: userRecord?.stripeCustomerId ?? null,
-      hasActiveSubscription: !!subscription,
+      hasActiveSubscription: isActive,
+      subscriptionPlan: subscription?.planId ?? null,
+      subscriptionInterval: subscription?.billingInterval ?? null,
+      subscriptionNextBilling: subscription?.currentPeriodEnd ?? null,
+      subscriptionStatus: subscription?.status ?? null,
     };
   }
 
@@ -624,7 +669,7 @@ export class UserViewRepository {
   }
 
   /**
-   * Get model usage statistics for user
+   * Get model usage statistics for user - includes all connected lead wallets
    */
   private static async getModelUsageStats(
     userId: string,
@@ -641,6 +686,49 @@ export class UserViewRepository {
       return [];
     }
 
+    // Find all leads linked to this user
+    const linkedLeads = await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId));
+
+    const linkedLeadIds = linkedLeads.map((l) => l.leadId);
+
+    // Find all leads connected via lead-lead links (graph traversal)
+    const allLeadIds = new Set<string>(linkedLeadIds);
+    const queue = [...linkedLeadIds];
+    while (queue.length > 0) {
+      const currentLeadId = queue.shift()!;
+      const links = await db
+        .select()
+        .from(leadLeadLinks)
+        .where(
+          or(
+            eq(leadLeadLinks.leadId1, currentLeadId),
+            eq(leadLeadLinks.leadId2, currentLeadId),
+          ),
+        );
+      for (const link of links) {
+        const otherId =
+          link.leadId1 === currentLeadId ? link.leadId2 : link.leadId1;
+        if (!allLeadIds.has(otherId)) {
+          allLeadIds.add(otherId);
+          queue.push(otherId);
+        }
+      }
+    }
+
+    // Get all wallets: user wallet + all connected lead wallets
+    const leadWallets =
+      allLeadIds.size > 0
+        ? await db
+            .select({ id: creditWallets.id })
+            .from(creditWallets)
+            .where(inArray(creditWallets.leadId, [...allLeadIds]))
+        : [];
+
+    const allWalletIds = [wallet.id, ...leadWallets.map((w) => w.id)];
+
     const results = await db
       .select({
         modelId: creditTransactions.modelId,
@@ -649,7 +737,11 @@ export class UserViewRepository {
       })
       .from(creditTransactions)
       .where(
-        sql`${creditTransactions.walletId} = ${wallet.id} AND ${creditTransactions.type} = ${CreditTransactionTypeDB[3]} AND ${creditTransactions.modelId} IS NOT NULL`,
+        and(
+          inArray(creditTransactions.walletId, allWalletIds),
+          sql`${creditTransactions.type} = ${CreditTransactionTypeDB[3]}`,
+          sql`${creditTransactions.modelId} IS NOT NULL`,
+        ),
       )
       .groupBy(creditTransactions.modelId)
       .orderBy(sql`ABS(SUM(${creditTransactions.amount})) DESC`);
@@ -659,5 +751,177 @@ export class UserViewRepository {
       totalCreditsSpent: Number(r.totalCreditsSpent) || 0,
       messageCount: r.messageCount,
     }));
+  }
+
+  /**
+   * Get connected leads and users for a given user
+   * Traverses: user -> userLeadLinks -> leads -> leadLeadLinks -> more leads -> userLeadLinks -> users
+   */
+  static async getConnections(userId: string): Promise<{
+    connectedLeads: Array<{
+      id: string;
+      email: string | null;
+      businessName: string;
+      status: string;
+      ipAddress: string | null;
+      deviceType: string | null;
+      browser: string | null;
+      os: string | null;
+      linkReason: string | null;
+      linkedAt: Date;
+    }>;
+    connectedUsers: Array<{
+      id: string;
+      email: string;
+      publicName: string;
+      linkReason: string | null;
+      linkedAt: Date;
+    }>;
+  }> {
+    // Get all directly linked leads
+    const directLinks = await db
+      .select({
+        leadId: userLeadLinks.leadId,
+        linkReason: userLeadLinks.linkReason,
+        linkedAt: userLeadLinks.linkedAt,
+      })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, userId));
+
+    if (directLinks.length === 0) {
+      return { connectedLeads: [], connectedUsers: [] };
+    }
+
+    const directLeadIds = directLinks.map((l) => l.leadId);
+    const linkInfoByLeadId = new Map<
+      string,
+      { linkReason: string | null; linkedAt: Date }
+    >(
+      directLinks.map((l) => [
+        l.leadId,
+        { linkReason: l.linkReason, linkedAt: l.linkedAt },
+      ]),
+    );
+
+    // Traverse lead-lead links to find all connected leads
+    const allLeadIds = new Set<string>(directLeadIds);
+    const queue = [...directLeadIds];
+    while (queue.length > 0) {
+      const currentLeadId = queue.shift()!;
+      const links = await db
+        .select()
+        .from(leadLeadLinks)
+        .where(
+          or(
+            eq(leadLeadLinks.leadId1, currentLeadId),
+            eq(leadLeadLinks.leadId2, currentLeadId),
+          ),
+        );
+      for (const link of links) {
+        const otherId =
+          link.leadId1 === currentLeadId ? link.leadId2 : link.leadId1;
+        if (!allLeadIds.has(otherId)) {
+          allLeadIds.add(otherId);
+          // Use the lead-lead link info for indirect connections
+          linkInfoByLeadId.set(otherId, {
+            linkReason: link.linkReason,
+            linkedAt: link.linkedAt,
+          });
+          queue.push(otherId);
+        }
+      }
+    }
+
+    // Fetch lead details
+    const allLeadIdsArr = [...allLeadIds];
+    const leadDetails = await db
+      .select({
+        id: leads.id,
+        email: leads.email,
+        businessName: leads.businessName,
+        status: leads.status,
+        ipAddress: leads.ipAddress,
+        deviceType: leads.deviceType,
+        browser: leads.browser,
+        os: leads.os,
+      })
+      .from(leads)
+      .where(inArray(leads.id, allLeadIdsArr));
+
+    const connectedLeads = leadDetails.map((lead) => {
+      const info = linkInfoByLeadId.get(lead.id);
+      return {
+        id: lead.id,
+        email: lead.email,
+        businessName: lead.businessName,
+        status: lead.status,
+        ipAddress: lead.ipAddress,
+        deviceType: lead.deviceType,
+        browser: lead.browser,
+        os: lead.os,
+        linkReason: info?.linkReason ?? null,
+        linkedAt: info?.linkedAt ?? new Date(),
+      };
+    });
+
+    // Find all users connected through these leads (excluding the current user)
+    const connectedUserLinks = await db
+      .select({
+        userId: userLeadLinks.userId,
+        leadId: userLeadLinks.leadId,
+        linkReason: userLeadLinks.linkReason,
+        linkedAt: userLeadLinks.linkedAt,
+      })
+      .from(userLeadLinks)
+      .where(
+        and(
+          inArray(userLeadLinks.leadId, allLeadIdsArr),
+          sql`${userLeadLinks.userId} != ${userId}`,
+        ),
+      );
+
+    if (connectedUserLinks.length === 0) {
+      return { connectedLeads, connectedUsers: [] };
+    }
+
+    const connectedUserIds = [
+      ...new Set(connectedUserLinks.map((l) => l.userId)),
+    ];
+    const userDetails = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        publicName: users.publicName,
+      })
+      .from(users)
+      .where(inArray(users.id, connectedUserIds));
+
+    // Pick earliest link for each user
+    const userLinkMap = new Map<
+      string,
+      { linkReason: string | null; linkedAt: Date }
+    >();
+    for (const link of connectedUserLinks) {
+      const existing = userLinkMap.get(link.userId);
+      if (!existing || link.linkedAt < existing.linkedAt) {
+        userLinkMap.set(link.userId, {
+          linkReason: link.linkReason,
+          linkedAt: link.linkedAt,
+        });
+      }
+    }
+
+    const connectedUsers = userDetails.map((u) => {
+      const info = userLinkMap.get(u.id);
+      return {
+        id: u.id,
+        email: u.email,
+        publicName: u.publicName,
+        linkReason: info?.linkReason ?? null,
+        linkedAt: info?.linkedAt ?? new Date(),
+      };
+    });
+
+    return { connectedLeads, connectedUsers };
   }
 }

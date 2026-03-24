@@ -7,6 +7,7 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { Step } from "react-joyride";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import {
   ProductIds,
@@ -73,12 +74,14 @@ export const getJoyrideLabels = (
   close: string;
   last: string;
   next: string;
+  nextWithProgress: string;
   skip: string;
 } => ({
   back: t("components.welcomeTour.buttons.back"),
   close: t("components.welcomeTour.buttons.close"),
   last: t("components.welcomeTour.buttons.last"),
   next: t("components.welcomeTour.buttons.next"),
+  nextWithProgress: t("components.welcomeTour.buttons.next"),
   skip: t("components.welcomeTour.buttons.skip"),
 });
 
@@ -149,7 +152,9 @@ export const getTourSteps = (
             {t("components.welcomeTour.welcome.title", { appName })}
           </H2>
           <P className="text-base">
-            {t("components.welcomeTour.welcome.description")}
+            {t("components.welcomeTour.welcome.description", {
+              modelCount: String(TOTAL_MODEL_COUNT),
+            })}
           </P>
           <P className="text-sm text-muted-foreground">
             {t("components.welcomeTour.welcome.subtitle")}
@@ -168,7 +173,9 @@ export const getTourSteps = (
             {t("components.welcomeTour.aiCompanion.title")}
           </H3>
           <P className="text-sm">
-            {t("components.welcomeTour.aiCompanion.description")}
+            {t("components.welcomeTour.aiCompanion.description", {
+              modelCount: String(TOTAL_MODEL_COUNT),
+            })}
           </P>
           <P className="text-xs text-muted-foreground">
             {t("components.welcomeTour.aiCompanion.tip")}
@@ -425,7 +432,7 @@ export const getTourSteps = (
     {
       target: getTourSelector(TOUR_DATA_ATTRS.CALL_MODE_BUTTON),
       content: (
-        <Div className="space-y-2">
+        <Div className="space-y-3">
           <H3 className="text-lg font-semibold flex items-center gap-2">
             <Icon icon="phone" className="h-5 w-5 text-green-500" />
             {t("components.welcomeTour.callMode.title")}
@@ -433,7 +440,7 @@ export const getTourSteps = (
           <P className="text-sm">
             {t("components.welcomeTour.callMode.description")}
           </P>
-          <P className="text-xs text-muted-foreground">
+          <P className="text-sm font-semibold text-green-500">
             {t("components.welcomeTour.callMode.tip")}
           </P>
         </Div>

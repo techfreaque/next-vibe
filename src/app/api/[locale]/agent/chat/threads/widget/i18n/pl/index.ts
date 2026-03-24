@@ -93,13 +93,13 @@ export const translations: typeof enTranslations = {
       welcome: {
         title: "Witaj w {{appName}}!",
         description:
-          "Twoja platforma AI zorientowana na prywatność z ponad 40 modelami, kontrolą treści przez użytkownika i zasadami wolności słowa.",
+          "Twoja platforma AI zorientowana na prywatność z ponad {{modelCount}} modelami, kontrolą treści przez użytkownika i zasadami wolności słowa.",
         subtitle: "Zrób szybką wycieczkę, aby zacząć.",
       },
       aiCompanion: {
         title: "Wybierz swojego towarzysza AI",
         description:
-          "Wybieraj spośród ponad 40 modeli AI, w tym głównonurtowych, open-source i bez cenzury.",
+          "Wybieraj spośród ponad {{modelCount}} modeli AI, w tym głównonurtowych, open-source i bez cenzury.",
         tip: "Kliknij, aby otworzyć selektor modeli i wybrać towarzysza.",
       },
       rootFolders: {
@@ -181,10 +181,10 @@ export const translations: typeof enTranslations = {
         },
       },
       callMode: {
-        title: "Tryb połączenia",
+        title: "Tryb rozmowy — AI odpowiada głosowo",
         description:
-          "Włącz tryb połączenia dla bezobsługowej, głosowej rozmowy z odpowiedziami AI w czasie rzeczywistym.",
-        tip: "Idealne, gdy jesteś w ruchu lub wolisz mówić niż pisać.",
+          "Dotknij ikony telefonu i po prostu mów. AI słucha, odpowiada na głos i trzyma się krótko — jak prawdziwa rozmowa.",
+        tip: "Bez pisania. Bez czytania. Po prostu mów.",
       },
       complete: {
         title: "Gotowe!",

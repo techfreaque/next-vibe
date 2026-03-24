@@ -129,6 +129,10 @@ export const { GET } = createEndpoint({
           lastPaymentAt: z.coerce.date().nullable(),
           stripeCustomerId: z.string().nullable(),
           hasActiveSubscription: z.boolean(),
+          subscriptionPlan: z.string().nullable(),
+          subscriptionInterval: z.string().nullable(),
+          subscriptionNextBilling: z.coerce.date().nullable(),
+          subscriptionStatus: z.string().nullable(),
         }),
       }),
 
@@ -184,6 +188,39 @@ export const { GET } = createEndpoint({
             modelId: z.string(),
             totalCreditsSpent: z.coerce.number(),
             messageCount: z.coerce.number(),
+          }),
+        ),
+      }),
+
+      // Connected Leads (via userLeadLinks + leadLeadLinks traversal)
+      connectedLeads: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            id: z.string(),
+            email: z.string().nullable(),
+            businessName: z.string(),
+            status: z.string(),
+            ipAddress: z.string().nullable(),
+            deviceType: z.string().nullable(),
+            browser: z.string().nullable(),
+            os: z.string().nullable(),
+            linkReason: z.string().nullable(),
+            linkedAt: z.coerce.date(),
+          }),
+        ),
+      }),
+
+      // Connected Users (user -> lead -> lead -> user)
+      connectedUsers: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            id: z.string(),
+            email: z.string(),
+            publicName: z.string(),
+            linkReason: z.string().nullable(),
+            linkedAt: z.coerce.date(),
           }),
         ),
       }),
@@ -246,6 +283,10 @@ export const { GET } = createEndpoint({
           lastPaymentAt: "2024-01-15T10:00:00.000Z",
           stripeCustomerId: "cus_123",
           hasActiveSubscription: true,
+          subscriptionPlan: "enums.subscription.subscription",
+          subscriptionInterval: "enums.billing.monthly",
+          subscriptionNextBilling: "2026-04-15T00:00:00.000Z",
+          subscriptionStatus: "enums.status.active",
         },
         newsletterInfo: {
           isSubscribed: true,
@@ -283,6 +324,21 @@ export const { GET } = createEndpoint({
             messageCount: 18,
           },
         ],
+        connectedLeads: [
+          {
+            id: "223e4567-e89b-12d3-a456-426614174001",
+            email: "lead@example.com",
+            businessName: "Example Corp",
+            status: "CONVERTED",
+            ipAddress: "203.0.113.42",
+            deviceType: "DESKTOP",
+            browser: "Chrome",
+            os: "Windows",
+            linkReason: "signup",
+            linkedAt: "2024-01-15T10:00:00.000Z",
+          },
+        ],
+        connectedUsers: [],
       },
     },
   },
