@@ -763,15 +763,16 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   const stickyBottomRef = useRef<boolean>(true);
   // Whether user is actively touching (suppresses our instant-scroll during gesture)
   const touchActiveRef = useRef<boolean>(false);
+  // Whether a smooth scroll-to-bottom animation is in progress (suppresses sticky snap)
+  const smoothScrollingRef = useRef<boolean>(false);
   // Whether to show the scroll-to-bottom button (user has scrolled up)
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   const scrollToBottom = useCallback((): void => {
     const container = messagesContainerRef.current;
     if (container) {
-      container.scrollTop = container.scrollHeight;
-      stickyBottomRef.current = true;
-      setShowScrollButton(false);
+      smoothScrollingRef.current = true;
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
     }
   }, []);
 
@@ -852,14 +853,19 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     }
 
     const BOTTOM_THRESHOLD = 80; // px - snap back to sticky when this close to bottom
+    const BUTTON_THRESHOLD = 800; // px - show scroll button when this far from bottom
 
     const handleScroll = (): void => {
       const { scrollTop, scrollHeight, clientHeight } = container;
       const distFromBottom = scrollHeight - scrollTop - clientHeight;
       const atBottom = distFromBottom < BOTTOM_THRESHOLD;
 
+      if (atBottom) {
+        // Arrived at bottom — clear smooth scroll flag and re-engage sticky
+        smoothScrollingRef.current = false;
+      }
       stickyBottomRef.current = atBottom;
-      setShowScrollButton(!atBottom);
+      setShowScrollButton(distFromBottom > BUTTON_THRESHOLD);
     };
 
     const handleTouchStart = (): void => {
@@ -895,18 +901,29 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     if (renderWindowThreadRef.current !== currentThreadId) {
       setRenderWindowExpansions(0);
       renderWindowThreadRef.current = currentThreadId;
-      // New thread: start sticky
+      // New thread: start sticky, clear any in-progress scroll
       stickyBottomRef.current = true;
+      smoothScrollingRef.current = false;
+      lastSnapScrollHeightRef.current = 0;
       setShowScrollButton(false);
     }
   }, [activeThreadId]);
 
   const hasAnyMessages = activeThreadMessages.length > 0;
 
-  // Sticky-bottom: after every render, if we're pinned and not mid-touch, snap to bottom.
+  // Track the last scrollHeight we snapped to — only snap when content grows.
+  const lastSnapScrollHeightRef = useRef<number>(0);
+
+  // Sticky-bottom: after every render, if we're pinned and new content arrived, snap to bottom.
   // useLayoutEffect fires synchronously after DOM commit so scrollHeight is up to date.
-  // This is the single source of truth for auto-scroll - no separate streaming detection.
+  // Only snaps when scrollHeight increases (new content) — not on every render — so manual
+  // scrolling near the bottom doesn't trigger a snap.
   useLayoutEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+
     // Initial scroll-to-bottom once per thread (not just during streaming)
     const currentThreadId = activeThreadId ?? null;
     if (
@@ -916,21 +933,25 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       currentRootFolderId !== "public"
     ) {
       initialScrollDoneRef.current.add(currentThreadId);
-      const container = messagesContainerRef.current;
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+      container.scrollTop = container.scrollHeight;
+      lastSnapScrollHeightRef.current = container.scrollHeight;
       return;
     }
 
-    // Ongoing sticky: snap to bottom instantly so streaming content feels responsive.
-    if (!stickyBottomRef.current || touchActiveRef.current) {
+    // Ongoing sticky: snap only when scrollHeight has grown (new content streamed in).
+    // Skip if smooth scroll in progress or touch active.
+    if (
+      !stickyBottomRef.current ||
+      touchActiveRef.current ||
+      smoothScrollingRef.current
+    ) {
       return;
     }
-    const container = messagesContainerRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
+    if (container.scrollHeight <= lastSnapScrollHeightRef.current) {
+      return;
     }
+    container.scrollTop = container.scrollHeight;
+    lastSnapScrollHeightRef.current = container.scrollHeight;
   });
 
   // After older history inserts above (via button click): restore scroll position so the view doesn't jump.
@@ -959,41 +980,42 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   });
 
   return (
-    <Div
-      ref={messagesContainerRef}
-      id={DOM_IDS.MESSAGES_CONTAINER}
-      className={cn(
-        "h-full overflow-y-auto",
-        "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full",
-      )}
-    >
-      {/* Sticky logo - inside scroll container for proper sticky behavior */}
-      {/* Uses h-0 overflow-visible so it doesn't push content down on md+ (same line layout) */}
-      {/* Below md: content has pt-20 to position below logo (separate line) */}
-      {/* z-[1] so message editors (z-10+) appear above the logo */}
-      {showBranding && viewMode === ViewMode.LINEAR && (
-        <Div className="sticky top-0 z-1 h-0 overflow-visible pointer-events-none">
-          <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15">
-            <Div className="pointer-events-auto flex bg-background/20 backdrop-blur rounded-lg p-2 shadow-sm border border-border/20 w-fit">
-              <Logo locale={locale} disabled size="h-10" />
+    <Div className="relative h-full">
+      <Div
+        ref={messagesContainerRef}
+        id={DOM_IDS.MESSAGES_CONTAINER}
+        className={cn(
+          "h-full overflow-y-auto",
+          "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full",
+        )}
+      >
+        {/* Sticky logo - inside scroll container for proper sticky behavior */}
+        {/* Uses h-0 overflow-visible so it doesn't push content down on md+ (same line layout) */}
+        {/* Below md: content has pt-20 to position below logo (separate line) */}
+        {/* z-[1] so message editors (z-10+) appear above the logo */}
+        {showBranding && viewMode === ViewMode.LINEAR && (
+          <Div className="sticky top-0 z-1 h-0 overflow-visible pointer-events-none">
+            <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15">
+              <Div className="pointer-events-auto flex bg-background/20 backdrop-blur rounded-lg p-2 shadow-sm border border-border/20 w-fit">
+                <Logo locale={locale} disabled size="h-10" />
+              </Div>
             </Div>
           </Div>
-        </Div>
-      )}
+        )}
 
-      {/* Inner container with consistent padding and dynamic bottom padding */}
-      {/* On native: no bottom padding needed since input is in normal flow */}
-      <Div
-        id={DOM_IDS.MESSAGES_CONTENT}
-        style={
-          platform.isReactNative
-            ? { paddingBottom: LAYOUT.MESSAGES_BOTTOM_PADDING }
-            : {
-                paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
-              }
-        }
-      >
-        {/*
+        {/* Inner container with consistent padding and dynamic bottom padding */}
+        {/* On native: no bottom padding needed since input is in normal flow */}
+        <Div
+          id={DOM_IDS.MESSAGES_CONTENT}
+          style={
+            platform.isReactNative
+              ? { paddingBottom: LAYOUT.MESSAGES_BOTTOM_PADDING }
+              : {
+                  paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING}px`,
+                }
+          }
+        >
+          {/*
           Responsive top padding:
           - With branding (LINEAR view):
             - Below md: pt-35 (logo on separate line above)
@@ -1001,141 +1023,168 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
           - Without branding (FLAT/THREADED/DEBUG views):
             - pt-15 to clear the top toolbar
         */}
-        <Div
-          className={cn(
-            "max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex flex-col gap-5",
-            showBranding && viewMode === ViewMode.LINEAR
-              ? "pt-35 md:pt-15"
-              : "pt-15",
-          )}
-        >
-          {/* Loading spinner for older history - shown while request is in-flight */}
-          {isLoadingOlderHistory && (
-            <Div className="flex justify-center py-2">
-              <Div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-                <Span className="text-xs text-muted-foreground">
-                  {ts("loadingOlderMessages")}
-                </Span>
+          <Div
+            className={cn(
+              "max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex flex-col gap-5",
+              showBranding && viewMode === ViewMode.LINEAR
+                ? "pt-35 md:pt-15"
+                : "pt-15",
+            )}
+          >
+            {/* Loading spinner for older history - shown while request is in-flight */}
+            {isLoadingOlderHistory && (
+              <Div className="flex justify-center py-2">
+                <Div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                  <Span className="text-xs text-muted-foreground">
+                    {ts("loadingOlderMessages")}
+                  </Span>
+                </Div>
               </Div>
-            </Div>
-          )}
-          {realMessages.length === 0 && !isLoading && !isLoadingBranch ? (
-            <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
-              <Div className="flex items-center justify-center h-full">
-                {/* Empty state - no messages and not loading */}
+            )}
+            {realMessages.length === 0 && !isLoading && !isLoadingBranch ? (
+              <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
+                <Div className="flex items-center justify-center h-full">
+                  {/* Empty state - no messages and not loading */}
+                </Div>
               </Div>
-            </Div>
-          ) : realMessages.length === 0 && (isLoading || isLoadingBranch) ? (
-            <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
-              <Div className="flex items-center justify-center h-full">
-                <Div className="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+            ) : realMessages.length === 0 && (isLoading || isLoadingBranch) ? (
+              <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
+                <Div className="flex items-center justify-center h-full">
+                  <Div className="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                </Div>
               </Div>
-            </Div>
-          ) : viewMode === ViewMode.FLAT ? (
-            // Flat view (4chan style) - ALL messages in chronological order
-            <FlatMessageView
-              messages={flatSortedMessages}
-              locale={locale}
-              logger={logger}
-              onMessageClick={handleFlatMessageClick}
-              onInsertQuote={handleInsertQuote}
-              currentUserId={currentUserId}
-              user={user}
-              onBranchMessage={branchMessage}
-              onRetryMessage={retryMessage}
-              onAnswerAsModel={answerAsAI}
-              onReplyMessage={async (parentMessageId, content, attachments) => {
-                await sendMessage({
+            ) : viewMode === ViewMode.FLAT ? (
+              // Flat view (4chan style) - ALL messages in chronological order
+              <FlatMessageView
+                messages={flatSortedMessages}
+                locale={locale}
+                logger={logger}
+                onMessageClick={handleFlatMessageClick}
+                onInsertQuote={handleInsertQuote}
+                currentUserId={currentUserId}
+                user={user}
+                onBranchMessage={branchMessage}
+                onRetryMessage={retryMessage}
+                onAnswerAsModel={answerAsAI}
+                onReplyMessage={async (
+                  parentMessageId,
                   content,
-                  parentId: parentMessageId,
                   attachments,
-                });
-              }}
-              onVoteMessage={voteMessage}
-            />
-          ) : viewMode === ViewMode.THREADED ? (
-            // Threaded view (Reddit style) - Show ALL messages, not just current path
-            threadedRootMessages.map((rootMessage) => (
-              <ErrorBoundary key={rootMessage.id} locale={locale}>
-                <ThreadedMessage
-                  message={rootMessage}
-                  messageGroup={threadedMessageToGroupMap.get(rootMessage.id)}
-                  replies={getDirectReplies(
-                    threadedPrimaryMessages,
-                    rootMessage.id,
-                  )}
-                  allMessages={threadedPrimaryMessages}
-                  messageToGroupMap={threadedMessageToGroupMap}
-                  depth={0}
-                  locale={locale}
-                  logger={logger}
-                  collapseState={collapseState}
-                  currentUserId={currentUserId}
-                  onBranchMessage={branchMessage}
-                  onRetryMessage={retryMessage}
-                  onAnswerAsModel={answerAsAI}
-                  onReplyMessage={async (
-                    parentMessageId,
+                ) => {
+                  await sendMessage({
                     content,
+                    parentId: parentMessageId,
                     attachments,
-                  ) => {
-                    await sendMessage({
+                  });
+                }}
+                onVoteMessage={voteMessage}
+              />
+            ) : viewMode === ViewMode.THREADED ? (
+              // Threaded view (Reddit style) - Show ALL messages, not just current path
+              threadedRootMessages.map((rootMessage) => (
+                <ErrorBoundary key={rootMessage.id} locale={locale}>
+                  <ThreadedMessage
+                    message={rootMessage}
+                    messageGroup={threadedMessageToGroupMap.get(rootMessage.id)}
+                    replies={getDirectReplies(
+                      threadedPrimaryMessages,
+                      rootMessage.id,
+                    )}
+                    allMessages={threadedPrimaryMessages}
+                    messageToGroupMap={threadedMessageToGroupMap}
+                    depth={0}
+                    locale={locale}
+                    logger={logger}
+                    collapseState={collapseState}
+                    currentUserId={currentUserId}
+                    onBranchMessage={branchMessage}
+                    onRetryMessage={retryMessage}
+                    onAnswerAsModel={answerAsAI}
+                    onReplyMessage={async (
+                      parentMessageId,
                       content,
-                      parentId: parentMessageId,
                       attachments,
-                    });
-                  }}
-                  onVoteMessage={voteMessage}
-                  user={user}
-                  ttsAutoplay={effectiveSettings.ttsAutoplay}
-                  deductCredits={deductCredits}
-                  ttsVoice={effectiveSettings.ttsVoice}
-                />
-              </ErrorBoundary>
-            ))
-          ) : (
-            // Linear view (ChatGPT style) - Build path through message tree
-            ((): JSX.Element => {
-              const { path: realPath, branchInfo } = buildMessagePath(
-                realMessages,
-                branchIndices,
-                leafMessageId,
-              );
+                    ) => {
+                      await sendMessage({
+                        content,
+                        parentId: parentMessageId,
+                        attachments,
+                      });
+                    }}
+                    onVoteMessage={voteMessage}
+                    user={user}
+                    ttsAutoplay={effectiveSettings.ttsAutoplay}
+                    deductCredits={deductCredits}
+                    ttsVoice={effectiveSettings.ttsVoice}
+                  />
+                </ErrorBoundary>
+              ))
+            ) : (
+              // Linear view (ChatGPT style) - Build path through message tree
+              ((): JSX.Element => {
+                const { path: realPath, branchInfo } = buildMessagePath(
+                  realMessages,
+                  branchIndices,
+                  leafMessageId,
+                );
 
-              // Render window trimming: only render from last compaction boundary forward
-              // to keep DOM size small in long sessions with multiple compactions.
-              // Expands backwards compaction-by-compaction on scroll-up.
-              const { startIndex, hasTrimmedMessages } =
-                computeRenderWindowStart(realPath, renderWindowExpansions);
+                // Render window trimming: only render from last compaction boundary forward
+                // to keep DOM size small in long sessions with multiple compactions.
+                // Expands backwards compaction-by-compaction on scroll-up.
+                const { startIndex, hasTrimmedMessages } =
+                  computeRenderWindowStart(realPath, renderWindowExpansions);
 
-              const visiblePath =
-                startIndex > 0 ? realPath.slice(startIndex) : realPath;
+                const visiblePath =
+                  startIndex > 0 ? realPath.slice(startIndex) : realPath;
 
-              // The oldest loaded message ID for the "load older" request.
-              // When there are trimmed messages, the oldest LOADED message is realPath[0].
-              // When nothing is trimmed, it's realPath[0] as well.
-              const oldestLoadedId = realPath[0]?.id ?? null;
+                // The oldest loaded message ID for the "load older" request.
+                // When there are trimmed messages, the oldest LOADED message is realPath[0].
+                // When nothing is trimmed, it's realPath[0] as well.
+                const oldestLoadedId = realPath[0]?.id ?? null;
 
-              return (
-                <>
-                  {/* Load older history button - shown when oldest message has hasOlderHistory flag */}
-                  {realPath[0]?.metadata?.hasOlderHistory === true &&
-                    !isLoadingOlderHistory &&
-                    oldestLoadedId && (
+                return (
+                  <>
+                    {/* Load older history button - shown when oldest message has hasOlderHistory flag */}
+                    {realPath[0]?.metadata?.hasOlderHistory === true &&
+                      !isLoadingOlderHistory &&
+                      oldestLoadedId && (
+                        <Div className="flex justify-center py-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                            onClick={(): void => {
+                              // Anchor the current leaf before loading older history.
+                              if (!leafMessageId) {
+                                const currentLeaf = realPath.at(-1);
+                                if (currentLeaf) {
+                                  setLeafMessageId(currentLeaf.id);
+                                }
+                              }
+                              const container = messagesContainerRef.current;
+                              if (container) {
+                                prevScrollRef.current = {
+                                  scrollTop: container.scrollTop,
+                                  scrollHeight: container.scrollHeight,
+                                };
+                              }
+                              loadOlderHistory(oldestLoadedId);
+                            }}
+                          >
+                            {ts("showOlderMessages")}
+                          </Button>
+                        </Div>
+                      )}
+
+                    {/* Render window expand button: expand already-loaded messages backwards */}
+                    {hasTrimmedMessages && (
                       <Div className="flex justify-center py-2">
                         <Button
                           variant="ghost"
                           size="sm"
                           className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                           onClick={(): void => {
-                            // Anchor the current leaf before loading older history.
-                            if (!leafMessageId) {
-                              const currentLeaf = realPath.at(-1);
-                              if (currentLeaf) {
-                                setLeafMessageId(currentLeaf.id);
-                              }
-                            }
                             const container = messagesContainerRef.current;
                             if (container) {
                               prevScrollRef.current = {
@@ -1143,7 +1192,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                                 scrollHeight: container.scrollHeight,
                               };
                             }
-                            loadOlderHistory(oldestLoadedId);
+                            setRenderWindowExpansions((prev) => prev + 1);
                           }}
                         >
                           {ts("showOlderMessages")}
@@ -1151,144 +1200,124 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
                       </Div>
                     )}
 
-                  {/* Render window expand button: expand already-loaded messages backwards */}
-                  {hasTrimmedMessages && (
-                    <Div className="flex justify-center py-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        onClick={(): void => {
-                          const container = messagesContainerRef.current;
-                          if (container) {
-                            prevScrollRef.current = {
-                              scrollTop: container.scrollTop,
-                              scrollHeight: container.scrollHeight,
-                            };
-                          }
-                          setRenderWindowExpansions((prev) => prev + 1);
-                        }}
-                      >
-                        {ts("showOlderMessages")}
-                      </Button>
-                    </Div>
-                  )}
+                    <ErrorBoundary locale={locale}>
+                      {viewMode === ViewMode.DEBUG ? (
+                        <DebugLinearMessageView
+                          messages={visiblePath}
+                          branchInfo={branchInfo}
+                          locale={locale}
+                          logger={logger}
+                          currentUserId={currentUserId ?? null}
+                          user={user}
+                          collapseState={collapseState}
+                          rootFolderId={currentRootFolderId}
+                          subFolderId={currentSubFolderId}
+                          onRetryMessage={retryMessage}
+                          onSwitchBranch={handleSwitchBranch}
+                          onBranchMessage={branchMessage}
+                          onStartEdit={startEdit}
+                          onStartRetry={handleLinearStartRetry}
+                          onStartAnswer={startAnswer}
+                          answerAsAI={answerAsAI}
+                          onCancelAction={cancelEditorAction}
+                          editingMessageId={editingMessageId}
+                          retryingMessageId={retryingMessageId}
+                          answeringMessageId={answeringMessageId}
+                          answerContent={answerContent}
+                          onSetAnswerContent={setAnswerContent}
+                          editorAttachments={editorAttachments}
+                          isLoadingRetryAttachments={isLoadingRetryAttachments}
+                          selectedSkill={selectedSkill}
+                          selectedModel={selectedModel}
+                          sendMessage={sendMessage}
+                          deductCredits={deductCredits}
+                          onLoadNewerHistory={loadNewerHistory}
+                          isLoadingNewerHistory={isLoadingNewerHistory}
+                          onVoteMessage={voteMessage}
+                          ttsAutoplay={effectiveSettings.ttsAutoplay}
+                          ttsVoice={effectiveSettings.ttsVoice}
+                        />
+                      ) : (
+                        <LinearMessageView
+                          messages={visiblePath}
+                          branchInfo={branchInfo}
+                          locale={locale}
+                          logger={logger}
+                          currentUserId={currentUserId ?? null}
+                          user={user}
+                          collapseState={collapseState}
+                          rootFolderId={currentRootFolderId}
+                          subFolderId={currentSubFolderId}
+                          onRetryMessage={retryMessage}
+                          onSwitchBranch={handleSwitchBranch}
+                          onBranchMessage={branchMessage}
+                          onStartEdit={startEdit}
+                          onStartRetry={handleLinearStartRetry}
+                          onStartAnswer={startAnswer}
+                          answerAsAI={answerAsAI}
+                          onCancelAction={cancelEditorAction}
+                          editingMessageId={editingMessageId}
+                          retryingMessageId={retryingMessageId}
+                          answeringMessageId={answeringMessageId}
+                          answerContent={answerContent}
+                          onSetAnswerContent={setAnswerContent}
+                          editorAttachments={editorAttachments}
+                          isLoadingRetryAttachments={isLoadingRetryAttachments}
+                          selectedSkill={selectedSkill}
+                          selectedModel={selectedModel}
+                          sendMessage={sendMessage}
+                          deductCredits={deductCredits}
+                          onLoadNewerHistory={loadNewerHistory}
+                          isLoadingNewerHistory={isLoadingNewerHistory}
+                          onVoteMessage={voteMessage}
+                          ttsAutoplay={effectiveSettings.ttsAutoplay}
+                          ttsVoice={effectiveSettings.ttsVoice}
+                        />
+                      )}
+                    </ErrorBoundary>
+                  </>
+                );
+              })()
+            )}
 
-                  <ErrorBoundary locale={locale}>
-                    {viewMode === ViewMode.DEBUG ? (
-                      <DebugLinearMessageView
-                        messages={visiblePath}
-                        branchInfo={branchInfo}
-                        locale={locale}
-                        logger={logger}
-                        currentUserId={currentUserId ?? null}
-                        user={user}
-                        collapseState={collapseState}
-                        rootFolderId={currentRootFolderId}
-                        subFolderId={currentSubFolderId}
-                        onRetryMessage={retryMessage}
-                        onSwitchBranch={handleSwitchBranch}
-                        onBranchMessage={branchMessage}
-                        onStartEdit={startEdit}
-                        onStartRetry={handleLinearStartRetry}
-                        onStartAnswer={startAnswer}
-                        answerAsAI={answerAsAI}
-                        onCancelAction={cancelEditorAction}
-                        editingMessageId={editingMessageId}
-                        retryingMessageId={retryingMessageId}
-                        answeringMessageId={answeringMessageId}
-                        answerContent={answerContent}
-                        onSetAnswerContent={setAnswerContent}
-                        editorAttachments={editorAttachments}
-                        isLoadingRetryAttachments={isLoadingRetryAttachments}
-                        selectedSkill={selectedSkill}
-                        selectedModel={selectedModel}
-                        sendMessage={sendMessage}
-                        deductCredits={deductCredits}
-                        onLoadNewerHistory={loadNewerHistory}
-                        isLoadingNewerHistory={isLoadingNewerHistory}
-                        onVoteMessage={voteMessage}
-                        ttsAutoplay={effectiveSettings.ttsAutoplay}
-                        ttsVoice={effectiveSettings.ttsVoice}
-                      />
-                    ) : (
-                      <LinearMessageView
-                        messages={visiblePath}
-                        branchInfo={branchInfo}
-                        locale={locale}
-                        logger={logger}
-                        currentUserId={currentUserId ?? null}
-                        user={user}
-                        collapseState={collapseState}
-                        rootFolderId={currentRootFolderId}
-                        subFolderId={currentSubFolderId}
-                        onRetryMessage={retryMessage}
-                        onSwitchBranch={handleSwitchBranch}
-                        onBranchMessage={branchMessage}
-                        onStartEdit={startEdit}
-                        onStartRetry={handleLinearStartRetry}
-                        onStartAnswer={startAnswer}
-                        answerAsAI={answerAsAI}
-                        onCancelAction={cancelEditorAction}
-                        editingMessageId={editingMessageId}
-                        retryingMessageId={retryingMessageId}
-                        answeringMessageId={answeringMessageId}
-                        answerContent={answerContent}
-                        onSetAnswerContent={setAnswerContent}
-                        editorAttachments={editorAttachments}
-                        isLoadingRetryAttachments={isLoadingRetryAttachments}
-                        selectedSkill={selectedSkill}
-                        selectedModel={selectedModel}
-                        sendMessage={sendMessage}
-                        deductCredits={deductCredits}
-                        onLoadNewerHistory={loadNewerHistory}
-                        isLoadingNewerHistory={isLoadingNewerHistory}
-                        onVoteMessage={voteMessage}
-                        ttsAutoplay={effectiveSettings.ttsAutoplay}
-                        ttsVoice={effectiveSettings.ttsVoice}
-                      />
-                    )}
-                  </ErrorBoundary>
-                </>
-              );
-            })()
-          )}
-
-          {/* Loading spinner for newer history - shown while request is in-flight */}
-          {isLoadingNewerHistory && (
-            <Div className="flex justify-center py-2">
-              <Div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-                <Span className="text-xs text-muted-foreground">
-                  {ts("loadingNewerMessages")}
-                </Span>
+            {/* Loading spinner for newer history - shown while request is in-flight */}
+            {isLoadingNewerHistory && (
+              <Div className="flex justify-center py-2">
+                <Div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                  <Span className="text-xs text-muted-foreground">
+                    {ts("loadingNewerMessages")}
+                  </Span>
+                </Div>
               </Div>
-            </Div>
-          )}
+            )}
 
-          <Div ref={messagesEndRef} />
+            <Div ref={messagesEndRef} />
+          </Div>
         </Div>
       </Div>
 
-      {/* Scroll-to-bottom button: appears when user has scrolled up */}
+      {/* Scroll-to-bottom button: absolute overlay, outside the scroll container */}
       {showScrollButton && !platform.isReactNative && (
-        <Div className="sticky bottom-0 left-0 right-0 pointer-events-none">
-          <Div
-            style={{
-              paddingBottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING + 8}px`,
-            }}
+        <Div
+          style={{
+            position: "absolute" as const,
+            left: 0,
+            right: 0,
+            bottom: `${inputHeight + LAYOUT.MESSAGES_BOTTOM_PADDING + 12}px`,
+            display: "flex",
+            justifyContent: "center",
+            pointerEvents: "none",
+          }}
+        >
+          <Button
+            variant="secondary"
+            size="icon"
+            className="pointer-events-auto rounded-full shadow-lg border border-border/50 bg-background/90 backdrop-blur h-10 w-10 [&_svg]:size-6"
+            onClick={scrollToBottom}
           >
-            <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex justify-end">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="pointer-events-auto rounded-full shadow-md h-8 w-8"
-                onClick={scrollToBottom}
-              >
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </Div>
-          </Div>
+            <ChevronDown />
+          </Button>
         </Div>
       )}
     </Div>
