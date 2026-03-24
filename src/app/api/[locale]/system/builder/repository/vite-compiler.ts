@@ -1112,7 +1112,9 @@ export class ViteCompiler {
                   return varName;
                 },
               );
-              if (imports.length === 0) {return undefined;}
+              if (imports.length === 0) {
+                return undefined;
+              }
               return { code: imports.join("\n") + "\n" + rewritten, map: null };
             },
           } as Plugin,

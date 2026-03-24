@@ -192,50 +192,6 @@ export class BuildRepository {
             });
           }
         }
-      } else if (data.package) {
-        // Next.js build + package build (CLI + browser files) - run as one
-        output.push(t("post.repository.messages.packageBuildStart"));
-        try {
-          const { builderRepository } =
-            await import("../../builder/repository");
-          const { t: builderT } = builderScopedTranslation.scopedT(locale);
-          const builderResult = await builderRepository.execute(
-            { configPath: "build.config.ts" },
-            logger,
-            builderT,
-          );
-          if (builderResult.success && builderResult.data) {
-            output.push(builderResult.data.output);
-            output.push(t("post.repository.messages.packageBuildSuccess"));
-            steps.push({ label: "Package", ok: true, skipped: false });
-          } else {
-            steps.push({ label: "Package", ok: false, skipped: false });
-            errors.push(t("post.repository.messages.packageBuildFailed"));
-            if (!data.force) {
-              const response: BuildResponseType = {
-                success: false,
-                output: output.join("\n"),
-                duration: Date.now() - startTime,
-                errors,
-                steps,
-              };
-              return success(response);
-            }
-          }
-        } catch (buildError) {
-          const parsedError = parseError(buildError);
-          steps.push({ label: "Package", ok: false, skipped: false });
-          errors.push(
-            `${t("post.repository.messages.packageBuildFailed")}: ${parsedError.message}`,
-          );
-          if (!data.force) {
-            return fail({
-              message: t("post.errors.server.title"),
-              errorType: ErrorResponseTypes.INTERNAL_ERROR,
-              messageParams: { error: parsedError.message },
-            });
-          }
-        }
       } else {
         // Build Next.js application with proper NODE_ENV
         output.push(t("post.repository.messages.buildingNextjs"));
@@ -284,6 +240,52 @@ export class BuildRepository {
                 error: detail,
               },
             });
+          }
+        }
+
+        // Run package build (CLI + browser files) if requested
+        if (data.package) {
+          output.push(t("post.repository.messages.packageBuildStart"));
+          try {
+            const { builderRepository } =
+              await import("../../builder/repository");
+            const { t: builderT } = builderScopedTranslation.scopedT(locale);
+            const builderResult = await builderRepository.execute(
+              { configPath: "build.config.ts" },
+              logger,
+              builderT,
+            );
+            if (builderResult.success && builderResult.data) {
+              output.push(builderResult.data.output);
+              output.push(t("post.repository.messages.packageBuildSuccess"));
+              steps.push({ label: "Package", ok: true, skipped: false });
+            } else {
+              steps.push({ label: "Package", ok: false, skipped: false });
+              errors.push(t("post.repository.messages.packageBuildFailed"));
+              if (!data.force) {
+                const response: BuildResponseType = {
+                  success: false,
+                  output: output.join("\n"),
+                  duration: Date.now() - startTime,
+                  errors,
+                  steps,
+                };
+                return success(response);
+              }
+            }
+          } catch (buildError) {
+            const parsedError = parseError(buildError);
+            steps.push({ label: "Package", ok: false, skipped: false });
+            errors.push(
+              `${t("post.repository.messages.packageBuildFailed")}: ${parsedError.message}`,
+            );
+            if (!data.force) {
+              return fail({
+                message: t("post.errors.server.title"),
+                errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                messageParams: { error: parsedError.message },
+              });
+            }
           }
         }
       }
