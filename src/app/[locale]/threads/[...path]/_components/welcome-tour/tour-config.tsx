@@ -86,33 +86,35 @@ export const getJoyrideLabels = (
   skip: t("components.welcomeTour.buttons.skip"),
 });
 
-// Read a Tailwind color token from the document root (resolved, theme-aware).
-// Uses --color-* tokens which are pre-resolved to valid CSS color values in globals.css.
-function getCssColor(token: string): string {
-  if (typeof window === "undefined") {return "";}
+function getCssVar(token: string): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
   return getComputedStyle(document.documentElement)
     .getPropertyValue(token)
     .trim();
 }
 
-// Tour style constants — resolved at runtime from CSS variables so they work
-// in both light and dark themes without any JS theme-detection imports.
+// Wrap a raw CSS var value in hsl() if it looks like bare HSL numbers,
+// otherwise return as-is (already a hex or other valid color).
+function toColor(value: string): string {
+  return /^\d/.test(value) ? `hsl(${value})` : value;
+}
+
 export const getTourColors = (): {
   PRIMARY: string;
+  PRIMARY_FOREGROUND: string;
   BACKGROUND: string;
   OVERLAY: string;
   TEXT: string;
   MUTED: string;
 } => ({
-  PRIMARY: getCssColor("--color-primary"),
-  BACKGROUND: getCssColor("--color-popover"),
-  // Use the page background color at 60% opacity so it works in both themes.
-  // getComputedStyle returns a resolved rgb(...) string; we convert to rgba.
-  OVERLAY: getCssColor("--color-background")
-    .replace(/^rgb\(/, "rgba(")
-    .replace(/\)$/, ", 0.6)"),
-  TEXT: getCssColor("--color-popover-foreground"),
-  MUTED: getCssColor("--color-muted-foreground"),
+  PRIMARY: toColor(getCssVar("--primary")),
+  PRIMARY_FOREGROUND: toColor(getCssVar("--primary-foreground")),
+  BACKGROUND: toColor(getCssVar("--popover")),
+  OVERLAY: `color-mix(in srgb, ${toColor(getCssVar("--background"))} 60%, transparent)`,
+  TEXT: toColor(getCssVar("--popover-foreground")),
+  MUTED: toColor(getCssVar("--muted-foreground")),
 });
 
 export const TOUR_SPACING = {
@@ -223,6 +225,7 @@ export const getTourSteps = (
         </Div>
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
+      skipBeacon: true,
     },
     // Private Folder - Only show if authenticated
     ...(isAuthenticated
@@ -357,6 +360,7 @@ export const getTourSteps = (
               </Div>
             ),
             placement: TOUR_PLACEMENTS.RIGHT,
+            skipBeacon: true,
           },
         ]
       : []),
@@ -377,6 +381,7 @@ export const getTourSteps = (
         </Div>
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
+      skipBeacon: true,
     },
     // Step: Text Input
     {

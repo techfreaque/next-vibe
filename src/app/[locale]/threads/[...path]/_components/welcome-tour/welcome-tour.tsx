@@ -106,22 +106,29 @@ export function WelcomeTour({
       const lastStepIndex = parseInt(lastStep, 10);
       const resumeStep = tourSteps[lastStepIndex];
 
+      let resumeDelay = 500;
+
       if (resumeStep?.target) {
         const target = resumeStep.target as string;
 
-        // Ensure sidebar is open if resuming on a sidebar step
         if (isSidebarTarget(target)) {
           ensureSidebarOpen();
+          // Extra time after refresh for sidebar to mount and animate
+          resumeDelay = 800;
         } else if (isMobile && target !== "body") {
-          // On mobile, collapse sidebar for non-body, non-sidebar steps
           setSidebarCollapsed(true);
+        }
+
+        if (needsBottomSheetExpanded(target)) {
+          setBottomSheetExpanded(true);
+          resumeDelay = 800;
         }
       }
 
       setSteps(tourSteps);
       setStepIndex(lastStepIndex);
       setTourActive(true);
-      setTimeout(() => setRun(true), 500);
+      setTimeout(() => setRun(true), resumeDelay);
       return;
     }
 
@@ -355,7 +362,8 @@ export function WelcomeTour({
             const nextIsSidebar = isSidebarTarget(target);
 
             // Handle sidebar state transitions
-            if (currentIsSidebar !== nextIsSidebar) {
+            const needsSidebarChange = currentIsSidebar !== nextIsSidebar;
+            if (needsSidebarChange) {
               if (isMobile) {
                 if (nextIsSidebar) {
                   ensureSidebarOpen();
@@ -376,6 +384,15 @@ export function WelcomeTour({
               pendingStepIndexRef.current = nextIndex;
               setWaitingForBottomSheet(true);
               setRun(false);
+              return;
+            }
+
+            // If sidebar state changed, pause and wait for DOM to settle
+            if (needsSidebarChange) {
+              setRun(false);
+              setStepIndex(nextIndex);
+              localStorage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
+              setTimeout(() => setRun(true), 400);
               return;
             }
           }
@@ -523,6 +540,7 @@ export function WelcomeTour({
       continuous
       options={{
         showProgress: true,
+        skipBeacon: true,
         buttons: ["back", "primary", "skip"],
         skipScroll: false,
         overlayClickAction: false,
@@ -546,6 +564,7 @@ export function WelcomeTour({
         },
         buttonPrimary: {
           backgroundColor: tourColors.PRIMARY,
+          color: tourColors.PRIMARY_FOREGROUND,
           borderRadius: TOUR_SPACING.BUTTON_BORDER_RADIUS,
           padding: TOUR_SPACING.BUTTON_PADDING,
           fontSize: TOUR_SPACING.BUTTON_FONT_SIZE,
