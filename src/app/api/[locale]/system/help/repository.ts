@@ -709,16 +709,20 @@ export class HelpRepository {
     const allMeta: EndpointMeta[] = metaModule.endpointsMeta;
 
     // Discovery platform - what platform context are we listing tools for?
-    // Admin can override with data.platform filter; non-admins get their actual platform.
-    // MCP uses CLI semantics (opt-out, not MCP_VISIBLE opt-in) - execute-tool reaches all CLI tools.
+    // Admin can override with data.platform filter.
+    // Non-admin users (customer, public) always see the AI tool set regardless of calling platform.
+    // Compact platforms (AI/MCP/CRON) keep their own platform semantics.
     const platformFilter = isAdmin ? data.platform : undefined;
     let discoveryPlatform: Platform;
 
     if (platformFilter) {
       const mapped = HelpRepository.mapFilterToPlatform(platformFilter);
       discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
+    } else if (!isAdmin && !isCompact) {
+      // Customers and public users on web always discover AI-accessible tools
+      discoveryPlatform = Platform.AI;
     } else {
-      // Use actual calling platform - each platform has its own correct access rules
+      // Admin (no filter) and compact platforms: use actual calling platform
       discoveryPlatform = platform;
     }
 
@@ -772,8 +776,9 @@ export class HelpRepository {
 
     // statsFilter: web/human platforms can filter by pinned or allowed tools.
     // null in DB = user has default settings (never stored when default).
-    // Direct DB query - compact platforms (AI/MCP/CRON) skip this entirely.
-    const statsFilter = data.statsFilter ?? "pinned";
+    // Compact platforms (AI/MCP/CRON) default to "all" - no pinned filtering for agents.
+    // Web/human platforms default to "pinned" to avoid loading all tools unnecessarily.
+    const statsFilter = data.statsFilter ?? (isCompact ? "all" : "pinned");
     // Server-side counts for the stats filter buttons (web only)
     let pinnedCount: number | undefined;
     let allowedCount: number | undefined;

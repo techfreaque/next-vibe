@@ -193,10 +193,7 @@ const { GET } = createEndpoint({
         label: "get.fields.statsFilter.label" as const,
         description: "get.fields.statsFilter.description" as const,
         columns: 4,
-        schema: z
-          .enum(["all", "pinned", "allowed"])
-          .optional()
-          .default("pinned"),
+        schema: z.enum(["all", "pinned", "allowed"]).optional(),
       }),
 
       // === RESPONSE FIELDS ===

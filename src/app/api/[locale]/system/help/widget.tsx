@@ -521,35 +521,88 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
+  // Shared filter chips (pinned / allowed / all) - shown in all modes except detail
+  const filterChips = (
+    <Div className="flex items-center gap-1.5 px-4 pt-4">
+      {(
+        [
+          ...(!user?.isPublic
+            ? [
+                {
+                  key: "pinned" as const,
+                  icon: Eye,
+                  label: t("aiTools.modal.pinnedLabel"),
+                  count: stats.pinned,
+                },
+                {
+                  key: "allowed" as const,
+                  icon: Shield,
+                  label: t("aiTools.modal.enabledLabel"),
+                  count: stats.enabled,
+                },
+              ]
+            : []),
+          {
+            key: "all" as const,
+            icon: null,
+            label: t("aiTools.modal.totalLabel"),
+            count: stats.total,
+          },
+        ] as const
+      ).map(({ key, icon: Icon, label, count }) => (
+        <Button
+          key={key}
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => handleStatsFilterChange(key)}
+          className={cn(
+            "h-7 px-2.5 gap-1.5 text-xs rounded-full transition-all border",
+            statsFilter === key
+              ? "bg-primary text-primary-foreground border-primary font-semibold hover:bg-primary/90 hover:text-primary-foreground"
+              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-transparent",
+          )}
+        >
+          {Icon && <Icon className="h-3 w-3 shrink-0" />}
+          <Span className="tabular-nums font-bold">{count}</Span>
+          <Span className="capitalize">{label}</Span>
+        </Button>
+      ))}
+    </Div>
+  );
+
   // Overview mode (no tools returned, just categories)
   if (availableTools.length === 0 && categories.length > 0) {
     return (
-      <Div className="flex flex-col gap-3 p-4">
-        {hint && <P className="text-xs text-muted-foreground">{hint}</P>}
-        <Div className="flex flex-col gap-1">
-          {categories.map(({ name, count }) => (
-            <Div
-              key={name}
-              className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-accent cursor-pointer text-sm"
-              onClick={(): void => {
-                void (async (): Promise<void> => {
-                  const helpDef = await import("./definition");
-                  navigate(helpDef.default.GET, {
-                    data: { category: name },
-                  });
-                })();
-              }}
-            >
-              <Span className="capitalize">{name}</Span>
-              <Badge variant="secondary" className="text-[10px]">
-                {count}
-              </Badge>
-            </Div>
-          ))}
+      <Div className="flex flex-col gap-0">
+        {filterChips}
+        <Div className="flex flex-col gap-3 p-4">
+          {hint && <P className="text-xs text-muted-foreground">{hint}</P>}
+          <Div className="flex flex-col gap-1">
+            {categories.map(({ name, count }) => (
+              <Div
+                key={name}
+                className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-accent cursor-pointer text-sm"
+                onClick={(): void => {
+                  void (async (): Promise<void> => {
+                    const helpDef = await import("./definition");
+                    navigate(helpDef.default.GET, {
+                      data: { category: name },
+                    });
+                  })();
+                }}
+              >
+                <Span className="capitalize">{name}</Span>
+                <Badge variant="secondary" className="text-[10px]">
+                  {count}
+                </Badge>
+              </Div>
+            ))}
+          </Div>
+          <P className="text-xs text-muted-foreground text-center">
+            {t("get.fields.totalCount.title")}: {totalCount}
+          </P>
         </Div>
-        <P className="text-xs text-muted-foreground text-center">
-          {t("get.fields.totalCount.title")}: {totalCount}
-        </P>
       </Div>
     );
   }
@@ -828,52 +881,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       )}
 
       {/* Filter chips */}
-      <Div className="flex items-center gap-1.5 px-4 pt-4">
-        {(
-          [
-            ...(!user?.isPublic
-              ? [
-                  {
-                    key: "pinned" as const,
-                    icon: Eye,
-                    label: t("aiTools.modal.pinnedLabel"),
-                    count: stats.pinned,
-                  },
-                  {
-                    key: "allowed" as const,
-                    icon: Shield,
-                    label: t("aiTools.modal.enabledLabel"),
-                    count: stats.enabled,
-                  },
-                ]
-              : []),
-            {
-              key: "all" as const,
-              icon: null,
-              label: t("aiTools.modal.totalLabel"),
-              count: stats.total,
-            },
-          ] as const
-        ).map(({ key, icon: Icon, label, count }) => (
-          <Button
-            key={key}
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => handleStatsFilterChange(key)}
-            className={cn(
-              "h-7 px-2.5 gap-1.5 text-xs rounded-full transition-all border",
-              statsFilter === key
-                ? "bg-primary text-primary-foreground border-primary font-semibold hover:bg-primary/90 hover:text-primary-foreground"
-                : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-transparent",
-            )}
-          >
-            {Icon && <Icon className="h-3 w-3 shrink-0" />}
-            <Span className="tabular-nums font-bold">{count}</Span>
-            <Span className="capitalize">{label}</Span>
-          </Button>
-        ))}
-      </Div>
+      {filterChips}
 
       <Div className="flex gap-3 flex-col px-4 pb-4 pt-3">
         {/* Search + Controls */}

@@ -308,7 +308,9 @@ export class UserViewRepository {
     const leadFreeCredits =
       linkedLeadIds.length > 0
         ? await db
-            .select({ freeCreditsRemaining: creditWallets.freeCreditsRemaining })
+            .select({
+              freeCreditsRemaining: creditWallets.freeCreditsRemaining,
+            })
             .from(creditWallets)
             .where(inArray(creditWallets.leadId, linkedLeadIds))
         : [];
@@ -487,8 +489,7 @@ export class UserViewRepository {
       (Number(refundResult?.total) || 0) * 100,
     );
 
-    const isActive =
-      subscription?.status === SubscriptionStatusDB[3]; // ACTIVE
+    const isActive = subscription?.status === SubscriptionStatusDB[3]; // ACTIVE
 
     return {
       totalRevenueCents,

@@ -6,6 +6,10 @@
 import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { UserRepository } from "@/app/api/[locale]/user/repository";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ThreadsRootPageProps {
@@ -18,12 +22,26 @@ export interface ThreadsRootPageData {
   locale: CountryLanguage;
 }
 
+async function getDefaultFolder(locale: CountryLanguage): Promise<string> {
+  const logger = createEndpointLogger(false, Date.now(), locale);
+  const userResponse = await UserRepository.getUserByAuth(
+    {
+      detailLevel: UserDetailLevel.MINIMAL,
+      roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+    },
+    locale,
+    logger,
+  );
+  const user = userResponse.success ? userResponse.data : undefined;
+  return user?.isPublic ? "incognito" : "private";
+}
+
 export async function tanstackLoader({
   params,
 }: ThreadsRootPageProps): Promise<ThreadsRootPageData> {
   const { locale } = await params;
-  // Redirect to private folder by default
-  redirect(`/${locale}/threads/private`);
+  const folder = await getDefaultFolder(locale);
+  redirect(`/${locale}/threads/${folder}`);
 }
 
 export function TanstackPage({ locale }: ThreadsRootPageData): JSX.Element {
@@ -34,7 +52,6 @@ export default async function ThreadsRootPage({
   params,
 }: ThreadsRootPageProps): Promise<never> {
   const { locale } = await params;
-
-  // Redirect to private folder by default
-  redirect(`/${locale}/threads/private`);
+  const folder = await getDefaultFolder(locale);
+  redirect(`/${locale}/threads/${folder}`);
 }
