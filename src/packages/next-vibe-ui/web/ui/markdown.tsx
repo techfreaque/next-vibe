@@ -77,6 +77,10 @@ function extractThinkingSections(content: string): {
     processedContent = processedContent.replace(/<think>[\s\S]*$/i, "");
   }
 
+  // Strip any orphaned </think> closing tags that leaked through as text-deltas
+  // (e.g. when a model emits reasoning content without a proper opening <think> tag)
+  processedContent = processedContent.replace(/<\/think>/gi, "");
+
   processedContent = processedContent.trim();
 
   return {

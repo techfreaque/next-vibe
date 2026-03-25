@@ -19,6 +19,7 @@ import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
@@ -34,6 +35,11 @@ export interface SendMessageParams {
   }>;
   audioInput?: { file: File };
   attachments: File[];
+  /** Image generation settings */
+  imageSize?: string;
+  imageQuality?: string;
+  /** Music generation settings */
+  musicDuration?: string;
 }
 
 export interface SendMessageDeps {
@@ -53,6 +59,7 @@ export interface SendMessageDeps {
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
+  locale: CountryLanguage;
 }
 
 export async function sendMessage(
@@ -73,6 +80,7 @@ export async function sendMessage(
     leafMessageId,
     user,
     settings,
+    locale,
   } = deps;
   const { content } = params;
 
@@ -354,6 +362,9 @@ export async function sendMessage(
         operation: "send",
         messageHistory, // Pass pre-loaded message history for incognito mode
         toolConfirmations: params.toolConfirmations,
+        imageSize: params.imageSize,
+        imageQuality: params.imageQuality,
+        musicDuration: params.musicDuration,
       },
       {
         logger,
@@ -362,6 +373,7 @@ export async function sendMessage(
         currentSubFolderId,
         user,
         settings,
+        locale,
       },
     );
 

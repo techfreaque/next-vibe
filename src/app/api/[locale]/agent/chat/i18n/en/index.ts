@@ -220,7 +220,7 @@ export const translations = {
     switchSkill: "Switch Skill",
     editSkill: "Edit Skill",
     delete: "Delete",
-    autoSelectedModel: "AUTO-SELECTED",
+    autoSelectedModel: "FILTER-BASED",
     manualSelectedModel: "MANUALLY SELECTED",
     intelligence: "Intelligence",
     contentFilter: "Content",
@@ -228,7 +228,7 @@ export const translations = {
     modelSelection: "Model Selection",
     autoModeDescription: "Best model is selected based on your filters",
     manualModeDescription: "Choose a specific model manually",
-    autoMode: "Auto",
+    autoMode: "Filter-Based",
     manualMode: "Manual",
     allModelsCount: "All {{count}} models",
     filteredModelsCount: "{{count}} models match filters",
@@ -441,6 +441,8 @@ export const translations = {
         "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
       gemini31ProPreviewCustomTools:
         "Gemini 3.1 Pro Preview (Custom Tools) - Gemini 3.1 Pro variant with improved tool selection that prevents overuse of bash tools in favor of more efficient third-party functions, ideal for coding agents and multi-tool workflows",
+      gemini31FlashImagePreview:
+        "Gemini 3.1 Flash Image Preview - Google's multimodal model that generates images directly from text prompts via chat, supporting both text and image output in the same conversation",
       gemini31FlashLitePreview:
         "Gemini 3.1 Flash Lite Preview - Google's high-efficiency model optimized for high-volume use cases, outperforming Gemini 2.5 Flash Lite with improvements in audio, RAG ranking, translation, and code completion",
       gemini3Pro:
@@ -549,6 +551,21 @@ export const translations = {
         "DeepSeek R1 Distill - Compact distilled version of DeepSeek R1 with efficient reasoning capabilities",
       qwen257b:
         "Qwen 2.5 7B - Alibaba's compact 7B model for fast and affordable conversational tasks",
+      dallE3:
+        "DALL-E 3 - OpenAI's image generation model with high-quality, detailed images from text prompts",
+      gptImage1:
+        "GPT-Image-1 - OpenAI's fast and affordable image generation model",
+      fluxSchnell:
+        "Flux Schnell - Black Forest Labs' fast image generation model optimized for speed",
+      fluxPro:
+        "Flux Pro 1.1 - Black Forest Labs' professional image generation model with superior quality and prompt adherence",
+      sdxl: "Stable Diffusion XL - Stability AI's high-quality open image generation model",
+      musicgenStereo:
+        "MusicGen Stereo - Meta's open-source stereo music generation model via Replicate",
+      stableAudio:
+        "Stable Audio - Stability AI's music and audio generation model for high-quality clips",
+      udioV2:
+        "Udio v2 - High-quality AI music generation with vocals and full production quality",
     },
   },
   modelUtilities: {

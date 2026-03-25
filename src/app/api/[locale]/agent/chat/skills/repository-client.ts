@@ -173,13 +173,20 @@ export class SkillsRepositoryClient {
     // Apply sorting if specified
     if (filters.sortBy) {
       return filtered.toSorted((a, b) => {
-        const aVal = this.getSortValue(a, filters.sortBy);
-        const bVal = this.getSortValue(b, filters.sortBy);
-
-        // Default to DESC if no direction specified
-        const direction = filters.sortDirection ?? ModelSortDirection.DESC;
-
-        return direction === ModelSortDirection.ASC ? aVal - bVal : bVal - aVal;
+        const dir1 = filters.sortDirection ?? ModelSortDirection.DESC;
+        const v1a = this.getSortValue(a, filters.sortBy);
+        const v1b = this.getSortValue(b, filters.sortBy);
+        const primary = dir1 === ModelSortDirection.ASC ? v1a - v1b : v1b - v1a;
+        if (primary !== 0) {
+          return primary;
+        }
+        if (filters.sortBy2) {
+          const dir2 = filters.sortDirection2 ?? ModelSortDirection.DESC;
+          const v2a = this.getSortValue(a, filters.sortBy2);
+          const v2b = this.getSortValue(b, filters.sortBy2);
+          return dir2 === ModelSortDirection.ASC ? v2a - v2b : v2b - v2a;
+        }
+        return 0;
       });
     }
 

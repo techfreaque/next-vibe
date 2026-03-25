@@ -304,6 +304,20 @@ export const translations: typeof enTranslations = {
       label: "Zeitzone",
       description: "Benutzer-Zeitzone für cache-stabile Zeitstempel",
     },
+    imageSize: {
+      label: "Bildgröße",
+      description:
+        "Größe des generierten Bildes (z.B. quadratisch, quer, hoch)",
+    },
+    imageQuality: {
+      label: "Bildqualität",
+      description:
+        "Qualitätseinstellung für das generierte Bild (standard oder hd)",
+    },
+    musicDuration: {
+      label: "Musikdauer",
+      description: "Dauer des generierten Audioclips",
+    },
     availableTools: {
       label: "Ausführbar",
       description:
@@ -671,24 +685,10 @@ export const translations: typeof enTranslations = {
     companion: {
       title: "Wähle deinen Begleiter",
       subtitle: "Dein täglicher Gesprächspartner",
-      budgetTitle: "Wie leistungsfähig soll deine KI sein?",
-      budgetSubtitle: "Du kannst das jederzeit in den Einstellungen ändern",
+      modelTitle: "Welches Modell soll es antreiben?",
+      customSetup: "Erweiterte Einrichtung →",
       next: "Weiter",
       selectFirst: "Wähle einen Begleiter zum Fortfahren",
-      budget: {
-        smart: {
-          label: "Smart",
-          desc: "Schnell, effizient, bewältigt die meisten Aufgaben gut",
-        },
-        brilliant: {
-          label: "Brilliant",
-          desc: "Beste Qualität - ideal für komplexe Fragen, Schreiben und Analysen",
-        },
-        max: {
-          label: "Max",
-          desc: "Höchstes Denkvermögen, keine Kompromisse - für wenn es wirklich darauf ankommt",
-        },
-      },
     },
     usecases: {
       title: "Wofür wirst du es hauptsächlich nutzen?",
@@ -696,7 +696,8 @@ export const translations: typeof enTranslations = {
         "Wir fügen automatisch die richtigen Spezialisten zu deinem KI-Toolkit hinzu.",
       saving: "Einrichtung...",
       start: "Chat starten",
-      skip: "Überspringen - ich richte es später ein",
+      hintNoneSelected:
+        "Wähle Bereiche für Spezialisten oder tippe auf Start zum Überspringen",
       noProviderAvailable:
         "Kein KI-Anbieter konfiguriert. Füge OPENROUTER_API_KEY hinzu oder aktiviere Claude Code (CLAUDE_CODE_ENABLED=true) um fortzufahren.",
       coding: {
@@ -718,10 +719,6 @@ export const translations: typeof enTranslations = {
       learning: {
         label: "Lernen & Studium",
         hint: "Tutor, Socratic Questioner",
-      },
-      chat: {
-        label: "Einfach chatten",
-        hint: "Dein Begleiter reicht aus",
       },
     },
   },

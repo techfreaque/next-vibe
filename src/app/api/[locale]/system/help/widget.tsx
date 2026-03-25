@@ -278,6 +278,25 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     }));
   }, [enabledTools, availableTools, user]);
 
+  // For public users, server returns all tools and we filter client-side from localStorage.
+  // For authenticated users, server already applied the statsFilter.
+  const visibleTools = useMemo((): HelpToolMetadataSerialized[] => {
+    if (!user?.isPublic) {
+      return availableTools;
+    }
+    if (statsFilter === "pinned") {
+      return availableTools.filter((tool) =>
+        effectiveEnabledTools.some((et) => et.id === tool.id && et.pinned),
+      );
+    }
+    if (statsFilter === "allowed") {
+      return availableTools.filter((tool) =>
+        effectiveEnabledTools.some((et) => et.id === tool.id),
+      );
+    }
+    return availableTools;
+  }, [user?.isPublic, availableTools, statsFilter, effectiveEnabledTools]);
+
   const toolsByCategory = useMemo(() => {
     const grouped: Record<
       string,
@@ -286,7 +305,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         subcategories: Record<string, HelpToolMetadataSerialized[]>;
       }
     > = {};
-    for (const tool of availableTools) {
+    for (const tool of visibleTools) {
       const category = tool.category;
       if (!grouped[category]) {
         grouped[category] = { tools: [], subcategories: {} };
@@ -299,24 +318,40 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       grouped[category].subcategories[subKey].push(tool);
     }
     return grouped;
-  }, [availableTools]);
+  }, [visibleTools]);
 
-  const stats = useMemo(
-    () => ({
+  const stats = useMemo(() => {
+    if (user?.isPublic) {
+      const pinnedCount2 = effectiveEnabledTools.filter(
+        (et) => et.pinned,
+      ).length;
+      const allowedCount2 = effectiveEnabledTools.length;
+      return {
+        pinned: pinnedCount2,
+        enabled: allowedCount2 > 0 ? allowedCount2 : totalCount,
+        total: totalCount,
+      };
+    }
+    return {
       pinned: pinnedCount ?? 0,
       enabled: allowedCount ?? totalCount,
       total: totalCount,
-    }),
-    [pinnedCount, allowedCount, totalCount],
-  );
+    };
+  }, [
+    user?.isPublic,
+    effectiveEnabledTools,
+    pinnedCount,
+    allowedCount,
+    totalCount,
+  ]);
 
   const allVisibleEnabled = useMemo(
     () =>
-      availableTools.length > 0 &&
-      availableTools.every((tool) =>
+      visibleTools.length > 0 &&
+      visibleTools.every((tool) =>
         effectiveEnabledTools.some((et) => et.id === tool.id),
       ),
-    [availableTools, effectiveEnabledTools],
+    [visibleTools, effectiveEnabledTools],
   );
 
   // ── Handlers ───────────────────────────────────────────────────────────────
@@ -370,7 +405,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     if (activeInstanceId) {
       return;
     }
-    const allIds = availableTools.map((tool) => tool.id);
+    const allIds = visibleTools.map((tool) => tool.id);
     const allEnabled = allIds.every((id) =>
       effectiveEnabledTools.some((et) => et.id === id),
     );
@@ -379,7 +414,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         effectiveEnabledTools.filter((et) => !allIds.includes(et.id)),
       );
     } else {
-      const toAdd = availableTools
+      const toAdd = visibleTools
         .filter(
           (tool) => !effectiveEnabledTools.some((et) => et.id === tool.id),
         )
@@ -526,22 +561,18 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     <Div className="flex items-center gap-1.5 px-4 pt-4">
       {(
         [
-          ...(!user?.isPublic
-            ? [
-                {
-                  key: "pinned" as const,
-                  icon: Eye,
-                  label: t("aiTools.modal.pinnedLabel"),
-                  count: stats.pinned,
-                },
-                {
-                  key: "allowed" as const,
-                  icon: Shield,
-                  label: t("aiTools.modal.enabledLabel"),
-                  count: stats.enabled,
-                },
-              ]
-            : []),
+          {
+            key: "pinned" as const,
+            icon: Eye,
+            label: t("aiTools.modal.pinnedLabel"),
+            count: stats.pinned,
+          },
+          {
+            key: "allowed" as const,
+            icon: Shield,
+            label: t("aiTools.modal.enabledLabel"),
+            count: stats.enabled,
+          },
           {
             key: "all" as const,
             icon: null,
@@ -571,8 +602,8 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     </Div>
   );
 
-  // Overview mode (no tools returned, just categories)
-  if (availableTools.length === 0 && categories.length > 0) {
+  // Overview mode (no tools to show after filtering, just categories)
+  if (visibleTools.length === 0 && categories.length > 0) {
     return (
       <Div className="flex flex-col gap-0">
         {filterChips}
@@ -898,7 +929,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           </Div>
 
           <Div className="flex gap-2">
-            {availableTools.length > 0 && (
+            {visibleTools.length > 0 && (
               <>
                 <Button
                   onClick={
@@ -968,7 +999,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               </Span>
             </Div>
           )}
-          {availableTools.length === 0 ? (
+          {visibleTools.length === 0 ? (
             <Div className="text-center py-8 text-muted-foreground text-sm">
               {searchQuery.length > 0
                 ? t("aiTools.modal.noToolsFound")

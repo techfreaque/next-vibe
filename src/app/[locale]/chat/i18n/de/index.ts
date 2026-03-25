@@ -289,6 +289,8 @@ export const translations: typeof enTranslations = {
   },
   input: {
     placeholder: "Geben Sie Ihre Nachricht ein...",
+    imagePlaceholder: "Beschreiben Sie das Bild, das Sie generieren möchten...",
+    audioPlaceholder: "Beschreiben Sie die Musik oder den Klang, den Sie generieren möchten...",
     noPermission: "Sie haben keine Berechtigung, Nachrichten zu posten",
     noPostPermission:
       "Sie haben keine Berechtigung, Nachrichten in diesem Thread zu posten",
@@ -322,6 +324,18 @@ export const translations: typeof enTranslations = {
       invalidFileType: "Ungültiger Dateityp",
       uploadError: "Fehler beim Hochladen der Datei",
     },
+  },
+  imageGen: {
+    sizeSquare: "Quadrat 1024×1024",
+    sizeLandscape: "Querformat 1792×1024",
+    sizePortrait: "Hochformat 1024×1792",
+    qualityStandard: "Standard",
+    qualityHD: "HD",
+  },
+  audioGen: {
+    durationShort: "~8s",
+    durationMedium: "~20s",
+    durationLong: "~30s",
   },
   modelSelector: {
     placeholder: "Modell auswählen",
@@ -626,7 +640,7 @@ export const translations: typeof enTranslations = {
     settings: "Einstellungen",
     noModel: "Kein Modell ausgewählt",
     model: "Modell",
-    autoSelect: "Bestes Modell automatisch wählen",
+    autoSelect: "Filterbasierte Auswahl",
     manualSelect: "Manuell auswählen...",
     best: "BESTE",
     bestForFilter: "Bestes für diesen Filter",
@@ -668,7 +682,7 @@ export const translations: typeof enTranslations = {
     editSkill: "Als benutzerdefinierten Charakter bearbeiten",
     switchSkillBtn: "Charakter wechseln",
     editSkillBtn: "Charakter bearbeiten",
-    autoSelectedModel: "Auto-ausgewählt:",
+    autoSelectedModel: "Filterbasiert:",
     manualSelectedModel: "Ausgewählt:",
     skillSelectedModel: "Charakter-Modell:",
     selectModelBelow: "Wählen Sie unten ein Modell aus",

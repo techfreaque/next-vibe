@@ -200,6 +200,23 @@ export interface MessageMetadata {
     vote: "up" | "down";
     timestamp: number;
   }>;
+
+  // Generated media (for ASSISTANT messages from image/video generation)
+  generatedMedia?: {
+    type: "image" | "video" | "audio";
+    /** CDN-hosted or provider URL of the generated media */
+    url?: string;
+    prompt: string;
+    modelId: string;
+    width?: number;
+    height?: number;
+    /** Duration in seconds (video only) */
+    durationSeconds?: number;
+    mimeType?: string;
+    creditCost: number;
+    /** Async generation status (video only) */
+    status?: "pending" | "complete" | "failed";
+  };
 }
 
 /**

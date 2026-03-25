@@ -32,6 +32,7 @@ export const {
   SMART: "modelUtilities.smart",
   VISION: "modelUtilities.vision",
   IMAGE_GEN: "modelUtilities.imageGen",
+  MUSIC_GEN: "modelUtilities.musicGen",
 
   // Content handling (what model CAN do)
   POLITICAL_LEFT: "modelUtilities.politicalLeft",
@@ -66,6 +67,7 @@ export const ModelUtilityDB = [
   ModelUtility.SMART,
   ModelUtility.VISION,
   ModelUtility.IMAGE_GEN,
+  ModelUtility.MUSIC_GEN,
   ModelUtility.POLITICAL_LEFT,
   ModelUtility.POLITICAL_RIGHT,
   ModelUtility.CONTROVERSIAL,

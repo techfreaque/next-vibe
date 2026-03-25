@@ -285,6 +285,8 @@ export const translations = {
   },
   input: {
     placeholder: "Type your message...",
+    imagePlaceholder: "Describe the image you want to generate...",
+    audioPlaceholder: "Describe the music or sound to generate...",
     noPermission: "You don't have permission to post messages",
     noPostPermission:
       "You don't have permission to post messages in this thread",
@@ -318,6 +320,18 @@ export const translations = {
       invalidFileType: "Invalid file type",
       uploadError: "Failed to upload file",
     },
+  },
+  imageGen: {
+    sizeSquare: "Square 1024×1024",
+    sizeLandscape: "Landscape 1792×1024",
+    sizePortrait: "Portrait 1024×1792",
+    qualityStandard: "Standard",
+    qualityHD: "HD",
+  },
+  audioGen: {
+    durationShort: "~8s",
+    durationMedium: "~20s",
+    durationLong: "~30s",
   },
   modelSelector: {
     placeholder: "Select Model",
@@ -620,7 +634,7 @@ export const translations = {
     settings: "Settings",
     noModel: "No model selected",
     model: "Model",
-    autoSelect: "Auto-select best model",
+    autoSelect: "Filter-based selection",
     manualSelect: "Pick manually...",
     best: "BEST",
     bestForFilter: "Best for this filter",
@@ -662,7 +676,7 @@ export const translations = {
     editSkill: "Edit as custom character",
     switchSkillBtn: "Switch Skill",
     editSkillBtn: "Edit Skill",
-    autoSelectedModel: "Auto-selected:",
+    autoSelectedModel: "Filter-based:",
     manualSelectedModel: "Selected:",
     skillSelectedModel: "Skill's model:",
     selectModelBelow: "Select a model below",

@@ -11,6 +11,7 @@ import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
@@ -32,6 +33,7 @@ export interface BranchMessageDeps {
     ttsVoice: typeof TtsVoiceValue;
   };
   setLeafMessageId?: (messageId: string) => void;
+  locale: CountryLanguage;
 }
 
 export async function branchMessage(

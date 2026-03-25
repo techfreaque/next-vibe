@@ -223,7 +223,7 @@ export const translations: typeof enTranslations = {
     switchSkill: "Zmień postać",
     editSkill: "Edytuj postać",
     delete: "Usuń",
-    autoSelectedModel: "AUTO-WYBRANE",
+    autoSelectedModel: "FILTROWANE",
     manualSelectedModel: "WYBRANE RĘCZNIE",
     intelligence: "Inteligencja",
     contentFilter: "Treść",
@@ -232,7 +232,7 @@ export const translations: typeof enTranslations = {
     autoModeDescription:
       "Najlepszy model jest wybierany na podstawie Twoich filtrów",
     manualModeDescription: "Wybierz konkretny model ręcznie",
-    autoMode: "Auto",
+    autoMode: "Filtrowanie",
     manualMode: "Ręczny",
     allModelsCount: "Wszystkie {{count}} modeli",
     filteredModelsCount: "{{count}} modeli pasuje do filtrów",
@@ -446,6 +446,8 @@ export const translations: typeof enTranslations = {
         "Gab AI Arya - Niecenzurowany model konwersacyjny AI z wolnością wypowiedzi i kreatywnymi możliwościami",
       gemini31ProPreviewCustomTools:
         "Gemini 3.1 Pro Preview (Custom Tools) - Wariant Gemini 3.1 Pro z ulepszoną selekcją narzędzi dla agentów kodowania i złożonych przepływów wielonarzędziowych",
+      gemini31FlashImagePreview:
+        "Gemini 3.1 Flash Image Preview - Multimodalny model Google generujący obrazy bezpośrednio z promptów tekstowych przez czat, obsługujący tekst i obraz w tej samej rozmowie",
       gemini31FlashLitePreview:
         "Gemini 3.1 Flash Lite Preview - Wysokowydajny model Google zoptymalizowany dla dużych wolumenów z ulepszeniami w audio, rankingu RAG, tłumaczeniu i uzupełnianiu kodu",
       gemini3Pro:
@@ -553,6 +555,21 @@ export const translations: typeof enTranslations = {
         "DeepSeek R1 Distill - Kompaktowa zdestylowana wersja DeepSeek R1 z wydajnymi możliwościami rozumowania",
       qwen257b:
         "Qwen 2.5 7B - Kompaktowy model 7B Alibaby do szybkich i niedrogich zadań konwersacyjnych",
+      dallE3:
+        "DALL-E 3 - Model generowania obrazów OpenAI tworzący wysokiej jakości, szczegółowe obrazy z opisów tekstowych",
+      gptImage1:
+        "GPT-Image-1 - Szybki i przystępny cenowo model generowania obrazów OpenAI",
+      fluxSchnell:
+        "Flux Schnell - Szybki model generowania obrazów Black Forest Labs, zoptymalizowany pod kątem szybkości",
+      fluxPro:
+        "Flux Pro 1.1 - Profesjonalny model generowania obrazów Black Forest Labs z doskonałą jakością",
+      sdxl: "Stable Diffusion XL - Wysokiej jakości otwarty model generowania obrazów Stability AI",
+      musicgenStereo:
+        "MusicGen Stereo - Open-source'owy stereofoniczny model generowania muzyki Meta via Replicate",
+      stableAudio:
+        "Stable Audio - Model generowania muzyki i dźwięku Stability AI dla wysokiej jakości klipów",
+      udioV2:
+        "Udio v2 - Wysokiej jakości generowanie muzyki AI z wokalem i pełną jakością produkcji",
     },
   },
   modelUtilities: {

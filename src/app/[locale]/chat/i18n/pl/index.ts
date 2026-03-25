@@ -289,6 +289,8 @@ export const translations: typeof enTranslations = {
   },
   input: {
     placeholder: "Wpisz swoją wiadomość...",
+    imagePlaceholder: "Opisz obraz, który chcesz wygenerować...",
+    audioPlaceholder: "Opisz muzykę lub dźwięk do wygenerowania...",
     noPermission: "Nie masz uprawnień do publikowania wiadomości",
     noPostPermission:
       "Nie masz uprawnień do publikowania wiadomości w tym wątku",
@@ -322,6 +324,18 @@ export const translations: typeof enTranslations = {
       invalidFileType: "Nieprawidłowy typ pliku",
       uploadError: "Nie udało się przesłać pliku",
     },
+  },
+  imageGen: {
+    sizeSquare: "Kwadrat 1024×1024",
+    sizeLandscape: "Poziomy 1792×1024",
+    sizePortrait: "Pionowy 1024×1792",
+    qualityStandard: "Standardowy",
+    qualityHD: "HD",
+  },
+  audioGen: {
+    durationShort: "~8s",
+    durationMedium: "~20s",
+    durationLong: "~30s",
   },
   modelSelector: {
     placeholder: "Wybierz model",
@@ -624,7 +638,7 @@ export const translations: typeof enTranslations = {
     settings: "Ustawienia",
     noModel: "Nie wybrano modelu",
     model: "Model",
-    autoSelect: "Automatycznie wybierz najlepszy model",
+    autoSelect: "Wybór na podstawie filtrów",
     manualSelect: "Wybierz ręcznie...",
     best: "NAJLEPSZY",
     bestForFilter: "Najlepszy dla tego filtra",
@@ -664,7 +678,7 @@ export const translations: typeof enTranslations = {
     setup: "Zestaw",
     delete: "Usuń",
     editSkill: "Edytuj jako własną postać",
-    autoSelectedModel: "Auto-wybrany:",
+    autoSelectedModel: "Filtrowany:",
     manualSelectedModel: "Wybrany:",
     skillSelectedModel: "Model postaci:",
     selectModelBelow: "Wybierz model poniżej",

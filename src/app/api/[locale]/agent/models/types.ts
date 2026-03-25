@@ -47,6 +47,8 @@ const sharedFilterPropsSchema = z.object({
     .optional(),
   sortBy: z.enum(ModelSortField).optional(),
   sortDirection: z.enum(ModelSortDirection).optional(),
+  sortBy2: z.enum(ModelSortField).optional(),
+  sortDirection2: z.enum(ModelSortDirection).optional(),
 });
 
 /**

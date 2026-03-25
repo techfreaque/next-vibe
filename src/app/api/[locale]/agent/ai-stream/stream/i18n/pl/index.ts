@@ -299,6 +299,19 @@ export const translations: typeof enTranslations = {
       label: "Strefa czasowa",
       description: "Strefa czasowa użytkownika dla stabilnych znaczników czasu",
     },
+    imageSize: {
+      label: "Rozmiar obrazu",
+      description:
+        "Rozmiar generowanego obrazu (np. kwadratowy, poziomy, pionowy)",
+    },
+    imageQuality: {
+      label: "Jakość obrazu",
+      description: "Ustawienie jakości generowanego obrazu (standard lub hd)",
+    },
+    musicDuration: {
+      label: "Czas trwania muzyki",
+      description: "Czas trwania generowanego klipu audio",
+    },
     availableTools: {
       label: "Może wykonywać",
       description:
@@ -658,24 +671,10 @@ export const translations: typeof enTranslations = {
     companion: {
       title: "Wybierz swojego towarzysza",
       subtitle: "Twój główny partner do codziennych rozmów",
-      budgetTitle: "Jak zaawansowana ma być twoja AI?",
-      budgetSubtitle: "Możesz to zmienić w dowolnym momencie w ustawieniach",
+      modelTitle: "Który model ma go napędzać?",
+      customSetup: "Zaawansowana konfiguracja →",
       next: "Dalej",
       selectFirst: "Wybierz towarzysza, aby kontynuować",
-      budget: {
-        smart: {
-          label: "Smart",
-          desc: "Szybka, wydajna, dobrze radzi sobie z większością zadań",
-        },
-        brilliant: {
-          label: "Brilliant",
-          desc: "Najlepsza jakość - świetna do złożonych pytań, pisania i analizy",
-        },
-        max: {
-          label: "Max",
-          desc: "Najwyższe możliwości rozumowania, bez kompromisów - gdy naprawdę ma znaczenie",
-        },
-      },
     },
     usecases: {
       title: "Do czego głównie będziesz tego używać?",
@@ -683,7 +682,8 @@ export const translations: typeof enTranslations = {
         "Automatycznie dodamy odpowiednich specjalistów do zestawu narzędzi twojej AI.",
       saving: "Konfigurowanie...",
       start: "Rozpocznij czat",
-      skip: "Pomiń - skonfigruję to później",
+      hintNoneSelected:
+        "Wybierz obszary dla specjalistów lub naciśnij Start, aby pominąć",
       noProviderAvailable:
         "Brak skonfigurowanego dostawcy AI. Dodaj OPENROUTER_API_KEY lub włącz Claude Code (CLAUDE_CODE_ENABLED=true) aby kontynuować.",
       coding: {
@@ -705,10 +705,6 @@ export const translations: typeof enTranslations = {
       learning: {
         label: "Nauka & Edukacja",
         hint: "Tutor, Socratic Questioner",
-      },
-      chat: {
-        label: "Po prostu rozmowy",
-        hint: "Twój towarzysz wystarczy",
       },
     },
   },

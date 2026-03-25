@@ -2697,7 +2697,7 @@ export class CreditRepository {
    * Shows only current lead wallet's transactions + summary of other devices' spending
    */
   private static async getTransactionsByLeadId(
-    leadId: string,
+    leadId: string | undefined,
     limit: number,
     offset: number,
     logger: EndpointLogger,
@@ -2710,6 +2710,12 @@ export class CreditRepository {
     }>
   > {
     try {
+      if (!leadId) {
+        return fail({
+          message: t("errors.invalidIdentifier"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
       // Get lead pool (lead wallets only, no user wallet)
       const poolResult = await CreditRepository.getLeadPoolOnly(
         leadId,

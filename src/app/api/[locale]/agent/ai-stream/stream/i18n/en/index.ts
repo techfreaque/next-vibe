@@ -334,6 +334,19 @@ export const translations = {
       label: "Timezone",
       description: "User timezone for cache-stable timestamps",
     },
+    imageSize: {
+      label: "Image Size",
+      description:
+        "Size of the generated image (e.g. square, landscape, portrait)",
+    },
+    imageQuality: {
+      label: "Image Quality",
+      description: "Quality setting for the generated image (standard or hd)",
+    },
+    musicDuration: {
+      label: "Music Duration",
+      description: "Duration of the generated audio clip",
+    },
     availableTools: {
       label: "Allowed to Execute",
       description:
@@ -680,24 +693,10 @@ export const translations = {
     companion: {
       title: "Choose your companion",
       subtitle: "Your main chat partner for everyday use",
-      budgetTitle: "How capable should your AI be?",
-      budgetSubtitle: "You can change this anytime in settings",
+      modelTitle: "Which model should power it?",
+      customSetup: "Advanced setup →",
       next: "Next",
       selectFirst: "Pick a companion to continue",
-      budget: {
-        smart: {
-          label: "Smart",
-          desc: "Fast, efficient, handles most things well",
-        },
-        brilliant: {
-          label: "Brilliant",
-          desc: "Best quality - great for complex questions, writing, and analysis",
-        },
-        max: {
-          label: "Max",
-          desc: "Highest reasoning, no compromises - for when it really matters",
-        },
-      },
     },
     usecases: {
       title: "What will you mostly use it for?",
@@ -705,7 +704,8 @@ export const translations = {
         "We'll add the right specialists to your AI's toolkit automatically.",
       saving: "Setting up...",
       start: "Start Chatting",
-      skip: "Skip - I'll set it up later",
+      hintNoneSelected:
+        "Select areas to set up specialist skills, or tap Start to skip",
       noProviderAvailable:
         "No AI provider configured. Add OPENROUTER_API_KEY or enable Claude Code (CLAUDE_CODE_ENABLED=true) to continue.",
       coding: {
@@ -727,10 +727,6 @@ export const translations = {
       learning: {
         label: "Learning & Study",
         hint: "Tutor, Socratic Questioner",
-      },
-      chat: {
-        label: "Just Chatting",
-        hint: "Your companion is enough",
       },
     },
   },

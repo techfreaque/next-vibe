@@ -596,6 +596,9 @@ export class AiStreamRepository {
             logger,
             t: aiStreamT,
             streamContext,
+            imageSize: data.imageSize ?? undefined,
+            imageQuality: data.imageQuality ?? undefined,
+            musicDuration: data.musicDuration ?? undefined,
           });
 
           // After stream completes, capture the last assistant message ID from the writer.
