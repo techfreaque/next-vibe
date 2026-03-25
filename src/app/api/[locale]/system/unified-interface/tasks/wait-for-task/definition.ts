@@ -45,6 +45,16 @@ const { POST } = createEndpoint({
   title: "waitForTask.post.title",
   description: "waitForTask.post.description",
   icon: "clock",
+  statusBadge: {
+    loading: {
+      label: "waitForTask.post.status.waiting",
+      color: "bg-blue-500/10 text-blue-500",
+    },
+    done: {
+      label: "waitForTask.post.status.complete",
+      color: "bg-green-500/10 text-green-500",
+    },
+  },
   category: "app.endpointCategories.systemTasks",
   tags: ["tags.tasks" as const],
   allowedRoles: [

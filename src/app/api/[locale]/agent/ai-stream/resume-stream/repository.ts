@@ -132,10 +132,12 @@ export class ResumeStreamRepository {
           .from(cronTasks)
           .where(eq(cronTasks.id, wakeUpTaskId))
           .limit(1);
-        if (!taskRow || taskRow.wakeUpCallbackMode === "wait") {
+        // Task gone (deleted by complete-task cleanup) = normal flow, proceed with revival.
+        // Only skip if the task exists with callbackMode=wait, meaning wait-for-task intercepted it.
+        if (taskRow?.wakeUpCallbackMode === "wait") {
           logger.debug(
             "[ResumeStream] wakeUp task intercepted by wait-for-task - skipping revival",
-            { wakeUpTaskId, taskFound: !!taskRow },
+            { wakeUpTaskId },
           );
           return success({ resumed: false, lastAiMessageId: null });
         }

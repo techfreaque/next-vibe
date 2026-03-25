@@ -642,6 +642,10 @@ export const translations: typeof enTranslations = {
         title: "Wynik zadania gotowy",
         description: "Zadanie ukończone lub oczekujący zarejestrowany",
       },
+      status: {
+        waiting: "Oczekiwanie na zadanie...",
+        complete: "Zadanie ukończone",
+      },
     },
   },
   errorMonitor: {

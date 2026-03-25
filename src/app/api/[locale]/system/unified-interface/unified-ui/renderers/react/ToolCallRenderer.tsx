@@ -164,19 +164,9 @@ export function ToolCallRenderer({
   };
   const [isOpen, setIsOpen] = useState(getIsOpen);
 
-  // Update isOpen when decision changes
-  useEffect(() => {
-    if (decision && decision.type !== "pending") {
-      setIsOpen(false);
-    }
-  }, [decision]);
-
   const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(
     null,
   );
-  // For execute-tool: resolve the child endpoint's definition for title/icon
-  const [childDefinition, setChildDefinition] =
-    useState<CreateApiEndpointAny | null>(null);
 
   // Create a form for managing the tool parameters when waiting for confirmation
   const confirmationForm = useForm<FieldValues>({
@@ -320,30 +310,6 @@ export function ToolCallRenderer({
     };
     void loadDef();
   }, [toolCall.toolName, definition, tryLoadIdentifier]);
-
-  // Separate effect: load child definition for execute-tool once parent + args are available.
-  // Runs whenever args change so it picks up toolName even if args arrived after definition.
-  useEffect(() => {
-    if (!definition?.aliases?.includes("execute-tool")) {
-      return;
-    }
-    const args = toolCall.args;
-    const childToolName =
-      args && typeof args === "object" && "toolName" in args
-        ? (args as Record<string, string>).toolName
-        : undefined;
-    if (!childToolName) {
-      return;
-    }
-
-    const loadChild = async (): Promise<void> => {
-      const childResult = await tryLoadIdentifier(childToolName);
-      if (childResult.success) {
-        setChildDefinition(childResult.data);
-      }
-    };
-    void loadChild();
-  }, [definition, toolCall.args, tryLoadIdentifier]);
 
   const hasResult = Boolean(toolCall.result);
   // Detect error: toolCall.error should be an ErrorResponseType (object with success=false).
@@ -513,63 +479,11 @@ export function ToolCallRenderer({
     | { message: string; messageParams?: Record<string, string | number> }
     | undefined;
 
-  // Resolve display title: for execute-tool, prefer child endpoint's title/icon
+  // Resolve display title: use this definition's own title/dynamicTitle
   const resolveDisplay = (): {
     displayName: string;
     icon: IconKey | undefined;
   } => {
-    // When execute-tool wraps a child endpoint, use the child's title/icon
-    if (childDefinition) {
-      const childScopedT = childDefinition.scopedTranslation.scopedT(locale);
-
-      // Try child's dynamicTitle with the execute-tool's input (child's request data)
-      const childDynamicFn = childDefinition.dynamicTitle as
-        | DynamicTitleFn
-        | undefined;
-      const childInput =
-        toolCall.args &&
-        typeof toolCall.args === "object" &&
-        "input" in toolCall.args
-          ? (toolCall.args as Record<string, ToolCall["args"]>).input
-          : undefined;
-      const childResponse =
-        toolCall.result &&
-        typeof toolCall.result === "object" &&
-        "data" in toolCall.result
-          ? (toolCall.result as Record<string, ToolCall["result"]>).data
-          : toolCall.result;
-      const childDynamic = childDynamicFn
-        ? childDynamicFn({
-            request:
-              childInput && typeof childInput === "object"
-                ? childInput
-                : undefined,
-            response:
-              childResponse && typeof childResponse === "object"
-                ? childResponse
-                : undefined,
-          })
-        : undefined;
-
-      if (childDynamic) {
-        return {
-          displayName:
-            childScopedT.t(childDynamic.message, childDynamic.messageParams) ??
-            toolCall.toolName,
-          icon: childDefinition.icon,
-        };
-      }
-
-      // Fall back to child's static title
-      const childTitle = childDefinition.title
-        ? childScopedT.t(childDefinition.title)
-        : undefined;
-      if (childTitle) {
-        return { displayName: childTitle, icon: childDefinition.icon };
-      }
-    }
-
-    // Standard path: use this definition's own title
     const scopedT = definition?.scopedTranslation.scopedT(locale);
     const staticTitle = definition?.title
       ? scopedT?.t(definition.title)
@@ -705,11 +619,26 @@ export function ToolCallRenderer({
                     )}
                   </Span>
                 )}
-              {isLoading && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
-                  {t("widgets.toolCall.status.executing")}
-                </Span>
-              )}
+              {isLoading &&
+                (() => {
+                  const loadingBadge = definition?.statusBadge?.loading;
+                  if (loadingBadge) {
+                    const scopedT =
+                      definition.scopedTranslation.scopedT(locale);
+                    return (
+                      <Span
+                        className={`text-xs px-2 py-0.5 rounded-full ${loadingBadge.color}`}
+                      >
+                        {scopedT.t(loadingBadge.label)}
+                      </Span>
+                    );
+                  }
+                  return (
+                    <Span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
+                      {t("widgets.toolCall.status.executing")}
+                    </Span>
+                  );
+                })()}
               {isSentToBackground && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
                   {t("widgets.toolCall.status.sentToBackground")}
@@ -766,11 +695,26 @@ export function ToolCallRenderer({
                 !isWakeUpBackground &&
                 !isWaitingForRemote &&
                 !isDeferred &&
-                !isConfirmedByUser && (
-                  <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
-                    {t("widgets.toolCall.status.complete")}
-                  </Span>
-                )}
+                !isConfirmedByUser &&
+                (() => {
+                  const doneBadge = definition?.statusBadge?.done;
+                  if (doneBadge) {
+                    const scopedT =
+                      definition.scopedTranslation.scopedT(locale);
+                    return (
+                      <Span
+                        className={`text-xs px-2 py-0.5 rounded-full ${doneBadge.color}`}
+                      >
+                        {scopedT.t(doneBadge.label)}
+                      </Span>
+                    );
+                  }
+                  return (
+                    <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
+                      {t("widgets.toolCall.status.complete")}
+                    </Span>
+                  );
+                })()}
             </Div>
           </Div>
         </CollapsibleTrigger>

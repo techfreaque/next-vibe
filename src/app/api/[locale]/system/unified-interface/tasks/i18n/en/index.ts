@@ -640,6 +640,10 @@ export const translations = {
         title: "Task Result Ready",
         description: "Task completed or waiter registered",
       },
+      status: {
+        waiting: "Waiting for task...",
+        complete: "Task complete",
+      },
     },
   },
   errorMonitor: {

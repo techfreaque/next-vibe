@@ -649,6 +649,10 @@ export const translations: typeof enTranslations = {
           description: "Ein Konflikt ist aufgetreten",
         },
       },
+      status: {
+        waiting: "Warte auf Aufgabe...",
+        complete: "Aufgabe abgeschlossen",
+      },
       success: {
         title: "Aufgabenergebnis bereit",
         description: "Aufgabe abgeschlossen oder Wartender registriert",

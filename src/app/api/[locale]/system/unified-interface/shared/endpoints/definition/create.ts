@@ -226,6 +226,27 @@ export interface ApiEndpoint<
         messageParams?: TParams;
       }
     | undefined;
+
+  /**
+   * Optional status badge config for AI tool call display.
+   * Overrides the default "Executing..." / "Complete" labels and colors
+   * so each endpoint can declare its own loading/done state appearance.
+   */
+  readonly statusBadge?: {
+    loading?: {
+      /** Translation key for the loading state label */
+      label: NoInfer<TScopedTranslationKey>;
+      /** Tailwind color classes, e.g. "bg-indigo-500/10 text-indigo-500" */
+      color: string;
+    };
+    done?: {
+      /** Translation key for the done state label */
+      label: NoInfer<TScopedTranslationKey>;
+      /** Tailwind color classes, e.g. "bg-green-500/10 text-green-500" */
+      color: string;
+    };
+  };
+
   readonly category: TranslationKey;
   readonly tags: readonly NoInfer<TScopedTranslationKey>[];
 

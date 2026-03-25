@@ -291,6 +291,17 @@ function createToolFromEndpoint(
             perCallStreamContext ?? context.streamContext,
           );
 
+          // Propagate waitingForRemoteResult back to the shared streamContext.
+          // perCallStreamContext is a copy — mutations to it don't affect the original.
+          // stream-part-handler checks context.streamContext.waitingForRemoteResult to
+          // decide whether to abort the stream at the tool-result event.
+          if (
+            perCallStreamContext?.waitingForRemoteResult &&
+            context.streamContext
+          ) {
+            context.streamContext.waitingForRemoteResult = true;
+          }
+
           if (!result.success) {
             const errorMsg = result.message ?? "Tool execution failed";
             // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK

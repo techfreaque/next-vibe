@@ -320,6 +320,37 @@ export class RouteExecuteRepository {
               },
             );
 
+            // wakeUp direct: insert a task row in RUNNING state so clearStreamingState
+            // (called when the AI stream finishes) sees an active task and sets thread
+            // → "waiting" instead of "idle". Resume-stream will delete this row on completion.
+            if (callbackMode === CallbackMode.WAKE_UP && effectiveThreadId) {
+              await db.insert(cronTasks).values({
+                id: directTaskId,
+                shortId: directTaskId,
+                routeId: "remote-direct",
+                displayName: `Remote wakeUp: ${toolName}`,
+                category: TaskCategory.SYSTEM,
+                schedule: "* * * * *",
+                priority: CronTaskPriority.HIGH,
+                enabled: false,
+                runOnce: true,
+                lastExecutionStatus: CronTaskStatus.RUNNING,
+                taskInput: {},
+                wakeUpCallbackMode: callbackMode,
+                wakeUpThreadId: effectiveThreadId,
+                wakeUpToolMessageId: effectiveToolMessageId ?? null,
+                wakeUpLeafMessageId: streamContext?.leafMessageId ?? null,
+                wakeUpModelId: streamContext?.modelId ?? null,
+                wakeUpSkillId: streamContext?.skillId ?? null,
+                wakeUpFavoriteId: streamContext?.favoriteId ?? null,
+                outputMode: TaskOutputMode.STORE_ONLY,
+                notificationTargets: [],
+                tags: ["remote-direct", instanceId, "wakeUp"],
+                targetInstance: null,
+                userId: user.id,
+              });
+            }
+
             const capturedToken = connInfo.token;
             const capturedRemoteUrl = connInfo.remoteUrl;
 
