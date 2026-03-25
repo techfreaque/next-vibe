@@ -24,13 +24,13 @@ import { Div } from "next-vibe-ui/ui/div";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Minus } from "next-vibe-ui/ui/icons/Minus";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -296,16 +296,16 @@ export function CreditsPurchaseContainer({
                   <Div className="text-sm font-medium mb-2">
                     {t("post.redirecting")}
                   </Div>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link
+                  <Button variant="outline" className="w-full" asChild>
+                    <ExternalLink
                       href={field.value.checkoutUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <ExternalLinkIcon className="h-4 w-4" />
                       {t("post.openCheckout")}
-                    </Link>
+                    </ExternalLink>
                   </Button>
                 </Div>
               )}

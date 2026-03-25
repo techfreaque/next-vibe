@@ -6,7 +6,7 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
 import { useMemo } from "react";
@@ -98,12 +98,12 @@ export function CodeQualityIssueList({
 
               return (
                 <Div key={idx} className="text-sm">
-                  <Link
+                  <ExternalLink
                     href={editorUrl}
                     className="text-blue-600 hover:underline"
                   >
                     {item.line || 1}:{item.column || 1}
-                  </Link>
+                  </ExternalLink>
                   <Span className={`ml-2 ${severityColor}`}>
                     {icon} {item.severity}
                   </Span>

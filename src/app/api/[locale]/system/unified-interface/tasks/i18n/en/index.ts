@@ -584,6 +584,19 @@ export const translations = {
           description:
             "True when the stream is paused waiting for the task to complete.",
         },
+        originalToolName: {
+          title: "Tool",
+          description: "The original tool that was executed.",
+        },
+        originalArgs: {
+          title: "Arguments",
+          description: "The original tool's input arguments.",
+        },
+      },
+      widget: {
+        noToolName: "No tool name available.",
+        resolving: "Resolving tool...",
+        unknownTool: "Unknown tool: {{toolName}}",
       },
       errors: {
         validation: {

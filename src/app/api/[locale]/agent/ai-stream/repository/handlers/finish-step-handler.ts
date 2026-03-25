@@ -95,6 +95,13 @@ export class FinishStepHandler {
       streamAbortController.signal.addEventListener("abort", () => {
         clearTimeout(timer);
       });
+      // Expose a cancel function so the stream's finally block can cancel
+      // the timer when the stream ends naturally (e.g. wakeUp mode where the
+      // AI writes a response and the loop exits without hitting the timeout).
+      streamContext.cancelPendingStreamTimer = (): void => {
+        clearTimeout(timer);
+        streamContext.cancelPendingStreamTimer = undefined;
+      };
     }
 
     // After a step finishes, update currentParentId to point to the last message

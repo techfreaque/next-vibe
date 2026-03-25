@@ -653,20 +653,28 @@ export class AiStreamRepository {
           await clearStreamingState(threadResultThreadId, logger);
           // wakeUp revival: insert deferred (single stream = no race) then revive.
           // Skip if stream was aborted (user cancel or timeout) - don't revive cancelled streams.
+          // Also filter out payloads intercepted by wait-for-task (delivered inline).
+          const headlessSuppressed =
+            streamContext.suppressedWakeUpToolMessageIds;
+          const headlessPendingWakeUps = headlessSuppressed
+            ? capturedWakeUpPayloads.filter(
+                (p) => !headlessSuppressed.has(p.toolMessageId),
+              )
+            : capturedWakeUpPayloads;
           if (
-            capturedWakeUpPayloads.length > 0 &&
+            headlessPendingWakeUps.length > 0 &&
             !streamAbortController.signal.aborted
           ) {
-            await handleWakeUpRevivalBatch(capturedWakeUpPayloads);
+            await handleWakeUpRevivalBatch(headlessPendingWakeUps);
           } else if (
-            capturedWakeUpPayloads.length > 0 &&
+            headlessPendingWakeUps.length > 0 &&
             streamAbortController.signal.aborted
           ) {
             logger.info(
               "[WakeUp] Headless: skipping revival - stream was aborted",
               {
                 threadId: threadResultThreadId,
-                pendingWakeUps: capturedWakeUpPayloads.length,
+                pendingWakeUps: headlessPendingWakeUps.length,
               },
             );
           }
@@ -707,6 +715,12 @@ export class AiStreamRepository {
               : "error";
         })
         .finally(() => {
+          // Cancel any pending stream timeout timer (e.g. wakeUp mode where AI
+          // writes a "task fired" response and the loop ends naturally before the
+          // 90s escalation timeout fires). Without this, the timer would fire after
+          // the stream has already ended, potentially interfering with the revival.
+          streamContext.cancelPendingStreamTimer?.();
+
           // Determine finish reason: if AbortErrorHandler handled it gracefully
           // (runStream resolved instead of rejecting), check the abort signal.
           if (
@@ -723,9 +737,15 @@ export class AiStreamRepository {
 
           // Skip wakeUp revival if the stream was cancelled by the user.
           // A wakeUp signal may have arrived mid-stream but the user aborted - don't revive.
+          // Also filter out payloads intercepted by wait-for-task (delivered inline).
           const wasAborted = streamAbortController.signal.aborted;
-          const shouldReviveWakeUp =
-            capturedWakeUpPayloads.length > 0 && !wasAborted;
+          const suppressed = streamContext.suppressedWakeUpToolMessageIds;
+          const pendingWakeUps = suppressed
+            ? capturedWakeUpPayloads.filter(
+                (p) => !suppressed.has(p.toolMessageId),
+              )
+            : capturedWakeUpPayloads;
+          const shouldReviveWakeUp = pendingWakeUps.length > 0 && !wasAborted;
 
           // clearStreamingState must run BEFORE STREAM_FINISHED is emitted so that
           // if it emits streaming-state-changed:waiting, clients receive it first.
@@ -744,14 +764,14 @@ export class AiStreamRepository {
               // wakeUp revival: if a pub/sub signal arrived mid-stream, insert the deferred
               // message now (stream is done, single-inserter guarantee holds) then fire revival.
               if (shouldReviveWakeUp) {
-                return handleWakeUpRevivalBatch(capturedWakeUpPayloads);
+                return handleWakeUpRevivalBatch(pendingWakeUps);
               }
-              if (capturedWakeUpPayloads.length > 0) {
+              if (pendingWakeUps.length > 0) {
                 logger.info(
                   "[WakeUp] Skipping revival - stream was aborted by user",
                   {
                     threadId: threadResultThreadId,
-                    pendingWakeUps: capturedWakeUpPayloads.length,
+                    pendingWakeUps: pendingWakeUps.length,
                   },
                 );
               }

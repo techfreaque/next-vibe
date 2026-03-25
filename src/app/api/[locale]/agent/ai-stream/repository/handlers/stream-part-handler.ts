@@ -241,6 +241,41 @@ export class StreamPartHandler {
         streamContext.currentToolMessageId =
           result.pendingToolMessage.messageId;
 
+        // If escalateToTask() fired BEFORE this TOOL message was created (the common
+        // case for interactive tools like claude-code), backfill the correct TOOL message
+        // ID onto the escalated task row now that we have it.
+        if (streamContext.pendingEscalatedTaskId) {
+          const escalatedId = streamContext.pendingEscalatedTaskId;
+          streamContext.pendingEscalatedTaskId = undefined; // consume it
+          const toolMsgId = result.pendingToolMessage.messageId;
+          void (async (): Promise<void> => {
+            try {
+              const { db: dbInst } =
+                await import("@/app/api/[locale]/system/db");
+              const { cronTasks: cronTasksTable } =
+                await import("@/app/api/[locale]/system/unified-interface/tasks/cron/db");
+              const { eq: drizzleEq } = await import("drizzle-orm");
+              await dbInst
+                .update(cronTasksTable)
+                .set({ wakeUpToolMessageId: toolMsgId })
+                .where(drizzleEq(cronTasksTable.id, escalatedId));
+              logger.info(
+                "[AI Stream] Backfilled wakeUpToolMessageId on escalated task",
+                { escalatedId, toolMsgId },
+              );
+            } catch (err) {
+              logger.warn(
+                "[AI Stream] Failed to backfill wakeUpToolMessageId on escalated task",
+                {
+                  escalatedId,
+                  toolMsgId,
+                  error: err instanceof Error ? err.message : String(err),
+                },
+              );
+            }
+          })();
+        }
+
         // Track the branch tip at the time of this tool call.
         // parentId is the assistant message that spawned the tool - this is the
         // correct leaf for deferred result insertion (wakeUp, approve, remote).

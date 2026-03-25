@@ -172,6 +172,8 @@ export class AiStreamRunRepository {
               favoriteId: undefined,
               headless: undefined,
               waitingForRemoteResult: undefined,
+              pendingEscalatedTaskId: undefined,
+              cancelPendingStreamTimer: undefined,
               abortSignal: preCallAbortController.signal,
               escalateToTask: undefined,
               callerCallbackMode: undefined,

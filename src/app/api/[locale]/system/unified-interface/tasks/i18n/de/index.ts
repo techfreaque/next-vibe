@@ -600,6 +600,19 @@ export const translations: typeof enTranslations = {
           description:
             "True wenn der Stream pausiert und auf die Aufgabe wartet.",
         },
+        originalToolName: {
+          title: "Tool",
+          description: "Das ursprünglich ausgeführte Tool.",
+        },
+        originalArgs: {
+          title: "Argumente",
+          description: "Die Eingabeargumente des ursprünglichen Tools.",
+        },
+      },
+      widget: {
+        noToolName: "Kein Toolname verfügbar.",
+        resolving: "Tool wird aufgelöst...",
+        unknownTool: "Unbekanntes Tool: {{toolName}}",
       },
       errors: {
         validation: {

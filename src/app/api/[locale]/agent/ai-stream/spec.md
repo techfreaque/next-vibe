@@ -47,11 +47,11 @@ AI sees: tool result returned inline, loop continues - **local only**. For remot
 
 - At tool-call time: original tool message created with `status: "pending"`, content = tool input args
 - While waiting: original message stays `pending`
-- On `handleTaskCompletion(WAIT)`: original tool message **backfilled** - `status: "completed"` (or `"failed"`), content = actual result
-- `TOOL_RESULT` WS event emitted so live clients update the message in place
-- Revival fires headless stream from the original tool message as parent - AI sees result as part of its context
-
-**No deferred message created for `wait`.** The original message is updated in place.
+- On `handleTaskCompletion(WAIT)` → resume-stream checks sequenceId:
+  - **sameSequence** (thread has not moved since tool call): original tool message **backfilled in place** - `status: "completed"`, result set. No deferred message created. `TOOL_RESULT` WS event emitted.
+  - **diffSequence** (user sent new messages while waiting): a deferred TOOL message is inserted after the new leaf. `MESSAGE_CREATED` + `TOOL_RESULT` WS events emitted.
+- Revival fires headless stream from the backfilled original (sameSequence) or deferred message (diffSequence) as parent
+- AI sees result, loop continues (no loop stop for `wait`)
 
 ---
 
@@ -90,7 +90,7 @@ AI sees: `{ taskId, status: "pending", hint: "result will be injected when ready
 - `TASK_COMPLETED` WS event emitted (carries `deferredMessage` for optimistic UI)
 - Revival fires headless stream from the deferred message as parent
 
-**AI context (message-converter):** for wakeUp deferred results, input args are suppressed - AI sees the result only. Input preserved in DB and shown in UI.
+**AI context (message-converter):** for wakeUp, the original tool call's args are replaced with a short hint in AI context (e.g. `{hint:"args omitted, see deferred result below"}`). Full args preserved in DB and shown in UI. The deferred result message is included in AI context as the authoritative result.
 
 **When resume-stream fires:**
 

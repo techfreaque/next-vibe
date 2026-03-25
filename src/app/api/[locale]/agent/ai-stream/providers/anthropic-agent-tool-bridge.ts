@@ -77,7 +77,7 @@ export class AgentToolExecutorRegistry {
         });
       }
     }
-    logger.info("[AgentToolBridge] Registered tool executors", {
+    logger.debug("[AgentToolBridge] Registered tool executors", {
       count: this.executors.size,
     });
   }

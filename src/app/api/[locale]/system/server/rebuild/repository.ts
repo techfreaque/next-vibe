@@ -31,7 +31,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as checkScopedTranslation } from "../../check/vibe-check/i18n";
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
-import { VIBE_START_PID_FILE } from "../pid";
+import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type { RebuildResponseOutput, RebuildStep } from "./definition";
 import type { RebuildT } from "./i18n";
 
@@ -63,6 +63,29 @@ export class RebuildRepository {
       }
       return ok;
     };
+
+    // If the running vibe start server is on a non-standard port (due to collision),
+    // patch NEXT_PUBLIC_APP_URL before building so the bundle bakes in the correct port.
+    const runningPort = readPidFilePort(VIBE_START_PID_FILE);
+    if (runningPort !== null) {
+      const currentUrl = process.env["NEXT_PUBLIC_APP_URL"];
+      if (currentUrl) {
+        try {
+          const parsed = new URL(currentUrl);
+          if (
+            parsed.hostname === "localhost" ||
+            parsed.hostname === "127.0.0.1"
+          ) {
+            parsed.port = String(runningPort);
+            Object.assign(process.env, {
+              NEXT_PUBLIC_APP_URL: parsed.toString(),
+            });
+          }
+        } catch {
+          // Not a valid URL - leave unchanged
+        }
+      }
+    }
 
     try {
       // Step 1: Code generation

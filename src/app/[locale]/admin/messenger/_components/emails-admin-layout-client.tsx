@@ -5,7 +5,7 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
+import type { Route } from "next";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -18,6 +18,7 @@ import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -31,7 +32,7 @@ interface EmailsAdminLayoutClientProps {
 
 interface SidebarItem {
   key: string;
-  href: string;
+  href: Route;
   icon: ComponentType<{ className?: string }>;
   label: string;
   pattern: RegExp;

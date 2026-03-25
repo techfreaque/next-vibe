@@ -172,9 +172,10 @@ export async function handleTaskCompletion(params: {
               ) as ToolCallResult)
             : undefined;
 
-        // wakeUp: do NOT touch the original tool message at all. The original stays
-        // exactly as the AI saw it ({taskId, hint, status: pending}). The real result
-        // is inserted as a completely separate deferred TOOL message by resume-stream.
+        // wakeUp: do NOT backfill here. resume-stream checks the leaf sequenceId:
+        //   - same sequenceId → backfill the original tool message directly
+        //   - different sequenceId → insert a deferred TOOL message after the new leaf
+        // All other modes: always backfill the original tool message.
         if (callbackMode !== CallbackMode.WAKE_UP) {
           await db
             .update(chatMessages)
@@ -193,14 +194,14 @@ export async function handleTaskCompletion(params: {
             })
             .where(eq(chatMessages.id, toolMessageId));
 
-          logger.info("[TaskCompletion] Backfilled tool message with result", {
+          logger.debug("[TaskCompletion] Backfilled tool message with result", {
             toolMessageId,
             toolStatus,
             taskId,
           });
         } else {
-          logger.info(
-            "[TaskCompletion] wakeUp - original untouched, deferred handled by resume-stream",
+          logger.debug(
+            "[TaskCompletion] wakeUp - backfill deferred to resume-stream (sequenceId check)",
             { toolMessageId, taskId },
           );
         }
@@ -292,7 +293,7 @@ export async function handleTaskCompletion(params: {
       logger,
     );
 
-    logger.info("[TaskCompletion] Emitted TASK_COMPLETED WS event", {
+    logger.debug("[TaskCompletion] Emitted TASK_COMPLETED WS event", {
       threadId,
       taskId,
       toolMessageId,
@@ -379,7 +380,7 @@ export async function handleTaskCompletion(params: {
         resumeTaskId,
       });
 
-      logger.info("[TaskCompletion] Scheduling resume-stream task", {
+      logger.debug("[TaskCompletion] Scheduling resume-stream task", {
         threadId,
         toolMessageId,
         taskId,
@@ -407,7 +408,7 @@ export async function handleTaskCompletion(params: {
         userId,
       });
 
-      logger.info("[TaskCompletion] resume-stream task scheduled", {
+      logger.debug("[TaskCompletion] resume-stream task scheduled", {
         resumeTaskId,
         threadId,
         taskId,
@@ -416,6 +417,8 @@ export async function handleTaskCompletion(params: {
       // Direct fire: when user + locale are available (local flows), fire resume-stream
       // immediately instead of waiting for the cron pulse. The cron task above serves
       // as a safety net - resume-stream's atomic isStreaming claim prevents double-firing.
+      // Use the task owner's user (built from task.userId) so the revival headless stream
+      // runs with the correct leadId for credit validation - not the complete-task caller's identity.
       if (directResumeUser && directResumeLocale) {
         const { t } = aiStreamScopedTranslation.scopedT(directResumeLocale);
         void ResumeStreamRepository.resume(
@@ -434,7 +437,7 @@ export async function handleTaskCompletion(params: {
             },
           );
         });
-        logger.info("[TaskCompletion] Fired resume-stream directly", {
+        logger.debug("[TaskCompletion] Fired resume-stream directly", {
           resumeTaskId,
           threadId,
         });

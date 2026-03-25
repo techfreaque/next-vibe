@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
+import type { Route } from "next";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Div } from "next-vibe-ui/ui/div";
 import { Folder } from "next-vibe-ui/ui/icons/Folder";
@@ -9,7 +9,8 @@ import { Play } from "next-vibe-ui/ui/icons/Play";
 import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Link } from "next-vibe-ui/ui/link";
-import type { JSX } from "react";
+import { cn } from "next-vibe/shared/utils";
+import type { ComponentType, JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -20,7 +21,12 @@ interface SshTabsNavProps {
 export function SshTabsNav({ locale }: SshTabsNavProps): JSX.Element {
   const pathname = usePathname();
 
-  const tabs = [
+  const tabs: Array<{
+    value: string;
+    href: Route;
+    icon: ComponentType<{ className?: string }>;
+    label: string;
+  }> = [
     {
       value: "terminal",
       href: `/${locale}/admin/ssh/terminal`,

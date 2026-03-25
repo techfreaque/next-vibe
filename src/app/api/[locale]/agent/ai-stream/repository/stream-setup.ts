@@ -254,6 +254,8 @@ export async function setupAiStream(params: {
         headless: params.headless,
         waitingForRemoteResult: undefined,
         onEscalatedTaskCancel: undefined,
+        pendingEscalatedTaskId: undefined,
+        cancelPendingStreamTimer: undefined,
         abortSignal: streamAbortController.signal,
         escalateToTask: undefined,
       },
@@ -776,6 +778,8 @@ export async function setupAiStream(params: {
     leafMessageId: undefined,
     waitingForRemoteResult: undefined,
     onEscalatedTaskCancel: undefined,
+    pendingEscalatedTaskId: undefined,
+    cancelPendingStreamTimer: undefined,
     abortSignal: streamAbortController.signal,
     // escalateToTask is wired after streamAbortController is created (below)
     escalateToTask: undefined,
@@ -949,6 +953,9 @@ export async function setupAiStream(params: {
     // revival (via handleTaskCompletion) delivers the result and resumes the thread.
     // callbackMode controls what happens ON revival (backfill vs deferred), not how the stream stops.
     streamContext.waitingForRemoteResult = true;
+    // Track the escalated task ID so stream-part-handler can backfill wakeUpToolMessageId
+    // with the correct TOOL message ID once it's created (after escalateToTask returns).
+    streamContext.pendingEscalatedTaskId = escalatedTaskId;
     // Set timeout from the tool's definition (callerTimeoutMs). 0 = no timer.
     const escalateTimeoutMs = streamContext.callerTimeoutMs;
     if (escalateTimeoutMs === undefined) {

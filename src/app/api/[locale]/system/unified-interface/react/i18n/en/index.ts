@@ -52,6 +52,8 @@ export const translations = {
         error: "Error",
         executing: "Executing...",
         complete: "Complete",
+        waitingForTask: "Waiting for task...",
+        completeWaitForTask: "Complete (waited)",
         sentToBackground: "Sent to background",
         wakeUpBackground: "Background task - AI will wake up with result",
         waitingForRemote: "Waiting for remote...",

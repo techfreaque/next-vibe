@@ -7,11 +7,14 @@ import {
   BUILD_ALIAS,
   BUILD_SERVER_ALIAS,
 } from "../../../server/build/constants";
-import { REBUILD_ALIAS } from "../../../server/rebuild/constants";
+import { DEV_ALIASES } from "../../../server/dev/constants";
 import {
-  START_ALIAS,
-  START_SERVER_ALIAS,
-} from "../../../server/start/constants";
+  findAvailablePort,
+  VIBE_DEV_PID_FILE,
+  VIBE_START_PID_FILE,
+} from "../../../server/pid";
+import { REBUILD_ALIAS } from "../../../server/rebuild/constants";
+import { START_ALIASES } from "../../../server/start/constants";
 import { Platform } from "../../shared/types/platform";
 
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */
@@ -186,8 +189,7 @@ export function loadEnvironment(): EnvironmentResult {
   const isPreviewMode =
     hasLocalFlag ||
     (!isProduction &&
-      (args.includes(START_ALIAS) ||
-        args.includes(START_SERVER_ALIAS) ||
+      (START_ALIASES.some((a) => args.includes(a)) ||
         args.includes(BUILD_ALIAS) ||
         args.includes(BUILD_SERVER_ALIAS) ||
         args.includes(REBUILD_ALIAS)));
@@ -232,6 +234,37 @@ export function loadEnvironment(): EnvironmentResult {
           parsed.hostname === "127.0.0.1"
         ) {
           parsed.port = previewPort;
+          process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+        }
+      } catch {
+        // If URL parsing fails, leave NEXT_PUBLIC_APP_URL unchanged
+      }
+    }
+  }
+
+  // Resolve port collisions before the env singleton reads NEXT_PUBLIC_APP_URL.
+  // Default ports: 3000 (vibe dev) and 3001 (vibe start / build).
+  // If the desired port is occupied by another project, bump to the next free port,
+  // skipping ports reserved for the sibling command and its internal offset.
+  const DEV_BASE_PORT = 3000;
+  const START_BASE_PORT = 3001;
+  const isDevCommand = DEV_ALIASES.some((a) => args.includes(a));
+
+  if (isDevCommand || isPreviewMode) {
+    const appUrl = process.env["NEXT_PUBLIC_APP_URL"];
+    if (appUrl) {
+      try {
+        const parsed = new URL(appUrl);
+        const basePort = parsed.port
+          ? parseInt(parsed.port, 10)
+          : isDevCommand
+            ? DEV_BASE_PORT
+            : START_BASE_PORT;
+        const pidFile = isDevCommand ? VIBE_DEV_PID_FILE : VIBE_START_PID_FILE;
+        const reservedPort = isDevCommand ? START_BASE_PORT : DEV_BASE_PORT;
+        const resolvedPort = findAvailablePort(basePort, pidFile, reservedPort);
+        if (resolvedPort !== basePort) {
+          parsed.port = String(resolvedPort);
           process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
         }
       } catch {

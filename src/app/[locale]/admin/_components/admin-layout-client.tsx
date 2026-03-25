@@ -5,7 +5,7 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
+import type { Route } from "next";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -13,9 +13,9 @@ import { Activity } from "next-vibe-ui/ui/icons/Activity";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { Brain } from "next-vibe-ui/ui/icons/Brain";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Frame } from "next-vibe-ui/ui/icons/Frame";
 import { Home } from "next-vibe-ui/ui/icons/Home";
-import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Menu } from "next-vibe-ui/ui/icons/Menu";
@@ -31,6 +31,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { Main } from "next-vibe-ui/ui/main";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1 } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -45,9 +46,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 interface NavigationItem {
   name: string;
-  href: string;
+  href: Route;
   icon: React.ComponentType<{ className?: string }>;
   current: boolean;
+  hidden: boolean;
 }
 
 interface AdminLayoutClientProps {
@@ -71,7 +73,7 @@ export function AdminLayoutClient({
   const allNavigation = [
     {
       name: t("app.admin.components.navigation.dashboard"),
-      href: `/${locale}/admin`,
+      href: `/${locale}/admin` as const,
       icon: Home,
       current: pathname === `/${locale}/admin`,
       hidden: false,
@@ -375,7 +377,7 @@ export function AdminLayoutClient({
               <ThemeToggle locale={locale} />
               <CountrySelector isNavBar locale={locale} user={user} />
               <Link
-                href={`/${locale}/`}
+                href={`/${locale}/threads`}
                 className="hidden sm:inline-flex text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
               >
                 {t("app.admin.components.navigation.backToApp")}

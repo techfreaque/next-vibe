@@ -2,7 +2,7 @@
 
 import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
 import { cn } from "next-vibe/shared/utils";
-import { Link } from "next-vibe-ui/ui/link";
+import { ExternalLink as ExternalLinkComponent } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -393,15 +393,15 @@ export const Markdown = memo(function Markdown({
             href?: string;
             children: React.ReactNode;
           }) => (
-            <Link
-              href={href || "#"}
+            <ExternalLinkComponent
+              href={href ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"
             >
               {children}
               <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
-            </Link>
+            </ExternalLinkComponent>
           ),
         ),
 

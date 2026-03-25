@@ -128,7 +128,7 @@ export class RouteExecuteRepository {
       // The abort signal fires when StreamRegistry.cancel() is called - any DB writes
       // or network calls after this point would create orphaned rows.
       if (streamContext?.abortSignal?.aborted) {
-        logger.info(
+        logger.debug(
           "[RouteExecute] Stream was cancelled before tool execution started - skipping",
           { toolName: data.toolName },
         );
@@ -154,17 +154,16 @@ export class RouteExecuteRepository {
       // Circuit breaker: headless streams (resume-stream revival) must not create
       // new remote WAIT tasks - this causes an infinite loop where each revival
       // calls execute-tool, creates a task, waits, resume-streams again, etc.
+      // Instead, auto-upgrade WAIT to WAKE_UP so the remote task completes
+      // asynchronously and the result is injected back via resume-stream.
       if (instanceId && streamContext?.headless) {
         const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
         if (callbackMode === CallbackMode.WAIT) {
-          logger.warn(
-            "[RouteExecute] Blocking remote WAIT call from headless stream (loop prevention)",
+          logger.debug(
+            "[RouteExecute] Auto-upgrading remote WAIT to WAKE_UP in headless stream (loop prevention)",
             { toolName, instanceId },
           );
-          return fail({
-            message: t("executeTool.post.errors.validation.title"),
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          });
+          data = { ...data, callbackMode: CallbackMode.WAKE_UP };
         }
       }
       if (instanceId && !user.isPublic) {
@@ -197,7 +196,7 @@ export class RouteExecuteRepository {
             .limit(1);
 
           if (existing) {
-            logger.info(
+            logger.debug(
               "[RouteExecute] Remote task already exists for toolMessageId - skipping duplicate creation",
               { toolName, instanceId, existingTaskId: existing.id },
             );
@@ -207,7 +206,7 @@ export class RouteExecuteRepository {
           }
         }
 
-        logger.info("[RouteExecute] Creating remote task", {
+        logger.debug("[RouteExecute] Creating remote task", {
           toolName,
           instanceId,
         });
@@ -282,7 +281,7 @@ export class RouteExecuteRepository {
             callbackMode === CallbackMode.WAIT ||
             callbackMode === CallbackMode.END_LOOP
           ) {
-            logger.info("[RouteExecute] Remote direct HTTP (blocking)", {
+            logger.debug("[RouteExecute] Remote direct HTTP (blocking)", {
               toolName,
               instanceId,
               callbackMode,
@@ -311,12 +310,15 @@ export class RouteExecuteRepository {
           ) {
             // Fire-and-forget: return pending immediately, handle completion async.
             const directTaskId = `remote-direct-${instanceId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-            logger.info("[RouteExecute] Remote direct HTTP (fire-and-forget)", {
-              toolName,
-              instanceId,
-              callbackMode,
-              directTaskId,
-            });
+            logger.debug(
+              "[RouteExecute] Remote direct HTTP (fire-and-forget)",
+              {
+                toolName,
+                instanceId,
+                callbackMode,
+                directTaskId,
+              },
+            );
 
             const capturedToken = connInfo.token;
             const capturedRemoteUrl = connInfo.remoteUrl;
@@ -374,7 +376,7 @@ export class RouteExecuteRepository {
                     hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
                   }
                 : {
-                    hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
+                    hint: "Result will be injected when complete. Call wait-for-task only if you need the result before continuing.",
                   }),
             });
           }
@@ -479,7 +481,7 @@ export class RouteExecuteRepository {
                 signal: AbortSignal.timeout(10_000),
               });
               if (resp.ok) {
-                logger.info(
+                logger.debug(
                   "[RouteExecute] Push-first: task pushed to local successfully",
                   {
                     taskId: capturedTaskId,
@@ -546,7 +548,7 @@ export class RouteExecuteRepository {
               }
             : callbackMode === CallbackMode.WAKE_UP
               ? {
-                  hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
+                  hint: "Result will be injected when complete. Call wait-for-task only if you need the result before continuing.",
                 }
               : {}),
         });
@@ -560,7 +562,7 @@ export class RouteExecuteRepository {
       // after the user confirms/cancels (which could be days later).
       // The stream fully ends after finish-step abort - no lingering state.
       if (callbackMode === CallbackMode.APPROVE) {
-        logger.info(
+        logger.debug(
           "[RouteExecute] APPROVE mode - returning placeholder (stream aborts at finish-step)",
           { toolName },
         );
@@ -580,7 +582,7 @@ export class RouteExecuteRepository {
         const executionId = `exec-${taskId}`;
         const startedAt = new Date();
 
-        logger.info("[RouteExecute] Executing local background route", {
+        logger.debug("[RouteExecute] Executing local background route", {
           toolName,
           taskId,
         });
@@ -798,7 +800,7 @@ export class RouteExecuteRepository {
           resolvedToolMessageId ?? streamContext?.aiMessageId;
         const effectiveLeafMessageId = resolvedLeafMessageId;
 
-        logger.info("[RouteExecute] Creating local wakeUp task (RUNNING)", {
+        logger.debug("[RouteExecute] Creating local wakeUp task (RUNNING)", {
           toolName,
           taskId,
           effectiveThreadId,
@@ -868,10 +870,14 @@ export class RouteExecuteRepository {
             pendingTimeoutMs: undefined,
             waitingForRemoteResult: undefined,
             onEscalatedTaskCancel: undefined,
+            cancelPendingStreamTimer: undefined,
             abortSignal: streamContext.abortSignal,
             // Wrapped escalateToTask: sets selfEscalated=true so we skip handleTaskCompletion.
             escalateToTask: wrappedEscalateToTask,
           };
+          // Closure variable: holds the tool result so the finally block can store it
+          // in taskInput.__result for wait-for-task to read inline.
+          let wakeUpFinalResult: Record<string, JsonValue> | null = null;
           try {
             const result = await RouteExecutionExecutor.executeGenericHandler<
               Record<string, JsonValue>
@@ -891,8 +897,9 @@ export class RouteExecuteRepository {
               : CronTaskStatus.FAILED;
             const finalResult =
               result.success && result.data !== undefined ? result.data : null;
+            wakeUpFinalResult = finalResult;
 
-            logger.info("[RouteExecute] wakeUp task finished", {
+            logger.debug("[RouteExecute] wakeUp task finished", {
               taskId,
               toolName,
               finalStatus,
@@ -902,28 +909,13 @@ export class RouteExecuteRepository {
             // Skip handleTaskCompletion if the tool self-escalated via escalateToTask.
             // Revival is managed by complete-task - we must not fire an early revival here.
             if (selfEscalated) {
-              logger.info(
+              logger.debug(
                 "[RouteExecute] wakeUp: tool self-escalated, skipping handleTaskCompletion",
                 { taskId, toolName },
               );
-            } else if (effectiveToolMessageId && effectiveThreadId && user.id) {
-              await handleTaskCompletion({
-                toolMessageId: effectiveToolMessageId,
-                threadId: effectiveThreadId ?? null,
-                callbackMode: CallbackMode.WAKE_UP,
-                status: finalStatus,
-                output: finalResult,
-                taskId,
-                modelId: streamContext?.modelId ?? null,
-                skillId: streamContext?.skillId ?? null,
-                favoriteId: streamContext?.favoriteId ?? null,
-                leafMessageId: streamContext?.leafMessageId ?? null,
-                userId: user.id,
-                logger,
-                directResumeUser: user,
-                directResumeLocale: locale,
-              });
             }
+            // handleTaskCompletion is called in the finally block below, after __result
+            // is stored, so wait-for-task interception can be detected reliably.
           } catch (err) {
             logger.error("[RouteExecute] wakeUp task execution failed", {
               taskId,
@@ -931,15 +923,142 @@ export class RouteExecuteRepository {
               error: err instanceof Error ? err.message : String(err),
             });
           } finally {
-            // Self-delete: task was ephemeral, clean it up.
-            try {
-              await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
-            } catch (delErr) {
-              logger.warn("[RouteExecute] wakeUp task self-delete failed", {
-                taskId,
-                error:
-                  delErr instanceof Error ? delErr.message : String(delErr),
-              });
+            // Atomically mark COMPLETED + store __result, but ONLY if wait-for-task has
+            // NOT intercepted yet (wakeUpCallbackMode still = WAKE_UP).
+            // If wait-for-task already wrote WAIT, rowsUpdated = 0 → skip revival.
+            // If we win (rowsUpdated = 1), read back the row to get wakeUp context for
+            // handleTaskCompletion. This is race-free: the single UPDATE is the lock.
+            if (
+              !selfEscalated &&
+              effectiveToolMessageId &&
+              effectiveThreadId &&
+              user.id
+            ) {
+              try {
+                const updated = await db
+                  .update(cronTasks)
+                  .set({
+                    lastExecutionStatus: CronTaskStatus.COMPLETED,
+                    lastExecutedAt: new Date(),
+                    taskInput: {
+                      __result: (wakeUpFinalResult ?? null) as JsonValue,
+                    },
+                    updatedAt: new Date(),
+                  })
+                  .where(
+                    drizzleSql`${cronTasks.id} = ${taskId} AND ${cronTasks.wakeUpCallbackMode} = ${CallbackMode.WAKE_UP}`,
+                  );
+
+                const claimed =
+                  updated.rowCount !== null && updated.rowCount > 0;
+
+                if (!claimed) {
+                  // wait-for-task already intercepted (wakeUpCallbackMode=WAIT).
+                  // Still store __result so wait-for-task can read it, but skip revival.
+                  logger.debug(
+                    "[RouteExecute] wakeUp: wait-for-task intercepted, skipping handleTaskCompletion",
+                    { taskId, toolName },
+                  );
+                  await db
+                    .update(cronTasks)
+                    .set({
+                      lastExecutionStatus: CronTaskStatus.COMPLETED,
+                      lastExecutedAt: new Date(),
+                      taskInput: {
+                        __result: (wakeUpFinalResult ?? null) as JsonValue,
+                      },
+                      updatedAt: new Date(),
+                    })
+                    .where(eq(cronTasks.id, taskId));
+                } else {
+                  // We won the race - read back wakeUp context and fire revival.
+                  const [latestTask] = await db
+                    .select({
+                      wakeUpCallbackMode: cronTasks.wakeUpCallbackMode,
+                      wakeUpThreadId: cronTasks.wakeUpThreadId,
+                      wakeUpToolMessageId: cronTasks.wakeUpToolMessageId,
+                      wakeUpModelId: cronTasks.wakeUpModelId,
+                      wakeUpSkillId: cronTasks.wakeUpSkillId,
+                      wakeUpFavoriteId: cronTasks.wakeUpFavoriteId,
+                      wakeUpLeafMessageId: cronTasks.wakeUpLeafMessageId,
+                      userId: cronTasks.userId,
+                    })
+                    .from(cronTasks)
+                    .where(eq(cronTasks.id, taskId))
+                    .limit(1);
+
+                  await handleTaskCompletion({
+                    toolMessageId:
+                      latestTask?.wakeUpToolMessageId ?? effectiveToolMessageId,
+                    threadId:
+                      latestTask?.wakeUpThreadId ?? effectiveThreadId ?? null,
+                    callbackMode: CallbackMode.WAKE_UP,
+                    status:
+                      wakeUpFinalResult !== null
+                        ? CronTaskStatus.COMPLETED
+                        : CronTaskStatus.FAILED,
+                    output: wakeUpFinalResult,
+                    taskId,
+                    modelId:
+                      latestTask?.wakeUpModelId ??
+                      streamContext?.modelId ??
+                      null,
+                    skillId:
+                      latestTask?.wakeUpSkillId ??
+                      streamContext?.skillId ??
+                      null,
+                    favoriteId:
+                      latestTask?.wakeUpFavoriteId ??
+                      streamContext?.favoriteId ??
+                      null,
+                    leafMessageId:
+                      latestTask?.wakeUpLeafMessageId ??
+                      streamContext?.leafMessageId ??
+                      null,
+                    userId: latestTask?.userId ?? user.id,
+                    logger,
+                    directResumeUser: user,
+                    directResumeLocale: locale,
+                  });
+                }
+              } catch (completionErr) {
+                logger.error(
+                  "[RouteExecute] wakeUp handleTaskCompletion failed",
+                  {
+                    taskId,
+                    error:
+                      completionErr instanceof Error
+                        ? completionErr.message
+                        : String(completionErr),
+                  },
+                );
+              }
+            } else if (!selfEscalated) {
+              // No stream context - just store __result so wait-for-task can read it.
+              try {
+                await db
+                  .update(cronTasks)
+                  .set({
+                    lastExecutionStatus: CronTaskStatus.COMPLETED,
+                    lastExecutedAt: new Date(),
+                    taskInput: {
+                      __result: (wakeUpFinalResult ?? null) as JsonValue,
+                    },
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(cronTasks.id, taskId));
+              } catch (updateErr) {
+                logger.warn(
+                  "[RouteExecute] wakeUp task status update failed (non-fatal)",
+                  {
+                    taskId,
+                    error:
+                      updateErr instanceof Error
+                        ? updateErr.message
+                        : String(updateErr),
+                  },
+                );
+              }
             }
           }
         })();
@@ -948,7 +1067,7 @@ export class RouteExecuteRepository {
         return success({
           taskId,
           status: CronTaskStatus.PENDING,
-          hint: "Result will be injected into this thread when complete. Do NOT call wait-for-task.",
+          hint: "Result will be injected when complete. Call wait-for-task only if you need the result before continuing.",
         });
       }
 
@@ -991,7 +1110,7 @@ export class RouteExecuteRepository {
       // The abort signal may have fired while the tool was running - any result
       // returned after cancellation should be ignored to prevent ghost responses.
       if (streamContext?.abortSignal?.aborted) {
-        logger.info(
+        logger.debug(
           "[RouteExecute] Stream was cancelled during tool execution - discarding result",
           { toolName },
         );

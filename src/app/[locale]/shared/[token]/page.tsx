@@ -6,6 +6,7 @@
 
 export const dynamic = "force-dynamic";
 
+import type { Route } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
@@ -30,7 +31,7 @@ interface SharedTokenPageProps {
 type SharedTokenPageState =
   | { kind: "userError"; errorTitle: string; errorMessage: string }
   | { kind: "shareLinkError"; errorTitle: string; errorMessage: string }
-  | { kind: "redirect"; url: string };
+  | { kind: "redirect"; url: Route };
 
 export interface SharedTokenPageData {
   locale: CountryLanguage;

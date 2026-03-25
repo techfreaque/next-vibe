@@ -6,8 +6,8 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
 import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import { H3, P } from "next-vibe-ui/ui/typography";

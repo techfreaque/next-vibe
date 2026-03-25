@@ -27,9 +27,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/admin/leads/stats`);
 }
 
-// oxlint-disable-next-line no-unused-vars
-export function TanstackPage(_props: AdminLeadsPageData): never {
-  redirect("/");
+export function TanstackPage(props: AdminLeadsPageData): never {
+  redirect(`/${props.locale}/admin/leads/stats`);
 }
 
 export default async function AdminLeadsPage({

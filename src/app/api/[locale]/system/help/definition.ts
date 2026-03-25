@@ -322,10 +322,9 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: {},
-      searchByName: { query: "search", page: 1 },
+      searchByName: { query: "search" },
       filterByCategory: { category: "chat", page: 1, pageSize: 50 },
       toolDetail: { toolName: "agent_search_brave_GET" },
-      adminAllPlatforms: { platform: Platform.CLI },
     },
     responses: {
       default: {

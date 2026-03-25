@@ -175,6 +175,26 @@ export interface ToolExecutionContext {
    * Cleared after the cancel runs (or after onComplete).
    */
   onEscalatedTaskCancel: (() => Promise<void>) | undefined;
+  /**
+   * Set by escalateToTask() immediately after inserting the task row.
+   * Cleared by stream-part-handler once it backfills wakeUpToolMessageId with
+   * the actual TOOL message ID (which is created after escalateToTask returns).
+   * This bridges the timing gap between escalation and TOOL message creation.
+   */
+  pendingEscalatedTaskId?: string | undefined;
+  /**
+   * Cancels the pending stream timeout timer set by finish-step-handler.
+   * Called by the stream's finally block so the 90s timer doesn't fire
+   * after the stream has already ended naturally (e.g. wakeUp mode where
+   * the AI writes a response and the loop exits cleanly).
+   */
+  cancelPendingStreamTimer?: (() => void) | undefined;
+  /**
+   * Tool message IDs of wakeUp calls that were intercepted by wait-for-task.
+   * The stream's finally block skips revival for these so the AI doesn't wake up
+   * again after wait-for-task already delivered the result inline.
+   */
+  suppressedWakeUpToolMessageIds?: Set<string>;
 }
 
 /**

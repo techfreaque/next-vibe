@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     // Cap page-data collection workers. Next.js default is min(cpuCount, freemem/1GB)
     // which hits 23 workers locally - each worker loads the full module graph causing
     // 14+ GB peak. 4 workers keeps peak under control with acceptable build time.
-    cpus: 1,
+    // cpus: 1,
     webpackBuildWorker: true,
     webpackMemoryOptimizations: true,
     // Soft memory hint for Turbopack's Rust engine (NapiTurboEngineOptions.memoryLimit).
@@ -16,8 +16,8 @@ const nextConfig: NextConfig = {
     // May reduce memory after compilation phase. Unit: bytes.
     turbopackMemoryLimit: 8 * 1024 * 1024 * 1024, // 8 GB
     // parallelServerBuildTraces: true,
-    // parallelServerCompiles: true,
-    // turbopackFileSystemCacheForDev: true,
+    parallelServerCompiles: true,
+    turbopackFileSystemCacheForDev: true,
     optimizePackageImports: [
       "lucide-react",
       "@radix-ui/react-icons",

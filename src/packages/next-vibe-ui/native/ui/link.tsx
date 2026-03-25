@@ -54,7 +54,7 @@ export function Link({
   target,
   rel,
   onClick,
-}: LinkProps): JSX.Element {
+}: LinkProps<string>): JSX.Element {
   // If children contain interactive elements, use View instead of Text
   const useView = hasInteractiveChildren(children);
 
@@ -77,3 +77,46 @@ export function Link({
 
 Link.displayName = "Link";
 export type { LinkProps };
+
+export interface ExternalLinkProps {
+  children?: ReactNode;
+  href: string;
+  target?: "_blank" | "_self" | "_parent" | "_top";
+  rel?: string;
+  onClick?: () => void;
+  className?: string;
+  download?: string | boolean;
+  title?: string;
+}
+
+/**
+ * ExternalLink for native — uses ExpoLink for external URLs
+ */
+export function ExternalLink({
+  className,
+  children,
+  href,
+  target,
+  rel,
+  onClick,
+}: ExternalLinkProps): JSX.Element {
+  const useView = hasInteractiveChildren(children);
+
+  if (useView) {
+    return (
+      <ExpoLink href={href} asChild target={target} rel={rel} onPress={onClick}>
+        <StyledView className={cn(className, "self-start")}>
+          {children}
+        </StyledView>
+      </ExpoLink>
+    );
+  }
+
+  return (
+    <ExpoLink href={href} target={target} rel={rel} onPress={onClick}>
+      <StyledText className={className}>{children}</StyledText>
+    </ExpoLink>
+  );
+}
+
+ExternalLink.displayName = "ExternalLink";

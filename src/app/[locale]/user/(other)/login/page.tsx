@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
+import type { Route } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
@@ -28,12 +29,12 @@ import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
-  searchParams: Promise<{ callbackUrl?: string }>;
+  searchParams: Promise<{ callbackUrl?: Route }>;
 }
 
 export interface LoginPageData {
   locale: CountryLanguage;
-  callbackUrl: string | undefined;
+  callbackUrl: Route | undefined;
   user: JwtPayloadType | null;
   loginOptions: LoginOptions | null;
   errorMessage: string | null;

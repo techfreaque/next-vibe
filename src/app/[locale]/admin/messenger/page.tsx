@@ -4,7 +4,6 @@
  */
 
 import { redirect } from "next-vibe-ui/lib/redirect";
-import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -25,9 +24,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/admin/messenger/inbox`);
 }
 
-// oxlint-disable-next-line no-unused-vars
-export function TanstackPage(_props: EmailsAdminPageData): JSX.Element {
-  redirect("/");
+export function TanstackPage(props: EmailsAdminPageData): never {
+  redirect(`/${props.locale}/admin/messenger/inbox`);
 }
 
 export default async function EmailsAdminPage({

@@ -307,9 +307,9 @@ export class DevRepository {
 
     DevRepository.logStartupInfo(port, logger, data);
 
-    // Kill any previous dev instance, then write our PID
+    // Kill any previous dev instance, then write our PID (including resolved port)
     killPreviousInstance(VIBE_DEV_PID_FILE, logger);
-    writePidFile(VIBE_DEV_PID_FILE, logger);
+    writePidFile(VIBE_DEV_PID_FILE, logger, [], port);
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
     const earlyExitHandler = (): void => {

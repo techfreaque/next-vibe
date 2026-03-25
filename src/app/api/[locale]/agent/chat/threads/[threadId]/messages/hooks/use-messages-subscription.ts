@@ -405,12 +405,56 @@ export function useMessagesSubscription(
     return (): void => {
       cleanup();
       // If a local stream is still running when the component unmounts,
-      // stop it in the store AND fire onStreamFinished so the nav store
-      // patches the sidebar threads cache back to "idle".
-      // (STREAM_FINISHED won't arrive after unmount - WS is being disconnected.)
+      // patch the sidebar caches directly (do NOT use optionsRef.current.onStreamFinished
+      // because optionsRef is updated on every render and may already reference a new
+      // activeThreadId after navigation - causing the wrong thread's cache to be patched).
+      // STREAM_FINISHED won't arrive after unmount since the WS channel is disconnected below.
       if (store().isLocalStream(threadId)) {
         store().stopStream(threadId);
-        optionsRef.current.onStreamFinished?.();
+        // Patch folder-contents cache (sidebar primary source) using closed-over ids.
+        apiClient.updateEndpointData(
+          folderContentsDefinition.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            return success({
+              ...old.data,
+              items: old.data.items.map((item) =>
+                item.type === "thread" && item.id === threadId
+                  ? { ...item, streamingState: "idle" }
+                  : item,
+              ),
+            });
+          },
+          {
+            urlPathParams: { rootFolderId },
+            requestData: { subFolderId: subFolderId ?? null },
+          },
+        );
+        // Also patch threads cache.
+        apiClient.updateEndpointData(
+          threadsDefinition.GET,
+          logger,
+          (old) => {
+            if (!old?.success) {
+              return old;
+            }
+            return success({
+              ...old.data,
+              threads: old.data.threads.map((t) =>
+                t.id === threadId ? { ...t, streamingState: "idle" } : t,
+              ),
+            });
+          },
+          {
+            requestData: {
+              rootFolderId: rootFolderId,
+              subFolderId: subFolderId ?? null,
+            },
+          },
+        );
       }
       // Always disconnect the channel on unmount - the thread is no longer viewed.
       disconnectChannel(buildMessagesChannel(threadId));

@@ -2451,7 +2451,7 @@ export class CreditRepository {
    */
   private static async getTransactions(
     userId: string,
-    leadId: string,
+    leadId: string | undefined,
     limit: number,
     offset: number,
     logger: EndpointLogger,
@@ -2644,28 +2644,34 @@ export class CreditRepository {
           (data.targetLeadId ?? data.targetUserId)) ??
         false);
     // When admin views a specific user, use the target lead if provided,
-    // otherwise pass empty string so getTransactions shows all leads in the user's pool
+    // otherwise undefined means show all leads in the user's pool
     const effectiveLeadId = isAdmin ? data.targetLeadId : user.leadId;
     const effectiveUserId =
       (isAdmin ? data.targetUserId : user.id) || undefined;
 
-    const result = effectiveUserId
-      ? await CreditRepository.getTransactions(
-          effectiveUserId,
-          effectiveLeadId,
-          limit,
-          offset,
-          logger,
-          t,
-        )
-      : await CreditRepository.getTransactionsByLeadId(
-          effectiveLeadId,
-          limit,
-          offset,
-          logger,
-          t,
-          locale,
-        );
+    const result =
+      effectiveUserId !== undefined
+        ? await CreditRepository.getTransactions(
+            effectiveUserId,
+            effectiveLeadId,
+            limit,
+            offset,
+            logger,
+            t,
+          )
+        : effectiveLeadId !== undefined
+          ? await CreditRepository.getTransactionsByLeadId(
+              effectiveLeadId,
+              limit,
+              offset,
+              logger,
+              t,
+              locale,
+            )
+          : fail({
+              message: t("errors.invalidIdentifier"),
+              errorType: ErrorResponseTypes.BAD_REQUEST,
+            });
 
     if (!result.success) {
       return result;

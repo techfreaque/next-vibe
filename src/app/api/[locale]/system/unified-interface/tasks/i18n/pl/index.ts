@@ -595,6 +595,19 @@ export const translations: typeof enTranslations = {
           title: "Oczekiwanie",
           description: "True gdy strumień jest zatrzymany czekając na zadanie.",
         },
+        originalToolName: {
+          title: "Narzędzie",
+          description: "Oryginalne wykonane narzędzie.",
+        },
+        originalArgs: {
+          title: "Argumenty",
+          description: "Argumenty wejściowe oryginalnego narzędzia.",
+        },
+      },
+      widget: {
+        noToolName: "Brak nazwy narzędzia.",
+        resolving: "Rozwiązywanie narzędzia...",
+        unknownTool: "Nieznane narzędzie: {{toolName}}",
       },
       errors: {
         validation: {

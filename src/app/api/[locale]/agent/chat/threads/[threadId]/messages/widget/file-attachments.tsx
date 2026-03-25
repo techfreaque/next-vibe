@@ -12,7 +12,7 @@ import { Download } from "next-vibe-ui/ui/icons/Download";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Image as ImageIcon } from "next-vibe-ui/ui/icons/Image";
 import { Image } from "next-vibe-ui/ui/image";
-import { Link } from "next-vibe-ui/ui/link";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
@@ -115,7 +115,7 @@ function FileAttachmentItem({
     <Div className="border border-border rounded-lg overflow-hidden bg-background/50">
       {/* Image preview */}
       {isImg && displayUrl && (
-        <Link
+        <ExternalLink
           href={displayUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -129,7 +129,7 @@ function FileAttachmentItem({
             unoptimized={isServerFile}
             className="w-full max-h-64 object-contain bg-muted"
           />
-        </Link>
+        </ExternalLink>
       )}
 
       {/* File info */}
@@ -146,7 +146,7 @@ function FileAttachmentItem({
         </Div>
 
         {displayUrl && (
-          <Link
+          <ExternalLink
             href={displayUrl}
             download={attachment.filename}
             target="_blank"
@@ -155,7 +155,7 @@ function FileAttachmentItem({
             title="Download file"
           >
             <Download className="h-4 w-4" />
-          </Link>
+          </ExternalLink>
         )}
       </Div>
     </Div>

@@ -11,8 +11,8 @@ import type React from "react";
 import type { ReactNode } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { UserGetResponseOutput } from "@/app/api/[locale]/users/user/[id]/definition";
 import { UserByIdRepository } from "@/app/api/[locale]/users/user/[id]/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -43,7 +43,11 @@ export async function tanstackLoader({
   );
 
   if (!userResponse.success) {
-    redirect(`/${locale}/`);
+    logger.error("Failed to get user data", {
+      userId: minimalUser.id,
+      error: userResponse.message,
+    });
+    redirect(`/${locale}/threads`);
   }
 
   return { locale, user: minimalUser, userData: userResponse.data };

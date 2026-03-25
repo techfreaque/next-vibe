@@ -1,13 +1,14 @@
 "use client";
 
+import type { Route } from "next";
 import type { IconComponent } from "next-vibe-ui/lib/helper";
 import { Div } from "next-vibe-ui/ui/div";
 import { History } from "next-vibe-ui/ui/icons/History";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { cn } from "next-vibe/shared/utils/utils";
 import { Link } from "next-vibe-ui/ui/link";
+import { cn } from "next-vibe/shared/utils/utils";
 import type { JSX } from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -29,7 +30,7 @@ export function SubscriptionTabsNav({
 
   const tabs: Array<{
     value: string;
-    href: string;
+    href: Route;
     icon: IconComponent;
     label: string;
   }> = [

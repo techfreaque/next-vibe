@@ -60,6 +60,15 @@ export class CompleteTaskRepository {
       });
     }
 
+    // Ownership check: only the user who owns the task may complete it.
+    // Admin bypass is intentionally NOT provided - tasks are personal and scoped to the owner.
+    if (task.userId !== user.id) {
+      return fail({
+        message: t("completeTask.post.errors.forbidden.title"),
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
+
     const now = new Date();
     const executionId = `complete-${taskId}-${now.getTime()}`;
 

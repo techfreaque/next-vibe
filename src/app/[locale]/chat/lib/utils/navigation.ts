@@ -52,7 +52,10 @@ export function buildFolderUrl(
   locale: CountryLanguage,
   rootFolderId: DefaultFolderId,
   subFolderId?: string | null,
-): Route {
+): Route<
+  | `/${CountryLanguage}/threads/${DefaultFolderId}/${string}`
+  | `/${CountryLanguage}/threads/${DefaultFolderId}`
+> {
   if (subFolderId) {
     return `/${locale}/threads/${rootFolderId}/${subFolderId}`;
   }

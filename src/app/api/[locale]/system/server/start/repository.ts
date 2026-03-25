@@ -40,6 +40,7 @@ import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import {
   cleanupPidFile,
+  isPortOwnedByUs,
   killPreviousInstance,
   VIBE_START_PID_FILE,
   writePidFile,
@@ -355,9 +356,9 @@ export class ServerStartRepository {
       runNext,
     );
 
-    // Kill any previous vibe start instance, then write our PID
+    // Kill any previous vibe start instance, then write our PID (including resolved port)
     killPreviousInstance(VIBE_START_PID_FILE, logger);
-    writePidFile(VIBE_START_PID_FILE, logger);
+    writePidFile(VIBE_START_PID_FILE, logger, [], port);
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
     const earlyExitHandler = (): void => {
@@ -655,18 +656,73 @@ export class ServerStartRepository {
   }
 
   /**
-   * Kill any process occupying the given port
+   * Kill any process occupying the given port ONLY if its PID is in our PID file.
+   * This prevents killing processes from other project instances running on the same port.
    */
   private static killProcessOnPort(port: number, logger: EndpointLogger): void {
+    // Get PID on this port
+    let pidOnPort: number | undefined;
     try {
-      // fuser is more reliable than lsof for finding processes on a port
-      execSync(`fuser -k ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
-      logger.debug(`Killed stale process on port ${port}`);
-      // Brief wait for process to exit
-      execSync("sleep 0.5");
+      const output = execSync(`fuser ${port}/tcp 2>/dev/null`, {
+        encoding: "utf-8",
+      }).trim();
+      const parsed = parseInt(output.split(/\s+/)[0] ?? "", 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        pidOnPort = parsed;
+      }
     } catch {
-      // No process on port or kill failed - both are fine
+      // No process on port - nothing to do
+      return;
     }
+
+    if (!pidOnPort) {
+      return;
+    }
+
+    if (!isPortOwnedByUs(port, VIBE_START_PID_FILE)) {
+      logger.debug(
+        `Port ${port} in use by PID ${pidOnPort} (not ours - leaving it alone)`,
+      );
+      return;
+    }
+
+    try {
+      process.kill(pidOnPort, "SIGTERM");
+      logger.debug(`Killed stale process on port ${port}`);
+    } catch {
+      // Already dead
+    }
+
+    // Wait up to 2s for graceful shutdown, then SIGKILL
+    const gracePeriod = Date.now() + 2000;
+    while (Date.now() < gracePeriod) {
+      try {
+        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+        execSync("sleep 0.1");
+      } catch {
+        return; // port released
+      }
+    }
+
+    // Still alive — force kill
+    try {
+      process.kill(pidOnPort, "SIGKILL");
+    } catch {
+      // Already dead
+    }
+
+    // Wait up to 3 more seconds for port release after SIGKILL
+    const deadline = Date.now() + 3000;
+    while (Date.now() < deadline) {
+      try {
+        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+        execSync("sleep 0.1");
+      } catch {
+        return;
+      }
+    }
+
+    logger.warn(`Port ${port} did not free up within 5 seconds`);
   }
 
   /**

@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -25,9 +25,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { CallbackMode } from "../../ai/execute-tool/constants";
-import { cronTaskExecutions, cronTasks } from "../cron/db";
+import { cronTasks } from "../cron/db";
 import { CronTaskStatus } from "../enum";
 import type { TasksT } from "../i18n";
+import type { JsonValue } from "../unified-runner/types";
 import type {
   WaitForTaskRequestOutput,
   WaitForTaskResponseOutput,
@@ -69,41 +70,73 @@ export class WaitForTaskRepository {
       }
 
       if (!task) {
-        // Task not found - it was already completed and cleaned up by revival.
-        // This is not an error: the wakeUp result was already injected into the thread.
-        // Return success so the AI can continue gracefully.
+        // Task not found - completed and cleaned up before wait-for-task was called.
+        // Cancel any pending revival and return completed status.
         logger.info(
           "[WaitForTask] Task not found - already completed and cleaned up",
           { taskId },
         );
+        try {
+          await db
+            .delete(cronTasks)
+            .where(
+              sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = 'resume-stream'`,
+            );
+        } catch (cleanupErr) {
+          logger.warn("[WaitForTask] Revival cleanup failed (non-fatal)", {
+            taskId,
+            error:
+              cleanupErr instanceof Error
+                ? cleanupErr.message
+                : String(cleanupErr),
+          });
+        }
         return success({
           status: CronTaskStatus.COMPLETED,
-          result: { message: "Task already completed and result injected." },
+          result: { message: "Task already completed." },
           waiting: false,
         });
       }
 
-      // If already completed, return result immediately - stream continues as normal.
+      // Helper: extract original tool info from task row for widget rendering
+      const originalToolName = task.routeId ?? undefined;
+      const rawTaskInput = task.taskInput as Record<string, JsonValue> | null;
+      // Strip internal __result sentinel if present
+      const { __result: storedResult, ...cleanTaskInput } = (rawTaskInput ??
+        {}) as Record<string, JsonValue> & {
+        __result?: JsonValue;
+      };
+      const originalArgs =
+        Object.keys(cleanTaskInput).length > 0 ? cleanTaskInput : undefined;
+
+      // If already completed (goroutine stored result in taskInput.__result), return inline.
       if (
         task.lastExecutionStatus === CronTaskStatus.COMPLETED ||
         task.lastExecutionStatus === CronTaskStatus.FAILED ||
         task.lastExecutionStatus === CronTaskStatus.CANCELLED
       ) {
-        // Fetch the most recent execution record for the result payload
-        const [execution] = await db
-          .select({ result: cronTaskExecutions.result })
-          .from(cronTaskExecutions)
-          .where(eq(cronTaskExecutions.taskId, taskId))
-          .orderBy(desc(cronTaskExecutions.completedAt))
-          .limit(1);
+        logger.debug(
+          "[WaitForTask] Task already completed - returning result",
+          {
+            taskId,
+            status: task.lastExecutionStatus,
+          },
+        );
 
-        logger.info("[WaitForTask] Task already completed - returning result", {
-          taskId,
-          status: task.lastExecutionStatus,
-        });
+        // Suppress wakeUp revival signal in the live stream — we're delivering inline.
+        // The original wakeUp tool message ID is what resume-stream uses to signal;
+        // adding it to suppressedWakeUpToolMessageIds makes the stream's finally block skip it.
+        const originalWakeUpToolMessageId = task.wakeUpToolMessageId;
+        if (streamContext && originalWakeUpToolMessageId) {
+          if (!streamContext.suppressedWakeUpToolMessageIds) {
+            streamContext.suppressedWakeUpToolMessageIds = new Set();
+          }
+          streamContext.suppressedWakeUpToolMessageIds.add(
+            originalWakeUpToolMessageId,
+          );
+        }
 
-        // Cancel any pending resume-stream task and delete the original wakeUp task row —
-        // the AI is handling the result inline so all context is now in the thread.
+        // Cancel pending resume-stream revival and delete task row - AI handles result inline.
         try {
           await db
             .delete(cronTasks)
@@ -111,7 +144,7 @@ export class WaitForTaskRepository {
               sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = 'resume-stream'`,
             );
           await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
-          logger.info(
+          logger.debug(
             "[WaitForTask] Cleaned up wakeUp task and pending resume-stream",
             { taskId },
           );
@@ -127,8 +160,13 @@ export class WaitForTaskRepository {
 
         return success({
           status: task.lastExecutionStatus,
-          result: execution?.result ?? undefined,
+          result:
+            storedResult !== undefined
+              ? (storedResult as Record<string, JsonValue>)
+              : undefined,
           waiting: false,
+          originalToolName,
+          originalArgs,
         });
       }
 
@@ -143,14 +181,15 @@ export class WaitForTaskRepository {
         const streamModelId = streamContext?.modelId;
         const streamSkillId = streamContext?.skillId;
         const streamFavoriteId = streamContext?.favoriteId;
-
         const streamLeafMessageId = streamContext?.leafMessageId;
 
         // Write revival context to typed wakeUp* columns - not into taskInput JSON blob.
+        // Use WAIT (not WAKE_UP) so handleTaskCompletion backfills the tool message
+        // in-place and resumes the stream directly - no deferred message, no new branch.
         await db
           .update(cronTasks)
           .set({
-            wakeUpCallbackMode: CallbackMode.WAKE_UP,
+            wakeUpCallbackMode: CallbackMode.WAIT,
             wakeUpThreadId: effectiveThreadId,
             wakeUpToolMessageId: effectiveToolMessageId,
             wakeUpModelId: streamModelId ?? null,
@@ -172,12 +211,21 @@ export class WaitForTaskRepository {
           },
         );
 
+        // Suppress any wakeUp signal for the original tool message — we're taking over delivery.
+        // The goroutine may have already queued a wakeUp signal via publishWakeUpSignal;
+        // the stream's finally block will skip it if it's in suppressedWakeUpToolMessageIds.
+        const originalWakeUpMsgId = task.wakeUpToolMessageId;
+        if (originalWakeUpMsgId) {
+          if (!streamContext.suppressedWakeUpToolMessageIds) {
+            streamContext.suppressedWakeUpToolMessageIds = new Set();
+          }
+          streamContext.suppressedWakeUpToolMessageIds.add(originalWakeUpMsgId);
+        }
+
         // Pause the stream - resume-stream will revive when the task completes.
         // Set pendingTimeoutMs so finish-step-handler starts the 90s abort timer.
-        if (streamContext) {
-          streamContext.waitingForRemoteResult = true;
-          streamContext.pendingTimeoutMs = 90_000;
-        }
+        streamContext.waitingForRemoteResult = true;
+        streamContext.pendingTimeoutMs = 90_000;
       } else {
         logger.warn(
           "[WaitForTask] No streamContext - cannot register waiter, returning pending status",
@@ -188,6 +236,8 @@ export class WaitForTaskRepository {
       return success({
         status: CronTaskStatus.PENDING,
         waiting: true,
+        originalToolName,
+        originalArgs,
       });
     } catch (error) {
       const msg = parseError(error).message;

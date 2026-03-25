@@ -312,13 +312,19 @@ export class ClaudeCodeRepository {
       // (stays visible + cancellable), and handles revival when CC calls complete-task.
       if (streamContext?.escalateToTask) {
         const callbackMode =
-          streamContext.callerCallbackMode ?? CallbackMode.WAKE_UP;
+          streamContext.callerCallbackMode ?? CallbackMode.WAIT;
         const { taskId: trackingTaskId } = await streamContext.escalateToTask({
           callbackMode,
           displayName: title,
         });
 
-        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} - When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} - pass the complete result in the response object so the AI that launched you can see it.`;
+        const { RemoteConnectionRepository: RCR } =
+          await import("@/app/api/[locale]/user/remote-connection/repository");
+        const selfInstanceId = RCR.deriveDefaultSelfInstanceId();
+        const mcpInstanceName =
+          selfInstanceId === "hermes-dev" ? "vibe-dev" : "vibe-local";
+
+        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} - When the work is complete, call MCP tool "complete-task" on MCP server "${mcpInstanceName}" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} - pass the complete result in the response object so the AI that launched you can see it.`;
 
         const terminal = ClaudeCodeRepository.detectTerminal(logger);
         if (terminal) {
@@ -441,7 +447,14 @@ export class ClaudeCodeRepository {
           );
         }
 
-        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} - When the work is complete, call MCP tool "complete-task" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} - pass the complete result in the response object so the AI that launched you can see it.`;
+        const { RemoteConnectionRepository: RCR2 } =
+          await import("@/app/api/[locale]/user/remote-connection/repository");
+        const mcpInstanceNameGoroutine =
+          RCR2.deriveDefaultSelfInstanceId() === "hermes-dev"
+            ? "vibe-dev"
+            : "vibe-local";
+
+        args[0] = `${args[0]}\n\n[TASK CONTEXT] taskId=${trackingTaskId} - When the work is complete, call MCP tool "complete-task" on MCP server "${mcpInstanceNameGoroutine}" with taskId="${trackingTaskId}" and response={"output":"<full result text>"} - pass the complete result in the response object so the AI that launched you can see it.`;
 
         const terminal = ClaudeCodeRepository.detectTerminal(logger);
         if (terminal) {

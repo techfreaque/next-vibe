@@ -53,6 +53,8 @@ export const translations: typeof enTranslations = {
         error: "Błąd",
         executing: "Wykonywanie...",
         complete: "Zakończono",
+        waitingForTask: "Oczekiwanie na zadanie...",
+        completeWaitForTask: "Zakończono (oczekiwano)",
         sentToBackground: "Wysłano w tle",
         wakeUpBackground: "Zadanie w tle - AI zostanie obudzone z wynikiem",
         waitingForRemote: "Oczekiwanie na zdalne...",

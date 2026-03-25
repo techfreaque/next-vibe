@@ -1,10 +1,11 @@
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
+import type { Route } from "next";
 import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 
 import { envClient, platform } from "@/config/env-client";
@@ -27,21 +28,13 @@ export function Logo({
   disabled?: boolean;
 }): JSX.Element {
   const { t } = simpleT(locale);
-  const Component = disabled ? Div : Link;
   const isLocalMode = envClient.NEXT_PUBLIC_LOCAL_MODE;
-  const href = isLocalMode
-    ? envClient.NEXT_PUBLIC_PROJECT_URL
-    : `/${locale}${pathName}`;
-  return (
-    <Component
-      href={href}
-      target={isLocalMode ? "_blank" : undefined}
-      rel={isLocalMode ? "noopener noreferrer" : undefined}
-      className={cn(
-        "inline-flex items-center gap-1.5 no-underline! hover:no-underline!",
-        linkClassName,
-      )}
-    >
+  const innerClassName = cn(
+    "inline-flex items-center gap-1.5 no-underline! hover:no-underline!",
+    linkClassName,
+  );
+  const inner = (
+    <>
       <Div className={cn("shrink-0", size)}>
         <Image
           fetchPriority="high"
@@ -76,6 +69,27 @@ export function Logo({
       >
         {t("config.appName")}
       </Span>
-    </Component>
+    </>
+  );
+  if (disabled) {
+    return <Div className={innerClassName}>{inner}</Div>;
+  }
+  if (isLocalMode) {
+    return (
+      <Link
+        href={envClient.NEXT_PUBLIC_PROJECT_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={innerClassName}
+      >
+        {inner}
+      </Link>
+    );
+  }
+  const localeHref: Route<`/${CountryLanguage}${string}`> = `/${locale}${pathName}`;
+  return (
+    <Link href={localeHref} className={innerClassName}>
+      {inner}
+    </Link>
   );
 }

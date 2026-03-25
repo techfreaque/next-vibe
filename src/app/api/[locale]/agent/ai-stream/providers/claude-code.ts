@@ -202,7 +202,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               toolExecutors.batchStopModes.add(callbackMode);
             }
 
-            logger.info("[AnthropicAgent] MCP handler invoked", {
+            logger.debug("[AnthropicAgent] MCP handler invoked", {
               toolName: t.name,
               toolCallId,
               callbackMode,

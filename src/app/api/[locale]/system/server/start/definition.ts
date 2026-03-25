@@ -21,14 +21,14 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
-import { START_ALIAS, START_SERVER_ALIAS } from "./constants";
+import { START_ALIASES } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "server", "start"],
-  aliases: [START_ALIAS, START_SERVER_ALIAS],
+  aliases: START_ALIASES,
   title: "post.title",
   description: "post.description",
   category: "app.endpointCategories.systemDevTools",

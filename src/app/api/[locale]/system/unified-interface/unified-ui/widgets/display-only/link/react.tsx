@@ -2,8 +2,8 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
-import { Link } from "next-vibe-ui/ui/link";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
@@ -114,7 +114,7 @@ export function LinkWidget<
 
       return (
         <Div className={containerClass}>
-          <Link
+          <ExternalLink
             href={url}
             className={cn(
               "inline-flex items-center text-primary hover:underline transition-colors",
@@ -129,11 +129,11 @@ export function LinkWidget<
           >
             <Span className="truncate">{translatedText}</Span>
             {openInNewTab && (
-              <ExternalLink
+              <ExternalLinkIcon
                 className={cn(iconSizeClass, "shrink-0 opacity-70")}
               />
             )}
-          </Link>
+          </ExternalLink>
         </Div>
       );
     }
@@ -147,7 +147,7 @@ export function LinkWidget<
 
     return (
       <Div className={containerClass}>
-        <Link
+        <ExternalLink
           href={href}
           className={cn(
             "inline-flex items-center text-primary hover:underline transition-colors",
@@ -162,11 +162,11 @@ export function LinkWidget<
         >
           <Span className="truncate">{translatedText}</Span>
           {openInNewTab && (
-            <ExternalLink
+            <ExternalLinkIcon
               className={cn(iconSizeClass, "shrink-0 opacity-70")}
             />
           )}
-        </Link>
+        </ExternalLink>
       </Div>
     );
   }

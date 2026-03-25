@@ -365,9 +365,11 @@ export function ToolCallRenderer({
   // detach: fire-and-forget, result in task history only
   const isSentToBackground =
     toolCall.callbackMode === "detach" && !toolCall.isDeferred;
-  // wakeUp: result will be injected back into thread when ready
+  // wakeUp: result will be injected back into thread when ready (only while still pending)
   const isWakeUpBackground =
-    toolCall.callbackMode === "wakeUp" && !toolCall.isDeferred;
+    toolCall.callbackMode === "wakeUp" &&
+    !toolCall.isDeferred &&
+    !isTerminalStatus;
   // wait: stream paused while remote executes
   const isWaitingForRemote =
     toolCall.callbackMode === "wait" && toolCall.status === "pending";

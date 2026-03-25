@@ -1104,7 +1104,7 @@ export class ViteCompiler {
               let counter = 0;
               const rewritten = code.replace(
                 /\brequire\((['"`])(\.\/[^'"` )]+)\1\)/g,
-                (_match, _q, specifier) => {
+                (...[, , specifier]) => {
                   const varName = `__cjsImport_${counter++}`;
                   imports.push(
                     `import * as ${varName} from ${JSON.stringify(specifier)};`,
@@ -1115,7 +1115,7 @@ export class ViteCompiler {
               if (imports.length === 0) {
                 return undefined;
               }
-              return { code: imports.join("\n") + "\n" + rewritten, map: null };
+              return { code: `${imports.join("\n")}\n${rewritten}`, map: null };
             },
           } as Plugin,
           // Resolve next-vibe-ui/* multi-path alias: tanstack/ first, then web/ fallback.

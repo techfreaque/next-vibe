@@ -10,7 +10,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Download } from "next-vibe-ui/ui/icons/Download";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
 import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { List } from "next-vibe-ui/ui/icons/List";
@@ -20,8 +20,8 @@ import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Li } from "next-vibe-ui/ui/li";
-import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { Code } from "next-vibe-ui/ui/typography";
 import { Ul } from "next-vibe-ui/ui/ul";
@@ -206,14 +206,14 @@ export function LeadsImportContainer({
             {t("post.widget.headerTitle")}
           </Span>
         </Div>
-        <Link
+        <ExternalLink
           href={buildTemplateCsvDataUri()}
           download="leads-import-template.csv"
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors border rounded-md px-2.5 py-1.5"
         >
           <Download className="h-3.5 w-3.5" />
           {t("post.widget.exportTemplateButton")}
-        </Link>
+        </ExternalLink>
       </Div>
 
       {/* Form */}
@@ -340,7 +340,7 @@ export function LeadsImportContainer({
                 handleCheckJobStatus(data.jobId!);
               }}
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLinkIcon className="h-3.5 w-3.5" />
               {t("post.widget.checkJobStatusButton")}
             </Button>
 

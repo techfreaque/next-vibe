@@ -31,9 +31,10 @@ export async function tanstackLoader({
   );
 }
 
-// oxlint-disable-next-line no-unused-vars
-export function TanstackPage(_props: LeadsEmailPreviewPageData): never {
-  redirect("/");
+export function TanstackPage(props: LeadsEmailPreviewPageData): never {
+  redirect(
+    `/${props.locale}/admin/messenger/campaigns/journeys/${props.journeyVariant}/${props.stage}`,
+  );
 }
 
 export default async function LeadsEmailPreviewPage({

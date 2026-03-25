@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import { Button } from "next-vibe-ui/ui/button";
 import {
   Dialog,
@@ -81,8 +82,8 @@ export function FolderAccessModal({
   const { title, explanation, folderName } = getFolderContent(folderId, t);
 
   // Construct proper locale-aware routes
-  const loginUrl = `/${locale}/user/login`;
-  const signupUrl = `/${locale}/user/signup`;
+  const loginUrl: Route<`/${CountryLanguage}/user/login`> = `/${locale}/user/login`;
+  const signupUrl: Route<`/${CountryLanguage}/user/signup`> = `/${locale}/user/signup`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

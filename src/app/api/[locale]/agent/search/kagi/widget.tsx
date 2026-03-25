@@ -6,9 +6,9 @@
 
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
-import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 
 import {
@@ -113,7 +113,7 @@ export function KagiSearchResultsContainer({
                     className="overflow-hidden hover:border-primary/50 transition-colors"
                   >
                     <CardContent className="p-0">
-                      <Link
+                      <ExternalLink
                         href={ref.url}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -121,7 +121,7 @@ export function KagiSearchResultsContainer({
                       >
                         <Div className="flex items-start gap-3">
                           <Div className="rounded-lg bg-muted p-2 mt-0.5">
-                            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                            <ExternalLinkIcon className="h-3.5 w-3.5 text-muted-foreground" />
                           </Div>
                           <Div className="flex-1 min-w-0">
                             <Div className="font-medium text-sm text-foreground mb-1 line-clamp-2">
@@ -137,7 +137,7 @@ export function KagiSearchResultsContainer({
                             </Div>
                           </Div>
                         </Div>
-                      </Link>
+                      </ExternalLink>
                     </CardContent>
                   </Card>
                 ))}

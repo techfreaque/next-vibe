@@ -17,17 +17,19 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
+  customWidgetObject,
   requestField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+
+import { WaitForTaskWidget } from "./widget";
+import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import {
   CronTaskStatus,
   CronTaskStatusDB,
@@ -53,11 +55,10 @@ const { POST } = createEndpoint({
   ] as const,
   aliases: ["wait-for-task"],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: WaitForTaskWidget,
+    noFormElement: true,
+    usage: { request: "data", response: true } as const,
     children: {
       // Request
       taskId: requestField(scopedTranslation, {
@@ -80,6 +81,16 @@ const { POST } = createEndpoint({
       waiting: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
+      }),
+      // Original tool info for widget rendering - mirrors execute-tool's toolName/input
+      originalToolName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
+      }),
+      originalArgs: responseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        schema: taskInputSchema.optional(),
       }),
     },
   }),

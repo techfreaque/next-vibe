@@ -55,13 +55,16 @@ export function subscribeWakeUpSignal(
  * Publish a wake-up signal for the given thread.
  * Called by resume-stream when a wakeUp deferred result is ready and isStreaming=true.
  * The live stream handles deferred insertion - no insertion happens here.
+ * Returns true if a handler was found and invoked, false if no live stream is registered.
  */
 export function publishWakeUpSignal(
   threadId: string,
   payload: WakeUpPayload,
-): void {
+): boolean {
   const handler = wakeUpHandlers.get(threadId);
   if (handler) {
     handler(payload);
+    return true;
   }
+  return false;
 }

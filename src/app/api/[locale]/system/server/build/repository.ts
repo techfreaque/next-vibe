@@ -20,6 +20,7 @@ import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { GenerateAllRepository } from "../../generators/generate-all/repository";
+import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type { BuildRequestOutput, BuildResponseOutput } from "./definition";
 import type { ServerBuildT } from "./i18n";
 
@@ -38,6 +39,29 @@ export class BuildRepository {
     const output: string[] = [];
     const errors: string[] = [];
     const steps: Array<{ label: string; ok: boolean; skipped: boolean }> = [];
+
+    // If a vibe start server is running on a non-standard port (due to collision),
+    // patch NEXT_PUBLIC_APP_URL to match so the build bakes in the correct port.
+    const runningPort = readPidFilePort(VIBE_START_PID_FILE);
+    if (runningPort !== null) {
+      const currentUrl = process.env["NEXT_PUBLIC_APP_URL"];
+      if (currentUrl) {
+        try {
+          const parsed = new URL(currentUrl);
+          if (
+            parsed.hostname === "localhost" ||
+            parsed.hostname === "127.0.0.1"
+          ) {
+            parsed.port = String(runningPort);
+            Object.assign(process.env, {
+              NEXT_PUBLIC_APP_URL: parsed.toString(),
+            });
+          }
+        } catch {
+          // Not a valid URL - leave unchanged
+        }
+      }
+    }
 
     try {
       output.push(t("post.repository.messages.buildStart"));

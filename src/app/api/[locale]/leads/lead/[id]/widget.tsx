@@ -21,7 +21,7 @@ import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
-import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { ExternalLink as ExternalLinkIcon } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Hash } from "next-vibe-ui/ui/icons/Hash";
 import { Globe } from "next-vibe-ui/ui/icons/Globe";
 import { Info } from "next-vibe-ui/ui/icons/Info";
@@ -43,7 +43,7 @@ import { User } from "next-vibe-ui/ui/icons/User";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
-import { Link } from "next-vibe-ui/ui/link";
+import { ExternalLink } from "next-vibe-ui/ui/link";
 import {
   Select,
   SelectContent,
@@ -738,15 +738,15 @@ function OverviewTab({
             {contactDetails.website && (
               <Div className="flex items-center gap-2">
                 <Globe className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                <Link
+                <ExternalLink
                   href={contactDetails.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-600 dark:text-blue-400 hover:underline truncate flex items-center gap-1"
                 >
                   {contactDetails.website}
-                  <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                </Link>
+                  <ExternalLinkIcon className="h-3 w-3 flex-shrink-0" />
+                </ExternalLink>
               </Div>
             )}
             <InfoRow
@@ -1170,7 +1170,7 @@ function LinkedIdentitiesTab({
                         onClick={() => onViewLinkedLead(link.linkedLeadId)}
                         className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
                       >
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLinkIcon className="h-3 w-3" />
                       </Button>
                     </Div>
                   </Div>
@@ -1248,7 +1248,7 @@ function LinkedIdentitiesTab({
                         onClick={() => onViewUserProfile(link.userId)}
                         className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
                       >
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLinkIcon className="h-3 w-3" />
                       </Button>
                     </Div>
                   </Div>

@@ -20,9 +20,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/admin/messenger/campaigns/journeys`);
 }
 
-// oxlint-disable-next-line no-unused-vars
-export function TanstackPage(_props: LeadsEmailsRedirectPageData): never {
-  redirect("/");
+export function TanstackPage(props: LeadsEmailsRedirectPageData): never {
+  redirect(`/${props.locale}/admin/messenger/campaigns/journeys`);
 }
 
 export default async function LeadsEmailsPage({

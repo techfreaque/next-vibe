@@ -120,8 +120,14 @@ export class SingleFavoriteRepository {
 
       // Build modelSelection response
       // If favorite has custom selection, return it; otherwise return null (use character defaults)
+      // Normalize empty objects (legacy data) to null - they fail discriminated union validation
+      const rawModelSelection = favorite.modelSelection;
       const modelSelection: FavoriteGetResponseOutput["modelSelection"] =
-        favorite.modelSelection ?? null;
+        rawModelSelection !== null &&
+        rawModelSelection !== undefined &&
+        "selectionType" in rawModelSelection
+          ? rawModelSelection
+          : null;
 
       const characterModelSelection: FavoriteGetResponseOutput["characterModelSelection"] =
         character.modelSelection;
