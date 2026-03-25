@@ -290,7 +290,8 @@ export const translations: typeof enTranslations = {
   input: {
     placeholder: "Geben Sie Ihre Nachricht ein...",
     imagePlaceholder: "Beschreiben Sie das Bild, das Sie generieren möchten...",
-    audioPlaceholder: "Beschreiben Sie die Musik oder den Klang, den Sie generieren möchten...",
+    audioPlaceholder:
+      "Beschreiben Sie die Musik oder den Klang, den Sie generieren möchten...",
     noPermission: "Sie haben keine Berechtigung, Nachrichten zu posten",
     noPostPermission:
       "Sie haben keine Berechtigung, Nachrichten in diesem Thread zu posten",

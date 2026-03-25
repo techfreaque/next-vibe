@@ -1,6 +1,12 @@
 "use client";
 
+import { Audio } from "next-vibe-ui/ui/audio";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Image } from "next-vibe-ui/ui/image";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { Download } from "next-vibe-ui/ui/icons/Download";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import { cn } from "next-vibe/shared/utils";
@@ -200,25 +206,161 @@ interface AssistantContentMessageProps {
   locale: CountryLanguage;
 }
 
+/**
+ * Copy/Download action buttons for generated media (image or audio).
+ */
+function MediaActions({
+  url,
+  type,
+  locale,
+}: {
+  url: string;
+  type: "image" | "audio" | "video";
+  locale: CountryLanguage;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback((): void => {
+    if (type === "image") {
+      // Copy image bytes to clipboard
+      void fetch(url)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const mimeType = blob.type || "image/png";
+          const item = new ClipboardItem({ [mimeType]: blob });
+          return navigator.clipboard.write([item]);
+        })
+        .then(
+          () => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+            return undefined;
+          },
+          () => {
+            // Fallback to URL copy if ClipboardItem not supported
+            void navigator.clipboard.writeText(url).then(
+              () => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+                return undefined;
+              },
+              () => undefined,
+            );
+          },
+        );
+    } else {
+      // For audio/video just copy the URL
+      void navigator.clipboard.writeText(url).then(
+        () => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          return undefined;
+        },
+        () => undefined,
+      );
+    }
+  }, [url, type]);
+
+  const handleDownload = useCallback((): void => {
+    const ext = type === "image" ? "jpg" : type === "audio" ? "mp3" : "mp4";
+    const filename = `generated-${type}-${Date.now()}.${ext}`;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.target = "_blank";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, [url, type]);
+
+  const copyLabel = copied
+    ? t("widget.common.generatedMediaActions.copied")
+    : t("widget.common.generatedMediaActions.copy");
+
+  return (
+    <Div className="flex items-center gap-1 mt-1.5">
+      <Button
+        variant="ghost"
+        size="unset"
+        onClick={handleCopy}
+        title={copyLabel}
+        className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground"
+      >
+        {copied ? (
+          <Check className="h-3.5 w-3.5 text-green-500" />
+        ) : (
+          <Copy className="h-3.5 w-3.5" />
+        )}
+        {copyLabel}
+      </Button>
+      <Button
+        variant="ghost"
+        size="unset"
+        onClick={handleDownload}
+        title={t("widget.common.generatedMediaActions.download")}
+        className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground"
+      >
+        <Download className="h-3.5 w-3.5" />
+        {t("widget.common.generatedMediaActions.download")}
+      </Button>
+    </Div>
+  );
+}
+
 const AssistantContentMessage = memo(
   function AssistantContentMessage({
     message,
     hasContentAfter,
     collapseState,
+    locale,
   }: AssistantContentMessageProps): JSX.Element | null {
     const content = message.content ?? "";
-    if (!content.trim()) {
+    const generatedMedia = message.metadata?.generatedMedia;
+
+    if (!content.trim() && !generatedMedia) {
       return null;
     }
 
     return (
       <Div className="mb-3 last:mb-0">
-        <Markdown
-          content={content}
-          messageId={message.id}
-          hasContentAfter={hasContentAfter}
-          collapseState={collapseState ?? undefined}
-        />
+        {content.trim() ? (
+          <Markdown
+            content={content}
+            messageId={message.id}
+            hasContentAfter={hasContentAfter}
+            collapseState={collapseState ?? undefined}
+          />
+        ) : null}
+        {/* Generated Media (image / audio) */}
+        {generatedMedia ? (
+          generatedMedia.type === "image" && generatedMedia.url ? (
+            <Div className="mt-2 max-w-lg">
+              <Image
+                src={generatedMedia.url}
+                alt={generatedMedia.prompt ?? "Generated image"}
+                unoptimized
+                width={1024}
+                height={1024}
+                className="rounded-lg w-full h-auto"
+              />
+              <MediaActions
+                url={generatedMedia.url}
+                type="image"
+                locale={locale}
+              />
+            </Div>
+          ) : generatedMedia.type === "audio" && generatedMedia.url ? (
+            <Div className="mt-2 w-full">
+              <Audio src={generatedMedia.url} controls className="w-full" />
+              <MediaActions
+                url={generatedMedia.url}
+                type="audio"
+                locale={locale}
+              />
+            </Div>
+          ) : null
+        ) : null}
         {/* File Attachments */}
         {message.metadata?.attachments &&
           message.metadata.attachments.length > 0 && (
@@ -234,6 +376,8 @@ const AssistantContentMessage = memo(
       prevProps.message.content === nextProps.message.content &&
       prevProps.message.metadata?.attachments ===
         nextProps.message.metadata?.attachments &&
+      prevProps.message.metadata?.generatedMedia ===
+        nextProps.message.metadata?.generatedMedia &&
       prevProps.message.metadata?.isCompacting ===
         nextProps.message.metadata?.isCompacting &&
       prevProps.message.metadata?.compactedMessageCount ===

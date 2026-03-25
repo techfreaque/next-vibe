@@ -157,6 +157,8 @@ export interface MessageMetadata {
   // Reasoning metadata (for ASSISTANT messages with reasoning)
   isReasoning?: boolean;
   isStreaming?: boolean;
+  /** Client-only: marks an optimistic placeholder added before server confirms */
+  isOptimistic?: boolean;
 
   // Voice input metadata (for USER messages with audio input)
   isTranscribing?: boolean;

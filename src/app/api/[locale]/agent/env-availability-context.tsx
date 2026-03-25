@@ -26,6 +26,9 @@ const ALL_AVAILABLE: AgentEnvAvailability = {
   gabAI: true,
   veniceAI: true,
   scrappey: true,
+  openAiImages: true,
+  replicate: true,
+  falAi: true,
 };
 
 const EnvAvailabilityContext =

@@ -19,9 +19,16 @@ export interface ModelFeatures {
   imageInput: boolean;
   pdfInput: boolean;
   imageOutput: boolean;
+  audioOutput: boolean;
   streaming: boolean;
   toolCalling: boolean;
 }
+
+/**
+ * Model type discriminant - determines which interface the UI renders
+ * and which backend endpoint to route to.
+ */
+export type ModelType = "text" | "image" | "video" | "audio";
 
 /**
  * Available AI model identifiers for the chat system.
@@ -45,6 +52,7 @@ export enum ModelId {
   GPT_5_MINI = "gpt-5-mini",
   GPT_5_NANO = "gpt-5-nano",
   GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS = "gemini-3.1-pro-preview-customtools",
+  GEMINI_3_1_FLASH_IMAGE_PREVIEW = "gemini-3.1-flash-image-preview",
   GEMINI_3_1_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
   GEMINI_3_PRO = "gemini-3-pro",
   GEMINI_3_FLASH = "gemini-3-flash",
@@ -90,6 +98,25 @@ export enum ModelId {
   CLAUDE_CODE_HAIKU = "claude-code-haiku",
   CLAUDE_CODE_SONNET = "claude-code-sonnet",
   CLAUDE_CODE_OPUS = "claude-code-opus",
+
+  // Image generation models
+  DALL_E_3 = "dall-e-3",
+  GPT_IMAGE_1 = "gpt-image-1",
+  FLUX_SCHNELL = "flux-schnell",
+  FLUX_PRO = "flux-pro",
+  SDXL = "sdxl",
+  FLUX_2_MAX = "flux-2-max",
+  FLUX_2_KLEIN_4B = "flux-2-klein-4b",
+  RIVERFLOW_V2_PRO = "riverflow-v2-pro",
+  RIVERFLOW_V2_FAST = "riverflow-v2-fast",
+  RIVERFLOW_V2_MAX_PREVIEW = "riverflow-v2-max-preview",
+  RIVERFLOW_V2_STANDARD_PREVIEW = "riverflow-v2-standard-preview",
+  SEEDREAM_4_5 = "seedream-4.5",
+
+  // Music generation models
+  MUSICGEN_STEREO = "musicgen-stereo",
+  STABLE_AUDIO = "stable-audio",
+  UDIO_V2 = "udio-v2",
 }
 
 /**
@@ -102,6 +129,9 @@ export enum ApiProvider {
   FREEDOMGPT = "freedomgpt",
   UNCENSORED_AI = "uncensored-ai",
   VENICE_AI = "venice-ai",
+  OPENAI_IMAGES = "openai-images",
+  REPLICATE = "replicate",
+  FAL_AI = "fal-ai",
 }
 
 // eslint-disable-next-line i18next/no-literal-string -- API provider names are technical identifiers
@@ -112,6 +142,9 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
   [ApiProvider.FREEDOMGPT]: "FreedomGPT",
   [ApiProvider.UNCENSORED_AI]: "Uncensored.ai",
   [ApiProvider.VENICE_AI]: "Venice.ai",
+  [ApiProvider.OPENAI_IMAGES]: "OpenAI Images",
+  [ApiProvider.REPLICATE]: "Replicate",
+  [ApiProvider.FAL_AI]: "Fal.ai",
 };
 
 /**
@@ -137,9 +170,49 @@ export interface ModelProviderConfigCreditBased {
   outputTokenCost?: never;
   adminOnly?: boolean;
 }
+export interface ModelProviderConfigImageBased {
+  id: ModelId;
+  apiProvider: ApiProvider;
+  providerModel: string;
+  /** Fixed credits per generated image */
+  creditCostPerImage: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+  adminOnly?: boolean;
+}
+export interface ModelProviderConfigVideoBased {
+  id: ModelId;
+  apiProvider: ApiProvider;
+  providerModel: string;
+  /** Credits per second of generated video */
+  creditCostPerSecond: number;
+  /** Default duration for upfront balance check */
+  defaultDurationSeconds: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+  adminOnly?: boolean;
+}
+export interface ModelProviderConfigAudioBased {
+  id: ModelId;
+  apiProvider: ApiProvider;
+  providerModel: string;
+  /** Fixed credits per generated audio clip */
+  creditCostPerClip: number;
+  /** Default duration in seconds for upfront balance check */
+  defaultDurationSeconds: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+  adminOnly?: boolean;
+}
 export type ModelProviderConfig =
   | ModelProviderConfigTokenBased
-  | ModelProviderConfigCreditBased;
+  | ModelProviderConfigCreditBased
+  | ModelProviderConfigImageBased
+  | ModelProviderConfigVideoBased
+  | ModelProviderConfigAudioBased;
 
 /**
  * Model definition - canonical source of truth for each conceptual model.
@@ -160,6 +233,8 @@ export interface ModelDefinition {
   content: typeof ContentLevelValue;
   features: ModelFeatures;
   weaknesses?: (typeof ModelUtilityValue)[];
+  /** Discriminant: determines routing and UI mode. Defaults to "text". */
+  modelType?: ModelType;
 }
 
 /**
@@ -205,6 +280,8 @@ export interface ModelOptionBase {
   weaknesses?: (typeof ModelUtilityValue)[];
   /** Whether this model variant is only visible to admin users */
   adminOnly?: boolean;
+  /** Discriminant: "text" (default), "image", or "video" */
+  modelType: ModelType;
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
   creditCost: typeof calculateCreditCost;
@@ -218,8 +295,34 @@ export interface ModelOptionCreditBased extends ModelOptionBase {
   inputTokenCost?: never;
   outputTokenCost?: never;
 }
+export interface ModelOptionImageBased extends ModelOptionBase {
+  creditCostPerImage: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+}
+export interface ModelOptionVideoBased extends ModelOptionBase {
+  creditCostPerSecond: number;
+  defaultDurationSeconds: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+}
 
-export type ModelOption = ModelOptionTokenBased | ModelOptionCreditBased;
+export interface ModelOptionAudioBased extends ModelOptionBase {
+  creditCostPerClip: number;
+  defaultDurationSeconds: number;
+  creditCost?: never;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+}
+
+export type ModelOption =
+  | ModelOptionTokenBased
+  | ModelOptionCreditBased
+  | ModelOptionImageBased
+  | ModelOptionVideoBased
+  | ModelOptionAudioBased;
 
 export interface ModelProvider {
   name: string;
@@ -291,6 +394,26 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "Gab AI",
     icon: "gab-ai-logo",
   },
+  blackForestLabs: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Black Forest Labs",
+    icon: "image",
+  },
+  stabilityAI: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Stability AI",
+    icon: "image",
+  },
+  meta: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Meta",
+    icon: "music",
+  },
+  udio: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Udio",
+    icon: "music",
+  },
 };
 
 // Default features for models without specific features
@@ -298,6 +421,7 @@ const defaultFeatures: ModelFeatures = {
   imageInput: false,
   pdfInput: false,
   imageOutput: false,
+  audioOutput: false,
   streaming: true,
   toolCalling: false,
 };
@@ -1887,6 +2011,38 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       toolCalling: true,
     },
   },
+  [ModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW]: {
+    name: "Gemini 3.1 Flash Image Preview",
+    by: "google",
+    description: "chat.models.descriptions.gemini31FlashImagePreview",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    providers: [
+      {
+        id: ModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3.1-flash-image-preview",
+        creditCostPerImage: 8, // updated by media-prices updater
+      },
+    ],
+
+    utilities: [
+      ModelUtility.CHAT,
+      ModelUtility.CREATIVE,
+      ModelUtility.IMAGE_GEN,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      imageOutput: true,
+    },
+    modelType: "image",
+  },
   [ModelId.GEMINI_3_1_FLASH_LITE_PREVIEW]: {
     name: "Gemini 3.1 Flash Lite Preview",
     by: "google",
@@ -2169,6 +2325,443 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
     weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
   },
+
+  // =============================================
+  // IMAGE GENERATION MODELS
+  // =============================================
+
+  [ModelId.DALL_E_3]: {
+    name: "DALL-E 3",
+    by: "openAI",
+    description: "chat.models.descriptions.dallE3",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-openai",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.DALL_E_3,
+        apiProvider: ApiProvider.OPENAI_IMAGES,
+        providerModel: "dall-e-3",
+        creditCostPerImage: 4, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.GPT_IMAGE_1]: {
+    name: "GPT-Image-1",
+    by: "openAI",
+    description: "chat.models.descriptions.gptImage1",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-openai",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.GPT_IMAGE_1,
+        apiProvider: ApiProvider.OPENAI_IMAGES,
+        providerModel: "gpt-image-1",
+        creditCostPerImage: 2,
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.FLUX_SCHNELL]: {
+    name: "Flux Schnell",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.fluxSchnell",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_SCHNELL,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux-schnell",
+        creditCostPerImage: 1, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.FLUX_PRO]: {
+    name: "Flux Pro",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.fluxPro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_PRO,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "black-forest-labs/flux-1.1-pro",
+        creditCostPerImage: 4, // $0.04 + 30% markup
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.SDXL]: {
+    name: "Stable Diffusion XL",
+    by: "stabilityAI",
+    description: "chat.models.descriptions.sdxl",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.SDXL,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "stability-ai/sdxl",
+        creditCostPerImage: 0.44, // ~$0.0044/image (p50) + 30% markup
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+
+  [ModelId.FLUX_2_MAX]: {
+    name: "FLUX.2 Max",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Max",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_MAX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-max",
+        creditCostPerImage: 9, // ~$0.07/MP first + $0.03/MP subsequent + 30% markup
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.FLUX_2_KLEIN_4B]: {
+    name: "FLUX.2 Klein 4B",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Klein4b",
+    parameterCount: 4,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_KLEIN_4B,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-klein-4b",
+        creditCostPerImage: 2, // $0.014/MP first + $0.001/MP subsequent + 30% markup
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_PRO]: {
+    name: "Riverflow V2 Pro",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2Pro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-pro",
+        creditCostPerImage: 20, // $0.15/image + 30% markup
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_FAST]: {
+    name: "Riverflow V2 Fast",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2Fast",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_FAST,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-fast",
+        creditCostPerImage: 3, // $0.02/image + 30% markup
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_MAX_PREVIEW]: {
+    name: "Riverflow V2 Max Preview",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2MaxPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_MAX_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-max-preview",
+        creditCostPerImage: 10, // $0.075/image + 30% markup
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_STANDARD_PREVIEW]: {
+    name: "Riverflow V2 Standard Preview",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2StandardPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-standard-preview",
+        creditCostPerImage: 5, // $0.035/image + 30% markup
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.SEEDREAM_4_5]: {
+    name: "Seedream 4.5",
+    by: "byteDanceSeed",
+    description: "chat.models.descriptions.seedream45",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.SEEDREAM_4_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "bytedance-seed/seedream-4.5",
+        creditCostPerImage: 5, // $0.04/image + 30% markup
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+
+  // =============================================
+  // MUSIC GENERATION MODELS
+  // =============================================
+
+  [ModelId.MUSICGEN_STEREO]: {
+    name: "MusicGen Stereo",
+    by: "meta",
+    description: "chat.models.descriptions.musicgenStereo",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.MUSICGEN_STEREO,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "meta/musicgen",
+        creditCostPerClip: 5.3999999999999995, // $0.054/8s clip (p50) + 30% markup
+        defaultDurationSeconds: 8,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      audioOutput: true,
+    },
+  },
+
+  [ModelId.STABLE_AUDIO]: {
+    name: "Stable Audio",
+    by: "stabilityAI",
+    description: "chat.models.descriptions.stableAudio",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.STABLE_AUDIO,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "stability-ai/stable-audio",
+        creditCostPerClip: 26, // ~$0.02 + 30% markup
+        defaultDurationSeconds: 20,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      audioOutput: true,
+    },
+  },
+
+  [ModelId.UDIO_V2]: {
+    name: "Udio v2",
+    by: "udio",
+    description: "chat.models.descriptions.udioV2",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.UDIO_V2,
+        apiProvider: ApiProvider.FAL_AI,
+        providerModel: "fal-ai/udio",
+        creditCostPerClip: 5, // ~$0.04 + 30% markup
+        defaultDurationSeconds: 30,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      audioOutput: true,
+    },
+  },
 };
 /* eslint-enable i18next/no-literal-string */
 
@@ -2199,9 +2792,27 @@ function buildModelOptions(): Record<string, ModelOption> {
         features: def.features,
         weaknesses: def.weaknesses,
         adminOnly: provider.adminOnly,
+        modelType: def.modelType ?? "text",
       };
 
-      if (typeof provider.creditCost === "number") {
+      if ("creditCostPerImage" in provider) {
+        result[provider.id] = {
+          ...base,
+          creditCostPerImage: provider.creditCostPerImage,
+        } as ModelOptionImageBased;
+      } else if ("creditCostPerClip" in provider) {
+        result[provider.id] = {
+          ...base,
+          creditCostPerClip: provider.creditCostPerClip,
+          defaultDurationSeconds: provider.defaultDurationSeconds,
+        } as ModelOptionAudioBased;
+      } else if ("creditCostPerSecond" in provider) {
+        result[provider.id] = {
+          ...base,
+          creditCostPerSecond: provider.creditCostPerSecond,
+          defaultDurationSeconds: provider.defaultDurationSeconds,
+        } as ModelOptionVideoBased;
+      } else if (typeof provider.creditCost === "number") {
         result[provider.id] = {
           ...base,
           creditCost: provider.creditCost,
@@ -2372,6 +2983,22 @@ export function calculateCreditCost(
   cachedInputTokens = 0,
   cacheWriteTokens = 0,
 ): number {
+  // Handle fixed-cost media generation models
+  // Stored value is raw API cost in credits; apply markup at call time
+  if ("creditCostPerImage" in modelOption) {
+    return modelOption.creditCostPerImage * (1 + STANDARD_MARKUP_PERCENTAGE);
+  }
+  if ("creditCostPerClip" in modelOption) {
+    return modelOption.creditCostPerClip * (1 + STANDARD_MARKUP_PERCENTAGE);
+  }
+  if ("creditCostPerSecond" in modelOption) {
+    return (
+      modelOption.creditCostPerSecond *
+      modelOption.defaultDurationSeconds *
+      (1 + STANDARD_MARKUP_PERCENTAGE)
+    );
+  }
+
   // Handle credit-based models (fixed cost per message)
   if (typeof modelOption.creditCost === "number") {
     return modelOption.creditCost;

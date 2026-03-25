@@ -465,6 +465,32 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
+      // === GENERATIVE MEDIA SETTINGS (image/audio models) ===
+      imageSize: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.imageSize.label",
+        description: "post.imageSize.description",
+        columns: 4,
+        schema: z.string().optional(),
+      }),
+      imageQuality: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.imageQuality.label",
+        description: "post.imageQuality.description",
+        columns: 4,
+        schema: z.string().optional(),
+      }),
+      musicDuration: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.musicDuration.label",
+        description: "post.musicDuration.description",
+        columns: 4,
+        schema: z.string().optional(),
+      }),
+
       // === RESPONSE FIELDS ===
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

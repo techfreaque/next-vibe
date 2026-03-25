@@ -34,15 +34,13 @@ export const translations = {
       standard: "Standard",
       hd: "HD",
     },
-    threadId: {
-      label: "Thread-ID",
-      description:
-        "Optionale Thread-ID, um das generierte Bild als Chat-Nachricht zu speichern",
+    submitButton: {
+      text: "Bild generieren",
+      loadingText: "Generiere...",
     },
     response: {
       imageUrl: "URL des generierten Bildes",
       creditCost: "Verwendete Credits",
-      messageId: "Nachrichten-ID",
     },
     errors: {
       validation_failed: {

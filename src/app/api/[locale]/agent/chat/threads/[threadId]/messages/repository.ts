@@ -23,6 +23,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { DefaultFolderId } from "../../../config";
 import {
   chatFolders,
   chatMessages,
@@ -30,7 +31,11 @@ import {
   type ChatMessage,
   type ToolCall,
 } from "../../../db";
-import { ChatMessageRole, type ChatMessageRoleDB } from "../../../enum";
+import {
+  ChatMessageRole,
+  type ChatMessageRoleDB,
+  ThreadStatusDB,
+} from "../../../enum";
 import {
   canPostInThread,
   canViewThread,
@@ -797,6 +802,137 @@ export class MessagesRepository {
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
+   * Persist a user prompt + assistant generatedMedia response to the thread.
+   * Called by image-generation and music-generation repositories when threadId is provided.
+   * Returns the IDs of both created messages.
+   */
+  static async createGeneratedMediaMessage(params: {
+    threadId: string;
+    userMessageId: string;
+    assistantMessageId: string;
+    prompt: string;
+    model: ModelId;
+    skill: string;
+    generatedMedia: {
+      type: "image" | "audio";
+      url: string;
+      creditCost: number;
+    };
+    userId: string | undefined;
+    leadId?: string | null;
+    rootFolderId?: string;
+    subFolderId?: string | null;
+    logger: EndpointLogger;
+  }): Promise<
+    ResponseType<{ userMessageId: string; assistantMessageId: string }>
+  > {
+    try {
+      const now = new Date();
+
+      // Ensure thread exists — for Mode A (image/audio) the client pre-creates the
+      // thread optimistically but the DB row may not exist yet when we get here.
+      const [existingThread] = await db
+        .select({ id: chatThreads.id })
+        .from(chatThreads)
+        .where(eq(chatThreads.id, params.threadId))
+        .limit(1);
+
+      if (!existingThread) {
+        await db.insert(chatThreads).values({
+          id: params.threadId,
+          title: params.prompt.slice(0, 80) || "New Chat",
+          rootFolderId:
+            (params.rootFolderId as DefaultFolderId | undefined) ??
+            DefaultFolderId.PRIVATE,
+          folderId: params.subFolderId ?? null,
+          userId: params.userId ?? null,
+          leadId: params.leadId ?? null,
+          status: ThreadStatusDB[0],
+          createdAt: now,
+          updatedAt: now,
+        });
+        params.logger.debug("Auto-created thread for generated media", {
+          threadId: params.threadId,
+        });
+      }
+
+      // Find the current leaf message (latest in thread) to use as parent
+      const [lastMessage] = await db
+        .select({ id: chatMessages.id })
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, params.threadId))
+        .orderBy(desc(chatMessages.createdAt))
+        .limit(1);
+
+      const parentId = lastMessage?.id ?? null;
+
+      // Insert user message (the prompt)
+      await db.insert(chatMessages).values({
+        id: params.userMessageId,
+        threadId: params.threadId,
+        role: ChatMessageRole.USER,
+        content: params.prompt,
+        parentId,
+        authorId: params.userId ?? null,
+        isAI: false,
+        createdAt: now,
+      });
+
+      // Insert assistant message (the generated media)
+      await db.insert(chatMessages).values({
+        id: params.assistantMessageId,
+        threadId: params.threadId,
+        role: ChatMessageRole.ASSISTANT,
+        content: null,
+        parentId: params.userMessageId,
+        authorId: null,
+        isAI: true,
+        model: params.model,
+        skill: params.skill,
+        metadata: {
+          generatedMedia: {
+            type: params.generatedMedia.type,
+            url: params.generatedMedia.url,
+            prompt: params.prompt,
+            modelId: params.model,
+            creditCost: params.generatedMedia.creditCost,
+            status: "complete" as const,
+          },
+        },
+        createdAt: new Date(now.getTime() + 1), // 1ms after user message
+      });
+
+      // Update thread's updatedAt
+      await db
+        .update(chatThreads)
+        .set({ updatedAt: now })
+        .where(eq(chatThreads.id, params.threadId));
+
+      params.logger.debug("Created generated media messages", {
+        userMessageId: params.userMessageId,
+        assistantMessageId: params.assistantMessageId,
+        threadId: params.threadId,
+        type: params.generatedMedia.type,
+      });
+
+      return success({
+        userMessageId: params.userMessageId,
+        assistantMessageId: params.assistantMessageId,
+      });
+    } catch (error) {
+      params.logger.error(
+        "Failed to persist generated media message",
+        parseError(error),
+      );
+      // Non-fatal - return success anyway since generation succeeded
+      return success({
+        userMessageId: params.userMessageId,
+        assistantMessageId: params.assistantMessageId,
       });
     }
   }

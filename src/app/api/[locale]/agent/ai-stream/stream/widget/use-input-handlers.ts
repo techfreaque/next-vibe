@@ -11,6 +11,7 @@ import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { useChatInputStore } from "../hooks/input-store";
 import { clearDraft } from "../hooks/use-input-autosave";
 
 // Utility functions
@@ -36,6 +37,11 @@ interface UseInputHandlersProps {
       audioInput?: { file: File };
       /** File attachments */
       attachments: File[];
+      /** Image generation settings */
+      imageSize?: string;
+      imageQuality?: string;
+      /** Music generation settings */
+      musicDuration?: string;
     },
     onNewThread?: (
       threadId: string,
@@ -70,6 +76,10 @@ export function useInputHandlers({
   logger,
   draftKey,
 }: UseInputHandlersProps): UseInputHandlersReturn {
+  const imageSize = useChatInputStore((s) => s.imageSize);
+  const imageQuality = useChatInputStore((s) => s.imageQuality);
+  const musicDuration = useChatInputStore((s) => s.musicDuration);
+
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
   const startStream = useChatNavigationStore((s) => s.startStream);
@@ -102,7 +112,7 @@ export function useInputHandlers({
       };
 
       const result = await sendMessage(
-        { content: input, attachments },
+        { content: input, attachments, imageSize, imageQuality, musicDuration },
         (threadId, rootFolderId, subFolderId) => {
           // Navigate to the newly created thread
           logger.debug("Chat", "Navigating to newly created thread", {
@@ -167,6 +177,9 @@ export function useInputHandlers({
     navActiveThreadId,
     navRootFolderId,
     navSubFolderId,
+    imageSize,
+    imageQuality,
+    musicDuration,
   ]);
 
   /**
@@ -196,7 +209,7 @@ export function useInputHandlers({
         };
 
         const result = await sendMessage(
-          { content, attachments },
+          { content, attachments, imageSize, imageQuality, musicDuration },
           (threadId, rootFolderId, subFolderId) => {
             logger.debug("Chat", "Navigating to newly created thread", {
               threadId,
@@ -249,6 +262,9 @@ export function useInputHandlers({
       navActiveThreadId,
       navRootFolderId,
       navSubFolderId,
+      imageSize,
+      imageQuality,
+      musicDuration,
     ],
   );
 

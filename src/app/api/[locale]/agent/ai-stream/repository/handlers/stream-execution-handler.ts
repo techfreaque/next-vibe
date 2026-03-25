@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
+import type { JSONValue, LanguageModel, ModelMessage } from "ai";
 import {
   streamText as aiStreamText,
   stepCountIs,
@@ -67,6 +67,9 @@ export class StreamExecutionHandler {
     logger: EndpointLogger;
     t: AiStreamT;
     streamContext: ToolExecutionContext;
+    imageSize?: string;
+    imageQuality?: string;
+    musicDuration?: string;
   }): Promise<void> {
     const {
       provider,
@@ -112,12 +115,65 @@ export class StreamExecutionHandler {
     // accumulate across many steps. We abort at 90% to leave headroom.
     const contextGuardThreshold = Math.floor(modelConfig.contextWindow * 0.9);
 
+    // Build generation settings for custom media providers.
+    // providerOptions must be Record<string, JSONObject> (provider-keyed objects).
+    // We use the "generation" key; custom providers read options.providerOptions?.["generation"].
+    const { imageSize, imageQuality, musicDuration } = params;
+    const generationSettings: Record<string, string> = {};
+    if (imageSize) {
+      generationSettings["imageSize"] = imageSize;
+    }
+    if (imageQuality) {
+      generationSettings["imageQuality"] = imageQuality;
+    }
+    if (musicDuration) {
+      generationSettings["musicDuration"] = musicDuration;
+    }
+    const hasGenerationSettings = Object.keys(generationSettings).length > 0;
+
+    // Extract user prompt for generated media metadata (image/audio models).
+    // Walk messages backwards to find the last user text part.
+    let mediaPrompt = "";
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const msg = messages[i];
+      if (msg?.role === "user") {
+        const content = msg.content;
+        if (typeof content === "string") {
+          mediaPrompt = content.trim();
+        } else if (Array.isArray(content)) {
+          mediaPrompt = content
+            .filter(
+              (p): p is { type: "text"; text: string } => p.type === "text",
+            )
+            .map((p) => p.text)
+            .join(" ")
+            .trim();
+        }
+        if (mediaPrompt) {
+          break;
+        }
+      }
+    }
+
+    const mediaCreditCost = calculateCreditCost(modelConfig, 0, 0, 0, 0);
+
+    const providerOptions: Record<string, Record<string, JSONValue>> = {};
+    if (hasGenerationSettings) {
+      providerOptions["generation"] = generationSettings;
+    }
+    if (modelConfig.features.imageOutput) {
+      providerOptions["openrouter"] = {
+        modalities: ["text", "image"] as JSONValue,
+      };
+    }
+
     const streamResult = aiStreamText({
-      model: provider.chat(modelConfig.providerModel),
+      model: provider.chat(modelConfig.providerModel) as LanguageModel,
       messages,
       temperature: DEFAULT_TEMPERATURE,
       abortSignal: streamAbortController.signal,
       system: systemWithCacheControl,
+      ...(Object.keys(providerOptions).length > 0 ? { providerOptions } : {}),
       ...(tools
         ? {
             tools,
@@ -178,6 +234,8 @@ export class StreamExecutionHandler {
           logger,
           t,
           streamContext: params.streamContext,
+          mediaPrompt,
+          mediaCreditCost,
         });
 
         if (shouldAbort) {

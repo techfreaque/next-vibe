@@ -171,8 +171,8 @@ export async function setupAiStream(params: {
   maxDuration: number;
   request: NextRequest | undefined;
   extraInstructions: string | undefined;
-  headless: boolean | undefined;
   excludeMemories: boolean | undefined;
+  headless: boolean | undefined;
   /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
   favoriteIdOverride: string | undefined;
 }): Promise<ResponseType<StreamSetupResult>> {
@@ -300,6 +300,16 @@ export async function setupAiStream(params: {
         return agentEnv.VENICE_AI_API_KEY
           ? null
           : buildMissingKeyMessage("veniceAI");
+      case ApiProvider.OPENAI_IMAGES:
+        return agentEnv.OPENAI_API_KEY
+          ? null
+          : buildMissingKeyMessage("openAiImages");
+      case ApiProvider.REPLICATE:
+        return agentEnv.REPLICATE_API_TOKEN
+          ? null
+          : buildMissingKeyMessage("replicate");
+      case ApiProvider.FAL_AI:
+        return agentEnv.FAL_AI_API_KEY ? null : buildMissingKeyMessage("falAi");
       case ApiProvider.CLAUDE_CODE:
         // Agent SDK authenticates via OAuth login, no separate API key needed
         return null;

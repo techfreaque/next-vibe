@@ -28,15 +28,13 @@ export const translations = {
       medium: "Medium (~20s)",
       long: "Long (~30s)",
     },
-    threadId: {
-      label: "Thread ID",
-      description:
-        "Optional thread ID to store the generated audio as a chat message",
+    submitButton: {
+      text: "Generate Music",
+      loadingText: "Generating...",
     },
     response: {
       audioUrl: "Generated audio URL",
       creditCost: "Credits used",
-      messageId: "Message ID",
       durationSeconds: "Duration in seconds",
     },
     errors: {

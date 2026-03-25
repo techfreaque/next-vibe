@@ -16,7 +16,7 @@ import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum
 import { DEFAULT_TTS_VOICE } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-
+import type { CountryLanguage } from "@/i18n/core/config";
 import type { UseAIStreamReturn } from "./use-ai-stream";
 
 export type StartStreamFn = UseAIStreamReturn["startStream"];
@@ -35,6 +35,11 @@ export interface CreateMessageParams {
     confirmed: boolean;
     updatedArgs?: Record<string, string | number | boolean | null>;
   }>;
+  /** Image generation settings (used when selectedModel.modelType === "image") */
+  imageSize?: string;
+  imageQuality?: string;
+  /** Music generation settings (used when selectedModel.modelType === "audio") */
+  musicDuration?: string;
 }
 
 export interface MessageOperationDeps {
@@ -53,6 +58,7 @@ export interface MessageOperationDeps {
   };
   /** Called immediately after the optimistic user message is added - switches the visible branch */
   setLeafMessageId?: (messageId: string) => void;
+  locale: CountryLanguage;
 }
 
 /**
@@ -174,6 +180,40 @@ export async function createAndSendUserMessage(
       // The auto-switch in useBranchManagement only fires when parentId === currentLeaf,
       // which doesn't hold for retry/branch (they use the grandparent as parentId).
       setLeafMessageId?.(newMessageId!);
+
+      // Add an optimistic assistant placeholder so the group header + loading
+      // indicator appear immediately, before the server emits MESSAGE_CREATED.
+      // Tagged with isOptimistic so event-handlers can remove it when the real
+      // server message arrives (or on error).
+      const optimisticAssistantId = crypto.randomUUID();
+      const optimisticAssistantMessage: ChatMessage = {
+        id: optimisticAssistantId,
+        threadId,
+        role: ChatMessageRole.ASSISTANT,
+        content: "",
+        parentId: newMessageId!,
+        sequenceId: null,
+        authorId: null,
+        authorName: null,
+        isAI: true,
+        model: settings.selectedModel,
+        skill: settings.selectedSkill,
+        errorType: null,
+        errorMessage: null,
+        errorCode: null,
+        metadata: { isStreaming: true, isOptimistic: true },
+        upvotes: 0,
+        downvotes: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        searchVector: null,
+      };
+      upsertMessage(
+        threadId,
+        currentRootFolderId,
+        logger,
+        optimisticAssistantMessage,
+      );
     } else {
       logger.debug("Skipping user message creation for tool confirmations", {
         count: params.toolConfirmations?.length ?? 0,
@@ -208,7 +248,7 @@ export async function createAndSendUserMessage(
       requiresConfirmation: t.requiresConfirmation ?? false,
     }));
 
-    // Start AI stream (same for all operations)
+    // Start AI stream (all model types go through ai-stream, including image/audio)
     // POST is fire-and-forget - WS events handled by useMessagesSubscription
     const streamStarted = await startStream({
       operation,
@@ -229,6 +269,9 @@ export async function createAndSendUserMessage(
       voiceMode: effectiveVoiceMode,
       audioInput: audioInput ?? { file: null },
       timezone,
+      imageSize: params.imageSize,
+      imageQuality: params.imageQuality,
+      musicDuration: params.musicDuration,
     });
 
     if (!streamStarted) {

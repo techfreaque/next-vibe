@@ -16,6 +16,7 @@ import type { AiStreamT } from "../../stream/i18n";
 import { AbortReason, StreamAbortError } from "../core/constants";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
+import { FilePartHandler } from "./file-part-handler";
 import { FinishStepHandler } from "./finish-step-handler";
 import { ReasoningHandler } from "./reasoning-handler";
 import { TextHandler } from "./text-handler";
@@ -49,6 +50,10 @@ export class StreamPartHandler {
     logger: EndpointLogger;
     t: AiStreamT;
     streamContext: ToolExecutionContext;
+    /** Prompt text used for generated media metadata (image/audio models) */
+    mediaPrompt: string;
+    /** Credit cost for the current model (used for generatedMedia metadata) */
+    mediaCreditCost: number;
   }): Promise<{ shouldAbort: boolean }> {
     const {
       part,
@@ -68,7 +73,25 @@ export class StreamPartHandler {
       logger,
       t,
       streamContext,
+      mediaPrompt,
+      mediaCreditCost,
     } = params;
+
+    if (part.type === "file") {
+      await FilePartHandler.processFilePart({
+        file: part.file,
+        ctx,
+        threadId,
+        model,
+        skill,
+        userId,
+        isIncognito,
+        logger,
+        prompt: mediaPrompt,
+        creditCost: mediaCreditCost,
+      });
+      return { shouldAbort: false };
+    }
 
     if (part.type === "finish-step") {
       const { shouldAbort } = await FinishStepHandler.processFinishStep({

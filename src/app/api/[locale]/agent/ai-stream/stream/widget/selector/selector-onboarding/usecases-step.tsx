@@ -8,7 +8,6 @@ import { Briefcase } from "next-vibe-ui/ui/icons/Briefcase";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Code } from "next-vibe-ui/ui/icons/Code";
 import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
-import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { PenTool } from "next-vibe-ui/ui/icons/PenTool";
 import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Span } from "next-vibe-ui/ui/span";
@@ -28,9 +27,9 @@ import type { FiltersModelSelection } from "@/app/api/[locale]/agent/chat/skills
 import {
   ContentLevel,
   IntelligenceLevel,
+  ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-  ModelSelectionType,
   SpeedLevel,
 } from "@/app/api/[locale]/agent/chat/skills/enum";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
@@ -38,25 +37,21 @@ import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/creat
 import favoritesDefinition from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { getModelById, ModelId } from "@/app/api/[locale]/agent/models/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-
-import type { BudgetTier } from "./companion-step";
 
 export type UseCase =
   | "coding"
   | "research"
   | "writing"
   | "business"
-  | "learning"
-  | "chat";
+  | "learning";
 
 const USE_CASE_IDS: UseCase[] = [
   "coding",
@@ -64,7 +59,6 @@ const USE_CASE_IDS: UseCase[] = [
   "writing",
   "business",
   "learning",
-  "chat",
 ];
 
 type UseCaseIcon = React.ComponentType<{ className?: string }>;
@@ -75,7 +69,6 @@ const USE_CASE_ICONS: Record<UseCase, UseCaseIcon> = {
   writing: PenTool,
   business: Briefcase,
   learning: BookOpen,
-  chat: MessageSquare,
 };
 
 const USE_CASE_SKILL_IDS: Record<UseCase, string[]> = {
@@ -84,43 +77,23 @@ const USE_CASE_SKILL_IDS: Record<UseCase, string[]> = {
   writing: ["writer", "editor"],
   business: ["business-advisor", "product-manager"],
   learning: ["tutor", "socraticQuestioner"],
-  chat: [],
 };
 
-interface ProviderFlags {
-  claudeCode: boolean;
-  openRouter: boolean;
-}
-
-function getCompanionModels(
-  budget: BudgetTier,
-  isAdmin: boolean,
-  providers: ProviderFlags,
-): ModelId[] {
-  // Claude Code models are admin-only; prefer them if both admin + provider available
-  const useClaudeCode = isAdmin && providers.claudeCode;
-
-  if (budget === "smart") {
-    // Smart tier: use OpenRouter or Kimi as primary (no Claude Code variant here)
-    return [ModelId.KIMI_K2_5, ModelId.UNCENSORED_LM_V1_2];
-  }
-  if (budget === "brilliant") {
-    const sonnet = useClaudeCode
-      ? ModelId.CLAUDE_CODE_SONNET
-      : ModelId.CLAUDE_SONNET_4_6;
-    return [sonnet, ModelId.KIMI_K2_5, ModelId.UNCENSORED_LM_V1_2];
-  }
-  const opus = useClaudeCode
-    ? ModelId.CLAUDE_CODE_OPUS
-    : ModelId.CLAUDE_OPUS_4_6;
-  return [opus, ModelId.KIMI_K2_5, ModelId.UNCENSORED_LM_V1_2];
-}
-
 function getSpecialistModelSelection(
-  budget: BudgetTier,
+  modelSelection: ModelSelectionSimple,
 ): FiltersModelSelection {
-  const intelligenceMin =
-    budget === "smart" ? IntelligenceLevel.SMART : IntelligenceLevel.BRILLIANT;
+  // Determine a minimum intelligence floor based on the selected companion model
+  let intelligenceMin: (typeof IntelligenceLevel)[keyof typeof IntelligenceLevel] =
+    IntelligenceLevel.SMART;
+  if (
+    modelSelection.selectionType === ModelSelectionType.MANUAL &&
+    modelSelection.manualModelId
+  ) {
+    const model = getModelById(modelSelection.manualModelId);
+    if (model?.intelligence === IntelligenceLevel.BRILLIANT) {
+      intelligenceMin = IntelligenceLevel.BRILLIANT;
+    }
+  }
 
   return {
     selectionType: ModelSelectionType.FILTERS,
@@ -154,10 +127,8 @@ interface SeedResult {
 
 async function seedFavorites(
   companionId: string,
-  budget: BudgetTier,
+  modelSelection: ModelSelectionSimple,
   selected: Set<UseCase>,
-  isAdmin: boolean,
-  providers: ProviderFlags,
   addFavorite: ReturnType<typeof useFavoriteCreate>["addFavorite"],
 ): Promise<SeedResult> {
   const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
@@ -165,30 +136,26 @@ async function seedFavorites(
     return { firstCompanionId: null, entries: [] };
   }
 
-  const companionModels = getCompanionModels(budget, isAdmin, providers);
-  let firstCompanionId: string | null = null;
   const entries: SeededEntry[] = [];
 
-  for (const modelId of companionModels) {
-    const modelSelection: ModelSelectionSimple = {
-      selectionType: ModelSelectionType.MANUAL,
-      manualModelId: modelId,
-    };
-    const id = await addFavorite({
+  // Create one companion favorite with the chosen model
+  const companionFavoriteId = await addFavorite({
+    skillId: companionId,
+    icon: companion.icon,
+    voice: companion.voice,
+    modelSelection,
+  });
+
+  const firstCompanionId = companionFavoriteId ?? null;
+  if (companionFavoriteId) {
+    entries.push({
+      id: companionFavoriteId,
       skillId: companionId,
-      icon: companion.icon,
-      voice: companion.voice,
       modelSelection,
     });
-    if (id) {
-      if (!firstCompanionId) {
-        firstCompanionId = id;
-      }
-      entries.push({ id, skillId: companionId, modelSelection });
-    }
   }
 
-  const specialistModelSelection = getSpecialistModelSelection(budget);
+  const specialistModelSelection = getSpecialistModelSelection(modelSelection);
   const seededSkillIds = new Set<string>();
 
   for (const useCase of USE_CASE_IDS) {
@@ -215,7 +182,7 @@ async function seedFavorites(
 
 interface UsecasesStepProps {
   companionId: string;
-  budget: BudgetTier;
+  modelSelection: ModelSelectionSimple;
   locale: CountryLanguage;
   onDone: () => void;
   onBack: () => void;
@@ -223,7 +190,7 @@ interface UsecasesStepProps {
 
 export function UsecasesStep({
   companionId,
-  budget,
+  modelSelection,
   locale,
   onDone,
   onBack,
@@ -238,11 +205,8 @@ export function UsecasesStep({
   const { addFavorite } = useFavoriteCreate(user, logger);
   const envAvailability = useEnvAvailability();
 
-  const isAdmin =
-    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  const claudeCodeAvailable = envAvailability.claudeCode;
-  const openRouterAvailable = envAvailability.openRouter;
-  const noProviderAvailable = !claudeCodeAvailable && !openRouterAvailable;
+  const noProviderAvailable =
+    !envAvailability.claudeCode && !envAvailability.openRouter;
 
   const toggleUseCase = useCallback((id: UseCase) => {
     setSelected((prev) => {
@@ -296,28 +260,23 @@ export function UsecasesStep({
   );
 
   const handleStart = useCallback(async () => {
-    const providers: ProviderFlags = {
-      claudeCode: claudeCodeAvailable,
-      openRouter: openRouterAvailable,
-    };
     setIsSaving(true);
     try {
       const { firstCompanionId, entries } = await seedFavorites(
         companionId,
-        budget,
+        modelSelection,
         selected,
-        isAdmin,
-        providers,
         addFavorite,
       );
       applyOptimisticFavorites(entries, firstCompanionId);
       onDone();
       if (firstCompanionId && settings?.ttsVoice) {
-        const companionModels = getCompanionModels(budget, isAdmin, providers);
         setActiveFavorite(
           firstCompanionId,
           companionId,
-          companionModels[0],
+          modelSelection.selectionType === ModelSelectionType.MANUAL
+            ? modelSelection.manualModelId
+            : ModelId.KIMI_K2_5,
           settings.ttsVoice,
         );
       }
@@ -327,52 +286,7 @@ export function UsecasesStep({
   }, [
     selected,
     companionId,
-    budget,
-    isAdmin,
-    claudeCodeAvailable,
-    openRouterAvailable,
-    addFavorite,
-    applyOptimisticFavorites,
-    setActiveFavorite,
-    settings?.ttsVoice,
-    onDone,
-  ]);
-
-  const handleSkip = useCallback(async () => {
-    const providers: ProviderFlags = {
-      claudeCode: claudeCodeAvailable,
-      openRouter: openRouterAvailable,
-    };
-    setIsSaving(true);
-    try {
-      const { firstCompanionId, entries } = await seedFavorites(
-        companionId,
-        budget,
-        new Set(),
-        isAdmin,
-        providers,
-        addFavorite,
-      );
-      applyOptimisticFavorites(entries, firstCompanionId);
-      onDone();
-      if (firstCompanionId && settings?.ttsVoice) {
-        const companionModels = getCompanionModels(budget, isAdmin, providers);
-        setActiveFavorite(
-          firstCompanionId,
-          companionId,
-          companionModels[0],
-          settings.ttsVoice,
-        );
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  }, [
-    companionId,
-    budget,
-    isAdmin,
-    claudeCodeAvailable,
-    openRouterAvailable,
+    modelSelection,
     addFavorite,
     applyOptimisticFavorites,
     setActiveFavorite,
@@ -430,8 +344,15 @@ export function UsecasesStep({
         </Div>
       )}
 
+      {/* Hint when nothing selected */}
+      {selected.size === 0 && !noProviderAvailable && (
+        <P className="text-xs text-muted-foreground text-center mb-3 shrink-0">
+          {t("onboarding.usecases.hintNoneSelected")}
+        </P>
+      )}
+
       {/* Start button */}
-      <Div className="mb-2 shrink-0">
+      <Div className="shrink-0">
         <Button
           type="button"
           className="w-full h-11 text-base"
@@ -441,19 +362,6 @@ export function UsecasesStep({
           {isSaving
             ? t("onboarding.usecases.saving")
             : t("onboarding.usecases.start")}
-        </Button>
-      </Div>
-
-      {/* Skip */}
-      <Div className="shrink-0">
-        <Button
-          type="button"
-          variant="ghost"
-          className="w-full h-9 text-sm text-muted-foreground"
-          disabled={isSaving}
-          onClick={handleSkip}
-        >
-          {t("onboarding.usecases.skip")}
         </Button>
       </Div>
     </Div>

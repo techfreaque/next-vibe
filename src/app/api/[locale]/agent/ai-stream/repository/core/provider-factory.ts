@@ -9,8 +9,13 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { createClaudeCode } from "../../providers/claude-code";
+import { createFalAiAudio } from "../../providers/fal-ai-audio";
+import { createFalAiImage } from "../../providers/fal-ai-image";
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";
+import { createOpenAIImages } from "../../providers/openai-images";
+import { createReplicateAudio } from "../../providers/replicate-audio";
+import { createReplicateImage } from "../../providers/replicate-image";
 import { logProviderRequest } from "../../providers/shared/debug-file-logger";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 import { createVeniceAI } from "../../providers/venice-ai";
@@ -72,6 +77,11 @@ export class ProviderFactory {
     | typeof createGabAI
     | typeof createVeniceAI
     | typeof createClaudeCode
+    | typeof createOpenAIImages
+    | typeof createReplicateImage
+    | typeof createFalAiImage
+    | typeof createReplicateAudio
+    | typeof createFalAiAudio
   > {
     switch (modelOption.apiProvider) {
       case ApiProvider.CLAUDE_CODE:
@@ -88,6 +98,21 @@ export class ProviderFactory {
 
       case ApiProvider.VENICE_AI:
         return createVeniceAI(logger);
+
+      case ApiProvider.OPENAI_IMAGES:
+        return createOpenAIImages(logger);
+
+      case ApiProvider.REPLICATE:
+        if ("creditCostPerClip" in modelOption) {
+          return createReplicateAudio(logger, modelOption);
+        }
+        return createReplicateImage(logger);
+
+      case ApiProvider.FAL_AI:
+        if ("creditCostPerClip" in modelOption) {
+          return createFalAiAudio(logger, modelOption);
+        }
+        return createFalAiImage(logger);
 
       default: {
         // Custom fetch wrapper that normalizes request body for stable caching

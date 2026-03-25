@@ -325,6 +325,11 @@ export const translations: typeof enTranslations = {
         upvote: "Głosuj za",
         downvote: "Głosuj przeciw",
       },
+      generatedMediaActions: {
+        copy: "Kopiuj",
+        copied: "Skopiowano",
+        download: "Pobierz",
+      },
     },
     messages: {
       assistant: "Asystent",

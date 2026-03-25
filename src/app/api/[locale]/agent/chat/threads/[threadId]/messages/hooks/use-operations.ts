@@ -18,6 +18,7 @@ import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import {
+  useWidgetLocale,
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -50,6 +51,11 @@ export interface MessageOperations {
       audioInput?: { file: File };
       /** File attachments */
       attachments: File[];
+      /** Image generation settings */
+      imageSize?: string;
+      imageQuality?: string;
+      /** Music generation settings */
+      musicDuration?: string;
     },
     onThreadCreated?: (
       threadId: string,
@@ -118,6 +124,7 @@ export function useMessageOperations(
 
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const locale = useWidgetLocale();
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
   const navSetAborting = useChatNavigationStore((s) => s.setAborting);
 
@@ -145,6 +152,9 @@ export function useMessageOperations(
         }>;
         audioInput?: { file: File };
         attachments: File[];
+        imageSize?: string;
+        imageQuality?: string;
+        musicDuration?: string;
       },
       onThreadCreated?: (
         threadId: string,
@@ -163,6 +173,7 @@ export function useMessageOperations(
           leafMessageId,
           user,
           settings,
+          locale,
         },
         onThreadCreated,
       );
@@ -176,6 +187,7 @@ export function useMessageOperations(
       leafMessageId,
       user,
       settings,
+      locale,
     ],
   );
 
@@ -193,6 +205,7 @@ export function useMessageOperations(
         user,
         settings,
         setLeafMessageId,
+        locale,
       });
     },
     [
@@ -204,6 +217,7 @@ export function useMessageOperations(
       user,
       settings,
       setLeafMessageId,
+      locale,
     ],
   );
 
@@ -223,6 +237,7 @@ export function useMessageOperations(
         user,
         settings,
         setLeafMessageId,
+        locale,
       });
     },
     [
@@ -234,6 +249,7 @@ export function useMessageOperations(
       user,
       settings,
       setLeafMessageId,
+      locale,
     ],
   );
 

@@ -9,136 +9,119 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { type JSX } from "react";
 
+import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import {
   type Skill,
   COMPANION_SKILLS,
 } from "@/app/api/[locale]/agent/chat/skills/config";
+import {
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+} from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
-import type { AiStreamT } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import { getModelById, ModelId } from "@/app/api/[locale]/agent/models/models";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { cn } from "@/app/api/[locale]/shared/utils";
 import { useWidgetUser } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-export type BudgetTier = "smart" | "brilliant" | "max";
+export const DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
+  selectionType: ModelSelectionType.FILTERS,
 
-const BUDGET_TIERS: BudgetTier[] = ["smart", "brilliant", "max"];
-
-function getBudgetModelHints(
-  isAdmin: boolean,
-  claudeCodeAvailable: boolean,
-): Record<BudgetTier, string> {
-  const useClaudeCode = isAdmin && claudeCodeAvailable;
-  return {
-    smart: getModelById(ModelId.KIMI_K2_5).name,
-    brilliant: useClaudeCode
-      ? getModelById(ModelId.CLAUDE_CODE_SONNET).name
-      : getModelById(ModelId.CLAUDE_SONNET_4_6).name,
-    max: useClaudeCode
-      ? getModelById(ModelId.CLAUDE_CODE_OPUS).name
-      : getModelById(ModelId.CLAUDE_OPUS_4_6).name,
-  };
-}
+  sortBy: ModelSortField.INTELLIGENCE,
+  sortDirection: ModelSortDirection.DESC,
+  sortBy2: ModelSortField.PRICE,
+  sortDirection2: ModelSortDirection.ASC,
+};
 
 interface CompanionStepProps {
   selectedId: string | null;
-  selectedBudget: BudgetTier;
+  modelSelection: ModelSelectionSimple | null;
   locale: CountryLanguage;
   setSelectedId: (id: string | null) => void;
-  setSelectedBudget: (tier: BudgetTier) => void;
+  setModelSelection: (selection: ModelSelectionSimple | null) => void;
   onContinue: () => void;
   onBack: () => void;
 }
 
 export function CompanionStep({
   selectedId,
-  selectedBudget,
+  modelSelection,
   locale,
   setSelectedId,
-  setSelectedBudget,
+  setModelSelection,
   onContinue,
   onBack,
 }: CompanionStepProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const envAvailability = useEnvAvailability();
-  const isAdmin =
-    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-  const budgetModelHints = getBudgetModelHints(
-    isAdmin,
-    envAvailability.claudeCode,
-  );
 
   return (
-    <Div className="flex flex-col p-5 overflow-y-auto">
-      {/* Back button */}
-      <Div className="mb-2 shrink-0">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="gap-1.5 text-muted-foreground px-0 h-8"
-          onClick={onBack}
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          {t("onboarding.back")}
-        </Button>
-      </Div>
+    <Div className="flex flex-col">
+      {/* Content */}
+      <Div className="p-5 pb-3 flex flex-col gap-5">
+        {/* Back button */}
+        <Div className="shrink-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 text-muted-foreground px-0 h-8"
+            onClick={onBack}
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("onboarding.back")}
+          </Button>
+        </Div>
 
-      {/* Companion section */}
-      <Div className="mb-5 shrink-0">
-        <H3 className="text-base font-semibold mb-1">
-          {t("onboarding.companion.title")}
-        </H3>
-        <P className="text-xs text-muted-foreground mb-3">
-          {t("onboarding.companion.subtitle")}
-        </P>
+        {/* Companion section */}
+        <Div className="shrink-0">
+          <H3 className="text-base font-semibold mb-1">
+            {t("onboarding.companion.title")}
+          </H3>
+          <P className="text-xs text-muted-foreground mb-3">
+            {t("onboarding.companion.subtitle")}
+          </P>
 
-        <Div className="grid grid-cols-2 gap-3">
-          {COMPANION_SKILLS.map((skill) => (
-            <CompanionCard
-              key={skill.id}
-              skill={skill}
-              isSelected={selectedId === skill.id}
-              onSelect={() => setSelectedId(skill.id)}
-              locale={locale}
-            />
-          ))}
+          <Div className="grid grid-cols-2 gap-3">
+            {COMPANION_SKILLS.map((skill) => (
+              <CompanionCard
+                key={skill.id}
+                skill={skill}
+                isSelected={selectedId === skill.id}
+                onSelect={() => setSelectedId(skill.id)}
+                locale={locale}
+              />
+            ))}
+          </Div>
+        </Div>
+
+        {/* Divider */}
+        <Div className="border-t border-border shrink-0" />
+
+        {/* Model section */}
+        <Div className="shrink-0">
+          <H3 className="text-base font-semibold mb-3">
+            {t("onboarding.companion.modelTitle")}
+          </H3>
+
+          <ModelSelector
+            modelSelection={modelSelection ?? DEFAULT_MODEL_SELECTION}
+            onChange={setModelSelection}
+            envAvailability={envAvailability}
+            locale={locale}
+            user={user}
+            compact
+          />
         </Div>
       </Div>
 
-      {/* Divider */}
-      <Div className="border-t border-border mb-5 shrink-0" />
-
-      {/* Budget section */}
-      <Div className="mb-5 shrink-0">
-        <H3 className="text-base font-semibold mb-1">
-          {t("onboarding.companion.budgetTitle")}
-        </H3>
-        <P className="text-xs text-muted-foreground mb-3">
-          {t("onboarding.companion.budgetSubtitle")}
-        </P>
-
-        <Div className="flex flex-col gap-2">
-          {BUDGET_TIERS.map((tier) => (
-            <BudgetCard
-              key={tier}
-              tier={tier}
-              modelHint={budgetModelHints[tier]}
-              isSelected={selectedBudget === tier}
-              onSelect={() => setSelectedBudget(tier)}
-              t={t}
-            />
-          ))}
-        </Div>
-      </Div>
-
-      {/* Action */}
-      <Div className="shrink-0">
+      {/* Sticky CTA */}
+      <Div className="sticky bottom-0 px-5 py-3 border-t border-border bg-popover">
         <Button
           type="button"
           className="w-full h-11 text-base gap-2"
@@ -210,56 +193,6 @@ function CompanionCard({
       <P className="text-xs text-muted-foreground text-center leading-relaxed">
         {t(skill.description)}
       </P>
-    </Div>
-  );
-}
-
-interface BudgetCardProps {
-  tier: BudgetTier;
-  modelHint: string;
-  isSelected: boolean;
-  onSelect: () => void;
-  t: AiStreamT;
-}
-
-function BudgetCard({
-  tier,
-  modelHint,
-  isSelected,
-  onSelect,
-  t,
-}: BudgetCardProps): JSX.Element {
-  return (
-    <Div
-      className={cn(
-        "flex items-center gap-3 p-3 rounded-xl border-2 transition-all cursor-pointer",
-        "hover:shadow-sm active:scale-[0.99]",
-        isSelected
-          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-          : "border-border bg-card hover:border-primary/40",
-      )}
-      onClick={onSelect}
-    >
-      <Div
-        className={cn(
-          "w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center",
-          isSelected ? "border-primary" : "border-muted-foreground/40",
-        )}
-      >
-        {isSelected && <Div className="w-2 h-2 rounded-full bg-primary" />}
-      </Div>
-
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-baseline gap-2">
-          <Span className="text-sm font-semibold">
-            {t(`onboarding.companion.budget.${tier}.label`)}
-          </Span>
-          <Span className="text-xs text-muted-foreground/60">{modelHint}</Span>
-        </Div>
-        <P className="text-xs text-muted-foreground">
-          {t(`onboarding.companion.budget.${tier}.desc`)}
-        </P>
-      </Div>
     </Div>
   );
 }

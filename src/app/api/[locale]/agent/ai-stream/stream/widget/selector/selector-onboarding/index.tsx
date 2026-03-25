@@ -3,11 +3,11 @@
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { useWidgetUser } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { BudgetTier } from "./companion-step";
-import { CompanionStep } from "./companion-step";
+import { CompanionStep, DEFAULT_MODEL_SELECTION } from "./companion-step";
 import { GuestStep } from "./guest-step";
 import { UsecasesStep } from "./usecases-step";
 import { WelcomeStep } from "./welcome-step";
@@ -29,12 +29,12 @@ export function SelectorOnboarding({
   const [selectedCompanionId, setSelectedCompanionId] = useState<string | null>(
     null,
   );
-  const [selectedBudget, setSelectedBudget] = useState<BudgetTier>("smart");
+  const [modelSelection, setModelSelection] =
+    useState<ModelSelectionSimple | null>(DEFAULT_MODEL_SELECTION);
 
   const goToNext = useCallback(
     (current: OnboardingStep) => {
       if (current === "welcome") {
-        // Show guest warning only for public (logged-out) users
         setStep(user.isPublic ? "guest" : "companion");
         return;
       }
@@ -82,10 +82,10 @@ export function SelectorOnboarding({
     return (
       <CompanionStep
         selectedId={selectedCompanionId}
-        selectedBudget={selectedBudget}
+        modelSelection={modelSelection}
         locale={locale}
         setSelectedId={setSelectedCompanionId}
-        setSelectedBudget={setSelectedBudget}
+        setModelSelection={setModelSelection}
         onContinue={() => goToNext("companion")}
         onBack={() => goBack("companion")}
       />
@@ -96,7 +96,7 @@ export function SelectorOnboarding({
     return (
       <UsecasesStep
         companionId={selectedCompanionId}
-        budget={selectedBudget}
+        modelSelection={modelSelection ?? DEFAULT_MODEL_SELECTION}
         locale={locale}
         onDone={onDone}
         onBack={() => goBack("usecases")}

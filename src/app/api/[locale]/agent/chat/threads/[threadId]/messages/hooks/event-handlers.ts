@@ -102,6 +102,14 @@ export function addErrorMessageToChat(
     return;
   }
 
+  // Remove any optimistic assistant placeholders.
+  const allMsgsForError = getCachedMessages(threadId, rootFolderId, logger);
+  for (const m of allMsgsForError) {
+    if (m.metadata?.isOptimistic) {
+      removeMessage(threadId, rootFolderId, logger, m.id);
+    }
+  }
+
   // Revert the optimistic user message.
   let errorParentId = parentId;
   if (leafMsg?.role === ChatMessageRole.USER) {
@@ -181,6 +189,21 @@ function handleMessageCreated(
     }
     if (leaf?.role === ChatMessageRole.USER) {
       removeMessage(e.threadId, rootFolderId, logger, leaf.id);
+    }
+  }
+
+  // For server-confirmed assistant messages: remove any optimistic placeholder
+  // (tagged with metadata.isOptimistic) that was added client-side while waiting.
+  if (isAssistantOrTool) {
+    const msgs = getCachedMessages(e.threadId, rootFolderId, logger);
+    for (const m of msgs) {
+      if (m.metadata?.isOptimistic) {
+        removeMessage(e.threadId, rootFolderId, logger, m.id);
+      }
+    }
+    // Mark as actively streaming so LoadingIndicator shows immediately
+    if (!serverMetadata.isStreaming) {
+      serverMetadata.isStreaming = true;
     }
   }
 
@@ -508,6 +531,14 @@ function handleError(
       threadId,
     });
     return;
+  }
+
+  // Revert any optimistic placeholders (user + assistant) before showing error.
+  const allMsgs = getCachedMessages(threadId, rootFolderId, logger);
+  for (const m of allMsgs) {
+    if (m.metadata?.isOptimistic) {
+      removeMessage(threadId, rootFolderId, logger, m.id);
+    }
   }
 
   // Revert the optimistic user message.

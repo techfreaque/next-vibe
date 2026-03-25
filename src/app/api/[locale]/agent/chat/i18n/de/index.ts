@@ -566,6 +566,20 @@ export const translations: typeof enTranslations = {
         "Flux Schnell - Black Forest Labs' schnelles Bildgenerierungsmodell, optimiert für Geschwindigkeit",
       fluxPro:
         "Flux Pro 1.1 - Black Forest Labs' professionelles Bildgenerierungsmodell mit überlegener Qualität",
+      flux2Max:
+        "FLUX.2 Max - Black Forest Labs' hochwertigstes Bildmodell mit maximaler Bildqualität, Prompt-Verständnis und Bearbeitungskonsistenz",
+      flux2Klein4b:
+        "FLUX.2 Klein 4B - Black Forest Labs' schnellstes und kosteneffizientestes Bildmodell, optimiert für hohen Durchsatz",
+      riverflowV2Pro:
+        "Riverflow V2 Pro - Sourcefuls leistungsstärkstes Bildgenerierungsmodell mit erstklassiger Steuerung und perfekter Textwiedergabe",
+      riverflowV2Fast:
+        "Riverflow V2 Fast - Sourcefuls schnellstes Bildgenerierungsmodell, optimiert für Produktionsumgebungen und latenzempfindliche Workflows",
+      riverflowV2MaxPreview:
+        "Riverflow V2 Max Preview - Sourcefuls leistungsstärkstes Preview-Modell, vereinheitlichtes Text-zu-Bild- und Bild-zu-Bild-Modell",
+      riverflowV2StandardPreview:
+        "Riverflow V2 Standard Preview - Sourcefuls Standard-Preview-Variante mit verbesserter Leistung gegenüber der Riverflow 1-Familie",
+      seedream45:
+        "Seedream 4.5 - ByteDances neuestes Bildgenerierungsmodell mit umfassenden Verbesserungen bei Bearbeitungskonsistenz, Porträtverfeinerung und Mehrbildkomposition",
       sdxl: "Stable Diffusion XL - Stability AIs hochwertiges Open-Source-Bildgenerierungsmodell",
       musicgenStereo:
         "MusicGen Stereo - Metas Open-Source-Stereo-Musikgenerierungsmodell via Replicate",

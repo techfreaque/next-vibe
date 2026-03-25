@@ -875,6 +875,9 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       touchActiveRef.current = false;
     };
 
+    // Run once on mount to set initial button visibility
+    handleScroll();
+
     container.addEventListener("scroll", handleScroll, { passive: true });
     container.addEventListener("touchstart", handleTouchStart, {
       passive: true,
@@ -891,6 +894,17 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       container.removeEventListener("touchcancel", handleTouchEnd);
     };
   }, []);
+
+  // Re-evaluate button visibility whenever messages change (content height may have changed)
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const distFromBottom = scrollHeight - scrollTop - clientHeight;
+    setShowScrollButton(distFromBottom > 800);
+  }, [activeThreadMessages]);
 
   // Track which threads have had their initial scroll-to-bottom performed.
   const initialScrollDoneRef = useRef<Set<string>>(new Set());

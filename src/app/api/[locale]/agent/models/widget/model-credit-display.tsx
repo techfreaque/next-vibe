@@ -143,9 +143,18 @@ export function ModelCreditDisplay({
   // Determine if token-based
   const isTokenBased = typeof model.creditCost === "function";
 
+  // Per-image or per-clip fixed cost
+  const fixedMediaCost =
+    "creditCostPerImage" in model
+      ? (model as { creditCostPerImage: number }).creditCostPerImage
+      : "creditCostPerClip" in model
+        ? (model as { creditCostPerClip: number }).creditCostPerClip
+        : null;
+
   // Check if truly free (model.creditCost === 0, not rounded to 0)
   const isTrulyFree =
     !isTokenBased &&
+    fixedMediaCost === null &&
     typeof model.creditCost === "number" &&
     model.creditCost === 0;
 
@@ -166,6 +175,13 @@ export function ModelCreditDisplay({
   } else if (isTokenBased) {
     // Show middle value with ~ to indicate it varies
     costText = `~${midCost} credits`;
+  } else if (fixedMediaCost !== null) {
+    // Per-image or per-clip
+    if (fixedMediaCost === 1) {
+      costText = t("credits.credit", { count: fixedMediaCost });
+    } else {
+      costText = t("credits.credits", { count: fixedMediaCost });
+    }
   } else {
     // Fixed cost models
     const cost = typeof model.creditCost === "number" ? model.creditCost : 0;

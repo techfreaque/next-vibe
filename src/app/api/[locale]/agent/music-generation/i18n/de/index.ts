@@ -29,15 +29,13 @@ export const translations = {
       medium: "Mittel (~20 Sek.)",
       long: "Lang (~30 Sek.)",
     },
-    threadId: {
-      label: "Thread-ID",
-      description:
-        "Optionale Thread-ID, um das generierte Audio als Chat-Nachricht zu speichern",
+    submitButton: {
+      text: "Musik generieren",
+      loadingText: "Generiere...",
     },
     response: {
       audioUrl: "URL des generierten Audios",
       creditCost: "Verwendete Credits",
-      messageId: "Nachrichten-ID",
       durationSeconds: "Dauer in Sekunden",
     },
     errors: {

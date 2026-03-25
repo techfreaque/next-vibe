@@ -32,6 +32,12 @@ export interface AgentEnvAvailability {
   veniceAI: boolean;
   /** Scrappey (web scraping) */
   scrappey: boolean;
+  /** OpenAI Images API (DALL-E, gpt-image-1) */
+  openAiImages: boolean;
+  /** Replicate (Flux Pro, SDXL, video models) */
+  replicate: boolean;
+  /** Fal.ai (fast image and video inference) */
+  falAi: boolean;
 }
 
 /**
@@ -54,6 +60,9 @@ export function getAgentEnvAvailability(): AgentEnvAvailability {
     gabAI: Boolean(agentEnv.GAB_AI_API_KEY),
     veniceAI: Boolean(agentEnv.VENICE_AI_API_KEY),
     scrappey: Boolean(agentEnv.SCRAPPEY_API_KEY),
+    openAiImages: Boolean(agentEnv.OPENAI_API_KEY),
+    replicate: Boolean(agentEnv.REPLICATE_API_TOKEN),
+    falAi: Boolean(agentEnv.FAL_AI_API_KEY),
   };
 }
 
@@ -111,6 +120,21 @@ export const PROVIDER_SETUP_INSTRUCTIONS = {
     envKey: "SCRAPPEY_API_KEY",
     url: "https://scrappey.com",
     label: "Scrappey",
+  },
+  openAiImages: {
+    envKey: "OPENAI_API_KEY",
+    url: "https://platform.openai.com/api-keys",
+    label: "OpenAI Images (DALL-E)",
+  },
+  replicate: {
+    envKey: "REPLICATE_API_TOKEN",
+    url: "https://replicate.com/account/api-tokens",
+    label: "Replicate",
+  },
+  falAi: {
+    envKey: "FAL_AI_API_KEY",
+    url: "https://fal.ai/dashboard/keys",
+    label: "Fal.ai",
   },
 } as const satisfies Record<
   Exclude<keyof AgentEnvAvailability, "anySearch">,

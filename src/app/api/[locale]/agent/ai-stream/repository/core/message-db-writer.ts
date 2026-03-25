@@ -940,6 +940,79 @@ export class MessageDbWriter {
   }
 
   /**
+   * Create an ASSISTANT message for generated media (image/audio).
+   * Emits MESSAGE_CREATED SSE with generatedMedia metadata, inserts to DB.
+   */
+  async emitGeneratedMediaMessage(params: {
+    messageId: string;
+    threadId: string;
+    parentId: string | null;
+    userId: string | undefined;
+    model: ModelId;
+    skill: string;
+    sequenceId: string | null;
+    generatedMedia: MessageMetadata["generatedMedia"];
+  }): Promise<void> {
+    const {
+      messageId,
+      threadId,
+      parentId,
+      model,
+      skill,
+      sequenceId,
+      generatedMedia,
+    } = params;
+
+    this.lastAssistantMessageId = messageId;
+
+    // SSE: MESSAGE_CREATED with generatedMedia metadata
+    // Also set top-level creditCost so AssistantMessageActions can display it
+    const metadata = {
+      generatedMedia,
+      creditCost: generatedMedia?.creditCost,
+    };
+    const messageEvent = createStreamEvent.messageCreated({
+      messageId,
+      threadId,
+      role: ChatMessageRole.ASSISTANT,
+      content: "",
+      parentId,
+      model,
+      skill,
+      sequenceId,
+      metadata,
+    });
+    this.enqueue(messageEvent);
+
+    // DB: insert with metadata
+    if (!this.isIncognito) {
+      try {
+        await db.insert(chatMessages).values({
+          id: messageId,
+          threadId,
+          role: ChatMessageRole.ASSISTANT,
+          content: null,
+          parentId,
+          authorId: params.userId ?? null,
+          sequenceId,
+          isAI: true,
+          model,
+          skill,
+          metadata,
+        });
+      } catch (err) {
+        this.logger.warn(
+          "[MessageDbWriter] Failed to create generated media message",
+          {
+            messageId,
+            error: err instanceof Error ? err.message : String(err),
+          },
+        );
+      }
+    }
+  }
+
+  /**
    * Emit a CONTENT_DONE SSE event only (no DB writes).
    * Use for fallback/empty stop events where there is no DB message to update.
    */

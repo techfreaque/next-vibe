@@ -34,15 +34,13 @@ export const translations = {
       standard: "Standardowa",
       hd: "HD",
     },
-    threadId: {
-      label: "ID wątku",
-      description:
-        "Opcjonalne ID wątku, aby zapisać wygenerowany obraz jako wiadomość czatu",
+    submitButton: {
+      text: "Generuj obraz",
+      loadingText: "Generowanie...",
     },
     response: {
       imageUrl: "URL wygenerowanego obrazu",
       creditCost: "Użyte kredyty",
-      messageId: "ID wiadomości",
     },
     errors: {
       validation_failed: {

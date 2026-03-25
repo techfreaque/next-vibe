@@ -19,7 +19,13 @@ import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import { Filter } from "next-vibe-ui/ui/icons/Filter";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Label } from "next-vibe-ui/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { RangeSlider } from "next-vibe-ui/ui/range-slider";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
@@ -55,8 +61,8 @@ import {
   getModelById,
   type ModelId,
   type ModelOption,
+  type ModelType,
   modelProviders,
-  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -222,6 +228,166 @@ function getRangeFromIndices<T extends string>(
   };
 }
 
+function isFullRange(indices: RangeIndices, len: number): boolean {
+  return indices.min === 0 && indices.max === len - 1;
+}
+
+interface FilterChip {
+  key: string;
+  label: string;
+  onRemove: () => void;
+}
+
+function buildFilterChips({
+  intelligenceIndices,
+  contentIndices,
+  speedIndices,
+  priceIndices,
+  sortBy,
+  sortDirection,
+  sortBy2,
+  sortDirection2,
+  t,
+  mode,
+  manualModelId,
+  handleIntelligenceChange,
+  handleContentChange,
+  handleSpeedChange,
+  handlePriceChange,
+  setUseSkillBased,
+  updateValue,
+}: {
+  intelligenceIndices: RangeIndices;
+  contentIndices: RangeIndices;
+  speedIndices: RangeIndices;
+  priceIndices: RangeIndices;
+  sortBy: ReturnType<typeof scopedTranslation.scopedT>["t"] extends never
+    ? never
+    : (typeof ModelSortField)[keyof typeof ModelSortField] | undefined;
+  sortDirection:
+    | (typeof ModelSortDirection)[keyof typeof ModelSortDirection]
+    | undefined;
+  sortBy2: (typeof ModelSortField)[keyof typeof ModelSortField] | undefined;
+  sortDirection2:
+    | (typeof ModelSortDirection)[keyof typeof ModelSortDirection]
+    | undefined;
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  mode: string;
+  manualModelId: ModelId | undefined;
+  handleIntelligenceChange: (min: number, max: number) => void;
+  handleContentChange: (min: number, max: number) => void;
+  handleSpeedChange: (min: number, max: number) => void;
+  handlePriceChange: (min: number, max: number) => void;
+  setUseSkillBased: (v: boolean) => void;
+  updateValue: (s: ModelSelectionSimple | null) => void;
+}): FilterChip[] {
+  const chips: FilterChip[] = [];
+
+  type ModelsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+  type ModelsKey = Parameters<ModelsT>[0];
+  const rangeLabel = (
+    display: readonly { label: ModelsKey }[],
+    indices: RangeIndices,
+  ): string => {
+    const minKey = display[indices.min]?.label;
+    const maxKey = display[indices.max]?.label;
+    const minL = minKey ? t(minKey) : "";
+    const maxL = maxKey ? t(maxKey) : "";
+    return indices.min === indices.max ? minL : `${minL}–${maxL}`;
+  };
+
+  if (!isFullRange(intelligenceIndices, INTELLIGENCE_DISPLAY.length)) {
+    chips.push({
+      key: "intelligence",
+      label: rangeLabel(INTELLIGENCE_DISPLAY, intelligenceIndices),
+      onRemove: () =>
+        handleIntelligenceChange(0, INTELLIGENCE_DISPLAY.length - 1),
+    });
+  }
+  if (!isFullRange(contentIndices, CONTENT_DISPLAY.length)) {
+    chips.push({
+      key: "content",
+      label: rangeLabel(CONTENT_DISPLAY, contentIndices),
+      onRemove: () => handleContentChange(0, CONTENT_DISPLAY.length - 1),
+    });
+  }
+  if (!isFullRange(speedIndices, SPEED_DISPLAY.length)) {
+    chips.push({
+      key: "speed",
+      label: rangeLabel(SPEED_DISPLAY, speedIndices),
+      onRemove: () => handleSpeedChange(0, SPEED_DISPLAY.length - 1),
+    });
+  }
+  if (!isFullRange(priceIndices, PRICE_DISPLAY.length)) {
+    chips.push({
+      key: "price",
+      label: rangeLabel(PRICE_DISPLAY, priceIndices),
+      onRemove: () => handlePriceChange(0, PRICE_DISPLAY.length - 1),
+    });
+  }
+  if (sortBy) {
+    const dir = sortDirection === ModelSortDirection.ASC ? "↑" : "↓";
+    chips.push({
+      key: "sort",
+      label: `${dir} ${t(sortBy as Parameters<typeof t>[0])}`,
+      onRemove: () => {
+        setUseSkillBased(false);
+        updateValue({
+          selectionType:
+            mode === ModelSelectionType.MANUAL
+              ? ModelSelectionType.MANUAL
+              : ModelSelectionType.FILTERS,
+          ...(mode === ModelSelectionType.MANUAL && manualModelId
+            ? { manualModelId }
+            : {}),
+          intelligenceRange: getRangeFromIndices(
+            intelligenceIndices,
+            INTELLIGENCE_DISPLAY,
+          ),
+          priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+          contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+          sortBy: undefined,
+          sortDirection: undefined,
+          sortBy2: undefined,
+          sortDirection2: undefined,
+        } as ModelSelectionSimple);
+      },
+    });
+  }
+  if (sortBy2) {
+    const dir2 = sortDirection2 === ModelSortDirection.ASC ? "↑" : "↓";
+    chips.push({
+      key: "sort2",
+      label: `then ${dir2} ${t(sortBy2 as Parameters<typeof t>[0])}`,
+      onRemove: () => {
+        setUseSkillBased(false);
+        updateValue({
+          selectionType:
+            mode === ModelSelectionType.MANUAL
+              ? ModelSelectionType.MANUAL
+              : ModelSelectionType.FILTERS,
+          ...(mode === ModelSelectionType.MANUAL && manualModelId
+            ? { manualModelId }
+            : {}),
+          intelligenceRange: getRangeFromIndices(
+            intelligenceIndices,
+            INTELLIGENCE_DISPLAY,
+          ),
+          priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+          contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+          speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+          sortBy,
+          sortDirection,
+          sortBy2: undefined,
+          sortDirection2: undefined,
+        } as ModelSelectionSimple);
+      },
+    });
+  }
+  return chips;
+}
+
 /**
  * Standalone Model Selector Component
  */
@@ -260,6 +426,12 @@ export interface ModelSelectorProps {
    * User payload for admin-only model filtering
    */
   user: JwtPayloadType;
+
+  /**
+   * Compact mode - removes outer border/padding and hides type tabs.
+   * Use in onboarding or embedded contexts where double-border is undesirable.
+   */
+  compact?: boolean;
 }
 
 /** Returns true if the model's provider is available given current env */
@@ -336,6 +508,7 @@ export function ModelSelector({
   envAvailability: envAvailabilityProp,
   locale,
   user,
+  compact = false,
 }: ModelSelectorProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   // Prefer prop (for non-chat contexts), fall back to context (chat pages)
@@ -354,10 +527,13 @@ export function ModelSelector({
   }, [characterModelSelection, modelSelection]);
 
   const [showAllModels, setShowAllModels] = useState(false);
-  const [showUnfilteredModels, setShowUnfilteredModels] = useState(false);
+  const showUnfilteredModels = false;
   const [showLegacyByGroup, setShowLegacyByGroup] = useState<
     Record<string, boolean>
   >({});
+  const [modelTypeTab, setModelTypeTab] = useState<ModelType>("text");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
 
   // Current selection - use character's selection if in CHARACTER_BASED mode
   const currentSelection =
@@ -494,6 +670,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     } else {
       updateValue({
@@ -507,6 +685,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     }
   };
@@ -531,6 +711,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     } else {
       updateValue({
@@ -544,6 +726,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     }
   };
@@ -568,6 +752,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     } else {
       updateValue({
@@ -581,6 +767,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     }
   };
@@ -605,6 +793,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     } else {
       updateValue({
@@ -618,6 +808,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy,
         sortDirection,
+        sortBy2,
+        sortDirection2,
       });
     }
   };
@@ -640,6 +832,27 @@ export function ModelSelector({
     });
   };
 
+  // Type tab change handler
+  const handleTypeTabChange = (newType: ModelType): void => {
+    setModelTypeTab(newType);
+    setShowAllModels(false);
+    if (newType !== "text") {
+      // Image/audio: force MANUAL, auto-select first available model of that type
+      setUseSkillBased(false);
+      const first = getAllModelOptions().find(
+        (m) =>
+          (m.modelType ?? "text") === newType &&
+          isProviderAvailable(m, envAvailability),
+      );
+      if (first) {
+        updateValue({
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: first.id,
+        });
+      }
+    }
+  };
+
   // Get current sort settings from activeSelection (works for both FILTERS and MANUAL)
   const sortBy =
     activeSelection?.selectionType === ModelSelectionType.FILTERS ||
@@ -650,6 +863,18 @@ export function ModelSelector({
     activeSelection?.selectionType === ModelSelectionType.FILTERS ||
     activeSelection?.selectionType === ModelSelectionType.MANUAL
       ? activeSelection.sortDirection
+      : undefined;
+
+  const sortBy2 =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortBy2
+      : undefined;
+
+  const sortDirection2 =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortDirection2
       : undefined;
 
   // Sort change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
@@ -679,6 +904,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy: field,
         sortDirection: defaultDirection,
+        sortBy2,
+        sortDirection2,
       });
     } else {
       updateValue({
@@ -692,6 +919,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy: field,
         sortDirection: defaultDirection,
+        sortBy2,
+        sortDirection2,
       });
     }
   };
@@ -721,6 +950,8 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
         sortDirection: newDirection,
+        sortBy2,
+        sortDirection2,
       });
     } else {
       updateValue({
@@ -734,6 +965,93 @@ export function ModelSelector({
         speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
         sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
         sortDirection: newDirection,
+        sortBy2,
+        sortDirection2,
+      });
+    }
+  };
+
+  const handleSortBy2Change = (
+    field: (typeof ModelSortField)[keyof typeof ModelSortField],
+  ): void => {
+    setUseSkillBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    const baseProps = {
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+    };
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        ...baseProps,
+        sortBy,
+        sortDirection,
+        sortBy2: field,
+        sortDirection2: ModelSortDirection.DESC,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        ...baseProps,
+        sortBy,
+        sortDirection,
+        sortBy2: field,
+        sortDirection2: ModelSortDirection.DESC,
+      });
+    }
+  };
+
+  const handleSortDirection2Toggle = (): void => {
+    const newDirection =
+      sortDirection2 === ModelSortDirection.ASC
+        ? ModelSortDirection.DESC
+        : ModelSortDirection.ASC;
+
+    setUseSkillBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    const baseProps = {
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+    };
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        ...baseProps,
+        sortBy,
+        sortDirection,
+        sortBy2: sortBy2 ?? ModelSortField.PRICE,
+        sortDirection2: newDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        ...baseProps,
+        sortBy,
+        sortDirection,
+        sortBy2: sortBy2 ?? ModelSortField.PRICE,
+        sortDirection2: newDirection,
       });
     }
   };
@@ -756,11 +1074,14 @@ export function ModelSelector({
       speedRange,
       sortBy,
       sortDirection,
+      sortBy2,
+      sortDirection2,
     };
-    return SkillsRepositoryClient.getFilteredModelsForSkill(
+    const base = SkillsRepositoryClient.getFilteredModelsForSkill(
       filtersModelSelection,
       user,
     );
+    return base.filter((m) => (m.modelType ?? "text") === modelTypeTab);
   }, [
     intelligenceRange,
     priceRange,
@@ -768,7 +1089,10 @@ export function ModelSelector({
     speedRange,
     sortBy,
     sortDirection,
+    sortBy2,
+    sortDirection2,
     user,
+    modelTypeTab,
   ]);
 
   const bestFilteredModel = useMemo(() => {
@@ -801,9 +1125,13 @@ export function ModelSelector({
     return models.filter((m) => isProviderAvailable(m, envAvailability));
   };
 
-  // Get models to show (filtered or all)
+  // Get models to show (filtered or all), always constrained by type tab
   const modelsToShow = filterUnavailableProviders(
-    showUnfilteredModels ? getAllModelOptions() : filteredModels,
+    showUnfilteredModels
+      ? getAllModelOptions().filter(
+          (m) => (m.modelType ?? "text") === modelTypeTab,
+        )
+      : filteredModels,
   );
 
   // Compute which model names appear with multiple providers (need provider suffix)
@@ -876,18 +1204,10 @@ export function ModelSelector({
       }
     };
 
-    // Sort models
-    const sorted = [...modelsToShow].toSorted((a, b) => {
-      const aVal = getSortInfo(a).value;
-      const bVal = getSortInfo(b).value;
-      return sortDirection === ModelSortDirection.ASC
-        ? aVal - bVal
-        : bVal - aVal;
-    });
-
-    // Group by sort value label
+    // modelsToShow is already sorted by filteredModels (primary + secondary sort)
+    // Just group by primary sort label, preserving existing order within groups
     const grouped: Record<string, ModelOption[]> = {};
-    for (const model of sorted) {
+    for (const model of modelsToShow) {
       const { label } = getSortInfo(model);
       if (!grouped[label]) {
         grouped[label] = [];
@@ -896,7 +1216,7 @@ export function ModelSelector({
     }
 
     return grouped;
-  }, [modelsToShow, sortBy, sortDirection, t]);
+  }, [modelsToShow, sortBy, t]);
 
   // Get display models (limited or all)
   const displayModels = useMemo(() => {
@@ -904,18 +1224,103 @@ export function ModelSelector({
       Object.keys(sortedAndGroupedModels).length === 1 &&
       sortedAndGroupedModels.ungrouped
     ) {
-      // No grouping - just slice for show more/less
-      return showAllModels
-        ? sortedAndGroupedModels.ungrouped
-        : sortedAndGroupedModels.ungrouped.slice(0, 3);
+      const ungrouped = sortedAndGroupedModels.ungrouped;
+      if (showAllModels) {
+        return ungrouped;
+      }
+      const slice = ungrouped.slice(0, 3);
+      // In MANUAL mode, pin the selected model to the top if it's not in the slice
+      if (
+        mode === ModelSelectionType.MANUAL &&
+        manualModelId &&
+        !slice.some((m) => m.id === manualModelId)
+      ) {
+        const selected = ungrouped.find((m) => m.id === manualModelId);
+        if (selected) {
+          return [selected, ...slice.slice(0, 2)];
+        }
+      }
+      return slice;
     }
     // With grouping - return all groups (show more/less handled per group)
     return sortedAndGroupedModels;
-  }, [sortedAndGroupedModels, showAllModels]);
+  }, [sortedAndGroupedModels, showAllModels, mode, manualModelId]);
+
+  // Available type tabs (only show tabs that have at least 1 accessible model)
+  const allModels = useMemo(() => getAllModelOptions(), []);
+  const availableTypes = useMemo((): ModelType[] => {
+    const types: ModelType[] = ["text"];
+    const hasImage = allModels.some(
+      (m) =>
+        m.modelType === "image" &&
+        (isAdmin || isProviderAvailable(m, envAvailability)),
+    );
+    const hasAudio = allModels.some(
+      (m) =>
+        m.modelType === "audio" &&
+        (isAdmin || isProviderAvailable(m, envAvailability)),
+    );
+    if (hasImage) {
+      types.push("image");
+    }
+    if (hasAudio) {
+      types.push("audio");
+    }
+    return types;
+  }, [allModels, isAdmin, envAvailability]);
+
+  const activeFilterChips = buildFilterChips({
+    intelligenceIndices,
+    contentIndices,
+    speedIndices,
+    priceIndices,
+    sortBy,
+    sortDirection,
+    sortBy2,
+    sortDirection2,
+    t,
+    mode,
+    manualModelId,
+    handleIntelligenceChange,
+    handleContentChange,
+    handleSpeedChange,
+    handlePriceChange,
+    setUseSkillBased,
+    updateValue,
+  });
 
   return (
     <TooltipProvider>
-      <Div className="flex flex-col gap-4 border rounded-lg p-4">
+      <Div
+        className={
+          compact
+            ? "flex flex-col gap-3"
+            : "flex flex-col gap-4 border rounded-lg p-4"
+        }
+      >
+        {/* Type tabs — Chat / Image / Audio */}
+        {!compact && availableTypes.length > 1 && (
+          <Div className="flex items-center gap-1 p-0.5 bg-muted/40 rounded-lg">
+            {availableTypes.map((type) => (
+              <Button
+                key={type}
+                type="button"
+                variant={modelTypeTab === type ? "default" : "ghost"}
+                size="sm"
+                className="flex-1 h-7 text-xs"
+                onClick={() => handleTypeTabChange(type)}
+                disabled={readOnly}
+              >
+                {type === "text"
+                  ? t("selector.typeChat")
+                  : type === "image"
+                    ? t("selector.typeImage")
+                    : t("selector.typeAudio")}
+              </Button>
+            ))}
+          </Div>
+        )}
+
         {/* Model selection mode tabs */}
         <Div className="flex items-center gap-1.5 p-1 bg-muted/50 rounded-lg">
           {characterModelSelection && (
@@ -927,7 +1332,7 @@ export function ModelSelector({
                   : "ghost"
               }
               size="sm"
-              className="flex-1 h-8 text-xs"
+              className="flex-1 h-7 text-xs"
               onClick={() =>
                 handleModeChange(ModelSelectionType.CHARACTER_BASED)
               }
@@ -958,20 +1363,9 @@ export function ModelSelector({
           </Button>
         </Div>
 
-        {/* Mode description */}
-        <Span className="text-xs text-center text-muted-foreground/70 -mt-2">
-          {mode === ModelSelectionType.CHARACTER_BASED
-            ? t("selector.characterBasedModeDescription")
-            : mode === ModelSelectionType.FILTERS
-              ? t("selector.autoModeDescription")
-              : t("selector.manualModeDescription")}
-        </Span>
-
-        <Separator className="my-1" />
-
         {/* Model preview card */}
         {bestModel ? (
-          <Div className="sticky top-0 z-15 flex items-start gap-3 p-3 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl shadow-lg backdrop-blur-sm">
+          <Div className="flex items-start gap-3 p-3 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl shadow-lg backdrop-blur-sm">
             <Div className="w-10 h-10 rounded-lg bg-primary/30 flex items-center justify-center shrink-0 shadow-inner">
               <Icon icon={bestModel.icon} className="h-5 w-5 text-primary" />
             </Div>
@@ -1016,123 +1410,241 @@ export function ModelSelector({
           </Div>
         )}
 
-        {/* Filter sliders */}
-        <Div className="flex flex-col gap-3.5">
-          <RangeSlider
-            options={INTELLIGENCE_DISPLAY}
-            minIndex={intelligenceIndices.min}
-            maxIndex={intelligenceIndices.max}
-            onChange={handleIntelligenceChange}
-            minLabel={t("ranges.intelligenceRange.minLabel")}
-            maxLabel={t("ranges.intelligenceRange.maxLabel")}
-            disabled={readOnly}
-            t={t}
-          />
+        {/* Filters + Sort rows — only for text/chat models */}
+        {modelTypeTab === "text" && (
+          <Div className="flex flex-col gap-2">
+            {/* Row 1: Filters */}
+            <Div className="flex items-center gap-2 flex-wrap">
+              {/* Filters popover */}
+              <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant={
+                      activeFilterChips.filter(
+                        (c) => c.key !== "sort" && c.key !== "sort2",
+                      ).length > 0
+                        ? "secondary"
+                        : "outline"
+                    }
+                    size="sm"
+                    className={cn(
+                      "h-7 gap-1.5 text-xs shrink-0",
+                      activeFilterChips.filter(
+                        (c) => c.key !== "sort" && c.key !== "sort2",
+                      ).length > 0 &&
+                        "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20",
+                    )}
+                    disabled={readOnly}
+                  >
+                    <Filter className="h-3 w-3" />
+                    {activeFilterChips.filter(
+                      (c) => c.key !== "sort" && c.key !== "sort2",
+                    ).length > 0
+                      ? t("selector.filtersActive", {
+                          count: activeFilterChips.filter(
+                            (c) => c.key !== "sort" && c.key !== "sort2",
+                          ).length,
+                        })
+                      : t("selector.filters")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-96 p-3 flex flex-col gap-3 overflow-y-auto max-h-[min(420px,80svh)]"
+                  align="start"
+                  side="top"
+                  sideOffset={8}
+                >
+                  <RangeSlider
+                    options={INTELLIGENCE_DISPLAY}
+                    minIndex={intelligenceIndices.min}
+                    maxIndex={intelligenceIndices.max}
+                    onChange={handleIntelligenceChange}
+                    minLabel={t("ranges.intelligenceRange.minLabel")}
+                    maxLabel={t("ranges.intelligenceRange.maxLabel")}
+                    disabled={readOnly}
+                    t={t}
+                  />
+                  <RangeSlider
+                    options={CONTENT_DISPLAY}
+                    minIndex={contentIndices.min}
+                    maxIndex={contentIndices.max}
+                    onChange={handleContentChange}
+                    minLabel={t("ranges.contentRange.minLabel")}
+                    maxLabel={t("ranges.contentRange.maxLabel")}
+                    disabled={readOnly}
+                    t={t}
+                  />
+                  <RangeSlider
+                    options={SPEED_DISPLAY}
+                    minIndex={speedIndices.min}
+                    maxIndex={speedIndices.max}
+                    onChange={handleSpeedChange}
+                    minLabel={t("ranges.speedRange.minLabel")}
+                    maxLabel={t("ranges.speedRange.maxLabel")}
+                    disabled={readOnly}
+                    t={t}
+                  />
+                  <RangeSlider
+                    options={PRICE_DISPLAY}
+                    minIndex={priceIndices.min}
+                    maxIndex={priceIndices.max}
+                    onChange={handlePriceChange}
+                    minLabel={t("ranges.priceRange.minLabel")}
+                    maxLabel={t("ranges.priceRange.maxLabel")}
+                    disabled={readOnly}
+                    t={t}
+                  />
+                </PopoverContent>
+              </Popover>
 
-          <RangeSlider
-            options={CONTENT_DISPLAY}
-            minIndex={contentIndices.min}
-            maxIndex={contentIndices.max}
-            onChange={handleContentChange}
-            minLabel={t("ranges.contentRange.minLabel")}
-            maxLabel={t("ranges.contentRange.maxLabel")}
-            disabled={readOnly}
-            t={t}
-          />
+              {/* Active filter chips (range filters only) */}
+              {activeFilterChips
+                .filter((c) => c.key !== "sort" && c.key !== "sort2")
+                .map((chip) => (
+                  <Div
+                    key={chip.key}
+                    className="flex items-center gap-1 h-7 px-2 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-medium"
+                  >
+                    <Span>{chip.label}</Span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 hover:bg-primary/20 rounded-sm ml-0.5"
+                      onClick={chip.onRemove}
+                      disabled={readOnly}
+                    >
+                      <X className="h-2.5 w-2.5" />
+                    </Button>
+                  </Div>
+                ))}
+            </Div>
 
-          <RangeSlider
-            options={SPEED_DISPLAY}
-            minIndex={speedIndices.min}
-            maxIndex={speedIndices.max}
-            onChange={handleSpeedChange}
-            minLabel={t("ranges.speedRange.minLabel")}
-            maxLabel={t("ranges.speedRange.maxLabel")}
-            disabled={readOnly}
-            t={t}
-          />
+            {/* Row 2: Sort */}
+            <Div className="flex items-center gap-2 flex-wrap">
+              {/* Sort popover — already rendered above, move trigger here */}
+              <Popover open={sortOpen} onOpenChange={setSortOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant={sortBy ? "secondary" : "outline"}
+                    size="sm"
+                    className={cn(
+                      "h-7 gap-1.5 text-xs shrink-0",
+                      sortBy &&
+                        "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20",
+                    )}
+                    disabled={readOnly}
+                  >
+                    <ArrowDown className="h-3 w-3" />
+                    {t("selector.sortBy")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-72 p-3 flex flex-col gap-3"
+                  align="start"
+                  side="top"
+                  sideOffset={8}
+                >
+                  <Div className="flex flex-col gap-1.5">
+                    <Span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                      {t("selector.sortBy")}
+                    </Span>
+                    <Div className="flex flex-wrap gap-1">
+                      {ModelSortFieldOptions.map((option) => (
+                        <Button
+                          key={option.value}
+                          type="button"
+                          variant={
+                            sortBy === option.value ? "default" : "outline"
+                          }
+                          size="sm"
+                          className="h-7 text-xs gap-1"
+                          onClick={() =>
+                            sortBy === option.value
+                              ? handleSortDirectionToggle()
+                              : handleSortFieldChange(option.value)
+                          }
+                          disabled={readOnly}
+                        >
+                          {t(option.label)}
+                          {sortBy === option.value &&
+                            (sortDirection === ModelSortDirection.ASC ? (
+                              <ArrowUp className="h-3 w-3" />
+                            ) : (
+                              <ArrowDown className="h-3 w-3" />
+                            ))}
+                        </Button>
+                      ))}
+                    </Div>
+                  </Div>
+                  {sortBy && (
+                    <Div className="flex flex-col gap-1.5">
+                      <Span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                        {t("selector.sortThen")}
+                      </Span>
+                      <Div className="flex flex-wrap gap-1">
+                        {ModelSortFieldOptions.filter(
+                          (o) => o.value !== sortBy,
+                        ).map((option) => (
+                          <Button
+                            key={option.value}
+                            type="button"
+                            variant={
+                              sortBy2 === option.value ? "default" : "outline"
+                            }
+                            size="sm"
+                            className="h-7 text-xs gap-1"
+                            onClick={() =>
+                              sortBy2 === option.value
+                                ? handleSortDirection2Toggle()
+                                : handleSortBy2Change(option.value)
+                            }
+                            disabled={readOnly}
+                          >
+                            {t(option.label)}
+                            {sortBy2 === option.value &&
+                              (sortDirection2 === ModelSortDirection.ASC ? (
+                                <ArrowUp className="h-3 w-3" />
+                              ) : (
+                                <ArrowDown className="h-3 w-3" />
+                              ))}
+                          </Button>
+                        ))}
+                      </Div>
+                    </Div>
+                  )}
+                </PopoverContent>
+              </Popover>
 
-          <RangeSlider
-            options={PRICE_DISPLAY}
-            minIndex={priceIndices.min}
-            maxIndex={priceIndices.max}
-            onChange={handlePriceChange}
-            minLabel={t("ranges.priceRange.minLabel")}
-            maxLabel={t("ranges.priceRange.maxLabel")}
-            disabled={readOnly}
-            t={t}
-          />
-        </Div>
+              {/* Active sort chips */}
+              {activeFilterChips
+                .filter((c) => c.key === "sort" || c.key === "sort2")
+                .map((chip) => (
+                  <Div
+                    key={chip.key}
+                    className="flex items-center gap-1 h-7 px-2 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-medium"
+                  >
+                    <Span>{chip.label}</Span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 hover:bg-primary/20 rounded-sm ml-0.5"
+                      onClick={chip.onRemove}
+                      disabled={readOnly}
+                    >
+                      <X className="h-2.5 w-2.5" />
+                    </Button>
+                  </Div>
+                ))}
+            </Div>
+          </Div>
+        )}
 
         {/* Models list */}
         <Div className="flex flex-col gap-3">
-          {/* Filter and Sort Controls */}
-          <Div className="flex items-center justify-between gap-2 px-1">
-            <Label className="text-xs font-medium text-muted-foreground">
-              {showUnfilteredModels
-                ? t("selector.allModelsCount", {
-                    count: TOTAL_MODEL_COUNT,
-                  })
-                : t("selector.filteredModelsCount", {
-                    count: filteredModels.length,
-                  })}
-            </Label>
-            <Div className="flex items-center gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs gap-1"
-                onClick={() => {
-                  setShowUnfilteredModels(!showUnfilteredModels);
-                }}
-                disabled={readOnly}
-              >
-                <Filter className="h-3 w-3" />
-                {showUnfilteredModels
-                  ? t("selector.showFiltered")
-                  : t("selector.showAllModels", {
-                      count: TOTAL_MODEL_COUNT,
-                    })}
-              </Button>
-            </Div>
-          </Div>
-
-          {/* Sort Controls */}
-          <Div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg border">
-            <Label className="text-[11px] font-medium text-muted-foreground shrink-0">
-              {t("selector.sortBy")}:
-            </Label>
-            <Div className="flex items-center gap-1 flex-wrap flex-1">
-              {ModelSortFieldOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  type="button"
-                  variant={sortBy === option.value ? "default" : "ghost"}
-                  size="sm"
-                  className="h-6 text-[11px] px-2"
-                  onClick={() => handleSortFieldChange(option.value)}
-                  disabled={readOnly}
-                >
-                  {t(option.label)}
-                </Button>
-              ))}
-            </Div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 shrink-0"
-              onClick={handleSortDirectionToggle}
-              disabled={!sortBy || readOnly}
-            >
-              {sortDirection === ModelSortDirection.ASC ? (
-                <ArrowUp className="h-3.5 w-3.5" />
-              ) : (
-                <ArrowDown className="h-3.5 w-3.5" />
-              )}
-            </Button>
-          </Div>
-
           {/* Model list */}
           {Array.isArray(displayModels) ? (
             // Ungrouped list
@@ -1151,7 +1663,10 @@ export function ModelSelector({
                     <ModelCard
                       key={model.id}
                       model={model}
-                      isBest={model.id === bestFilteredModel?.id}
+                      isBest={
+                        mode !== ModelSelectionType.MANUAL &&
+                        model.id === bestFilteredModel?.id
+                      }
                       selected={
                         mode === ModelSelectionType.MANUAL &&
                         manualModelId === model.id

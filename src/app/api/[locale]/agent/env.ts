@@ -121,6 +121,36 @@ const baseFields = {
     comment: "Scrappey API key",
     commented: true,
   },
+  OPENAI_API_KEY: {
+    schema: z.string().optional(),
+    example: "sk-...",
+    comment:
+      "OpenAI API key for DALL-E and gpt-image models - get yours at https://platform.openai.com/api-keys",
+    commented: true,
+    sensitive: true,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
+  },
+  REPLICATE_API_TOKEN: {
+    schema: z.string().optional(),
+    example: "r8_...",
+    comment:
+      "Replicate API token for Flux Pro, SDXL, and video generation models - get yours at https://replicate.com/account/api-tokens",
+    commented: true,
+    sensitive: true,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
+  },
+  FAL_AI_API_KEY: {
+    schema: z.string().optional(),
+    example: "your-fal-ai-key",
+    comment:
+      "Fal.ai API key for fast image and video generation - get yours at https://fal.ai/dashboard/keys",
+    commented: true,
+    sensitive: true,
+    onboardingStep: 4,
+    onboardingGroup: "ai",
+  },
 } as const;
 
 // S3 storage specific fields

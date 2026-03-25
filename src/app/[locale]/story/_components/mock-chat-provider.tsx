@@ -34,6 +34,9 @@ const MOCK_ENV: AgentEnvAvailability = {
   veniceAI: false,
   scrappey: false,
   claudeCode: false,
+  openAiImages: false,
+  replicate: false,
+  falAi: false,
 };
 
 const MOCK_CREDITS: ChatBootValue["initialCredits"] = {

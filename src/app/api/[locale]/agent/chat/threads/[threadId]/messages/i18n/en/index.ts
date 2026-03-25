@@ -322,6 +322,11 @@ export const translations = {
         upvote: "Upvote",
         downvote: "Downvote",
       },
+      generatedMediaActions: {
+        copy: "Copy",
+        copied: "Copied",
+        download: "Download",
+      },
     },
     messages: {
       assistant: "Assistant",

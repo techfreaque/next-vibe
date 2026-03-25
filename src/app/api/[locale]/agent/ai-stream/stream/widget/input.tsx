@@ -15,6 +15,13 @@ import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Square } from "next-vibe-ui/ui/icons/Square";
 import { X } from "next-vibe-ui/ui/icons/X";
 import { Kbd } from "next-vibe-ui/ui/kbd";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe-ui/ui/select";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import {
@@ -29,7 +36,12 @@ import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
-import { useChatInputStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
+import {
+  useChatInputStore,
+  ImageSize,
+  ImageQuality,
+  MusicDuration,
+} from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
 import { AGENT_MESSAGE_LENGTH } from "@/app/api/[locale]/agent/chat/constants";
@@ -305,6 +317,19 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const modelSupportsTools = currentModel?.supportsTools ?? false;
   const isInputDisabled = isLoading || !canPost;
 
+  // Model-type-aware UI
+  const isImageModel = currentModel?.modelType === "image";
+  const isAudioModel = currentModel?.modelType === "audio";
+  const isGenerativeModel = isImageModel || isAudioModel;
+
+  // Generation settings from store
+  const imageSize = useChatInputStore((s) => s.imageSize);
+  const imageQuality = useChatInputStore((s) => s.imageQuality);
+  const musicDuration = useChatInputStore((s) => s.musicDuration);
+  const setImageSize = useChatInputStore((s) => s.setImageSize);
+  const setImageQuality = useChatInputStore((s) => s.setImageQuality);
+  const setMusicDuration = useChatInputStore((s) => s.setMusicDuration);
+
   // Aborting state - user clicked cancel but STREAM_FINISHED hasn't arrived yet
   const isAborting = useAIStreamStore((s) =>
     activeThreadId ? s.isAborting(activeThreadId) : false,
@@ -496,30 +521,36 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           {!input && canPost && (
             <Div className="absolute inset-0 pl-3 pr-3 pointer-events-none hidden @sm:flex flex-col justify-between pb-1">
               <Div className="text-sm text-muted-foreground/70 pt-2">
-                {t("app.chat.input.placeholder")}
+                {isImageModel
+                  ? t("app.chat.input.imagePlaceholder")
+                  : isAudioModel
+                    ? t("app.chat.input.audioPlaceholder")
+                    : t("app.chat.input.placeholder")}
               </Div>
-              <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
-                <Span>
-                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                    {t("app.chat.input.keyboardShortcuts.enter")}
-                  </Kbd>{" "}
-                  {t("app.chat.input.keyboardShortcuts.toSend")}
-                </Span>
-                <Span className="opacity-30">{"/"}</Span>
-                <Span>
-                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                    {t("app.chat.input.keyboardShortcuts.shiftEnter")}
-                  </Kbd>{" "}
-                  {t("app.chat.input.keyboardShortcuts.forNewLine")}
-                </Span>
-                <Span className="opacity-30">{"/"}</Span>
-                <Span>
-                  <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
-                    {t("app.chat.input.keyboardShortcuts.ctrlV")}
-                  </Kbd>{" "}
-                  {t("app.chat.input.keyboardShortcuts.orPasteFiles")}
-                </Span>
-              </Div>
+              {!isGenerativeModel && (
+                <Div className="flex items-center gap-2 text-[11px] text-muted-foreground/40">
+                  <Span>
+                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                      {t("app.chat.input.keyboardShortcuts.enter")}
+                    </Kbd>{" "}
+                    {t("app.chat.input.keyboardShortcuts.toSend")}
+                  </Span>
+                  <Span className="opacity-30">{"/"}</Span>
+                  <Span>
+                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                      {t("app.chat.input.keyboardShortcuts.shiftEnter")}
+                    </Kbd>{" "}
+                    {t("app.chat.input.keyboardShortcuts.forNewLine")}
+                  </Span>
+                  <Span className="opacity-30">{"/"}</Span>
+                  <Span>
+                    <Kbd className="px-1 py-px bg-muted/50 rounded text-[10px] font-sans">
+                      {t("app.chat.input.keyboardShortcuts.ctrlV")}
+                    </Kbd>{" "}
+                    {t("app.chat.input.keyboardShortcuts.orPasteFiles")}
+                  </Span>
+                </Div>
+              )}
             </Div>
           )}
 
@@ -529,6 +560,61 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
               {noPermissionReason || t("app.chat.input.noPermission")}
             </Div>
           )}
+        </Div>
+      )}
+
+      {/* Generation settings row for image/audio models */}
+      {isImageModel && (
+        <Div className="flex items-center gap-2 mb-2 flex-wrap">
+          <Select value={imageSize} onValueChange={setImageSize}>
+            <SelectTrigger className="h-7 text-xs w-auto min-w-[9rem]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ImageSize.SQUARE_1024}>
+                {t("app.chat.imageGen.sizeSquare")}
+              </SelectItem>
+              <SelectItem value={ImageSize.LANDSCAPE_1792}>
+                {t("app.chat.imageGen.sizeLandscape")}
+              </SelectItem>
+              <SelectItem value={ImageSize.PORTRAIT_1792}>
+                {t("app.chat.imageGen.sizePortrait")}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={imageQuality} onValueChange={setImageQuality}>
+            <SelectTrigger className="h-7 text-xs w-auto min-w-[7rem]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ImageQuality.STANDARD}>
+                {t("app.chat.imageGen.qualityStandard")}
+              </SelectItem>
+              <SelectItem value={ImageQuality.HD}>
+                {t("app.chat.imageGen.qualityHD")}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </Div>
+      )}
+      {isAudioModel && (
+        <Div className="flex items-center gap-2 mb-2">
+          <Select value={musicDuration} onValueChange={setMusicDuration}>
+            <SelectTrigger className="h-7 text-xs w-auto min-w-[7rem]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={MusicDuration.SHORT}>
+                {t("app.chat.audioGen.durationShort")}
+              </SelectItem>
+              <SelectItem value={MusicDuration.MEDIUM}>
+                {t("app.chat.audioGen.durationMedium")}
+              </SelectItem>
+              <SelectItem value={MusicDuration.LONG}>
+                {t("app.chat.audioGen.durationLong")}
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </Div>
       )}
 
@@ -576,65 +662,69 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             initialSkillData={initialSkillData}
           />
 
-          {modelSupportsTools && (
+          {modelSupportsTools && !isGenerativeModel && (
             <ToolsButton disabled={isLoading} locale={locale} />
           )}
 
-          <FileUploadButton
-            disabled={isInputDisabled}
-            locale={locale}
-            attachments={attachments}
-            onFilesSelected={setAttachments}
-            onRemoveFile={handleRemoveFile}
-          />
+          {!isGenerativeModel && (
+            <FileUploadButton
+              disabled={isInputDisabled}
+              locale={locale}
+              attachments={attachments}
+              onFilesSelected={setAttachments}
+              onRemoveFile={handleRemoveFile}
+            />
+          )}
         </Div>
 
         {/* Right: Call Mode + Mic + Send/Stop */}
         <Div className="flex flex-row items-center gap-0.5 shrink-0">
-          {/* Call mode toggle */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant={
-                    ttsAutoplay && !voiceUnconfigured ? "default" : "ghost"
-                  }
-                  onClick={handleToggleCallMode}
-                  className={cn(
-                    "h-8 w-8 @sm:h-9 @sm:w-9",
-                    !voiceUnconfigured &&
-                      ttsAutoplay &&
-                      "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
-                    voiceUnconfigured && "opacity-50 cursor-not-allowed",
-                  )}
-                  data-tour={TOUR_DATA_ATTRS.CALL_MODE_BUTTON}
+          {/* Call mode toggle - hidden for image/audio models */}
+          {!isGenerativeModel && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant={
+                      ttsAutoplay && !voiceUnconfigured ? "default" : "ghost"
+                    }
+                    onClick={handleToggleCallMode}
+                    className={cn(
+                      "h-8 w-8 @sm:h-9 @sm:w-9",
+                      !voiceUnconfigured &&
+                        ttsAutoplay &&
+                        "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500",
+                      voiceUnconfigured && "opacity-50 cursor-not-allowed",
+                    )}
+                    data-tour={TOUR_DATA_ATTRS.CALL_MODE_BUTTON}
+                  >
+                    <Phone className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent
+                  className={voiceUnconfigured ? "max-w-xs text-xs" : undefined}
                 >
-                  <Phone className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent
-                className={voiceUnconfigured ? "max-w-xs text-xs" : undefined}
-              >
-                {voiceUnconfigured ? (
-                  <>
-                    <P className="font-semibold mb-1">
-                      {t("app.chat.voiceMode.unconfiguredTitle")}
-                    </P>
-                    <P>{t("app.chat.voiceMode.unconfiguredDescription")}</P>
-                    <P className="mt-1 font-mono text-[10px] opacity-80">
-                      EDEN_AI_API_KEY
-                    </P>
-                  </>
-                ) : ttsAutoplay ? (
-                  t("app.chat.voiceMode.callModeDescription")
-                ) : (
-                  t("app.chat.voiceMode.callMode")
-                )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                  {voiceUnconfigured ? (
+                    <>
+                      <P className="font-semibold mb-1">
+                        {t("app.chat.voiceMode.unconfiguredTitle")}
+                      </P>
+                      <P>{t("app.chat.voiceMode.unconfiguredDescription")}</P>
+                      <P className="mt-1 font-mono text-[10px] opacity-80">
+                        EDEN_AI_API_KEY
+                      </P>
+                    </>
+                  ) : ttsAutoplay ? (
+                    t("app.chat.voiceMode.callModeDescription")
+                  ) : (
+                    t("app.chat.voiceMode.callMode")
+                  )}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
           {/* Mic button */}
           {showMicButton && (

@@ -28,15 +28,13 @@ export const translations = {
       medium: "Średni (~20 sek.)",
       long: "Długi (~30 sek.)",
     },
-    threadId: {
-      label: "ID wątku",
-      description:
-        "Opcjonalne ID wątku, aby zapisać wygenerowane audio jako wiadomość czatu",
+    submitButton: {
+      text: "Generuj muzykę",
+      loadingText: "Generowanie...",
     },
     response: {
       audioUrl: "URL wygenerowanego audio",
       creditCost: "Użyte kredyty",
-      messageId: "ID wiadomości",
       durationSeconds: "Czas trwania w sekundach",
     },
     errors: {
