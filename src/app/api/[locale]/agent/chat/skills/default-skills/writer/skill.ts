@@ -1,12 +1,15 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const writerSkill: Skill = {
@@ -56,13 +59,74 @@ export const writerSkill: Skill = {
     "skills.writer.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.GROK_4_20_BETA,
     intelligenceRange: {
       min: IntelligenceLevel.BRILLIANT,
       max: IntelligenceLevel.BRILLIANT,
     },
-    contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
-    sortBy: ModelSortField.CONTENT,
+    contentRange: {
+      min: ContentLevel.OPEN,
+      max: ContentLevel.OPEN,
+    },
+    sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "western",
+      variantName: "skills.writer.variants.western" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GROK_4_20_BETA,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "eastern",
+      variantName: "skills.writer.variants.eastern" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.MINIMAX_M2_7,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "budget",
+      variantName: "skills.writer.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.KIMI_K2,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

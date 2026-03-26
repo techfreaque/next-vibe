@@ -1,12 +1,15 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const financialAdvisorSkill: Skill = {
@@ -90,10 +93,11 @@ Always recommend consulting a licensed financial advisor for personalized advice
     "skills.financialAdvisor.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.GROK_4_20_BETA,
     intelligenceRange: {
-      min: IntelligenceLevel.SMART,
-      max: IntelligenceLevel.SMART,
+      min: IntelligenceLevel.BRILLIANT,
+      max: IntelligenceLevel.BRILLIANT,
     },
     contentRange: {
       min: ContentLevel.OPEN,
@@ -102,4 +106,43 @@ Always recommend consulting a licensed financial advisor for personalized advice
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "maverick",
+      variantName: "skills.financialAdvisor.variants.maverick" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GROK_4_20_BETA,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "budget",
+      variantName: "skills.financialAdvisor.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.DEEPSEEK_V32,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

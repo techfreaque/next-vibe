@@ -408,6 +408,7 @@ export const ICON_REGISTRY = {
   // AI Providers
   "uncensored-ai": "UncensoredAILogo",
   "si-anthropic": "SiAnthropic",
+  "si-bytedance": "SiBytedance",
   "si-googlegemini": "SiGooglegemini",
   "si-mistralai": "SiMistralai",
   "si-x": "SiX",
@@ -873,6 +874,7 @@ export const ICON_CATEGORIES = {
     name: "app.ui.iconPicker.categories.aiProviders",
     icons: [
       "si-anthropic",
+      "si-bytedance",
       "si-googlegemini",
       "si-minimax",
       "si-mistralai",

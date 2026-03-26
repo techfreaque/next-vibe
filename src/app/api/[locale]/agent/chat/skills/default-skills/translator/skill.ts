@@ -1,13 +1,15 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-  SpeedLevel,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const translatorSkill: Skill = {
@@ -56,17 +58,56 @@ export const translatorSkill: Skill = {
     "skills.translator.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.GEMINI_3_FLASH,
     intelligenceRange: {
-      min: IntelligenceLevel.QUICK,
+      min: IntelligenceLevel.SMART,
       max: IntelligenceLevel.SMART,
     },
     contentRange: {
       min: ContentLevel.MAINSTREAM,
       max: ContentLevel.MAINSTREAM,
     },
-    speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
-    sortBy: ModelSortField.PRICE,
-    sortDirection: ModelSortDirection.ASC,
+    sortBy: ModelSortField.INTELLIGENCE,
+    sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "gemini",
+      variantName: "skills.translator.variants.gemini" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_FLASH,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "budget",
+      variantName: "skills.translator.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GLM_4_7_FLASH,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

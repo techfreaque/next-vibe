@@ -164,6 +164,11 @@ const { GET } = createEndpoint({
               hidden: true,
               schema: z.string(),
             }),
+            variantId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: z.string().nullable(),
+            }),
             modelId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               hidden: true,
@@ -317,6 +322,7 @@ const { GET } = createEndpoint({
           {
             id: "550e8400-e29b-41d4-a716-446655440000",
             skillId: "default",
+            variantId: null,
             modelId: ModelId.CLAUDE_SONNET_4_5,
             voice: TtsVoiceValue,
             position: 0,

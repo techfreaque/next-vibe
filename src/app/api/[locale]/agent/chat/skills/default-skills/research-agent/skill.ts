@@ -1,3 +1,5 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
 import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/constants";
 import { KAGI_ALIAS } from "@/app/api/[locale]/agent/search/kagi/constants";
@@ -21,7 +23,6 @@ import {
   ModelSortField,
   SkillCategory,
   SkillOwnershipType,
-  SpeedLevel,
 } from "../../enum";
 
 export const researchAgentSkill: Skill = {
@@ -78,14 +79,56 @@ export const researchAgentSkill: Skill = {
     "skills.researchAgent.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
     intelligenceRange: {
-      min: IntelligenceLevel.SMART,
+      min: IntelligenceLevel.BRILLIANT,
       max: IntelligenceLevel.BRILLIANT,
     },
-    contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
-    speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
+    contentRange: {
+      min: ContentLevel.MAINSTREAM,
+      max: ContentLevel.MAINSTREAM,
+    },
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "gemini",
+      variantName: "skills.researchAgent.variants.gemini" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "fast",
+      variantName: "skills.researchAgent.variants.fast" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_FLASH,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

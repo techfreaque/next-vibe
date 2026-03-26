@@ -1,3 +1,5 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import {
   CRON_DELETE_ALIAS,
@@ -25,7 +27,6 @@ import {
   ModelSortField,
   SkillCategory,
   SkillOwnershipType,
-  SpeedLevel,
 } from "../../enum";
 
 export const cronManagerSkill: Skill = {
@@ -85,17 +86,56 @@ export const cronManagerSkill: Skill = {
     "skills.cronManager.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
     intelligenceRange: {
-      min: IntelligenceLevel.SMART,
+      min: IntelligenceLevel.BRILLIANT,
       max: IntelligenceLevel.BRILLIANT,
     },
     contentRange: {
       min: ContentLevel.MAINSTREAM,
       max: ContentLevel.MAINSTREAM,
     },
-    speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "gemini",
+      variantName: "skills.cronManager.variants.gemini" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "fast",
+      variantName: "skills.cronManager.variants.fast" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_FLASH,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

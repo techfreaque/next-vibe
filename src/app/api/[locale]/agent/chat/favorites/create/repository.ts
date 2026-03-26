@@ -19,6 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { DEFAULT_SKILLS } from "../../skills/config";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
@@ -86,8 +87,18 @@ export class FavoritesCreateRepository {
       const voiceToStore =
         character && data.voice === character.voice ? null : data.voice;
 
-      // modelSelection is already the right format - store it directly
-      const modelSelectionToStore = data.modelSelection;
+      // If a variantId is provided, resolve its modelSelection from DEFAULT_SKILLS
+      // so the favorite stores the correct model config for that variant.
+      let modelSelectionToStore = data.modelSelection;
+      if (data.variantId && data.skillId) {
+        const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === data.skillId);
+        const variant = defaultSkill?.variants?.find(
+          (v) => v.id === data.variantId,
+        );
+        if (variant) {
+          modelSelectionToStore = variant.modelSelection;
+        }
+      }
 
       // Get current max position using database aggregation
       const [maxPositionResult] = await db
@@ -102,6 +113,7 @@ export class FavoritesCreateRepository {
         .values({
           userId,
           skillId: data.skillId,
+          variantId: data.variantId ?? null,
           customName: null,
           customIcon: null,
           voice: voiceToStore,

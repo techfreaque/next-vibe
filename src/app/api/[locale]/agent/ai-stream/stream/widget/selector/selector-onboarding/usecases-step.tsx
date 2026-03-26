@@ -117,6 +117,7 @@ function getSpecialistModelSelection(
 interface SeededEntry {
   id: string;
   skillId: string;
+  variantId: string | null;
   modelSelection: ModelSelectionSimple;
 }
 
@@ -127,7 +128,6 @@ interface SeedResult {
 
 async function seedFavorites(
   companionId: string,
-  modelSelection: ModelSelectionSimple,
   selected: Set<UseCase>,
   addFavorite: ReturnType<typeof useFavoriteCreate>["addFavorite"],
 ): Promise<SeedResult> {
@@ -137,25 +137,42 @@ async function seedFavorites(
   }
 
   const entries: SeededEntry[] = [];
+  let firstCompanionId: string | null = null;
 
-  // Create one companion favorite with the chosen model
-  const companionFavoriteId = await addFavorite({
-    skillId: companionId,
-    icon: companion.icon,
-    voice: companion.voice,
-    modelSelection,
-  });
-
-  const firstCompanionId = companionFavoriteId ?? null;
-  if (companionFavoriteId) {
-    entries.push({
-      id: companionFavoriteId,
+  // Create one favorite per companion variant
+  const variants = companion.variants ?? [];
+  for (const variant of variants) {
+    const id = await addFavorite({
       skillId: companionId,
-      modelSelection,
+      variantId: variant.id,
+      icon: companion.icon,
+      voice: companion.voice,
+      modelSelection: variant.modelSelection,
     });
+    if (id) {
+      if (variant.isDefault ?? false) {
+        firstCompanionId = id;
+      }
+      entries.push({
+        id,
+        skillId: companionId,
+        variantId: variant.id,
+        modelSelection: variant.modelSelection,
+      });
+    }
   }
 
-  const specialistModelSelection = getSpecialistModelSelection(modelSelection);
+  // Fallback: if no variant was marked default, use the first one created
+  if (!firstCompanionId && entries.length > 0) {
+    firstCompanionId = entries[0]!.id;
+  }
+
+  const defaultModelSelection =
+    entries.find((e) => e.id === firstCompanionId)?.modelSelection ??
+    companion.modelSelection;
+  const specialistModelSelection = getSpecialistModelSelection(
+    defaultModelSelection,
+  );
   const seededSkillIds = new Set<string>();
 
   for (const useCase of USE_CASE_IDS) {
@@ -172,7 +189,12 @@ async function seedFavorites(
         modelSelection: specialistModelSelection,
       });
       if (id) {
-        entries.push({ id, skillId, modelSelection: specialistModelSelection });
+        entries.push({
+          id,
+          skillId,
+          variantId: null,
+          modelSelection: specialistModelSelection,
+        });
       }
     }
   }
@@ -182,7 +204,6 @@ async function seedFavorites(
 
 interface UsecasesStepProps {
   companionId: string;
-  modelSelection: ModelSelectionSimple;
   locale: CountryLanguage;
   onDone: () => void;
   onBack: () => void;
@@ -190,7 +211,6 @@ interface UsecasesStepProps {
 
 export function UsecasesStep({
   companionId,
-  modelSelection,
   locale,
   onDone,
   onBack,
@@ -223,36 +243,44 @@ export function UsecasesStep({
   const applyOptimisticFavorites = useCallback(
     (entries: SeededEntry[], firstId: string | null) => {
       const { t: tSkill } = skillsScopedTranslation.scopedT(locale);
+      const cards = entries.map((entry, index) => {
+        const skill = DEFAULT_SKILLS.find((s) => s.id === entry.skillId);
+        return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
+          {
+            id: entry.id,
+            skillId: entry.skillId,
+            variantId: entry.variantId,
+            customIcon: skill?.icon ?? null,
+            voice: skill?.voice ?? null,
+            modelSelection: entry.modelSelection,
+            position: index,
+          },
+          skill?.modelSelection ?? null,
+          skill?.icon ?? null,
+          skill?.name ? tSkill(skill.name) : null,
+          skill?.tagline ? tSkill(skill.tagline) : null,
+          skill?.description ? tSkill(skill.description) : null,
+          firstId,
+          skill?.voice ?? null,
+          locale,
+          user,
+        );
+      });
       apiClient.updateEndpointData(
         favoritesDefinition.GET,
         logger,
         (oldData) => {
-          if (!oldData?.success) {
-            return undefined;
-          }
-          const cards = entries.map((entry, index) => {
-            const skill = DEFAULT_SKILLS.find((s) => s.id === entry.skillId);
-            return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
-              {
-                id: entry.id,
-                skillId: entry.skillId,
-                customIcon: skill?.icon ?? null,
-                voice: skill?.voice ?? null,
-                modelSelection: entry.modelSelection,
-                position: index,
-              },
-              skill?.modelSelection ?? null,
-              skill?.icon ?? null,
-              skill?.name ? tSkill(skill.name) : null,
-              skill?.tagline ? tSkill(skill.tagline) : null,
-              skill?.description ? tSkill(skill.description) : null,
-              firstId,
-              skill?.voice ?? null,
-              locale,
-              user,
-            );
-          });
-          return success({ ...oldData.data, favorites: cards });
+          const base = oldData?.success
+            ? oldData.data
+            : {
+                totalCount: null,
+                matchedCount: null,
+                currentPage: null,
+                totalPages: null,
+                hint: null,
+                favorites: [],
+              };
+          return success({ ...base, favorites: cards });
         },
       );
     },
@@ -264,19 +292,22 @@ export function UsecasesStep({
     try {
       const { firstCompanionId, entries } = await seedFavorites(
         companionId,
-        modelSelection,
         selected,
         addFavorite,
       );
       applyOptimisticFavorites(entries, firstCompanionId);
       onDone();
       if (firstCompanionId && settings?.ttsVoice) {
+        const defaultEntry = entries.find((e) => e.id === firstCompanionId);
+        const activeModelId =
+          defaultEntry?.modelSelection.selectionType ===
+          ModelSelectionType.MANUAL
+            ? defaultEntry.modelSelection.manualModelId
+            : ModelId.KIMI_K2_5;
         setActiveFavorite(
           firstCompanionId,
           companionId,
-          modelSelection.selectionType === ModelSelectionType.MANUAL
-            ? modelSelection.manualModelId
-            : ModelId.KIMI_K2_5,
+          activeModelId,
           settings.ttsVoice,
         );
       }
@@ -286,7 +317,6 @@ export function UsecasesStep({
   }, [
     selected,
     companionId,
-    modelSelection,
     addFavorite,
     applyOptimisticFavorites,
     setActiveFavorite,

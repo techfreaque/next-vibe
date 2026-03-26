@@ -1,11 +1,15 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
+  IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const uncensoredSkill: Skill = {
@@ -26,13 +30,92 @@ export const uncensoredSkill: Skill = {
     "skills.uncensored.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
-
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.UNCENSORED_LM_V1_2,
+    intelligenceRange: {
+      min: IntelligenceLevel.SMART,
+      max: IntelligenceLevel.SMART,
+    },
     contentRange: {
       min: ContentLevel.UNCENSORED,
       max: ContentLevel.UNCENSORED,
     },
-    sortBy: ModelSortField.CONTENT,
+    sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "far-right",
+      variantName: "skills.uncensored.variants.farRight" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "conservative",
+      variantName: "skills.uncensored.variants.conservative" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GAB_AI_ARYA,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "libertarian",
+      variantName: "skills.uncensored.variants.libertarian" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.FREEDOMGPT_LIBERTY,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "open",
+      variantName: "skills.uncensored.variants.open" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.VENICE_UNCENSORED,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

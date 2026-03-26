@@ -125,6 +125,9 @@ const { POST } = createEndpoint({
               ownershipType: SkillOwnershipType.USER,
               trustLevel: null,
               voteCount: null,
+              variantId: null,
+              variantName: null,
+              isVariant: false,
             };
 
             // Add to existing section or create new section for this category

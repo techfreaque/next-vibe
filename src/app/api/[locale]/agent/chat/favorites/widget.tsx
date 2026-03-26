@@ -38,6 +38,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
+import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -62,6 +63,7 @@ import {
 import { scopedTranslation as ttsScopedTranslation } from "../../text-to-speech/i18n";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
+import { scopedTranslation as skillsScopedTranslation } from "../skills/i18n";
 import { NO_SKILL_ID } from "../skills/constants";
 import { SkillCategory } from "../skills/enum";
 import definition, {
@@ -98,8 +100,29 @@ interface SkillGroup {
 const GROUP_PREFIX = "group-";
 
 /**
+ * Resolve the localized variant label for a favorite card.
+ * Returns null for non-variant favorites or unknown variants.
+ */
+function getVariantLabel(
+  variantId: string | null,
+  skillId: string,
+  locale: CountryLanguage,
+): string | null {
+  if (!variantId) {
+    return null;
+  }
+  const skill = DEFAULT_SKILLS.find((s) => s.id === skillId);
+  const variant = skill?.variants?.find((v) => v.id === variantId);
+  if (!variant) {
+    return null;
+  }
+  return skillsScopedTranslation.scopedT(locale).t(variant.variantName);
+}
+
+/**
  * Group favorites by skillId, preserving position order.
  * Groups ordered by the minimum position of their members.
+ * Group name uses the base skill name (not variant-suffixed).
  */
 function groupBySkill(favorites: FavoriteCard[]): SkillGroup[] {
   const map = new Map<string, FavoriteCard[]>();
@@ -117,6 +140,7 @@ function groupBySkill(favorites: FavoriteCard[]): SkillGroup[] {
     .map(([groupKey, items]) => ({
       id: `${GROUP_PREFIX}${groupKey}`,
       skillId: items[0].skillId,
+      // Always use base name (items[0].name is the skill name, not variant-suffixed)
       name: items[0].name,
       icon: items[0].icon,
       tagline: items[0].tagline,
@@ -197,6 +221,7 @@ const FullCard = React.memo(function FullCard({
   user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
   const isActive = Boolean(item.activeBadge);
+  const variantLabel = getVariantLabel(item.variantId, item.skillId, locale);
 
   return (
     <Div
@@ -238,6 +263,11 @@ const FullCard = React.memo(function FullCard({
               fieldName={arrayFieldPath(FAVORITES_FIELD, index, "name")}
             />
           </Span>
+          {variantLabel && (
+            <Span className="text-xs font-bold px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+              {variantLabel}
+            </Span>
+          )}
           <TextWidget
             field={withValue(
               fieldChildren.favorites.child.children.tagline,
@@ -376,6 +406,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
   locale: CountryLanguage;
   isTouch: boolean;
 }): React.JSX.Element {
+  const variantLabel = getVariantLabel(item.variantId, item.skillId, locale);
   const {
     attributes,
     listeners,
@@ -407,24 +438,30 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
         )}
         onClick={() => !isActive && void handleSelectFavorite(item)}
       >
-        {/* Model icon */}
-        <IconWidget
-          field={withValue(
-            fieldChildren.favorites.child.children.modelIcon,
-            item.modelIcon,
-            item,
-          )}
-          fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelIcon")}
-        />
-
-        {/* Two-line model info */}
+        {/* Two-line content */}
         <Div className="flex-1 min-w-0">
+          {/* Line 1: variant name · model icon · model name · active badge */}
           <Div className="flex items-center gap-1.5">
-            <Span
-              className={cn(
-                "text-sm truncate",
-                isActive && "text-primary font-medium",
+            {variantLabel && (
+              <Span
+                className={cn(
+                  "text-sm font-bold truncate",
+                  isActive && "text-primary",
+                )}
+              >
+                {variantLabel}
+              </Span>
+            )}
+            <IconWidget
+              field={withValue(
+                fieldChildren.favorites.child.children.modelIcon,
+                item.modelIcon,
+                item,
               )}
+              fieldName={arrayFieldPath(FAVORITES_FIELD, index, "modelIcon")}
+            />
+            <Span
+              className={cn("text-sm truncate", isActive && "text-primary")}
             >
               <TextWidget
                 field={withValue(
@@ -444,43 +481,52 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
               fieldName={arrayFieldPath(FAVORITES_FIELD, index, "activeBadge")}
             />
           </Div>
-          <Div className="flex flex-col gap-0">
-            <Div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <TextWidget
-                field={withValue(
-                  fieldChildren.favorites.child.children.modelProvider,
-                  item.modelProvider,
-                  item,
-                )}
-                fieldName={arrayFieldPath(
-                  FAVORITES_FIELD,
-                  index,
-                  "modelProvider",
-                )}
-              />
-              {item.modelId ? (
-                <>
-                  <TextWidget
-                    field={fieldChildren.favorites.child.children.separator2}
-                    fieldName={arrayFieldPath(
-                      FAVORITES_FIELD,
-                      index,
-                      "separator2",
-                    )}
-                  />
-                  <ModelCreditDisplay
-                    modelId={item.modelId}
-                    variant="text"
-                    className="text-xs text-muted-foreground"
-                    locale={locale}
-                  />
-                </>
-              ) : null}
-            </Div>
+          {/* Line 2: provider · price · voice */}
+          <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <TextWidget
+              field={withValue(
+                fieldChildren.favorites.child.children.modelProvider,
+                item.modelProvider,
+                item,
+              )}
+              fieldName={arrayFieldPath(
+                FAVORITES_FIELD,
+                index,
+                "modelProvider",
+              )}
+            />
+            {item.modelId ? (
+              <>
+                <TextWidget
+                  field={fieldChildren.favorites.child.children.separator2}
+                  fieldName={arrayFieldPath(
+                    FAVORITES_FIELD,
+                    index,
+                    "separator2",
+                  )}
+                />
+                <ModelCreditDisplay
+                  modelId={item.modelId}
+                  variant="text"
+                  className="text-xs text-muted-foreground"
+                  locale={locale}
+                />
+              </>
+            ) : null}
             {item.voice ? (
-              <Span className="text-xs text-muted-foreground opacity-60">
-                {ttsScopedTranslation.scopedT(locale).t(item.voice)}
-              </Span>
+              <>
+                <TextWidget
+                  field={fieldChildren.favorites.child.children.separator2}
+                  fieldName={arrayFieldPath(
+                    FAVORITES_FIELD,
+                    index,
+                    "separator2",
+                  )}
+                />
+                <Span className="opacity-60">
+                  {ttsScopedTranslation.scopedT(locale).t(item.voice)}
+                </Span>
+              </>
             ) : null}
           </Div>
         </Div>
@@ -689,7 +735,7 @@ const SortableGroup = React.memo(function SortableGroup({
             items={group.items.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            <Div className="border-t border-border/40 ml-[4.5rem] mr-3 py-0.5">
+            <Div className="border-t border-border/40 py-0.5">
               {group.items.map((item) => {
                 const globalIndex = allFavorites.findIndex(
                   (f) => f.id === item.id,
@@ -922,6 +968,7 @@ export function FavoritesListContainer({
           variant="ghost"
           className="flex-1 rounded-none border-b-2 border-transparent h-10 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1.5"
           onClick={() => void handleBrowseSkills()}
+          data-tour={TOUR_DATA_ATTRS.FAVORITES_BROWSE_SKILLS}
         >
           <Compass className="h-4 w-4" />
           {tFav("get.tabs.browseSkills")}
@@ -946,7 +993,14 @@ export function FavoritesListContainer({
             >
               <Div className="flex flex-col gap-3">
                 {sections.map((section, sectionIdx) => (
-                  <Div key={section.type}>
+                  <Div
+                    key={section.type}
+                    data-tour={
+                      section.type === "companion"
+                        ? TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP
+                        : undefined
+                    }
+                  >
                     {/* Section header - only shown when multiple sections exist */}
                     {sections.length > 1 && (
                       <Div

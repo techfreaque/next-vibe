@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     // May reduce memory after compilation phase. Unit: bytes.
     turbopackMemoryLimit: 8 * 1024 * 1024 * 1024, // 8 GB
     // parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
+    // parallelServerCompiles: true,
     turbopackFileSystemCacheForDev: true,
     optimizePackageImports: [
       "lucide-react",

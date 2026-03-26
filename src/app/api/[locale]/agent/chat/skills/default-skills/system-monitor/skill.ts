@@ -1,3 +1,5 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { CRON_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/constants";
@@ -19,7 +21,6 @@ import {
   ModelSortField,
   SkillCategory,
   SkillOwnershipType,
-  SpeedLevel,
 } from "../../enum";
 
 export const systemMonitorSkill: Skill = {
@@ -79,7 +80,8 @@ export const systemMonitorSkill: Skill = {
     "skills.systemMonitor.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.GEMINI_3_FLASH,
     intelligenceRange: {
       min: IntelligenceLevel.SMART,
       max: IntelligenceLevel.SMART,
@@ -88,8 +90,46 @@ export const systemMonitorSkill: Skill = {
       min: ContentLevel.MAINSTREAM,
       max: ContentLevel.MAINSTREAM,
     },
-    speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
-    sortBy: ModelSortField.SPEED,
+    sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "fast",
+      variantName: "skills.systemMonitor.variants.fast" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_FLASH,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "budget",
+      variantName: "skills.systemMonitor.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.CLAUDE_HAIKU_4_5,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

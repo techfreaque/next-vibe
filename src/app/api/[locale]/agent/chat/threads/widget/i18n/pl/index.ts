@@ -102,6 +102,18 @@ export const translations: typeof enTranslations = {
           "Wybieraj spośród ponad {{modelCount}} modeli AI, w tym głównonurtowych, open-source i bez cenzury.",
         tip: "Kliknij, aby otworzyć selektor modeli i wybrać towarzysza.",
       },
+      companionVariants: {
+        title: "Warianty twojego towarzysza",
+        description:
+          "Twój towarzysz ma kilka wariantów — brilliant do głębokiego myślenia, smart do codziennych zadań i bez cenzury do niefiltrowanych odpowiedzi. Dotknij dowolny wiersz, aby natychmiast przełączyć.",
+        tip: "Możesz przeciągać, aby zmienić kolejność, lub dodawać kolejne warianty w dowolnym momencie.",
+      },
+      browseSkills: {
+        title: "Odkryj więcej umiejętności",
+        description:
+          "Przeglądaj 40+ specjalistycznych umiejętności — od koderów i badaczy po pisarzy i doradców. Dodaj dowolną umiejętność jako ulubioną, a pojawi się tutaj.",
+        tip: "Umiejętności nadają AI konkretny cel i najlepszy model do zadania.",
+      },
       rootFolders: {
         title: "Twoje foldery czatów",
         description:

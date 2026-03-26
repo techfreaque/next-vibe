@@ -11,7 +11,7 @@ import type { GenericHandlerBase } from "../unified-interface/shared/endpoints/r
 /* eslint-disable prettier/prettier */
 
 /**
- * Dynamically import route handler by path
+ * Dynamically import route handler by path.
  * @param path - The route path (e.g., "core/agent/chat/threads")
  * @returns The route module or null if not found
  */

@@ -435,6 +435,7 @@ const { PATCH } = createEndpoint({
                       {
                         id: pathParams.id,
                         skillId: fav.skillId,
+                        variantId: fav.variantId ?? null,
                         customIcon: requestData.icon ?? null,
                         voice: requestData.voice ?? null,
                         modelSelection: requestData.modelSelection,
@@ -807,6 +808,12 @@ const { GET } = createEndpoint({
       skillId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
+        hidden: true,
+      }),
+
+      variantId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().nullable(),
         hidden: true,
       }),
 

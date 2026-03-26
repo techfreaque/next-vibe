@@ -293,16 +293,26 @@ export class HelpRepository {
     parameters?: HelpToolParameters,
     includeExamples = false,
     platforms?: Platform[],
+    compact = false,
   ): HelpToolMetadataSerialized {
     return {
       name: tool.toolName,
       title: tool.title,
-      id: tool.toolName,
-      tags: tool.tags,
-      method: tool.method,
+      // id is redundant with name - omit for compact platforms (AI/MCP) to save tokens
+      ...(!compact && { id: tool.toolName }),
+      // tags are low-signal for AI tool selection - omit for compact platforms
+      ...(!compact && { tags: tool.tags }),
+      // method is irrelevant for AI (calls via execute-tool) - omit for compact platforms
+      ...(!compact && { method: tool.method }),
       description: tool.description,
       category: tool.category,
-      aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
+      // compact: only include first alias to avoid token bloat
+      aliases:
+        tool.aliases.length > 0
+          ? compact
+            ? tool.aliases.slice(0, 1)
+            : tool.aliases
+          : undefined,
       requiresConfirmation: tool.requiresConfirmation,
       credits: tool.credits,
       platforms,
@@ -314,15 +324,24 @@ export class HelpRepository {
   private static serializeMetaMinimal(
     tool: EndpointMeta,
     platforms?: Platform[],
+    compact = false,
   ): HelpToolMetadataSerialized {
     return {
       name: tool.toolName,
       title: tool.title,
-      id: tool.toolName,
-      tags: tool.tags,
+      // id is redundant with name - omit for compact platforms
+      ...(!compact && { id: tool.toolName }),
+      // tags are low-signal for AI tool selection - omit for compact platforms
+      ...(!compact && { tags: tool.tags }),
       description: tool.description,
       category: tool.category,
-      aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
+      // compact: only include first alias
+      aliases:
+        tool.aliases.length > 0
+          ? compact
+            ? tool.aliases.slice(0, 1)
+            : tool.aliases
+          : undefined,
       credits: tool.credits,
       platforms,
     };
@@ -584,7 +603,7 @@ export class HelpRepository {
             tool.title.toLowerCase().includes(lowerQuery) ||
             tool.description.toLowerCase().includes(lowerQuery) ||
             tool.category.toLowerCase().includes(lowerQuery) ||
-            tool.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
+            tool.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
             tool.aliases?.some((a) => a.toLowerCase().includes(lowerQuery))
           ) {
             return true;
@@ -781,11 +800,14 @@ export class HelpRepository {
       .toSorted((a, b) => a[0].localeCompare(b[0]))
       .map(([name, count]) => ({ name, count }));
 
-    // statsFilter: web/human platforms can filter by pinned or allowed tools.
-    // null in DB = user has default settings (never stored when default).
-    // Compact platforms (AI/MCP/CRON) default to "all" - no pinned filtering for agents.
-    // Web/human platforms default to "pinned" to avoid loading all tools unnecessarily.
-    const statsFilter = data.statsFilter ?? (isCompact ? "all" : "pinned");
+    // statsFilter: web platforms (NEXT_PAGE, NEXT_API, TRPC, FRAME, ELECTRON) default to "pinned"
+    // to avoid loading all tools unnecessarily in the web UI.
+    // Compact platforms (AI/MCP/CRON) and CLI default to "all" - no pinned filtering needed.
+    const isWebPlatform =
+      !isCompact &&
+      platform !== Platform.CLI &&
+      platform !== Platform.CLI_PACKAGE;
+    const statsFilter = data.statsFilter ?? (isWebPlatform ? "pinned" : "all");
     // Server-side counts for the stats filter buttons (web only)
     let pinnedCount: number | undefined;
     let allowedCount: number | undefined;
@@ -904,6 +926,7 @@ export class HelpRepository {
             parameters,
             true,
             getToolPlatforms(matchedTool),
+            isCompact,
           ),
         ],
         totalCount,
@@ -943,6 +966,7 @@ export class HelpRepository {
               parameters,
               true,
               getToolPlatforms(exactMatch),
+              isCompact,
             ),
           ],
           totalCount,
@@ -1005,6 +1029,7 @@ export class HelpRepository {
               parameters,
               true,
               getToolPlatforms(m),
+              true, // compact=true (we're inside isCompact block)
             );
           }),
         );
@@ -1024,8 +1049,9 @@ export class HelpRepository {
           ? ` Page ${safePage}/${totalPages} - pass page=${safePage + 1} to continue.`
           : "";
       return success({
-        tools: pageSlice.map((m) =>
-          HelpRepository.serializeMetaMinimal(m, getToolPlatforms(m)),
+        tools: pageSlice.map(
+          (m) =>
+            HelpRepository.serializeMetaMinimal(m, getToolPlatforms(m), true), // compact=true
         ),
         totalCount,
         matchedCount,
@@ -1069,7 +1095,13 @@ export class HelpRepository {
 
     return success({
       tools: pageSlice.map((m) =>
-        HelpRepository.serializeMeta(m, undefined, false, getToolPlatforms(m)),
+        HelpRepository.serializeMeta(
+          m,
+          undefined,
+          false,
+          getToolPlatforms(m),
+          isCompact,
+        ),
       ),
       totalCount,
       matchedCount,

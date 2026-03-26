@@ -36,7 +36,12 @@ import type {
   SkillUpdateRequestOutput,
   SkillUpdateResponseOutput,
 } from "./[id]/definition";
-import { type Skill, DEFAULT_SKILLS, NO_SKILL } from "./config";
+import {
+  type Skill,
+  type SkillVariant,
+  DEFAULT_SKILLS,
+  NO_SKILL,
+} from "./config";
 import { NO_SKILL_ID } from "./constants";
 import type {
   SkillCreateRequestOutput,
@@ -117,7 +122,7 @@ export class SkillsRepository {
   ): Promise<ResponseType<SkillListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     const isCompact = platform ? isAgentPlatform(platform) : false;
-    const COMPACT_PAGE_SIZE = 25;
+    const COMPACT_PAGE_SIZE = 10;
     const effectivePageSize =
       data.pageSize ?? (isCompact ? COMPACT_PAGE_SIZE : undefined);
     const currentPage = data.page ?? 1;
@@ -182,9 +187,8 @@ export class SkillsRepository {
 
         // Map default skills to card display fields (filtered by role + instance)
         const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
-        const defaultSkillsCards = filteredDefaults.map((char) => {
-          return SkillsRepository.mapSkillToListItem(
-            char.id,
+        const defaultSkillsCards = filteredDefaults.flatMap((char) => {
+          return SkillsRepository.expandDefaultSkill(
             {
               icon: char.icon,
               name: t(char.name),
@@ -195,7 +199,9 @@ export class SkillsRepository {
               ownershipType: SkillOwnershipType.SYSTEM,
               voteCount: null,
               trustLevel: null,
+              variants: char.variants,
             },
+            char.id,
             t,
             user,
           );
@@ -239,9 +245,8 @@ export class SkillsRepository {
       // For public/lead users, return only default skills as card display fields (filtered)
       logger.debug("Getting default skills for public user");
       const filteredDefaults = SkillsRepository.filterDefaultSkills(user);
-      let defaultSkillsCards = filteredDefaults.map((char) => {
-        return SkillsRepository.mapSkillToListItem(
-          char.id,
+      let defaultSkillsCards = filteredDefaults.flatMap((char) => {
+        return SkillsRepository.expandDefaultSkill(
           {
             icon: char.icon,
             name: t(char.name),
@@ -252,7 +257,9 @@ export class SkillsRepository {
             ownershipType: SkillOwnershipType.SYSTEM,
             voteCount: null,
             trustLevel: null,
+            variants: char.variants,
           },
+          char.id,
           t,
           user,
         );
@@ -328,10 +335,13 @@ export class SkillsRepository {
     const offset = (safePage - 1) * pageSize;
     const pageSkills = allMatchedSkills.slice(offset, offset + pageSize);
     const pageSections = this.groupSkillsIntoSections(pageSkills, t);
+    const s = totalCount === 1 ? "" : "s";
     const hint =
-      totalPages > 1
-        ? `Page ${safePage}/${totalPages} (${totalCount} skills). Use page param to navigate.`
-        : `${totalCount} skill${totalCount === 1 ? "" : "s"} found.`;
+      totalCount <= 5
+        ? `${totalCount} skill${s} matched — showing full detail.`
+        : totalPages > 1
+          ? `Page ${safePage}/${totalPages} (${totalCount} skills). Use page param to navigate. Narrow query for more detail.`
+          : `${totalCount} skill${s} found. Use query to filter. ≤5 results = full detail.`;
 
     return {
       sections: pageSections,
@@ -820,6 +830,9 @@ export class SkillsRepository {
     },
     t: ReturnType<(typeof scopedTranslation)["scopedT"]>["t"],
     user: JwtPayloadType,
+    variantId?: string | null,
+    variantName?: string | null,
+    isVariant?: boolean,
   ): SkillListItem {
     // Get best model from skill's modelSelection
     const bestModel = SkillsRepositoryClient.getBestModelForSkill(
@@ -835,7 +848,8 @@ export class SkillsRepository {
       ? {
           modelIcon: bestModel.icon,
           modelInfo: getModelDisplayName(bestModel, isAdmin),
-          modelProvider: modelProviders[bestModel.provider].name,
+          modelProvider:
+            modelProviders[bestModel.provider]?.name ?? bestModel.provider,
         }
       : {
           modelIcon: "sparkles" as const,
@@ -856,7 +870,62 @@ export class SkillsRepository {
       ownershipType: char.ownershipType,
       voteCount: char.voteCount,
       trustLevel: char.trustLevel,
+      variantId: variantId ?? null,
+      variantName: variantName ?? null,
+      isVariant: isVariant ?? false,
       ...modelRow,
     };
+  }
+
+  /**
+   * Expand a default skill into one or more list items.
+   * Skills with variants produce one item per variant (each with isVariant=true).
+   * Skills without variants produce a single item (isVariant=false).
+   */
+  private static expandDefaultSkill(
+    char: {
+      icon: IconKey | null;
+      name: string | null;
+      tagline: string | null;
+      description: string | null;
+      category: typeof SkillCategoryValue;
+      modelSelection: ModelSelectionSimple;
+      ownershipType: typeof SkillOwnershipTypeValue;
+      voteCount: number | null;
+      trustLevel: typeof SkillTrustLevelValue | null;
+      variants?: SkillVariant[];
+    },
+    id: string,
+    t: ReturnType<(typeof scopedTranslation)["scopedT"]>["t"],
+    user: JwtPayloadType,
+  ): SkillListItem[] {
+    if (!char.variants || char.variants.length === 0) {
+      return [
+        SkillsRepository.mapSkillToListItem(
+          id,
+          char,
+          t,
+          user,
+          null,
+          null,
+          false,
+        ),
+      ];
+    }
+
+    return char.variants.map((variant) =>
+      SkillsRepository.mapSkillToListItem(
+        id,
+        {
+          ...char,
+          modelSelection: variant.modelSelection as ModelSelectionSimple,
+        },
+        t,
+        user,
+        variant.id,
+        t(variant.variantName),
+        true,
+      ),
+    );
   }
 }

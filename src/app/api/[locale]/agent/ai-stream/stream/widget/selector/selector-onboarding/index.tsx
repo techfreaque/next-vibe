@@ -3,11 +3,10 @@
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { useWidgetUser } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { CompanionStep, DEFAULT_MODEL_SELECTION } from "./companion-step";
+import { CompanionStep } from "./companion-step";
 import { GuestStep } from "./guest-step";
 import { UsecasesStep } from "./usecases-step";
 import { WelcomeStep } from "./welcome-step";
@@ -29,8 +28,6 @@ export function SelectorOnboarding({
   const [selectedCompanionId, setSelectedCompanionId] = useState<string | null>(
     null,
   );
-  const [modelSelection, setModelSelection] =
-    useState<ModelSelectionSimple | null>(DEFAULT_MODEL_SELECTION);
 
   const goToNext = useCallback(
     (current: OnboardingStep) => {
@@ -82,10 +79,8 @@ export function SelectorOnboarding({
     return (
       <CompanionStep
         selectedId={selectedCompanionId}
-        modelSelection={modelSelection}
         locale={locale}
         setSelectedId={setSelectedCompanionId}
-        setModelSelection={setModelSelection}
         onContinue={() => goToNext("companion")}
         onBack={() => goBack("companion")}
       />
@@ -96,7 +91,6 @@ export function SelectorOnboarding({
     return (
       <UsecasesStep
         companionId={selectedCompanionId}
-        modelSelection={modelSelection ?? DEFAULT_MODEL_SELECTION}
         locale={locale}
         onDone={onDone}
         onBack={() => goBack("usecases")}

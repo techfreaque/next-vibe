@@ -15,6 +15,7 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
+import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
 
 const SelectorOnboarding = lazy(() =>
   import("./selector-onboarding").then((mod) => ({
@@ -26,7 +27,6 @@ type SelectorView = "onboarding" | "favorites" | "loading";
 
 interface SelectorContentProps {
   locale: CountryLanguage;
-  onClose?: () => void;
 }
 
 function LoadingSpinner({ t }: { t: TFunction }): JSX.Element {
@@ -42,13 +42,13 @@ function LoadingSpinner({ t }: { t: TFunction }): JSX.Element {
   );
 }
 
-export function SelectorContent({
-  locale,
-  onClose,
-}: SelectorContentProps): JSX.Element {
+export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { t } = simpleT(locale);
+  const setOnboardingComplete = useTourState(
+    (state) => state.setOnboardingComplete,
+  );
 
   const { favorites, isInitialLoading: favoritesLoading } = useChatFavorites(
     logger,
@@ -81,7 +81,7 @@ export function SelectorContent({
           locale={locale}
           onDone={() => {
             setView("favorites");
-            onClose?.();
+            setOnboardingComplete(true);
           }}
         />
       </Suspense>

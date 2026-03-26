@@ -1,13 +1,15 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-  SpeedLevel,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const coderSkill: Skill = {
@@ -60,14 +62,74 @@ export const coderSkill: Skill = {
     "skills.coder.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.CLAUDE_OPUS_4_6,
     intelligenceRange: {
-      min: IntelligenceLevel.SMART,
-      max: IntelligenceLevel.SMART,
+      min: IntelligenceLevel.BRILLIANT,
+      max: IntelligenceLevel.BRILLIANT,
     },
-    contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
-    speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.BALANCED },
-    sortBy: ModelSortField.SPEED,
+    contentRange: {
+      min: ContentLevel.MAINSTREAM,
+      max: ContentLevel.MAINSTREAM,
+    },
+    sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "claude",
+      variantName: "skills.coder.variants.claude" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.CLAUDE_OPUS_4_6,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "kimi",
+      variantName: "skills.coder.variants.kimi" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.KIMI_K2_5,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+    {
+      id: "budget",
+      variantName: "skills.coder.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.DEEPSEEK_V32,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

@@ -112,6 +112,7 @@ const { POST } = createEndpoint({
         const newFavoriteConfig = {
           id: responseData.id,
           skillId: requestData.skillId ?? "default",
+          variantId: requestData.variantId ?? null,
           customIcon: null,
           voice: requestData.voice ?? null,
           modelSelection: requestData.modelSelection,
@@ -198,6 +199,15 @@ const { POST } = createEndpoint({
         columns: 6,
         hidden: true,
         schema: z.string(),
+      }),
+
+      variantId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.variantId.label" as const,
+        columns: 6,
+        hidden: true,
+        schema: z.string().nullable().optional(),
       }),
 
       icon: requestField(scopedTranslation, {

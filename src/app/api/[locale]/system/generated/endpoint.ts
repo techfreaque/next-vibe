@@ -11,7 +11,7 @@
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 /**
- * Dynamically import endpoint definition by path
+ * Dynamically import endpoint definition by path.
  * @param path - The endpoint path (e.g., "core/agent/chat/threads")
  * @returns The endpoint definition or null if not found
  */

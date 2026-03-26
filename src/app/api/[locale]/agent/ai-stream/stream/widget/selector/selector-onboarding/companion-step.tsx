@@ -14,51 +14,27 @@ import {
   type Skill,
   COMPANION_SKILLS,
 } from "@/app/api/[locale]/agent/chat/skills/config";
-import {
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
-import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
-import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { cn } from "@/app/api/[locale]/shared/utils";
-import { useWidgetUser } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-export const DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
-  selectionType: ModelSelectionType.FILTERS,
-
-  sortBy: ModelSortField.INTELLIGENCE,
-  sortDirection: ModelSortDirection.DESC,
-  sortBy2: ModelSortField.PRICE,
-  sortDirection2: ModelSortDirection.ASC,
-};
-
 interface CompanionStepProps {
   selectedId: string | null;
-  modelSelection: ModelSelectionSimple | null;
   locale: CountryLanguage;
   setSelectedId: (id: string | null) => void;
-  setModelSelection: (selection: ModelSelectionSimple | null) => void;
   onContinue: () => void;
   onBack: () => void;
 }
 
 export function CompanionStep({
   selectedId,
-  modelSelection,
   locale,
   setSelectedId,
-  setModelSelection,
   onContinue,
   onBack,
 }: CompanionStepProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const user = useWidgetUser();
-  const envAvailability = useEnvAvailability();
 
   return (
     <Div className="flex flex-col">
@@ -98,25 +74,6 @@ export function CompanionStep({
               />
             ))}
           </Div>
-        </Div>
-
-        {/* Divider */}
-        <Div className="border-t border-border shrink-0" />
-
-        {/* Model section */}
-        <Div className="shrink-0">
-          <H3 className="text-base font-semibold mb-3">
-            {t("onboarding.companion.modelTitle")}
-          </H3>
-
-          <ModelSelector
-            modelSelection={modelSelection ?? DEFAULT_MODEL_SELECTION}
-            onChange={setModelSelection}
-            envAvailability={envAvailability}
-            locale={locale}
-            user={user}
-            compact
-          />
         </Div>
       </Div>
 

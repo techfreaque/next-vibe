@@ -1,3 +1,5 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import { SkillCategory, SkillOwnershipType } from "../../enum";
@@ -7,7 +9,6 @@ import {
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-  SpeedLevel,
 } from "../../enum";
 
 export const socialMediaManagerSkill: Skill = {
@@ -118,17 +119,56 @@ export const socialMediaManagerSkill: Skill = {
     "skills.socialMediaManager.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.GPT_5_4_MINI,
     intelligenceRange: {
-      min: IntelligenceLevel.QUICK,
+      min: IntelligenceLevel.SMART,
       max: IntelligenceLevel.SMART,
     },
     contentRange: {
       min: ContentLevel.MAINSTREAM,
       max: ContentLevel.MAINSTREAM,
     },
-    speedRange: { min: SpeedLevel.FAST, max: SpeedLevel.BALANCED },
-    sortBy: ModelSortField.SPEED,
+    sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "snappy",
+      variantName: "skills.socialMediaManager.variants.snappy" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GPT_5_4_MINI,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "budget",
+      variantName: "skills.socialMediaManager.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GPT_5_4_NANO,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

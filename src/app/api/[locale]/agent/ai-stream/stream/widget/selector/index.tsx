@@ -148,12 +148,7 @@ export function Selector({
         sideOffset={8}
       >
         {/* Only render content when popover is open - so we don't fetch data until needed */}
-        {popoverOpen && (
-          <SelectorContent
-            locale={locale}
-            onClose={() => setPopoverOpen(false)}
-          />
-        )}
+        {popoverOpen && <SelectorContent locale={locale} />}
       </PopoverContent>
     </Popover>
   );

@@ -386,12 +386,13 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     // 3. Validate request data using request validator
-    // Build a role-filtered schema so fields gated by `visibleFor` are stripped
-    // for callers who don't have the required role - schema-level security guarantee.
+    // Build a role- and platform-filtered schema so fields gated by `visibleFor`
+    // or `hiddenForPlatforms` are stripped - schema-level security guarantee.
     const permissionRoles = filterUserPermissionRoles(user.roles);
     const roleFilteredRequestSchema = generateRoleFilteredRequestSchema(
       endpoint.fields,
       permissionRoles,
+      platform,
     );
     const validationResult = validateHandlerRequestData(
       {

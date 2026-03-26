@@ -569,6 +569,13 @@
       "when": 1774355576737,
       "tag": "20260324123256_aberrant_proudstar",
       "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1774552145232,
+      "tag": "20260326190905_lethal_shotgun",
+      "breakpoints": true
     }
   ]
 }

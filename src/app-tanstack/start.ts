@@ -22,8 +22,12 @@ const C = {
 } as const;
 
 function statusColor(status: number): string {
-  if (status < 300) return C.green;
-  if (status < 400) return C.yellow;
+  if (status < 300) {
+    return C.green;
+  }
+  if (status < 400) {
+    return C.yellow;
+  }
   return C.red;
 }
 
@@ -33,11 +37,19 @@ function formatMs(ms: number): string {
   return useColors ? `${C.gray}${s}${C.reset}` : s;
 }
 
-function logRequest(method: string, path: string, status: number, totalMs: number, appMs: number): void {
+function logRequest(
+  method: string,
+  path: string,
+  status: number,
+  totalMs: number,
+  appMs: number,
+): void {
   const useColors = Boolean(process.stdout?.isTTY) && !process.env.NO_COLOR;
   const ts = `[${process.uptime().toFixed(3)}s]`;
   const sc = statusColor(status);
-  const statusStr = useColors ? `${sc}${String(status)}${C.reset}` : String(status);
+  const statusStr = useColors
+    ? `${sc}${String(status)}${C.reset}`
+    : String(status);
   const methodStr = useColors ? `${C.bold}${method}${C.reset}` : method;
   const pathStr = useColors ? `${C.cyan}${path}${C.reset}` : path;
   const line = `${ts} ${methodStr} ${pathStr} ${statusStr} in ${formatMs(totalMs)} (app: ${formatMs(appMs)})`;
@@ -45,12 +57,32 @@ function logRequest(method: string, path: string, status: number, totalMs: numbe
 }
 
 // Paths to skip logging (Vite internals, HMR, source maps, favicons)
-const SKIP_LOG_PREFIXES = ["/@", "/__vite", "/_build", "/node_modules", "/favicon"];
-const SKIP_LOG_EXTENSIONS = [".map", ".ico", ".png", ".jpg", ".jpeg", ".svg", ".woff", ".woff2", ".ttf"];
+const SKIP_LOG_PREFIXES = [
+  "/@",
+  "/__vite",
+  "/_build",
+  "/node_modules",
+  "/favicon",
+];
+const SKIP_LOG_EXTENSIONS = [
+  ".map",
+  ".ico",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".svg",
+  ".woff",
+  ".woff2",
+  ".ttf",
+];
 
 function shouldSkipLog(pathname: string): boolean {
-  if (SKIP_LOG_PREFIXES.some((p) => pathname.startsWith(p))) return true;
-  if (SKIP_LOG_EXTENSIONS.some((e) => pathname.endsWith(e))) return true;
+  if (SKIP_LOG_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return true;
+  }
+  if (SKIP_LOG_EXTENSIONS.some((e) => pathname.endsWith(e))) {
+    return true;
+  }
   return false;
 }
 

@@ -124,6 +124,9 @@ export const translations = {
         skillId: {
           content: "Skill: {{value}}",
         },
+        variantId: {
+          content: "Variant: {{value}}",
+        },
         customName: {
           content: "Custom Name: {{value}}",
         },

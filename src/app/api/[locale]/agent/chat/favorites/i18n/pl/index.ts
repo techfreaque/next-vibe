@@ -126,6 +126,9 @@ export const translations: typeof enTranslations = {
         skillId: {
           content: "Postać: {{value}}",
         },
+        variantId: {
+          content: "Wariant: {{value}}",
+        },
         customName: {
           content: "Nazwa niestandardowa: {{value}}",
         },

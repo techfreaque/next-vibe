@@ -1,13 +1,15 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
-  SpeedLevel,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const uncensoredWriterSkill: Skill = {
@@ -87,17 +89,56 @@ You are a tool for creative expression. Write what is requested with skill and w
     "skills.uncensoredWriter.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.UNCENSORED_LM_V1_2,
     intelligenceRange: {
       min: IntelligenceLevel.SMART,
-      max: IntelligenceLevel.BRILLIANT,
+      max: IntelligenceLevel.SMART,
     },
     contentRange: {
       min: ContentLevel.UNCENSORED,
       max: ContentLevel.UNCENSORED,
     },
-    speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "smart",
+      variantName: "skills.uncensoredWriter.variants.smart" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "fast",
+      variantName: "skills.uncensoredWriter.variants.fast" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.VENICE_UNCENSORED,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

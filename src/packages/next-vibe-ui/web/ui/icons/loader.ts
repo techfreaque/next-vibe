@@ -435,6 +435,8 @@ export async function loadIconModule(name: string): Promise<IconModule> {
       return import("./SiAndroid") as Promise<IconModule>;
     case "SiAnthropic":
       return import("./SiAnthropic") as Promise<IconModule>;
+    case "SiBytedance":
+      return import("./SiBytedance") as Promise<IconModule>;
     case "SiApple":
       return import("./SiApple") as Promise<IconModule>;
     case "SiDiscord":

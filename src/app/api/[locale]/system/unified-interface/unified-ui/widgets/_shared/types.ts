@@ -243,6 +243,12 @@ export interface BaseWidgetConfig<
    * If omitted, the field is visible to all users who can access the endpoint.
    */
   visibleFor?: readonly (typeof UserPermissionRoleValue)[];
+  /**
+   * Platforms on which this field is hidden from the input schema.
+   * If omitted, the field is visible on all platforms.
+   * Use this to hide admin/web-only fields from AI, MCP, or CLI consumers.
+   */
+  hiddenForPlatforms?: readonly Platform[];
 }
 
 export interface BasePrimitiveWidgetConfig<

@@ -23,7 +23,10 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  UserPermissionRole,
+  UserRole,
+} from "@/app/api/[locale]/user/user-roles/enum";
 
 import { cliRequestDataSchema } from "@/app/api/[locale]/system/unified-interface/cli/runtime/cli-request-data";
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
@@ -41,9 +44,9 @@ const aiToolMetadataSchema = z.object({
   name: z.string(),
   title: z.string(),
   description: z.string(),
-  /** Internal technical ID (e.g. "system_server_rebuild_POST"). Use `name` to call tools, not this. */
-  id: z.string(),
-  tags: z.array(z.string()),
+  /** Internal technical ID (e.g. "system_server_rebuild_POST"). Use `name` to call tools, not this. Omitted for compact platforms (AI/MCP). */
+  id: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   // Present in list mode with query/category
   method: z.string().optional(),
   category: z.string(),
@@ -165,6 +168,13 @@ const { GET } = createEndpoint({
         columns: 3,
         schema: z.enum(Platform).optional(),
         userRoles: [UserRole.ADMIN],
+        visibleFor: [UserPermissionRole.ADMIN],
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+        ],
       }),
 
       includeProdOnly: requestField(scopedTranslation, {
@@ -175,6 +185,13 @@ const { GET } = createEndpoint({
         columns: 3,
         schema: z.boolean().optional(),
         userRoles: [UserRole.ADMIN],
+        visibleFor: [UserPermissionRole.ADMIN],
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+        ],
       }),
 
       instanceId: requestField(scopedTranslation, {
@@ -194,6 +211,12 @@ const { GET } = createEndpoint({
         description: "get.fields.statsFilter.description" as const,
         columns: 4,
         schema: z.enum(["all", "pinned", "allowed"]).optional(),
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+        ],
       }),
 
       // === RESPONSE FIELDS ===

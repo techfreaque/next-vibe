@@ -32,6 +32,10 @@ export const translations: typeof enTranslations = {
       label: "Charakter",
       description: "Wählen Sie den Charakter für diesen Favoriten",
     },
+    variantId: {
+      label: "Variante",
+      description: "Skill-Variante (z.B. brilliant, günstig, unzensiert)",
+    },
     customName: {
       label: "Benutzerdefinierter Name",
       description: "Optionaler benutzerdefinierter Name für diesen Favoriten",

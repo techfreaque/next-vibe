@@ -40,6 +40,9 @@ export const chatFavorites = pgTable("chat_favorites", {
   // Note: DB column is "character_id", mapped to skillId in code
   skillId: text("character_id").notNull(),
 
+  // Variant reference - null means "no variant / skill default"
+  variantId: text("variant_id"),
+
   // Custom display name (DB column is just "name")
   customName: text("name"),
 

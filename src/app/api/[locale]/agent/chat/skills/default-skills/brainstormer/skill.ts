@@ -1,12 +1,15 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
 import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
 } from "../../enum";
 
 export const brainstormerSkill: Skill = {
@@ -60,16 +63,56 @@ export const brainstormerSkill: Skill = {
     "skills.brainstormer.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.MIMO_V2_PRO,
     intelligenceRange: {
       min: IntelligenceLevel.BRILLIANT,
       max: IntelligenceLevel.BRILLIANT,
     },
     contentRange: {
-      min: ContentLevel.MAINSTREAM,
-      max: ContentLevel.MAINSTREAM,
+      min: ContentLevel.OPEN,
+      max: ContentLevel.OPEN,
     },
-    sortBy: ModelSortField.SPEED,
+    sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "wildcard",
+      variantName: "skills.brainstormer.variants.wildcard" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.MIMO_V2_PRO,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "eastern",
+      variantName: "skills.brainstormer.variants.eastern" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.KIMI_K2,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

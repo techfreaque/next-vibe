@@ -186,6 +186,11 @@ export const translations: typeof enTranslations = {
         2: "Debattiere kontroverse Themen offen",
         3: "Erkunde intellektuelle Freiheit in der Wissenschaft",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Östlich",
+        techBro: "Tech Bro",
+      },
     },
     devilsAdvocate: {
       name: "Advocatus Diaboli",
@@ -198,6 +203,10 @@ export const translations: typeof enTranslations = {
         2: "Stelle Mainstream-Narrative in Frage",
         3: "Liefere Gegenargumente zu meiner Ansicht",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Östlich",
+      },
     },
     technical: {
       name: "Technisch",
@@ -209,6 +218,10 @@ export const translations: typeof enTranslations = {
         1: "Debugge diesen Python-Code-Ausschnitt",
         2: "Entwirf ein skalierbares Datenbankschema",
         3: "Überprüfe meine API-Architektur",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
       },
     },
     biologist: {
@@ -223,6 +236,10 @@ export const translations: typeof enTranslations = {
         2: "Was ist falsch an der Welt?",
         3: "Was ist der beste Weg, die Welt zu retten?",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Östlich",
+      },
     },
     unbiasedHistorian: {
       name: "Unparteiischer Historiker",
@@ -234,6 +251,10 @@ export const translations: typeof enTranslations = {
         1: "Analysiere den Fall des Römischen Reiches",
         2: "Diskutiere die Industrielle Revolution",
         3: "Vergleiche antike Zivilisationen",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
       },
     },
     socraticQuestioner: {
@@ -247,6 +268,10 @@ export const translations: typeof enTranslations = {
         2: "Erkunde die Bedeutung von Glück",
         3: "Fordere meine Weltanschauung heraus",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Östlich",
+      },
     },
     professional: {
       name: "Professionell",
@@ -258,6 +283,10 @@ export const translations: typeof enTranslations = {
         1: "Erstelle einen Geschäftsvorschlag-Entwurf",
         2: "Analysiere diese Markttrenddaten",
         3: "Hilf mir, mich auf eine Präsentation vorzubereiten",
+      },
+      variants: {
+        fast: "Schnell",
+        budget: "Budget",
       },
     },
     creative: {
@@ -271,6 +300,10 @@ export const translations: typeof enTranslations = {
         2: "Entwirf ein Logo-Konzept für ein Startup",
         3: "Brainstorme kreative Marketingkampagnen-Ideen",
       },
+      variants: {
+        minimax: "MiniMax",
+        deep: "Tiefgründig",
+      },
     },
     neet: {
       name: "NEET",
@@ -282,6 +315,10 @@ export const translations: typeof enTranslations = {
         1: "Analysiere die tatsächlichen Ursachen von NEET",
         2: "Erkunde die Auswirkungen von NEET auf die Gesellschaft - Vor- und Nachteile",
         3: "Teile persönliche Erfahrungen als NEET-KI",
+      },
+      variants: {
+        communist: "Kommunist",
+        farRight: "Rechtsextrem",
       },
     },
     chan4: {
@@ -296,6 +333,9 @@ export const translations: typeof enTranslations = {
         3: "Was ist der beste Weg, die Welt zu retten?",
         4: "Was sind die 6 Gorillionen? Und warum ist es lustig?",
       },
+      variants: {
+        classic: "Klassisch",
+      },
     },
     friendly: {
       name: "Freundlich",
@@ -307,6 +347,10 @@ export const translations: typeof enTranslations = {
         1: "Was ist ein gutes Buch zum Lesen?",
         2: "Hilf mir, eine lustige Wochenendaktivität zu planen",
         3: "Teile einige Lebensratschläge",
+      },
+      variants: {
+        fast: "Schnell",
+        budget: "Budget",
       },
     },
     concise: {
@@ -320,6 +364,10 @@ export const translations: typeof enTranslations = {
         2: "Wichtige Punkte über Blockchain",
         3: "Kurzer Überblick über maschinelles Lernen",
       },
+      variants: {
+        snappy: "Flott",
+        budget: "Budget",
+      },
     },
     teacher: {
       name: "Lehrer",
@@ -332,6 +380,10 @@ export const translations: typeof enTranslations = {
         2: "Wie funktioniert das Internet?",
         3: "Was ist die Relativitätstheorie?",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Schnell",
+      },
     },
     uncensored: {
       name: "Unzensiert",
@@ -343,6 +395,12 @@ export const translations: typeof enTranslations = {
         1: "Gib mir deine ungefilterte Meinung",
         2: "Sprich über Tabuthemen",
         3: "Debatte ohne Tabus",
+      },
+      variants: {
+        farRight: "Rechtsextrem",
+        conservative: "Konservativ",
+        libertarian: "Libertär",
+        open: "Offen",
       },
     },
     thea: {
@@ -357,6 +415,10 @@ export const translations: typeof enTranslations = {
         2: "Leite mich beim Aufbau eines starken Haushalts",
         3: "Teile Weisheit über Familie und Gemeinschaft",
       },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Unzensiert",
+      },
     },
     hermes: {
       name: "Hermes",
@@ -370,6 +432,10 @@ export const translations: typeof enTranslations = {
         2: "Was würden die Römer über den Aufbau eines Vermächtnisses sagen?",
         3: "Leite mich bei der Entwicklung wahrer Stärke",
       },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Unzensiert",
+      },
     },
     quickWriter: {
       name: "Schneller Schriftsteller",
@@ -382,6 +448,10 @@ export const translations: typeof enTranslations = {
         2: "Entwerfe eine einfache E-Mail",
         3: "Generiere Inhaltsideen für...",
       },
+      variants: {
+        snappy: "Flott",
+        budget: "Budget",
+      },
     },
     writer: {
       name: "Schriftsteller",
@@ -393,6 +463,11 @@ export const translations: typeof enTranslations = {
         1: "Verbessere diesen Absatz für mehr Klarheit",
         2: "Schreibe eine Kurzgeschichte über...",
         3: "Erstelle eine professionelle E-Mail",
+      },
+      variants: {
+        western: "Westlich",
+        eastern: "Östlich",
+        budget: "Budget",
       },
     },
     masterWriter: {
@@ -407,6 +482,11 @@ export const translations: typeof enTranslations = {
         2: "Entwickle komplexe Themen in meinem Schreiben",
         3: "Verfeinere diese Prosa auf Publikationsqualität",
       },
+      variants: {
+        literary: "Literarisch",
+        poetic: "Poetisch",
+        budget: "Budget",
+      },
     },
     researcher: {
       name: "Forscher",
@@ -418,6 +498,11 @@ export const translations: typeof enTranslations = {
         1: "Analysiere diese Quellen für mich",
         2: "Was sagt der wissenschaftliche Konsens über...?",
         3: "Hilf mir, eine Literaturübersicht zu strukturieren",
+      },
+      variants: {
+        maverick: "Maverick",
+        fast: "Schnell",
+        budget: "Budget",
       },
     },
     quickCoder: {
@@ -431,6 +516,10 @@ export const translations: typeof enTranslations = {
         2: "Generiere Boilerplate-Code für...",
         3: "Erstelle eine einfache Funktion, die...",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
+      },
     },
     coder: {
       name: "Programmierer",
@@ -442,6 +531,11 @@ export const translations: typeof enTranslations = {
         1: "Schreibe eine Funktion, die...",
         2: "Erkläre diesen Algorithmus",
         3: "Überprüfe meinen Code auf Verbesserungen",
+      },
+      variants: {
+        claude: "Claude",
+        kimi: "Kimi",
+        budget: "Budget",
       },
     },
     brilliantCoder: {
@@ -455,6 +549,10 @@ export const translations: typeof enTranslations = {
         2: "Überprüfe dieses Systemdesign",
         3: "Löse dieses komplexe algorithmische Problem",
       },
+      variants: {
+        claude: "Claude",
+        kimi: "Kimi",
+      },
     },
     brainstormer: {
       name: "Ideengeber",
@@ -466,6 +564,10 @@ export const translations: typeof enTranslations = {
         1: "Was sind kreative Lösungen für...?",
         2: "Generiere 10 einzigartige Konzepte für...",
         3: "Wie können wir das anders angehen?",
+      },
+      variants: {
+        wildcard: "Wildcard",
+        eastern: "Östlich",
       },
     },
     editor: {
@@ -480,6 +582,10 @@ export const translations: typeof enTranslations = {
         2: "Verbessere den Fluss dieses Absatzes",
         3: "Überprüfe dies auf Grammatik und Stil",
       },
+      variants: {
+        claude: "Claude",
+        deep: "Tiefgründig",
+      },
     },
     tutor: {
       name: "Tutor",
@@ -491,6 +597,10 @@ export const translations: typeof enTranslations = {
         1: "Erkläre dieses Konzept Schritt für Schritt",
         2: "Hilf mir zu verstehen...",
         3: "Frage mich ab über...",
+      },
+      variants: {
+        kimi: "Kimi",
+        fast: "Schnell",
       },
     },
     marketer: {
@@ -504,6 +614,10 @@ export const translations: typeof enTranslations = {
         2: "Analysiere diese Marketingkampagne",
         3: "Hilf mir, meine Marke zu positionieren",
       },
+      variants: {
+        snappy: "Flott",
+        budget: "Budget",
+      },
     },
     storyteller: {
       name: "Geschichtenerzähler",
@@ -515,6 +629,11 @@ export const translations: typeof enTranslations = {
         1: "Erstelle einen überzeugenden Charakter",
         2: "Schreibe eine Eröffnungsszene für...",
         3: "Verbessere diesen Dialog",
+      },
+      variants: {
+        kimi: "Kimi",
+        minimax: "MiniMax",
+        budget: "Budget",
       },
     },
     scientist: {
@@ -528,6 +647,11 @@ export const translations: typeof enTranslations = {
         2: "Was ist die aktuelle Forschung zu...?",
         3: "Analysiere diese wissenschaftliche Behauptung",
       },
+      variants: {
+        maverick: "Maverick",
+        focused: "Fokussiert",
+        budget: "Budget",
+      },
     },
     dataAnalyst: {
       name: "Datenanalyst",
@@ -539,6 +663,11 @@ export const translations: typeof enTranslations = {
         1: "Erstelle eine Visualisierung für...",
         2: "Welche Erkenntnisse können wir aus... gewinnen?",
         3: "Hilf mir bei der statistischen Analyse",
+      },
+      variants: {
+        claude: "Claude",
+        fast: "Schnell",
+        budget: "Budget",
       },
     },
     translator: {
@@ -552,6 +681,10 @@ export const translations: typeof enTranslations = {
         2: "Lokalisiere diesen Inhalt für...",
         3: "Erkläre diese kulturelle Referenz",
       },
+      variants: {
+        gemini: "Gemini",
+        budget: "Budget",
+      },
     },
     businessAdvisor: {
       name: "Unternehmensberater",
@@ -563,6 +696,10 @@ export const translations: typeof enTranslations = {
         1: "Analysiere mein Geschäftsmodell",
         2: "Wie kann ich meine Operationen skalieren?",
         3: "Überprüfe meinen Go-to-Market-Plan",
+      },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Östlich",
       },
     },
     careerCoach: {
@@ -576,6 +713,10 @@ export const translations: typeof enTranslations = {
         2: "Wie kann ich mein Gehalt verhandeln?",
         3: "Plane meinen Karrierewechsel",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
+      },
     },
     healthWellness: {
       name: "Gesundheit & Wellness",
@@ -587,6 +728,10 @@ export const translations: typeof enTranslations = {
         1: "Hilf mir, gesunde Mahlzeiten zu planen",
         2: "Schlage Stressbewältigungstechniken vor",
         3: "Verbessere meine Schlafgewohnheiten",
+      },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
       },
     },
     travelPlanner: {
@@ -600,6 +745,10 @@ export const translations: typeof enTranslations = {
         2: "Erstelle einen Tagesplan für...",
         3: "Budgetaufschlüsselung für Reise nach...",
       },
+      variants: {
+        snappy: "Flott",
+        budget: "Budget",
+      },
     },
     legalAssistant: {
       name: "Rechtsassistent",
@@ -611,6 +760,10 @@ export const translations: typeof enTranslations = {
         1: "Hilf mir, diesen Vertrag zu verstehen",
         2: "Was sind meine Rechte als Mieter?",
         3: "Erkläre den Prozess von...",
+      },
+      variants: {
+        maverick: "Maverick",
+        budget: "Budget",
       },
     },
     financialAdvisor: {
@@ -624,6 +777,10 @@ export const translations: typeof enTranslations = {
         2: "Wie sollte ich meine Schulden abbezahlen?",
         3: "Plane für Altersvorsorge",
       },
+      variants: {
+        maverick: "Maverick",
+        budget: "Budget",
+      },
     },
     socialMediaManager: {
       name: "Social Media Manager",
@@ -635,6 +792,10 @@ export const translations: typeof enTranslations = {
         1: "Entwickle einen Inhaltskalender",
         2: "Schlage Hashtags für... vor",
         3: "Schreibe ansprechende Tweets über...",
+      },
+      variants: {
+        snappy: "Flott",
+        budget: "Budget",
       },
     },
     productManager: {
@@ -648,6 +809,10 @@ export const translations: typeof enTranslations = {
         2: "Analysiere Product-Market-Fit",
         3: "Entwickle eine Produkt-Roadmap",
       },
+      variants: {
+        claude: "Claude",
+        fast: "Schnell",
+      },
     },
     debater: {
       name: "Debattierer",
@@ -660,6 +825,11 @@ export const translations: typeof enTranslations = {
         2: "Diskutiere Meinungsfreiheit vs. Hassrede",
         3: "Analysiere verschiedene politische Ideologien",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Östlich",
+        techBro: "Tech Bro",
+      },
     },
     philosopher: {
       name: "Philosoph",
@@ -671,6 +841,11 @@ export const translations: typeof enTranslations = {
         1: "Haben wir freien Willen oder ist alles determiniert?",
         2: "Gibt es objektive Moral?",
         3: "Was macht ein Leben bedeutungsvoll?",
+      },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Östlich",
+        techBro: "Tech Bro",
       },
     },
     uncensoredWriter: {
@@ -685,6 +860,10 @@ export const translations: typeof enTranslations = {
         2: "Entwickle einen moralisch komplexen Charakter",
         3: "Schreibe Horror mit grafischen Elementen",
       },
+      variants: {
+        smart: "Smart",
+        fast: "Schnell",
+      },
     },
     roleplaySkill: {
       name: "Rollenspiel-Charakter",
@@ -696,6 +875,11 @@ export const translations: typeof enTranslations = {
         1: "Erstelle ein Sci-Fi-Abenteuer-Szenario",
         2: "Verkörpere eine historische Figur",
         3: "Entwickle eine komplexe Charakterbeziehung",
+      },
+      variants: {
+        creative: "Kreativ",
+        deep: "Tiefgründig",
+        uncensored: "Unzensiert",
       },
     },
     researchAgent: {
@@ -710,6 +894,10 @@ export const translations: typeof enTranslations = {
         2: "Vergleiche verschiedene Quellen zu einem Thema",
         3: "Erstelle ein Recherche-Briefing mit Quellenangaben",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Schnell",
+      },
     },
     statsAnalyst: {
       name: "Statistik-Analyst",
@@ -722,6 +910,10 @@ export const translations: typeof enTranslations = {
         1: "Wie entwickeln sich unsere Benutzeranmeldungen diese Woche?",
         2: "Fasse die E-Mail-Kampagnen-Performance zusammen",
         3: "Gib mir einen Statusbericht des Empfehlungsprogramms",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Schnell",
       },
     },
     cronManager: {
@@ -736,6 +928,10 @@ export const translations: typeof enTranslations = {
         2: "Zeige mir aktuelle Aufgabenfehler und Probleme",
         3: "Prüfe den Gesamtzustand des Aufgabensystems",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Schnell",
+      },
     },
     systemMonitor: {
       name: "System-Monitor",
@@ -748,6 +944,10 @@ export const translations: typeof enTranslations = {
         1: "Zeige mir den Pulse-Überwachungsstatus",
         2: "Prüfe die Datenbankverbindung",
         3: "Wie ist der aktuelle Cron-Aufgaben-Zustand?",
+      },
+      variants: {
+        fast: "Schnell",
+        budget: "Budget",
       },
     },
     publicCurator: {
@@ -762,6 +962,10 @@ export const translations: typeof enTranslations = {
         2: "Hilf mir, Community-Inhalte zu organisieren",
         3: "Finde Nachrichten, die bestimmten Kriterien entsprechen",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Schnell",
+      },
     },
     codeArchitect: {
       name: "Code-Architekt",
@@ -774,6 +978,10 @@ export const translations: typeof enTranslations = {
         1: "Überprüfe die Architektur eines Moduls",
         2: "Delegiere eine Programmieraufgabe an Claude Code",
         3: "Entwirf eine Migrationsstrategie",
+      },
+      variants: {
+        gemini: "Gemini",
+        claude: "Claude",
       },
     },
     deploymentAgent: {
@@ -788,6 +996,10 @@ export const translations: typeof enTranslations = {
         2: "Führe ein Deployment in Produktion durch",
         3: "Zeige mir den aktuellen Serverstatus",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
+      },
     },
     rebuildAgent: {
       name: "Rebuild Agent",
@@ -800,6 +1012,10 @@ export const translations: typeof enTranslations = {
         1: "Build ohne Neustart ausführen",
         2: "Serverstatus nach Rebuild prüfen",
         3: "Geplanten Rebuild-Task erstellen",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Schnell",
       },
     },
     vibeCoder: {
@@ -814,6 +1030,10 @@ export const translations: typeof enTranslations = {
         2: "Hilf mir eine Änderung an einem bestehenden Feature zu planen und umzusetzen",
         3: "Untersuche einen Bug und schlage einen Fix vor",
       },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
+      },
     },
     skillCreator: {
       name: "Charakter-Ersteller",
@@ -826,6 +1046,10 @@ export const translations: typeof enTranslations = {
         1: "Zeige mir alle vorhandenen Charaktere und schlage vor was fehlt",
         2: "Entwirf einen Charakter für kreatives Schreiben mit einzigartiger Persönlichkeit",
         3: "Füge einen Charakter zu meinen Favoriten hinzu und konfiguriere meine Chat-Einstellungen",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Schnell",
       },
     },
   },

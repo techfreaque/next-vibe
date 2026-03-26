@@ -1,3 +1,5 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/constants";
 import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
 import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/constants";
@@ -23,7 +25,6 @@ import {
   ModelSortField,
   SkillCategory,
   SkillOwnershipType,
-  SpeedLevel,
 } from "../../enum";
 
 export const vibeCoderSkill: Skill = {
@@ -109,17 +110,56 @@ If anything is unclear or the task is complex:
     "skills.vibeCoder.suggestedPrompts.3" as const,
   ],
   modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
+    selectionType: ModelSelectionType.MANUAL,
+    manualModelId: ModelId.KIMI_K2_5,
     intelligenceRange: {
       min: IntelligenceLevel.BRILLIANT,
       max: IntelligenceLevel.BRILLIANT,
     },
     contentRange: {
-      min: ContentLevel.MAINSTREAM,
-      max: ContentLevel.MAINSTREAM,
+      min: ContentLevel.OPEN,
+      max: ContentLevel.OPEN,
     },
-    speedRange: { min: SpeedLevel.BALANCED, max: SpeedLevel.THOROUGH },
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
+  variants: [
+    {
+      id: "kimi",
+      variantName: "skills.vibeCoder.variants.kimi" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.KIMI_K2_5,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
+    },
+    {
+      id: "budget",
+      variantName: "skills.vibeCoder.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.DEEPSEEK_V32,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
+    },
+  ],
 };

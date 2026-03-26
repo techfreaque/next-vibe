@@ -20,6 +20,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_TTS_VOICE } from "../../../text-to-speech/enum";
+import { DEFAULT_SKILLS } from "../../skills/config";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
@@ -129,8 +130,14 @@ export class SingleFavoriteRepository {
           ? rawModelSelection
           : null;
 
+      // Use variant's modelSelection as characterModelSelection when variantId is set
+      const variantModelSelection = favorite.variantId
+        ? DEFAULT_SKILLS.find((s) => s.id === favorite.skillId)?.variants?.find(
+            (v) => v.id === favorite.variantId,
+          )?.modelSelection
+        : undefined;
       const characterModelSelection: FavoriteGetResponseOutput["characterModelSelection"] =
-        character.modelSelection;
+        variantModelSelection ?? character.modelSelection;
 
       // Merge customIcon with character icon (customIcon takes precedence)
       const displayIcon = favorite.customIcon ?? character?.icon ?? "bot";
@@ -138,6 +145,7 @@ export class SingleFavoriteRepository {
       // Flattened response
       return success<FavoriteGetResponseOutput>({
         skillId: favorite.skillId,
+        variantId: favorite.variantId ?? null,
         icon: displayIcon,
         name: character?.name ?? charactersT("skills.default.name"),
         tagline: character?.tagline ?? charactersT("skills.default.tagline"),

@@ -381,17 +381,18 @@ function generateInputSchema(
 
   try {
     // Combine request data and URL params
+    // Pass Platform.AI so fields with hiddenForPlatforms including AI are excluded
     const requestDataSchema = generateSchemaForUsage<
       typeof endpoint.fields,
       FieldUsage.RequestData
-    >(endpoint.fields, FieldUsage.RequestData, userRoles) as
+    >(endpoint.fields, FieldUsage.RequestData, userRoles, Platform.AI) as
       | z.ZodObject<Record<string, z.ZodTypeAny>>
       | z.ZodNever;
 
     const urlPathParamsSchema = generateSchemaForUsage<
       typeof endpoint.fields,
       FieldUsage.RequestUrlParams
-    >(endpoint.fields, FieldUsage.RequestUrlParams, userRoles) as
+    >(endpoint.fields, FieldUsage.RequestUrlParams, userRoles, Platform.AI) as
       | z.ZodObject<Record<string, z.ZodTypeAny>>
       | z.ZodNever;
 

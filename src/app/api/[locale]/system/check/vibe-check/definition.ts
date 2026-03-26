@@ -25,6 +25,7 @@ import {
 import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
 import { envClient } from "@/config/env-client";
 import { UserRole } from "../../../user/user-roles/enum";
+import { VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const CheckResultWidget = lazyCliWidget(() =>
@@ -47,7 +48,7 @@ const { POST } = createEndpoint({
     ...(envClient.NODE_ENV !== "production" ? [UserRole.MCP_VISIBLE] : []),
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["check", "c"],
+  aliases: [VIBE_CHECK_ALIAS, VIBE_CHECK_ALIAS_SHORT],
 
   cli: {
     firstCliArgKey: "paths",
@@ -310,31 +311,9 @@ const { POST } = createEndpoint({
   // === EXAMPLES ===
   examples: {
     requests: {
-      default: {
-        fix: true,
-        limit: 100,
-        page: 1,
-      },
-      success: {
-        fix: false,
-        limit: 100,
-        page: 1,
-      },
-      withErrors: {
-        fix: true,
-        limit: 100,
-        page: 1,
-      },
-      quickCheck: {
-        fix: false,
-        limit: 100,
-        page: 1,
-      },
+      default: {},
       specificPaths: {
-        fix: true,
         paths: ["src/components", "src/utils"],
-        limit: 100,
-        page: 1,
       },
     },
     responses: {
@@ -344,41 +323,7 @@ const { POST } = createEndpoint({
         totalIssues: 0,
         totalFiles: 0,
       },
-      success: {
-        items: [],
-        files: [],
-        totalIssues: 0,
-        totalFiles: 0,
-      },
-      withErrors: {
-        items: [
-          {
-            file: "src/components/example.tsx",
-            line: 42,
-            column: 10,
-            rule: "no-unused-vars",
-            severity: "error" as const,
-            message: "Variable 'example' is defined but never used",
-          },
-        ],
-        files: [
-          {
-            file: "src/components/example.tsx",
-            errors: 1,
-            warnings: 0,
-            total: 1,
-          },
-        ],
-        totalIssues: 1,
-        totalFiles: 1,
-        totalErrors: 1,
-      },
-      quickCheck: {
-        items: [],
-        files: [],
-        totalIssues: 0,
-        totalFiles: 0,
-      },
+
       specificPaths: {
         items: [],
         files: [],

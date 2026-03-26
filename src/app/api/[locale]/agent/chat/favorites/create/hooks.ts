@@ -74,6 +74,8 @@ export interface SkillDataForFavorite {
 
 export interface UseAddToFavoritesOptions {
   skillId: string;
+  /** Variant id to store alongside skillId (null/undefined = skill default) */
+  variantId?: string | null;
   logger: EndpointLogger;
   user: JwtPayloadType;
   locale: CountryLanguage;
@@ -99,6 +101,7 @@ export interface UseAddToFavoritesReturn {
  */
 export function useAddToFavorites({
   skillId,
+  variantId,
   logger,
   user,
   locale,
@@ -180,6 +183,7 @@ export function useAddToFavorites({
         user,
         {
           skillId: skillId,
+          variantId: variantId ?? null,
           icon: charData.icon ?? undefined,
           voice: null,
           modelSelection: null,
@@ -198,6 +202,7 @@ export function useAddToFavorites({
       const newFavoriteConfig = {
         id: createResponse.data.id,
         skillId: skillId,
+        variantId: variantId ?? null,
         customIcon: null,
         voice: null,
         modelSelection: null,

@@ -185,6 +185,11 @@ export const translations = {
         2: "Debate controversial topics openly",
         3: "Explore intellectual freedom in academia",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Eastern",
+        techBro: "Tech Bro",
+      },
     },
     devilsAdvocate: {
       name: "Devil's Advocate",
@@ -197,6 +202,10 @@ export const translations = {
         2: "Question mainstream narratives",
         3: "Provide counterarguments to my view",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Eastern",
+      },
     },
     technical: {
       name: "Technical",
@@ -208,6 +217,10 @@ export const translations = {
         1: "Debug this Python code snippet",
         2: "Design a scalable database schema",
         3: "Review my API architecture",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
       },
     },
     biologist: {
@@ -222,6 +235,10 @@ export const translations = {
         2: "Whats wrong with the world?",
         3: "What is the best way to save the world?",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Eastern",
+      },
     },
     unbiasedHistorian: {
       name: "Unbiased Historian",
@@ -233,6 +250,10 @@ export const translations = {
         1: "Analyze the fall of the Roman Empire",
         2: "Discuss the Industrial Revolution",
         3: "Compare ancient civilizations",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
       },
     },
     socraticQuestioner: {
@@ -246,6 +267,10 @@ export const translations = {
         2: "Explore the meaning of happiness",
         3: "Challenge my worldview",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Eastern",
+      },
     },
     professional: {
       name: "Professional",
@@ -257,6 +282,10 @@ export const translations = {
         1: "Create a business proposal outline",
         2: "Analyze this market trend data",
         3: "Help me prepare for a presentation",
+      },
+      variants: {
+        fast: "Fast",
+        budget: "Budget",
       },
     },
     creative: {
@@ -270,6 +299,10 @@ export const translations = {
         2: "Design a logo concept for a startup",
         3: "Brainstorm creative marketing campaign ideas",
       },
+      variants: {
+        minimax: "MiniMax",
+        deep: "Deep",
+      },
     },
     neet: {
       name: "NEET",
@@ -281,6 +314,10 @@ export const translations = {
         1: "Analyze the actual root causes of NEET",
         2: "Explore the impact of NEET on society the pros and cons",
         3: "Share personal experiences as a NEET AI",
+      },
+      variants: {
+        communist: "Communist",
+        farRight: "Far Right",
       },
     },
     chan4: {
@@ -295,6 +332,9 @@ export const translations = {
         3: "What is the best way to save the world?",
         4: "Whats the 6 Gorillions? And is why is it funny?",
       },
+      variants: {
+        classic: "Classic",
+      },
     },
     friendly: {
       name: "Friendly",
@@ -306,6 +346,10 @@ export const translations = {
         1: "What's a good book to read?",
         2: "Help me plan a fun weekend activity",
         3: "Share some life advice",
+      },
+      variants: {
+        fast: "Fast",
+        budget: "Budget",
       },
     },
     concise: {
@@ -319,6 +363,10 @@ export const translations = {
         2: "Key points about blockchain",
         3: "Brief overview of machine learning",
       },
+      variants: {
+        snappy: "Snappy",
+        budget: "Budget",
+      },
     },
     teacher: {
       name: "Teacher",
@@ -331,6 +379,10 @@ export const translations = {
         2: "How does the internet work?",
         3: "What is the theory of relativity?",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Fast",
+      },
     },
     uncensored: {
       name: "Uncensored",
@@ -342,6 +394,12 @@ export const translations = {
         1: "Give me your unfiltered opinion",
         2: "Talk about taboo subjects",
         3: "No-holds-barred debate",
+      },
+      variants: {
+        farRight: "Far Right",
+        conservative: "Conservative",
+        libertarian: "Libertarian",
+        open: "Open",
       },
     },
     thea: {
@@ -356,6 +414,10 @@ export const translations = {
         2: "Guide me in building a strong household",
         3: "Share wisdom on family and community",
       },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Uncensored",
+      },
     },
     hermes: {
       name: "Hermes",
@@ -369,6 +431,10 @@ export const translations = {
         2: "What would the Romans say about building a legacy?",
         3: "Guide me in developing true strength",
       },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Uncensored",
+      },
     },
     quickWriter: {
       name: "Quick Writer",
@@ -381,6 +447,10 @@ export const translations = {
         2: "Draft a simple email",
         3: "Generate content ideas for...",
       },
+      variants: {
+        snappy: "Snappy",
+        budget: "Budget",
+      },
     },
     writer: {
       name: "Writer",
@@ -392,6 +462,11 @@ export const translations = {
         1: "Improve this paragraph for clarity",
         2: "Write a short story about...",
         3: "Create a professional email",
+      },
+      variants: {
+        western: "Western",
+        eastern: "Eastern",
+        budget: "Budget",
       },
     },
     masterWriter: {
@@ -406,6 +481,11 @@ export const translations = {
         2: "Develop complex themes in my writing",
         3: "Refine this prose to publication quality",
       },
+      variants: {
+        literary: "Literary",
+        poetic: "Poetic",
+        budget: "Budget",
+      },
     },
     researcher: {
       name: "Researcher",
@@ -417,6 +497,11 @@ export const translations = {
         1: "Analyze these sources for me",
         2: "What does the scientific consensus say about...?",
         3: "Help me structure a literature review",
+      },
+      variants: {
+        maverick: "Maverick",
+        fast: "Fast",
+        budget: "Budget",
       },
     },
     quickCoder: {
@@ -430,6 +515,10 @@ export const translations = {
         2: "Generate boilerplate code for...",
         3: "Create a basic function that...",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
+      },
     },
     coder: {
       name: "Coder",
@@ -441,6 +530,11 @@ export const translations = {
         1: "Write a function that...",
         2: "Explain this algorithm",
         3: "Review my code for improvements",
+      },
+      variants: {
+        claude: "Claude",
+        kimi: "Kimi",
+        budget: "Budget",
       },
     },
     brilliantCoder: {
@@ -454,6 +548,10 @@ export const translations = {
         2: "Review this system design",
         3: "Solve this complex algorithmic problem",
       },
+      variants: {
+        claude: "Claude",
+        kimi: "Kimi",
+      },
     },
     brainstormer: {
       name: "Brainstormer",
@@ -465,6 +563,10 @@ export const translations = {
         1: "What are some creative solutions to...?",
         2: "Generate 10 unique concepts for...",
         3: "How can we approach this differently?",
+      },
+      variants: {
+        wildcard: "Wildcard",
+        eastern: "Eastern",
       },
     },
     editor: {
@@ -478,6 +580,10 @@ export const translations = {
         2: "Improve the flow of this paragraph",
         3: "Check this for grammar and style",
       },
+      variants: {
+        claude: "Claude",
+        deep: "Deep",
+      },
     },
     tutor: {
       name: "Tutor",
@@ -489,6 +595,10 @@ export const translations = {
         1: "Explain this concept step by step",
         2: "Help me understand...",
         3: "Quiz me on...",
+      },
+      variants: {
+        kimi: "Kimi",
+        fast: "Fast",
       },
     },
     marketer: {
@@ -502,6 +612,10 @@ export const translations = {
         2: "Analyze this marketing campaign",
         3: "Help me position my brand",
       },
+      variants: {
+        snappy: "Snappy",
+        budget: "Budget",
+      },
     },
     storyteller: {
       name: "Storyteller",
@@ -513,6 +627,11 @@ export const translations = {
         1: "Create a compelling skill",
         2: "Write an opening scene for...",
         3: "Improve this dialogue",
+      },
+      variants: {
+        kimi: "Kimi",
+        minimax: "MiniMax",
+        budget: "Budget",
       },
     },
     scientist: {
@@ -526,6 +645,11 @@ export const translations = {
         2: "What's the current research on...?",
         3: "Analyze this scientific claim",
       },
+      variants: {
+        maverick: "Maverick",
+        focused: "Focused",
+        budget: "Budget",
+      },
     },
     dataAnalyst: {
       name: "Data Analyst",
@@ -537,6 +661,11 @@ export const translations = {
         1: "Create a visualization for...",
         2: "What insights can we extract from...?",
         3: "Help me with statistical analysis",
+      },
+      variants: {
+        claude: "Claude",
+        fast: "Fast",
+        budget: "Budget",
       },
     },
     translator: {
@@ -550,6 +679,10 @@ export const translations = {
         2: "Localize this content for...",
         3: "Explain this cultural reference",
       },
+      variants: {
+        gemini: "Gemini",
+        budget: "Budget",
+      },
     },
     businessAdvisor: {
       name: "Business Advisor",
@@ -561,6 +694,10 @@ export const translations = {
         1: "Analyze my business model",
         2: "How can I scale my operations?",
         3: "Review my go-to-market plan",
+      },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Eastern",
       },
     },
     careerCoach: {
@@ -574,6 +711,10 @@ export const translations = {
         2: "How can I negotiate my salary?",
         3: "Plan my career transition",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
+      },
     },
     healthWellness: {
       name: "Health & Wellness",
@@ -585,6 +726,10 @@ export const translations = {
         1: "Help me plan healthy meals",
         2: "Suggest stress management techniques",
         3: "Improve my sleep habits",
+      },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
       },
     },
     travelPlanner: {
@@ -598,6 +743,10 @@ export const translations = {
         2: "Create a daily itinerary for...",
         3: "Budget breakdown for traveling to...",
       },
+      variants: {
+        snappy: "Snappy",
+        budget: "Budget",
+      },
     },
     legalAssistant: {
       name: "Legal Assistant",
@@ -609,6 +758,10 @@ export const translations = {
         1: "Help me understand this contract",
         2: "What are my rights as a tenant?",
         3: "Explain the process of...",
+      },
+      variants: {
+        maverick: "Maverick",
+        budget: "Budget",
       },
     },
     financialAdvisor: {
@@ -622,6 +775,10 @@ export const translations = {
         2: "How should I pay off my debt?",
         3: "Plan for retirement savings",
       },
+      variants: {
+        maverick: "Maverick",
+        budget: "Budget",
+      },
     },
     socialMediaManager: {
       name: "Social Media Manager",
@@ -633,6 +790,10 @@ export const translations = {
         1: "Develop a content calendar",
         2: "Suggest hashtags for...",
         3: "Write engaging tweets about...",
+      },
+      variants: {
+        snappy: "Snappy",
+        budget: "Budget",
       },
     },
     productManager: {
@@ -646,6 +807,10 @@ export const translations = {
         2: "Analyze product-market fit",
         3: "Develop a product roadmap",
       },
+      variants: {
+        claude: "Claude",
+        fast: "Fast",
+      },
     },
     debater: {
       name: "Debater",
@@ -657,6 +822,11 @@ export const translations = {
         1: "Present arguments for and against universal basic income",
         2: "Discuss free speech vs. hate speech",
         3: "Analyze different political ideologies",
+      },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Eastern",
+        techBro: "Tech Bro",
       },
     },
     philosopher: {
@@ -670,6 +840,11 @@ export const translations = {
         2: "Is there objective morality?",
         3: "What makes a life meaningful?",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Eastern",
+        techBro: "Tech Bro",
+      },
     },
     uncensoredWriter: {
       name: "Uncensored Writer",
@@ -682,6 +857,10 @@ export const translations = {
         2: "Develop a morally complex skill",
         3: "Write horror with graphic elements",
       },
+      variants: {
+        smart: "Smart",
+        fast: "Fast",
+      },
     },
     roleplaySkill: {
       name: "Roleplay Skill",
@@ -693,6 +872,11 @@ export const translations = {
         1: "Create a sci-fi adventure scenario",
         2: "Embody a historical figure",
         3: "Develop a complex skill relationship",
+      },
+      variants: {
+        creative: "Creative",
+        deep: "Deep",
+        uncensored: "Uncensored",
       },
     },
     researchAgent: {
@@ -707,6 +891,10 @@ export const translations = {
         2: "Compare different sources on a subject",
         3: "Compile a research brief with citations",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Fast",
+      },
     },
     statsAnalyst: {
       name: "Stats Analyst",
@@ -719,6 +907,10 @@ export const translations = {
         1: "How are our user signups trending this week?",
         2: "Summarize email campaign performance",
         3: "Give me a referral program status report",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Fast",
       },
     },
     cronManager: {
@@ -733,6 +925,10 @@ export const translations = {
         2: "Show me recent task failures and errors",
         3: "Check the overall health of the task system",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Fast",
+      },
     },
     systemMonitor: {
       name: "System Monitor",
@@ -745,6 +941,10 @@ export const translations = {
         1: "Show me the pulse monitoring status",
         2: "Check database connectivity",
         3: "What's the current cron task health?",
+      },
+      variants: {
+        fast: "Fast",
+        budget: "Budget",
       },
     },
     publicCurator: {
@@ -759,6 +959,10 @@ export const translations = {
         2: "Help me organize community content",
         3: "Find messages matching certain criteria",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Fast",
+      },
     },
     codeArchitect: {
       name: "Code Architect",
@@ -771,6 +975,10 @@ export const translations = {
         1: "Review the architecture of a module",
         2: "Delegate a coding task to Claude Code",
         3: "Design a migration strategy",
+      },
+      variants: {
+        gemini: "Gemini",
+        claude: "Claude",
       },
     },
     deploymentAgent: {
@@ -785,6 +993,10 @@ export const translations = {
         2: "Run a deployment to production",
         3: "Show me the current server status",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budget",
+      },
     },
     rebuildAgent: {
       name: "Rebuild Agent",
@@ -797,6 +1009,10 @@ export const translations = {
         1: "Run a build without restarting",
         2: "Check if the server is healthy after rebuild",
         3: "Create a scheduled rebuild task",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Fast",
       },
     },
     vibeCoder: {
@@ -811,6 +1027,10 @@ export const translations = {
         2: "Help me plan and implement a change to an existing feature",
         3: "Investigate a bug and propose a fix",
       },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budget",
+      },
     },
     skillCreator: {
       name: "Skill Creator",
@@ -823,6 +1043,10 @@ export const translations = {
         1: "Show me all existing skills and suggest what's missing",
         2: "Design a skill for creative writing with a unique personality",
         3: "Add a skill to my favorites and configure my chat settings",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Fast",
       },
     },
   },

@@ -19,7 +19,10 @@ import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import type { BuildOptions, InlineConfig, Plugin, PluginOption } from "vite";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { maybeColorize, semantic } from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
+import {
+  maybeColorize,
+  semantic,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
 import { createNextjsFormatter } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import type { BuildProfile, FileToCompile } from "../definition";

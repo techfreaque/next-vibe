@@ -134,18 +134,56 @@ export class MessageConverter {
         return { content: contentParts, role: "user" };
       }
       case ChatMessageRole.ASSISTANT: {
-        if (!message.content || !message.content.trim()) {
+        const assistantParts: Array<
+          | { type: "text"; text: string }
+          | { type: "image"; image: string | URL }
+        > = [];
+
+        // Add text content — strip <think> blocks (kept in DB for UI but must
+        // not be re-sent to AI as part of history).
+        if (message.content?.trim()) {
+          const strippedContent = message.content
+            .replace(/<think>[\s\S]*?<\/think>/g, "")
+            .trim();
+          if (strippedContent) {
+            assistantParts.push({ type: "text", text: strippedContent });
+          }
+        }
+
+        // Add generated image so the model can see its own previous output.
+        // Fetch + base64 encode (same pattern as user attachments) for reliability
+        // across providers that may not accept raw CDN URLs.
+        const generatedMedia =
+          "metadata" in message ? message.metadata?.generatedMedia : undefined;
+        if (generatedMedia?.url && generatedMedia.type === "image") {
+          try {
+            const response = await fetch(generatedMedia.url);
+            if (response.ok) {
+              const buffer = await response.arrayBuffer();
+              const base64Data = Buffer.from(buffer).toString("base64");
+              const mimeType = generatedMedia.mimeType ?? "image/png";
+              assistantParts.push({
+                type: "image",
+                image: `data:${mimeType};base64,${base64Data}`,
+              });
+            }
+          } catch (error) {
+            logger.error(
+              "[MessageConverter] Failed to fetch generated image for AI context",
+              { url: generatedMedia.url, error: parseError(error) },
+            );
+          }
+        }
+
+        if (assistantParts.length === 0) {
           return null;
         }
-        // Strip <think>...</think> blocks - kept in DB for UI display but
-        // must not be re-sent to the AI as part of history.
-        const strippedContent = message.content
-          .replace(/<think>[\s\S]*?<\/think>/g, "")
-          .trim();
-        if (!strippedContent) {
-          return null;
+        // Preserve string format for text-only to avoid unnecessary format changes
+        // that could affect prompt caching. Use array only when images are present.
+        if (assistantParts.length === 1 && assistantParts[0]?.type === "text") {
+          return { content: assistantParts[0].text, role: "assistant" };
         }
-        return { content: strippedContent, role: "assistant" };
+        return { content: assistantParts, role: "assistant" };
       }
       case ChatMessageRole.SYSTEM:
         return { content: message.content ?? "", role: "system" };

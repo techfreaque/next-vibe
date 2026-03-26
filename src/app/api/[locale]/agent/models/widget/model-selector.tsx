@@ -7,7 +7,6 @@
 
 "use client";
 
-import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -36,6 +35,7 @@ import {
   TooltipTrigger,
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
+import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -59,10 +59,10 @@ import {
   getAllModelOptions,
   getCreditCostFromModel,
   getModelById,
+  modelProviders,
   type ModelId,
   type ModelOption,
   type ModelType,
-  modelProviders,
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -859,7 +859,7 @@ export function ModelSelector({
       setUseSkillBased(false);
       const first = getAllModelOptions().find(
         (m) =>
-          (m.modelType ?? "text") === newType &&
+          m.modelTypes.includes(newType) &&
           isProviderAvailable(m, envAvailability),
       );
       if (first) {
@@ -1099,7 +1099,7 @@ export function ModelSelector({
       filtersModelSelection,
       user,
     );
-    return base.filter((m) => (m.modelType ?? "text") === modelTypeTab);
+    return base.filter((m) => m.modelTypes.includes(modelTypeTab));
   }, [
     intelligenceRange,
     priceRange,
@@ -1146,9 +1146,7 @@ export function ModelSelector({
   // Get models to show (filtered or all), always constrained by type tab
   const modelsToShow = filterUnavailableProviders(
     showUnfilteredModels
-      ? getAllModelOptions().filter(
-          (m) => (m.modelType ?? "text") === modelTypeTab,
-        )
+      ? getAllModelOptions().filter((m) => m.modelTypes.includes(modelTypeTab))
       : filteredModels,
   );
 
@@ -1270,12 +1268,12 @@ export function ModelSelector({
     const types: ModelType[] = ["text"];
     const hasImage = allModels.some(
       (m) =>
-        m.modelType === "image" &&
+        m.modelTypes.includes("image") &&
         (isAdmin || isProviderAvailable(m, envAvailability)),
     );
     const hasAudio = allModels.some(
       (m) =>
-        m.modelType === "audio" &&
+        m.modelTypes.includes("audio") &&
         (isAdmin || isProviderAvailable(m, envAvailability)),
     );
     if (hasImage) {

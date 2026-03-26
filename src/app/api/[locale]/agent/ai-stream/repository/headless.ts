@@ -26,6 +26,7 @@ import type { MessageMetadata, ToolCallResult } from "../../chat/db";
 import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
+import { DEFAULT_SKILLS } from "../../chat/skills/config";
 import { NO_SKILL_ID } from "../../chat/skills/constants";
 import {
   isFiltersSelection,
@@ -200,8 +201,29 @@ export async function resolveFavorite(
     }
   }
 
-  // CHARACTER_BASED or no selection: load the skill to get its modelSelection
+  // CHARACTER_BASED or no selection: use variant's modelSelection if variantId set,
+  // otherwise load the skill to get its modelSelection
   if (skill !== NO_SKILL_ID) {
+    // Check variant first (default skills only — custom skills have no variants)
+    if (favorite.variantId) {
+      const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === skill);
+      const variant = defaultSkill?.variants?.find(
+        (v) => v.id === favorite.variantId,
+      );
+      if (variant?.modelSelection) {
+        const varSel = variant.modelSelection;
+        if (isManualSelection(varSel) || isFiltersSelection(varSel)) {
+          const best = SkillsRepositoryClient.getBestModelForSkill(
+            varSel,
+            user,
+          );
+          if (best) {
+            return { model: best.id as ModelId, skill };
+          }
+        }
+      }
+    }
+
     const { SkillsRepository } = await import("../../chat/skills/repository");
     const skillResult = await SkillsRepository.getSkillById(
       { id: skill },

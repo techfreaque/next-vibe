@@ -1,0 +1,1 @@
+ALTER TABLE "chat_favorites" ADD COLUMN "variant_id" text;

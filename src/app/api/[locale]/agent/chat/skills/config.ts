@@ -36,6 +36,20 @@ export {
 type ConfigModelSelection = FiltersModelSelection | ManualModelSelection;
 
 /**
+ * A named variant of a skill with its own model selection.
+ * Skills with variants are expanded into grouped rows in the skill list.
+ */
+export interface SkillVariant {
+  /** Unique identifier within the skill, e.g. "brilliant", "uncensored" */
+  id: string;
+  /** Localized sub-label shown under the skill name, e.g. "skills.thea.variants.brilliant" */
+  variantName: SkillsTranslationKey;
+  modelSelection: ConfigModelSelection;
+  /** Which variant is the default when none is specified */
+  isDefault?: boolean;
+}
+
+/**
  * Skill type representing FULL skill details
  * Used when:
  * - Defining default skills in config
@@ -57,6 +71,8 @@ export interface Skill {
   voice: typeof TtsVoiceValue;
   suggestedPrompts: SkillsTranslationKey[];
   modelSelection: ConfigModelSelection;
+  /** Optional named variants, each with their own modelSelection. Expanded as grouped rows in skill list. */
+  variants?: SkillVariant[];
   ownershipType: typeof SkillOwnershipTypeValue;
   modelInfo?: string;
   creditCost?: string;

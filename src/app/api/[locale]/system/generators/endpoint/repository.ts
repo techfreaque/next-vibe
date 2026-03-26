@@ -98,22 +98,35 @@ export class EndpointGeneratorRepository {
 
       // Skip definitions without route (warning shown by endpoints-index generator)
 
-      // Generate both files
-      const { endpointContent, aliasMapContent, endpointCount } =
-        await EndpointGeneratorRepository.generateContent(
-          validDefinitionFiles,
-          logger,
-        );
+      // Generate all files
+      const {
+        endpointContent,
+        aliasMapContent,
+        endpointHotPathsContent,
+        endpointCount,
+      } = await EndpointGeneratorRepository.generateContent(
+        validDefinitionFiles,
+        logger,
+      );
 
-      // Derive alias-map path from outputFile (same dir)
+      // Derive sibling paths from outputFile
       const aliasMapFile = outputFile.replace(
         /\/endpoint\.ts$/,
         "/alias-map.ts",
       );
+      const hotPathsFile = outputFile.replace(
+        /\/endpoint\.ts$/,
+        "/endpoint-hot-paths.ts",
+      );
 
-      // Write both files
+      // Write all files
       await writeGeneratedFile(outputFile, endpointContent, data.dryRun);
       await writeGeneratedFile(aliasMapFile, aliasMapContent, data.dryRun);
+      await writeGeneratedFile(
+        hotPathsFile,
+        endpointHotPathsContent,
+        data.dryRun,
+      );
 
       const duration = Date.now() - startTime;
 
@@ -159,9 +172,13 @@ export class EndpointGeneratorRepository {
   ): Promise<{
     endpointContent: string;
     aliasMapContent: string;
+    endpointHotPathsContent: string;
     endpointCount: number;
   }> {
-    const pathMap: Record<string, { importPath: string; method: string }> = {};
+    const pathMap: Record<
+      string,
+      { importPath: string; absPath: string; method: string }
+    > = {};
     const allPaths: string[] = [];
     let endpointCount = 0;
 
@@ -257,7 +274,7 @@ export class EndpointGeneratorRepository {
         const toolName = endpointToToolName(endpoint);
 
         if (!pathMap[toolName]) {
-          pathMap[toolName] = { importPath, method };
+          pathMap[toolName] = { importPath, absPath: defFile, method };
           allPaths.push(toolName);
           endpointCount++;
         }
@@ -266,7 +283,7 @@ export class EndpointGeneratorRepository {
         if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
           for (const alias of endpoint.aliases) {
             if (!pathMap[alias]) {
-              pathMap[alias] = { importPath, method };
+              pathMap[alias] = { importPath, absPath: defFile, method };
               allPaths.push(alias);
             }
           }
@@ -340,40 +357,42 @@ export class EndpointGeneratorRepository {
       }
     }
 
-    // Generate getEndpoint function cases
+    // Generate static-import cases (bundler-traceable) and hot-paths map entries
     const cases: string[] = [];
+    const hotPathEntries: string[] = [];
     for (const path of allPaths) {
-      const { importPath, method } = pathMap[path];
-      // Calculate line lengths for different wrapping strategies
+      const { importPath, absPath, method } = pathMap[path];
+      // Static import strings for bundler tracing
       const returnWithDefault = `      return (await import("${importPath}")).default`;
       const returnWithParen = `      return (await import("${importPath}"))`;
       const fullLine = `      return (await import("${importPath}")).default.${method};`;
 
       if (fullLine.length <= 80) {
-        // Short (<=80 chars, prettier printWidth): keep on one line
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).default.${method};`);
       } else if (returnWithDefault.length <= 80) {
-        // Wrap after .default (returnWithDefault <=80, but fullLine >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).default
         .${method};`);
       } else if (returnWithParen.length <= 80) {
-        // Wrap after import paren (returnWithParen <=80, but returnWithDefault >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}"))
         .default.${method};`);
       } else {
-        // Very long: wrap import statement itself (returnWithParen >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (
         await import("${importPath}")
       ).default.${method};`);
       }
+
+      // eslint-disable-next-line i18next/no-literal-string
+      hotPathEntries.push(
+        `  "${path}": { absPath: "${absPath}", method: "${method}" },`,
+      );
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -422,7 +441,7 @@ ${aliasMapEntries}
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
 /**
- * Dynamically import endpoint definition by path
+ * Dynamically import endpoint definition by path.
  * @param path - The endpoint path (e.g., "core/agent/chat/threads")
  * @returns The endpoint definition or null if not found
  */
@@ -437,6 +456,26 @@ ${cases.join("\n")}
 }
 `;
 
-    return { endpointContent, aliasMapContent, endpointCount };
+    // eslint-disable-next-line i18next/no-literal-string
+    const endpointHotPathsContent = `${header}
+
+/* eslint-disable prettier/prettier */
+
+/**
+ * Maps every endpoint path to its import path and HTTP method.
+ * Used by the MCP hot-loader to build fresh (cache-busted) imports at runtime
+ * without static import strings that bundlers would trace.
+ */
+export const endpointHotPaths: Record<string, { absPath: string; method: string }> = {
+${hotPathEntries.join("\n")}
+};
+`;
+
+    return {
+      endpointContent,
+      aliasMapContent,
+      endpointHotPathsContent,
+      endpointCount,
+    };
   }
 }

@@ -984,22 +984,26 @@ export class DevRepository {
           }
         : {};
 
-      const nextProcess = spawn("bun", ["run", "next", "dev", "--port", String(nextPort)], {
-        stdio: ["ignore", "pipe", "pipe"],
-        env: {
-          ...process.env,
-          ...profilingEnv,
-          // Cap V8 heap to force GC before memory balloons unboundedly.
-          // 8GB is enough for dev; without this Node grows until OOM.
-          NODE_OPTIONS: [
-            process.env.NODE_OPTIONS,
-            "--max-old-space-size=8192",
-          ]
-            .filter(Boolean)
-            .join(" "),
+      const nextProcess = spawn(
+        "bun",
+        ["run", "next", "dev", "--port", String(nextPort)],
+        {
+          stdio: ["ignore", "pipe", "pipe"],
+          env: {
+            ...process.env,
+            ...profilingEnv,
+            // Cap V8 heap to force GC before memory balloons unboundedly.
+            // 8GB is enough for dev; without this Node grows until OOM.
+            NODE_OPTIONS: [
+              process.env.NODE_OPTIONS,
+              "--max-old-space-size=8192",
+            ]
+              .filter(Boolean)
+              .join(" "),
+          },
+          cwd: process.cwd(),
         },
-        cwd: process.cwd(),
-      });
+      );
       DevRepository.runningProcesses.set("next", nextProcess);
 
       // Track child PID in PID file so it gets killed on next startup too

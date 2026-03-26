@@ -92,7 +92,8 @@ export function SkillsListContainer({
     activeFavoriteId: null,
   });
 
-  // Group favorites by skill ID
+  // Group favorites by skill ID (for skill-level indicators)
+  // Also build a per-variant map keyed as "skillId:variantId"
   const favoritesBySkill = useMemo(() => {
     const map: Record<string, string[]> = {};
     if (favorites) {
@@ -101,6 +102,23 @@ export function SkillsListContainer({
           map[fav.skillId] = [];
         }
         map[fav.skillId].push(fav.id);
+      }
+    }
+    return map;
+  }, [favorites]);
+
+  // Per-variant favorites map: "skillId:variantId" -> favoriteId[]
+  const favoritesByVariant = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    if (favorites) {
+      for (const fav of favorites) {
+        if (fav.variantId) {
+          const key = `${fav.skillId}:${fav.variantId}`;
+          if (!map[key]) {
+            map[key] = [];
+          }
+          map[key].push(fav.id);
+        }
       }
     }
     return map;
@@ -424,6 +442,7 @@ export function SkillsListContainer({
                       isTouch={isTouch}
                       t={t}
                       favoritesBySkill={favoritesBySkill}
+                      favoritesByVariant={favoritesByVariant}
                       activeFavoriteId={activeFavoriteId}
                     >
                       {children}
@@ -475,8 +494,31 @@ export function SkillsListContainer({
  * - Elegant "Show X more" button with smooth animation
  * - Gradient fade hint when collapsed
  * - Animated expand/collapse with height transition
+ * - Groups variant items (isVariant=true) under a shared card header
  */
 const INITIAL_VISIBLE_COUNT = 6;
+
+/** Group consecutive variant items by skill id into renderable units */
+type SkillGroup =
+  | { type: "single"; item: SkillListItem }
+  | { type: "variants"; id: string; items: SkillListItem[] };
+
+function groupSkillItems(skills: SkillListItem[]): SkillGroup[] {
+  const groups: SkillGroup[] = [];
+  const seen = new Set<string>();
+  for (const item of skills) {
+    if (!item.isVariant) {
+      groups.push({ type: "single", item });
+      continue;
+    }
+    if (!seen.has(item.id)) {
+      seen.add(item.id);
+      const variants = skills.filter((s) => s.id === item.id && s.isVariant);
+      groups.push({ type: "variants", id: item.id, items: variants });
+    }
+  }
+  return groups;
+}
 
 function CollapsibleSkillSection({
   skills,
@@ -490,6 +532,7 @@ function CollapsibleSkillSection({
   isTouch,
   t,
   favoritesBySkill,
+  favoritesByVariant,
   activeFavoriteId,
 }: {
   skills: SkillListItem[];
@@ -503,11 +546,13 @@ function CollapsibleSkillSection({
   isTouch: boolean;
   t: ReturnType<typeof useWidgetTranslation>;
   favoritesBySkill: Record<string, string[]>;
+  favoritesByVariant: Record<string, string[]>;
   activeFavoriteId: string | null;
 }): React.JSX.Element {
-  const totalCount = skills.length;
+  const groups = useMemo(() => groupSkillItems(skills), [skills]);
+  const totalCount = groups.length;
   const hasMore = totalCount > INITIAL_VISIBLE_COUNT;
-  const visibleSkills = skills.slice(0, INITIAL_VISIBLE_COUNT);
+  const visibleGroups = groups.slice(0, INITIAL_VISIBLE_COUNT);
 
   const handleBrowseAll = (): void => {
     void (async (): Promise<void> => {
@@ -527,23 +572,41 @@ function CollapsibleSkillSection({
             "flex flex-col gap-3 transition-all duration-300 ease-out",
           )}
         >
-          {visibleSkills.map((char) => (
-            <SkillCard
-              key={char.id}
-              char={char}
-              idx={idx}
-              navigate={navigate}
-              logger={logger}
-              user={user}
-              locale={locale}
-              isTouch={isTouch}
-              t={t}
-              favoriteIds={favoritesBySkill[char.id] || []}
-              activeFavoriteId={activeFavoriteId}
-            >
-              {children}
-            </SkillCard>
-          ))}
+          {visibleGroups.map((group) =>
+            group.type === "single" ? (
+              <SkillCard
+                key={group.item.id}
+                char={group.item}
+                idx={idx}
+                navigate={navigate}
+                logger={logger}
+                user={user}
+                locale={locale}
+                isTouch={isTouch}
+                t={t}
+                favoriteIds={favoritesBySkill[group.item.id] || []}
+                activeFavoriteId={activeFavoriteId}
+              >
+                {children}
+              </SkillCard>
+            ) : (
+              <VariantGroupCard
+                key={group.id}
+                items={group.items}
+                idx={idx}
+                fieldDefs={children}
+                navigate={navigate}
+                logger={logger}
+                user={user}
+                locale={locale}
+                isTouch={isTouch}
+                t={t}
+                favoritesBySkill={favoritesBySkill}
+                favoritesByVariant={favoritesByVariant}
+                activeFavoriteId={activeFavoriteId}
+              />
+            ),
+          )}
         </Div>
       </Div>
 
@@ -565,6 +628,315 @@ function CollapsibleSkillSection({
           <Span>{t("get.section.browseAll")}</Span>
         </Button>
       )}
+    </Div>
+  );
+}
+
+/**
+ * Variant Group Card - renders a skill group header with compact variant rows below.
+ * Mirrors the favorites grouping visual pattern.
+ */
+function VariantGroupCard({
+  items,
+  idx,
+  fieldDefs,
+  navigate,
+  logger,
+  user,
+  locale,
+  isTouch,
+  t,
+  favoritesBySkill,
+  favoritesByVariant,
+  activeFavoriteId,
+}: {
+  items: SkillListItem[];
+  idx: number;
+  fieldDefs: (typeof definition.GET)["fields"]["children"];
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+  isTouch: boolean;
+  t: ReturnType<typeof useWidgetTranslation>;
+  favoritesBySkill: Record<string, string[]>;
+  favoritesByVariant: Record<string, string[]>;
+  activeFavoriteId: string | null;
+}): React.JSX.Element {
+  const first = items[0];
+  if (!first) {
+    return <></>;
+  }
+  const skillId = first.id;
+  const allFavoriteIds = favoritesBySkill[skillId] || [];
+  const isInCollection = allFavoriteIds.length > 0;
+  const isActive =
+    activeFavoriteId !== null && allFavoriteIds.includes(activeFavoriteId);
+
+  return (
+    <Div
+      className={cn(
+        "rounded-lg border overflow-hidden transition-all hover:shadow-sm",
+        isActive
+          ? "border-l-4 border-l-primary border-primary/20 bg-primary/5"
+          : isInCollection
+            ? "border-l-2 border-l-primary/50"
+            : "",
+      )}
+    >
+      {/* Group header - icon + name + tagline + description (click to detail) */}
+      <Div
+        className="flex items-start gap-3 p-3 cursor-pointer"
+        onClick={() =>
+          navigate(skillDetailDefinitions.GET, {
+            urlPathParams: { id: skillId },
+          })
+        }
+      >
+        <Div className="flex-shrink-0 pt-0.5">
+          <IconWidget
+            field={withValue(
+              fieldDefs.sections.child.children.skills.child.children.icon,
+              first.icon,
+              first,
+            )}
+            fieldName={`sections.${idx}.skills.${skillId}.icon`}
+          />
+        </Div>
+        <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
+          <Div className="flex items-center gap-2 flex-wrap">
+            <TextWidget
+              field={withValue(
+                fieldDefs.sections.child.children.skills.child.children.name,
+                first.name,
+                first,
+              )}
+              fieldName={`sections.${idx}.skills.${skillId}.name`}
+            />
+            <TextWidget
+              field={withValue(
+                fieldDefs.sections.child.children.skills.child.children.tagline,
+                first.tagline,
+                first,
+              )}
+              fieldName={`sections.${idx}.skills.${skillId}.tagline`}
+            />
+            {isInCollection && (
+              <Div className="flex items-center gap-1 text-xs text-primary">
+                <Star className={cn("h-3 w-3", isActive && "fill-primary")} />
+              </Div>
+            )}
+          </Div>
+          <TextWidget
+            field={withValue(
+              fieldDefs.sections.child.children.skills.child.children
+                .description,
+              first.description,
+              first,
+            )}
+            fieldName={`sections.${idx}.skills.${skillId}.description`}
+          />
+        </Div>
+      </Div>
+
+      {/* Variant rows - one per variant */}
+      {items.map((variant, vIdx) => {
+        const variantKey = variant.variantId
+          ? `${skillId}:${variant.variantId}`
+          : null;
+        const variantFavoriteIds = variantKey
+          ? (favoritesByVariant[variantKey] ?? [])
+          : allFavoriteIds;
+        return (
+          <VariantRow
+            key={`${variant.id}-${variant.variantId ?? vIdx}`}
+            char={variant}
+            skillId={skillId}
+            idx={idx}
+            vIdx={vIdx}
+            fieldDefs={fieldDefs}
+            navigate={navigate}
+            logger={logger}
+            user={user}
+            locale={locale}
+            isTouch={isTouch}
+            t={t}
+            favoriteIds={variantFavoriteIds}
+            activeFavoriteId={activeFavoriteId}
+          />
+        );
+      })}
+    </Div>
+  );
+}
+
+/**
+ * Compact variant row - model icon + variantName + modelInfo + provider + credits + actions
+ */
+function VariantRow({
+  char,
+  skillId,
+  idx,
+  vIdx,
+  fieldDefs,
+  navigate,
+  logger,
+  user,
+  locale,
+  isTouch,
+  t,
+  favoriteIds,
+  activeFavoriteId,
+}: {
+  char: SkillListItem;
+  skillId: string;
+  idx: number;
+  vIdx: number;
+  fieldDefs: (typeof definition.GET)["fields"]["children"];
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: ReturnType<typeof useWidgetContext>["locale"];
+  isTouch: boolean;
+  t: ReturnType<typeof useWidgetTranslation>;
+  favoriteIds: string[];
+  activeFavoriteId: string | null;
+}): React.JSX.Element {
+  const isInCollection = favoriteIds.length > 0;
+  const isActive =
+    activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
+  const [showActions, setShowActions] = useState(false);
+
+  return (
+    <Div
+      className="group border-t border-border/40"
+      onMouseEnter={() => !isTouch && setShowActions(true)}
+      onMouseLeave={() => !isTouch && setShowActions(false)}
+    >
+      {/* Row content */}
+      <Div
+        className="flex items-center gap-2 px-3 py-2 cursor-pointer ml-9 hover:bg-muted/30 transition-colors"
+        onClick={() =>
+          navigate(skillDetailDefinitions.GET, {
+            urlPathParams: { id: skillId },
+          })
+        }
+      >
+        {/* Variant name */}
+        {char.variantName && (
+          <Span className="text-sm font-medium text-foreground min-w-[5rem]">
+            {char.variantName}
+          </Span>
+        )}
+
+        {/* Model icon */}
+        <IconWidget
+          field={withValue(
+            fieldDefs.sections.child.children.skills.child.children.modelIcon,
+            char.modelIcon,
+            char,
+          )}
+          fieldName={`sections.${idx}.skills.${skillId}.${vIdx}.modelIcon`}
+        />
+
+        {/* Model info */}
+        <TextWidget
+          field={withValue(
+            fieldDefs.sections.child.children.skills.child.children.modelInfo,
+            char.modelInfo,
+            char,
+          )}
+          fieldName={`sections.${idx}.skills.${skillId}.${vIdx}.modelInfo`}
+        />
+
+        <TextWidget
+          field={
+            fieldDefs.sections.child.children.skills.child.children.separator1
+          }
+          fieldName={`sections.${idx}.skills.${skillId}.${vIdx}.separator1`}
+        />
+
+        {/* Provider */}
+        <TextWidget
+          field={withValue(
+            fieldDefs.sections.child.children.skills.child.children
+              .modelProvider,
+            char.modelProvider,
+            char,
+          )}
+          fieldName={`sections.${idx}.skills.${skillId}.${vIdx}.modelProvider`}
+        />
+
+        {/* Credits */}
+        <ModelCreditDisplay
+          modelId={char.modelId}
+          variant="text"
+          className="text-xs text-muted-foreground"
+          locale={locale}
+        />
+
+        {/* Active indicator */}
+        {isActive && (
+          <Div className="ml-auto flex-shrink-0">
+            <Star className="h-3 w-3 fill-primary text-primary" />
+          </Div>
+        )}
+
+        {/* Touch toggle */}
+        {isTouch && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 ml-auto flex-shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowActions(!showActions);
+            }}
+          >
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 transition-transform",
+                showActions && "rotate-180",
+              )}
+            />
+          </Button>
+        )}
+      </Div>
+
+      {/* Hover action bar */}
+      <Div
+        className={cn(
+          "transition-all duration-200 ease-out overflow-hidden",
+          showActions || (isTouch && showActions) ? "max-h-12" : "max-h-0",
+          !isTouch && "group-hover:max-h-12",
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 border-t ml-9">
+          {isInCollection ? (
+            <Span className="text-xs text-muted-foreground">
+              {t("get.card.actions.inCollection")}
+            </Span>
+          ) : (
+            <>
+              <Span className="text-xs text-muted-foreground flex-shrink-0">
+                {t("get.card.actions.addToCollection")}
+              </Span>
+              <AddToFavoritesButton
+                char={char}
+                logger={logger}
+                user={user}
+                locale={locale}
+                variant="default"
+                className="ml-auto h-6 gap-1 text-xs px-2"
+              >
+                <Zap className="h-3 w-3" />
+                {t("get.card.actions.quick")}
+              </AddToFavoritesButton>
+            </>
+          )}
+        </Div>
+      </Div>
     </Div>
   );
 }
@@ -997,6 +1369,7 @@ function AddToFavoritesButton({
 }): React.JSX.Element {
   const { isLoading, addToFavorites } = useAddToFavorites({
     skillId: char.id,
+    variantId: char.isVariant ? char.variantId : null,
     logger,
     user,
     locale,
@@ -1083,17 +1456,14 @@ function SkillFavoriteActions({
 
       const favorite = favoriteResponse.data;
 
-      // Determine the model to use
-      let modelId = null;
-      if (favorite.modelSelection) {
-        const { SkillsRepositoryClient } = await import("./repository-client");
-        const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
-          favorite.modelSelection,
-          undefined,
-          user,
-        );
-        modelId = bestModel?.id || null;
-      }
+      // Determine the model to use (favorite override → variant → skill default)
+      const { SkillsRepositoryClient } = await import("./repository-client");
+      const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+        favorite.modelSelection,
+        favorite.characterModelSelection ?? undefined,
+        user,
+      );
+      const modelId = bestModel?.id || null;
 
       // Activate this favorite
       await ChatSettingsRepositoryClient.selectFavorite({
@@ -1146,17 +1516,14 @@ function SkillFavoriteActions({
 
       const favorite = favoriteResponse.data;
 
-      // Determine the model to use
-      let modelId = null;
-      if (favorite.modelSelection) {
-        const { SkillsRepositoryClient } = await import("./repository-client");
-        const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
-          favorite.modelSelection,
-          undefined,
-          user,
-        );
-        modelId = bestModel?.id || null;
-      }
+      // Determine the model to use (favorite override → variant → skill default)
+      const { SkillsRepositoryClient } = await import("./repository-client");
+      const bestModel = SkillsRepositoryClient.getBestModelForFavorite(
+        favorite.modelSelection,
+        favorite.characterModelSelection ?? undefined,
+        user,
+      );
+      const modelId = bestModel?.id || null;
 
       // Activate this favorite
       await ChatSettingsRepositoryClient.selectFavorite({

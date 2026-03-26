@@ -100,6 +100,18 @@ export const translations = {
           "Select from {{modelCount}}+ AI models including mainstream, open-source, and uncensored options.",
         tip: "Click to open the model selector and pick your companion.",
       },
+      companionVariants: {
+        title: "Your Companion Variants",
+        description:
+          "Your companion comes in multiple variants — brilliant for deep thinking, smart for everyday tasks, and uncensored for unfiltered responses. Tap any row to switch instantly.",
+        tip: "You can drag to reorder or add more variants anytime.",
+      },
+      browseSkills: {
+        title: "Discover More Skills",
+        description:
+          "Explore 40+ specialist skills — from coders and researchers to writers and advisors. Add any skill as a favorite and it appears right here.",
+        tip: "Skills give your AI a specific focus and the best model for the job.",
+      },
       rootFolders: {
         title: "Your Chat Folders",
         description:

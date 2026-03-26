@@ -9,6 +9,7 @@ import {
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
   hasChild,
@@ -33,14 +34,19 @@ function generateInputSchema(
 
   try {
     // Combine request data and URL params
+    // Pass Platform.MCP so fields with hiddenForPlatforms including MCP are excluded
     const requestDataSchema = generateSchemaForUsage(
       endpoint.fields,
       FieldUsage.RequestData,
+      undefined,
+      Platform.MCP,
     ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
 
     const urlPathParamsSchema = generateSchemaForUsage(
       endpoint.fields,
       FieldUsage.RequestUrlParams,
+      undefined,
+      Platform.MCP,
     ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
 
     const combinedShape: { [key: string]: z.ZodTypeAny } = {};

@@ -110,14 +110,19 @@ export class RouteHandlersGeneratorRepository {
       }
 
       // Generate content with only valid route files
-      const { content, routeCount } =
+      const { content, hotPathsContent, routeCount } =
         await RouteHandlersGeneratorRepository.generateContent(
           validRouteFiles,
           logger,
         );
 
-      // Write file
+      // Write route-handlers.ts and hot-paths.ts
+      const hotPathsFile = outputFile.replace(
+        /\/route-handlers\.ts$/,
+        "/route-hot-paths.ts",
+      );
       await writeGeneratedFile(outputFile, content, data.dryRun);
+      await writeGeneratedFile(hotPathsFile, hotPathsContent, data.dryRun);
 
       const duration = Date.now() - startTime;
 
@@ -243,8 +248,11 @@ export class RouteHandlersGeneratorRepository {
   private static async generateContent(
     routeFiles: string[],
     logger: EndpointLogger,
-  ): Promise<{ content: string; routeCount: number }> {
-    const pathMap: Record<string, { importPath: string; method: string }> = {};
+  ): Promise<{ content: string; hotPathsContent: string; routeCount: number }> {
+    const pathMap: Record<
+      string,
+      { importPath: string; absPath: string; method: string }
+    > = {};
     const allPaths: string[] = [];
     let routeCount = 0;
 
@@ -272,7 +280,7 @@ export class RouteHandlersGeneratorRepository {
       for (const method of methods) {
         const pathWithMethod = `${path}${PATH_SEPARATOR}${method}`;
         if (!pathMap[pathWithMethod]) {
-          pathMap[pathWithMethod] = { importPath, method };
+          pathMap[pathWithMethod] = { importPath, absPath: routeFile, method };
           allPaths.push(pathWithMethod);
           routeCount++;
         }
@@ -286,7 +294,7 @@ export class RouteHandlersGeneratorRepository {
       for (const { alias, method } of definitionAliases) {
         // Only add if not already present (first wins)
         if (!pathMap[alias]) {
-          pathMap[alias] = { importPath, method };
+          pathMap[alias] = { importPath, absPath: routeFile, method };
           allPaths.push(alias);
         }
       }
@@ -295,40 +303,43 @@ export class RouteHandlersGeneratorRepository {
     // Sort paths for consistent output
     allPaths.sort();
 
-    // Generate getRouteHandler function cases with type-safe loading
+    // Generate static-import cases (bundler-traceable)
     const cases: string[] = [];
+    // Also build the hot-paths map: toolName -> { absPath, method }
+    const hotPathEntries: string[] = [];
     for (const path of allPaths) {
-      const { importPath, method } = pathMap[path];
-      // Calculate line lengths for different wrapping strategies
+      const { importPath, absPath, method } = pathMap[path];
+      // Static import strings for bundler tracing
       const returnWithTools = `      return (await import("${importPath}")).tools`;
       const returnWithParen = `      return (await import("${importPath}"))`;
       const fullLine = `      return (await import("${importPath}")).tools.${method} as GenericHandlerBase;`;
 
       if (fullLine.length <= 80) {
-        // Short (<=80 chars, prettier printWidth): keep on one line
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).tools.${method} as GenericHandlerBase;`);
       } else if (returnWithTools.length <= 80) {
-        // Wrap after .tools (returnWithTools <=80, but fullLine >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}")).tools
         .${method} as GenericHandlerBase;`);
       } else if (returnWithParen.length <= 80) {
-        // Wrap after import paren (returnWithParen <=80, but returnWithTools >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (await import("${importPath}"))
         .tools.${method} as GenericHandlerBase;`);
       } else {
-        // Very long: wrap import statement itself (returnWithParen >80)
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (
         await import("${importPath}")
       ).tools.${method} as GenericHandlerBase;`);
       }
+
+      // eslint-disable-next-line i18next/no-literal-string
+      hotPathEntries.push(
+        `  "${path}": { absPath: "${absPath}", method: "${method}" },`,
+      );
     }
 
     // eslint-disable-next-line i18next/no-literal-string
@@ -347,7 +358,7 @@ import type { GenericHandlerBase } from "../unified-interface/shared/endpoints/r
 /* eslint-disable prettier/prettier */
 
 /**
- * Dynamically import route handler by path
+ * Dynamically import route handler by path.
  * @param path - The route path (e.g., "core/agent/chat/threads")
  * @returns The route module or null if not found
  */
@@ -361,6 +372,21 @@ ${cases.join("\n")}
   }
 }
 `;
-    return { content, routeCount };
+
+    // eslint-disable-next-line i18next/no-literal-string
+    const hotPathsContent = `${header}
+
+/* eslint-disable prettier/prettier */
+
+/**
+ * Maps every tool name to its import path and HTTP method.
+ * Used by the MCP hot-loader to build fresh (cache-busted) imports at runtime
+ * without static import strings that bundlers would trace.
+ */
+export const routeHotPaths: Record<string, { absPath: string; method: string }> = {
+${hotPathEntries.join("\n")}
+};
+`;
+    return { content, hotPathsContent, routeCount };
   }
 }

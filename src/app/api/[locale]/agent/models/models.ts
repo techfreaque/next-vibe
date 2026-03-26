@@ -19,6 +19,10 @@ export interface ModelFeatures {
   imageInput: boolean;
   pdfInput: boolean;
   imageOutput: boolean;
+  /** Whether size/quality UI controls are meaningful for this model's image output.
+   * true = pure generators (Flux, DALL-E, etc.) that accept imageSize/imageQuality params.
+   * false = chat models that produce images inline (Gemini image, GPT-5 Image). */
+  imageOutputSettings: boolean;
   audioOutput: boolean;
   streaming: boolean;
   toolCalling: boolean;
@@ -239,8 +243,10 @@ export interface ModelDefinition {
   content: typeof ContentLevelValue;
   features: ModelFeatures;
   weaknesses?: (typeof ModelUtilityValue)[];
-  /** Discriminant: determines routing and UI mode. Defaults to "text". */
+  /** Primary UI mode discriminant. Defaults to "text". Controls generation settings shown in chat. */
   modelType?: ModelType;
+  /** All tabs this model should appear in. Defaults to [modelType]. Use for cross-tab models (e.g. multimodal chat). */
+  modelTypes?: ModelType[];
 }
 
 /**
@@ -286,8 +292,10 @@ export interface ModelOptionBase {
   weaknesses?: (typeof ModelUtilityValue)[];
   /** Whether this model variant is only visible to admin users */
   adminOnly?: boolean;
-  /** Discriminant: "text" (default), "image", or "video" */
+  /** Primary UI mode discriminant ("text" default). Controls generation settings shown in chat. */
   modelType: ModelType;
+  /** All tabs this model appears in. Defaults to [modelType]. Cross-tab models list multiple types. */
+  modelTypes: ModelType[];
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
   creditCost: typeof calculateCreditCost;
@@ -420,6 +428,26 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "Udio",
     icon: "music",
   },
+  miniMax: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "MiniMax",
+    icon: "si-minimax",
+  },
+  xiaomi: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Xiaomi",
+    icon: "si-xiaomi",
+  },
+  byteDanceSeed: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "ByteDance",
+    icon: "si-bytedance",
+  },
+  sourceful: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Sourceful",
+    icon: "image",
+  },
 };
 
 // Default features for models without specific features
@@ -427,6 +455,7 @@ const defaultFeatures: ModelFeatures = {
   imageInput: false,
   pdfInput: false,
   imageOutput: false,
+  imageOutputSettings: false,
   audioOutput: false,
   streaming: true,
   toolCalling: false,
@@ -1549,12 +1578,13 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
+      ModelUtility.VISION,
     ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.FAST,
     content: ContentLevel.OPEN,
-    features: { ...defaultFeatures, toolCalling: true },
+    features: { ...defaultFeatures, imageInput: true, toolCalling: true },
   },
   [ModelId.KIMI_K2]: {
     name: "Kimi K2",
@@ -2047,7 +2077,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       imageInput: true,
       imageOutput: true,
     },
-    modelType: "image",
+    // modelType omitted (defaults to "text") — primary UI mode is chat (no size/quality dropdowns).
+    // modelTypes includes "image" so this model appears in both the Chat and Image tabs.
+    modelTypes: ["text", "image"],
   },
   [ModelId.GEMINI_3_1_FLASH_LITE_PREVIEW]: {
     name: "Gemini 3.1 Flash Lite Preview",
@@ -2361,6 +2393,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.GPT_IMAGE_1]: {
@@ -2388,6 +2421,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_SCHNELL]: {
@@ -2415,6 +2449,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_PRO]: {
@@ -2446,6 +2481,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.SDXL]: {
@@ -2473,6 +2509,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
 
@@ -2505,6 +2542,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_2_KLEIN_4B]: {
@@ -2532,6 +2570,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_PRO]: {
@@ -2563,6 +2602,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_FAST]: {
@@ -2590,6 +2630,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_MAX_PREVIEW]: {
@@ -2621,6 +2662,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_STANDARD_PREVIEW]: {
@@ -2648,6 +2690,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.RIVERFLOW_V2_FAST_PREVIEW]: {
@@ -2675,6 +2718,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_2_FLEX]: {
@@ -2706,6 +2750,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.FLUX_2_PRO]: {
@@ -2737,6 +2782,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
   [ModelId.GEMINI_3_PRO_IMAGE_PREVIEW]: {
@@ -2746,7 +2792,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 65536,
     icon: "si-googlegemini",
-    modelType: "image",
+    // modelType intentionally omitted (defaults to "text") — multimodal chat model,
+    // not a pure image generator. Routes through stream; imageOutput: true drives
+    // the modalities passed to OpenRouter.
     providers: [
       {
         id: ModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
@@ -2770,6 +2818,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       imageInput: true,
       imageOutput: true,
     },
+    // modelType omitted (defaults to "text") — primary UI mode is chat.
+    // modelTypes includes "image" so this model appears in both the Chat and Image tabs.
+    modelTypes: ["text", "image"],
   },
   [ModelId.GPT_5_IMAGE_MINI]: {
     name: "GPT-5 Image Mini",
@@ -2778,7 +2829,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    modelType: "image",
+    // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
+    // modelTypes includes "image" so it appears in both Chat and Image tabs.
     providers: [
       {
         id: ModelId.GPT_5_IMAGE_MINI,
@@ -2802,6 +2854,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       imageInput: true,
       imageOutput: true,
     },
+    modelTypes: ["text", "image"],
   },
   [ModelId.GPT_5_IMAGE]: {
     name: "GPT-5 Image",
@@ -2810,7 +2863,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    modelType: "image",
+    // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
+    // modelTypes includes "image" so it appears in both Chat and Image tabs.
     providers: [
       {
         id: ModelId.GPT_5_IMAGE,
@@ -2834,6 +2888,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       imageInput: true,
       imageOutput: true,
     },
+    modelTypes: ["text", "image"],
   },
   [ModelId.SEEDREAM_4_5]: {
     name: "Seedream 4.5",
@@ -2860,6 +2915,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       ...defaultFeatures,
       streaming: false,
       imageOutput: true,
+      imageOutputSettings: true,
     },
   },
 
@@ -2984,6 +3040,7 @@ function buildModelOptions(): Record<string, ModelOption> {
         weaknesses: def.weaknesses,
         adminOnly: provider.adminOnly,
         modelType: def.modelType ?? "text",
+        modelTypes: def.modelTypes ?? [def.modelType ?? "text"],
       };
 
       if ("creditCostPerImage" in provider) {

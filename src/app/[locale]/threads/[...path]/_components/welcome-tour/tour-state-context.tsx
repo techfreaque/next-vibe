@@ -4,6 +4,8 @@ interface TourState {
   isActive: boolean;
   modelSelectorOpen: boolean;
   modelSelectorOnboarding: boolean;
+  // Set to true when the selector onboarding finishes (companion + usecases steps done)
+  onboardingComplete: boolean;
   // Pause tour while selector is open (hides tooltip)
   isPaused: boolean;
   // Current tour step index (for coordination)
@@ -13,6 +15,7 @@ interface TourState {
   setTourActive: (active: boolean) => void;
   setModelSelectorOpen: (open: boolean) => void;
   setModelSelectorOnboarding: (onboarding: boolean) => void;
+  setOnboardingComplete: (complete: boolean) => void;
   setIsPaused: (paused: boolean) => void;
   setCurrentStepIndex: (index: number) => void;
   setAdvanceTour: (callback: (() => void) | null) => void;
@@ -22,6 +25,7 @@ export const useTourState = create<TourState>((set) => ({
   isActive: false,
   modelSelectorOpen: false,
   modelSelectorOnboarding: false,
+  onboardingComplete: false,
   isPaused: false,
   currentStepIndex: 0,
   advanceTour: null,
@@ -33,6 +37,9 @@ export const useTourState = create<TourState>((set) => ({
   },
   setModelSelectorOnboarding: (onboarding): void => {
     set({ modelSelectorOnboarding: onboarding });
+  },
+  setOnboardingComplete: (complete): void => {
+    set({ onboardingComplete: complete });
   },
   setIsPaused: (paused): void => {
     set({ isPaused: paused });

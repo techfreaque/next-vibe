@@ -17,6 +17,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { DefaultFolderId } from "../../../agent/chat/config";
+import { VIBE_CHECK_TOOL_NAMES } from "@/app/api/[locale]/system/check/vibe-check/constants";
 import {
   definitionLoader,
   type IDefinitionLoader,
@@ -37,6 +38,13 @@ import type {
   MCPToolMetadata,
 } from "./types";
 import { MCPErrorCode } from "./types";
+
+/**
+ * Tools excluded from hot-reload (use cached module loading instead).
+ * vibe-check is excluded because it is the code quality tool itself and
+ * must remain stable while checking other code.
+ */
+const HOT_RELOAD_EXCLUDED_TOOLS = new Set(VIBE_CHECK_TOOL_NAMES);
 
 /**
  * MCP Registry Implementation
@@ -195,7 +203,20 @@ export class MCPRegistry {
       });
     }
 
-    // Execute tool using shared generic handler
+    // Hot reload: load fresh modules on every call so file changes are reflected
+    // immediately without restarting the MCP server. vibe-check is excluded
+    // because it must remain stable while checking code quality.
+    const isHotReload = !HOT_RELOAD_EXCLUDED_TOOLS.has(context.toolName);
+
+    // Execute tool using shared generic handler.
+    // For hot-reload tools, pre-load the handler fresh and pass it as preloadedHandler
+    // so the executor uses it directly without going through the cached switch.
+    const freshHandler = isHotReload
+      ? await import("./hot-loader").then((m) =>
+          m.getRouteHandlerFresh(context.toolName),
+        )
+      : undefined;
+
     const executeArgs: Parameters<
       typeof RouteExecutionExecutor.executeGenericHandler
     >[0] = {
@@ -205,6 +226,7 @@ export class MCPRegistry {
       locale: context.locale,
       logger,
       platform: Platform.MCP,
+      preloadedHandler: freshHandler,
       streamContext: {
         rootFolderId: DefaultFolderId.CRON,
         threadId: undefined,
@@ -270,32 +292,39 @@ export class MCPRegistry {
           "error" in result.messageParams &&
           "errorCount" in result.messageParams);
       if (needsEndpoint) {
-        let endpointResult = await this.definitionLdr.load({
-          identifier: context.toolName,
-          platform: Platform.MCP,
-          user: context.user,
-          logger,
-          locale: context.locale,
-        });
-        // Bun TDZ race: dynamic imports can throw "Cannot access 'X' before initialization"
-        // on first load. Retry once after 10ms to let the module settle.
-        if (
-          !endpointResult.success &&
-          endpointResult.message?.includes("before initialization")
-        ) {
-          await new Promise<void>((resolve) => {
-            setTimeout(resolve, 10);
-          });
-          endpointResult = await this.definitionLdr.load({
+        if (isHotReload) {
+          // Hot reload: bypass allDefinitionsCache and load fresh from disk
+          endpoint = await import("./hot-loader").then((m) =>
+            m.getEndpointFresh(context.toolName),
+          );
+        } else {
+          let endpointResult = await this.definitionLdr.load({
             identifier: context.toolName,
             platform: Platform.MCP,
             user: context.user,
             logger,
             locale: context.locale,
           });
-        }
-        if (endpointResult.success) {
-          endpoint = endpointResult.data;
+          // Bun TDZ race: dynamic imports can throw "Cannot access 'X' before initialization"
+          // on first load. Retry once after 10ms to let the module settle.
+          if (
+            !endpointResult.success &&
+            endpointResult.message?.includes("before initialization")
+          ) {
+            await new Promise<void>((resolve) => {
+              setTimeout(resolve, 10);
+            });
+            endpointResult = await this.definitionLdr.load({
+              identifier: context.toolName,
+              platform: Platform.MCP,
+              user: context.user,
+              logger,
+              locale: context.locale,
+            });
+          }
+          if (endpointResult.success) {
+            endpoint = endpointResult.data;
+          }
         }
       }
 

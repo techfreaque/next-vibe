@@ -1,6 +1,7 @@
 "use client";
 
 import { Audio } from "next-vibe-ui/ui/audio";
+import { Video } from "next-vibe-ui/ui/video";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
@@ -332,7 +333,7 @@ const AssistantContentMessage = memo(
             collapseState={collapseState ?? undefined}
           />
         ) : null}
-        {/* Generated Media (image / audio) */}
+        {/* Generated Media (image / audio / video) */}
         {generatedMedia ? (
           generatedMedia.type === "image" && generatedMedia.url ? (
             <Div className="mt-2 max-w-lg">
@@ -356,6 +357,19 @@ const AssistantContentMessage = memo(
               <MediaActions
                 url={generatedMedia.url}
                 type="audio"
+                locale={locale}
+              />
+            </Div>
+          ) : generatedMedia.type === "video" && generatedMedia.url ? (
+            <Div className="mt-2 max-w-lg">
+              <Video
+                src={generatedMedia.url}
+                controls
+                className="rounded-lg w-full h-auto"
+              />
+              <MediaActions
+                url={generatedMedia.url}
+                type="video"
                 locale={locale}
               />
             </Div>

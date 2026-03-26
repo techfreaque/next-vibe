@@ -28,6 +28,7 @@ import type { EndpointLogger } from "../logger/endpoint";
 import type { InferSchemaFromField, UnifiedField } from "../types/endpoint";
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 import { FieldUsage, type SpacingSize, WidgetType } from "../types/enums";
+import type { Platform } from "../types/platform";
 import type {
   ArrayWidgetConfig,
   DisplayOnlyWidgetConfig,
@@ -567,11 +568,14 @@ export type InferObjectType<C, Usage extends FieldUsage> =
  *   the caller has at least one matching role. This is the schema-level security
  *   guarantee - excluded fields are stripped by Zod's default `.strip()` behaviour
  *   and never reach the handler, regardless of what the client sends.
+ * @param platform - Optional calling platform. When provided, fields with
+ *   `hiddenForPlatforms` set are excluded from the schema for matching platforms.
  */
 export function generateSchemaForUsage<F, Usage extends FieldUsage>(
   field: F,
   targetUsage: Usage,
   userRoles?: readonly (typeof UserPermissionRoleValue)[],
+  platform?: Platform,
 ): InferSchemaFromField<F, Usage> {
   // Defensive check: ensure field is defined
   if (!field || typeof field !== "object") {
@@ -624,6 +628,18 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
       return false; // explicitly empty → no one sees it
     }
     return childField.visibleFor.some((role) => userRoles.includes(role));
+  };
+
+  interface FieldWithHiddenPlatforms {
+    hiddenForPlatforms?: readonly Platform[];
+  }
+  const isHiddenForPlatform = (
+    childField: FieldWithHiddenPlatforms,
+  ): boolean => {
+    if (!platform || !childField.hiddenForPlatforms) {
+      return false; // no platform context or no constraint - always visible
+    }
+    return childField.hiddenForPlatforms.includes(platform);
   };
 
   interface FieldWithType {
@@ -704,6 +720,11 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           continue;
         }
 
+        // Skip fields hidden for the current platform
+        if (isHiddenForPlatform(childField as FieldWithHiddenPlatforms)) {
+          continue;
+        }
+
         // CRITICAL: Skip objectFields that only contain widget children - they're UI-only containers
         // Examples: footerLinks container with only widget links inside
         const isObjectFieldWithOnlyWidgets =
@@ -756,6 +777,7 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           childField,
           targetUsage,
           userRoles,
+          platform,
         );
         // Check if schema is z.never() by comparing type to actual z.never() instance
         if (childSchema._def.type !== neverType) {
@@ -819,10 +841,16 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
           continue;
         }
 
+        // Skip fields hidden for the current platform
+        if (isHiddenForPlatform(childField as FieldWithHiddenPlatforms)) {
+          continue;
+        }
+
         const childSchema = generateSchemaForUsage<typeof childField, Usage>(
           childField,
           targetUsage,
           userRoles,
+          platform,
         );
         if (childSchema._def.type !== neverType) {
           shape[key] = childSchema;
@@ -997,18 +1025,21 @@ export function generateRequestDataSchema<F>(
 }
 
 /**
- * Generate a role-filtered request data schema.
+ * Generate a role- and platform-filtered request data schema.
  * Fields with `visibleFor` set are excluded unless the caller holds a matching role.
+ * Fields with `hiddenForPlatforms` set are excluded for matching platforms.
  * Use this at request time (after auth) instead of the static `endpoint.requestSchema`.
  */
 export function generateRoleFilteredRequestSchema<F>(
   field: F,
   userRoles: readonly (typeof UserPermissionRoleValue)[],
+  platform?: Platform,
 ): InferSchemaFromField<F, FieldUsage.RequestData> {
   return generateSchemaForUsage<F, FieldUsage.RequestData>(
     field,
     FieldUsage.RequestData,
     userRoles,
+    platform,
   );
 }
 

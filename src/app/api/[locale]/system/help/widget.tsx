@@ -88,7 +88,7 @@ interface CustomWidgetProps {
 // ─── Label helpers ──────────────────────────────────────────────────────────
 
 function getToolLabel(tool: HelpToolMetadataSerialized): string {
-  return tool.title || tool.aliases?.[0] || tool.id;
+  return tool.title || tool.aliases?.[0] || (tool.id ?? tool.name);
 }
 
 const isIdSegment = (s: string): boolean =>
@@ -272,9 +272,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     // null = default: all tools are allowed (enabled), only role-appropriate DEFAULT_TOOL_IDS are pinned
     const defaultPinnedSet = new Set<string>(getDefaultToolIdsForUser(user));
     return availableTools.map((tool) => ({
-      id: tool.id,
+      id: tool.id ?? tool.name,
       requiresConfirmation: tool.requiresConfirmation ?? false,
-      pinned: defaultPinnedSet.has(tool.id),
+      pinned: defaultPinnedSet.has(tool.id ?? tool.name),
     }));
   }, [enabledTools, availableTools, user]);
 
@@ -286,12 +286,14 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     }
     if (statsFilter === "pinned") {
       return availableTools.filter((tool) =>
-        effectiveEnabledTools.some((et) => et.id === tool.id && et.pinned),
+        effectiveEnabledTools.some(
+          (et) => et.id === (tool.id ?? tool.name) && et.pinned,
+        ),
       );
     }
     if (statsFilter === "allowed") {
       return availableTools.filter((tool) =>
-        effectiveEnabledTools.some((et) => et.id === tool.id),
+        effectiveEnabledTools.some((et) => et.id === (tool.id ?? tool.name)),
       );
     }
     return availableTools;
@@ -311,7 +313,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         grouped[category] = { tools: [], subcategories: {} };
       }
       grouped[category].tools.push(tool);
-      const subKey = getSubcategory(tool.id);
+      const subKey = getSubcategory(tool.id ?? tool.name);
       if (!grouped[category].subcategories[subKey]) {
         grouped[category].subcategories[subKey] = [];
       }
@@ -349,7 +351,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     () =>
       visibleTools.length > 0 &&
       visibleTools.every((tool) =>
-        effectiveEnabledTools.some((et) => et.id === tool.id),
+        effectiveEnabledTools.some((et) => et.id === (tool.id ?? tool.name)),
       ),
     [visibleTools, effectiveEnabledTools],
   );
@@ -405,7 +407,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     if (activeInstanceId) {
       return;
     }
-    const allIds = visibleTools.map((tool) => tool.id);
+    const allIds = visibleTools.map((tool) => tool.id ?? tool.name);
     const allEnabled = allIds.every((id) =>
       effectiveEnabledTools.some((et) => et.id === id),
     );
@@ -416,10 +418,13 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     } else {
       const toAdd = visibleTools
         .filter(
-          (tool) => !effectiveEnabledTools.some((et) => et.id === tool.id),
+          (tool) =>
+            !effectiveEnabledTools.some(
+              (et) => et.id === (tool.id ?? tool.name),
+            ),
         )
         .map((tool) => ({
-          id: tool.id,
+          id: tool.id ?? tool.name,
           requiresConfirmation: tool.requiresConfirmation ?? false,
           pinned: true,
         }));
@@ -453,10 +458,13 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     } else {
       const toAdd = tools
         .filter(
-          (tool) => !effectiveEnabledTools.some((et) => et.id === tool.id),
+          (tool) =>
+            !effectiveEnabledTools.some(
+              (et) => et.id === (tool.id ?? tool.name),
+            ),
         )
         .map((tool) => ({
-          id: tool.id,
+          id: tool.id ?? tool.name,
           requiresConfirmation: tool.requiresConfirmation ?? false,
           pinned: true,
         }));
@@ -705,7 +713,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           variant="default"
           size="sm"
           onClick={(): void => {
-            void handleOpenTool(tool.id);
+            void handleOpenTool(tool.id ?? tool.name);
           }}
         >
           {t("get.fields.openTool.label")}
@@ -1083,7 +1091,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                                 <Div className="divide-y">
                                   {subTools.map((tool) => (
                                     <ToolRow
-                                      key={tool.id}
+                                      key={tool.id ?? tool.name}
                                       tool={tool}
                                       effectiveEnabledTools={
                                         effectiveEnabledTools
@@ -1104,7 +1112,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                             <Div className="divide-y">
                               {tools.map((tool) => (
                                 <ToolRow
-                                  key={tool.id}
+                                  key={tool.id ?? tool.name}
                                   tool={tool}
                                   effectiveEnabledTools={effectiveEnabledTools}
                                   onToggleEnabled={handleToggleEnabled}
@@ -1204,7 +1212,9 @@ function ToolRow({
   onOpenTool: (toolName: string) => Promise<void>;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
 }): JSX.Element {
-  const enabledTool = effectiveEnabledTools.find((et) => et.id === tool.id);
+  const enabledTool = effectiveEnabledTools.find(
+    (et) => et.id === (tool.id ?? tool.name),
+  );
   const isEnabled = !!enabledTool;
   const isActive = enabledTool?.pinned ?? false;
   const requiresConfirmation = enabledTool?.requiresConfirmation ?? false;
@@ -1220,7 +1230,7 @@ function ToolRow({
       <Div className="flex items-center gap-3">
         <Switch
           checked={isEnabled}
-          onCheckedChange={() => onToggleEnabled(tool.id)}
+          onCheckedChange={() => onToggleEnabled(tool.id ?? tool.name)}
           className="h-4 w-7 shrink-0"
         />
         <Div className="flex-1 min-w-0">
@@ -1279,7 +1289,7 @@ function ToolRow({
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onToggleActive(tool.id);
+                    onToggleActive(tool.id ?? tool.name);
                   }}
                 >
                   {isActive ? (
@@ -1314,7 +1324,7 @@ function ToolRow({
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onToggleConfirmation(tool.id);
+                    onToggleConfirmation(tool.id ?? tool.name);
                   }}
                 >
                   <Shield className="h-3.5 w-3.5" />
@@ -1339,7 +1349,7 @@ function ToolRow({
                 className="h-7 w-7 p-0 shrink-0 text-muted-foreground/40 hover:text-primary hover:bg-primary/10"
                 onClick={(e) => {
                   e.stopPropagation();
-                  void onOpenTool(tool.id);
+                  void onOpenTool(tool.id ?? tool.name);
                 }}
               >
                 <ArrowRight className="h-3.5 w-3.5" />

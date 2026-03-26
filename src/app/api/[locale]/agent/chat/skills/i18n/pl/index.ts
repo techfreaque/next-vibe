@@ -186,6 +186,11 @@ export const translations: typeof enTranslations = {
         2: "Debatuj kontrowersyjne tematy otwarcie",
         3: "Zbadaj wolność intelektualną w świecie akademickim",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Wschodni",
+        techBro: "Tech Bro",
+      },
     },
     devilsAdvocate: {
       name: "Adwokat Diabła",
@@ -198,6 +203,10 @@ export const translations: typeof enTranslations = {
         2: "Kwestionuj narracje głównego nurtu",
         3: "Przedstaw kontrargumenty do mojego poglądu",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Wschodni",
+      },
     },
     technical: {
       name: "Techniczny",
@@ -209,6 +218,10 @@ export const translations: typeof enTranslations = {
         1: "Zdebuguj ten fragment kodu w Pythonie",
         2: "Zaprojektuj skalowalny schemat bazy danych",
         3: "Przejrzyj moją architekturę API",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budżet",
       },
     },
     biologist: {
@@ -223,6 +236,10 @@ export const translations: typeof enTranslations = {
         2: "Co jest nie tak ze światem?",
         3: "Jaki jest najlepszy sposób na uratowanie świata?",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Wschodni",
+      },
     },
     unbiasedHistorian: {
       name: "Bezstronny Historyk",
@@ -234,6 +251,10 @@ export const translations: typeof enTranslations = {
         1: "Przeanalizuj upadek Cesarstwa Rzymskiego",
         2: "Omów rewolucję przemysłową",
         3: "Porównaj starożytne cywilizacje",
+      },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budżet",
       },
     },
     socraticQuestioner: {
@@ -248,6 +269,10 @@ export const translations: typeof enTranslations = {
         2: "Zbadaj znaczenie szczęścia",
         3: "Zakwestionuj mój światopogląd",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Wschodni",
+      },
     },
     professional: {
       name: "Profesjonalny",
@@ -259,6 +284,10 @@ export const translations: typeof enTranslations = {
         1: "Utwórz zarys propozycji biznesowej",
         2: "Przeanalizuj te dane dotyczące trendów rynkowych",
         3: "Pomóż mi przygotować się do prezentacji",
+      },
+      variants: {
+        fast: "Szybki",
+        budget: "Budżet",
       },
     },
     creative: {
@@ -272,6 +301,10 @@ export const translations: typeof enTranslations = {
         2: "Zaprojektuj koncepcję logo dla startupu",
         3: "Wymyśl pomysły na kreatywną kampanię marketingową",
       },
+      variants: {
+        minimax: "MiniMax",
+        deep: "Głęboki",
+      },
     },
     neet: {
       name: "NEET",
@@ -283,6 +316,10 @@ export const translations: typeof enTranslations = {
         1: "Przeanalizuj rzeczywiste przyczyny NEET",
         2: "Zbadaj wpływ NEET na społeczeństwo - plusy i minusy",
         3: "Podziel się osobistymi doświadczeniami jako NEET AI",
+      },
+      variants: {
+        communist: "Komunista",
+        farRight: "Skrajnie prawy",
       },
     },
     chan4: {
@@ -297,6 +334,9 @@ export const translations: typeof enTranslations = {
         3: "Jaki jest najlepszy sposób na uratowanie świata?",
         4: "Czym są 6 Gorillionów? I dlaczego to jest zabawne?",
       },
+      variants: {
+        classic: "Klasyczny",
+      },
     },
     friendly: {
       name: "Przyjazny",
@@ -308,6 +348,10 @@ export const translations: typeof enTranslations = {
         1: "Jaka jest dobra książka do czytania?",
         2: "Pomóż mi zaplanować zabawną aktywność weekendową",
         3: "Podziel się radami życiowymi",
+      },
+      variants: {
+        fast: "Szybki",
+        budget: "Budżet",
       },
     },
     concise: {
@@ -321,6 +365,10 @@ export const translations: typeof enTranslations = {
         2: "Kluczowe punkty dotyczące blockchaina",
         3: "Krótki przegląd uczenia maszynowego",
       },
+      variants: {
+        snappy: "Żwawy",
+        budget: "Budżet",
+      },
     },
     teacher: {
       name: "Nauczyciel",
@@ -333,6 +381,10 @@ export const translations: typeof enTranslations = {
         2: "Jak działa internet?",
         3: "Czym jest teoria względności?",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Szybki",
+      },
     },
     uncensored: {
       name: "Bez cenzury",
@@ -344,6 +396,12 @@ export const translations: typeof enTranslations = {
         1: "Daj mi swoją niefiltrowaną opinię",
         2: "Rozmawiaj o tematach tabu",
         3: "Debata bez ograniczeń",
+      },
+      variants: {
+        farRight: "Skrajnie prawy",
+        conservative: "Konserwatywny",
+        libertarian: "Libertariański",
+        open: "Otwarty",
       },
     },
     thea: {
@@ -358,6 +416,10 @@ export const translations: typeof enTranslations = {
         2: "Poprowadź mnie w budowaniu silnego gospodarstwa domowego",
         3: "Podziel się mądrością o rodzinie i społeczności",
       },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Bez cenzury",
+      },
     },
     hermes: {
       name: "Hermes",
@@ -371,6 +433,10 @@ export const translations: typeof enTranslations = {
         2: "Co Rzymianie powiedzieliby o budowaniu spuścizny?",
         3: "Poprowadź mnie w rozwijaniu prawdziwej siły",
       },
+      variants: {
+        brilliant: "Brilliant",
+        uncensored: "Bez cenzury",
+      },
     },
     quickWriter: {
       name: "Szybki Pisarz",
@@ -383,6 +449,10 @@ export const translations: typeof enTranslations = {
         2: "Napisz prosty e-mail",
         3: "Wygeneruj pomysły na treści dla...",
       },
+      variants: {
+        snappy: "Żwawy",
+        budget: "Budżet",
+      },
     },
     writer: {
       name: "Pisarz",
@@ -394,6 +464,11 @@ export const translations: typeof enTranslations = {
         1: "Popraw ten akapit dla większej jasności",
         2: "Napisz krótkie opowiadanie o...",
         3: "Stwórz profesjonalny e-mail",
+      },
+      variants: {
+        western: "Zachodni",
+        eastern: "Wschodni",
+        budget: "Budżet",
       },
     },
     masterWriter: {
@@ -408,6 +483,11 @@ export const translations: typeof enTranslations = {
         2: "Rozwiń złożone tematy w moim pisaniu",
         3: "Dopracuj tę prozę do poziomu publikacji",
       },
+      variants: {
+        literary: "Literacki",
+        poetic: "Poetycki",
+        budget: "Budżet",
+      },
     },
     researcher: {
       name: "Badacz",
@@ -419,6 +499,11 @@ export const translations: typeof enTranslations = {
         1: "Przeanalizuj te źródła dla mnie",
         2: "Co mówi konsensus naukowy o...?",
         3: "Pomóż mi ustrukturyzować przegląd literatury",
+      },
+      variants: {
+        maverick: "Maverick",
+        fast: "Szybki",
+        budget: "Budżet",
       },
     },
     quickCoder: {
@@ -432,6 +517,10 @@ export const translations: typeof enTranslations = {
         2: "Wygeneruj kod szablonowy dla...",
         3: "Stwórz podstawową funkcję, która...",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budżet",
+      },
     },
     coder: {
       name: "Programista",
@@ -444,6 +533,11 @@ export const translations: typeof enTranslations = {
         2: "Wyjaśnij ten algorytm",
         3: "Przejrzyj mój kod pod kątem ulepszeń",
       },
+      variants: {
+        claude: "Claude",
+        kimi: "Kimi",
+        budget: "Budżet",
+      },
     },
     brilliantCoder: {
       name: "Genialny Programista",
@@ -455,6 +549,10 @@ export const translations: typeof enTranslations = {
         1: "Zoptymalizuj ten algorytm pod kątem wydajności",
         2: "Przejrzyj ten projekt systemu",
         3: "Rozwiąż ten złożony problem algorytmiczny",
+      },
+      variants: {
+        claude: "Claude",
+        kimi: "Kimi",
       },
     },
     brainstormer: {
@@ -469,6 +567,10 @@ export const translations: typeof enTranslations = {
         2: "Wygeneruj 10 unikalnych koncepcji dla...",
         3: "Jak możemy podejść do tego inaczej?",
       },
+      variants: {
+        wildcard: "Wildcard",
+        eastern: "Wschodni",
+      },
     },
     editor: {
       name: "Redaktor",
@@ -482,6 +584,10 @@ export const translations: typeof enTranslations = {
         2: "Popraw płynność tego akapitu",
         3: "Sprawdź to pod kątem gramatyki i stylu",
       },
+      variants: {
+        claude: "Claude",
+        deep: "Głęboki",
+      },
     },
     tutor: {
       name: "Korepetytor",
@@ -493,6 +599,10 @@ export const translations: typeof enTranslations = {
         1: "Wyjaśnij tę koncepcję krok po kroku",
         2: "Pomóż mi zrozumieć...",
         3: "Sprawdź moją wiedzę o...",
+      },
+      variants: {
+        kimi: "Kimi",
+        fast: "Szybki",
       },
     },
     marketer: {
@@ -506,6 +616,10 @@ export const translations: typeof enTranslations = {
         2: "Przeanalizuj tę kampanię marketingową",
         3: "Pomóż mi pozycjonować moją markę",
       },
+      variants: {
+        snappy: "Żwawy",
+        budget: "Budżet",
+      },
     },
     storyteller: {
       name: "Opowiadacz",
@@ -517,6 +631,11 @@ export const translations: typeof enTranslations = {
         1: "Stwórz przekonującą postać",
         2: "Napisz scenę otwierającą dla...",
         3: "Popraw ten dialog",
+      },
+      variants: {
+        kimi: "Kimi",
+        minimax: "MiniMax",
+        budget: "Budżet",
       },
     },
     scientist: {
@@ -530,6 +649,11 @@ export const translations: typeof enTranslations = {
         2: "Jakie są aktualne badania na temat...?",
         3: "Przeanalizuj to twierdzenie naukowe",
       },
+      variants: {
+        maverick: "Maverick",
+        focused: "Skupiony",
+        budget: "Budżet",
+      },
     },
     dataAnalyst: {
       name: "Analityk Danych",
@@ -541,6 +665,11 @@ export const translations: typeof enTranslations = {
         1: "Stwórz wizualizację dla...",
         2: "Jakie wnioski możemy wyciągnąć z...?",
         3: "Pomóż mi z analizą statystyczną",
+      },
+      variants: {
+        claude: "Claude",
+        fast: "Szybki",
+        budget: "Budżet",
       },
     },
     translator: {
@@ -554,6 +683,10 @@ export const translations: typeof enTranslations = {
         2: "Zlokalizuj tę treść dla...",
         3: "Wyjaśnij to odniesienie kulturowe",
       },
+      variants: {
+        gemini: "Gemini",
+        budget: "Budżet",
+      },
     },
     businessAdvisor: {
       name: "Doradca Biznesowy",
@@ -565,6 +698,10 @@ export const translations: typeof enTranslations = {
         1: "Przeanalizuj mój model biznesowy",
         2: "Jak mogę skalować moje operacje?",
         3: "Przejrzyj mój plan wejścia na rynek",
+      },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Wschodni",
       },
     },
     careerCoach: {
@@ -579,6 +716,10 @@ export const translations: typeof enTranslations = {
         2: "Jak mogę negocjować wynagrodzenie?",
         3: "Zaplanuj moją zmianę kariery",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budżet",
+      },
     },
     healthWellness: {
       name: "Zdrowie i Wellness",
@@ -590,6 +731,10 @@ export const translations: typeof enTranslations = {
         1: "Pomóż mi zaplanować zdrowe posiłki",
         2: "Zasugeruj techniki radzenia sobie ze stresem",
         3: "Popraw moje nawyki senne",
+      },
+      variants: {
+        claude: "Claude",
+        budget: "Budżet",
       },
     },
     travelPlanner: {
@@ -603,6 +748,10 @@ export const translations: typeof enTranslations = {
         2: "Stwórz dzienny plan dla...",
         3: "Rozbicie budżetu na podróż do...",
       },
+      variants: {
+        snappy: "Żwawy",
+        budget: "Budżet",
+      },
     },
     legalAssistant: {
       name: "Asystent Prawny",
@@ -614,6 +763,10 @@ export const translations: typeof enTranslations = {
         1: "Pomóż mi zrozumieć tę umowę",
         2: "Jakie są moje prawa jako najemcy?",
         3: "Wyjaśnij proces...",
+      },
+      variants: {
+        maverick: "Maverick",
+        budget: "Budżet",
       },
     },
     financialAdvisor: {
@@ -627,6 +780,10 @@ export const translations: typeof enTranslations = {
         2: "Jak powinienem spłacić swoje długi?",
         3: "Zaplanuj oszczędności emerytalne",
       },
+      variants: {
+        maverick: "Maverick",
+        budget: "Budżet",
+      },
     },
     socialMediaManager: {
       name: "Menedżer Social Media",
@@ -638,6 +795,10 @@ export const translations: typeof enTranslations = {
         1: "Opracuj kalendarz treści",
         2: "Zasugeruj hashtagi dla...",
         3: "Napisz angażujące tweety o...",
+      },
+      variants: {
+        snappy: "Żwawy",
+        budget: "Budżet",
       },
     },
     productManager: {
@@ -651,6 +812,10 @@ export const translations: typeof enTranslations = {
         2: "Przeanalizuj dopasowanie produktu do rynku",
         3: "Opracuj mapę drogową produktu",
       },
+      variants: {
+        claude: "Claude",
+        fast: "Szybki",
+      },
     },
     debater: {
       name: "Debater",
@@ -662,6 +827,11 @@ export const translations: typeof enTranslations = {
         1: "Przedstaw argumenty za i przeciw bezwarunkowemu dochodowi podstawowemu",
         2: "Omów wolność słowa vs. mowa nienawiści",
         3: "Przeanalizuj różne ideologie polityczne",
+      },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Wschodni",
+        techBro: "Tech Bro",
       },
     },
     philosopher: {
@@ -675,6 +845,11 @@ export const translations: typeof enTranslations = {
         2: "Czy istnieje obiektywna moralność?",
         3: "Co nadaje życiu sens?",
       },
+      variants: {
+        maverick: "Maverick",
+        eastern: "Wschodni",
+        techBro: "Tech Bro",
+      },
     },
     uncensoredWriter: {
       name: "Niecenzurowany Pisarz",
@@ -687,6 +862,10 @@ export const translations: typeof enTranslations = {
         2: "Opracuj moralnie złożoną postać",
         3: "Napisz horror z graficznymi elementami",
       },
+      variants: {
+        smart: "Smart",
+        fast: "Szybki",
+      },
     },
     roleplaySkill: {
       name: "Postać do Odgrywania Ról",
@@ -698,6 +877,11 @@ export const translations: typeof enTranslations = {
         1: "Stwórz scenariusz przygody sci-fi",
         2: "Wciel się w postać historyczną",
         3: "Rozwiń złożoną relację między postaciami",
+      },
+      variants: {
+        creative: "Kreatywny",
+        deep: "Głęboki",
+        uncensored: "Bez cenzury",
       },
     },
     researchAgent: {
@@ -712,6 +896,10 @@ export const translations: typeof enTranslations = {
         2: "Porównaj różne źródła na dany temat",
         3: "Opracuj briefing badawczy z cytatami",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Szybki",
+      },
     },
     statsAnalyst: {
       name: "Analityk Statystyk",
@@ -724,6 +912,10 @@ export const translations: typeof enTranslations = {
         1: "Jak wyglądają trendy rejestracji użytkowników w tym tygodniu?",
         2: "Podsumuj wydajność kampanii e-mailowych",
         3: "Daj mi raport statusu programu poleceń",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Szybki",
       },
     },
     cronManager: {
@@ -738,6 +930,10 @@ export const translations: typeof enTranslations = {
         2: "Pokaż mi ostatnie błędy i awarie zadań",
         3: "Sprawdź ogólny stan systemu zadań",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Szybki",
+      },
     },
     systemMonitor: {
       name: "Monitor Systemu",
@@ -750,6 +946,10 @@ export const translations: typeof enTranslations = {
         1: "Pokaż mi status monitoringu pulse",
         2: "Sprawdź łączność z bazą danych",
         3: "Jaki jest aktualny stan zadań cron?",
+      },
+      variants: {
+        fast: "Szybki",
+        budget: "Budżet",
       },
     },
     publicCurator: {
@@ -764,6 +964,10 @@ export const translations: typeof enTranslations = {
         2: "Pomóż mi zorganizować treści społeczności",
         3: "Znajdź wiadomości pasujące do określonych kryteriów",
       },
+      variants: {
+        gemini: "Gemini",
+        fast: "Szybki",
+      },
     },
     codeArchitect: {
       name: "Architekt Kodu",
@@ -776,6 +980,10 @@ export const translations: typeof enTranslations = {
         1: "Przejrzyj architekturę modułu",
         2: "Deleguj zadanie programistyczne do Claude Code",
         3: "Zaprojektuj strategię migracji",
+      },
+      variants: {
+        gemini: "Gemini",
+        claude: "Claude",
       },
     },
     deploymentAgent: {
@@ -790,6 +998,10 @@ export const translations: typeof enTranslations = {
         2: "Przeprowadź wdrożenie na produkcję",
         3: "Pokaż mi aktualny status serwera",
       },
+      variants: {
+        claude: "Claude",
+        budget: "Budżet",
+      },
     },
     rebuildAgent: {
       name: "Rebuild Agent",
@@ -802,6 +1014,10 @@ export const translations: typeof enTranslations = {
         1: "Uruchom build bez restartu",
         2: "Sprawdź stan serwera po przebudowie",
         3: "Utwórz zaplanowane zadanie przebudowy",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Szybki",
       },
     },
     vibeCoder: {
@@ -816,6 +1032,10 @@ export const translations: typeof enTranslations = {
         2: "Pomóż mi zaplanować i wdrożyć zmianę w istniejącej funkcji",
         3: "Zbadaj błąd i zaproponuj poprawkę",
       },
+      variants: {
+        kimi: "Kimi",
+        budget: "Budżet",
+      },
     },
     skillCreator: {
       name: "Kreator Postaci",
@@ -828,6 +1048,10 @@ export const translations: typeof enTranslations = {
         1: "Pokaż mi wszystkie istniejące postacie i zasugeruj czego brakuje",
         2: "Zaprojektuj postać do kreatywnego pisania z unikalną osobowością",
         3: "Dodaj postać do moich ulubionych i skonfiguruj ustawienia czatu",
+      },
+      variants: {
+        gemini: "Gemini",
+        fast: "Szybki",
       },
     },
   },

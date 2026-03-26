@@ -186,9 +186,47 @@ export const getTourSteps = (
       // Allow user to click the selector to open it
       blockTargetInteraction: false,
     },
-    // NOTE: Selector internal steps removed - the unified selector now has its own
-    // built-in onboarding ("Meet Your AI Companion") that handles companion selection.
-    // When selector closes after user picks a companion, tour continues to sidebar steps.
+    // Step 3: Companion variants - shown inside the open selector after onboarding completes
+    {
+      target: getTourSelector(TOUR_DATA_ATTRS.FAVORITES_COMPANION_GROUP),
+      content: (
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold">
+            {t("components.welcomeTour.companionVariants.title")}
+          </H3>
+          <P className="text-sm">
+            {t("components.welcomeTour.companionVariants.description")}
+          </P>
+          <P className="text-xs text-muted-foreground">
+            {t("components.welcomeTour.companionVariants.tip")}
+          </P>
+        </Div>
+      ),
+      placement: TOUR_PLACEMENTS.BOTTOM,
+      skipBeacon: true,
+    },
+    // Step 4: Browse Skills button - discover more specialists
+    {
+      target: getTourSelector(TOUR_DATA_ATTRS.FAVORITES_BROWSE_SKILLS),
+      content: (
+        <Div className="space-y-2">
+          <H3 className="text-lg font-semibold">
+            {t("components.welcomeTour.browseSkills.title")}
+          </H3>
+          <P className="text-sm">
+            {t("components.welcomeTour.browseSkills.description")}
+          </P>
+          <P className="text-xs text-muted-foreground">
+            {t("components.welcomeTour.browseSkills.tip")}
+          </P>
+        </Div>
+      ),
+      placement: TOUR_PLACEMENTS.BOTTOM,
+      skipBeacon: true,
+      blockTargetInteraction: false,
+    },
+    // NOTE: After step 4, tour continues to sidebar steps.
+    // The selector stays open — user can close it manually or proceed.
     {
       target: getTourSelector(TOUR_DATA_ATTRS.ROOT_FOLDERS),
       content: (

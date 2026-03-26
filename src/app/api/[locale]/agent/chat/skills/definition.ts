@@ -39,8 +39,13 @@ import {
   SkillOwnershipTypeDB,
   SkillTrustLevelDB,
 } from "./enum";
+import { lazyCliWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/lazy-cli-widget";
+
 import { scopedTranslation } from "./i18n";
-import { SkillsListContainer } from "./widget";
+
+const SkillsListContainer = lazyCliWidget(() =>
+  import("./widget").then((m) => ({ default: m.SkillsListContainer })),
+);
 
 /**
  * Get Skills List Endpoint (GET)
@@ -294,6 +299,23 @@ const { GET } = createEndpoint({
                     hidden: true,
                     schema: z.enum(SkillCategoryDB),
                   }),
+                  /** Present only for variant sub-rows (isVariant=true) */
+                  variantId: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.string().nullable(),
+                  }),
+                  variantName: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.string().nullable(),
+                  }),
+                  /** True for variant sub-rows; false/absent for standalone skill cards */
+                  isVariant: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.boolean(),
+                  }),
                   modelId: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
@@ -485,6 +507,9 @@ const { GET } = createEndpoint({
                 ownershipType: SkillOwnershipTypeDB[0],
                 trustLevel: null,
                 voteCount: null,
+                variantId: null,
+                variantName: null,
+                isVariant: false,
               },
             ],
           },
@@ -507,6 +532,9 @@ const { GET } = createEndpoint({
                 ownershipType: SkillOwnershipTypeDB[2],
                 trustLevel: SkillTrustLevelDB[1],
                 voteCount: 42,
+                variantId: null,
+                variantName: null,
+                isVariant: false,
               },
             ],
           },

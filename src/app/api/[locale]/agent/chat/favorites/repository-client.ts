@@ -54,6 +54,7 @@ import type { FavoritesReorderRequestOutput } from "./reorder/definition";
 interface StoredLocalFavorite {
   id: string;
   skillId: string;
+  variantId: string | null;
   customIcon: IconKey | null;
   voice: typeof TtsVoiceValue | null;
   modelSelection: FavoriteGetModelSelection | null;
@@ -135,6 +136,7 @@ export class ChatFavoritesRepositoryClient {
       const newConfig: StoredLocalFavorite = {
         id,
         skillId: data.skillId ?? "default",
+        variantId: data.variantId ?? null,
         voice: data.voice ?? null,
         modelSelection: data.modelSelection,
         customIcon: null,
@@ -330,6 +332,7 @@ export class ChatFavoritesRepositoryClient {
     return {
       id: stored.id,
       skillId: stored.skillId,
+      variantId: stored.variantId ?? null,
       modelId: bestModel?.id ?? null,
       voice: stored.voice ?? characterVoice ?? DEFAULT_TTS_VOICE,
       position: stored.position,
@@ -373,6 +376,7 @@ export class ChatFavoritesRepositoryClient {
       // Flattened structure - no character found
       return {
         skillId: stored.skillId,
+        variantId: stored.variantId ?? null,
         icon: "user" as const,
         name: t("fallbacks.unknownSkill"),
         tagline: t("fallbacks.noTagline"),
@@ -391,18 +395,26 @@ export class ChatFavoritesRepositoryClient {
       };
     }
 
+    // Resolve variant's modelSelection to use as characterModelSelection fallback
+    const variant = stored.variantId
+      ? character.variants?.find((v) => v.id === stored.variantId)
+      : undefined;
+    const effectiveCharacterModelSelection =
+      variant?.modelSelection ?? character.modelSelection ?? {
+        selectionType: ModelSelectionType.FILTERS,
+      };
+
     // Flattened structure - translate default character keys using characters scope
     return {
       skillId: stored.skillId,
+      variantId: stored.variantId ?? null,
       icon: stored.customIcon ?? character.icon,
       name: character.name ? tChar(character.name) : t("fallbacks.unknown"),
       tagline: character.tagline ? tChar(character.tagline) : "",
       description: character.description ? tChar(character.description) : "",
       voice: stored.voice ?? character.voice,
       modelSelection: stored.modelSelection, // null = use character defaults
-      characterModelSelection: character.modelSelection ?? {
-        selectionType: ModelSelectionType.FILTERS,
-      },
+      characterModelSelection: effectiveCharacterModelSelection,
       compactTrigger: null,
       availableTools: null,
       pinnedTools: null,

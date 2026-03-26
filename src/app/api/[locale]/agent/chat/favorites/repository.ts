@@ -120,6 +120,7 @@ export class ChatFavoritesRepository {
             {
               id: favorite.id,
               skillId: favorite.skillId,
+              variantId: favorite.variantId ?? null,
               customIcon: favorite.customIcon,
               voice: favorite.voice,
               modelSelection: favorite.modelSelection,
@@ -249,18 +250,34 @@ export class ChatFavoritesRepository {
         }
       }
 
-      const items = rows.map((row) => ({
-        id: row.id,
-        name: row.customName ?? row.skillId,
-        skillId: row.skillId,
-        characterName: skillNameMap.get(row.skillId) ?? null,
-        modelId: null as string | null, // model resolved client-side; not stored server-side
-        modelInfo: "",
-        isActive: row.id === activeFavoriteId,
-        position: row.position,
-        useCount: row.useCount,
-        lastUsedAt: row.lastUsedAt,
-      }));
+      const items = rows.map((row) => {
+        const baseName = skillNameMap.get(row.skillId) ?? row.skillId;
+        let variantLabel: string | null = null;
+        if (row.variantId) {
+          const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === row.skillId);
+          const variant = defaultSkill?.variants?.find(
+            (v) => v.id === row.variantId,
+          );
+          if (variant) {
+            variantLabel = charT(variant.variantName);
+          }
+        }
+        const characterName = variantLabel
+          ? `${baseName} – ${variantLabel}`
+          : baseName;
+        return {
+          id: row.id,
+          name: row.customName ?? characterName,
+          skillId: row.skillId,
+          characterName,
+          modelId: null as string | null, // model resolved client-side; not stored server-side
+          modelInfo: "",
+          isActive: row.id === activeFavoriteId,
+          position: row.position,
+          useCount: row.useCount,
+          lastUsedAt: row.lastUsedAt,
+        };
+      });
 
       logger.debug("Generated favorites summary", {
         userId,
@@ -326,18 +343,34 @@ export class ChatFavoritesRepository {
       }
     }
 
-    const items: FavoriteSummaryItem[] = rows.map((row) => ({
-      id: row.id,
-      name: row.customName ?? row.skillId,
-      skillId: row.skillId,
-      characterName: skillNameMap.get(row.skillId) ?? null,
-      modelId: null,
-      modelInfo: "",
-      isActive: row.id === activeFavoriteId,
-      position: row.position,
-      useCount: row.useCount,
-      lastUsedAt: row.lastUsedAt,
-    }));
+    const items: FavoriteSummaryItem[] = rows.map((row) => {
+      const baseName = skillNameMap.get(row.skillId) ?? row.skillId;
+      let variantLabel: string | null = null;
+      if (row.variantId) {
+        const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === row.skillId);
+        const variant = defaultSkill?.variants?.find(
+          (v) => v.id === row.variantId,
+        );
+        if (variant) {
+          variantLabel = charT(variant.variantName);
+        }
+      }
+      const characterName = variantLabel
+        ? `${baseName} – ${variantLabel}`
+        : baseName;
+      return {
+        id: row.id,
+        name: row.customName ?? characterName,
+        skillId: row.skillId,
+        characterName,
+        modelId: null,
+        modelInfo: "",
+        isActive: row.id === activeFavoriteId,
+        position: row.position,
+        useCount: row.useCount,
+        lastUsedAt: row.lastUsedAt,
+      };
+    });
 
     logger.debug("Loaded favorites items", {
       userId,

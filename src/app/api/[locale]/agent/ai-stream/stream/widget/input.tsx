@@ -318,9 +318,16 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const isInputDisabled = isLoading || !canPost;
 
   // Model-type-aware UI
+  // isImageModel/isAudioModel: pure generator (modelType = primary UI mode)
   const isImageModel = currentModel?.modelType === "image";
   const isAudioModel = currentModel?.modelType === "audio";
+  // isGenerativeModel: pure generator — no streaming conversation, hides voice/call mode
   const isGenerativeModel = isImageModel || isAudioModel;
+  // Feature-flag driven UI: use capability flags instead of modelType for these
+  const hasImageOutputSettings =
+    currentModel?.features.imageOutputSettings === true;
+  const showFileUpload =
+    !isGenerativeModel || (currentModel?.features.imageInput ?? false);
 
   // Generation settings from store
   const imageSize = useChatInputStore((s) => s.imageSize);
@@ -563,8 +570,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         </Div>
       )}
 
-      {/* Generation settings row for image/audio models */}
-      {isImageModel && (
+      {/* Generation settings row — only for models that accept size/quality params */}
+      {hasImageOutputSettings && (
         <Div className="flex items-center gap-2 mb-2 flex-wrap">
           <Select value={imageSize} onValueChange={setImageSize}>
             <SelectTrigger className="h-7 text-xs w-auto min-w-[9rem]">
@@ -662,11 +669,11 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             initialSkillData={initialSkillData}
           />
 
-          {modelSupportsTools && !isGenerativeModel && (
+          {modelSupportsTools && (
             <ToolsButton disabled={isLoading} locale={locale} />
           )}
 
-          {!isGenerativeModel && (
+          {showFileUpload && (
             <FileUploadButton
               disabled={isInputDisabled}
               locale={locale}

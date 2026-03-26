@@ -32,8 +32,9 @@ import {
 } from "./tour-config";
 import { useTourState } from "./tour-state-context";
 
-// Model selector step index (step after welcome)
-const MODEL_SELECTOR_STEP_INDEX = 1;
+// Step indices
+const MODEL_SELECTOR_STEP_INDEX = 1; // "Choose Your AI Companion" - clicks open selector
+const BROWSE_SKILLS_STEP_INDEX = 3; // Shown inside open selector — browse skills button
 
 interface WelcomeTourProps {
   isAuthenticated: boolean;
@@ -61,6 +62,10 @@ export function WelcomeTour({
   );
   const setAdvanceTour = useTourState((state) => state.setAdvanceTour);
   const modelSelectorOpen = useTourState((state) => state.modelSelectorOpen);
+  const onboardingComplete = useTourState((state) => state.onboardingComplete);
+  const setOnboardingComplete = useTourState(
+    (state) => state.setOnboardingComplete,
+  );
 
   // Sidebar footer state (for expanding bottom sheet during tour)
   const setBottomSheetExpanded = useSidebarFooterStore(
@@ -199,24 +204,30 @@ export function WelcomeTour({
   }, [run, setAdvanceTour, goToNextStep]);
 
   // Pause/resume tour based on selector state
-  // When selector is open during tour step 2, hide the tooltip
+  // When selector is open during tour step 2, hide the tooltip until onboarding completes
   useEffect(() => {
-    // Handle both: clicking "Next" on step 2 (sets waitingForSelectorRef)
-    // AND clicking the selector directly during step 2
     const isOnSelectorStep = stepIndex === MODEL_SELECTOR_STEP_INDEX;
 
     if (modelSelectorOpen && isOnSelectorStep && run) {
-      // Selector opened during step 2 - pause tour (hide tooltip)
+      // Selector opened during step 2 - pause tour (hide tooltip), wait for onboarding
       waitingForSelectorRef.current = true;
       setRun(false);
-    } else if (!modelSelectorOpen && waitingForSelectorRef.current) {
-      // Selector closed - resume tour and advance
+    } else if (onboardingComplete && waitingForSelectorRef.current) {
+      // Onboarding finished inside selector - advance tour to companion variants step
       waitingForSelectorRef.current = false;
+      setOnboardingComplete(false);
       goToNextStep();
-      // Small delay to ensure step index updates before showing tooltip
-      setTimeout(() => setRun(true), 100);
+      // Small delay to ensure step index updates and favorites DOM is ready
+      setTimeout(() => setRun(true), 300);
     }
-  }, [modelSelectorOpen, stepIndex, run, goToNextStep]);
+  }, [
+    modelSelectorOpen,
+    onboardingComplete,
+    stepIndex,
+    run,
+    goToNextStep,
+    setOnboardingComplete,
+  ]);
 
   // Resume tour after bottom sheet animation completes
   useEffect(() => {
@@ -335,14 +346,19 @@ export function WelcomeTour({
       if (type === EVENTS.STEP_AFTER) {
         if (action === ACTIONS.NEXT) {
           // Special handling for MODEL_SELECTOR step
-          // When user clicks "Next" on this step, open the selector and wait for it to close
+          // When user clicks "Next" on this step, open the selector and wait for onboarding to complete
           if (index === MODEL_SELECTOR_STEP_INDEX) {
             // Open the selector modal
             setModelSelectorOpen(true);
-            // Mark that we're waiting for the selector to close
+            // Mark that we're waiting for onboarding to complete
             waitingForSelectorRef.current = true;
-            // Don't advance - the selector will call advanceTour when done
+            // Don't advance - onboardingComplete will trigger advance via useEffect
             return;
+          }
+
+          // When leaving the in-selector steps, close the selector
+          if (index === BROWSE_SKILLS_STEP_INDEX) {
+            setModelSelectorOpen(false);
           }
 
           const nextIndex = index + 1;

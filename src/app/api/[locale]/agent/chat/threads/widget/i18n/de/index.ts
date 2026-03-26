@@ -102,6 +102,18 @@ export const translations: typeof enTranslations = {
           "Wählen Sie aus {{modelCount}}+ KI-Modellen, darunter Mainstream, Open-Source und zensurfreie Optionen.",
         tip: "Klicken Sie, um den Modellselektor zu öffnen und Ihren Begleiter auszuwählen.",
       },
+      companionVariants: {
+        title: "Ihre Begleiter-Varianten",
+        description:
+          "Ihr Begleiter hat mehrere Varianten — brilliant für tiefes Denken, smart für alltägliche Aufgaben und zensurfrei für ungefilterte Antworten. Tippen Sie auf eine Zeile, um sofort zu wechseln.",
+        tip: "Sie können die Reihenfolge per Drag ändern oder jederzeit weitere Varianten hinzufügen.",
+      },
+      browseSkills: {
+        title: "Weitere Skills entdecken",
+        description:
+          "Erkunden Sie 40+ Spezialist-Skills — von Programmierern und Forschern bis zu Autoren und Beratern. Fügen Sie einen Skill als Favorit hinzu und er erscheint direkt hier.",
+        tip: "Skills geben Ihrer KI einen spezifischen Fokus und das beste Modell für die Aufgabe.",
+      },
       rootFolders: {
         title: "Ihre Chat-Ordner",
         description:

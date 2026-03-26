@@ -30,6 +30,10 @@ export const translations = {
       label: "Skill",
       description: "Select the character for this favorite",
     },
+    variantId: {
+      label: "Variant",
+      description: "Skill variant (e.g. brilliant, cheap, uncensored)",
+    },
     customName: {
       label: "Custom Name",
       description: "Optional custom name for this favorite",

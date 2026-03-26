@@ -15,8 +15,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import { allGraphSeeds } from "@/app/api/[locale]/system/generated/graph-seeds-index";
+import {
+  maybeColorize,
+  semantic,
+} from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { colors, maybeColorize, semantic } from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
 
 import { pipelineGraphs } from "./db";
 import { GraphOwnerType } from "./enum";
@@ -70,7 +73,7 @@ async function ensureSeedGraphs(logger: EndpointLogger): Promise<void> {
   }
 
   logger.info(
-    `📊 ${maybeColorize(`${colors.bold}${semantic.highlight}${String(allGraphSeeds.length)}${colors.boldOff}${semantic.sense} vibe sense graphs ready${created > 0 ? ` (${String(created)} new)` : ""}`, semantic.sense)}`,
+    `📊 ${maybeColorize(`${semantic.sense} ${allGraphSeeds.length} vibe sense graphs ready${created > 0 ? ` (${String(created)} new)` : ""}`, semantic.sense)}`,
   );
 }
 

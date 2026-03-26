@@ -265,6 +265,7 @@ export { SiGoogle } from "./SiGoogle";
 export { SiGooglegemini } from "./SiGooglegemini";
 export { SiJavascript } from "./SiJavascript";
 export { SiLinux } from "./SiLinux";
+export { SiBytedance } from "./SiBytedance";
 export { SiMinimax } from "./SiMinimax";
 export { SiMistralai } from "./SiMistralai";
 export { SiNextdotjs } from "./SiNextdotjs";
