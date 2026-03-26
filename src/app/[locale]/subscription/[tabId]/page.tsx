@@ -15,6 +15,8 @@ import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
@@ -45,6 +47,7 @@ export interface SubscriptionTabPageData {
   initialHistory: CreditsHistoryGetResponseOutput | null;
   hasPaymentProvider: boolean;
   isAdmin: boolean;
+  envAvailability: AgentEnvAvailability;
 }
 
 const BASE_TABS = ["overview", "buy", "history"];
@@ -165,6 +168,7 @@ export async function tanstackLoader({
     initialHistory,
     hasPaymentProvider,
     isAdmin,
+    envAvailability: getAgentEnvAvailability(),
   };
 }
 
@@ -178,6 +182,7 @@ export function TanstackPage({
   initialHistory,
   hasPaymentProvider,
   isAdmin,
+  envAvailability,
 }: SubscriptionTabPageData): JSX.Element {
   return (
     <SubscriptionPageClient
@@ -190,6 +195,7 @@ export function TanstackPage({
       initialHistory={initialHistory}
       hasPaymentProvider={hasPaymentProvider}
       isAdmin={isAdmin}
+      envAvailability={envAvailability}
     />
   );
 }

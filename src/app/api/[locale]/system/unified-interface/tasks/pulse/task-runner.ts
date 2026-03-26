@@ -46,7 +46,8 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
     const PULSE_INTERVAL = (env.PULSE_INTERVAL_MINUTES ?? 1) * 60 * 1000;
     logger.info(
       formatTask(
-        `💓 Started task runner with pulse of ${env.PULSE_INTERVAL_MINUTES ?? 1}min`,
+        `Started task runner with pulse of ${env.PULSE_INTERVAL_MINUTES === 1 ? "1 minute" : `${env.PULSE_INTERVAL_MINUTES} minutes`}`,
+        "💓",
       ),
     );
 

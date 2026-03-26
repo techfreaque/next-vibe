@@ -27,6 +27,22 @@ export function Head({ children }: HeadProps): JSX.Element {
         dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
         suppressHydrationWarning
       />
+      {process.env.NODE_ENV === "development" && (
+        /* eslint-disable-next-line react/no-danger -- Vite HMR + React Fast Refresh preamble required in dev */
+        <script
+          type="module"
+          dangerouslySetInnerHTML={{
+            __html: [
+              `import "/@vite/client";`,
+              `import { injectIntoGlobalHook } from "/@react-refresh";`,
+              `injectIntoGlobalHook(window);`,
+              `window.$RefreshReg$ = () => {};`,
+              `window.$RefreshSig$ = () => (type) => type;`,
+            ].join("\n"),
+          }}
+          suppressHydrationWarning
+        />
+      )}
       <HeadContent />
       {children}
     </head>

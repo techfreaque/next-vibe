@@ -67,6 +67,10 @@ const nonExtensivePatterns = [
   "**/generated/**",
   "**/*.test.ts",
   "**/*.test.tsx",
+  "src/app-tanstack/routes/**",
+  "src/app-tanstack/routeTree.gen.ts",
+  "**/registry/generated.ts",
+  "**/registry/generated.client.ts",
 ];
 const {
   oxlintIgnores: oxlintNonExtensiveIgnores,

@@ -2,8 +2,12 @@
 @source "../..";
 @source not "../../**/i18n/**";
 @source not "../../app-tanstack/**";
+@source not "../../app-native/**";
 @source not "../../**/generated/**";
+@source not "../../**/generated.ts";
+@source not "../../**/*.gen.ts";
 @source not "../../**/*.route.ts";
+@source not "../../api/**/test-files/**";
 
 @plugin 'tailwindcss-animate';
 

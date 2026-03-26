@@ -21,6 +21,10 @@ export const translations = {
       development: "Development",
       production: "Production",
     },
+    framework: {
+      next: "Next.js",
+      tanstack: "TanStack/Vite",
+    },
   },
   build: buildTranslations,
   dev: devTranslations,

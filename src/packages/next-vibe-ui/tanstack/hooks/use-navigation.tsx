@@ -42,5 +42,4 @@ export function usePathname(): string {
 }
 
 export { useParams, useSearch as useSearchParams };
-export { redirect } from "../lib/redirect";
 export { notFound } from "../lib/not-found";

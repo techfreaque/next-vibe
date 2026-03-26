@@ -111,6 +111,12 @@ export enum ModelId {
   RIVERFLOW_V2_FAST = "riverflow-v2-fast",
   RIVERFLOW_V2_MAX_PREVIEW = "riverflow-v2-max-preview",
   RIVERFLOW_V2_STANDARD_PREVIEW = "riverflow-v2-standard-preview",
+  RIVERFLOW_V2_FAST_PREVIEW = "riverflow-v2-fast-preview",
+  FLUX_2_FLEX = "flux-2-flex",
+  FLUX_2_PRO = "flux-2-pro",
+  GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
+  GPT_5_IMAGE_MINI = "gpt-5-image-mini",
+  GPT_5_IMAGE = "gpt-5-image",
   SEEDREAM_4_5 = "seedream-4.5",
 
   // Music generation models
@@ -1622,7 +1628,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "zAi",
     description: "chat.models.descriptions.glm5",
     parameterCount: undefined,
-    contextWindow: 202752,
+    contextWindow: 80000,
     icon: "si-zendesk",
     providers: [
       {
@@ -1630,8 +1636,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.8,
-        outputTokenCost: 2.56,
+        inputTokenCost: 0.72,
+        outputTokenCost: 2.3,
         cacheReadTokenCost: 0.16,
       },
     ],
@@ -1662,8 +1668,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5-turbo",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.96,
-        outputTokenCost: 3.2,
+        inputTokenCost: 1.2,
+        outputTokenCost: 4,
       },
     ],
 
@@ -1693,9 +1699,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.38,
-        outputTokenCost: 1.98,
-        cacheReadTokenCost: 0.19,
+        inputTokenCost: 0.39,
+        outputTokenCost: 1.75,
+        cacheReadTokenCost: 0.2,
       },
     ],
 
@@ -2016,14 +2022,14 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "google",
     description: "chat.models.descriptions.gemini31FlashImagePreview",
     parameterCount: undefined,
-    contextWindow: 1048576,
+    contextWindow: 65536,
     icon: "si-googlegemini",
     providers: [
       {
         id: ModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "google/gemini-3.1-flash-image-preview",
-        creditCostPerImage: 8, // updated by media-prices updater
+        creditCostPerImage: 6, // updated by media-prices updater
       },
     ],
 
@@ -2177,8 +2183,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-v3.2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.25,
-        outputTokenCost: 0.4,
+        inputTokenCost: 0.26,
+        outputTokenCost: 0.38,
       },
     ],
 
@@ -2397,7 +2403,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_SCHNELL,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux-schnell",
-        creditCostPerImage: 1, // updated by media-prices updater
+        creditCostPerImage: 0.3, // updated by media-prices updater
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -2424,7 +2430,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_PRO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "black-forest-labs/flux-1.1-pro",
-        creditCostPerImage: 4, // $0.04 + 30% markup
+        creditCostPerImage: 4, // updated by media-prices updater
       },
     ],
     utilities: [
@@ -2455,7 +2461,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.SDXL,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "stability-ai/sdxl",
-        creditCostPerImage: 0.44, // ~$0.0044/image (p50) + 30% markup
+        creditCostPerImage: 0.44, // updated by media-prices updater
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2483,7 +2489,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_2_MAX,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux.2-max",
-        creditCostPerImage: 9, // ~$0.07/MP first + $0.03/MP subsequent + 30% markup
+        creditCostPerImage: 7, // updated by media-prices updater
       },
     ],
     utilities: [
@@ -2514,7 +2520,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.FLUX_2_KLEIN_4B,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "black-forest-labs/flux.2-klein-4b",
-        creditCostPerImage: 2, // $0.014/MP first + $0.001/MP subsequent + 30% markup
+        creditCostPerImage: 1.4, // updated by media-prices updater
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -2541,7 +2547,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_PRO,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-pro",
-        creditCostPerImage: 20, // $0.15/image + 30% markup
+        creditCostPerImage: 15, // updated by media-prices updater
       },
     ],
     utilities: [
@@ -2572,7 +2578,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_FAST,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-fast",
-        creditCostPerImage: 3, // $0.02/image + 30% markup
+        creditCostPerImage: 2, // updated by media-prices updater
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
@@ -2599,7 +2605,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_MAX_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-max-preview",
-        creditCostPerImage: 10, // $0.075/image + 30% markup
+        creditCostPerImage: 7.5, // updated by media-prices updater
       },
     ],
     utilities: [
@@ -2630,7 +2636,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "sourceful/riverflow-v2-standard-preview",
-        creditCostPerImage: 5, // $0.035/image + 30% markup
+        creditCostPerImage: 3.5, // updated by media-prices updater
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2641,6 +2647,191 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     features: {
       ...defaultFeatures,
       streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_FAST_PREVIEW]: {
+    name: "Riverflow V2 Fast Preview",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2FastPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_FAST_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-fast-preview",
+        creditCostPerImage: 3, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.FLUX_2_FLEX]: {
+    name: "FLUX.2 Flex",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Flex",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_FLEX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-flex",
+        creditCostPerImage: 6, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.FLUX_2_PRO]: {
+    name: "FLUX.2 Pro",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Pro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-pro",
+        creditCostPerImage: 3, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+    },
+  },
+  [ModelId.GEMINI_3_PRO_IMAGE_PREVIEW]: {
+    name: "Gemini 3 Pro Image Preview",
+    by: "google",
+    description: "chat.models.descriptions.gemini3ProImagePreview",
+    parameterCount: undefined,
+    contextWindow: 65536,
+    icon: "si-googlegemini",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3-pro-image-preview",
+        creditCostPerImage: 12, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageInput: true,
+      imageOutput: true,
+    },
+  },
+  [ModelId.GPT_5_IMAGE_MINI]: {
+    name: "GPT-5 Image Mini",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt5ImageMini",
+    parameterCount: undefined,
+    contextWindow: 400000,
+    icon: "si-openai",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.GPT_5_IMAGE_MINI,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-image-mini",
+        creditCostPerImage: 0.8, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageInput: true,
+      imageOutput: true,
+    },
+  },
+  [ModelId.GPT_5_IMAGE]: {
+    name: "GPT-5 Image",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt5Image",
+    parameterCount: undefined,
+    contextWindow: 400000,
+    icon: "si-openai",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.GPT_5_IMAGE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-image",
+        creditCostPerImage: 4, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageInput: true,
       imageOutput: true,
     },
   },
@@ -2657,7 +2848,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.SEEDREAM_4_5,
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "bytedance-seed/seedream-4.5",
-        creditCostPerImage: 5, // $0.04/image + 30% markup
+        creditCostPerImage: 4, // updated by media-prices updater
       },
     ],
     utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
@@ -2689,7 +2880,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.MUSICGEN_STEREO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "meta/musicgen",
-        creditCostPerClip: 5.3999999999999995, // $0.054/8s clip (p50) + 30% markup
+        creditCostPerClip: 5.4, // updated by media-prices updater
         defaultDurationSeconds: 8,
       },
     ],
@@ -2718,7 +2909,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.STABLE_AUDIO,
         apiProvider: ApiProvider.REPLICATE,
         providerModel: "stability-ai/stable-audio",
-        creditCostPerClip: 26, // ~$0.02 + 30% markup
+        creditCostPerClip: 26, // updated by media-prices updater
         defaultDurationSeconds: 20,
       },
     ],
@@ -2747,7 +2938,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         id: ModelId.UDIO_V2,
         apiProvider: ApiProvider.FAL_AI,
         providerModel: "fal-ai/udio",
-        creditCostPerClip: 5, // ~$0.04 + 30% markup
+        creditCostPerClip: 5, // updated by media-prices updater
         defaultDurationSeconds: 30,
       },
     ],
@@ -2963,9 +3154,11 @@ export function getModelCost(
   );
 }
 
-/**
- * Default token counts for credit cost estimation
- */
+function roundMediaCost(v: number): number {
+  const r = Math.round(v * 10) / 10;
+  return r % 1 === 0 ? Math.round(r) : r;
+}
+
 /**
  * Calculate credit cost based on token pricing
  * 1 credit = $0.01 (1 cent)
@@ -2986,16 +3179,20 @@ export function calculateCreditCost(
   // Handle fixed-cost media generation models
   // Stored value is raw API cost in credits; apply markup at call time
   if ("creditCostPerImage" in modelOption) {
-    return modelOption.creditCostPerImage * (1 + STANDARD_MARKUP_PERCENTAGE);
+    return roundMediaCost(
+      modelOption.creditCostPerImage * (1 + STANDARD_MARKUP_PERCENTAGE),
+    );
   }
   if ("creditCostPerClip" in modelOption) {
-    return modelOption.creditCostPerClip * (1 + STANDARD_MARKUP_PERCENTAGE);
+    return roundMediaCost(
+      modelOption.creditCostPerClip * (1 + STANDARD_MARKUP_PERCENTAGE),
+    );
   }
   if ("creditCostPerSecond" in modelOption) {
-    return (
+    return roundMediaCost(
       modelOption.creditCostPerSecond *
-      modelOption.defaultDurationSeconds *
-      (1 + STANDARD_MARKUP_PERCENTAGE)
+        modelOption.defaultDurationSeconds *
+        (1 + STANDARD_MARKUP_PERCENTAGE),
     );
   }
 

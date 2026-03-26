@@ -1,3 +1,5 @@
+import "server-only";
+
 import { redirect as tsRedirect } from "@tanstack/react-router";
 
 /**

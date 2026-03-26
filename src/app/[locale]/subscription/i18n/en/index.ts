@@ -86,6 +86,12 @@ export const translations = {
           showLegacy: "Show Legacy Models",
           hideLegacy: "Hide Legacy Models",
           legacyBadge: "Legacy",
+          types: {
+            text: "Chat",
+            image: "Image Generation",
+            audio: "Music Generation",
+            video: "Video Generation",
+          },
         },
         features: {
           title: "Features",

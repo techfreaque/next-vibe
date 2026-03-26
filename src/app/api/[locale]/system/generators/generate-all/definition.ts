@@ -118,7 +118,7 @@ const { POST } = createEndpoint({
         label: "post.fields.skipTanstack.label",
         description: "post.fields.skipTanstack.description",
         columns: 4,
-        schema: z.boolean().optional().default(true),
+        schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===

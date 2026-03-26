@@ -188,7 +188,7 @@ const { GET } = createEndpoint({
             model: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.model.content" as const,
-              schema: z.nativeEnum(ModelId).nullable(),
+              schema: z.enum(ModelId).nullable(),
             }),
             skill: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

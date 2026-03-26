@@ -9,16 +9,19 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   customWidgetObject,
   objectField,
+  requestField,
   responseArrayOptionalField,
   responseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { ServerFramework, ServerFrameworkOptions } from "../enum";
 
 import { REBUILD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -52,8 +55,17 @@ const { POST } = createEndpoint({
 
   fields: customWidgetObject({
     render: RebuildWidget,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      framework: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.framework.title",
+        description: "post.fields.framework.description",
+        options: ServerFrameworkOptions,
+        schema: z.nativeEnum(ServerFramework).default(ServerFramework.NEXT),
+      }),
+
       success: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
@@ -148,6 +160,10 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
+    requests: {
+      default: { framework: ServerFramework.NEXT },
+      tanstack: { framework: ServerFramework.TANSTACK },
+    },
     responses: {
       default: {
         success: "Rebuild Complete",
@@ -176,6 +192,8 @@ const { POST } = createEndpoint({
 });
 
 const rebuildDefinition = { POST };
+export type RebuildRequestInput = typeof POST.types.RequestInput;
+export type RebuildRequestOutput = typeof POST.types.RequestOutput;
 export type RebuildResponseOutput = typeof POST.types.ResponseOutput;
 export type RebuildStep = NonNullable<RebuildResponseOutput["steps"]>[number];
 export default rebuildDefinition;

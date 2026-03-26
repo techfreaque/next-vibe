@@ -89,6 +89,12 @@ export const translations: typeof enTranslations = {
           showLegacy: "Legacy-Modelle anzeigen",
           hideLegacy: "Legacy-Modelle ausblenden",
           legacyBadge: "Legacy",
+          types: {
+            text: "Chat",
+            image: "Bildgenerierung",
+            audio: "Musikgenerierung",
+            video: "Videogenerierung",
+          },
         },
         features: {
           title: "Funktionen",

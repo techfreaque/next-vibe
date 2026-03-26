@@ -32,6 +32,7 @@ export const colors = {
 
   // Text styles
   bold: "\u001B[1m",
+  boldOff: "\u001B[22m",
   dim: "\u001B[2m",
   italic: "\u001B[3m",
   underline: "\u001B[4m",
@@ -52,7 +53,7 @@ export const semantic = {
   server: colors.magenta,
   database: colors.brightGreen,
   task: colors.brightMagenta,
-  generator: colors.magenta,
+  generator: colors.brightBlue,
   sense: colors.brightRed,
   nextjs: colors.brightCyan,
 

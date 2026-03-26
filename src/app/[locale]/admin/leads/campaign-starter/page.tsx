@@ -20,8 +20,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/admin/messenger/campaigns`);
 }
 
-export function TanstackPage(props: LeadsCampaignStarterPageData): never {
-  redirect(`/${props.locale}/admin/messenger/campaigns`);
+export function TanstackPage(): never {
+  return null as never;
 }
 
 export default async function LeadsCampaignStarterPage({

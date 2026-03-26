@@ -435,7 +435,7 @@ export interface ModelSelectorProps {
 }
 
 /** Returns true if the model's provider is available given current env */
-function isProviderAvailable(
+export function isProviderAvailable(
   model: ModelOption,
   envAvailability: AgentEnvAvailability | undefined,
 ): boolean {
@@ -455,6 +455,12 @@ function isProviderAvailable(
       return envAvailability.gabAI;
     case ApiProvider.VENICE_AI:
       return envAvailability.veniceAI;
+    case ApiProvider.OPENAI_IMAGES:
+      return envAvailability.openAiImages;
+    case ApiProvider.REPLICATE:
+      return envAvailability.replicate;
+    case ApiProvider.FAL_AI:
+      return envAvailability.falAi;
     default:
       return true;
   }
@@ -495,6 +501,18 @@ function getSetupRequiredMessage(
       return envAvailability.claudeCode
         ? null
         : `${t("selector.addEnvKey")}: CLAUDE_CODE_ENABLED=true (install claude CLI)`;
+    case ApiProvider.OPENAI_IMAGES:
+      return envAvailability.openAiImages
+        ? null
+        : `${t("selector.addEnvKey")}: OPENAI_API_KEY → platform.openai.com/api-keys`;
+    case ApiProvider.REPLICATE:
+      return envAvailability.replicate
+        ? null
+        : `${t("selector.addEnvKey")}: REPLICATE_API_TOKEN → replicate.com/account/api-tokens`;
+    case ApiProvider.FAL_AI:
+      return envAvailability.falAi
+        ? null
+        : `${t("selector.addEnvKey")}: FAL_AI_API_KEY → fal.ai/dashboard/keys`;
     default:
       return null;
   }

@@ -31,10 +31,8 @@ export async function tanstackLoader({
   );
 }
 
-export function TanstackPage(props: LeadsEmailPreviewPageData): never {
-  redirect(
-    `/${props.locale}/admin/messenger/campaigns/journeys/${props.journeyVariant}/${props.stage}`,
-  );
+export function TanstackPage(): never {
+  return null as never;
 }
 
 export default async function LeadsEmailPreviewPage({

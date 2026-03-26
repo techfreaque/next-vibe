@@ -75,4 +75,9 @@ export const translations: typeof enTranslations = {
   tags: {
     models: "Modele",
   },
+  updateMediaModelPrices: {
+    name: "Zaktualizuj ceny modeli medialnych",
+    description:
+      "Pobiera aktualne ceny modeli generowania obrazów i dźwięku z API dostawców i aktualizuje models.ts",
+  },
 };

@@ -21,6 +21,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { ServerFramework, ServerFrameworkOptions } from "../enum";
 import { DEV_ALIASES } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -151,12 +152,13 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
-      tanstack: requestField(scopedTranslation, {
+      framework: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.tanstack.title",
-        description: "post.fields.tanstack.description",
-        schema: z.boolean().default(false),
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.framework.title",
+        description: "post.fields.framework.description",
+        options: ServerFrameworkOptions,
+        schema: z.enum(ServerFramework).default(ServerFramework.TANSTACK),
       }),
 
       output: responseField(scopedTranslation, {
@@ -227,7 +229,7 @@ const { POST } = createEndpoint({
         skipMigrationGeneration: false,
         skipSeeding: false,
         profile: false,
-        tanstack: false,
+        framework: ServerFramework.TANSTACK,
       },
       quickStart: {
         skipDbSetup: true,
@@ -241,7 +243,7 @@ const { POST } = createEndpoint({
         skipMigrationGeneration: false,
         skipSeeding: false,
         profile: false,
-        tanstack: false,
+        framework: ServerFramework.TANSTACK,
       },
     },
     responses: {

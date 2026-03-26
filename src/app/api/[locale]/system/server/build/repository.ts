@@ -20,6 +20,7 @@ import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { GenerateAllRepository } from "../../generators/generate-all/repository";
+import { ServerFramework } from "../enum";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
 import type { BuildRequestOutput, BuildResponseOutput } from "./definition";
 import type { ServerBuildT } from "./i18n";
@@ -83,7 +84,7 @@ export class BuildRepository {
               skipSeeds: !data.generateSeeds,
               skipTaskIndex: false,
               enableTrpc: false,
-              skipTanstack: !data.tanstack,
+              skipTanstack: data.framework !== ServerFramework.TANSTACK,
             },
             logger,
             locale,
@@ -171,7 +172,7 @@ export class BuildRepository {
             }
           }
         }
-      } else if (data.tanstack) {
+      } else if (data.framework === ServerFramework.TANSTACK) {
         // Build TanStack Start (SSR) via vibe builder (uses build.config.ts).
         // build.config.ts already includes both the CLI/browser files (package)
         // and tanstack-start, so a single run covers both - no separate package build needed.

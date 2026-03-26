@@ -37,8 +37,8 @@ export class SetupInstallRepository {
    * Get the appropriate binary directory for the current platform
    */
   private static getBinaryDirectory(): string {
-    const platform = os.platform();
-    const homeDir = os.homedir();
+    const platform = /*turbopackIgnore: true*/ os.platform();
+    const homeDir = /*turbopackIgnore: true*/ os.homedir();
 
     switch (platform) {
       case "win32": {
@@ -135,7 +135,8 @@ root="/"
 while [ "$current_dir" != "$root" ]; do
   candidate="$current_dir/$REL_PATH"
   if [ -f "$candidate" ]; then
-    exec bun "$candidate" "$@"
+    PROC_NAME="vibe-\${1:-cli}"
+    exec -a "$PROC_NAME" bun "$candidate" "$@"
   fi
   current_dir="$(dirname "$current_dir")"
 done
@@ -220,7 +221,10 @@ exit 1
         "cli",
         "vibe-runtime.ts",
       );
-      const vibeTsAbsolutePath = path.join(process.cwd(), vibeRelativePath);
+      const vibeTsAbsolutePath = path.join(
+        /*turbopackIgnore: true*/ process.cwd(),
+        vibeRelativePath,
+      );
       /* eslint-enable i18next/no-literal-string */
 
       // Verify vibe-runtime.ts exists
@@ -232,7 +236,7 @@ exit 1
             // eslint-disable-next-line i18next/no-literal-string
             error: `vibe-runtime.ts not found at ${vibeTsAbsolutePath}`,
 
-            cwd: process.cwd(),
+            cwd: /*turbopackIgnore: true*/ process.cwd(),
           },
         });
       }
@@ -332,11 +336,12 @@ exit 1
   }> {
     try {
       // Check common installation paths directly instead of using which/where
+      const homeDir = /*turbopackIgnore: true*/ process.env.HOME || "/tmp";
       const possiblePaths = [
         // eslint-disable-next-line i18next/no-literal-string
-        path.join(process.env.HOME || "/tmp", ".local", "bin", "vibe"),
+        path.join(homeDir, ".local", "bin", "vibe"),
         // eslint-disable-next-line i18next/no-literal-string
-        path.join(process.env.HOME || "/tmp", ".yarn", "bin", "vibe"),
+        path.join(homeDir, ".yarn", "bin", "vibe"),
 
         "/usr/local/bin/vibe",
 
@@ -348,7 +353,10 @@ exit 1
           // Get version
           let version: string | undefined;
           try {
-            const packageJsonPath = path.join(process.cwd(), "package.json");
+            const packageJsonPath = path.join(
+              /*turbopackIgnore: true*/ process.cwd(),
+              "package.json",
+            );
             if (existsSync(packageJsonPath)) {
               const packageJson = JSON.parse(
                 await readFile(packageJsonPath, "utf8"),
@@ -386,7 +394,7 @@ exit 1
   ): Promise<string> {
     return await new Promise((resolve, reject) => {
       const childProcess = spawn(command, args, {
-        cwd: options.cwd || process.cwd(),
+        cwd: options.cwd || /*turbopackIgnore: true*/ process.cwd(),
         stdio: options.verbose ? "inherit" : "pipe",
         shell: false, // Disable shell to avoid security warnings
 

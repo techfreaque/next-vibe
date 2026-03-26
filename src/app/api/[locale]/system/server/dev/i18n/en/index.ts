@@ -58,9 +58,9 @@ export const translations = {
         title: "Skip Seeding",
         description: "Skip database seeding with initial data",
       },
-      tanstack: {
-        title: "TanStack",
-        description: "Use TanStack Router/Vite instead of Next.js",
+      framework: {
+        title: "Framework",
+        description: "Frontend framework/bundler to use",
       },
       profile: {
         title: "Profile",

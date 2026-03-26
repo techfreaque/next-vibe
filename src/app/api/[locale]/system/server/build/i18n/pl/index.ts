@@ -58,9 +58,9 @@ export const translations: typeof enTranslations = {
         title: "Wymuś budowanie",
         description: "Kontynuuj budowanie nawet przy błędach",
       },
-      tanstack: {
-        title: "Budowanie TanStack",
-        description: "Buduj aplikację TanStack/Vite zamiast Next.js",
+      framework: {
+        title: "Framework",
+        description: "Frontend framework/bundler",
       },
       webpack: {
         title: "Użyj Webpack",

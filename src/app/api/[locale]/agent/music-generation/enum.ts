@@ -4,7 +4,9 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
+import type { AgentEnvAvailability } from "../env-availability";
 import { getAllModelOptions, ModelId } from "../models/models";
+import { isProviderAvailable } from "../models/widget/model-selector";
 import { scopedTranslation } from "./i18n";
 
 export const {
@@ -41,8 +43,29 @@ export const MUSIC_MODEL_IDS = [
 
 export type MusicModelId = (typeof MUSIC_MODEL_IDS)[number];
 
-/** Options array for UI select, built from existing model definitions */
+/** Static options array (all models, no availability filtering) */
 export const MusicModelOptions = getAllModelOptions()
   .filter((m) => (MUSIC_MODEL_IDS as readonly string[]).includes(m.id))
   // eslint-disable-next-line i18next/no-literal-string
   .map((m) => ({ value: m.id, label: m.name }));
+
+/**
+ * Dynamic model options that respect provider availability.
+ * - Admins: all models shown, unavailable ones are disabled.
+ * - Non-admins: unavailable models are hidden.
+ */
+export function getMusicModelOptions(
+  envAvailability: AgentEnvAvailability | undefined,
+  isAdmin: boolean,
+): { value: string; label: string; disabled?: boolean }[] {
+  return getAllModelOptions()
+    .filter((m) => (MUSIC_MODEL_IDS as readonly string[]).includes(m.id))
+    .flatMap((m) => {
+      const available = isProviderAvailable(m, envAvailability);
+      if (!available && !isAdmin) {
+        return [];
+      }
+      // eslint-disable-next-line i18next/no-literal-string
+      return [{ value: m.id, label: m.name, disabled: !available }];
+    });
+}

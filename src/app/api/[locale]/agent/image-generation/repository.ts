@@ -14,6 +14,7 @@ import {
 
 import {
   ApiProvider,
+  calculateCreditCost,
   getModelById,
   type ModelOptionImageBased,
 } from "@/app/api/[locale]/agent/models/models";
@@ -56,7 +57,7 @@ export class ImageGenerationRepository {
     }
 
     const imageModel = modelConfig as ModelOptionImageBased;
-    const creditCost = imageModel.creditCostPerImage;
+    const creditCost = calculateCreditCost(imageModel, 0, 0);
 
     logger.info("[ImageGen] Starting image generation", {
       model: data.model,

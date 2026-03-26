@@ -571,6 +571,18 @@ export const translations = {
         "Riverflow V2 Max Preview - Sourceful's most powerful preview variant, unified text-to-image and image-to-image model",
       riverflowV2StandardPreview:
         "Riverflow V2 Standard Preview - Sourceful's standard preview variant, unified text-to-image and image-to-image model exceeding the Riverflow 1 family",
+      riverflowV2FastPreview:
+        "Riverflow V2 Fast Preview - Sourceful's fastest preview variant, unified text-to-image and image-to-image model at the lowest price point",
+      flux2Flex:
+        "FLUX.2 Flex - Black Forest Labs' image model excelling at complex text rendering, typography, and multi-reference editing in a unified architecture",
+      flux2Pro:
+        "FLUX.2 Pro - Black Forest Labs' high-end image generation and editing model with frontier-level visual quality, strong prompt adherence, and consistent character reproduction",
+      gemini3ProImagePreview:
+        "Nano Banana Pro (Gemini 3 Pro Image Preview) - Google's most advanced image generation model with improved multimodal reasoning, real-world grounding, high-fidelity visual synthesis, and industry-leading text rendering",
+      gpt5ImageMini:
+        "GPT-5 Image Mini - OpenAI's efficient multimodal image generation model combining GPT-5 Mini language capabilities with fast, affordable image generation",
+      gpt5Image:
+        "GPT-5 Image - OpenAI's flagship multimodal model combining GPT-5 language capabilities with state-of-the-art image generation and editing",
       seedream45:
         "Seedream 4.5 - ByteDance's latest image generation model with comprehensive improvements in editing consistency, portrait refinement, and multi-image composition",
       sdxl: "Stable Diffusion XL - Stability AI's high-quality open image generation model",

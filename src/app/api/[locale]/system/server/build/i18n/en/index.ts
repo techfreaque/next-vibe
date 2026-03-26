@@ -55,9 +55,9 @@ export const translations = {
         title: "Force Build",
         description: "Continue build even if errors occur",
       },
-      tanstack: {
-        title: "TanStack Build",
-        description: "Build TanStack/Vite app instead of Next.js",
+      framework: {
+        title: "Framework",
+        description: "Frontend framework/bundler to build",
       },
       webpack: {
         title: "Use Webpack",

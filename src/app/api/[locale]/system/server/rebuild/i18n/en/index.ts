@@ -12,6 +12,10 @@ export const translations = {
       description: "Rebuild the application and restart the server",
     },
     fields: {
+      framework: {
+        title: "Framework",
+        description: "Target framework to build and restart",
+      },
       success: {
         title: "Result",
       },

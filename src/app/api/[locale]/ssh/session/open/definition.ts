@@ -75,7 +75,7 @@ export const { POST } = createEndpoint({
       status: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "session.open.post.response.status.title" as const,
-        schema: z.nativeEnum(SshSessionStatus),
+        schema: z.enum(SshSessionStatus),
       }),
       shell: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

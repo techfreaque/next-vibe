@@ -112,9 +112,18 @@ export class FilePartHandler {
     // Without this, the reasoning message stays in isStreaming=true forever because
     // MESSAGE_CREATED forces isStreaming=true and only CONTENT_DONE clears it.
     if (ctx.currentAssistantMessageId) {
+      // If the model emitted a <think> tag but never closed it (e.g. Gemini image models
+      // that stream reasoning then a file part without emitting </think>), close it here
+      // so the frontend Markdown renderer doesn't show an incomplete-thinking spinner.
+      let closedContent = ctx.currentAssistantContent;
+      if (/<think>/i.test(closedContent) && !/<\/think>/i.test(closedContent)) {
+        closedContent += "</think>";
+        ctx.dbWriter.emitDelta(ctx.currentAssistantMessageId, "</think>");
+      }
+      ctx.currentAssistantContent = closedContent;
       ctx.dbWriter.emitContentDoneRaw({
         messageId: ctx.currentAssistantMessageId,
-        content: ctx.currentAssistantContent,
+        content: closedContent,
         totalTokens: 0,
         finishReason: "stop",
       });

@@ -3,22 +3,22 @@
  * Handles run database seeds operations
  */
 
-import { parseError } from "next-vibe/shared/utils";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { defaultLocale } from "@/i18n/core/config";
 
 import type { SeedRequestOutput, SeedResponseOutput } from "./definition";
-import { scopedTranslation } from "./i18n";
 import type { SeedT } from "./i18n";
-import { seedDatabase } from "./seed-manager";
+import { scopedTranslation } from "./i18n";
 import type { EnvironmentSeeds } from "./seed-manager";
+import { seedDatabase } from "./seed-manager";
 
 /**
  * Run database seeds Repository
@@ -32,7 +32,7 @@ export class SeedRepository {
     const startTime = Date.now();
 
     try {
-      logger.info(`🌱 Starting database seeding (${environment})...`);
+      logger.debug(`🌱 Starting database seeding (${environment})...`);
 
       await seedDatabase(environment, logger, defaultLocale);
 

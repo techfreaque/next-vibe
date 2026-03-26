@@ -288,7 +288,15 @@ export class GenerateTanstackRoutesRepository {
       `});`,
       ``,
     ].join("\n");
-    writeFileSync(outPath, content, "utf-8");
+    if (!GenerateTanstackRoutesRepository.writeIfNotCustom(outPath, content)) {
+      result.skipped.push(
+        relative(
+          GenerateTanstackRoutesRepository.PROJECT_ROOT,
+          outPath,
+        ).replace(/\\/g, "/"),
+      );
+      return;
+    }
     result.created.push(
       relative(GenerateTanstackRoutesRepository.PROJECT_ROOT, outPath).replace(
         /\\/g,
@@ -339,7 +347,7 @@ export class GenerateTanstackRoutesRepository {
         GenerateTanstackRoutesRepository.hasParamsInLoader(srcFile);
 
       const layoutLines: string[] = [
-        `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
+        `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
       ];
 
@@ -370,7 +378,6 @@ export class GenerateTanstackRoutesRepository {
         );
       } else {
         layoutLines.push(
-          `  .inputValidator((data: Record<string, string>) => data)`,
           `  .handler(async () => {`,
           `    const { tanstackLoader } = await import("${importPath}");`,
           `    return tanstackLoader();`,
@@ -383,7 +390,7 @@ export class GenerateTanstackRoutesRepository {
       if (hasSearch) {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
-          `  staleTime: 0,`,
+          `  staleTime: Infinity,`,
           `  validateSearch: (search: Record<string, string>) => search,`,
           `  loaderDeps: ({ search }) => ({ search }),`,
           `  loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),`,
@@ -394,7 +401,7 @@ export class GenerateTanstackRoutesRepository {
       } else if (hasParams) {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
-          `  staleTime: 0,`,
+          `  staleTime: Infinity,`,
           `  loader: ({ params }) => loadData({ data: params as Record<string, string> }),`,
           `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
           `});`,
@@ -403,7 +410,7 @@ export class GenerateTanstackRoutesRepository {
       } else {
         layoutLines.push(
           `export const Route = createFileRoute("${routePath}")({`,
-          `  staleTime: 0,`,
+          `  staleTime: Infinity,`,
           `  loader: () => loadData(),`,
           `  component: () => <Layout {...Route.useLoaderData()}><Outlet /></Layout>,`,
           `});`,
@@ -415,7 +422,7 @@ export class GenerateTanstackRoutesRepository {
     } else if (isClientComponent) {
       // "use client" layout: safe to import and use directly as a wrapper.
       content = [
-        `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
+        `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
         `import Layout from "${importPath}";`,
         ``,
@@ -428,7 +435,7 @@ export class GenerateTanstackRoutesRepository {
       // Plain Next.js async server layout without tanstackLoader/TanstackPage.
       // Cannot be rendered directly in TanStack - use a transparent Outlet passthrough.
       content = [
-        `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
+        `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
         `import { createFileRoute, Outlet } from "@tanstack/react-router";`,
         ``,
         `export const Route = createFileRoute("${routePath}")({`,
@@ -438,7 +445,9 @@ export class GenerateTanstackRoutesRepository {
       ].join("\n");
     }
 
-    writeFileSync(outPath, content, "utf-8");
+    if (!GenerateTanstackRoutesRepository.writeIfNotCustom(outPath, content)) {
+      return null;
+    }
     return relative(
       GenerateTanstackRoutesRepository.PROJECT_ROOT,
       outPath,
@@ -497,7 +506,7 @@ export class GenerateTanstackRoutesRepository {
       );
 
     const lines = [
-      `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
+      `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
       `import { createFileRoute } from "@tanstack/react-router";`,
       `import { createServerFn } from "@tanstack/react-start";`,
       `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
@@ -530,9 +539,9 @@ export class GenerateTanstackRoutesRepository {
         `        ...p,`,
         `        ${catchAllName}: (p["_splat"] ?? "").split("/").filter(Boolean),`,
         `      } as { locale: CountryLanguage; ${catchAllName}: string[] }),`,
-        hasSearch
-          ? `      searchParams: Promise.resolve(data.search),`
-          : `      searchParams: Promise.resolve({}),`,
+        ...(hasSearch
+          ? [`      searchParams: Promise.resolve(data.search),`]
+          : []),
         `    });`,
         `  });`,
         ``,
@@ -612,7 +621,9 @@ export class GenerateTanstackRoutesRepository {
 
     const content = lines.join("\n");
 
-    writeFileSync(outPath, content, "utf-8");
+    if (!GenerateTanstackRoutesRepository.writeIfNotCustom(outPath, content)) {
+      return null;
+    }
     return relative(
       GenerateTanstackRoutesRepository.PROJECT_ROOT,
       outPath,
@@ -640,7 +651,7 @@ export class GenerateTanstackRoutesRepository {
     ).replace(/\\/g, "/");
 
     const content = [
-      `// AUTO-GENERATED. Add "use custom" to ${srcRelative} to skip.`,
+      `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
       `import { createFileRoute } from "@tanstack/react-router";`,
       `import { wrapNextApiRoute } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
       ``,
@@ -650,7 +661,9 @@ export class GenerateTanstackRoutesRepository {
       ``,
     ].join("\n");
 
-    writeFileSync(outPath, content, "utf-8");
+    if (!GenerateTanstackRoutesRepository.writeIfNotCustom(outPath, content)) {
+      return null;
+    }
     return relative(
       GenerateTanstackRoutesRepository.PROJECT_ROOT,
       outPath,
@@ -859,10 +872,26 @@ export class GenerateTanstackRoutesRepository {
       ) {
         continue;
       }
-      // Check for AUTO-GENERATED header and delete if found
+      // Delete auto-generated files, but preserve any that have a "use custom"
+      // directive — those are user-customized overrides of the generated file.
       try {
         const content = readFileSync(fullPath, "utf-8");
-        if (content.startsWith("// AUTO-GENERATED")) {
+        if (!content.startsWith("// AUTO-GENERATED")) {
+          continue;
+        }
+        const hasCustom = content
+          .split("\n")
+          .slice(0, 10)
+          .some((line) => {
+            const t = line.trim().replace(/;$/, "");
+            return (
+              t === '"use custom"' ||
+              t === "'use custom'" ||
+              t === '"use-custom"' ||
+              t === "'use-custom'"
+            );
+          });
+        if (!hasCustom) {
           rmSync(fullPath);
         }
       } catch {
@@ -875,6 +904,34 @@ export class GenerateTanstackRoutesRepository {
   // Utilities
   // ---------------------------------------------------------------------------
 
+  /** Write content to outPath unless the existing file has a "use custom" directive. Returns true if written. */
+  private static writeIfNotCustom(outPath: string, content: string): boolean {
+    if (existsSync(outPath)) {
+      try {
+        const existing = readFileSync(outPath, "utf-8");
+        const hasCustom = existing
+          .split("\n")
+          .slice(0, 10)
+          .some((line) => {
+            const t = line.trim().replace(/;$/, "");
+            return (
+              t === '"use custom"' ||
+              t === "'use custom'" ||
+              t === '"use-custom"' ||
+              t === "'use-custom'"
+            );
+          });
+        if (hasCustom) {
+          return false;
+        }
+      } catch {
+        // ignore read errors, proceed to write
+      }
+    }
+    writeFileSync(outPath, content, "utf-8");
+    return true;
+  }
+
   private static hasCustomDirective(filePath: string): boolean {
     if (!existsSync(filePath)) {
       return false;
@@ -885,8 +942,13 @@ export class GenerateTanstackRoutesRepository {
         .split("\n")
         .slice(0, 10)
         .some((line) => {
-          const t = line.trim();
-          return t === '"use custom"' || t === "'use custom'";
+          const t = line.trim().replace(/;$/, "");
+          return (
+            t === '"use custom"' ||
+            t === "'use custom'" ||
+            t === '"use-custom"' ||
+            t === "'use-custom'"
+          );
         });
     } catch {
       return false;

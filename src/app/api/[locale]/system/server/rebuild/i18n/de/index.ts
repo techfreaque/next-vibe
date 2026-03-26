@@ -14,6 +14,10 @@ export const translations: typeof enTranslations = {
       description: "Anwendung neu bauen und Server neustarten",
     },
     fields: {
+      framework: {
+        title: "Framework",
+        description: "Ziel-Framework zum Bauen und Neustarten",
+      },
       success: { title: "Ergebnis" },
       errors: { title: "Fehler" },
       duration: { title: "Dauer" },

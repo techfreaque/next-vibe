@@ -29,7 +29,10 @@ import type { MediaPricesGetResponseOutput } from "./definition";
 import type { MediaPricesT } from "./i18n";
 
 function usdToCredits(usd: number): number {
-  return usd / CREDIT_VALUE_USD;
+  const raw = usd / CREDIT_VALUE_USD;
+  // Round to 4 significant decimal places to avoid float noise (e.g. 7.000000000000001)
+  const rounded = Math.round(raw * 10000) / 10000;
+  return rounded % 1 === 0 ? Math.round(rounded) : rounded;
 }
 
 interface MediaModelPrice {
@@ -195,20 +198,65 @@ async function fetchReplicatePrice(
 
 // ---------------------------------------------------------------------------
 // OpenRouter image generation pricing
-// OpenRouter image models are NOT in /v1/models (text-only endpoint).
-// Fetch from /api/v1/models?supported_parameters=image_url to get image models,
-// or use their /v1/images/generations cost estimation endpoint.
-// For now, fetch from the standard /v1/models endpoint first; image models
-// that are listed there will be picked up. Others fall back to static prices.
+// /api/frontend/models includes pricing_json with provider-native cost fields.
+// We derive per-image USD cost using provider-specific logic:
+//   bfl:informational_output_megapixels   — USD per MP (first MP = 1 image)
+//   sourceful:cents_per_image_output      — cents per image (÷ 100)
+//   seedream:cents_per_image_output       — cents per image (÷ 100)
+//   gemini:image_output_tokens            — USD per token × 1000 tokens/image
+//   openai_responses:image_output_tokens  — USD per token × 1000 tokens/image
 // ---------------------------------------------------------------------------
 
-interface OpenRouterModel {
-  id: string;
-  pricing: {
-    image?: string; // per-image cost in USD (string)
-    prompt?: string;
-    completion?: string;
+interface OpenRouterFrontendModel {
+  slug: string;
+  endpoint?: {
+    pricing_json?: Record<string, number | string>;
   };
+}
+
+function derivePerImageUsd(
+  pricingJson: Record<string, number | string>,
+): number | null {
+  const n = (k: string): number | null => {
+    const v = pricingJson[k];
+    if (v === undefined) {
+      return null;
+    }
+    const f = typeof v === "string" ? parseFloat(v) : v;
+    return isNaN(f) ? null : f;
+  };
+
+  // BFL FLUX: per-megapixel USD (first MP = typical 1024×1024 image)
+  const bflMp = n("bfl:informational_output_megapixels");
+  if (bflMp !== null && bflMp > 0) {
+    return bflMp;
+  }
+
+  // Sourceful Riverflow: cents per standard image
+  const sourcefulCents = n("sourceful:cents_per_image_output");
+  if (sourcefulCents !== null && sourcefulCents > 0) {
+    return sourcefulCents / 100;
+  }
+
+  // ByteDance Seedream: cents per image
+  const seedreamCents = n("seedream:cents_per_image_output");
+  if (seedreamCents !== null && seedreamCents > 0) {
+    return seedreamCents / 100;
+  }
+
+  // Google Gemini: USD per image output token × 1000 tokens/image
+  const geminiTok = n("gemini:image_output_tokens");
+  if (geminiTok !== null && geminiTok > 0) {
+    return geminiTok * 1000;
+  }
+
+  // OpenAI image models: USD per image output token × 1000 tokens/image
+  const openaiTok = n("openai_responses:image_output_tokens");
+  if (openaiTok !== null && openaiTok > 0) {
+    return openaiTok * 1000;
+  }
+
+  return null;
 }
 
 async function fetchOpenRouterImagePrices(
@@ -216,25 +264,29 @@ async function fetchOpenRouterImagePrices(
 ): Promise<Map<string, number>> {
   const prices = new Map<string, number>();
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/models", {
+    const response = await fetch("https://openrouter.ai/api/frontend/models", {
       headers: { "Content-Type": "application/json" },
     });
     if (!response.ok) {
-      logger.warn("OpenRouter models API failed", { status: response.status });
+      logger.warn("OpenRouter frontend models API failed", {
+        status: response.status,
+      });
       return prices;
     }
-    const data = (await response.json()) as { data: OpenRouterModel[] };
+    const data = (await response.json()) as {
+      data: OpenRouterFrontendModel[];
+    };
     for (const model of data.data) {
-      if (model.pricing.image) {
-        const usd = parseFloat(model.pricing.image);
-        if (!isNaN(usd) && usd > 0) {
-          prices.set(model.id, usd);
-        }
+      const pj = model.endpoint?.pricing_json;
+      if (!pj) {
+        continue;
+      }
+      const usd = derivePerImageUsd(pj);
+      if (usd !== null && usd > 0) {
+        prices.set(model.slug, usd);
       }
     }
-    logger.debug("OpenRouter image prices fetched", {
-      count: prices.size,
-    });
+    logger.debug("OpenRouter image prices fetched", { count: prices.size });
   } catch (err) {
     logger.warn("Error fetching OpenRouter image prices", {
       error: parseError(err).message,
@@ -313,7 +365,6 @@ export class MediaPricesRepository {
             provider.apiProvider === ApiProvider.OPENROUTER &&
             isImageModel
           ) {
-            // Try live OpenRouter API first
             const livePrice = openRouterImagePrices.get(provider.providerModel);
             if (livePrice !== undefined) {
               usd = livePrice;

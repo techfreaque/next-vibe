@@ -44,8 +44,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/threads/${folder}`);
 }
 
-export function TanstackPage({ locale }: ThreadsRootPageData): JSX.Element {
-  redirect(`/${locale}/threads/private`);
+export function TanstackPage(): JSX.Element {
+  return null as never;
 }
 
 export default async function ThreadsRootPage({

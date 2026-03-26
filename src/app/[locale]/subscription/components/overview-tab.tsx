@@ -19,19 +19,22 @@ import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
+  type ModelDefinition,
   modelDefinitions,
   modelProviders,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
+import { isProviderAvailable } from "@/app/api/[locale]/agent/models/widget/model-selector";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import {
   FEATURE_COSTS,
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -40,11 +43,42 @@ import { formatPrice } from "./types";
 interface OverviewTabProps {
   locale: CountryLanguage;
   onSwitchTab: () => void;
+  envAvailability: AgentEnvAvailability;
+}
+
+const MODEL_TYPE_ORDER = ["text", "image", "audio", "video"] as const;
+type ModelTypeKey = (typeof MODEL_TYPE_ORDER)[number];
+
+/** Returns a representative price for sorting (ascending = cheapest first). */
+function getModelSortPrice(def: ModelDefinition): number {
+  const p = def.providers[0];
+  if (!p) {
+    return 0;
+  }
+  if ("creditCostPerImage" in p) {
+    return p.creditCostPerImage;
+  }
+  if ("creditCostPerClip" in p) {
+    return p.creditCostPerClip;
+  }
+  if ("creditCostPerSecond" in p) {
+    return p.creditCostPerSecond;
+  }
+  // Token-based: use a typical 16k input / 1.5k output scenario
+  if (
+    "inputTokenCost" in p &&
+    p.inputTokenCost !== undefined &&
+    p.outputTokenCost !== undefined
+  ) {
+    return p.inputTokenCost * 16000 + p.outputTokenCost * 1500;
+  }
+  return typeof p.creditCost === "number" ? p.creditCost : 0;
 }
 
 export function OverviewTab({
   locale,
   onSwitchTab,
+  envAvailability,
 }: OverviewTabProps): JSX.Element {
   const { t } = useTranslation();
   const [showLegacyModels, setShowLegacyModels] = useState(false);
@@ -206,73 +240,100 @@ export function OverviewTab({
                       )}
                 </Button>
               </Div>
-              <Div className="flex flex-col gap-4">
-                {Object.entries(modelProviders).map(
-                  ([providerId, provider]) => {
-                    const providerModels = Object.values(
-                      modelDefinitions,
-                    ).filter((def) => {
-                      // Filter by provider company
-                      if (def.by !== providerId) {
+              <Div className="flex flex-col gap-6">
+                {MODEL_TYPE_ORDER.map((modelType: ModelTypeKey) => {
+                  const typeModels = Object.values(modelDefinitions).filter(
+                    (def) => {
+                      if ((def.modelType ?? "text") !== modelType) {
                         return false;
                       }
-
-                      // Filter legacy models if toggle is off
-                      const isLegacy = def.utilities.includes(
-                        ModelUtility.LEGACY,
+                      if (
+                        !showLegacyModels &&
+                        def.utilities.includes(ModelUtility.LEGACY)
+                      ) {
+                        return false;
+                      }
+                      return def.providers.some((p) =>
+                        isProviderAvailable(
+                          p as Parameters<typeof isProviderAvailable>[0],
+                          envAvailability,
+                        ),
                       );
-                      if (!showLegacyModels && isLegacy) {
-                        return false;
-                      }
+                    },
+                  );
+                  if (typeModels.length === 0) {
+                    return null;
+                  }
 
-                      return true;
-                    });
-                    if (providerModels.length === 0) {
-                      return null;
-                    }
-                    return (
-                      <Div key={providerId}>
-                        <H4 className="font-semibold mb-2 flex items-center gap-2">
-                          <Icon icon={provider.icon} className="h-5 w-5" />
-                          {provider.name}
-                        </H4>
-                        <Div className="grid grid-cols-2 gap-2 text-sm">
-                          {providerModels.map((def) => {
-                            const isLegacy = def.utilities.includes(
-                              ModelUtility.LEGACY,
-                            );
-                            const primaryId = def.providers[0].id;
-                            return (
-                              <Div
-                                key={primaryId}
-                                className="flex justify-between p-2 rounded bg-accent"
-                              >
-                                <Span className="flex items-center gap-1">
-                                  {def.name}
-                                  {isLegacy && (
-                                    <Span className="text-xs text-muted-foreground">
-                                      (
-                                      {t(
-                                        "app.subscription.subscription.overview.costs.models.legacyBadge",
-                                      )}
-                                      )
-                                    </Span>
-                                  )}
-                                </Span>
-                                <ModelCreditDisplay
-                                  modelId={primaryId}
-                                  variant="text"
-                                  className="font-mono"
-                                  locale={locale}
-                                />
-                              </Div>
-                            );
-                          })}
-                        </Div>
-                      </Div>
+                  // Sub-group by provider company, sorted A-Z
+                  const byProvider = Object.entries(modelProviders)
+                    .map(([providerId, provider]) => ({
+                      providerId,
+                      provider,
+                      models: typeModels
+                        .filter((def) => def.by === providerId)
+                        .toSorted(
+                          (a, b) => getModelSortPrice(a) - getModelSortPrice(b),
+                        ),
+                    }))
+                    .filter(({ models }) => models.length > 0)
+                    .toSorted((a, b) =>
+                      a.provider.name.localeCompare(b.provider.name),
                     );
-                  },
-                )}
+
+                  return (
+                    <Div key={modelType}>
+                      <H4 className="font-semibold mb-3 text-base">
+                        {t(
+                          `app.subscription.subscription.overview.costs.models.types.${modelType}`,
+                        )}
+                      </H4>
+                      <Div className="flex flex-col gap-4">
+                        {byProvider.map(({ providerId, provider, models }) => (
+                          <Div key={providerId}>
+                            <Div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground font-medium">
+                              <Icon icon={provider.icon} className="h-4 w-4" />
+                              {provider.name}
+                            </Div>
+                            <Div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                              {models.map((def) => {
+                                const isLegacy = def.utilities.includes(
+                                  ModelUtility.LEGACY,
+                                );
+                                const primaryId = def.providers[0].id;
+                                return (
+                                  <Div
+                                    key={primaryId}
+                                    className="flex items-center gap-3 p-2 rounded bg-accent"
+                                  >
+                                    <Span className="flex items-center gap-1">
+                                      {def.name}
+                                      {isLegacy && (
+                                        <Span className="text-xs text-muted-foreground">
+                                          (
+                                          {t(
+                                            "app.subscription.subscription.overview.costs.models.legacyBadge",
+                                          )}
+                                          )
+                                        </Span>
+                                      )}
+                                    </Span>
+                                    <ModelCreditDisplay
+                                      modelId={primaryId}
+                                      variant="text"
+                                      className="font-mono"
+                                      locale={locale}
+                                    />
+                                  </Div>
+                                );
+                              })}
+                            </Div>
+                          </Div>
+                        ))}
+                      </Div>
+                    </Div>
+                  );
+                })}
               </Div>
             </Div>
 
@@ -282,8 +343,8 @@ export function OverviewTab({
                   "app.subscription.subscription.overview.costs.features.title",
                 )}
               </H4>
-              <Div className="grid grid-cols-2 gap-2 text-sm">
-                <Div className="flex justify-between p-2 rounded bg-accent">
+              <Div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
                     {t(
                       "app.subscription.subscription.overview.costs.features.searchLabel",
@@ -301,7 +362,7 @@ export function OverviewTab({
                     )}
                   </Span>
                 </Div>
-                <Div className="flex justify-between p-2 rounded bg-accent">
+                <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
                     {t(
                       "app.subscription.subscription.overview.costs.features.fetchUrlLabel",
@@ -319,7 +380,7 @@ export function OverviewTab({
                     )}
                   </Span>
                 </Div>
-                <Div className="flex justify-between p-2 rounded bg-accent">
+                <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
                     {t(
                       "app.subscription.subscription.overview.costs.features.ttsLabel",
@@ -337,7 +398,7 @@ export function OverviewTab({
                     )}
                   </Span>
                 </Div>
-                <Div className="flex justify-between p-2 rounded bg-accent">
+                <Div className="flex items-center gap-3 p-2 rounded bg-accent">
                   <Span>
                     {t(
                       "app.subscription.subscription.overview.costs.features.sttLabel",

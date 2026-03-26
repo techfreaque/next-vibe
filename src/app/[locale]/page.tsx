@@ -64,8 +64,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/story`);
 }
 
-export function TanstackPage(props: HomePageData): never {
-  redirect(`/${props.locale}/threads`);
+export function TanstackPage(): never {
+  return null as never;
 }
 
 /**

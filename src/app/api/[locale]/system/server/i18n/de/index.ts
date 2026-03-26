@@ -22,6 +22,10 @@ export const translations: typeof enTranslations = {
       development: "Entwicklung",
       production: "Produktion",
     },
+    framework: {
+      next: "Next.js",
+      tanstack: "TanStack/Vite",
+    },
   },
   build: buildTranslations,
   dev: devTranslations,

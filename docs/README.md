@@ -41,9 +41,18 @@ Core patterns for building with NextVibe. **Read the relevant doc before touchin
 
 NextVibe exposes every endpoint across up to 10 platforms from a single definition. Here's how each works:
 
-### 1. Web API (REST / Next.js)
+### 1. Web API (REST / Next.js or TanStack/Vite)
 
 `route.ts` wires the definition into a Next.js App Router handler via `endpointsHandler()`. Handles validation, auth, error handling, and logging automatically.
+
+NextVibe supports two frontend frameworks - switch with `--framework=`:
+
+| Framework  | Dev command                 | Build command                     | Notes                                         |
+| ---------- | --------------------------- | --------------------------------- | --------------------------------------------- |
+| `tanstack` | `vibe dev` (default)        | `vibe build --framework=tanstack` | Vite + Nitro SSR, output in `.dist-tanstack/` |
+| `next`     | `vibe dev --framework=next` | `vibe build`                      | Next.js App Router, output in `.next-prod/`   |
+
+Route files (`route.ts`) and all endpoint logic are shared between both frameworks. Only the server runner changes.
 
 **Disable:** add `UserRole.WEB_OFF` to `allowedRoles`
 

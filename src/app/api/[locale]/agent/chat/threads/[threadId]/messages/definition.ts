@@ -25,11 +25,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { lazy } from "react";
 import { DefaultFolderId } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
 import { scopedTranslation } from "./i18n";
-import { lazy } from "react";
 
 const MessagesWidget = lazy(() =>
   import("./widget/widget").then((m) => ({ default: m.MessagesWidget })),
@@ -344,7 +344,7 @@ const { GET } = createEndpoint({
             }),
             model: responseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              schema: z.nativeEnum(ModelId).nullable(),
+              schema: z.enum(ModelId).nullable(),
             }),
             skill: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

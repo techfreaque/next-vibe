@@ -5,6 +5,7 @@
 
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import type { Server as NodeHttpServer } from "node:http";
+import { networkInterfaces } from "node:os";
 import { basename, dirname, resolve } from "node:path";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -18,6 +19,8 @@ import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import type { BuildOptions, InlineConfig, Plugin, PluginOption } from "vite";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { maybeColorize, semantic } from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
+import { createNextjsFormatter } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import type { BuildProfile, FileToCompile } from "../definition";
 import type { scopedTranslation } from "../i18n";
@@ -609,6 +612,14 @@ export class ViteCompiler {
             const nonImportCode = lines
               .filter((l) => !l.trimStart().startsWith("import "))
               .join("\n");
+            // Strip string literals and comments to avoid false positives
+            // (e.g. `kind: "redirect"` or `// redirects to overview` keeping the import).
+            const nonImportCodeNoStrings = nonImportCode
+              .replace(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
+              .replace(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
+              .replace(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
+              .replace(/\/\*[\s\S]*?\*\//g, "")
+              .replace(/\/\/[^\n]*/g, "");
             const filteredLines = lines.filter((line) => {
               const trimmed = line.trimStart();
               if (
@@ -639,7 +650,7 @@ export class ViteCompiler {
               }
               return bindings.some((b) => {
                 const re = new RegExp(`\\b${b}\\b`);
-                return re.test(nonImportCode);
+                return re.test(nonImportCodeNoStrings);
               });
             });
             return { code: filteredLines.join("\n"), map: null };
@@ -810,11 +821,15 @@ export class ViteCompiler {
   async startTanstackDevServer(
     fileConfig: FileToCompile,
     port: number | undefined,
-    logger: EndpointLogger,
     /** Public-facing proxy port (e.g. 5000). When set, configures Vite HMR to use this port
      *  so the browser connects to the proxy instead of the internal Vite port directly. */
     publicPort?: number,
-  ): Promise<{ success: boolean; url?: string; message?: string }> {
+  ): Promise<{
+    success: boolean;
+    url?: string;
+    message?: string;
+    close?: () => Promise<void>;
+  }> {
     try {
       const { createServer } = await import("vite");
       const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
@@ -834,6 +849,7 @@ export class ViteCompiler {
         nitro: () => PluginOption;
       };
 
+      const tailwindVite = (await import("@tailwindcss/vite")).default;
       const react = (await import("@vitejs/plugin-react")).default;
 
       const srcDirectory = fileConfig.input;
@@ -849,9 +865,48 @@ export class ViteCompiler {
       // Keys are import specifiers, values are paths relative to ROOT_DIR.
       const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
 
+      // Custom Vite logger: pipe all Vite/Nitro output through the same
+      // timestamp+color formatter used for Next.js output.
+      const fmtVite = createNextjsFormatter(
+        port ?? 3001,
+        publicPort ?? port ?? 3001,
+      );
+      const viteLogger = {
+        hasWarned: false,
+        info(msg: string): void {
+          process.stdout.write(`${fmtVite(msg)}\n`);
+        },
+        warn(msg: string): void {
+          // Suppress sourcemap warnings for packages that ship without source files
+          if (msg.includes("points to missing source files")) {
+            return;
+          }
+          this.hasWarned = true;
+          process.stdout.write(`${fmtVite(msg)}\n`);
+        },
+        warnOnce(msg: string): void {
+          if (msg.includes("points to missing source files")) {
+            return;
+          }
+          this.hasWarned = true;
+          process.stdout.write(`${fmtVite(msg)}\n`);
+        },
+        error(msg: string): void {
+          process.stderr.write(`${fmtVite(msg)}\n`);
+        },
+        clearScreen(): void {
+          /* no-op */
+        },
+        hasErrorLogged(): boolean {
+          return false;
+        },
+      };
+
       const server = await createServer({
         root: ROOT_DIR,
+        customLogger: viteLogger,
         plugins: [
+          tailwindVite(),
           tanstackStart({
             srcDirectory,
             // Mark `server-only` as denied on the client env.
@@ -864,23 +919,17 @@ export class ViteCompiler {
           }),
           react(),
           nitro(),
-          // TanStack Start's dev-server plugin provides "tanstack-start-injected-head-scripts:v"
-          // only to the server environment (consumer === "server"). It calls transformIndexHtml
-          // to extract the React Fast Refresh preamble and injects it before the client entry.
-          // The client environment also imports this virtual module, so we shim it there with
-          // undefined - the preamble is already embedded in the SSR HTML by the server plugin.
+          // Shim for TanStack Start virtual modules that aren't provided in dev mode.
+          // "tanstack-start-injected-head-scripts:v" is imported by the server env at runtime
+          // (router-manifest.js). TanStack's own dev plugin provides it only when its
+          // configureServer hook runs — but that requires the full TanStack dev server setup.
+          // We provide a no-op shim so the import resolves without error.
+          // The actual preamble is now injected directly in the <Head> component.
           {
-            name: "tanstack-start-client-virtual-shims",
+            name: "tanstack-start-virtual-shims",
             enforce: "pre",
-            applyToEnvironment(env: { name: string }) {
-              // Only shim on the client - let the server environment use the real plugin
-              return env.name === "client";
-            },
             resolveId(id: string) {
-              if (
-                id === "tanstack-start-injected-head-scripts:v" ||
-                id === "tanstack-start-manifest:v"
-              ) {
+              if (id === "tanstack-start-injected-head-scripts:v") {
                 return `\0${id}`;
               }
               return null;
@@ -888,9 +937,6 @@ export class ViteCompiler {
             load(id: string) {
               if (id === "\0tanstack-start-injected-head-scripts:v") {
                 return `export const injectedHeadScripts = undefined;`;
-              }
-              if (id === "\0tanstack-start-manifest:v") {
-                return `export const tsrStartManifest = () => ({ routes: {}, clientEntry: "" });`;
               }
               return null;
             },
@@ -1006,6 +1052,14 @@ export class ViteCompiler {
               const nonImportCode = lines
                 .filter((l) => !l.trimStart().startsWith("import "))
                 .join("\n");
+              // Strip string literals and comments to avoid false positives
+              // (e.g. `kind: "redirect"` or `// redirects to overview` keeping the import).
+              const nonImportCodeNoStrings = nonImportCode
+                .replace(/"[^"\\]*(?:\\.[^"\\]*)*"/g, '""')
+                .replace(/'[^'\\]*(?:\\.[^'\\]*)*'/g, "''")
+                .replace(/`[^`\\]*(?:\\.[^`\\]*)*`/g, "``")
+                .replace(/\/\*[\s\S]*?\*\//g, "")
+                .replace(/\/\/[^\n]*/g, "");
               const filteredLines = lines.filter((line) => {
                 const trimmed = line.trimStart();
                 // Only process value imports (not `import type`)
@@ -1039,9 +1093,9 @@ export class ViteCompiler {
                   return true;
                 }
                 return bindings.some((b) => {
-                  // Use word-boundary check to avoid false matches
+                  // Use word-boundary check, excluding string literals
                   const re = new RegExp(`\\b${b}\\b`);
-                  return re.test(nonImportCode);
+                  return re.test(nonImportCodeNoStrings);
                 });
               });
               return { code: filteredLines.join("\n"), map: null };
@@ -1205,15 +1259,23 @@ export class ViteCompiler {
         },
         server: {
           port: port ?? 3001,
+          strictPort: true,
           host: "127.0.0.1",
           watch: {
             // Ignore .tmp dir - contains bracket paths ([locale]) that crash inotify on Linux.
             // Ignore routeTree.gen.ts - regenerated by TanStack Start plugin, not user source.
             // Ignore app-tanstack/routes - auto-generated, touching them shouldn't trigger CSS HMR.
+            // Ignore generated/ dirs - written by task runner generators, contain no Tailwind classes.
+            // Without this, every generator run triggers a globals.css HMR cycle via Tailwind's
+            // @source scanner re-evaluating all watched files.
             ignored: [
               "**/.tmp/**",
               "**/routeTree.gen.ts",
               "**/app-tanstack/routes/**",
+              "**/system/generated/**",
+              "**/messenger/registry/generated.ts",
+              "**/app-native/**",
+              "**/test-files/**",
             ],
           },
           // When running behind a proxy (e.g. Bun WS proxy on publicPort), tell Vite's
@@ -1362,19 +1424,52 @@ export class ViteCompiler {
         httpServer.keepAliveTimeout = 0;
         httpServer.headersTimeout = 0;
         httpServer.timeout = 0;
+        // Node 14+: disable request timeout so slow SSR renders don't abort
+        (
+          httpServer as NodeHttpServer & { requestTimeout?: number }
+        ).requestTimeout = 0;
       }
       const resolvedPort = server.config.server.port ?? port ?? 3001;
       const url = `http://localhost:${resolvedPort}`;
       const publicUrl = publicPort ? `http://localhost:${publicPort}` : url;
-      logger.info(`TanStack Start dev server ready at ${publicUrl}`);
 
-      const stop = (): void => {
-        void server.close();
+      // Pretty startup banner matching Next.js style
+      const networkUrl = ((): string | undefined => {
+        try {
+          for (const ifaces of Object.values(networkInterfaces())) {
+            for (const iface of ifaces ?? []) {
+              if (iface.family === "IPv4" && !iface.internal) {
+                return `http://${iface.address}:${publicPort ?? resolvedPort}`;
+              }
+            }
+          }
+        } catch {
+          /* ignore */
+        }
+        return undefined;
+      })();
+      const uptime = process.uptime().toFixed(3);
+      const lines = [
+        `⚡ TanStack Start (Vite + Nitro)`,
+        `   - Local:    ${publicUrl}`,
+        networkUrl ? `   - Network:  ${networkUrl}` : undefined,
+        `   ✓ Ready`,
+      ].filter(Boolean) as string[];
+      const indent = " ".repeat(`[${uptime}s] `.length);
+      const formatted = lines
+        .map((line, i) =>
+          i === 0
+            ? `[${uptime}s] ${maybeColorize(line, semantic.generator)}`
+            : `${indent}${maybeColorize(line, semantic.generator)}`,
+        )
+        .join("\n");
+      process.stdout.write(`${formatted}\n`);
+
+      return {
+        success: true,
+        url,
+        close: (): Promise<void> => server.close(),
       };
-      process.once("SIGINT", stop);
-      process.once("SIGTERM", stop);
-
-      return { success: true, url };
     } catch (error) {
       return { success: false, message: parseError(error).message };
     }

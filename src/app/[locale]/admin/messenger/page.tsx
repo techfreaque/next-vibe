@@ -24,8 +24,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/admin/messenger/inbox`);
 }
 
-export function TanstackPage(props: EmailsAdminPageData): never {
-  redirect(`/${props.locale}/admin/messenger/inbox`);
+export function TanstackPage(): never {
+  return null as never;
 }
 
 export default async function EmailsAdminPage({

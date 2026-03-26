@@ -270,6 +270,7 @@ export class OxlintRepository {
           logger,
           config.prettier.configPath,
           config.prettier.ignoreFilePath,
+          extraIgnorePatterns,
         ),
       ]);
 
@@ -312,6 +313,7 @@ export class OxlintRepository {
     logger: EndpointLogger,
     configPath: string,
     ignoreFilePath?: string,
+    extraIgnorePatterns?: string[],
   ): Promise<void> {
     if (paths.length === 0) {
       return;
@@ -321,8 +323,20 @@ export class OxlintRepository {
       ignoreFilePath && existsSync(`${process.cwd()}/${ignoreFilePath}`)
         ? ["--ignore-path", `${process.cwd()}/${ignoreFilePath}`]
         : [];
+    // oxfmt supports exclude patterns via "!pattern" positional args
+    const excludeArgs =
+      extraIgnorePatterns && extraIgnorePatterns.length > 0
+        ? extraIgnorePatterns.map((p) => `!${p}`)
+        : [];
     /* eslint-enable i18next/no-literal-string */
-    const command = ["oxfmt", "--config", configPath, ...ignoreArgs, ...paths];
+    const command = [
+      "oxfmt",
+      "--config",
+      configPath,
+      ...ignoreArgs,
+      ...paths,
+      ...excludeArgs,
+    ];
 
     logger.debug(`[OXLINT] Executing Oxfmt command: bunx ${command.join(" ")}`);
 

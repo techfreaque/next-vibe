@@ -27,8 +27,8 @@ export async function tanstackLoader({
   redirect(`/${locale}/admin/leads/stats`);
 }
 
-export function TanstackPage(props: AdminLeadsPageData): never {
-  redirect(`/${props.locale}/admin/leads/stats`);
+export function TanstackPage(): never {
+  return null as never;
 }
 
 export default async function AdminLeadsPage({

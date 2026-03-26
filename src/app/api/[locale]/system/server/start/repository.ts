@@ -45,6 +45,7 @@ import {
   VIBE_START_PID_FILE,
   writePidFile,
 } from "../pid";
+import { ServerFramework } from "../enum";
 import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
@@ -141,14 +142,7 @@ export class ServerStartRepository {
   ): void {
     const currentEnv = process.env["NODE_ENV"] || "production";
     const mode = data.mode ?? "all";
-    logger.vibe(
-      formatStartup(
-        data.tanstack
-          ? "Starting TanStack/Vite Production Server"
-          : "Starting Production Server",
-        "🚀",
-      ),
-    );
+    logger.vibe(formatStartup("Starting Production Server", "🚀"));
     ServerStartRepository.log("");
     ServerStartRepository.log(
       `  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`,
@@ -156,6 +150,9 @@ export class ServerStartRepository {
     ServerStartRepository.log(`  ${formatConfig("Env", currentEnv)}`);
     ServerStartRepository.log(
       `  ${formatConfig("Mode", mode)}  ${formatHint("(--mode=all|web|tasks)")}`,
+    );
+    ServerStartRepository.log(
+      `  ${formatConfig("Framework", data.framework === ServerFramework.TANSTACK ? "TanStack/Vite" : "Next.js")}  ${formatHint("(--framework=next|tanstack)")}`,
     );
     ServerStartRepository.log("");
     if (runDb) {
@@ -269,6 +266,7 @@ export class ServerStartRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    skipTanstack: boolean,
   ): Promise<void> {
     try {
       logger.debug(formatTask("Starting task runner"));
@@ -283,6 +281,7 @@ export class ServerStartRepository {
         user,
         locale,
         logger,
+        skipTanstack,
       ).catch((catchError) => {
         logger.error("Task runner exited unexpectedly", {
           error: parseError(catchError).message,
@@ -377,7 +376,12 @@ export class ServerStartRepository {
 
     // Start task runner if enabled (non-blocking - fires before Next.js)
     if (runTasks) {
-      void ServerStartRepository.startTaskRunnerIfEnabled(user, locale, logger);
+      void ServerStartRepository.startTaskRunnerIfEnabled(
+        user,
+        locale,
+        logger,
+        data.framework !== ServerFramework.TANSTACK,
+      );
     } else {
       logger.vibe(formatSkip("Task runner skipped"));
     }
@@ -400,7 +404,7 @@ export class ServerStartRepository {
       });
     }
 
-    if (data.tanstack) {
+    if (data.framework === ServerFramework.TANSTACK) {
       try {
         const tanstackResult = await ServerStartRepository.startTanstackServer(
           port,
@@ -634,9 +638,21 @@ export class ServerStartRepository {
       process.stderr.write(data);
     });
 
-    tanstackProcess.on("exit", (code) => {
-      logger.info(`TanStack Start server exited with code ${String(code)}`);
+    tanstackProcess.on("exit", (code, signal) => {
       ServerStartRepository.runningProcesses.delete("tanstack");
+      if (code !== 0 && code !== null) {
+        logger.error(
+          `TanStack Start server exited unexpectedly with code ${String(code)} - shutting down`,
+        );
+        process.exit(1);
+      } else if (signal && signal !== "SIGTERM") {
+        logger.error(
+          `TanStack Start server killed by signal ${signal} - shutting down`,
+        );
+        process.exit(1);
+      } else {
+        logger.info(`TanStack Start server exited with code ${String(code)}`);
+      }
     });
 
     // Give it a moment to start

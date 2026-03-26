@@ -251,6 +251,7 @@ export interface TaskRunner<TScopedTranslationKey extends string> {
     /** The locale of the user who owns this runner; equals systemLocale for system runners */
     userLocale: CountryLanguage;
     cronUser: JwtPrivatePayloadType;
+    skipTanstack: boolean;
   }) => Promise<void> | void;
   onError?: (props: {
     error: Error;

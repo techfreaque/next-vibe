@@ -89,7 +89,8 @@ You can also edit `.env` directly - `.env.example` documents every variable. Use
 ### 4. Start Development Server
 
 ```bash
-vibe dev
+vibe dev                        # TanStack/Vite (default)
+vibe dev --framework=next       # Next.js dev server
 ```
 
 This single command will:
@@ -98,7 +99,7 @@ This single command will:
 - ✅ Create database if missing
 - ✅ Run migrations
 - ✅ Seed development data
-- ✅ Start Next.js dev server on http://localhost:3000
+- ✅ Start dev server on http://localhost:3000
 - ✅ Start cron task runner
 
 ---
@@ -108,10 +109,11 @@ This single command will:
 ### Development
 
 ```bash
-vibe dev                    # Start dev server (auto-manages everything)
-vibe check                  # Run lint + typecheck (AI's best friend)
-vibe check src/path         # Check specific folder
-bun run dev                 # Alternative: Start Next.js only (manual DB)
+vibe dev                        # Start dev server - TanStack/Vite (default)
+vibe dev --framework=next       # Start dev server - Next.js
+vibe check                      # Run lint + typecheck (AI's best friend)
+vibe check src/path             # Check specific folder
+bun run dev                     # Alternative: Start Next.js only (manual DB)
 ```
 
 ### Database
@@ -146,9 +148,11 @@ vibe system-settings        # View all settings with health indicators (read-onl
 ### Production
 
 ```bash
-vibe build                  # Build for production
-vibe start                  # Start production server
-vibe rebuild                # Rebuild & hot-restart (zero-downtime)
+vibe build                          # Build Next.js for production
+vibe build --framework=tanstack     # Build TanStack/Vite (→ .dist-tanstack/)
+vibe start                          # Start Next.js production server
+vibe start --framework=tanstack     # Start TanStack production server
+vibe rebuild                        # Rebuild & hot-restart (zero-downtime, Next.js only)
 ```
 
 `vibe rebuild` regenerates code, builds Next.js, runs migrations, and hot-restarts the running `vibe start` process - zero downtime.

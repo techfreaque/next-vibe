@@ -23,6 +23,11 @@ import {
   clearDirtyFlags,
   updateLiveIndex,
 } from "../../../generators/shared/live-index";
+import {
+  formatCount,
+  formatDuration,
+  formatGenerator,
+} from "../../shared/logger/formatters";
 import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";
@@ -41,7 +46,7 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
 
-  async run({ logger, signal, systemLocale }) {
+  async run({ logger, signal, systemLocale, skipTanstack }) {
     if (env.NODE_ENV !== Environment.DEVELOPMENT) {
       logger.debug("Dev watcher skipped (not in development mode)");
       return;
@@ -50,14 +55,14 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
     logger.debug("Starting smart development file watcher...");
 
     try {
-      await startSmartFileWatcher(signal, logger, systemLocale);
+      await startSmartFileWatcher(signal, logger, systemLocale, skipTanstack);
     } catch (error) {
       const errorMsg = parseError(error).message;
       logger.error(
         "Smart file watcher failed, falling back to polling",
         new Error(errorMsg),
       );
-      await startPollingWatcher(signal, logger, systemLocale);
+      await startPollingWatcher(signal, logger, systemLocale, skipTanstack);
     }
   },
 
@@ -86,6 +91,7 @@ const startSmartFileWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  skipTanstack: boolean,
 ): Promise<void> => {
   const fs = await import("node:fs");
 
@@ -120,6 +126,10 @@ const startSmartFileWatcher = async (
     if (dirty.seeds) {
       dirtyNames.push("seeds");
     }
+    const runTanstack = !skipTanstack && dirty.endpoints;
+    if (runTanstack) {
+      dirtyNames.push("tanstack-routes");
+    }
 
     if (dirtyNames.length === 0) {
       logger.debug("⏭️  No dirty generators - skipping run");
@@ -135,13 +145,55 @@ const startSmartFileWatcher = async (
     const dirtySnapshot = { ...dirty };
     clearDirtyFlags(liveIndex);
 
-    try {
-      await GenerateAllRepository.generateDirty(
+    const generatorPromises: Promise<void>[] = [
+      GenerateAllRepository.generateDirty(
         dirtySnapshot,
         liveIndex,
         logger,
         locale,
+      ).catch((error) => {
+        logger.error(
+          "Generator execution failed",
+          new Error(parseError(error).message),
+        );
+      }),
+    ];
+
+    if (runTanstack) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          const start = Date.now();
+          try {
+            const { GenerateTanstackRoutesRepository } =
+              await import("../../tanstack-start/generate/repository");
+            const result =
+              await GenerateTanstackRoutesRepository.generateInternal();
+            const ms = Date.now() - start;
+            if (result.success) {
+              const { created, skipped } = result.data;
+              logger.vibe(
+                formatGenerator(
+                  `Generated TanStack routes: ${formatCount(created.length, "created", "created")} ${formatCount(skipped.length, "skipped", "skipped")} in ${formatDuration(ms)}`,
+                  "🗺️ ",
+                ),
+              );
+            } else {
+              logger.error(
+                `TanStack routes generation failed: ${result.message ?? "Unknown error"}`,
+              );
+            }
+          } catch (error) {
+            logger.error(
+              "TanStack routes generation failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
       );
+    }
+
+    try {
+      await Promise.allSettled(generatorPromises);
       logger.debug(`✅ Generators completed for change #${changeCount}`);
     } catch (error) {
       const errorMsg = parseError(error).message;
@@ -343,6 +395,7 @@ const startPollingWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
   locale: CountryLanguage,
+  skipTanstack: boolean,
 ): Promise<void> => {
   logger.info("Using fallback polling watcher...");
 
@@ -363,7 +416,7 @@ const startPollingWatcher = async (
           skipSeeds: watchCount !== 1,
           skipTaskIndex: false,
           enableTrpc: false,
-          skipTanstack: true,
+          skipTanstack,
         },
         logger,
         locale,

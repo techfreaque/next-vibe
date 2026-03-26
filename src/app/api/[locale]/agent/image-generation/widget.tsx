@@ -3,18 +3,23 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { Image } from "next-vibe-ui/ui/image";
 import type { JSX } from "react";
+import { useMemo } from "react";
 
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { TextWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { getImageModelOptions } from "./enum";
 import type definition from "./definition";
 import type { ImageGenerationPostResponseOutput } from "./definition";
 
@@ -32,6 +37,14 @@ export function ImageGenerationContainer({
   const form = useWidgetForm<typeof definition.POST>();
   const result = field.value;
   const prompt = form?.watch("prompt") ?? "";
+  const envAvailability = useEnvAvailability();
+  const user = useWidgetUser();
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const modelOptions = useMemo(
+    () => getImageModelOptions(envAvailability, isAdmin),
+    [envAvailability, isAdmin],
+  );
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -40,7 +53,10 @@ export function ImageGenerationContainer({
       <TextareaFieldWidget fieldName="prompt" field={children.prompt} />
 
       <Div className="grid grid-cols-2 gap-4">
-        <SelectFieldWidget fieldName="model" field={children.model} />
+        <SelectFieldWidget
+          fieldName="model"
+          field={{ ...children.model, options: modelOptions }}
+        />
         <SelectFieldWidget fieldName="size" field={children.size} />
         <SelectFieldWidget fieldName="quality" field={children.quality} />
       </Div>

@@ -500,9 +500,14 @@ export default checkConfig.eslint?.buildFlatConfig?.(
           config.prettier,
         );
 
-        // Generate .prettierignore from oxlint ignore patterns for oxfmt --ignore-path
+        // Generate .prettierignore from oxlint ignore patterns for oxfmt --ignore-path.
+        // Always include nonExtensiveIgnorePatterns (generated/test files should never
+        // be auto-formatted regardless of --extensive flag).
         const ignorePatterns = config.oxlint.enabled
-          ? (config.oxlint.ignorePatterns ?? [])
+          ? [
+              ...(config.oxlint.ignorePatterns ?? []),
+              ...(config.oxlint.nonExtensiveIgnorePatterns ?? []),
+            ]
           : [];
         if (config.prettier.ignoreFilePath && ignorePatterns.length > 0) {
           await ConfigRepositoryImpl.generatePrettierIgnore(

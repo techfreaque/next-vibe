@@ -60,9 +60,9 @@ export const translations: typeof enTranslations = {
         title: "Pomiń seeding",
         description: "Pomiń seedowanie bazy danych z danymi początkowymi",
       },
-      tanstack: {
-        title: "TanStack",
-        description: "Użyj TanStack Router/Vite zamiast Next.js",
+      framework: {
+        title: "Framework",
+        description: "Frontend framework/bundler",
       },
       profile: {
         title: "Profilowanie",

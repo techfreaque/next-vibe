@@ -26,6 +26,7 @@ import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[
 import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
 import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import {
+  FEATURED_MODELS,
   ModelId,
   TOTAL_CHARACTER_COUNT,
   TOTAL_MODEL_COUNT,
@@ -385,30 +386,36 @@ function ModelsVisual(): JSX.Element {
   const tiers = [
     {
       name: "Mainstream",
-      color: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-      models: "GPT-5, Claude, Gemini",
+      className:
+        "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-800 dark:text-indigo-200 border-indigo-200 dark:border-indigo-500/30",
+      models: FEATURED_MODELS.mainstream.join(", "),
     },
     {
       name: "Open",
-      color: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-      models: "DeepSeek, Grok, Qwen, GLM",
+      className:
+        "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-500/30",
+      models: FEATURED_MODELS.open.join(", "),
     },
     {
       name: "Uncensored",
-      color: "bg-red-500/20 text-red-400 border-red-500/30",
-      models: "Venice, FreedomGPT, Gab",
+      className:
+        "bg-rose-50 dark:bg-rose-500/15 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-500/30",
+      models: FEATURED_MODELS.uncensored.join(", "),
     },
   ];
 
   return (
     <Div className="space-y-4">
       {tiers.map((tier) => (
-        <Div key={tier.name} className={`rounded-lg border p-4 ${tier.color}`}>
+        <Div
+          key={tier.name}
+          className={`rounded-lg border p-4 ${tier.className}`}
+        >
           <Div className="flex items-center gap-2 mb-2">
             <Sparkles className="h-4 w-4" />
             <Span className="font-semibold text-sm">{tier.name}</Span>
           </Div>
-          <P className="text-sm opacity-80">{tier.models}</P>
+          <P className="text-sm opacity-90">{tier.models}</P>
         </Div>
       ))}
     </Div>

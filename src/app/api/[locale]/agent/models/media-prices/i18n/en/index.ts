@@ -73,4 +73,9 @@ export const translations = {
   tags: {
     models: "Models",
   },
+  updateMediaModelPrices: {
+    name: "Update Media Model Prices",
+    description:
+      "Fetches live pricing for image and audio generation models from provider APIs and updates models.ts",
+  },
 };

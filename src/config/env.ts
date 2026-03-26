@@ -175,7 +175,7 @@ export const {
     fieldType: "url",
   },
   PULSE_INTERVAL_MINUTES: {
-    schema: z.coerce.number().int().positive().optional(),
+    schema: z.coerce.number().int().positive().default(1),
     example: "1",
     comment: "Pulse runner interval in minutes (default: 1)",
     fieldType: "number",

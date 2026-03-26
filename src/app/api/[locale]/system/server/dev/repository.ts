@@ -8,7 +8,8 @@
 
 import type { ChildProcess } from "node:child_process";
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -48,6 +49,7 @@ import {
   VIBE_DEV_PID_FILE,
   writePidFile,
 } from "../pid";
+import { ServerFramework } from "../enum";
 import type { DevRequestOutput } from "./definition";
 
 /**
@@ -332,12 +334,20 @@ export class DevRepository {
         logger,
         earlyExitHandler,
         data.profile,
-        data.tanstack,
+        data.framework === ServerFramework.TANSTACK,
       );
     }
 
+    // Shared abort controller: aborted by shutdown() so task runners stop cleanly
+    const shutdownController = new AbortController();
+
     // Start task runner if not skipped
-    void DevRepository.startTaskRunnerIfEnabled(data, locale, logger);
+    void DevRepository.startTaskRunnerIfEnabled(
+      data,
+      locale,
+      logger,
+      shutdownController.signal,
+    );
 
     // Start Next.js (or Vite for TanStack) and keep process alive
     return await DevRepository.startNextJsAndWait(
@@ -345,7 +355,8 @@ export class DevRepository {
       logger,
       earlyExitHandler,
       data.profile,
-      data.tanstack,
+      data.framework === ServerFramework.TANSTACK,
+      shutdownController,
     );
   }
 
@@ -357,23 +368,14 @@ export class DevRepository {
     logger: EndpointLogger,
     data: DevRequestOutput,
   ): void {
-    logger.vibe(
-      formatStartup(
-        data.tanstack
-          ? "Starting TanStack/Vite Development Server"
-          : "Starting Development Server",
-        "⚡",
-      ),
-    );
+    logger.vibe(formatStartup("Starting Development Server", "⚡"));
     DevRepository.log("");
     DevRepository.log(
       `  ${formatConfig("Port", port)}  ${formatHint("(--port=N)")}`,
     );
-    if (data.tanstack) {
-      DevRepository.log(
-        `  ${formatConfig("Mode", "TanStack/Vite")} ${formatHint("(--tanstack)")}`,
-      );
-    }
+    DevRepository.log(
+      `  ${formatConfig("Framework", data.framework === ServerFramework.TANSTACK ? "TanStack/Vite" : "Next.js")}  ${formatHint("(--framework=next|tanstack)")}`,
+    );
     DevRepository.log(
       `  ${formatConfig("Debug", logger.isDebugEnabled ? "ON" : "OFF")}  ${formatHint(logger.isDebugEnabled ? "(remove -v or --verbose to disable)" : "(-v or --verbose to enable)")}`,
     );
@@ -643,6 +645,7 @@ export class DevRepository {
     data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    signal: AbortSignal,
   ): Promise<void> {
     if (data.skipTaskRunner) {
       logger.vibe(formatSkip("Task runner disabled"));
@@ -651,7 +654,7 @@ export class DevRepository {
 
     try {
       logger.debug(formatTask("Starting task runner"));
-      await DevRepository.startUnifiedTaskRunner(locale, logger, data);
+      await DevRepository.startUnifiedTaskRunner(locale, logger, data, signal);
       logger.debug(formatTask("Task runner started"));
     } catch (error) {
       const parsedError = parseError(error);
@@ -674,6 +677,7 @@ export class DevRepository {
     earlyExitHandler?: () => void,
     profile = false,
     tanstack = false,
+    shutdownController?: AbortController,
   ): Promise<never> {
     const { spawn } = await import("node:child_process");
 
@@ -707,8 +711,19 @@ export class DevRepository {
     DevRepository.killProcessOnPort(nextPort, logger);
     DevRepository.killProcessOnPort(wsPort, logger);
 
-    // --- Start WS server (once - outlives Next.js restarts) ---
-    const wsHandle = startWebSocketServer({ port: wsPort, logger });
+    // WS proxy handle - started immediately for Next.js mode, but deferred
+    // until AFTER Vite is ready for TanStack mode (early requests to the proxy
+    // before Vite is listening on nextPort can interfere with Nitro's startup).
+    let wsHandle: ReturnType<typeof startWebSocketServer> | undefined;
+
+    // For Next.js mode, start the proxy immediately so it's ready to accept connections.
+    // For TanStack mode, we start Vite first and only then start the proxy.
+    if (!tanstack) {
+      wsHandle = startWebSocketServer({ port: wsPort, logger });
+    }
+
+    // Vite server close function - set after startTanstackDevServer resolves
+    let viteClose: (() => Promise<void>) | undefined;
 
     const restoreTty = (): void => {
       try {
@@ -728,8 +743,10 @@ export class DevRepository {
       if (message) {
         process.stdout.write(`\n${message}\n`);
       }
-      // Stop Bun WS server
-      wsHandle.stop();
+      // Signal task runners to stop cleanly
+      shutdownController?.abort();
+      // Stop Bun WS server (may be undefined if still in Vite startup for TanStack mode)
+      wsHandle?.stop();
       // Kill Next.js child process (current one tracked in runningProcesses)
       const currentNext = DevRepository.runningProcesses.get("next");
       if (currentNext && !currentNext.killed) {
@@ -739,11 +756,28 @@ export class DevRepository {
         currentNext.stderr?.destroy();
         currentNext.kill("SIGTERM");
       }
-      // Force-kill anything still on the ports (catches stale processes)
-      DevRepository.killProcessOnPort(nextPort, logger);
-      DevRepository.killProcessOnPort(wsPort, logger);
       cleanupPidFile(VIBE_DEV_PID_FILE);
-      process.exit(code);
+      // Close Vite dev server (TanStack mode) then exit.
+      // We await it so Vite can flush its cleanup before process.exit —
+      // skipping the await causes the OS to SIGKILL the process mid-cleanup.
+      // A 2s timeout prevents hanging if Vite's shutdown stalls.
+      if (viteClose) {
+        const timer = setTimeout(() => {
+          process.exit(code);
+        }, 2000);
+        void viteClose()
+          .catch(() => {
+            /* ignore vite close errors */
+          })
+          .finally(() => {
+            clearTimeout(timer);
+            process.exit(code);
+          });
+      } else {
+        // Use setImmediate so synchronous cleanup above finishes before exit,
+        // preventing Bun from seeing live handles and sending SIGKILL.
+        setImmediate(() => process.exit(code));
+      }
     };
 
     // Replace early exit handler with full graceful shutdown handler
@@ -751,8 +785,22 @@ export class DevRepository {
       process.off("SIGINT", earlyExitHandler);
       process.off("SIGTERM", earlyExitHandler);
     }
+    const SHUTDOWN_MESSAGES = [
+      "👋 Peace out! The vibes have left the building",
+      "🌙 Server has left the chat",
+      "🌙 Going dark... catch you on the flip side",
+      "🎬 And... scene! That's a wrap folks",
+      "🚪 Server has stopped responding (just kidding, it's fine)",
+      "☕ Taking a coffee break... indefinitely",
+      "🎮 Game over! Insert coin to continue",
+      "🛌 Server is going to bed. Sweet dreams!",
+      "🎪 The circus has left town",
+      "🦖 Server went extinct (but it'll be back)",
+    ];
     const sigintHandler = (): void => {
-      shutdown(0);
+      const msg =
+        SHUTDOWN_MESSAGES[Math.floor(Math.random() * SHUTDOWN_MESSAGES.length)];
+      shutdown(0, msg);
     };
     process.on("SIGINT", sigintHandler);
     process.on("SIGTERM", sigintHandler);
@@ -796,7 +844,7 @@ export class DevRepository {
             // Kill Next.js so it flushes NEXT_CPU_PROF output
             DevRepository.shuttingDown = true;
             restoreTty();
-            wsHandle.stop();
+            wsHandle?.stop();
             const currentNext = DevRepository.runningProcesses.get("next");
             if (currentNext && !currentNext.killed) {
               currentNext.stdout?.unpipe();
@@ -881,18 +929,34 @@ export class DevRepository {
         logger.error("No tanstack-start entry found in build.config.ts");
         process.exit(1);
       }
+      // Ensure the routes directory exists before the TanStack router-generator
+      // plugin scans it - it will throw ENOENT if the folder is missing.
+      const routesDir = join(process.cwd(), "src/app-tanstack/routes");
+      if (!existsSync(routesDir)) {
+        mkdirSync(routesDir, { recursive: true });
+      }
+
       // TanStack Vite runs on nextPort (internal); WS proxy on wsPort forwards to it.
       // Pass wsPort as publicPort so Vite's HMR client points to the proxy, not the internal port.
+      // IMPORTANT: Start Vite BEFORE the proxy so early browser requests don't interfere with
+      // Nitro's startup (requests arriving on the proxy while Vite is still initializing can
+      // cause Nitro to hang mid-startup, resulting in the server never becoming ready).
       const devResult = await viteCompiler.startTanstackDevServer(
         tanstackEntry,
         nextPort,
-        logger,
         disableProxy ? undefined : wsPort,
       );
       if (!devResult.success) {
         logger.error(devResult.message ?? "TanStack Start dev server failed");
         process.exit(1);
       }
+      viteClose = devResult.close;
+
+      // Vite is now ready - start the proxy so it can forward requests to Vite
+      if (!disableProxy) {
+        wsHandle = startWebSocketServer({ port: wsPort, logger });
+      }
+
       // Keep the process alive - the Vite/Nitro server runs until SIGINT/SIGTERM
       // oxlint-disable-next-line no-empty-function -- intentional infinite wait; server runs until SIGINT/SIGTERM
       return new Promise<never>(() => {
@@ -920,21 +984,17 @@ export class DevRepository {
           }
         : {};
 
-      const spawnArgs: string[] = [
-        "run",
-        "next",
-        "dev",
-        "--port",
-        String(nextPort),
-      ];
-      const nextProcess = spawn("bun", spawnArgs, {
+      const nextProcess = spawn("bun", ["run", "next", "dev", "--port", String(nextPort)], {
         stdio: ["ignore", "pipe", "pipe"],
         env: {
           ...process.env,
           ...profilingEnv,
           // Cap V8 heap to force GC before memory balloons unboundedly.
           // 8GB is enough for dev; without this Node grows until OOM.
-          NODE_OPTIONS: [process.env.NODE_OPTIONS, "--max-old-space-size=8192"]
+          NODE_OPTIONS: [
+            process.env.NODE_OPTIONS,
+            "--max-old-space-size=8192",
+          ]
             .filter(Boolean)
             .join(" "),
         },
@@ -1029,6 +1089,7 @@ export class DevRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     data: DevRequestOutput,
+    signal: AbortSignal,
   ): Promise<void> {
     try {
       // Load the task registry
@@ -1051,21 +1112,13 @@ export class DevRepository {
       // Set environment to development
       UnifiedTaskRunnerRepository.environment = "development";
 
-      // Create abort controller so task runners can be stopped on shutdown
-      const controller = new AbortController();
-      process.once("SIGINT", () => {
-        controller.abort();
-      });
-      process.once("SIGTERM", () => {
-        controller.abort();
-      });
-
       // Start the task runner with filtered tasks
       const startResult = UnifiedTaskRunnerRepository.start(
         devTasks,
-        controller.signal,
+        signal,
         locale,
         logger,
+        data.framework !== ServerFramework.TANSTACK,
       );
 
       if (startResult.success) {

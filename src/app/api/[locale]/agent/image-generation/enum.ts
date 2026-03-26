@@ -4,7 +4,9 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
+import type { AgentEnvAvailability } from "../env-availability";
 import { getAllModelOptions, ModelId } from "../models/models";
+import { isProviderAvailable } from "../models/widget/model-selector";
 import { scopedTranslation } from "./i18n";
 
 export const {
@@ -50,13 +52,39 @@ export const IMAGE_MODEL_IDS = [
   ModelId.RIVERFLOW_V2_FAST,
   ModelId.RIVERFLOW_V2_MAX_PREVIEW,
   ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
+  ModelId.RIVERFLOW_V2_FAST_PREVIEW,
+  ModelId.FLUX_2_FLEX,
+  ModelId.FLUX_2_PRO,
+  ModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+  ModelId.GPT_5_IMAGE_MINI,
+  ModelId.GPT_5_IMAGE,
   ModelId.SEEDREAM_4_5,
 ] as const;
 
 export type ImageModelId = (typeof IMAGE_MODEL_IDS)[number];
 
-/** Options array for UI select, built from existing model definitions */
+/** Static options array (all models, no availability filtering) */
 export const ImageModelOptions = getAllModelOptions()
   .filter((m) => (IMAGE_MODEL_IDS as readonly string[]).includes(m.id))
   // eslint-disable-next-line i18next/no-literal-string
   .map((m) => ({ value: m.id, label: m.name }));
+
+/**
+ * Dynamic model options that respect provider availability.
+ * - Admins: all models shown, unavailable ones are disabled.
+ * - Non-admins: unavailable models are hidden.
+ */
+export function getImageModelOptions(
+  envAvailability: AgentEnvAvailability | undefined,
+  isAdmin: boolean,
+): { value: string; label: string; disabled?: boolean }[] {
+  return getAllModelOptions()
+    .filter((m) => (IMAGE_MODEL_IDS as readonly string[]).includes(m.id))
+    .flatMap((m) => {
+      const available = isProviderAvailable(m, envAvailability);
+      if (!available && !isAdmin) {
+        return [];
+      }
+      return [{ value: m.id, label: m.name, disabled: !available }];
+    });
+}

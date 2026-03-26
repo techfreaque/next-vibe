@@ -61,10 +61,9 @@ export const translations: typeof enTranslations = {
         description:
           "Profiling aktivieren: setzt NEXT_CPU_PROF=1 (schreibt .cpuprofile beim Beenden) für den Produktions-Next.js-Server",
       },
-      tanstack: {
-        title: "TanStack",
-        description:
-          "TanStack Router/Vite statt Next.js verwenden (führt vite preview aus)",
+      framework: {
+        title: "Framework",
+        description: "Frontend-Framework/Bundler",
       },
       skipTaskRunner: {
         title: "Task Runner überspringen",

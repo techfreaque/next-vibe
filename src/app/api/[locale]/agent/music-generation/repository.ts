@@ -14,6 +14,7 @@ import {
 
 import {
   ApiProvider,
+  calculateCreditCost,
   getModelById,
   type ModelOptionAudioBased,
 } from "@/app/api/[locale]/agent/models/models";
@@ -55,7 +56,7 @@ export class MusicGenerationRepository {
     }
 
     const audioModel = modelConfig as ModelOptionAudioBased;
-    const creditCost = audioModel.creditCostPerClip;
+    const creditCost = calculateCreditCost(audioModel, 0, 0);
     const durationSeconds =
       MUSIC_DURATION_SECONDS[data.duration] ??
       audioModel.defaultDurationSeconds;

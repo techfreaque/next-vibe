@@ -22,11 +22,12 @@ export async function tanstackLoader({
   params,
 }: AdminUsersPageProps): Promise<AdminUsersPageData> {
   const { locale } = await params;
+  redirect(`/${locale}/admin/users/stats`);
   return { locale };
 }
 
-export function TanstackPage({ locale }: AdminUsersPageData): JSX.Element {
-  redirect(`/${locale}/admin/users/stats`);
+export function TanstackPage(): JSX.Element {
+  return null as never;
 }
 
 export default async function AdminUsersPage({

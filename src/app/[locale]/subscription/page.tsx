@@ -15,13 +15,11 @@ export async function tanstackLoader({
   params,
 }: SubscriptionPageProps): Promise<SubscriptionRootPageData> {
   const { locale } = await params;
-  return { locale };
+  redirect(`/${locale}/subscription/overview`);
 }
 
-export function TanstackPage({
-  locale,
-}: SubscriptionRootPageData): JSX.Element {
-  redirect(`/${locale}/subscription/overview`);
+export function TanstackPage(): JSX.Element {
+  return null as never;
 }
 
 /**

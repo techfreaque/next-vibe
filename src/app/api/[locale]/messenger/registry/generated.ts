@@ -16,50 +16,47 @@ import type {
 /**
  * Lazy-loaded template registry with dynamic imports
  */
-const templateLoaders: Record<
-  string,
-  () => Promise<EmailTemplateDefinitionAny>
-> = {
+const templateLoaders: Record<string, () => Promise<EmailTemplateDefinitionAny>> = {
   "admin-contact-form-notification": async () =>
-    (await import("@/app/api/[locale]/contact/email"))[
-      "adminContactFormEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/contact/email")
+    )["adminContactFormEmailTemplate"] as EmailTemplateDefinitionAny,
   "admin-signup-notification": async () =>
-    (await import("@/app/api/[locale]/user/public/signup/email"))[
-      "adminSignupNotificationEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/user/public/signup/email")
+    )["adminSignupNotificationEmailTemplate"] as EmailTemplateDefinitionAny,
   "admin-subscription-notification": async () =>
-    (await import("@/app/api/[locale]/subscription/email"))[
-      "adminSubscriptionNotificationEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/subscription/email")
+    )["adminSubscriptionNotificationEmailTemplate"] as EmailTemplateDefinitionAny,
   "contact-form": async () =>
-    (await import("@/app/api/[locale]/contact/email"))[
-      "contactFormEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/contact/email")
+    )["contactFormEmailTemplate"] as EmailTemplateDefinitionAny,
   "credits-credit-pack-admin": async () =>
-    (await import("@/app/api/[locale]/credits/email"))[
-      "creditPackAdminEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/credits/email")
+    )["creditPackAdminEmailTemplate"] as EmailTemplateDefinitionAny,
   "credits-credit-pack-user": async () =>
-    (await import("@/app/api/[locale]/credits/email"))[
-      "creditPackUserEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/credits/email")
+    )["creditPackUserEmailTemplate"] as EmailTemplateDefinitionAny,
   "newsletter-subscribe-admin": async () =>
-    (await import("@/app/api/[locale]/newsletter/subscribe/email"))[
-      "adminNewsletterSubscribeEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/newsletter/subscribe/email")
+    )["adminNewsletterSubscribeEmailTemplate"] as EmailTemplateDefinitionAny,
   "newsletter-unsubscribe": async () =>
-    (await import("@/app/api/[locale]/newsletter/unsubscribe/email"))[
-      "newsletterUnsubscribeEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/newsletter/unsubscribe/email")
+    )["newsletterUnsubscribeEmailTemplate"] as EmailTemplateDefinitionAny,
   "newsletter-unsubscribe-admin": async () =>
-    (await import("@/app/api/[locale]/newsletter/unsubscribe/email"))[
-      "adminNewsletterUnsubscribeEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/newsletter/unsubscribe/email")
+    )["adminNewsletterUnsubscribeEmailTemplate"] as EmailTemplateDefinitionAny,
   "newsletter-welcome": async () =>
-    (await import("@/app/api/[locale]/newsletter/subscribe/email"))[
-      "newsletterWelcomeEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/newsletter/subscribe/email")
+    )["newsletterWelcomeEmailTemplate"] as EmailTemplateDefinitionAny,
   "password-reset-confirm": async () =>
     (
       await import("@/app/api/[locale]/user/public/reset-password/confirm/email")
@@ -69,29 +66,29 @@ const templateLoaders: Record<
       await import("@/app/api/[locale]/user/public/reset-password/request/email")
     )["passwordResetRequestEmailTemplate"] as EmailTemplateDefinitionAny,
   "referral-payout-admin": async () =>
-    (await import("@/app/api/[locale]/referral/payout/email"))[
-      "payoutAdminEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/referral/payout/email")
+    )["payoutAdminEmailTemplate"] as EmailTemplateDefinitionAny,
   "referral-payout-user": async () =>
-    (await import("@/app/api/[locale]/referral/payout/email"))[
-      "payoutUserEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/referral/payout/email")
+    )["payoutUserEmailTemplate"] as EmailTemplateDefinitionAny,
   "signup-welcome": async () =>
-    (await import("@/app/api/[locale]/user/public/signup/email"))[
-      "signupWelcomeEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/user/public/signup/email")
+    )["signupWelcomeEmailTemplate"] as EmailTemplateDefinitionAny,
   "subscription-success": async () =>
-    (await import("@/app/api/[locale]/subscription/email"))[
-      "subscriptionSuccessEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/subscription/email")
+    )["subscriptionSuccessEmailTemplate"] as EmailTemplateDefinitionAny,
   "user-create-admin-notification": async () =>
-    (await import("@/app/api/[locale]/user/public/signup/email"))[
-      "userCreateAdminNotificationEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/user/public/signup/email")
+    )["userCreateAdminNotificationEmailTemplate"] as EmailTemplateDefinitionAny,
   "user-create-welcome": async () =>
-    (await import("@/app/api/[locale]/user/public/signup/email"))[
-      "userCreateWelcomeEmailTemplate"
-    ] as EmailTemplateDefinitionAny,
+    (
+      await import("@/app/api/[locale]/user/public/signup/email")
+    )["userCreateWelcomeEmailTemplate"] as EmailTemplateDefinitionAny,
 };
 
 /**

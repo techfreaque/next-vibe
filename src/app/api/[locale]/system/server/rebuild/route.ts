@@ -14,8 +14,9 @@ import { RebuildRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: rebuildEndpoints,
   [Methods.POST]: {
-    handler: ({ locale, logger, t, streamContext }) => {
+    handler: ({ data, locale, logger, t, streamContext }) => {
       return RebuildRepository.execute(
+        data,
         locale,
         logger,
         t,

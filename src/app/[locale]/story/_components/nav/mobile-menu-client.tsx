@@ -188,7 +188,7 @@ export function MobileMenuClient({
                               return (
                                 <Link
                                   key={childItem.title}
-                                  href={`/${locale}/story${childItem.href}`}
+                                  href={`/${locale}${childItem.href}`}
                                   className={cn(
                                     "text-base flex items-center py-1 hover:text-primary transition-colors",
                                     isChildActive &&
@@ -263,7 +263,7 @@ export function MobileMenuClient({
                   return (
                     <Link
                       key={item.title}
-                      href={`/${locale}/story${item.href}`}
+                      href={`/${locale}${item.href}`}
                       className={cn(
                         "flex text-base font-medium hover:text-primary transition-colors py-2",
                         isActive && "text-primary font-semibold",

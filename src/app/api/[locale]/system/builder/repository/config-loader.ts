@@ -108,7 +108,7 @@ export class ConfigLoader implements IConfigLoader {
           }),
         ),
       );
-      logger.vibe(`📄 Config  ${configPath}`);
+      logger.debug(`📄 Config  ${configPath}`);
 
       const importedModule = (await import(fullPath)) as
         | BuildConfigModule
@@ -126,7 +126,7 @@ export class ConfigLoader implements IConfigLoader {
 
     // Use inline configuration
     output.push(outputFormatter.formatStep(t("messages.usingInlineConfig")));
-    logger.vibe("📄 Config  inline");
+    logger.debug("📄 Config  inline");
 
     return success({
       foldersToClean: inlineConfig?.foldersToClean,

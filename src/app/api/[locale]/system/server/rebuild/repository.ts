@@ -29,10 +29,16 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { ServerFramework } from "../enum";
+
 import { scopedTranslation as checkScopedTranslation } from "../../check/vibe-check/i18n";
 import { DatabaseMigrationRepository } from "../../db/migrate/repository";
 import { readPidFilePort, VIBE_START_PID_FILE } from "../pid";
-import type { RebuildResponseOutput, RebuildStep } from "./definition";
+import type {
+  RebuildRequestOutput,
+  RebuildResponseOutput,
+  RebuildStep,
+} from "./definition";
 import type { RebuildT } from "./i18n";
 
 /**
@@ -40,6 +46,7 @@ import type { RebuildT } from "./i18n";
  */
 export class RebuildRepository {
   static async execute(
+    data: RebuildRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: RebuildT,
@@ -99,7 +106,7 @@ export class RebuildRepository {
               skipSeeds: false,
               skipTaskIndex: false,
               enableTrpc: false,
-              skipTanstack: true,
+              skipTanstack: data.framework !== ServerFramework.TANSTACK,
             },
             logger,
             locale,

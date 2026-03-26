@@ -3,15 +3,22 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { Audio } from "next-vibe-ui/ui/audio";
 import type { JSX } from "react";
+import { useMemo } from "react";
 
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import { useWidgetIsSubmitting } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetIsSubmitting,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { TextWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { getMusicModelOptions } from "./enum";
 import type definition from "./definition";
 import type { MusicGenerationPostResponseOutput } from "./definition";
 
@@ -27,6 +34,14 @@ export function MusicGenerationContainer({
   const children = field.children;
   const isSubmitting = useWidgetIsSubmitting();
   const result = field.value;
+  const envAvailability = useEnvAvailability();
+  const user = useWidgetUser();
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const modelOptions = useMemo(
+    () => getMusicModelOptions(envAvailability, isAdmin),
+    [envAvailability, isAdmin],
+  );
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -35,7 +50,10 @@ export function MusicGenerationContainer({
       <TextareaFieldWidget fieldName="prompt" field={children.prompt} />
 
       <Div className="grid grid-cols-2 gap-4">
-        <SelectFieldWidget fieldName="model" field={children.model} />
+        <SelectFieldWidget
+          fieldName="model"
+          field={{ ...children.model, options: modelOptions }}
+        />
         <SelectFieldWidget fieldName="duration" field={children.duration} />
       </Div>
 

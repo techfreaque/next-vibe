@@ -8,6 +8,7 @@ dist
 # Generated files - these are just to big and will generated before build anyways
 **/system/generated/endpoints-meta
 **/system/generated/remote-capabilities
+src/app-tanstack/routeTree.gen.ts
 
 # TypeScript compilation artifacts (when accidentally generated)
 src/app/api/[locale]/system/check/oxlint/types.js

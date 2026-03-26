@@ -19,11 +19,12 @@ export async function tanstackLoader({
 }: SshAdminPageProps): Promise<SshAdminPageData> {
   const { locale } = await params;
   const user = await requireAdminUser(locale, `/${locale}/admin/ssh`);
+  redirect(`/${locale}/admin/ssh/terminal`);
   return { locale, user };
 }
 
-export function TanstackPage({ locale }: SshAdminPageData): JSX.Element {
-  redirect(`/${locale}/admin/ssh/terminal`);
+export function TanstackPage(): JSX.Element {
+  return null as never;
 }
 
 export default async function SshAdminPage({

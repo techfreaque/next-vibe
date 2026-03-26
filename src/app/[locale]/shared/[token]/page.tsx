@@ -6,7 +6,6 @@
 
 export const dynamic = "force-dynamic";
 
-import type { Route } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
@@ -30,8 +29,7 @@ interface SharedTokenPageProps {
 
 type SharedTokenPageState =
   | { kind: "userError"; errorTitle: string; errorMessage: string }
-  | { kind: "shareLinkError"; errorTitle: string; errorMessage: string }
-  | { kind: "redirect"; url: Route };
+  | { kind: "shareLinkError"; errorTitle: string; errorMessage: string };
 
 export interface SharedTokenPageData {
   locale: CountryLanguage;
@@ -91,30 +89,14 @@ export async function tanstackLoader({
 
   // Check if authentication is required but user is not authenticated
   if (shareLink.requireAuth && user.isPublic) {
-    // Redirect to login with return URL
     const returnUrl = encodeURIComponent(`/${locale}/shared/${token}`);
-    return {
-      locale,
-      state: {
-        kind: "redirect",
-        url: `/${locale}/user/auth?returnUrl=${returnUrl}`,
-      },
-    };
+    redirect(`/${locale}/user/auth?returnUrl=${returnUrl}`);
   }
 
-  // Redirect to the actual thread
-  // Format: /{locale}/threads/shared/{threadId}
-  return {
-    locale,
-    state: { kind: "redirect", url: `/${locale}/threads/shared/${thread.id}` },
-  };
+  redirect(`/${locale}/threads/shared/${thread.id}`);
 }
 
 export function TanstackPage({ state }: SharedTokenPageData): JSX.Element {
-  if (state.kind === "redirect") {
-    redirect(state.url);
-  }
-
   return (
     <Div className="flex items-center justify-center min-h-screen p-4">
       <Div className="max-w-md text-center">

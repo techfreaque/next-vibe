@@ -702,10 +702,17 @@ export class HelpRepository {
       ? "development"
       : "production";
 
-    // Load the pre-translated static meta for this locale
-    const metaModule = await import(
-      `@/app/api/[locale]/system/generated/endpoints-meta/${locale === "de-DE" ? "de" : locale === "pl-PL" ? "pl" : "en"}`
-    );
+    // Load only the locale we need.
+    const localeToFile: Record<string, string> = {
+      "de-DE": "de",
+      "pl-PL": "pl",
+    };
+    const localeFile = localeToFile[locale] ?? "en";
+    const metaModule = await (localeFile === "de"
+      ? import("@/app/api/[locale]/system/generated/endpoints-meta/de")
+      : localeFile === "pl"
+        ? import("@/app/api/[locale]/system/generated/endpoints-meta/pl")
+        : import("@/app/api/[locale]/system/generated/endpoints-meta/en"));
     const allMeta: EndpointMeta[] = metaModule.endpointsMeta;
 
     // Discovery platform - what platform context are we listing tools for?

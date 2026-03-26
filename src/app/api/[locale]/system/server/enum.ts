@@ -27,3 +27,13 @@ export const { enum: ServerMode, options: ServerModeOptions } =
     DEVELOPMENT: "enum.mode.development",
     PRODUCTION: "enum.mode.production",
   });
+
+export enum ServerFramework {
+  NEXT = "next",
+  TANSTACK = "tanstack",
+}
+
+export const ServerFrameworkOptions = [
+  { value: ServerFramework.NEXT, label: "Next.js" },
+  { value: ServerFramework.TANSTACK, label: "TanStack/Vite" },
+];

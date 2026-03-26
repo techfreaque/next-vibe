@@ -96,9 +96,9 @@ export function killPreviousInstance(
   // Force-kill any survivors
   for (const pid of running) {
     if (isProcessRunning(pid)) {
-      logger.warn("Previous instance did not exit gracefully, force killing", {
-        pid,
-      });
+      logger.warn(
+        "Previous instance did not exit gracefully, force killing...",
+      );
       try {
         process.kill(pid, "SIGKILL");
       } catch {

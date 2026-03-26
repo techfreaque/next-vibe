@@ -14,6 +14,10 @@ export const translations: typeof enTranslations = {
       description: "Przebuduj aplikację i uruchom ponownie serwer",
     },
     fields: {
+      framework: {
+        title: "Framework",
+        description: "Docelowy framework do zbudowania i restartu",
+      },
       success: { title: "Wynik" },
       errors: { title: "Błędy" },
       duration: { title: "Czas" },
