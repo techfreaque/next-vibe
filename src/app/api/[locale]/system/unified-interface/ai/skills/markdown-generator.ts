@@ -584,7 +584,9 @@ export async function generateSkillAiRunMarkdown(
   const { DEFAULT_SKILLS } =
     await import("@/app/api/[locale]/agent/chat/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
-  const modelSelection = defaultChar?.modelSelection ?? null;
+  const defaultVariant =
+    defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
+  const modelSelection = defaultVariant?.modelSelection ?? null;
 
   const now = new Date().toISOString();
   const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
@@ -1017,7 +1019,9 @@ export async function generateSkillSkillMarkdown(
   const { DEFAULT_SKILLS } =
     await import("@/app/api/[locale]/agent/chat/skills/config");
   const defaultChar = DEFAULT_SKILLS.find((c) => c.id === skillId);
-  const modelSelection = defaultChar?.modelSelection ?? null;
+  const defaultVariant2 =
+    defaultChar?.variants.find((v) => v.isDefault) ?? defaultChar?.variants[0];
+  const modelSelection = defaultVariant2?.modelSelection ?? null;
 
   const now = new Date().toISOString();
   const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";

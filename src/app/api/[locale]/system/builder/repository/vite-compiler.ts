@@ -16,7 +16,13 @@ import {
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
-import type { BuildOptions, InlineConfig, Plugin, PluginOption } from "vite";
+import {
+  isRunnableDevEnvironment,
+  type BuildOptions,
+  type InlineConfig,
+  type Plugin,
+  type PluginOption,
+} from "vite";
 
 import {
   maybeColorize,
@@ -1234,28 +1240,42 @@ export class ViteCompiler {
           {
             name: "ssr-clear-on-hmr",
             configureServer(srv) {
-              // oxlint-disable-next-line no-unused-vars
-              srv.middlewares.use((req, _res, next) => {
-                // On every non-asset request, clear the SSR module cache so
-                // a reload after HMR never hits the stale TDZ state.
-                const url = (req as { url?: string }).url ?? "";
-                if (!url.startsWith("/@") && !url.startsWith("/node_modules")) {
-                  const runner = srv.environments?.["ssr"]?.runner;
-                  if (runner?.evaluatedModules) {
-                    runner.evaluatedModules.clear();
+              // Intercept /@tanstack-start/styles.css before TanStack's handler.
+              // CSS is declared via head() ?url link — this bundle is redundant.
+              // unshift so we run before all other middleware.
+              srv.middlewares.stack.unshift({
+                route: "",
+                handle: (
+                  req: { url?: string },
+                  res: {
+                    setHeader: (k: string, v: string) => void;
+                    statusCode: number;
+                    end: () => void;
+                  },
+                  next: () => void,
+                ) => {
+                  if (
+                    (req.url ?? "").startsWith("/@tanstack-start/styles.css")
+                  ) {
+                    res.setHeader("content-type", "text/css");
+                    res.setHeader("cache-control", "no-store");
+                    res.statusCode = 200;
+                    res.end();
+                    return;
                   }
-                }
-                next();
-              });
+                  next();
+                },
+              } as never);
+
             },
             handleHotUpdate({ modules, server: viteServer }) {
               const hasSrcChange = modules.some((m) => m.id?.includes("/src/"));
               if (!hasSrcChange) {
                 return;
               }
-              const runner = viteServer.environments?.["ssr"]?.runner;
-              if (runner?.evaluatedModules) {
-                runner.evaluatedModules.clear();
+              const ssrEnv = viteServer.environments?.["ssr"];
+              if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
+                ssrEnv.runner.evaluatedModules.clear();
               }
             },
           } as Plugin,

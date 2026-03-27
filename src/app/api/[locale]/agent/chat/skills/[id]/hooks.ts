@@ -33,7 +33,11 @@ export function useSkill(
     () => ({
       read: {
         queryOptions: {
-          enabled: !!skillId,
+          // Only enable during SSR if we have initialData to hydrate from.
+          // Without it, SSR would fetch and render skill content that the client can't
+          // match on initial render (no data yet) → hydration mismatch → blank flash.
+          enabled:
+            !!skillId && (initialData != null || typeof window !== "undefined"),
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000, // 5 minutes
         },

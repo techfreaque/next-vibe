@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "hermes": {
+      "command": "bun",
+      "args": [
+        "--preload",
+        "{{PROJECT_PATH}}/src/app/api/[locale]/system/unified-interface/cli/runtime/env-preload.ts",
+        "{{PROJECT_PATH}}/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+        "mcp",
+        "--local"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    "hermes-dev": {
+      "command": "bun",
+      "args": [
+        "--preload",
+        "{{PROJECT_PATH}}/src/app/api/[locale]/system/unified-interface/cli/runtime/env-preload.ts",
+        "{{PROJECT_PATH}}/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
+        "mcp"
+      ],
+      "env": {}
+    }
+  }
+}

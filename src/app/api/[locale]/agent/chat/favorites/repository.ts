@@ -105,12 +105,17 @@ export class ChatFavoritesRepository {
               locale,
             );
             if (skillResult.success) {
-              characterModelSelection = skillResult.data.modelSelection;
               characterIcon = skillResult.data.icon;
               characterName = skillResult.data.name;
               characterTagline = skillResult.data.tagline;
               characterDescription = skillResult.data.description;
               characterVoice = skillResult.data.voice;
+              // Resolve variant's modelSelection from the skill's variants list
+              const variants = skillResult.data.variants;
+              const variant = favorite.variantId
+                ? variants.find((v) => v.id === favorite.variantId)
+                : null;
+              characterModelSelection = variant?.modelSelection ?? null;
             }
           }
 

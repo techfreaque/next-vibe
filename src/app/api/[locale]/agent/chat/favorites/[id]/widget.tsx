@@ -108,8 +108,13 @@ export function FavoriteEditContainer({
   const favoriteCharacterModelSelection: ModelSelectionSimple | undefined =
     favoriteGetEndpoint.read?.data?.characterModelSelection ?? undefined;
 
+  const variantId = favoriteGetEndpoint.read?.data?.variantId;
   const characterEndpoint = useSkill(skillId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
+  const characterVariant = variantId
+    ? characterData?.variants?.find((v) => v.id === variantId)
+    : characterData?.variants?.[0];
+  const characterModelSelection = characterVariant?.modelSelection;
 
   // Get settings to check if this favorite is active
   const settingsOps = useChatSettings(user, logger);
@@ -428,8 +433,7 @@ export function FavoriteEditContainer({
               characterModelSelection={
                 isNoSkill
                   ? undefined
-                  : (favoriteCharacterModelSelection ??
-                    characterData?.modelSelection)
+                  : (favoriteCharacterModelSelection ?? characterModelSelection)
               }
               locale={locale}
               user={user}
@@ -446,7 +450,7 @@ export function FavoriteEditContainer({
               modelSelection={favoriteModelSelection ?? null}
               characterModelSelection={
                 favoriteCharacterModelSelection ??
-                characterData?.modelSelection ??
+                characterModelSelection ??
                 null
               }
               label={t("patch.slotOverride.label")}

@@ -4,14 +4,20 @@ Comprehensive guide to the `widget.tsx` / `widget/` folder pattern for custom UI
 
 ## Overview
 
-Every endpoint is **definition-driven by default** - the rendering engine (`EndpointsPage` → `EndpointRenderer`) reads the definition fields and generates UI automatically. A custom widget is only needed when the auto-rendered UI is insufficient.
+**Every endpoint gets a widget. No exceptions.**
 
-When a custom widget IS needed, it lives alongside the endpoint's `definition.ts`, in one of two forms:
+The auto-rendered form is a fallback for internal/admin tooling only. Any endpoint a user or AI agent will actually interact with needs a custom widget — because the default renderer produces a generic form that ignores layout, context, and platform.
+
+The only valid reason to skip a widget is a purely internal endpoint that will never be seen by a human or AI agent and has trivially obvious fields (e.g. a raw admin toggle with one boolean input and a success message). When in doubt, write the widget.
+
+The widget lives alongside the endpoint's `definition.ts`, in one of two forms:
 
 | Complexity | Pattern                                         | When to use                             |
 | ---------- | ----------------------------------------------- | --------------------------------------- |
 | Simple     | `widget.tsx` (single file)                      | One main component, fits in <1000 lines |
 | Complex    | `widget/` folder with `widget/widget.tsx` entry | Multiple sub-components, complex layout |
+
+A `widget.cli.tsx` should accompany every endpoint that returns non-trivial data or is callable from CLI/MCP — see [widget.cli.md](widget.cli.md).
 
 ## Fundamental Rules
 
@@ -313,6 +319,62 @@ export function MyCustomWidget({ field }: CustomWidgetProps): JSX.Element {
 }
 ```
 
+## Web vs Native Platform Divergence
+
+`widget.tsx` renders on both web (`Platform.NEXT_PAGE`) and React Native. Use `useWidgetPlatform()` to branch when the two surfaces need different UI — don't try to make one layout work everywhere by force.
+
+```typescript
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { useWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+
+export function MyWidget({ field }: MyWidgetProps): JSX.Element {
+  const platform = useWidgetPlatform();
+  const isWeb = platform === Platform.NEXT_PAGE;
+  const children = field.children;
+
+  return (
+    <Div className="flex flex-col gap-4 p-4">
+      {isWeb ? (
+        // Web: rich layout, hover states, keyboard shortcuts
+        <Div className="grid grid-cols-2 gap-4">
+          <TextFieldWidget fieldName="name" field={children.name} />
+          <SelectFieldWidget fieldName="category" field={children.category} />
+        </Div>
+      ) : (
+        // Native: stacked, touch-friendly, no hover states
+        <>
+          <TextFieldWidget fieldName="name" field={children.name} />
+          <SelectFieldWidget fieldName="category" field={children.category} />
+        </>
+      )}
+      <SubmitButtonWidget<typeof definition.POST>
+        field={{ text: "post.submit", loadingText: "post.submitting" }}
+      />
+    </Div>
+  );
+}
+```
+
+**Platform values for `widget.tsx`:**
+
+| Value                  | Context                        |
+| ---------------------- | ------------------------------ |
+| `Platform.NEXT_PAGE`   | Web browser (Next.js)          |
+| `Platform.ELECTRON`    | Desktop app (Electron wrapper) |
+| `Platform.FRAME`       | Embedded vibe-frame widget     |
+| `Platform.TRPC`        | tRPC API call (no UI)          |
+
+For React Native-specific utilities (`isNative`, `platformSelect`, etc.), use:
+
+```typescript
+import { isNative, platformSelect } from "@/app/api/[locale]/system/unified-interface/react-native/platform-helpers";
+```
+
+**Rules:**
+- Never import React Native modules unconditionally in `widget.tsx` — they crash on web
+- Use `next-vibe-ui/ui/*` components — they are platform-aware and resolve to the correct implementation automatically
+- Keep native branches touch-friendly: larger tap targets, no hover-only interactions, stacked layouts over grids
+
 ## Dialog Wrapper Pattern
 
 When an endpoint's UI should appear as a dialog (launched from another widget), wrap `EndpointsPage` in a dialog shell. This is the correct pattern for reusing another endpoint's UI - you embed the whole endpoint, not individual components.
@@ -454,39 +516,18 @@ import { SkillCard } from "@/app/api/[locale]/agent/chat/skills/widget"; // WRON
 
 For truly generic, domain-agnostic components (buttons, inputs, icons, layout primitives), use `src/packages/next-vibe-ui/`.
 
-## Definition-Driven Rendering (no widget needed)
+## When to Skip a Widget (Rare)
 
-Many endpoints don't need a custom widget at all. If the auto-rendered form is sufficient, omit `customWidgetObject` entirely and use flat field definitions. `EndpointRenderer` handles all layout:
+Skipping `widget.tsx` is only acceptable when ALL of the following are true:
 
-```typescript
-// definition.ts - no widget needed
-const { GET } = createEndpoint({
-  scopedTranslation,
-  fields: {
-    name: requestField(scopedTranslation, {
-      schema: z.string(),
-      type: WidgetType.FORM_FIELD,
-      fieldType: FieldDataType.TEXT,
-      label: "get.name.label" as const,
-      order: 0,
-      columns: 6,
-    }),
-    result: responseField(scopedTranslation, {
-      schema: z.string(),
-      type: WidgetType.TEXT,
-      content: "get.result.content" as const,
-    }),
-  },
-});
-// No widget.tsx needed - EndpointsPage renders this automatically
-```
+- The endpoint is internal/admin-only and will never be a primary user-facing surface
+- The fields are trivially obvious (one or two inputs, one text response)
+- No platform-specific rendering is needed
+- The default form layout is genuinely sufficient
 
-Use a custom widget only when:
+When you skip a widget, you still need a `widget.cli.tsx` if the endpoint is callable from CLI or MCP and returns structured data.
 
-- You need custom layout (sidebar, split-pane, complex grid)
-- You need inline conditionals that field metadata can't express
-- You need custom interactive elements (drag-and-drop, rich editor, inline preview)
-- The auto-rendered form doesn't match the design
+The auto-renderer exists as a fallback for prototyping and internal tools — not as the default for real endpoints.
 
 ## Violations
 

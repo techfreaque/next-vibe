@@ -1,6 +1,6 @@
 /* eslint-disable oxlint-plugin-jsx-capitalization/jsx-capitalization */
 
-import "./globals.css";
+import "next-vibe-ui/global-css";
 
 import type { Metadata, Viewport } from "next";
 import { Body } from "next-vibe-ui/ui/body";
@@ -73,7 +73,6 @@ interface RootLayoutData {
   locale: CountryLanguage;
   structuredData: StructuredDataOrganization;
   theme: "light" | "dark";
-  inlineCSS?: string;
   children?: ReactNode;
 }
 
@@ -113,6 +112,7 @@ export async function tanstackLoader({
   };
   const themeCookie = getCookie("theme");
   const theme: "light" | "dark" = themeCookie === "dark" ? "dark" : "light";
+
   return { locale, structuredData, theme };
 }
 
@@ -126,8 +126,6 @@ export function TanstackPage({
     <Html lang={locale} className={theme} suppressHydrationWarning>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/images/apple-icon.png" />
         <link rel="manifest" href={`/api/${locale}/manifest`} />
       </Head>
       <Body className={inter.className}>

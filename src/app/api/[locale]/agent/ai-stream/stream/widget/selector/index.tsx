@@ -97,36 +97,41 @@ export function Selector({
           data-tour={TOUR_DATA_ATTRS.MODEL_SELECTOR}
           suppressHydrationWarning
         >
-          {/* Skill icon - hidden for model-only */}
-          {!isModelOnly && currentSkill?.icon && (
+          {/* Skill icon - hidden for model-only. Always rendered when not model-only to
+              avoid structural hydration mismatch; content fills in once skill data loads. */}
+          {!isModelOnly && (
             <Span className="flex items-center justify-center w-5 h-5 shrink-0">
-              {currentSkill ? (
-                <Icon icon={currentSkill.icon} className="h-4 w-4" />
-              ) : null}
+              <Span className="inline-block h-4 w-4" suppressHydrationWarning>
+                {currentSkill?.icon ? (
+                  <Icon icon={currentSkill.icon} className="h-4 w-4" />
+                ) : null}
+              </Span>
             </Span>
           )}
 
           {/* Skill name - hidden when container is narrow, always shown when no tools, hidden for model-only */}
-          {!isModelOnly && currentSkill?.name && (
+          {!isModelOnly && (
             <Span
               className={cn(
                 "max-w-[80px] @xl:max-w-[100px] truncate",
                 modelSupportsTools ? "hidden @md:inline" : "hidden @xs:inline",
               )}
+              suppressHydrationWarning
             >
-              {currentSkill.name}
+              {currentSkill?.name ?? null}
             </Span>
           )}
 
           {/* Separator - hidden when container is narrow, always shown when no tools, hidden for model-only */}
-          {!isModelOnly && currentSkill && (
+          {!isModelOnly && (
             <Span
               className={cn(
                 "text-muted-foreground/50",
                 modelSupportsTools ? "hidden @md:inline" : "inline",
               )}
+              suppressHydrationWarning
             >
-              +
+              {currentSkill ? "+" : null}
             </Span>
           )}
 

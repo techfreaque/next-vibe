@@ -51,10 +51,9 @@ export const useTourState = create<TourState>()(
     }),
     {
       name: "ai-chat-tour-state",
-      // Only persist what's needed across refresh — not callbacks or transient flags
-      partialize: (state) => ({
-        modelSelectorOpen: state.modelSelectorOpen,
-      }),
+      version: 2,
+      // Only persist what's needed across refresh — not transient UI state
+      partialize: () => ({}),
     },
   ),
 );

@@ -19,7 +19,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_SKILLS } from "../../skills/config";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
 import type {
@@ -87,16 +86,22 @@ export class FavoritesCreateRepository {
       const voiceToStore =
         character && data.voice === character.voice ? null : data.voice;
 
-      // If a variantId is provided, resolve its modelSelection from DEFAULT_SKILLS
-      // so the favorite stores the correct model config for that variant.
+      // If a variantId is provided, resolve its modelSelection from the skill's variants.
       let modelSelectionToStore = data.modelSelection;
       if (data.variantId && data.skillId) {
-        const defaultSkill = DEFAULT_SKILLS.find((s) => s.id === data.skillId);
-        const variant = defaultSkill?.variants?.find(
-          (v) => v.id === data.variantId,
+        const skillResult = await SkillsRepository.getSkillById(
+          { id: data.skillId },
+          user,
+          logger,
+          locale,
         );
-        if (variant) {
-          modelSelectionToStore = variant.modelSelection;
+        if (skillResult.success) {
+          const variant = skillResult.data.variants.find(
+            (v) => v.id === data.variantId,
+          );
+          if (variant) {
+            modelSelectionToStore = variant.modelSelection;
+          }
         }
       }
 

@@ -74,7 +74,7 @@ const { POST } = createEndpoint({
         description: "post.model.description",
         columns: 6,
         options: ImageModelOptions,
-        schema: z.enum(IMAGE_MODEL_IDS).default(IMAGE_MODEL_IDS[2]),
+        schema: z.enum(IMAGE_MODEL_IDS).default(IMAGE_MODEL_IDS[0]),
       }),
       size: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -156,7 +156,7 @@ const { POST } = createEndpoint({
     requests: {
       default: {
         prompt: "A photorealistic sunset over a mountain lake",
-        model: IMAGE_MODEL_IDS[2],
+        model: IMAGE_MODEL_IDS[0],
         size: ImageSize.SQUARE_1024,
         quality: ImageQuality.STANDARD,
       },

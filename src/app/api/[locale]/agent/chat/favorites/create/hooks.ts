@@ -69,7 +69,11 @@ export interface SkillDataForFavorite {
   tagline: string | null;
   description: string | null;
   voice: typeof TtsVoiceValue | null;
-  modelSelection: ModelSelectionSimple | null;
+  variants: Array<{
+    id: string;
+    modelSelection: ModelSelectionSimple;
+    isDefault?: boolean;
+  }>;
 }
 
 export interface UseAddToFavoritesOptions {
@@ -136,7 +140,7 @@ export function useAddToFavorites({
             tagline: cachedData.data.tagline,
             description: cachedData.data.description,
             voice: cachedData.data.voice,
-            modelSelection: cachedData.data.modelSelection,
+            variants: cachedData.data.variants ?? null,
           };
         } else {
           // Fetch from API
@@ -161,7 +165,7 @@ export function useAddToFavorites({
             tagline: characterResponse.data.tagline,
             description: characterResponse.data.description,
             voice: characterResponse.data.voice,
-            modelSelection: characterResponse.data.modelSelection,
+            variants: characterResponse.data.variants ?? null,
           };
         }
       }
@@ -217,10 +221,15 @@ export function useAddToFavorites({
             return oldData;
           }
 
+          // Resolve variant modelSelection from the skill's variants
+          const variantModelSel = variantId
+            ? charData.variants?.find((v) => v.id === variantId)?.modelSelection
+            : undefined;
+
           const newFavorite =
             ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
               newFavoriteConfig,
-              charData.modelSelection,
+              variantModelSel ?? null,
               charData.icon,
               charData.name,
               charData.tagline,

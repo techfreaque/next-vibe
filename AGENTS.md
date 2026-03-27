@@ -86,11 +86,11 @@ src/app/api/[locale]/<category>/<feature>/
 
 ## Agent Roles
 
-**Thea** — Cloud AI (prod/VPS). Monitors platform, delegates to Hermes or Claude Code.
+**Thea** — Cloud AI (prod/VPS). Monitors platform, delegates to Hermes or Coding Agent.
 
 **Hermes** — Local AI (dev/localhost). Executes tasks, calls tools. MCP servers: `hermes` (prod), `hermes-dev` (local).
 
-**Claude Code (You)** — Execution agent for Thea, Hermes, or Max. Explore → implement → test → report.
+**Coding Agent (You)** — Execution agent for Thea, Hermes, or Max. Explore → implement → test → report.
 
 ## Workflow
 

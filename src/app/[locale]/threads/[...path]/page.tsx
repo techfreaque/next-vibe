@@ -427,6 +427,21 @@ export async function tanstackLoader({
     }
   }
 
+  // For incognito routes, settings and skill are not fetched above (localStorage-only).
+  // But we still need the default skill data so SSR and client render the same
+  // Selector button structure — otherwise React hydration fails and causes a blank flash.
+  if (initialSkillData === null && user) {
+    const defaultSkillResult = await SkillsRepository.getSkillById(
+      { id: "thea" },
+      user,
+      logger,
+      locale,
+    );
+    if (defaultSkillResult.success) {
+      initialSkillData = defaultSkillResult.data;
+    }
+  }
+
   return {
     locale,
     user,

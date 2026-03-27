@@ -30,7 +30,6 @@ import {
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
-import { ModelSelectionType } from "../skills/enum";
 import { scopedTranslation as charactersScopedTranslation } from "../skills/i18n";
 import { SkillsRepositoryClient } from "../skills/repository-client";
 import type {
@@ -86,9 +85,12 @@ export class ChatFavoritesRepositoryClient {
       const { t: tChar } = charactersScopedTranslation.scopedT(locale);
       const cards = storedConfigs.map((config): FavoriteCard => {
         const character = DEFAULT_SKILLS.find((c) => c.id === config.skillId);
+        const variant = config.variantId
+          ? character?.variants.find((v) => v.id === config.variantId)
+          : undefined;
         return this.computeFavoriteDisplayFields(
           config,
-          character?.modelSelection,
+          variant?.modelSelection,
           character?.icon ?? null,
           character?.name ? tChar(character.name) : null,
           character?.tagline ? tChar(character.tagline) : null,
@@ -383,9 +385,7 @@ export class ChatFavoritesRepositoryClient {
         description: t("fallbacks.noDescription"),
         voice: stored.voice,
         modelSelection: stored.modelSelection, // null or actual selection
-        characterModelSelection: {
-          selectionType: ModelSelectionType.FILTERS,
-        },
+        characterModelSelection: null,
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
@@ -395,14 +395,11 @@ export class ChatFavoritesRepositoryClient {
       };
     }
 
-    // Resolve variant's modelSelection to use as characterModelSelection fallback
+    // Resolve modelSelection from the specific variant (variantId always set for default skills)
     const variant = stored.variantId
-      ? character.variants?.find((v) => v.id === stored.variantId)
+      ? character.variants.find((v) => v.id === stored.variantId)
       : undefined;
-    const effectiveCharacterModelSelection = variant?.modelSelection ??
-      character.modelSelection ?? {
-        selectionType: ModelSelectionType.FILTERS,
-      };
+    const effectiveCharacterModelSelection = variant?.modelSelection ?? null;
 
     // Flattened structure - translate default character keys using characters scope
     return {

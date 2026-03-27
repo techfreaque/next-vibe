@@ -266,7 +266,9 @@ export function SkillViewContainer({
   const { logger, user } = context;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definitionGet.GET>();
-  const modelSelection = field.value?.modelSelection;
+  const variants = field.value?.variants;
+  const defaultVariant = variants?.find((v) => v.isDefault) ?? variants?.[0];
+  const modelSelection = defaultVariant?.modelSelection;
   const skillOwnership = field.value?.skillOwnership;
   const skillId = navigation?.current?.params?.urlPathParams?.id as
     | string

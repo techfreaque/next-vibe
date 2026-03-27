@@ -20,7 +20,6 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_TTS_VOICE } from "../../../text-to-speech/enum";
-import { DEFAULT_SKILLS } from "../../skills/config";
 import { scopedTranslation as charactersScopedTranslation } from "../../skills/i18n";
 import { SkillsRepository } from "../../skills/repository";
 import { chatFavorites } from "../db";
@@ -105,20 +104,6 @@ export class SingleFavoriteRepository {
       const character = characterResult.data;
       const voice = favorite.voice || character?.voice || DEFAULT_TTS_VOICE;
 
-      // Validate character has modelSelection
-      if (!character?.modelSelection) {
-        logger.error("No character modelSelection found", {
-          favoriteId: urlPathParams.id,
-          skillId: favorite.skillId,
-          hasFavoriteModelSelection: !!favorite.modelSelection,
-          hasSkillModelSelection: !!character?.modelSelection,
-        });
-        return fail({
-          message: t("get.errors.server.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-
       // Build modelSelection response
       // If favorite has custom selection, return it; otherwise return null (use character defaults)
       // Normalize empty objects (legacy data) to null - they fail discriminated union validation
@@ -130,14 +115,12 @@ export class SingleFavoriteRepository {
           ? rawModelSelection
           : null;
 
-      // Use variant's modelSelection as characterModelSelection when variantId is set
-      const variantModelSelection = favorite.variantId
-        ? DEFAULT_SKILLS.find((s) => s.id === favorite.skillId)?.variants?.find(
-            (v) => v.id === favorite.variantId,
-          )?.modelSelection
-        : undefined;
+      // Resolve characterModelSelection from the specific variant via skill's variants list
+      const variant = favorite.variantId
+        ? character.variants?.find((v) => v.id === favorite.variantId)
+        : character.variants?.[0];
       const characterModelSelection: FavoriteGetResponseOutput["characterModelSelection"] =
-        variantModelSelection ?? character.modelSelection;
+        variant?.modelSelection ?? null;
 
       // Merge customIcon with character icon (customIcon takes precedence)
       const displayIcon = favorite.customIcon ?? character?.icon ?? "bot";

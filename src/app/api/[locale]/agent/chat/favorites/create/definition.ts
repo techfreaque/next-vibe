@@ -91,21 +91,18 @@ const { POST } = createEndpoint({
           characterName = character.data.name ?? null;
           characterTagline = character.data.tagline ?? null;
           characterDescription = character.data.description ?? null;
-          characterModelSelection = character.data.modelSelection ?? null;
+          // Resolve modelSelection from the specific variant
+          const variants = character.data.variants;
+          const variant = requestData.variantId
+            ? variants?.find((v) => v.id === requestData.variantId)
+            : variants?.[0];
+          characterModelSelection = variant?.modelSelection ?? null;
         } else {
-          const { DEFAULT_SKILLS } = await import("../../skills/config");
-          const defaultSkill = DEFAULT_SKILLS.find(
-            (s) => s.id === requestData.skillId,
+          logger.error(
+            "Failed to fetch character data in create favorite onSuccess",
+            { skillId: requestData.skillId },
           );
-          if (defaultSkill) {
-            characterModelSelection = defaultSkill.modelSelection ?? null;
-          } else {
-            logger.error(
-              "Failed to fetch character data in create favorite onSuccess",
-              { skillId: requestData.skillId },
-            );
-            return;
-          }
+          return;
         }
 
         // Create new favorite config for optimistic update

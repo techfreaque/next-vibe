@@ -711,26 +711,40 @@ export default checkConfig.eslint?.buildFlatConfig?.(
     locale: CountryLanguage,
   ): Promise<ResponseType<CreateDefaultMcpConfigResult>> {
     const { t } = scopedTranslation.scopedT(locale);
-    const mcpConfigPath = `${process.cwd()}/${path}`;
+    const projectPath = process.cwd();
+    const mcpConfigPath = `${projectPath}/${path}`;
 
     try {
-      const mcpConfig = {
-        mcpServers: {
-          vibe: {
-            command: "npx",
-            args: ["--yes", "@next-vibe/checker@latest", "mcp"],
-            env: {
-              PROJECT_ROOT: process.cwd(),
+      // Use .mcp.example.json template if available, replacing {{PROJECT_PATH}}
+      // eslint-disable-next-line i18next/no-literal-string
+      const examplePath = resolve(projectPath, ".mcp.example.json");
+      let mcpContent: string;
+
+      if (existsSync(examplePath)) {
+        const template = await fs.readFile(examplePath, "utf8");
+        mcpContent = template.replaceAll("{{PROJECT_PATH}}", projectPath);
+      } else {
+        // Fallback: minimal config using npx for external @next-vibe/checker package
+        mcpContent = JSON.stringify(
+          {
+            mcpServers: {
+              vibe: {
+                command: "npx",
+                // eslint-disable-next-line i18next/no-literal-string
+                args: ["--yes", "@next-vibe/checker@latest", "mcp"],
+                env: {
+                  PROJECT_ROOT: projectPath,
+                },
+              },
             },
           },
-        },
-      };
+          null,
+          2,
+        );
+      }
 
-      await fs.writeFile(
-        mcpConfigPath,
-        JSON.stringify(mcpConfig, null, 2),
-        "utf8",
-      );
+      await fs.mkdir(dirname(mcpConfigPath), { recursive: true });
+      await fs.writeFile(mcpConfigPath, mcpContent, "utf8");
 
       return success({ mcpConfigPath });
     } catch (error) {

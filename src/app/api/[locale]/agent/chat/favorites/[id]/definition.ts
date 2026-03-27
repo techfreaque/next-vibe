@@ -389,6 +389,45 @@ const { PATCH } = createEndpoint({
           }
         }
 
+        // Pre-resolve characterModelSelection outside the synchronous callback:
+        // Try single GET cache first, then fall back to skill GET cache.
+        const getEndpointData = apiClient.getEndpointData(
+          definitions.GET,
+          logger,
+          { urlPathParams: { id: pathParams.id } },
+        );
+        let cachedCharacterModelSelection = getEndpointData?.success
+          ? getEndpointData.data.characterModelSelection
+          : undefined;
+
+        if (cachedCharacterModelSelection === undefined) {
+          // Read from the favorites list to find the current favorite's skillId/variantId
+          const currentFavListData = apiClient.getEndpointData(
+            favoritesDefinition.default.GET,
+            logger,
+          );
+          const currentFav = currentFavListData?.success
+            ? currentFavListData.data.favorites.find(
+                (f) => f.id === pathParams.id,
+              )
+            : undefined;
+          if (currentFav?.skillId && currentFav.variantId) {
+            const skillDefinitions =
+              await import("../../skills/[id]/definition");
+            const skillData = apiClient.getEndpointData(
+              skillDefinitions.default.GET,
+              logger,
+              { urlPathParams: { id: currentFav.skillId } },
+            );
+            if (skillData?.success) {
+              const variant = skillData.data.variants.find(
+                (v) => v.id === currentFav.variantId,
+              );
+              cachedCharacterModelSelection = variant?.modelSelection ?? null;
+            }
+          }
+        }
+
         // Optimistically update the favorite in the list with proper recomputation
         apiClient.updateEndpointData(
           favoritesDefinition.default.GET,
@@ -409,25 +448,10 @@ const { PATCH } = createEndpoint({
 
                   // For PATCH, character display fields (name/tagline/description) are widget-only
                   // and not in the request. Keep them from the existing favorite card.
-                  // Only update icon (from request) and modelSelection (from updatedConfig).
                   const characterIcon = requestData.icon ?? null;
-
-                  // Keep name/tagline/description from the existing favorite card
                   const characterName = fav.name ?? null;
                   const characterTagline = fav.tagline ?? null;
                   const characterDescription = fav.description ?? null;
-
-                  // Get characterModelSelection from GET endpoint cache
-                  const getEndpointData = apiClient.getEndpointData(
-                    definitions.GET,
-                    logger,
-                    {
-                      urlPathParams: { id: pathParams.id },
-                    },
-                  );
-                  const characterModelSelection = getEndpointData?.success
-                    ? getEndpointData.data.characterModelSelection
-                    : undefined;
 
                   // Recompute display fields with updated config
                   const updatedFavorite =
@@ -441,7 +465,7 @@ const { PATCH } = createEndpoint({
                         modelSelection: requestData.modelSelection,
                         position: fav.position,
                       },
-                      characterModelSelection,
+                      cachedCharacterModelSelection,
                       characterIcon,
                       characterName,
                       characterTagline,

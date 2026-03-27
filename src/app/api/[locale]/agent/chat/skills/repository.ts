@@ -199,8 +199,6 @@ export class SkillsRepository {
               tagline: t(char.tagline),
               description: t(char.description),
               category: char.category,
-              modelSelection:
-                char.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
               ownershipType: SkillOwnershipType.SYSTEM,
               voteCount: null,
               trustLevel: null,
@@ -258,8 +256,6 @@ export class SkillsRepository {
             tagline: t(char.tagline),
             description: t(char.description),
             category: char.category,
-            modelSelection:
-              char.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
             ownershipType: SkillOwnershipType.SYSTEM,
             voteCount: null,
             trustLevel: null,
@@ -428,7 +424,6 @@ export class SkillsRepository {
       // Check default skills first
       const defaultSkill = DEFAULT_SKILLS.find((p) => p.id === skillId);
       if (defaultSkill) {
-        // Flattened response - no container/skill/badges/systemPromptSection nesting
         return success({
           icon: defaultSkill.icon,
           name: t(defaultSkill.name),
@@ -438,7 +433,6 @@ export class SkillsRepository {
           isPublic: false,
           voice: defaultSkill.voice,
           systemPrompt: defaultSkill.systemPrompt,
-          modelSelection: defaultSkill.modelSelection,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
           availableTools: defaultSkill.availableTools
@@ -448,12 +442,16 @@ export class SkillsRepository {
               }))
             : null,
           pinnedTools: null,
+          variants: defaultSkill.variants.map((v) => ({
+            id: v.id,
+            modelSelection: v.modelSelection,
+            isDefault: v.isDefault,
+          })),
         });
       }
 
       // Check for NO_SKILL
       if (skillId === NO_SKILL_ID) {
-        // Flattened response
         return success({
           icon: null,
           name: null,
@@ -463,11 +461,15 @@ export class SkillsRepository {
           isPublic: false,
           voice: NO_SKILL.voice,
           systemPrompt: null,
-          modelSelection: NO_SKILL.modelSelection,
           skillOwnership: SkillOwnershipType.SYSTEM,
           compactTrigger: null,
           availableTools: null,
           pinnedTools: null,
+          variants: NO_SKILL.variants.map((v) => ({
+            id: v.id,
+            modelSelection: v.modelSelection,
+            isDefault: v.isDefault,
+          })),
         });
       }
 
@@ -519,7 +521,6 @@ export class SkillsRepository {
         isPublic: customSkill.ownershipType === SkillOwnershipType.PUBLIC,
         voice: customSkill.voice || DEFAULT_TTS_VOICE,
         systemPrompt: customSkill.systemPrompt,
-        modelSelection: customSkill.modelSelection,
         skillOwnership: customSkill.ownershipType,
         compactTrigger: customSkill.compactTrigger ?? null,
         availableTools:
@@ -532,6 +533,15 @@ export class SkillsRepository {
             toolId: tool.toolId,
             requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
+        variants: customSkill.modelSelection
+          ? [
+              {
+                id: "default",
+                modelSelection: customSkill.modelSelection,
+                isDefault: true,
+              },
+            ]
+          : [],
       });
     } catch (error) {
       logger.error("Failed to get skill by ID", parseError(error));
@@ -887,8 +897,7 @@ export class SkillsRepository {
 
   /**
    * Expand a default skill into one or more list items.
-   * Skills with variants produce one item per variant (each with isVariant=true).
-   * Skills without variants produce a single item (isVariant=false).
+   * Each variant produces one item (isVariant=true).
    */
   private static expandDefaultSkill(
     char: {
@@ -897,36 +906,21 @@ export class SkillsRepository {
       tagline: string | null;
       description: string | null;
       category: typeof SkillCategoryValue;
-      modelSelection: ModelSelectionSimple;
       ownershipType: typeof SkillOwnershipTypeValue;
       voteCount: number | null;
       trustLevel: typeof SkillTrustLevelValue | null;
-      variants?: SkillVariant[];
+      variants: SkillVariant[];
     },
     id: string,
     t: ReturnType<(typeof scopedTranslation)["scopedT"]>["t"],
     user: JwtPayloadType,
   ): SkillListItem[] {
-    if (!char.variants || char.variants.length === 0) {
-      return [
-        SkillsRepository.mapSkillToListItem(
-          id,
-          char,
-          t,
-          user,
-          null,
-          null,
-          false,
-        ),
-      ];
-    }
-
     return char.variants.map((variant) =>
       SkillsRepository.mapSkillToListItem(
         id,
         {
           ...char,
-          modelSelection: variant.modelSelection ?? char.modelSelection,
+          modelSelection: variant.modelSelection,
         },
         t,
         user,

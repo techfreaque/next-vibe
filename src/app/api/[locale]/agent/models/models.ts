@@ -123,7 +123,7 @@ export enum ModelId {
   // GPT_5_IMAGE = "gpt-5-image",
   // SEEDREAM_4_5 = "seedream-4.5",
 
-  // // Music generation models
+  // Music generation models
   // MUSICGEN_STEREO = "musicgen-stereo",
   // STABLE_AUDIO = "stable-audio",
   // UDIO_V2 = "udio-v2",
@@ -2920,8 +2920,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
   // },
 
   // // =============================================
-  // // MUSIC GENERATION MODELS
-  // // =============================================
+  // MUSIC GENERATION MODELS
+  // =============================================
 
   // [ModelId.MUSICGEN_STEREO]: {
   //   name: "MusicGen Stereo",

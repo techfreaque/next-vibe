@@ -172,34 +172,18 @@ async function seedFavorites(
         continue;
       }
 
-      const skillVariants = skill.variants ?? [];
-      if (skillVariants.length > 0) {
-        for (const variant of skillVariants) {
-          const id = await addFavorite({
-            skillId,
-            variantId: variant.id,
-            modelSelection: variant.modelSelection,
-          });
-          if (id) {
-            entries.push({
-              id,
-              skillId,
-              variantId: variant.id,
-              modelSelection: variant.modelSelection,
-            });
-          }
-        }
-      } else {
+      for (const variant of skill.variants) {
         const id = await addFavorite({
           skillId,
-          modelSelection: skill.modelSelection,
+          variantId: variant.id,
+          modelSelection: variant.modelSelection,
         });
         if (id) {
           entries.push({
             id,
             skillId,
-            variantId: null,
-            modelSelection: skill.modelSelection,
+            variantId: variant.id,
+            modelSelection: variant.modelSelection,
           });
         }
       }
@@ -256,8 +240,7 @@ export function UsecasesStep({
         const variant = entry.variantId
           ? skill?.variants?.find((v) => v.id === entry.variantId)
           : undefined;
-        const effectiveModelSelection =
-          variant?.modelSelection ?? skill?.modelSelection ?? null;
+        const effectiveModelSelection = variant?.modelSelection ?? null;
         return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: entry.id,

@@ -3,6 +3,9 @@ import { cn } from "next-vibe/shared/utils/utils";
 import React, { useEffect, useState } from "react";
 import { Appearance, useColorScheme, View } from "react-native";
 
+/** Mirrors the web constant — no cookie in React Native but exported for interface parity */
+export const THEME_COOKIE_NAME = "theme";
+
 import type {
   ThemeProviderProps,
   UseThemeToggleReturn,

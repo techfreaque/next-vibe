@@ -83,9 +83,19 @@ export const modelSelectionSchemaSimple = z.discriminatedUnion(
 );
 
 /**
+ * Skill variant schema (variant-level model selection)
+ */
+export const skillVariantSchema = z.object({
+  id: z.string(),
+  modelSelection: modelSelectionSchemaSimple,
+  isDefault: z.boolean().optional(),
+});
+
+/**
  * Type exports for convenience
  */
 export type ManualModelSelection = z.infer<typeof manualModelSelectionSchema>;
 export type FiltersModelSelection = z.infer<typeof filtersModelSelectionSchema>;
 
 export type ModelSelectionSimple = z.infer<typeof modelSelectionSchemaSimple>;
+export type SkillVariantData = z.infer<typeof skillVariantSchema>;

@@ -1,4 +1,5 @@
 import { Await, RouterProvider } from "@tanstack/react-router";
+import type { AnyRouter } from "@tanstack/react-router";
 import { hydrateStart } from "@tanstack/react-start/client";
 import { TSR_DEFERRED_PROMISE } from "@tanstack/router-core";
 import { StrictMode } from "react";
@@ -21,18 +22,21 @@ hydrateStart()
     // React 19's trackUsedThenable checks thenable.status first:
     //   "fulfilled" → returns thenable.value synchronously (no suspend)
     //   anything else → suspends, causing a blank flash during hydration
-    // Stamping status="fulfilled" + value makes React.use() resolve instantly.
-    const syncThenable = {
-      status: "fulfilled" as const,
-      value: router,
-      then() {},
-      [TSR_DEFERRED_PROMISE]: { status: "success" as const, data: router },
-    };
+    // Stamping status="fulfilled" + value on a real Promise makes React.use()
+    // resolve instantly without suspending.
+    const syncPromise: Promise<AnyRouter> = Object.assign(
+      Promise.resolve(router),
+      {
+        status: "fulfilled" as const,
+        value: router,
+        [TSR_DEFERRED_PROMISE]: { status: "success" as const, data: router },
+      },
+    );
 
     hydrateRoot(
       document,
       <StrictMode>
-        <Await promise={syncThenable}>
+        <Await promise={syncPromise}>
           {(r) => <RouterProvider router={r} />}
         </Await>
       </StrictMode>,
@@ -40,5 +44,6 @@ hydrateStart()
     return undefined;
   })
   .catch((err: Error) => {
+    // eslint-disable-next-line no-console
     console.error("[client] hydration failed:", err);
   });

@@ -6,13 +6,16 @@ CLI widgets are **Ink-based React components** that override the default definit
 
 ## When to Write a CLI Widget
 
-Only create `widget.cli.tsx` when the default field-driven output is **insufficient for terminal display**. Most endpoints do NOT need one - the CLI renderer handles `WidgetType.TEXT`, `BADGE`, `FORM_FIELD`, etc. automatically.
+**Every endpoint that returns non-trivial data or is callable from CLI/MCP gets a `widget.cli.tsx`.** The default field-driven CLI renderer outputs a raw dump of field values — acceptable only for the simplest internal tooling.
 
-Write a CLI widget when:
+Write a `widget.cli.tsx` for any endpoint that:
 
-- Output needs **chalk colors, terminal hyperlinks, or grouped formatting** not achievable with standard widgets
-- Response needs **MCP vs CLI divergence** (compact plain text for MCP, colored for CLI)
-- Complex structured data like code quality reports, tool lists, or diffs
+- Returns a list, table, or structured result a human or AI will read
+- Is exposed as a vibe CLI command or MCP tool
+- Benefits from MCP vs CLI divergence (different formatting for AI agents vs humans)
+- Has response data that should be scannable, colored, or grouped
+
+Skip it only for purely internal endpoints with one or two trivially obvious output fields (e.g. a success boolean) where the raw dump is genuinely sufficient.
 
 ---
 
@@ -94,10 +97,13 @@ Never use React `useWidgetForm`, `useWidgetData`, etc. - those are web-only.
 
 ## MCP vs CLI Divergence
 
-Many CLI widgets need to render differently for MCP (AI agent reading plain text) vs terminal (human reading colored output). Use `useInkWidgetPlatform()`:
+MCP consumers are AI agents reading plain text. CLI consumers are humans reading a terminal. They need fundamentally different output. **Always handle both.**
+
+Use `useInkWidgetPlatform()` to branch:
 
 ```tsx
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { useInkWidgetPlatform } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 export function MyWidget({ field }: CliWidgetProps): React.JSX.Element {
   const platform = useInkWidgetPlatform();
@@ -115,12 +121,10 @@ export function MyWidget({ field }: CliWidgetProps): React.JSX.Element {
     );
   }
 
-  // CLI: colored, formatted
+  // CLI: colored, formatted, human-readable
   return (
     <Box flexDirection="column">
-      <Text bold color="cyan">
-        {value.summary}
-      </Text>
+      <Text bold color="cyan">{value.summary}</Text>
     </Box>
   );
 }
@@ -128,12 +132,57 @@ export function MyWidget({ field }: CliWidgetProps): React.JSX.Element {
 MyWidget.cliWidget = true as const;
 ```
 
-**MCP rules:**
+### MCP rules (strict)
 
-- No `chalk` - MCP consumers are AI agents, ANSI escape codes are noise
-- No `terminalLink` - hyperlinks don't render in AI context
-- Compact output - one meaningful line per item, no decorative borders
-- Use `<Text wrap="end">` for multi-line plain text blocks
+- **No `chalk`** — ANSI codes are noise to AI agents
+- **No `terminalLink`** — hyperlinks don't render in AI context
+- **No decorative borders or padding** — wastes token budget
+- **One meaningful line per item** — AI reads line-by-line
+- **Include pagination hints as plain text** — `Page 1/3 - use page=2 for next`
+- **Use `<Text wrap="end">` for multi-line blocks**
+
+### CLI rules
+
+- **Use `chalk`** for color, `bold`, `dim`, `underline`
+- **Align columns** with `padEnd()` for scannable lists
+- **Group items** under section headers
+- **Show pagination** as a dim hint: `vibe skills --page=2`
+- **Use `terminalLink`** for file paths, guarded by `process.stdout.isTTY`
+
+### List size divergence
+
+For endpoints returning lists, apply a detail threshold:
+
+```tsx
+const DETAIL_THRESHOLD = 5;
+
+// ≤5 items → full detail block (name, description, metadata)
+// >5 items → compact one-line-per-item list with pagination hint
+
+const count = value.items.length;
+const output = count <= DETAIL_THRESHOLD
+  ? (isMcp ? renderDetailMcp(value.items) : renderDetailCli(value.items))
+  : (isMcp ? renderListMcp(value) : renderListCli(value));
+```
+
+**MCP list format** — one line per item, pipe-separated fields:
+```
+SkillName — tagline • modelInfo • provider
+Page 1/3 - use page=2 for next
+```
+
+**CLI list format** — aligned columns, chalk colors, grouped by section:
+```
+  Skills
+    name           tagline truncated to 50 chars   model
+    another-skill  tagline here                     gpt-4o
+
+Page 1/3 — vibe skills --page=2
+```
+
+### Real-world reference
+
+See `src/app/api/[locale]/agent/chat/skills/widget.cli.tsx` — the canonical example of detail/list threshold, full MCP/CLI divergence, and pagination hints.
 
 ---
 
@@ -246,6 +295,8 @@ if (!value) return <Box />;  // ✅
 - [ ] Empty state returns `<Box />` not `null`
 - [ ] MCP vs CLI divergence handled via `useInkWidgetPlatform()`
 - [ ] No chalk/terminal-links in MCP path
+- [ ] List endpoints: detail threshold applied (≤5 full detail, >5 compact list)
+- [ ] Pagination hints present for both MCP (plain text) and CLI (dim hint with command)
 - [ ] `definition.ts` unchanged - still imports from `widget.tsx`
 - [ ] Shared components use `.cli.tsx` suffix and canonical owner folder
 

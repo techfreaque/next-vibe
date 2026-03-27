@@ -10,15 +10,15 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
+
 import type { ToolConfigItem } from "../settings/definition";
 import { NO_SKILL_ID } from "./constants";
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-} from "./create/definition";
 import {
   ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
   SkillCategory,
   type SkillCategoryValue,
   SkillOwnershipType,
@@ -29,11 +29,7 @@ export {
   COMPANION_SKILLS,
   DEFAULT_SKILLS,
 } from "@/app/api/[locale]/system/generated/skills-index";
-/**
- * Legacy model selection type for config
- * Includes unused fields that are kept for backwards compatibility
- */
-type ConfigModelSelection = FiltersModelSelection | ManualModelSelection;
+export type VariantModelSelection = ModelSelectionSimple;
 
 /**
  * A named variant of a skill with its own model selection.
@@ -44,7 +40,8 @@ export interface SkillVariant {
   id: string;
   /** Localized sub-label shown under the skill name, e.g. "skills.thea.variants.brilliant" */
   variantName: SkillsTranslationKey;
-  modelSelection?: ConfigModelSelection;
+  /** Model selection for this variant - required, drives model resolution */
+  modelSelection: VariantModelSelection;
   /** Which variant is the default when none is specified */
   isDefault?: boolean;
 }
@@ -122,11 +119,13 @@ export const NO_SKILL = {
     {
       id: NO_SKILL_ID,
       variantName: "skills.default.variants.default" as const,
+      isDefault: true,
       modelSelection: {
         selectionType: ModelSelectionType.FILTERS,
-        intelligenceRange: {},
-        contentRange: {},
-        speedRange: {},
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.ASC,
+        sortBy2: ModelSortField.PRICE,
+        sortDirection2: ModelSortDirection.ASC,
       },
     },
   ],

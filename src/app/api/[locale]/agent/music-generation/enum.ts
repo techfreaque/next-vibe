@@ -5,7 +5,7 @@
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
 import type { AgentEnvAvailability } from "../env-availability";
-import { getAllModelOptions, ModelId } from "../models/models";
+import { getAllModelOptions } from "../models/models";
 import { isProviderAvailable } from "../models/widget/model-selector";
 import { scopedTranslation } from "./i18n";
 
@@ -36,9 +36,9 @@ export const MUSIC_DURATION_SECONDS: Record<string, number> = {
 
 /** Valid music model IDs — subset of ModelId for music generation */
 export const MUSIC_MODEL_IDS = [
-  ModelId.MUSICGEN_STEREO,
-  ModelId.STABLE_AUDIO,
-  ModelId.UDIO_V2,
+  // ModelId.MUSICGEN_STEREO,
+  // ModelId.STABLE_AUDIO,
+  // ModelId.UDIO_V2,
 ] as const;
 
 export type MusicModelId = (typeof MUSIC_MODEL_IDS)[number];

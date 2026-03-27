@@ -22,6 +22,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { generateWithFalAi } from "../ai-stream/providers/fal-ai-image";
+import { generateWithOpenAI } from "../ai-stream/providers/openai-images";
+import { generateWithOpenRouter } from "../ai-stream/providers/openrouter-image";
+import { generateWithReplicate } from "../ai-stream/providers/replicate-image";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -31,10 +35,6 @@ import type {
   ImageGenerationPostResponseOutput,
 } from "./definition";
 import type { ImageGenerationT } from "./i18n";
-import { generateWithFalAi } from "../ai-stream/providers/fal-ai-image";
-import { generateWithOpenAI } from "../ai-stream/providers/openai-images";
-import { generateWithOpenRouter } from "../ai-stream/providers/openrouter-image";
-import { generateWithReplicate } from "../ai-stream/providers/replicate-image";
 
 export class ImageGenerationRepository {
   /**

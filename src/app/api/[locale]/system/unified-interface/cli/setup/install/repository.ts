@@ -8,7 +8,7 @@ import "server-only";
 
 import { spawn } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -287,6 +287,11 @@ exit 1
         chmodSync(targetPath, 0o755);
       }
 
+      // Set up MCP config files (.mcp.json and mcp.json) from the example template
+      await SetupInstallRepository.setupMcpFiles(
+        /*turbopackIgnore: true*/ process.cwd(),
+      );
+
       // eslint-disable-next-line i18next/no-literal-string
       let output = `Binary installed at ${targetPath}`;
 
@@ -298,6 +303,8 @@ exit 1
         // eslint-disable-next-line i18next/no-literal-string
         output += `\nNote: Make sure ${binDir} is in your PATH. Add this to your shell profile if needed:\nexport PATH="${binDir}:$PATH"`;
       }
+      // eslint-disable-next-line i18next/no-literal-string
+      output += `\nMCP config written to .mcp.json (Claude Code) and mcp.json (Cursor/Windsurf)`;
 
       // Verify installation
       const newStatus = await this.checkInstallationStatus();
@@ -327,6 +334,25 @@ exit 1
         },
       });
     }
+  }
+
+  /**
+   * Generate .mcp.json and mcp.json from .mcp.example.json by replacing
+   * {{PROJECT_PATH}} with the actual project path (cwd). Both files are written
+   * so they work for Claude Code (.mcp.json) and Cursor/Windsurf (mcp.json).
+   */
+  private static async setupMcpFiles(projectPath: string): Promise<void> {
+    // eslint-disable-next-line i18next/no-literal-string
+    const examplePath = path.join(projectPath, ".mcp.example.json");
+    if (!existsSync(examplePath)) {
+      return;
+    }
+    const template = await readFile(examplePath, "utf8");
+    const content = template.replaceAll("{{PROJECT_PATH}}", projectPath);
+    // eslint-disable-next-line i18next/no-literal-string
+    await writeFile(path.join(projectPath, ".mcp.json"), content, "utf8");
+    // eslint-disable-next-line i18next/no-literal-string
+    await writeFile(path.join(projectPath, "mcp.json"), content, "utf8");
   }
 
   private static async checkInstallationStatus(): Promise<{

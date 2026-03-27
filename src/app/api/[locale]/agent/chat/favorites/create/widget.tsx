@@ -66,9 +66,14 @@ export function FavoriteCreateContainer({
 
   const favoriteModelSelection: ModelSelectionSimple | undefined =
     form.watch("modelSelection") ?? undefined;
+  const variantId = form.watch("variantId");
 
   const characterEndpoint = useSkill(skillId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
+  const characterVariant = variantId
+    ? characterData?.variants?.find((v) => v.id === variantId)
+    : characterData?.variants?.[0];
+  const characterModelSelection = characterVariant?.modelSelection;
 
   const { updateSettings } = useChatSettings(user, logger);
 
@@ -81,7 +86,7 @@ export function FavoriteCreateContainer({
     try {
       // Resolve the model to use
       const modelSelection =
-        favoriteModelSelection ?? characterData?.modelSelection ?? null;
+        favoriteModelSelection ?? characterModelSelection ?? null;
 
       let selectedModel: ModelId | undefined = undefined;
 
@@ -185,7 +190,7 @@ export function FavoriteCreateContainer({
                 form.setValue("modelSelection", selection)
               }
               characterModelSelection={
-                isNoSkill ? undefined : characterData?.modelSelection
+                isNoSkill ? undefined : characterModelSelection
               }
               locale={locale}
               user={user}

@@ -28,11 +28,7 @@ import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { lazy } from "react";
-
-const ThreadsListContainer = lazy(() =>
-  import("./widget/widget").then((m) => ({ default: m.ThreadsListContainer })),
-);
+import { ThreadsListContainer } from "./widget/widget";
 
 /**
  * Get Threads List Endpoint (GET)

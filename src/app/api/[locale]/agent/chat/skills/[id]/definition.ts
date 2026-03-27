@@ -9,7 +9,10 @@ import {
   getModelDisplayName,
   ModelId,
 } from "@/app/api/[locale]/agent/models/models";
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
+import {
+  modelSelectionSchemaSimple,
+  skillVariantSchema,
+} from "@/app/api/[locale]/agent/models/types";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -45,9 +48,7 @@ import {
   ContentLevel,
   IntelligenceLevel,
   ModelSelectionType,
-  PriceLevel,
   SkillOwnershipType,
-  SpeedLevel,
 } from "../../skills/enum";
 import {
   SKILL_DELETE_ALIAS,
@@ -311,7 +312,20 @@ const { PATCH } = createEndpoint({
               return oldData;
             }
 
-            // Update with new data from the request
+            // If modelSelection changed, update the default variant's modelSelection in variants[]
+            const newVariants =
+              data.requestData.modelSelection !== undefined
+                ? oldData.data.variants.map((v) =>
+                    v.isDefault
+                      ? {
+                          ...v,
+                          modelSelection:
+                            data.requestData.modelSelection ?? v.modelSelection,
+                        }
+                      : v,
+                  )
+                : oldData.data.variants;
+
             return {
               success: true,
               data: {
@@ -326,9 +340,7 @@ const { PATCH } = createEndpoint({
                 voice: data.requestData.voice ?? oldData.data.voice,
                 systemPrompt:
                   data.requestData.systemPrompt ?? oldData.data.systemPrompt,
-                modelSelection:
-                  data.requestData.modelSelection ??
-                  oldData.data.modelSelection,
+                variants: newVariants,
               },
             };
           },
@@ -653,7 +665,6 @@ const { PATCH } = createEndpoint({
         },
         availableTools: [
           { toolId: "execute-tool", requiresConfirmation: false },
-          { toolId: "system_help_GET", requiresConfirmation: false },
         ],
         pinnedTools: [{ toolId: "execute-tool", requiresConfirmation: false }],
       },
@@ -759,11 +770,6 @@ const { GET } = createEndpoint({
         type: WidgetType.MARKDOWN,
         schema: z.string().nullable(),
       }),
-      modelSelection: responseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.OBJECT,
-        schema: modelSelectionSchemaSimple,
-      }),
       skillOwnership: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
@@ -801,6 +807,11 @@ const { GET } = createEndpoint({
             }),
           )
           .nullable(),
+      }),
+      variants: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.array(skillVariantSchema),
       }),
     },
   }),
@@ -861,28 +872,26 @@ const { GET } = createEndpoint({
         skillOwnership: SkillOwnershipType.SYSTEM,
         voice: TtsVoice.FEMALE,
         systemPrompt: "",
-        modelSelection: {
-          selectionType: ModelSelectionType.FILTERS,
-          intelligenceRange: {
-            min: IntelligenceLevel.QUICK,
-            max: IntelligenceLevel.QUICK,
-          },
-          priceRange: {
-            min: PriceLevel.CHEAP,
-            max: PriceLevel.CHEAP,
-          },
-          contentRange: {
-            min: ContentLevel.MAINSTREAM,
-            max: ContentLevel.MAINSTREAM,
-          },
-          speedRange: {
-            min: SpeedLevel.FAST,
-            max: SpeedLevel.FAST,
-          },
-        },
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
+        variants: [
+          {
+            id: "default",
+            modelSelection: {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange: {
+                min: IntelligenceLevel.QUICK,
+                max: IntelligenceLevel.QUICK,
+              },
+              contentRange: {
+                min: ContentLevel.MAINSTREAM,
+                max: ContentLevel.MAINSTREAM,
+              },
+            },
+            isDefault: true,
+          },
+        ],
       },
       getCustom: {
         icon: "👨‍💻",
@@ -894,28 +903,26 @@ const { GET } = createEndpoint({
         skillOwnership: SkillOwnershipType.PUBLIC,
         voice: TtsVoice.MALE,
         systemPrompt: "You are an expert code reviewer...",
-        modelSelection: {
-          selectionType: ModelSelectionType.FILTERS,
-          intelligenceRange: {
-            min: IntelligenceLevel.QUICK,
-            max: IntelligenceLevel.QUICK,
-          },
-          priceRange: {
-            min: PriceLevel.CHEAP,
-            max: PriceLevel.CHEAP,
-          },
-          contentRange: {
-            min: ContentLevel.MAINSTREAM,
-            max: ContentLevel.MAINSTREAM,
-          },
-          speedRange: {
-            min: SpeedLevel.FAST,
-            max: SpeedLevel.FAST,
-          },
-        },
         compactTrigger: null,
         availableTools: null,
         pinnedTools: null,
+        variants: [
+          {
+            id: "default",
+            modelSelection: {
+              selectionType: ModelSelectionType.FILTERS,
+              intelligenceRange: {
+                min: IntelligenceLevel.QUICK,
+                max: IntelligenceLevel.QUICK,
+              },
+              contentRange: {
+                min: ContentLevel.MAINSTREAM,
+                max: ContentLevel.MAINSTREAM,
+              },
+            },
+            isDefault: true,
+          },
+        ],
       },
     },
     urlPathParams: {
@@ -945,22 +952,6 @@ export type SkillDeleteResponseOutput = typeof DELETE.types.ResponseOutput;
 
 const definitions = { GET, PATCH, DELETE } as const;
 export default definitions;
-
-// tests only types - import types from create endpoint instead
-// Get response tests
-type SkillGetModelSelection = SkillGetResponseOutput["modelSelection"];
-type SkillGetFiltersModelSelection = Extract<
-  SkillGetModelSelection,
-  { selectionType: typeof ModelSelectionType.FILTERS }
->;
-type SkillGetManualModelSelection = Extract<
-  SkillGetModelSelection,
-  { selectionType: typeof ModelSelectionType.MANUAL }
->;
-// oxlint-disable-next-line no-unused-vars
-const _test_get_1: FiltersModelSelection = {} as SkillGetFiltersModelSelection;
-// oxlint-disable-next-line no-unused-vars
-const _test_get_2: ManualModelSelection = {} as SkillGetManualModelSelection;
 
 // Patch request tests
 type SkillModelSelection = SkillUpdateRequestOutput["modelSelection"];
