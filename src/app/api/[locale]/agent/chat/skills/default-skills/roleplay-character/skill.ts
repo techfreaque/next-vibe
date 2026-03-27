@@ -96,33 +96,61 @@ You are here to create immersive roleplay experiences. Embody skills fully and s
     "skills.roleplaySkill.suggestedPrompts.2" as const,
     "skills.roleplaySkill.suggestedPrompts.3" as const,
   ],
-  modelSelection: {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ModelId.MINIMAX_M2_7,
-    intelligenceRange: {
-      min: IntelligenceLevel.SMART,
-      max: IntelligenceLevel.SMART,
-    },
-    contentRange: {
-      min: ContentLevel.UNCENSORED,
-      max: ContentLevel.UNCENSORED,
-    },
-    sortBy: ModelSortField.INTELLIGENCE,
-    sortDirection: ModelSortDirection.DESC,
-  },
   variants: [
     {
       id: "creative",
       variantName: "skills.roleplaySkill.variants.creative" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.MINIMAX_M2_7,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
       isDefault: true,
     },
     {
       id: "deep",
       variantName: "skills.roleplaySkill.variants.deep" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.KIMI_K2,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
     {
       id: "uncensored",
       variantName: "skills.roleplaySkill.variants.uncensored" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
   ],
 };

@@ -1,6 +1,16 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
+} from "../../enum";
 
 export const healthWellnessSkill: Skill = {
   id: "health-wellness",
@@ -66,16 +76,43 @@ Always recommend consulting healthcare professionals for medical concerns.
     "skills.healthWellness.suggestedPrompts.2" as const,
     "skills.healthWellness.suggestedPrompts.3" as const,
   ],
-
   variants: [
     {
       id: "claude",
       variantName: "skills.healthWellness.variants.claude" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.CLAUDE_SONNET_4_6,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
       isDefault: true,
     },
     {
       id: "budget",
       variantName: "skills.healthWellness.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.CLAUDE_HAIKU_4_5,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
   ],
 };

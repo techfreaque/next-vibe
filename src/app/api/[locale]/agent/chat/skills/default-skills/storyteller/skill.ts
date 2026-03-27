@@ -71,30 +71,61 @@ export const storytellerSkill: Skill = {
     "skills.storyteller.suggestedPrompts.2" as const,
     "skills.storyteller.suggestedPrompts.3" as const,
   ],
-  modelSelection: {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ModelId.KIMI_K2,
-    intelligenceRange: {
-      min: IntelligenceLevel.BRILLIANT,
-      max: IntelligenceLevel.BRILLIANT,
-    },
-    contentRange: { min: ContentLevel.OPEN, max: ContentLevel.OPEN },
-    sortBy: ModelSortField.INTELLIGENCE,
-    sortDirection: ModelSortDirection.DESC,
-  },
   variants: [
     {
       id: "kimi",
       variantName: "skills.storyteller.variants.kimi" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.KIMI_K2,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
       isDefault: true,
     },
     {
       id: "minimax",
       variantName: "skills.storyteller.variants.minimax" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.MINIMAX_M2_7,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
     {
       id: "budget",
       variantName: "skills.storyteller.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GLM_5_TURBO,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.OPEN,
+          max: ContentLevel.OPEN,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
   ],
 };

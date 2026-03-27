@@ -44,29 +44,43 @@ export const teacherSkill: Skill = {
     "skills.teacher.suggestedPrompts.2" as const,
     "skills.teacher.suggestedPrompts.3" as const,
   ],
-  modelSelection: {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ModelId.GEMINI_3_PRO,
-    intelligenceRange: {
-      min: IntelligenceLevel.BRILLIANT,
-      max: IntelligenceLevel.BRILLIANT,
-    },
-    contentRange: {
-      min: ContentLevel.MAINSTREAM,
-      max: ContentLevel.MAINSTREAM,
-    },
-    sortBy: ModelSortField.INTELLIGENCE,
-    sortDirection: ModelSortDirection.DESC,
-  },
   variants: [
     {
       id: "gemini",
       variantName: "skills.teacher.variants.gemini" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_PRO,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
       isDefault: true,
     },
     {
       id: "fast",
       variantName: "skills.teacher.variants.fast" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GEMINI_3_FLASH,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
   ],
 };

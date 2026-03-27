@@ -70,29 +70,43 @@ export const marketerSkill: Skill = {
     "skills.marketer.suggestedPrompts.2" as const,
     "skills.marketer.suggestedPrompts.3" as const,
   ],
-  modelSelection: {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ModelId.GPT_5_4_MINI,
-    intelligenceRange: {
-      min: IntelligenceLevel.SMART,
-      max: IntelligenceLevel.SMART,
-    },
-    contentRange: {
-      min: ContentLevel.MAINSTREAM,
-      max: ContentLevel.MAINSTREAM,
-    },
-    sortBy: ModelSortField.INTELLIGENCE,
-    sortDirection: ModelSortDirection.DESC,
-  },
   variants: [
     {
       id: "snappy",
       variantName: "skills.marketer.variants.snappy" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GPT_5_4_MINI,
+        intelligenceRange: {
+          min: IntelligenceLevel.SMART,
+          max: IntelligenceLevel.SMART,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
       isDefault: true,
     },
     {
       id: "budget",
       variantName: "skills.marketer.variants.budget" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.GPT_5_4_NANO,
+        intelligenceRange: {
+          min: IntelligenceLevel.QUICK,
+          max: IntelligenceLevel.QUICK,
+        },
+        contentRange: {
+          min: ContentLevel.MAINSTREAM,
+          max: ContentLevel.MAINSTREAM,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
   ],
 };

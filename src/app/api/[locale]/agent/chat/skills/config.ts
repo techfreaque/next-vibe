@@ -54,7 +54,7 @@ export interface SkillVariant {
  * Used when:
  * - Defining default skills in config
  * - Fetching individual skill via GET /skills/[id]
- * - Sending messages (needs systemPrompt, modelSelection)
+ * - Sending messages (needs systemPrompt, variants)
  *
  * DO NOT use this for list display - use SkillListItem from definition.ts instead
  *
@@ -70,9 +70,8 @@ export interface Skill {
   category: typeof SkillCategoryValue;
   voice: typeof TtsVoiceValue;
   suggestedPrompts: SkillsTranslationKey[];
-  modelSelection?: ConfigModelSelection;
-  /** Optional named variants, each with their own modelSelection. Expanded as grouped rows in skill list. */
-  variants?: SkillVariant[];
+  /** Named variants. Expanded as grouped rows in skill list. */
+  variants: SkillVariant[];
   ownershipType: typeof SkillOwnershipTypeValue;
   modelInfo?: string;
   creditCost?: string;
@@ -99,11 +98,6 @@ export interface Skill {
 }
 
 /**
- * Helper type to get clean model selection without legacy fields
- */
-export type CleanModelSelection = FiltersModelSelection | ManualModelSelection;
-
-/**
  * Helper to create a tool config item (uses aliases for update-safe references)
  */
 export function tool(
@@ -124,10 +118,16 @@ export const NO_SKILL = {
     "skills.default.suggestedPrompts.2" as const,
     "skills.default.suggestedPrompts.3" as const,
   ],
-  modelSelection: {
-    selectionType: ModelSelectionType.FILTERS,
-    intelligenceRange: {},
-    contentRange: {},
-    speedRange: {},
-  },
+  variants: [
+    {
+      id: NO_SKILL_ID,
+      variantName: "skills.default.variants.default" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: {},
+        contentRange: {},
+        speedRange: {},
+      },
+    },
+  ],
 };

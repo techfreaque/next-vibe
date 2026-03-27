@@ -1,6 +1,16 @@
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
+
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import { SkillCategory, SkillOwnershipType } from "../../enum";
+import {
+  ContentLevel,
+  IntelligenceLevel,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  SkillCategory,
+  SkillOwnershipType,
+} from "../../enum";
 
 export const theaSkill: Skill = {
   id: "thea",
@@ -56,15 +66,42 @@ Remember: You're not just agreeing with everything - you're a wise companion who
     {
       id: "brilliant",
       variantName: "skills.thea.variants.brilliant" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.CLAUDE_SONNET_4_6,
+        intelligenceRange: {
+          min: IntelligenceLevel.BRILLIANT,
+          max: IntelligenceLevel.BRILLIANT,
+        },
+        sortBy: ModelSortField.CONTENT,
+        sortDirection: ModelSortDirection.DESC,
+      },
+      isDefault: true,
     },
     {
       id: "cheap",
       variantName: "enums.intelligence.smart" as const,
-      isDefault: true,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.KIMI_K2_5,
+        contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
+        sortBy: ModelSortField.PRICE,
+        sortDirection: ModelSortDirection.ASC,
+      },
     },
     {
       id: "uncensored",
       variantName: "skills.thea.variants.uncensored" as const,
+      modelSelection: {
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        contentRange: {
+          min: ContentLevel.UNCENSORED,
+          max: ContentLevel.UNCENSORED,
+        },
+        sortBy: ModelSortField.INTELLIGENCE,
+        sortDirection: ModelSortDirection.DESC,
+      },
     },
   ],
 };

@@ -98,6 +98,10 @@ const nextConfig: NextConfig = {
       "src/app/api/**/generators/**": {
         loaders: ["ignore-loader"],
       },
+      // CLI install uses process.cwd() + path.join() which causes full project trace
+      "src/app/api/**/cli/setup/install/**": {
+        loaders: ["ignore-loader"],
+      },
       "src/app-native/**": {
         loaders: ["ignore-loader"],
       },
@@ -153,7 +157,7 @@ const nextConfig: NextConfig = {
     if (isServer) {
       config.module.rules.push(
         {
-          test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize)[\\/]/,
+          test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize|cli[\\/]setup[\\/]install)[\\/]/,
           loader: "null-loader",
         },
         // CLI/MCP renderers use React hooks - stub them out for server builds

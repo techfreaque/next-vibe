@@ -12,7 +12,9 @@ export const THEME_COOKIE_NAME = "theme";
 function ThemeCookieSync(): null {
   const { resolvedTheme } = useTheme();
   useEffect(() => {
-    if (!resolvedTheme) {return;}
+    if (!resolvedTheme) {
+      return;
+    }
     // SameSite=Lax; no Secure required (works on http localhost too).
     // Max-Age=2147483647 ≈ 68 years — effectively non-expiring.
     document.cookie = `${THEME_COOKIE_NAME}=${resolvedTheme};path=/;max-age=2147483647;SameSite=Lax`;

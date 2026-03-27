@@ -538,7 +538,6 @@ export class ViteCompiler {
           importProtection: {
             client: { specifiers: ["server-only"] },
           },
-          dev: { ssrStyles: { enabled: false } },
         }),
         react(),
         nitro({
@@ -916,7 +915,6 @@ export class ViteCompiler {
             importProtection: {
               client: { specifiers: ["server-only"] },
             },
-            dev: { ssrStyles: { enabled: false } },
           }),
           react(),
           nitro(),

@@ -40,14 +40,6 @@ export function Head({ children }: HeadProps): JSX.Element {
           no <link>→<style> swap, no flash. HeadContent still handles meta/title/etc. */}
       <style dangerouslySetInnerHTML={{ __html: globalCSS }} />
       <HeadContent />
-      {/* Remove TanStack's dev styles <link> immediately so Vite never gets to swap it */}
-      {process.env.NODE_ENV === "development" && (
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `document.querySelectorAll('link[data-tanstack-router-dev-styles]').forEach(e=>e.remove())`,
-          }}
-        />
-      )}
       {children}
     </head>
   );
