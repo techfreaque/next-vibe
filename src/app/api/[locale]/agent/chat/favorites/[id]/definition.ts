@@ -969,6 +969,7 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         skillId: "thea",
+        variantId: null,
         icon: "sun" as const,
         name: "fallbacks.unknownSkill" as const,
         tagline: "fallbacks.noTagline" as const,

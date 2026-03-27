@@ -3,6 +3,8 @@
  * Clean dashboard for admin overview
  */
 
+export const dynamic = "force-dynamic";
+
 import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";

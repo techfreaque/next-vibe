@@ -80,39 +80,11 @@ export const brainstormerSkill: Skill = {
     {
       id: "wildcard",
       variantName: "skills.brainstormer.variants.wildcard" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.MIMO_V2_PRO,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "eastern",
       variantName: "skills.brainstormer.variants.eastern" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

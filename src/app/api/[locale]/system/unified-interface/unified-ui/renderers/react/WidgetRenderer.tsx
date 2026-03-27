@@ -1,6 +1,6 @@
 "use client";
 
-import React, { type JSX, Suspense } from "react";
+import React, { Suspense, type JSX } from "react";
 import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -35,6 +35,7 @@ import FormAlertWidget from "../../widgets/interactive/form-alert/react";
 import NavigateButtonWidget from "../../widgets/interactive/navigate-button/react";
 import SubmitButtonWidget from "../../widgets/interactive/submit-button/react";
 import { WidgetErrorBoundary } from "./ErrorBoundary";
+import { resolvedCache } from "./widget-preloader";
 
 /**
  * Widget Renderer Component - Routes to appropriate widget with full type inference.
@@ -99,26 +100,11 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
       );
     }
     case WidgetType.DESCRIPTION:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/description/react"),
-        props,
-        "widget-description",
-      );
+      return createWidget("description", props);
     case WidgetType.METADATA:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/metadata/react"),
-        props,
-        "widget-metadata",
-      );
+      return createWidget("metadata", props);
     case WidgetType.KEY_VALUE:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/key-value/react"),
-        props,
-        "widget-key-value",
-      );
+      return createWidget("key-value", props);
     case WidgetType.BADGE: {
       // Dispatch-boundary cast: switch discriminant guarantees type safety.
       // oxlint-disable-next-line typescript/no-explicit-any
@@ -144,19 +130,9 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
       );
     }
     case WidgetType.MARKDOWN:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/markdown/react"),
-        props,
-        "widget-markdown",
-      );
+      return createWidget("markdown", props);
     case WidgetType.MARKDOWN_EDITOR:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/markdown-editor/react"),
-        props,
-        "widget-markdown-editor",
-      );
+      return createWidget("markdown-editor", props);
     case WidgetType.TITLE: {
       // Dispatch-boundary cast: switch discriminant guarantees type safety.
       // oxlint-disable-next-line typescript/no-explicit-any
@@ -170,47 +146,17 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
       );
     }
     case WidgetType.LINK:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/link/react"),
-        props,
-        "widget-link",
-      );
+      return createWidget("link", props);
     case WidgetType.CODE_OUTPUT:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/code-output/react"),
-        props,
-        "widget-code-output",
-      );
+      return createWidget("code-output", props);
     case WidgetType.CODE_QUALITY_LIST:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/code-quality-list/react"),
-        props,
-        "widget-code-quality-list",
-      );
+      return createWidget("code-quality-list", props);
     case WidgetType.PAGINATION:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/react"),
-        props,
-        "widget-pagination",
-      );
+      return createWidget("pagination", props);
     case WidgetType.STAT:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/stat/react"),
-        props,
-        "widget-stat",
-      );
+      return createWidget("stat", props);
     case WidgetType.CHART:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/chart/react"),
-        props,
-        "widget-chart",
-      );
+      return createWidget("chart", props);
     case WidgetType.CUSTOM_WIDGET: {
       // Get render function from field
       const customField = props.field as typeof props.field & {
@@ -223,13 +169,15 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         return <></>;
       }
 
-      // Pass the entire props (fieldName + field) to custom render
+      // Custom widgets may be React.lazy — wrap in Suspense scoped to this widget only.
       return (
-        <CustomRender
-          fieldName={props.fieldName}
-          field={props.field}
-          inlineButtonInfo={props.inlineButtonInfo}
-        />
+        <Suspense fallback={null}>
+          <CustomRender
+            fieldName={props.fieldName}
+            field={props.field}
+            inlineButtonInfo={props.inlineButtonInfo}
+          />
+        </Suspense>
       );
     }
     case WidgetType.CONTAINER: {
@@ -317,47 +265,17 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
       );
     }
     case WidgetType.STATUS_INDICATOR:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/status-indicator/react"),
-        props,
-        "widget-status-indicator",
-      );
+      return createWidget("status-indicator", props);
     case WidgetType.EMPTY_STATE:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/empty-state/react"),
-        props,
-        "widget-empty-state",
-      );
+      return createWidget("empty-state", props);
     case WidgetType.CODE_QUALITY_FILES:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/code-quality-files/react"),
-        props,
-        "widget-code-quality-files",
-      );
+      return createWidget("code-quality-files", props);
     case WidgetType.CODE_QUALITY_SUMMARY:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/code-quality-summary/react"),
-        props,
-        "widget-code-quality-summary",
-      );
+      return createWidget("code-quality-summary", props);
     case WidgetType.AVATAR:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/avatar/react"),
-        props,
-        "widget-avatar",
-      );
+      return createWidget("avatar", props);
     case WidgetType.LOADING:
-      return createWidget(
-        () =>
-          import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/loading/react"),
-        props,
-        "widget-loading",
-      );
+      return createWidget("loading", props);
 
     case WidgetType.FORM_FIELD: {
       // TypeScript cannot narrow fieldType through the large FormFieldWidgetConfig union
@@ -378,68 +296,23 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
           );
         }
         case FieldDataType.COLOR:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/color-field/react"),
-            props,
-            "field-color",
-          );
+          return createWidget("color", props);
         case FieldDataType.COUNTRY_SELECT:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/country-select-field/react"),
-            props,
-            "field-country-select",
-          );
+          return createWidget("country-select", props);
         case FieldDataType.CURRENCY_SELECT:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/currency-select-field/react"),
-            props,
-            "field-currency-select",
-          );
+          return createWidget("currency-select", props);
         case FieldDataType.DATE:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-field/react"),
-            props,
-            "field-date",
-          );
+          return createWidget("date", props);
         case FieldDataType.DATE_RANGE:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/date-range-field/react"),
-            props,
-            "field-date-range",
-          );
+          return createWidget("date-range", props);
         case FieldDataType.DATETIME:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/datetime-field/react"),
-            props,
-            "field-datetime",
-          );
+          return createWidget("datetime", props);
         case FieldDataType.EMAIL:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/react"),
-            props,
-            "field-email",
-          );
+          return createWidget("email", props);
         case FieldDataType.FILE:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/file-field/react"),
-            props,
-            "field-file",
-          );
+          return createWidget("file", props);
         case FieldDataType.FILTER_PILLS:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/filter-pills-field/react"),
-            props,
-            "field-filter-pills",
-          );
+          return createWidget("filter-pills", props);
         case FieldDataType.ICON: {
           // Dispatch-boundary cast: switch discriminant guarantees type safety.
           // oxlint-disable-next-line typescript/no-explicit-any
@@ -453,61 +326,21 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
           );
         }
         case FieldDataType.INT:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/int-field/react"),
-            props,
-            "field-int",
-          );
+          return createWidget("int", props);
         case FieldDataType.JSON:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/json-field/react"),
-            props,
-            "field-json",
-          );
+          return createWidget("json", props);
         case FieldDataType.LANGUAGE_SELECT:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/language-select-field/react"),
-            props,
-            "field-language-select",
-          );
+          return createWidget("language-select", props);
         case FieldDataType.MULTISELECT:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/multiselect-field/react"),
-            props,
-            "field-multiselect",
-          );
+          return createWidget("multiselect", props);
         case FieldDataType.NUMBER:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react"),
-            props,
-            "field-number",
-          );
+          return createWidget("number", props);
         case FieldDataType.PASSWORD:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react"),
-            props,
-            "field-password",
-          );
+          return createWidget("password", props);
         case FieldDataType.TEL:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/phone-field/react"),
-            props,
-            "field-tel",
-          );
+          return createWidget("tel", props);
         case FieldDataType.RANGE_SLIDER:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/range-slider-field/react"),
-            props,
-            "field-range-slider",
-          );
+          return createWidget("range-slider", props);
 
         case FieldDataType.SELECT: {
           // Dispatch-boundary cast: switch discriminant guarantees type safety.
@@ -522,19 +355,9 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
           );
         }
         case FieldDataType.SLIDER:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/slider-field/react"),
-            props,
-            "field-slider",
-          );
+          return createWidget("slider", props);
         case FieldDataType.TAGS:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/tags-field/react"),
-            props,
-            "field-tags",
-          );
+          return createWidget("tags", props);
         case FieldDataType.TEXTAREA: {
           // Dispatch-boundary cast: switch discriminant guarantees type safety.
           // oxlint-disable-next-line typescript/no-explicit-any
@@ -548,12 +371,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
           );
         }
         case FieldDataType.TEXT_ARRAY:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-array-field/react"),
-            props,
-            "field-text-array",
-          );
+          return createWidget("text-array", props);
         case FieldDataType.TEXT: {
           // Dispatch-boundary cast: switch discriminant guarantees type safety.
           // oxlint-disable-next-line typescript/no-explicit-any
@@ -567,33 +385,13 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
           );
         }
         case FieldDataType.TIME:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/time-field/react"),
-            props,
-            "field-time",
-          );
+          return createWidget("time", props);
         case FieldDataType.TIME_RANGE:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/time-range-field/react"),
-            props,
-            "field-time-range",
-          );
+          return createWidget("time-range", props);
         case FieldDataType.TIMEZONE:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/timezone-field/react"),
-            props,
-            "field-timezone",
-          );
+          return createWidget("timezone", props);
         case FieldDataType.URL:
-          return createWidget(
-            () =>
-              import("@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/url-field/react"),
-            props,
-            "field-url",
-          );
+          return createWidget("url", props);
         case FieldDataType.UUID: {
           // Dispatch-boundary cast: switch discriminant guarantees type safety.
           // oxlint-disable-next-line typescript/no-explicit-any
@@ -621,73 +419,13 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
 }
 
 /**
- * Global cache for lazy-loaded widget components.
- * Ensures that once a widget module is loaded, it stays in memory
- * and is not re-imported on every render.
- */
-const lazyComponentCache = new Map<
-  string,
-  React.ComponentType<
-    ReactWidgetProps<
-      CreateApiEndpointAny,
-      FieldUsageConfig,
-      DispatchField<
-        string,
-        z.ZodTypeAny,
-        FieldUsageConfig,
-        AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-      >
-    >
-  >
->();
-
-/**
- * Get or create a lazy-loaded widget component.
- * Uses a cache to prevent re-importing modules on every render.
- */
-function getLazyWidget(
-  importFn: () => Promise<{
-    default: React.ComponentType<
-      ReactWidgetProps<
-        CreateApiEndpointAny,
-        FieldUsageConfig,
-        DispatchField<
-          string,
-          z.ZodTypeAny,
-          FieldUsageConfig,
-          AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-        >
-      >
-    >;
-  }>,
-  cacheKey: string,
-): React.ComponentType<
-  ReactWidgetProps<
-    CreateApiEndpointAny,
-    FieldUsageConfig,
-    DispatchField<
-      string,
-      z.ZodTypeAny,
-      FieldUsageConfig,
-      AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-    >
-  >
-> {
-  if (!lazyComponentCache.has(cacheKey)) {
-    lazyComponentCache.set(cacheKey, React.lazy(importFn));
-  }
-  return lazyComponentCache.get(cacheKey)!;
-}
-
-/**
- * Dispatch-boundary cast for lazy-loaded widgets.
- * After switch narrowing, TS can't prove the narrowed config matches the target widget's
- * expected props because conditional types don't resolve against generic union members.
- * Safe: switch discriminant guarantees the narrowed config matches the target widget.
+ * Render a widget from the eager-import cache (lives in widget-preloader.ts,
+ * outside "use client" so Vite does not strip it).
+ * Renders synchronously if the chunk is resolved — no Suspense, no SSR
+ * streaming boundary, no flash.
  */
 function createWidget<TEndpoint extends CreateApiEndpointAny>(
-  // oxlint-disable-next-line typescript/no-explicit-any
-  importFn: () => Promise<{ default: React.ComponentType<any> }>,
+  key: string,
   props: ReactWidgetProps<
     TEndpoint,
     FieldUsageConfig,
@@ -698,14 +436,18 @@ function createWidget<TEndpoint extends CreateApiEndpointAny>(
       AnyChildrenConstrain<string, FieldUsageConfig>
     >
   >,
-  cacheKey: string,
 ): JSX.Element {
-  const LazyWidget = getLazyWidget(importFn, cacheKey);
-
+  // resolvedCache is imported from widget-preloader (no "use client" — not stripped)
+  const Widget = resolvedCache.get(key);
+  if (!Widget) {
+    return <></>;
+  }
   return (
-    <Suspense>
-      <LazyWidget fieldName={props.fieldName} field={props.field} />
-    </Suspense>
+    <Widget
+      fieldName={props.fieldName}
+      field={props.field}
+      inlineButtonInfo={props.inlineButtonInfo}
+    />
   );
 }
 

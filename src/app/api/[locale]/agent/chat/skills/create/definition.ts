@@ -128,6 +128,7 @@ const { POST } = createEndpoint({
               variantId: null,
               variantName: null,
               isVariant: false,
+              isDefault: false,
             };
 
             // Add to existing section or create new section for this category

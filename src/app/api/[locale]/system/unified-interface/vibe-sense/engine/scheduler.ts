@@ -16,11 +16,11 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
-  formatCount,
   formatDuration,
   formatSense,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
+import { maybeColorize, semantic } from "../../shared/logger/colors";
 import { pipelineGraphs } from "../db";
 import { RunStatus } from "../enum";
 import { getLatestRun } from "../store/runs";
@@ -93,15 +93,14 @@ export async function runDueGraphs(
 
   if (executed > 0 || errors.length > 0) {
     const duration = Date.now() - startTime;
-    const parts: string[] = [
-      `${formatCount(executed, "graph")} executed`,
-      `of ${String(scheduledGraphs.length)} scheduled`,
-      formatDuration(duration),
-    ];
     if (errors.length > 0) {
-      parts.push(`${String(errors.length)} failed`);
+      logger.info(
+        `📊 ${maybeColorize(`${semantic.sense}Executed ${executed} graphs with ${errors.length} errors in ${formatDuration(duration)}`, semantic.sense)}`,
+      );
     }
-    logger.info(formatSense(parts.join(" · "), "📈"));
+    logger.info(
+      `📊 ${maybeColorize(`${semantic.sense}Executed ${executed} graphs in ${formatDuration(duration)}`, semantic.sense)}`,
+    );
   }
 
   return {

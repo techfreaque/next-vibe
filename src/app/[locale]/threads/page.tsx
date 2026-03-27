@@ -3,6 +3,8 @@
  * Shows all folders - redirects to first folder
  */
 
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 

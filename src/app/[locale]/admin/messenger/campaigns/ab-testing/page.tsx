@@ -3,6 +3,8 @@
  * Configure and monitor A/B testing for email campaigns
  */
 
+export const dynamic = "force-dynamic";
+
 import type React from "react";
 
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";

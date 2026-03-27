@@ -246,7 +246,7 @@ export class RemoteConnectionConnectRepository {
       );
       if (match?.[1]) {
         remotePingLeadId = match[1];
-        logger.info("[CONNECT] Got remote leadId from ping", {
+        logger.debug("[CONNECT] Got remote leadId from ping", {
           leadId: remotePingLeadId,
         });
       }
@@ -313,7 +313,7 @@ export class RemoteConnectionConnectRepository {
 
       token = loginBody.data.token;
       effectiveLeadId = loginBody.data.leadId ?? "";
-      logger.info("[CONNECT] Successfully logged into remote", { remoteUrl });
+      logger.debug("[CONNECT] Successfully logged into remote", { remoteUrl });
     } catch (err) {
       logger.error("[CONNECT] Remote login error", { error: String(err) });
       return fail({
@@ -483,7 +483,7 @@ export class RemoteConnectionConnectRepository {
       });
     }
 
-    logger.info(`[CONNECT] Successfully connected to ${remoteUrl}`, {
+    logger.debug(`[CONNECT] Successfully connected to ${remoteUrl}`, {
       userId: user.id,
       instanceId,
     });
@@ -496,7 +496,7 @@ export class RemoteConnectionConnectRepository {
         const { TaskSyncRepository } =
           await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/repository");
         await TaskSyncRepository.pullFromRemote(logger, locale);
-        logger.info("[CONNECT] Initial capability sync completed", {
+        logger.debug("[CONNECT] Initial capability sync completed", {
           instanceId,
         });
       } catch (syncError) {

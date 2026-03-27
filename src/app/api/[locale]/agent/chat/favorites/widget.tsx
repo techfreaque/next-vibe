@@ -33,12 +33,19 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Star } from "next-vibe-ui/ui/icons/Star";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "next-vibe-ui/ui/popover";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
-import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -63,9 +70,9 @@ import {
 import { scopedTranslation as ttsScopedTranslation } from "../../text-to-speech/i18n";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import { DEFAULT_SKILLS } from "../skills/config";
-import { scopedTranslation as skillsScopedTranslation } from "../skills/i18n";
 import { NO_SKILL_ID } from "../skills/constants";
 import { SkillCategory } from "../skills/enum";
+import { scopedTranslation as skillsScopedTranslation } from "../skills/i18n";
 import definition, {
   type FavoriteCard,
   type FavoritesListResponseOutput,
@@ -432,7 +439,7 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
     >
       <Div
         className={cn(
-          "group/row flex items-center gap-2 py-1.5 px-2 rounded transition-colors",
+          "group/row relative flex items-center py-1.5 px-2 rounded transition-colors",
           isActive ? "bg-primary/5" : "hover:bg-accent/50 cursor-pointer",
           isDragging && "opacity-50 z-[999]",
         )}
@@ -530,11 +537,10 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
             ) : null}
           </Div>
         </Div>
-
-        {/* Action buttons - visible on hover */}
+        {/* Action buttons - floating absolute overlay, visible on hover */}
         <Div
           className={cn(
-            "flex gap-0.5 shrink-0",
+            "absolute top-0 right-0 flex gap-0.5 h-full items-center pr-0.5",
             isTouch
               ? "opacity-100"
               : "opacity-0 group-hover/row:opacity-100 transition-opacity",
@@ -702,7 +708,7 @@ const SortableGroup = React.memo(function SortableGroup({
           </Div>
           <Div
             className={cn(
-              "flex gap-0.5 shrink-0",
+              "absolute top-1 right-1 flex gap-0.5",
               isTouch
                 ? "opacity-100"
                 : "opacity-0 group-hover:opacity-100 transition-opacity",
@@ -722,6 +728,12 @@ const SortableGroup = React.memo(function SortableGroup({
               user={user}
               locale={locale}
             />
+            <DeleteGroupButton
+              group={group}
+              logger={logger}
+              user={user}
+              locale={locale}
+            />
           </Div>
         </Div>
 
@@ -735,7 +747,7 @@ const SortableGroup = React.memo(function SortableGroup({
             items={group.items.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            <Div className="border-t border-border/40 py-0.5">
+            <Div className="border-t border-border/40 py-0.5 ml-[4.5rem] mr-3">
               {group.items.map((item) => {
                 const globalIndex = allFavorites.findIndex(
                   (f) => f.id === item.id,
@@ -1161,6 +1173,116 @@ function AddVariantButton({
         <Plus className={iconSize} />
       )}
     </Button>
+  );
+}
+
+function DeleteGroupButton({
+  group,
+  logger,
+  user,
+  locale,
+}: {
+  group: SkillGroup;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: CountryLanguage;
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+  const { t } = scopedTranslation.scopedT(locale);
+
+  const handleConfirm = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const favoriteDetailDefinitions = await import("./[id]/definition");
+      const ids = group.items.map((item) => item.id);
+
+      await Promise.all(
+        ids.map((id) =>
+          apiClient.mutate(
+            favoriteDetailDefinitions.default.DELETE,
+            logger,
+            user,
+            undefined,
+            { id },
+            locale,
+          ),
+        ),
+      );
+
+      apiClient.updateEndpointData(definition.GET, logger, (oldData) => {
+        if (!oldData?.success) {
+          return oldData;
+        }
+        return {
+          success: true,
+          data: {
+            ...oldData.data,
+            favorites: oldData.data.favorites.filter(
+              (f) => !ids.includes(f.id),
+            ),
+          },
+        };
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="text-destructive hover:text-destructive"
+          onClick={(e) => e.stopPropagation()}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-56 p-3"
+        side="top"
+        align="end"
+        onInteractOutside={(e) => e.stopPropagation()}
+      >
+        <Div className="flex flex-col gap-2">
+          <Span className="text-sm font-medium">
+            {t("get.deleteGroup.confirm", { count: group.items.length })}
+          </Span>
+          <Div className="flex gap-2 justify-end">
+            <PopoverClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {t("get.deleteGroup.cancel")}
+              </Button>
+            </PopoverClose>
+            <PopoverClose asChild>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={handleConfirm}
+              >
+                {t("get.deleteGroup.action")}
+              </Button>
+            </PopoverClose>
+          </Div>
+        </Div>
+      </PopoverContent>
+    </Popover>
   );
 }
 

@@ -170,7 +170,7 @@ function handleMessageCreated(
     ...(isUserRole && e.content ? { isTranscribing: false } : {}),
   };
 
-  // For server-emitted error messages: de-duplicate + revert optimistic user msg.
+  // For server-emitted error messages: de-duplicate + revert optimistic messages.
   if (isErrorRole) {
     const msgs = getCachedMessages(e.threadId, rootFolderId, logger);
     const sorted = [...msgs].toSorted(
@@ -179,13 +179,23 @@ function handleMessageCreated(
     );
     const leaf = sorted[0];
     if (leaf?.role === ChatMessageRole.ERROR) {
-      // HTTP error already added one - update in place
+      // HTTP error already added one - update in place, preserving the server parentId
+      // so the error sits at the correct branch position in the tree.
       patchMessage(e.threadId, rootFolderId, logger, leaf.id, {
         content: e.content || leaf.content,
         errorType: "STREAM_ERROR",
         errorMessage: (e.content || leaf.content) ?? null,
+        ...(e.parentId ? { parentId: e.parentId } : {}),
       });
       return;
+    }
+    // Remove any optimistic messages (user + assistant placeholders) before
+    // inserting the real error. This handles cancellation where the optimistic
+    // assistant placeholder is still present when the error arrives.
+    for (const m of msgs) {
+      if (m.metadata?.isOptimistic) {
+        removeMessage(e.threadId, rootFolderId, logger, m.id);
+      }
     }
     if (leaf?.role === ChatMessageRole.USER) {
       removeMessage(e.threadId, rootFolderId, logger, leaf.id);

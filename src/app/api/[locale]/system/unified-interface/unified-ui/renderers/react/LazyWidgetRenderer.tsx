@@ -1,17 +1,14 @@
 /**
- * Lazy Widget Renderer
+ * Widget Renderer wrapper.
  *
- * Wraps WidgetRenderer in React.lazy so its large dependency tree
- * (all widget components) is only loaded when actually needed.
- *
- * When an endpoint uses a custom widget at the root (customWidgetObject with render),
- * EndpointRenderer renders the custom component directly, and this module
- * is never imported - avoiding the cost of loading every widget type.
+ * Previously used React.lazy to defer loading WidgetRenderer's large dependency
+ * tree. Removed lazy loading because the empty <Suspense> fallback caused a
+ * visible blank flash during SSR→client hydration on any page with a widget.
  */
 
 "use client";
 
-import React, { Suspense } from "react";
+import React from "react";
 import type { z } from "zod";
 
 import type { InlineButtonInfo } from "../../widgets/_shared/field-helpers";
@@ -21,6 +18,7 @@ import type {
   DispatchField,
   FieldUsageConfig,
 } from "../../widgets/_shared/types";
+import { WidgetRenderer } from "./WidgetRenderer";
 
 /** Props accepted by the WidgetRenderer (type-only, no runtime cost) */
 interface WidgetRendererProps {
@@ -34,28 +32,13 @@ interface WidgetRendererProps {
   inlineButtonInfo?: InlineButtonInfo;
 }
 
-// oxlint-disable-next-line typescript/no-explicit-any
-const LazyWidget: React.ComponentType<WidgetRendererProps> = React.lazy(
-  () =>
-    import("./WidgetRenderer").then((mod) => ({
-      default: mod.WidgetRenderer as React.ComponentType<WidgetRendererProps>,
-    })) as Promise<{
-      default: React.ComponentType<WidgetRendererProps>;
-    }>,
-);
-
 /**
- * Lazy-loaded WidgetRenderer wrapper.
- * Same props as WidgetRenderer, loaded on demand.
+ * WidgetRenderer wrapper — same props, no lazy loading.
  */
 export function LazyWidgetRenderer(
   props: WidgetRendererProps,
 ): React.JSX.Element {
-  return (
-    <Suspense>
-      <LazyWidget {...props} />
-    </Suspense>
-  );
+  return <WidgetRenderer {...props} />;
 }
 
 LazyWidgetRenderer.displayName = "LazyWidgetRenderer";

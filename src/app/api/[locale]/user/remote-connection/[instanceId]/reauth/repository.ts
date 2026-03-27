@@ -108,7 +108,7 @@ export class RemoteConnectionReauthRepository {
 
       token = loginBody.data.token;
       newLeadId = loginBody.data.leadId ?? "";
-      logger.info("[REAUTH] Successfully logged into remote", {
+      logger.debug("[REAUTH] Successfully logged into remote", {
         remoteUrl,
         instanceId,
       });

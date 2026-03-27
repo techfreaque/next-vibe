@@ -29,7 +29,7 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import { useMemo, useState } from "react";
 
-import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -55,7 +55,11 @@ import skillDetailDefinitions from "./[id]/definition";
 import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem, SkillListResponseOutput } from "./definition";
-import { SkillOwnershipType, SkillTrustLevel } from "./enum";
+import {
+  ModelSelectionType,
+  SkillOwnershipType,
+  SkillTrustLevel,
+} from "./enum";
 
 /**
  * Props for custom widget
@@ -434,7 +438,6 @@ export function SkillsListContainer({
                     <CollapsibleSkillSection
                       skills={section.skills}
                       idx={idx}
-                      categoryKey={section.skills[0]?.category}
                       navigate={navigate}
                       logger={logger}
                       user={user}
@@ -496,7 +499,7 @@ export function SkillsListContainer({
  * - Animated expand/collapse with height transition
  * - Groups variant items (isVariant=true) under a shared card header
  */
-const INITIAL_VISIBLE_COUNT = 6;
+const INITIAL_VISIBLE_COUNT = 4;
 
 /** Group consecutive variant items by skill id into renderable units */
 type SkillGroup =
@@ -523,7 +526,7 @@ function groupSkillItems(skills: SkillListItem[]): SkillGroup[] {
 function CollapsibleSkillSection({
   skills,
   idx,
-  categoryKey,
+
   children,
   navigate,
   logger,
@@ -537,7 +540,7 @@ function CollapsibleSkillSection({
 }: {
   skills: SkillListItem[];
   idx: number;
-  categoryKey: string | undefined;
+
   children: (typeof definition.GET)["fields"]["children"];
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   logger: ReturnType<typeof useWidgetContext>["logger"];
@@ -549,68 +552,57 @@ function CollapsibleSkillSection({
   favoritesByVariant: Record<string, string[]>;
   activeFavoriteId: string | null;
 }): React.JSX.Element {
+  const [expanded, setExpanded] = useState(false);
   const groups = useMemo(() => groupSkillItems(skills), [skills]);
   const totalCount = groups.length;
   const hasMore = totalCount > INITIAL_VISIBLE_COUNT;
-  const visibleGroups = groups.slice(0, INITIAL_VISIBLE_COUNT);
-
-  const handleBrowseAll = (): void => {
-    void (async (): Promise<void> => {
-      const skillsDef = await import("./definition");
-      navigate(skillsDef.default.GET, {
-        data: categoryKey ? { query: categoryKey } : undefined,
-      });
-    })();
-  };
+  const visibleGroups = expanded
+    ? groups
+    : groups.slice(0, INITIAL_VISIBLE_COUNT);
+  const hiddenCount = totalCount - INITIAL_VISIBLE_COUNT;
 
   return (
     <Div className="flex flex-col gap-3">
       {/* Skill Cards */}
-      <Div className="relative">
-        <Div
-          className={cn(
-            "flex flex-col gap-3 transition-all duration-300 ease-out",
-          )}
-        >
-          {visibleGroups.map((group) =>
-            group.type === "single" ? (
-              <SkillCard
-                key={group.item.id}
-                char={group.item}
-                idx={idx}
-                navigate={navigate}
-                logger={logger}
-                user={user}
-                locale={locale}
-                isTouch={isTouch}
-                t={t}
-                favoriteIds={favoritesBySkill[group.item.id] || []}
-                activeFavoriteId={activeFavoriteId}
-              >
-                {children}
-              </SkillCard>
-            ) : (
-              <VariantGroupCard
-                key={group.id}
-                items={group.items}
-                idx={idx}
-                fieldDefs={children}
-                navigate={navigate}
-                logger={logger}
-                user={user}
-                locale={locale}
-                isTouch={isTouch}
-                t={t}
-                favoritesBySkill={favoritesBySkill}
-                favoritesByVariant={favoritesByVariant}
-                activeFavoriteId={activeFavoriteId}
-              />
-            ),
-          )}
-        </Div>
+      <Div className="flex flex-col gap-3">
+        {visibleGroups.map((group) =>
+          group.type === "single" ? (
+            <SkillCard
+              key={group.item.id}
+              char={group.item}
+              idx={idx}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+              isTouch={isTouch}
+              t={t}
+              favoriteIds={favoritesBySkill[group.item.id] || []}
+              activeFavoriteId={activeFavoriteId}
+            >
+              {children}
+            </SkillCard>
+          ) : (
+            <VariantGroupCard
+              key={group.id}
+              items={group.items}
+              idx={idx}
+              fieldDefs={children}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+              isTouch={isTouch}
+              t={t}
+              favoritesBySkill={favoritesBySkill}
+              favoritesByVariant={favoritesByVariant}
+              activeFavoriteId={activeFavoriteId}
+            />
+          ),
+        )}
       </Div>
 
-      {/* Browse All button replaces Show More when section has overflow */}
+      {/* Show more / Show less */}
       {hasMore && (
         <Button
           variant="ghost"
@@ -622,10 +614,17 @@ function CollapsibleSkillSection({
             "rounded-lg transition-all duration-200",
             "hover:bg-muted/50",
           )}
-          onClick={handleBrowseAll}
+          onClick={() => setExpanded((v) => !v)}
         >
-          <ChevronDown className="h-4 w-4" />
-          <Span>{t("get.section.browseAll")}</Span>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 transition-transform",
+              expanded && "rotate-180",
+            )}
+          />
+          <Span>
+            {expanded ? t("get.section.showLess") : `+${hiddenCount}`}
+          </Span>
         </Button>
       )}
     </Div>
@@ -914,9 +913,17 @@ function VariantRow({
       >
         <Div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 border-t ml-9">
           {isInCollection ? (
-            <Span className="text-xs text-muted-foreground">
-              {t("get.card.actions.inCollection")}
-            </Span>
+            <SkillFavoriteActions
+              char={char}
+              favoriteCount={favoriteIds.length}
+              favoriteIds={favoriteIds}
+              activeFavoriteId={activeFavoriteId}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+              t={t}
+            />
           ) : (
             <>
               <Span className="text-xs text-muted-foreground flex-shrink-0">
@@ -1302,12 +1309,21 @@ function EditFavBeforeAddButton({
       const editFavoriteDefinitions =
         await import("../favorites/[id]/definition");
 
+      const defaultVariantId = char.isVariant ? (char.variantId ?? null) : null;
+      const variantModelSelection = char.isVariant
+        ? {
+            selectionType: ModelSelectionType.MANUAL,
+            manualModelId: char.modelId,
+          }
+        : null;
+
       navigate(createFavoriteDefinitions.default.POST, {
         data: {
           skillId: char.id,
+          variantId: defaultVariantId ?? undefined,
           icon: fullChar.icon ?? undefined,
           voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
-          modelSelection: null,
+          modelSelection: variantModelSelection,
         },
         replaceOnSuccess: {
           endpoint: editFavoriteDefinitions.default.PATCH,
@@ -1367,9 +1383,11 @@ function AddToFavoritesButton({
   children?: React.ReactNode;
   disabled?: boolean;
 }): React.JSX.Element {
+  const variantId = char.isVariant ? char.variantId : null;
+
   const { isLoading, addToFavorites } = useAddToFavorites({
     skillId: char.id,
-    variantId: char.isVariant ? char.variantId : null,
+    variantId,
     logger,
     user,
     locale,
@@ -1579,12 +1597,21 @@ function SkillFavoriteActions({
     const editFavoriteDefinitions =
       await import("../favorites/[id]/definition");
 
+    const variantId = char.isVariant ? (char.variantId ?? null) : null;
+    const variantModelSelection = char.isVariant
+      ? {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: char.modelId,
+        }
+      : null;
+
     navigate(createFavoriteDefinitions.default.POST, {
       data: {
         skillId: char.id,
+        variantId: variantId ?? undefined,
         icon: fullChar.icon ?? undefined,
         voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
-        modelSelection: null,
+        modelSelection: variantModelSelection,
       },
       replaceOnSuccess: {
         endpoint: editFavoriteDefinitions.default.PATCH,
@@ -1735,10 +1762,24 @@ function FavoritesList({
     );
   }
 
+  // Detect duplicate names so we can show a disambiguating index
+  const nameCounts = favoriteCards.reduce<Record<string, number>>(
+    (acc, fav) => {
+      acc[fav.name] = (acc[fav.name] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+  const nameSeenSoFar: Record<string, number> = {};
+
   return (
     <>
       {favoriteCards.map((fav) => {
         const isActive = fav.id === activeFavoriteId;
+        const isDuplicateName = (nameCounts[fav.name] ?? 0) > 1;
+        nameSeenSoFar[fav.name] = (nameSeenSoFar[fav.name] ?? 0) + 1;
+        const index = nameSeenSoFar[fav.name] ?? 1;
+
         return (
           <Div
             key={fav.id}
@@ -1752,7 +1793,7 @@ function FavoritesList({
               }
             }}
           >
-            {/* Skill icon */}
+            {/* Favorite icon */}
             <Div
               className={cn(
                 "flex items-center justify-center rounded-md w-7 h-7 flex-shrink-0",
@@ -1761,30 +1802,35 @@ function FavoritesList({
             >
               <Icon icon={fav.icon} className="h-4 w-4" />
             </Div>
-            {/* Model info */}
+            {/* Name + model info */}
             <Div className="flex-1 min-w-0">
-              <Div className="flex items-center gap-1 text-sm">
-                <Icon
-                  icon={fav.modelIcon}
-                  className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground"
-                />
+              <Div className="flex items-center gap-1">
                 <Span
                   className={cn(
-                    "truncate font-medium",
+                    "text-sm font-medium truncate",
                     isActive ? "text-primary" : "",
                   )}
                 >
-                  {t(fav.modelInfo)}
+                  {fav.name}
                 </Span>
+                {isDuplicateName && (
+                  <Span className="text-xs text-muted-foreground flex-shrink-0">
+                    #{index}
+                  </Span>
+                )}
               </Div>
               <Div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Icon icon={fav.modelIcon} className="h-3 w-3 flex-shrink-0" />
+                <Span className="truncate">{t(fav.modelInfo)}</Span>
                 {fav.modelId && (
-                  <ModelCreditDisplay
-                    modelId={fav.modelId}
-                    variant="text"
-                    className="text-xs"
-                    locale={locale}
-                  />
+                  <>
+                    <ModelCreditDisplay
+                      modelId={fav.modelId}
+                      variant="text"
+                      className="text-xs"
+                      locale={locale}
+                    />
+                  </>
                 )}
               </Div>
             </Div>

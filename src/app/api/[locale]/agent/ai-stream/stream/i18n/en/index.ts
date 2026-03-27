@@ -728,6 +728,22 @@ export const translations = {
         label: "Learning & Study",
         hint: "Tutor, Socratic Questioner",
       },
+      creative: {
+        label: "Creative & Stories",
+        hint: "Storyteller, Creative",
+      },
+      health: {
+        label: "Health & Career",
+        hint: "Health Wellness, Career Coach",
+      },
+      controversial: {
+        label: "Free Thinking",
+        hint: "Uncensored, Philosopher",
+      },
+      roleplay: {
+        label: "Roleplay & Characters",
+        hint: "Roleplay, Character Creator",
+      },
     },
   },
 };

@@ -3,6 +3,8 @@
  * Server component for users statistics and analytics using EndpointRenderer
  */
 
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import type React from "react";
 

@@ -73,7 +73,7 @@ async function ensureSeedGraphs(logger: EndpointLogger): Promise<void> {
   }
 
   logger.info(
-    `📊 ${maybeColorize(`${semantic.sense} ${allGraphSeeds.length} vibe sense graphs ready${created > 0 ? ` (${String(created)} new)` : ""}`, semantic.sense)}`,
+    `📊 ${maybeColorize(`${semantic.sense}${allGraphSeeds.length} vibe sense graphs ready${created > 0 ? ` (${String(created)} new)` : ""}`, semantic.sense)}`,
   );
 }
 

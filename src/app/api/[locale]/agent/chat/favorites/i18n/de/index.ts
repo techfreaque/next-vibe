@@ -99,6 +99,12 @@ export const translations: typeof enTranslations = {
       },
     },
     addVariant: "Variante hinzufügen",
+    deleteGroup: {
+      trigger: "Alle Varianten löschen",
+      confirm: "Alle {{count}} Varianten löschen?",
+      cancel: "Abbrechen",
+      action: "Alle löschen",
+    },
     emptyState: "Sie haben noch keine Favoriten hinzugefügt",
     tabs: {
       myFavorites: "Meine Favoriten",

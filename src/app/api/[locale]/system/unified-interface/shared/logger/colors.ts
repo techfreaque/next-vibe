@@ -53,7 +53,7 @@ export const semantic = {
   server: colors.magenta,
   database: colors.brightGreen,
   task: colors.brightMagenta,
-  generator: colors.brightBlue,
+  generator: colors.brightMagenta,
   sense: colors.brightRed,
   nextjs: colors.brightCyan,
 

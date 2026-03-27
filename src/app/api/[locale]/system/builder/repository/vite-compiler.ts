@@ -8,21 +8,21 @@ import type { Server as NodeHttpServer } from "node:http";
 import { networkInterfaces } from "node:os";
 import { basename, dirname, resolve } from "node:path";
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import type { BuildOptions, InlineConfig, Plugin, PluginOption } from "vite";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   maybeColorize,
   semantic,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/colors";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { createNextjsFormatter } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
 import type { BuildProfile, FileToCompile } from "../definition";
@@ -538,6 +538,7 @@ export class ViteCompiler {
           importProtection: {
             client: { specifiers: ["server-only"] },
           },
+          dev: { ssrStyles: { enabled: false } },
         }),
         react(),
         nitro({
@@ -585,11 +586,7 @@ export class ViteCompiler {
             id: string,
             opts,
           ): Promise<{ code: string; map: null } | undefined> {
-            if (
-              opts?.ssr ||
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vite 6 environments API
-              (this as any).environment?.name === "ssr"
-            ) {
+            if (opts?.ssr || this.environment?.name === "ssr") {
               return undefined;
             }
             if (
@@ -919,6 +916,7 @@ export class ViteCompiler {
             importProtection: {
               client: { specifiers: ["server-only"] },
             },
+            dev: { ssrStyles: { enabled: false } },
           }),
           react(),
           nitro(),
@@ -1013,11 +1011,7 @@ export class ViteCompiler {
             ): Promise<{ code: string; map: null } | undefined> {
               // Only run for client (not SSR). Check both opts.ssr (Vite classic)
               // and this.environment.name (Vite 6 environments API).
-              if (
-                opts?.ssr ||
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vite 6 environments API
-                (this as any).environment?.name === "ssr"
-              ) {
+              if (opts?.ssr || this.environment?.name === "ssr") {
                 return undefined;
               }
               // Only target layout.tsx and page.tsx in src/app/[locale]
@@ -1116,11 +1110,7 @@ export class ViteCompiler {
               id: string,
               opts,
             ): { code: string; map: null } | undefined {
-              if (
-                opts?.ssr ||
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vite 6 environments API
-                (this as any).environment?.name === "ssr"
-              ) {
+              if (opts?.ssr || this.environment?.name === "ssr") {
                 return undefined;
               }
               if (
@@ -1234,6 +1224,41 @@ export class ViteCompiler {
                 return { id, external: true };
               }
               return null;
+            },
+          } as Plugin,
+          // After HMR invalidates any src/ module, clear the SSR module runner
+          // evaluated module cache. Without this, the runner keeps stale module
+          // instances with partially-initialized circular imports, causing:
+          //   "Cannot access '__vite_ssr_import_N__' before initialization"
+          // Clearing forces fresh re-evaluation on the next SSR request.
+          // We clear both on HMR (for file changes) and on every incoming SSR
+          // request (for page reloads after HMR) so stale state never survives.
+          {
+            name: "ssr-clear-on-hmr",
+            configureServer(srv) {
+              // oxlint-disable-next-line no-unused-vars
+              srv.middlewares.use((req, _res, next) => {
+                // On every non-asset request, clear the SSR module cache so
+                // a reload after HMR never hits the stale TDZ state.
+                const url = (req as { url?: string }).url ?? "";
+                if (!url.startsWith("/@") && !url.startsWith("/node_modules")) {
+                  const runner = srv.environments?.["ssr"]?.runner;
+                  if (runner?.evaluatedModules) {
+                    runner.evaluatedModules.clear();
+                  }
+                }
+                next();
+              });
+            },
+            handleHotUpdate({ modules, server: viteServer }) {
+              const hasSrcChange = modules.some((m) => m.id?.includes("/src/"));
+              if (!hasSrcChange) {
+                return;
+              }
+              const runner = viteServer.environments?.["ssr"]?.runner;
+              if (runner?.evaluatedModules) {
+                runner.evaluatedModules.clear();
+              }
             },
           } as Plugin,
         ],

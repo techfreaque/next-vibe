@@ -3,6 +3,8 @@
  * Displays comprehensive user information using EndpointsPage
  */
 
+export const dynamic = "force-dynamic";
+
 import type { JSX } from "react";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";

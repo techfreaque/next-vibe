@@ -61,39 +61,11 @@ export const devilsAdvocateSkill: Skill = {
     {
       id: "maverick",
       variantName: "skills.devilsAdvocate.variants.maverick" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_20_BETA,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.UNCENSORED,
-          max: ContentLevel.UNCENSORED,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "eastern",
       variantName: "skills.devilsAdvocate.variants.eastern" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.UNCENSORED,
-          max: ContentLevel.UNCENSORED,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

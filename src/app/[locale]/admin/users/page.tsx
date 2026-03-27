@@ -3,6 +3,8 @@
  * Main users management interface showing statistics and analytics
  */
 
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 

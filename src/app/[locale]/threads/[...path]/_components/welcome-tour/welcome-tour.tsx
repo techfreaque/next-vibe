@@ -10,6 +10,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
@@ -30,10 +31,9 @@ import {
   TOUR_STORAGE_KEY,
   TOUR_TEXT_ALIGN,
 } from "./tour-config";
-import { useTourState } from "./tour-state-context";
 
 // Step indices
-const MODEL_SELECTOR_STEP_INDEX = 1; // "Choose Your AI Companion" - clicks open selector
+const MODEL_SELECTOR_STEP_INDEX = 1; // "Choose Your AI Companion" — clicks open selector
 const BROWSE_SKILLS_STEP_INDEX = 3; // Shown inside open selector — browse skills button
 
 interface WelcomeTourProps {
@@ -61,7 +61,6 @@ export function WelcomeTour({
     (state) => state.setModelSelectorOpen,
   );
   const setAdvanceTour = useTourState((state) => state.setAdvanceTour);
-  const modelSelectorOpen = useTourState((state) => state.modelSelectorOpen);
   const onboardingComplete = useTourState((state) => state.onboardingComplete);
   const setOnboardingComplete = useTourState(
     (state) => state.setOnboardingComplete,
@@ -72,7 +71,7 @@ export function WelcomeTour({
     (state) => state.setBottomSheetExpanded,
   );
 
-  // Ref to track if we're waiting for selector to close
+  // Ref to track if we're waiting for selector onboarding to finish
   const waitingForSelectorRef = useRef(false);
 
   // Track if we're waiting for bottom sheet to expand
@@ -203,31 +202,17 @@ export function WelcomeTour({
     };
   }, [run, setAdvanceTour, goToNextStep]);
 
-  // Pause/resume tour based on selector state
-  // When selector is open during tour step 2, hide the tooltip until onboarding completes
+  // Resume tour after onboarding completes inside the selector
   useEffect(() => {
-    const isOnSelectorStep = stepIndex === MODEL_SELECTOR_STEP_INDEX;
-
-    if (modelSelectorOpen && isOnSelectorStep && run) {
-      // Selector opened during step 2 - pause tour (hide tooltip), wait for onboarding
-      waitingForSelectorRef.current = true;
-      setRun(false);
-    } else if (onboardingComplete && waitingForSelectorRef.current) {
-      // Onboarding finished inside selector - advance tour to companion variants step
+    if (onboardingComplete && waitingForSelectorRef.current) {
       waitingForSelectorRef.current = false;
       setOnboardingComplete(false);
+
       goToNextStep();
-      // Small delay to ensure step index updates and favorites DOM is ready
-      setTimeout(() => setRun(true), 300);
+      // Wait for favorites list to fully render before resuming tour
+      setTimeout(() => setRun(true), 800);
     }
-  }, [
-    modelSelectorOpen,
-    onboardingComplete,
-    stepIndex,
-    run,
-    goToNextStep,
-    setOnboardingComplete,
-  ]);
+  }, [onboardingComplete, goToNextStep, setOnboardingComplete]);
 
   // Resume tour after bottom sheet animation completes
   useEffect(() => {
@@ -250,7 +235,7 @@ export function WelcomeTour({
 
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
-  // Helper to navigate based on tour target - uses Zustand store as source of truth
+  // Helper to navigate based on tour target
   const navigateForTarget = useCallback(
     (target: string): void => {
       const navigateToFolder = (folderId: DefaultFolderId): void => {
@@ -282,7 +267,6 @@ export function WelcomeTour({
           : DefaultFolderId.INCOGNITO;
         navigateToFolder(folderId);
       } else if (target === getTourSelector(TOUR_DATA_ATTRS.CHAT_INPUT)) {
-        // Chat input requires a new thread page
         const folderId = isAuthenticated
           ? DefaultFolderId.PRIVATE
           : DefaultFolderId.INCOGNITO;
@@ -308,12 +292,10 @@ export function WelcomeTour({
         if (currentStep?.target) {
           const target = currentStep.target as string;
 
-          // If this step needs sidebar, ensure it's open
           if (isSidebarTarget(target)) {
             ensureSidebarOpen();
           }
 
-          // If this step needs bottom sheet expanded, expand it
           if (needsBottomSheetExpanded(target)) {
             setBottomSheetExpanded(true);
           } else {
@@ -328,13 +310,9 @@ export function WelcomeTour({
         const currentStep = steps[index];
         if (currentStep?.target) {
           const target = currentStep.target as string;
-
-          // Try to open sidebar if needed
           if (isSidebarTarget(target)) {
             ensureSidebarOpen();
           }
-
-          // Try to expand bottom sheet if needed
           if (needsBottomSheetExpanded(target)) {
             setBottomSheetExpanded(true);
           }
@@ -345,18 +323,17 @@ export function WelcomeTour({
       // Handle step changes
       if (type === EVENTS.STEP_AFTER) {
         if (action === ACTIONS.NEXT) {
-          // Special handling for MODEL_SELECTOR step
-          // When user clicks "Next" on this step, open the selector and wait for onboarding to complete
+          // MODEL_SELECTOR step: pause tour, open selector, wait for onboarding
           if (index === MODEL_SELECTOR_STEP_INDEX) {
-            // Open the selector modal
-            setModelSelectorOpen(true);
-            // Mark that we're waiting for onboarding to complete
             waitingForSelectorRef.current = true;
-            // Don't advance - onboardingComplete will trigger advance via useEffect
+            setRun(false);
+            setModelSelectorOpen(true);
+
+            // Don't advance — onboardingComplete effect will resume tour
             return;
           }
 
-          // When leaving the in-selector steps, close the selector
+          // Leaving the in-selector steps: close selector
           if (index === BROWSE_SKILLS_STEP_INDEX) {
             setModelSelectorOpen(false);
           }
@@ -366,19 +343,13 @@ export function WelcomeTour({
 
           if (nextStep?.target) {
             const target = nextStep.target as string;
-
-            // Get current step info
-            const currentStepData = steps[index];
-            const currentTarget = currentStepData?.target as string | undefined;
-
-            // Check if we're transitioning between sidebar and non-sidebar targets
+            const currentTarget = steps[index]?.target as string | undefined;
             const currentIsSidebar = currentTarget
               ? isSidebarTarget(currentTarget)
               : false;
             const nextIsSidebar = isSidebarTarget(target);
-
-            // Handle sidebar state transitions
             const needsSidebarChange = currentIsSidebar !== nextIsSidebar;
+
             if (needsSidebarChange) {
               if (isMobile) {
                 if (nextIsSidebar) {
@@ -391,10 +362,8 @@ export function WelcomeTour({
               }
             }
 
-            // Navigate to appropriate folder
             navigateForTarget(target);
 
-            // If next step needs bottom sheet, expand it and wait
             if (needsBottomSheetExpanded(target)) {
               setBottomSheetExpanded(true);
               pendingStepIndexRef.current = nextIndex;
@@ -403,7 +372,6 @@ export function WelcomeTour({
               return;
             }
 
-            // If sidebar state changed, pause and wait for DOM to settle
             if (needsSidebarChange) {
               setRun(false);
               setStepIndex(nextIndex);
@@ -413,7 +381,6 @@ export function WelcomeTour({
             }
           }
 
-          // Advance step
           setStepIndex(nextIndex);
           localStorage.setItem(TOUR_LAST_STEP_KEY, nextIndex.toString());
         } else if (action === ACTIONS.PREV) {
@@ -422,8 +389,6 @@ export function WelcomeTour({
 
           if (prevStep?.target) {
             const target = prevStep.target as string;
-
-            // Handle sidebar state for mobile
             if (isMobile) {
               if (isSidebarTarget(target)) {
                 ensureSidebarOpen();
@@ -433,21 +398,19 @@ export function WelcomeTour({
             } else if (isSidebarTarget(target)) {
               ensureSidebarOpen();
             }
-
-            // Navigate to appropriate folder
             navigateForTarget(target);
-
-            // Handle bottom sheet state
             if (needsBottomSheetExpanded(target)) {
-              // Keep it expanded if going back to a bottom sheet step
               setBottomSheetExpanded(true);
             } else {
-              // Close bottom sheet if leaving bottom sheet steps
               setBottomSheetExpanded(false);
             }
           }
 
-          // Go back
+          // Going back to model selector step — reopen the selector
+          if (prevIndex === MODEL_SELECTOR_STEP_INDEX) {
+            setModelSelectorOpen(true);
+          }
+
           setStepIndex(prevIndex);
           localStorage.setItem(TOUR_LAST_STEP_KEY, prevIndex.toString());
         }
@@ -465,7 +428,6 @@ export function WelcomeTour({
         localStorage.removeItem(TOUR_IN_PROGRESS_KEY);
         localStorage.removeItem(TOUR_SKIPPED_KEY);
 
-        // Navigate to appropriate folder with new thread
         const targetFolder = isAuthenticated
           ? DefaultFolderId.PRIVATE
           : DefaultFolderId.INCOGNITO;
@@ -516,12 +478,9 @@ export function WelcomeTour({
     localStorage.removeItem(TOUR_AUTH_PENDING_KEY);
     localStorage.removeItem(TOUR_LAST_STEP_KEY);
     localStorage.removeItem(TOUR_IN_PROGRESS_KEY);
-
-    // Close any open modals and reset UI state
     setModelSelectorOpen(false);
     setBottomSheetExpanded(false);
 
-    // Reset tour state
     setSteps(tourSteps);
     setStepIndex(0);
     setTourActive(true);

@@ -316,6 +316,12 @@ const { GET } = createEndpoint({
                     hidden: true,
                     schema: z.boolean(),
                   }),
+                  /** True if this variant is the default selection for the skill */
+                  isDefault: responseField(scopedTranslation, {
+                    type: WidgetType.TEXT,
+                    hidden: true,
+                    schema: z.boolean(),
+                  }),
                   modelId: responseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     hidden: true,
@@ -510,6 +516,7 @@ const { GET } = createEndpoint({
                 variantId: null,
                 variantName: null,
                 isVariant: false,
+                isDefault: false,
               },
             ],
           },
@@ -535,6 +542,7 @@ const { GET } = createEndpoint({
                 variantId: null,
                 variantName: null,
                 isVariant: false,
+                isDefault: false,
               },
             ],
           },

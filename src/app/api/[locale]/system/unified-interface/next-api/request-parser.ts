@@ -201,10 +201,23 @@ function parseFormData(
       value = values[0];
     }
 
+    // Handle simple bracket notation for arrays of scalars/files: attachments[0]
+    const simpleBracketMatch = /^([^[]+)\[(\d+)\]$/.exec(key);
     // Handle bracket+dot notation for arrays of objects: tools[0].toolId
-    // Split on first dot to get the array part and the property part
     const bracketDotMatch = /^([^[]+)\[(\d+)\]\.(.+)$/.exec(key);
-    if (bracketDotMatch) {
+    if (simpleBracketMatch) {
+      const arrayKey = simpleBracketMatch[1];
+      const index = parseInt(simpleBracketMatch[2], 10);
+      if (arrayKey) {
+        if (!(arrayKey in result)) {
+          result[arrayKey] = [];
+        }
+        (result[arrayKey] as Array<string | File | File[] | MergedObject>)[
+          index
+        ] =
+          typeof value === "string" ? (tryParseValue(value) as string) : value;
+      }
+    } else if (bracketDotMatch) {
       const arrayKey = bracketDotMatch[1];
       const index = parseInt(bracketDotMatch[2], 10);
       const propPath = bracketDotMatch[3];

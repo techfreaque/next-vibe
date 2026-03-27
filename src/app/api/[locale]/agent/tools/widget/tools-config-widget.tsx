@@ -123,7 +123,7 @@ function fromEnabledTools(tools: EnabledTool[] | null): ToolsConfigValue {
 // ─── Label helpers ──────────────────────────────────────────────────────────
 
 function getToolLabel(tool: HelpToolMetadataSerialized): string {
-  return tool.title || tool.aliases?.[0] || tool.id;
+  return tool.title || tool.aliases?.[0] || (tool.id ?? tool.name);
 }
 
 const isIdSegment = (s: string): boolean =>
@@ -217,9 +217,9 @@ export function ToolsConfigEdit({
     }
     const defaultPinnedSet = new Set<string>(getDefaultToolIdsForUser(user));
     return availableTools.map((tool) => ({
-      id: tool.id,
+      id: tool.id ?? tool.name,
       requiresConfirmation: tool.requiresConfirmation ?? false,
-      pinned: defaultPinnedSet.has(tool.id),
+      pinned: defaultPinnedSet.has(tool.id ?? tool.name),
     }));
   }, [enabledTools, skillEnabledTools, availableTools, user]);
 
@@ -258,7 +258,7 @@ export function ToolsConfigEdit({
         grouped[category] = { tools: [], subcategories: {} };
       }
       grouped[category].tools.push(tool);
-      const subKey = getSubcategory(tool.id);
+      const subKey = getSubcategory(tool.id ?? tool.name);
       if (!grouped[category].subcategories[subKey]) {
         grouped[category].subcategories[subKey] = [];
       }
@@ -277,7 +277,7 @@ export function ToolsConfigEdit({
     () =>
       filteredTools.length > 0 &&
       filteredTools.every((tool) =>
-        effectiveEnabledTools.some((t) => t.id === tool.id),
+        effectiveEnabledTools.some((t) => t.id === (tool.id ?? tool.name)),
       ),
     [filteredTools, effectiveEnabledTools],
   );
@@ -322,7 +322,7 @@ export function ToolsConfigEdit({
   };
 
   const handleEnableAll = (): void => {
-    const allIds = filteredTools.map((tool) => tool.id);
+    const allIds = filteredTools.map((tool) => tool.id ?? tool.name);
     const allEnabled = allIds.every((id) =>
       effectiveEnabledTools.some((t) => t.id === id),
     );
@@ -332,9 +332,12 @@ export function ToolsConfigEdit({
       );
     } else {
       const toAdd = filteredTools
-        .filter((tool) => !effectiveEnabledTools.some((t) => t.id === tool.id))
+        .filter(
+          (tool) =>
+            !effectiveEnabledTools.some((t) => t.id === (tool.id ?? tool.name)),
+        )
         .map((tool) => ({
-          id: tool.id,
+          id: tool.id ?? tool.name,
           requiresConfirmation: tool.requiresConfirmation ?? false,
           pinned: true,
         }));
@@ -357,7 +360,7 @@ export function ToolsConfigEdit({
   };
 
   const toggleCategoryTools = (tools: HelpToolMetadataSerialized[]): void => {
-    const ids = tools.map((t) => t.id);
+    const ids = tools.map((t) => t.id ?? t.name);
     const allEnabled = ids.every((id) =>
       effectiveEnabledTools.some((t) => t.id === id),
     );
@@ -367,9 +370,12 @@ export function ToolsConfigEdit({
       );
     } else {
       const toAdd = tools
-        .filter((tool) => !effectiveEnabledTools.some((t) => t.id === tool.id))
+        .filter(
+          (tool) =>
+            !effectiveEnabledTools.some((t) => t.id === (tool.id ?? tool.name)),
+        )
         .map((tool) => ({
-          id: tool.id,
+          id: tool.id ?? tool.name,
           requiresConfirmation: tool.requiresConfirmation ?? false,
           pinned: true,
         }));
@@ -630,7 +636,7 @@ export function ToolsConfigEdit({
                                         <Div className="divide-y">
                                           {subTools.map((tool) => (
                                             <ToolConfigRow
-                                              key={tool.id}
+                                              key={tool.id ?? tool.name}
                                               tool={tool}
                                               effectiveEnabledTools={
                                                 effectiveEnabledTools
@@ -654,7 +660,7 @@ export function ToolsConfigEdit({
                                   <Div className="divide-y">
                                     {tools.map((tool) => (
                                       <ToolConfigRow
-                                        key={tool.id}
+                                        key={tool.id ?? tool.name}
                                         tool={tool}
                                         effectiveEnabledTools={
                                           effectiveEnabledTools
@@ -720,7 +726,8 @@ function ToolConfigRow({
   onTogglePinned: (toolName: string) => void;
   onToggleConfirmation: (toolName: string) => void;
 }): JSX.Element {
-  const enabledTool = effectiveEnabledTools.find((et) => et.id === tool.id);
+  const toolKey = tool.id ?? tool.name;
+  const enabledTool = effectiveEnabledTools.find((et) => et.id === toolKey);
   const isEnabled = !!enabledTool;
   const isPinned = enabledTool?.pinned ?? false;
   const requiresConfirmation = enabledTool?.requiresConfirmation ?? false;
@@ -736,7 +743,7 @@ function ToolConfigRow({
       <Div className="flex items-center gap-2">
         <Switch
           checked={isEnabled}
-          onCheckedChange={() => onToggleEnabled(tool.id)}
+          onCheckedChange={() => onToggleEnabled(toolKey)}
           className="h-4 w-7 shrink-0"
         />
         <Div className="flex-1 min-w-0">
@@ -771,7 +778,7 @@ function ToolConfigRow({
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onTogglePinned(tool.id);
+                    onTogglePinned(toolKey);
                   }}
                 >
                   {isPinned ? (
@@ -805,7 +812,7 @@ function ToolConfigRow({
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onToggleConfirmation(tool.id);
+                    onToggleConfirmation(toolKey);
                   }}
                 >
                   <Shield className="h-3 w-3" />

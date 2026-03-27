@@ -3,6 +3,8 @@
  * Server component for authentication
  */
 
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import type React from "react";
 

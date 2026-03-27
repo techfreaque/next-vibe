@@ -122,7 +122,7 @@ export class MemoriesRepository {
       .where(and(...baseConditions))
       .orderBy(desc(memories.priority), memories.id);
 
-    logger.info("Retrieved memories", {
+    logger.debug("Retrieved memories", {
       userId,
       count: result.length,
     });

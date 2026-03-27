@@ -3,6 +3,8 @@
  * Server component for leads statistics and analytics
  */
 
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import type React from "react";
 

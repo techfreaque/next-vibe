@@ -15,7 +15,7 @@ import {
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import type { TFunction } from "@/i18n/core/static-types";
-import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 
 const SelectorOnboarding = lazy(() =>
   import("./selector-onboarding").then((mod) => ({
@@ -46,10 +46,7 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const { t } = simpleT(locale);
-  const setOnboardingComplete = useTourState(
-    (state) => state.setOnboardingComplete,
-  );
-
+  const setOnboardingComplete = useTourState((s) => s.setOnboardingComplete);
   const { favorites, isInitialLoading: favoritesLoading } = useChatFavorites(
     logger,
     {

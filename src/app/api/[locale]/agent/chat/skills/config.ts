@@ -44,7 +44,7 @@ export interface SkillVariant {
   id: string;
   /** Localized sub-label shown under the skill name, e.g. "skills.thea.variants.brilliant" */
   variantName: SkillsTranslationKey;
-  modelSelection: ConfigModelSelection;
+  modelSelection?: ConfigModelSelection;
   /** Which variant is the default when none is specified */
   isDefault?: boolean;
 }
@@ -70,7 +70,7 @@ export interface Skill {
   category: typeof SkillCategoryValue;
   voice: typeof TtsVoiceValue;
   suggestedPrompts: SkillsTranslationKey[];
-  modelSelection: ConfigModelSelection;
+  modelSelection?: ConfigModelSelection;
   /** Optional named variants, each with their own modelSelection. Expanded as grouped rows in skill list. */
   variants?: SkillVariant[];
   ownershipType: typeof SkillOwnershipTypeValue;

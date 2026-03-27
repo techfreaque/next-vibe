@@ -348,7 +348,7 @@ export class RemoteConnectionRepository {
         },
       });
 
-    logger.info("Stored remote connection", { userId, remoteUrl, instanceId });
+    logger.debug("Stored remote connection", { userId, remoteUrl, instanceId });
     return success({ remoteUrl, isConnected: true });
   }
 

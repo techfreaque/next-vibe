@@ -4,12 +4,16 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
 import { Briefcase } from "next-vibe-ui/ui/icons/Briefcase";
 import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Code } from "next-vibe-ui/ui/icons/Code";
-import { BookOpen } from "next-vibe-ui/ui/icons/BookOpen";
+import { Flame } from "next-vibe-ui/ui/icons/Flame";
+import { Heart } from "next-vibe-ui/ui/icons/Heart";
 import { PenTool } from "next-vibe-ui/ui/icons/PenTool";
 import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { type JSX, useCallback, useState } from "react";
@@ -23,21 +27,14 @@ import {
   DEFAULT_SKILLS,
 } from "@/app/api/[locale]/agent/chat/skills/config";
 import { scopedTranslation as skillsScopedTranslation } from "@/app/api/[locale]/agent/chat/skills/i18n";
-import type { FiltersModelSelection } from "@/app/api/[locale]/agent/chat/skills/create/definition";
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  SpeedLevel,
-} from "@/app/api/[locale]/agent/chat/skills/enum";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/skills/enum";
+import type { UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import { ChatFavoritesRepositoryClient } from "@/app/api/[locale]/agent/chat/favorites/repository-client";
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
 import favoritesDefinition from "@/app/api/[locale]/agent/chat/favorites/definition";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
-import { getModelById, ModelId } from "@/app/api/[locale]/agent/models/models";
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -51,14 +48,22 @@ export type UseCase =
   | "research"
   | "writing"
   | "business"
-  | "learning";
+  | "creative"
+  | "learning"
+  | "health"
+  | "controversial"
+  | "roleplay";
 
 const USE_CASE_IDS: UseCase[] = [
   "coding",
   "research",
   "writing",
   "business",
+  "creative",
   "learning",
+  "health",
+  "controversial",
+  "roleplay",
 ];
 
 type UseCaseIcon = React.ComponentType<{ className?: string }>;
@@ -68,51 +73,24 @@ const USE_CASE_ICONS: Record<UseCase, UseCaseIcon> = {
   research: Search,
   writing: PenTool,
   business: Briefcase,
+  creative: Sparkles,
   learning: BookOpen,
+  health: Heart,
+  controversial: Flame,
+  roleplay: Users,
 };
 
 const USE_CASE_SKILL_IDS: Record<UseCase, string[]> = {
   coding: ["vibe-coder", "coder"],
   research: ["researcher", "data-analyst"],
   writing: ["writer", "editor"],
-  business: ["business-advisor", "product-manager"],
-  learning: ["tutor", "socraticQuestioner"],
+  business: ["business-advisor", "financial-advisor"],
+  creative: ["storyteller", "creative"],
+  learning: ["tutor", "teacher"],
+  health: ["health-wellness", "career-coach"],
+  controversial: ["uncensored", "philosopher"],
+  roleplay: ["roleplay-skill", "character-creator"],
 };
-
-function getSpecialistModelSelection(
-  modelSelection: ModelSelectionSimple,
-): FiltersModelSelection {
-  // Determine a minimum intelligence floor based on the selected companion model
-  let intelligenceMin: (typeof IntelligenceLevel)[keyof typeof IntelligenceLevel] =
-    IntelligenceLevel.SMART;
-  if (
-    modelSelection.selectionType === ModelSelectionType.MANUAL &&
-    modelSelection.manualModelId
-  ) {
-    const model = getModelById(modelSelection.manualModelId);
-    if (model?.intelligence === IntelligenceLevel.BRILLIANT) {
-      intelligenceMin = IntelligenceLevel.BRILLIANT;
-    }
-  }
-
-  return {
-    selectionType: ModelSelectionType.FILTERS,
-    intelligenceRange: {
-      min: intelligenceMin,
-      max: IntelligenceLevel.BRILLIANT,
-    },
-    contentRange: {
-      min: ContentLevel.MAINSTREAM,
-      max: ContentLevel.MAINSTREAM,
-    },
-    speedRange: {
-      min: SpeedLevel.BALANCED,
-      max: SpeedLevel.THOROUGH,
-    },
-    sortBy: ModelSortField.INTELLIGENCE,
-    sortDirection: ModelSortDirection.DESC,
-  };
-}
 
 interface SeededEntry {
   id: string;
@@ -130,6 +108,7 @@ async function seedFavorites(
   companionId: string,
   selected: Set<UseCase>,
   addFavorite: ReturnType<typeof useFavoriteCreate>["addFavorite"],
+  userRoles: readonly (typeof UserPermissionRoleValue)[],
 ): Promise<SeedResult> {
   const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
   if (!companion) {
@@ -167,12 +146,6 @@ async function seedFavorites(
     firstCompanionId = entries[0]!.id;
   }
 
-  const defaultModelSelection =
-    entries.find((e) => e.id === firstCompanionId)?.modelSelection ??
-    companion.modelSelection;
-  const specialistModelSelection = getSpecialistModelSelection(
-    defaultModelSelection,
-  );
   const seededSkillIds = new Set<string>();
 
   for (const useCase of USE_CASE_IDS) {
@@ -184,17 +157,51 @@ async function seedFavorites(
         continue;
       }
       seededSkillIds.add(skillId);
-      const id = await addFavorite({
-        skillId,
-        modelSelection: specialistModelSelection,
-      });
-      if (id) {
-        entries.push({
-          id,
+
+      const skill = DEFAULT_SKILLS.find((s) => s.id === skillId);
+      if (!skill) {
+        continue;
+      }
+
+      // Skip skills the user doesn't have the required role for
+      if (
+        skill.userRole &&
+        skill.userRole.length > 0 &&
+        !skill.userRole.some((r) => userRoles.includes(r))
+      ) {
+        continue;
+      }
+
+      const skillVariants = skill.variants ?? [];
+      if (skillVariants.length > 0) {
+        for (const variant of skillVariants) {
+          const id = await addFavorite({
+            skillId,
+            variantId: variant.id,
+            modelSelection: variant.modelSelection,
+          });
+          if (id) {
+            entries.push({
+              id,
+              skillId,
+              variantId: variant.id,
+              modelSelection: variant.modelSelection,
+            });
+          }
+        }
+      } else {
+        const id = await addFavorite({
           skillId,
-          variantId: null,
-          modelSelection: specialistModelSelection,
+          modelSelection: skill.modelSelection,
         });
+        if (id) {
+          entries.push({
+            id,
+            skillId,
+            variantId: null,
+            modelSelection: skill.modelSelection,
+          });
+        }
       }
     }
   }
@@ -227,6 +234,7 @@ export function UsecasesStep({
 
   const noProviderAvailable =
     !envAvailability.claudeCode && !envAvailability.openRouter;
+  const userRoles = user.roles;
 
   const toggleUseCase = useCallback((id: UseCase) => {
     setSelected((prev) => {
@@ -245,6 +253,11 @@ export function UsecasesStep({
       const { t: tSkill } = skillsScopedTranslation.scopedT(locale);
       const cards = entries.map((entry, index) => {
         const skill = DEFAULT_SKILLS.find((s) => s.id === entry.skillId);
+        const variant = entry.variantId
+          ? skill?.variants?.find((v) => v.id === entry.variantId)
+          : undefined;
+        const effectiveModelSelection =
+          variant?.modelSelection ?? skill?.modelSelection ?? null;
         return ChatFavoritesRepositoryClient.computeFavoriteDisplayFields(
           {
             id: entry.id,
@@ -255,7 +268,7 @@ export function UsecasesStep({
             modelSelection: entry.modelSelection,
             position: index,
           },
-          skill?.modelSelection ?? null,
+          effectiveModelSelection,
           skill?.icon ?? null,
           skill?.name ? tSkill(skill.name) : null,
           skill?.tagline ? tSkill(skill.tagline) : null,
@@ -294,23 +307,40 @@ export function UsecasesStep({
         companionId,
         selected,
         addFavorite,
+        userRoles,
       );
       applyOptimisticFavorites(entries, firstCompanionId);
       onDone();
-      if (firstCompanionId && settings?.ttsVoice) {
-        const defaultEntry = entries.find((e) => e.id === firstCompanionId);
-        const activeModelId =
-          defaultEntry?.modelSelection.selectionType ===
-          ModelSelectionType.MANUAL
-            ? defaultEntry.modelSelection.manualModelId
-            : ModelId.KIMI_K2_5;
-        setActiveFavorite(
-          firstCompanionId,
-          companionId,
-          activeModelId,
-          settings.ttsVoice,
+      try {
+        if (firstCompanionId) {
+          const defaultEntry = entries.find((e) => e.id === firstCompanionId);
+          const activeModelId =
+            defaultEntry?.modelSelection.selectionType ===
+            ModelSelectionType.MANUAL
+              ? defaultEntry.modelSelection.manualModelId
+              : ModelId.KIMI_K2_5;
+          const companion = COMPANION_SKILLS.find((c) => c.id === companionId);
+          const voice = settings?.ttsVoice ?? companion?.voice;
+          if (voice) {
+            setActiveFavorite(
+              firstCompanionId,
+              companionId,
+              activeModelId,
+              voice,
+            );
+          }
+        }
+      } catch (e) {
+        logger.error(
+          "Failed to set active favorite after onboarding",
+          e instanceof Error ? e.message : String(e),
         );
       }
+    } catch (e) {
+      logger.error(
+        "Onboarding seeding failed",
+        e instanceof Error ? e.message : String(e),
+      );
     } finally {
       setIsSaving(false);
     }
@@ -322,6 +352,8 @@ export function UsecasesStep({
     setActiveFavorite,
     settings?.ttsVoice,
     onDone,
+    userRoles,
+    logger,
   ]);
 
   return (
@@ -352,7 +384,7 @@ export function UsecasesStep({
       </Div>
 
       {/* Use-case grid */}
-      <Div className="grid grid-cols-2 gap-2 mb-5 shrink-0">
+      <Div className="grid grid-cols-3 gap-2 mb-5 shrink-0">
         {USE_CASE_IDS.map((uc) => (
           <UseCaseCard
             key={uc}
@@ -411,10 +443,13 @@ function UseCaseCard({
   onToggle,
   t,
 }: UseCaseCardProps): JSX.Element {
+  const IconComp = USE_CASE_ICONS[useCase];
+  const skillCount = USE_CASE_SKILL_IDS[useCase].length;
+
   return (
     <Div
       className={cn(
-        "flex items-start gap-2.5 p-3 rounded-xl border-2 transition-all cursor-pointer",
+        "relative flex flex-col p-2.5 rounded-xl border-2 transition-all cursor-pointer",
         "hover:shadow-sm active:scale-[0.99]",
         isSelected
           ? "border-primary bg-primary/5 ring-1 ring-primary/20"
@@ -422,9 +457,10 @@ function UseCaseCard({
       )}
       onClick={onToggle}
     >
+      {/* Checkbox top-right */}
       <Div
         className={cn(
-          "w-4 h-4 rounded border-2 shrink-0 mt-0.5 flex items-center justify-center transition-colors",
+          "absolute top-2 right-2 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors shrink-0",
           isSelected
             ? "border-primary bg-primary"
             : "border-muted-foreground/40",
@@ -435,22 +471,23 @@ function UseCaseCard({
         )}
       </Div>
 
-      <Div className="flex-1 min-w-0">
-        <Div className="flex items-center gap-1.5 mb-0.5">
-          {(() => {
-            const IconComp = USE_CASE_ICONS[useCase];
-            return (
-              <IconComp className="h-4 w-4 text-muted-foreground shrink-0" />
-            );
-          })()}
-          <Span className="text-sm font-medium">
-            {t(`onboarding.usecases.${useCase}.label`)}
-          </Span>
-        </Div>
-        <P className="text-xs text-muted-foreground leading-snug">
-          {t(`onboarding.usecases.${useCase}.hint`)}
-        </P>
-      </Div>
+      {/* Icon top-left */}
+      <IconComp
+        className={cn(
+          "h-5 w-5 mb-1.5",
+          isSelected ? "text-primary" : "text-muted-foreground",
+        )}
+      />
+
+      {/* Label */}
+      <Span className="text-xs font-medium leading-tight pr-5">
+        {t(`onboarding.usecases.${useCase}.label`)}
+      </Span>
+
+      {/* Skill count badge */}
+      <Span className="text-[10px] text-muted-foreground mt-1">
+        {skillCount} {skillCount === 1 ? "skill" : "skills"}
+      </Span>
     </Div>
   );
 }

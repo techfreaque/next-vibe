@@ -3,6 +3,8 @@
  * Lists all pipeline graphs visible to the current admin
  */
 
+export const dynamic = "force-dynamic";
+
 import type { JSX } from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

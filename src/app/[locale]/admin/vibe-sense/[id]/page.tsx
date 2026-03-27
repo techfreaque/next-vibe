@@ -3,6 +3,8 @@
  * Shows graph config, chart visualization, and management actions
  */
 
+export const dynamic = "force-dynamic";
+
 import type { JSX } from "react";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";

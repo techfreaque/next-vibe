@@ -3,6 +3,8 @@
  * Main leads management interface showing statistics and overview
  */
 
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
 import type React from "react";
 

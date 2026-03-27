@@ -3,6 +3,8 @@
  * Shows leads currently active in email campaigns
  */
 
+export const dynamic = "force-dynamic";
+
 import type React from "react";
 
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";

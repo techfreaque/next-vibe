@@ -4,7 +4,6 @@ import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
 import {
   ContentLevel,
-  IntelligenceLevel,
   ModelSelectionType,
   ModelSortDirection,
   ModelSortField,
@@ -43,10 +42,7 @@ export const chan4Skill: Skill = {
   modelSelection: {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: ModelId.UNCENSORED_LM_V1_2,
-    intelligenceRange: {
-      min: IntelligenceLevel.SMART,
-      max: IntelligenceLevel.SMART,
-    },
+
     contentRange: {
       min: ContentLevel.UNCENSORED,
       max: ContentLevel.UNCENSORED,
@@ -54,25 +50,4 @@ export const chan4Skill: Skill = {
     sortBy: ModelSortField.INTELLIGENCE,
     sortDirection: ModelSortDirection.DESC,
   },
-  variants: [
-    {
-      id: "classic",
-      variantName: "skills.chan4.variants.classic" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.UNCENSORED,
-          max: ContentLevel.UNCENSORED,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
-      isDefault: true,
-    },
-  ],
 };

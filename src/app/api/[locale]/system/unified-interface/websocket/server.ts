@@ -281,7 +281,13 @@ export function startWebSocketServer(
         const targetUrl = `ws://127.0.0.1:${String(nextPort)}${url.pathname}${url.search}`;
         // Open upstream WS connection, then upgrade the browser connection.
         // Messages are bridged in the websocket handlers below.
-        const upstream = new WebSocket(targetUrl);
+        // Forward the subprotocol (e.g. "vite-hmr") so Vite accepts the connection.
+        const subprotocol =
+          req.headers.get("sec-websocket-protocol") ?? undefined;
+        const upstream = new WebSocket(
+          targetUrl,
+          subprotocol ? [subprotocol] : undefined,
+        );
         const upgraded = bunServer.upgrade(req, {
           data: {
             userId: null,

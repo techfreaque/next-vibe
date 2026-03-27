@@ -80,57 +80,15 @@ export const researcherSkill: Skill = {
     {
       id: "maverick",
       variantName: "skills.researcher.variants.maverick" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_20_BETA,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "fast",
       variantName: "skills.researcher.variants.fast" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_FAST,
-        intelligenceRange: {
-          min: IntelligenceLevel.QUICK,
-          max: IntelligenceLevel.QUICK,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
     {
       id: "budget",
       variantName: "skills.researcher.variants.budget" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

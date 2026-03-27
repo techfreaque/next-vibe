@@ -122,39 +122,11 @@ Format: "As a [user type], I want to [action] so that [benefit]"
     {
       id: "claude",
       variantName: "skills.productManager.variants.claude" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_SONNET_4_6,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.MAINSTREAM,
-          max: ContentLevel.MAINSTREAM,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "fast",
       variantName: "skills.productManager.variants.fast" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_FLASH,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.MAINSTREAM,
-          max: ContentLevel.MAINSTREAM,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

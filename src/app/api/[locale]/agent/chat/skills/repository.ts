@@ -9,16 +9,16 @@ import { and, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isAgentPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -60,10 +60,12 @@ import {
   type SkillTrustLevelValue,
   CATEGORY_CONFIG,
   ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
   SkillOwnershipType,
 } from "./enum";
-import type { SkillsT } from "./i18n";
 import { scopedTranslation } from "./i18n";
+import type { SkillsT } from "./i18n";
 import { SkillsRepositoryClient } from "./repository-client";
 
 /**
@@ -75,6 +77,8 @@ export class SkillsRepository {
   private static readonly DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
     selectionType: ModelSelectionType.MANUAL,
     manualModelId: defaultModel,
+    sortBy: ModelSortField.CONTENT,
+    sortDirection: ModelSortDirection.DESC,
   };
 
   /**
@@ -195,7 +199,8 @@ export class SkillsRepository {
               tagline: t(char.tagline),
               description: t(char.description),
               category: char.category,
-              modelSelection: char.modelSelection,
+              modelSelection:
+                char.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
               ownershipType: SkillOwnershipType.SYSTEM,
               voteCount: null,
               trustLevel: null,
@@ -253,7 +258,8 @@ export class SkillsRepository {
             tagline: t(char.tagline),
             description: t(char.description),
             category: char.category,
-            modelSelection: char.modelSelection,
+            modelSelection:
+              char.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
             ownershipType: SkillOwnershipType.SYSTEM,
             voteCount: null,
             trustLevel: null,
@@ -833,10 +839,11 @@ export class SkillsRepository {
     variantId?: string | null,
     variantName?: string | null,
     isVariant?: boolean,
+    isDefault?: boolean,
   ): SkillListItem {
     // Get best model from skill's modelSelection
     const bestModel = SkillsRepositoryClient.getBestModelForSkill(
-      char.modelSelection,
+      char.modelSelection ?? SkillsRepository.DEFAULT_MODEL_SELECTION,
       user,
     );
 
@@ -873,6 +880,7 @@ export class SkillsRepository {
       variantId: variantId ?? null,
       variantName: variantName ?? null,
       isVariant: isVariant ?? false,
+      isDefault: isDefault ?? false,
       ...modelRow,
     };
   }
@@ -918,13 +926,14 @@ export class SkillsRepository {
         id,
         {
           ...char,
-          modelSelection: variant.modelSelection as ModelSelectionSimple,
+          modelSelection: variant.modelSelection ?? char.modelSelection,
         },
         t,
         user,
         variant.id,
         t(variant.variantName),
         true,
+        variant.isDefault ?? false,
       ),
     );
   }

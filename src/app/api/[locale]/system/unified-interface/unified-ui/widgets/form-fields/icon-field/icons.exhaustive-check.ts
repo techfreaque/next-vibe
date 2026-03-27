@@ -264,6 +264,7 @@ const {
   SiAndroid,
   SiAnthropic,
   SiApple,
+  SiBytedance,
   SiDiscord,
   SiDocker,
   SiGit,

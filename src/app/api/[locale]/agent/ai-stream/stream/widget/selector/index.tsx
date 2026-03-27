@@ -13,7 +13,7 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
-import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
+import { useTourState } from "@/app/api/[locale]/agent/chat/tour-state";
 import { NO_SKILL_ID } from "@/app/api/[locale]/agent/chat/skills/constants";
 import {
   getModelById,
@@ -51,15 +51,26 @@ export function Selector({
 }: SelectorProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  // Tour state (for uncontrolled mode)
-  const tourPopoverOpen = useTourState((state) => state.modelSelectorOpen);
-  const setTourPopoverOpen = useTourState(
-    (state) => state.setModelSelectorOpen,
-  );
 
-  // Use controlled state if provided, otherwise use tour state, otherwise use local state
-  const popoverOpen = controlledOnOpenChange ? controlledOpen : tourPopoverOpen;
-  const setPopoverOpen = controlledOnOpenChange ?? setTourPopoverOpen;
+  const tourModelSelectorOpen = useTourState((s) => s.modelSelectorOpen);
+  const tourIsActive = useTourState((s) => s.isActive);
+  const setModelSelectorOpen = useTourState((s) => s.setModelSelectorOpen);
+
+  // Use controlled state if provided, otherwise use tour state
+  const popoverOpen = controlledOnOpenChange
+    ? controlledOpen
+    : tourModelSelectorOpen;
+
+  // When tour controls the popover, block Radix close requests while tour is active
+  const setPopoverOpen = controlledOnOpenChange
+    ? controlledOnOpenChange
+    : (open: boolean): void => {
+        if (!open && tourIsActive && tourModelSelectorOpen) {
+          return;
+        }
+        setModelSelectorOpen(open);
+      };
+
   const isModelOnly = skillId === NO_SKILL_ID;
   const currentCharaterHook = useSkill(
     isModelOnly ? undefined : skillId,

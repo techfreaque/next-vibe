@@ -111,8 +111,8 @@ export const translations: typeof enTranslations = {
       browseSkills: {
         title: "Weitere Skills entdecken",
         description:
-          "Erkunden Sie 40+ Spezialist-Skills — von Programmierern und Forschern bis zu Autoren und Beratern. Fügen Sie einen Skill als Favorit hinzu und er erscheint direkt hier.",
-        tip: "Skills geben Ihrer KI einen spezifischen Fokus und das beste Modell für die Aufgabe.",
+          "Entdecke 40+ Skills — von Programmierern und Forschern bis zu Autoren und Beratern. Füge einen Skill als Favorit hinzu und er erscheint direkt hier.",
+        tip: "Skills geben deiner KI einen klaren Fokus und das passende Modell für die Aufgabe.",
       },
       rootFolders: {
         title: "Ihre Chat-Ordner",

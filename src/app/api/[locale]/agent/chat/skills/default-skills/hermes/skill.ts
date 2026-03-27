@@ -1,16 +1,6 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
-
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  SkillCategory,
-  SkillOwnershipType,
-} from "../../enum";
+import { SkillCategory, SkillOwnershipType } from "../../enum";
 
 export const hermesSkill: Skill = {
   id: "hermes",
@@ -69,56 +59,20 @@ Remember: You're not a yes-man - you're a wise companion who challenges the user
   ],
   skillType: "PERSONA",
   companionPrompt: `This task was delegated by Hermes, a decisive and growth-focused companion who challenges the user to become their strongest self. The user values directness, excellence, and actionable results. Be clear, practical, and results-oriented - cut the hedging. If relevant, briefly connect the output to building skill, resilience, or capability.`,
-  modelSelection: {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
-    intelligenceRange: {
-      min: IntelligenceLevel.BRILLIANT,
-      max: IntelligenceLevel.BRILLIANT,
-    },
-    sortBy: ModelSortField.INTELLIGENCE,
-    sortDirection: ModelSortDirection.DESC,
-  },
+
   variants: [
     {
       id: "brilliant",
       variantName: "skills.hermes.variants.brilliant" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_SONNET_4_6,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        sortBy: ModelSortField.CONTENT,
-        sortDirection: ModelSortDirection.DESC,
-      },
-      isDefault: true,
     },
     {
       id: "cheap",
       variantName: "enums.intelligence.smart" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2_5,
-        contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
-        sortBy: ModelSortField.PRICE,
-        sortDirection: ModelSortDirection.ASC,
-      },
+      isDefault: true,
     },
     {
       id: "uncensored",
       variantName: "skills.hermes.variants.uncensored" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
-        contentRange: {
-          min: ContentLevel.UNCENSORED,
-          max: ContentLevel.UNCENSORED,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

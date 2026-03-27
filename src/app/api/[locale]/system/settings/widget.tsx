@@ -42,6 +42,7 @@ import {
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { ServerFramework } from "../server/enum";
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
 import exportEnvEndpoints from "./export-env/definition";
@@ -425,7 +426,7 @@ export function SystemSettingsWidget({ field }: WidgetProps): JSX.Element {
         rebuildDef.default.POST,
         logger,
         user,
-        undefined,
+        { framework: ServerFramework.NEXT },
         undefined,
         locale,
       );

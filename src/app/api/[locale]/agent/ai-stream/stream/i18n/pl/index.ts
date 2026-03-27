@@ -706,6 +706,22 @@ export const translations: typeof enTranslations = {
         label: "Nauka & Edukacja",
         hint: "Tutor, Socratic Questioner",
       },
+      creative: {
+        label: "Kreatywność & Historie",
+        hint: "Gawędziarz, Kreatywny",
+      },
+      health: {
+        label: "Zdrowie & Kariera",
+        hint: "Wellness, Coach kariery",
+      },
+      controversial: {
+        label: "Wolne myślenie",
+        hint: "Bez cenzury, Filozof",
+      },
+      roleplay: {
+        label: "Roleplay & Postacie",
+        hint: "Roleplay, Twórca postaci",
+      },
     },
   },
 };

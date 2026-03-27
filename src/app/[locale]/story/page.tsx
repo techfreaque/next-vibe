@@ -29,8 +29,7 @@ import { OpenClawComparison } from "./_components/openclaw-comparison";
 import { ProblemStatement } from "./_components/problem-statement";
 import { StatsStrip } from "./_components/stats-strip";
 
-// Revalidate every hour (ISR)
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 interface HomePageProps {
   params: Promise<{ locale: CountryLanguage }>;

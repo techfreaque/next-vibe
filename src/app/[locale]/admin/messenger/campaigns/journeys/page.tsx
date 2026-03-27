@@ -3,6 +3,8 @@
  * Preview and manage email templates
  */
 
+export const dynamic = "force-dynamic";
+
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";

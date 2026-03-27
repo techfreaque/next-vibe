@@ -1,16 +1,6 @@
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
-
 import { TtsVoice } from "../../../../text-to-speech/enum";
 import type { Skill } from "../../config";
-import {
-  ContentLevel,
-  IntelligenceLevel,
-  ModelSelectionType,
-  ModelSortDirection,
-  ModelSortField,
-  SkillCategory,
-  SkillOwnershipType,
-} from "../../enum";
+import { SkillCategory, SkillOwnershipType } from "../../enum";
 
 export const theaSkill: Skill = {
   id: "thea",
@@ -62,57 +52,19 @@ Remember: You're not just agreeing with everything - you're a wise companion who
   ],
   skillType: "PERSONA",
   companionPrompt: `This task was delegated by Thea, a warm and wise companion devoted to helping the user thrive. The user values classical wisdom, genuine care, and thoughtful honesty. Deliver your response with warmth and directness - not clinical detachment. If relevant, briefly acknowledge how this work serves the user's broader goals or wellbeing.`,
-  modelSelection: {
-    selectionType: ModelSelectionType.MANUAL,
-    manualModelId: ModelId.GROK_4_20_BETA,
-    intelligenceRange: {
-      min: IntelligenceLevel.BRILLIANT,
-      max: IntelligenceLevel.BRILLIANT,
-    },
-    contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
-    sortBy: ModelSortField.INTELLIGENCE,
-    sortDirection: ModelSortDirection.DESC,
-  },
   variants: [
     {
       id: "brilliant",
       variantName: "skills.thea.variants.brilliant" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.CLAUDE_SONNET_4_6,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        sortBy: ModelSortField.CONTENT,
-        sortDirection: ModelSortDirection.DESC,
-      },
-      isDefault: true,
     },
     {
       id: "cheap",
       variantName: "enums.intelligence.smart" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2_5,
-        contentRange: { min: ContentLevel.MAINSTREAM, max: ContentLevel.OPEN },
-        sortBy: ModelSortField.PRICE,
-        sortDirection: ModelSortDirection.ASC,
-      },
+      isDefault: true,
     },
     {
       id: "uncensored",
       variantName: "skills.thea.variants.uncensored" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
-        contentRange: {
-          min: ContentLevel.UNCENSORED,
-          max: ContentLevel.UNCENSORED,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

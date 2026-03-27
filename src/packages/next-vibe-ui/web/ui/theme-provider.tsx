@@ -6,6 +6,20 @@ import React, { type JSX, useEffect, useState } from "react";
 
 import type { StyleType } from "../utils/style-type";
 
+export const THEME_COOKIE_NAME = "theme";
+
+/** Mirrors the resolved theme to a non-expiring cookie so SSR can read it. */
+function ThemeCookieSync(): null {
+  const { resolvedTheme } = useTheme();
+  useEffect(() => {
+    if (!resolvedTheme) {return;}
+    // SameSite=Lax; no Secure required (works on http localhost too).
+    // Max-Age=2147483647 ≈ 68 years — effectively non-expiring.
+    document.cookie = `${THEME_COOKIE_NAME}=${resolvedTheme};path=/;max-age=2147483647;SameSite=Lax`;
+  }, [resolvedTheme]);
+  return null;
+}
+
 export type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: "light" | "dark" | "system";
@@ -29,6 +43,7 @@ export function ThemeProvider({
       attribute={attribute}
       {...props}
     >
+      <ThemeCookieSync />
       {children}
     </NextThemesProvider>
   );

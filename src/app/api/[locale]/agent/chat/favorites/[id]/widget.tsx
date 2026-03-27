@@ -56,7 +56,7 @@ import { useChatSettings } from "../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import { CompactTriggerEdit } from "../../settings/widget";
 import { useSkill } from "../../skills/[id]/hooks";
-import type definitionPatch from "./definition";
+import definitionPatch from "./definition";
 import type { FavoriteUpdateResponseOutput } from "./definition";
 
 /**
@@ -91,6 +91,23 @@ export function FavoriteEditContainer({
   const favoriteModelSelection: ModelSelectionSimple | undefined =
     form.watch("modelSelection") ?? undefined;
 
+  // characterModelSelection lives on the GET endpoint (not PATCH).
+  // Use useEndpoint to read the cached GET response so we get the variant's selection.
+  const favoriteId = form.watch("id");
+  const favoriteGetEndpoint = useEndpoint(
+    { GET: definitionPatch.GET },
+    {
+      read: {
+        urlPathParams: { id: favoriteId ?? "" },
+        queryOptions: { enabled: !!favoriteId, staleTime: 5 * 60 * 1000 },
+      },
+    },
+    logger,
+    user,
+  );
+  const favoriteCharacterModelSelection: ModelSelectionSimple | undefined =
+    favoriteGetEndpoint.read?.data?.characterModelSelection ?? undefined;
+
   const characterEndpoint = useSkill(skillId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
 
@@ -98,7 +115,6 @@ export function FavoriteEditContainer({
   const settingsOps = useChatSettings(user, logger);
 
   // Check if this favorite is currently active
-  const favoriteId = form.watch("id");
   const isActiveFavorite =
     settingsOps.settings?.activeFavoriteId === favoriteId;
 
@@ -410,7 +426,10 @@ export function FavoriteEditContainer({
                 })
               }
               characterModelSelection={
-                isNoSkill ? undefined : characterData?.modelSelection
+                isNoSkill
+                  ? undefined
+                  : (favoriteCharacterModelSelection ??
+                    characterData?.modelSelection)
               }
               locale={locale}
               user={user}
@@ -425,7 +444,11 @@ export function FavoriteEditContainer({
                 form.setValue("compactTrigger", v, { shouldDirty: true })
               }
               modelSelection={favoriteModelSelection ?? null}
-              characterModelSelection={characterData?.modelSelection ?? null}
+              characterModelSelection={
+                favoriteCharacterModelSelection ??
+                characterData?.modelSelection ??
+                null
+              }
               label={t("patch.slotOverride.label")}
               user={user}
             />
@@ -607,12 +630,13 @@ function DeniedToolsEdit({
               </Div>
             ) : (
               filteredTools.map((tool) => {
-                const isDenied = deniedSet.has(tool.id);
+                const toolId = tool.id ?? "";
+                const isDenied = deniedSet.has(toolId);
                 return (
                   <Div
-                    key={tool.id}
+                    key={toolId}
                     className="flex items-center gap-3 px-3 py-2 hover:bg-accent/20 cursor-pointer transition-colors"
-                    onClick={() => handleToggle(tool.id)}
+                    onClick={() => handleToggle(toolId)}
                   >
                     <Div className="flex-1 min-w-0">
                       <Span className="text-xs font-medium block truncate">

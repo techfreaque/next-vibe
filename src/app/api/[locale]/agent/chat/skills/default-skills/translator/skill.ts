@@ -75,39 +75,11 @@ export const translatorSkill: Skill = {
     {
       id: "gemini",
       variantName: "skills.translator.variants.gemini" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GEMINI_3_FLASH,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.MAINSTREAM,
-          max: ContentLevel.MAINSTREAM,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "budget",
       variantName: "skills.translator.variants.budget" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GLM_4_7_FLASH,
-        intelligenceRange: {
-          min: IntelligenceLevel.QUICK,
-          max: IntelligenceLevel.QUICK,
-        },
-        contentRange: {
-          min: ContentLevel.MAINSTREAM,
-          max: ContentLevel.MAINSTREAM,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

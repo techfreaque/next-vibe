@@ -76,57 +76,15 @@ export const writerSkill: Skill = {
     {
       id: "western",
       variantName: "skills.writer.variants.western" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_20_BETA,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "eastern",
       variantName: "skills.writer.variants.eastern" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.MINIMAX_M2_7,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
     {
       id: "budget",
       variantName: "skills.writer.variants.budget" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

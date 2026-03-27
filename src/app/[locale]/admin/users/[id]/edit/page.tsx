@@ -3,6 +3,8 @@
  * Server component for authentication
  */
 
+export const dynamic = "force-dynamic";
+
 import type React from "react";
 
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";

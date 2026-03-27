@@ -720,6 +720,22 @@ export const translations: typeof enTranslations = {
         label: "Lernen & Studium",
         hint: "Tutor, Socratic Questioner",
       },
+      creative: {
+        label: "Kreativität & Geschichten",
+        hint: "Storyteller, Kreativ",
+      },
+      health: {
+        label: "Gesundheit & Karriere",
+        hint: "Wellness, Karriere-Coach",
+      },
+      controversial: {
+        label: "Freies Denken",
+        hint: "Ohne Zensur, Philosoph",
+      },
+      roleplay: {
+        label: "Rollenspiel & Charaktere",
+        hint: "Rollenspiel, Charakterersteller",
+      },
     },
   },
 };

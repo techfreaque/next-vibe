@@ -109,8 +109,8 @@ export const translations = {
       browseSkills: {
         title: "Discover More Skills",
         description:
-          "Explore 40+ specialist skills — from coders and researchers to writers and advisors. Add any skill as a favorite and it appears right here.",
-        tip: "Skills give your AI a specific focus and the best model for the job.",
+          "Explore 40+ skills — coders, researchers, writers, advisors and more. Add one as a favorite and it shows up right here.",
+        tip: "Skills give your AI a clear focus and the right model for the job.",
       },
       rootFolders: {
         title: "Your Chat Folders",

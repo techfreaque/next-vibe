@@ -399,8 +399,8 @@ export class ChatFavoritesRepositoryClient {
     const variant = stored.variantId
       ? character.variants?.find((v) => v.id === stored.variantId)
       : undefined;
-    const effectiveCharacterModelSelection =
-      variant?.modelSelection ?? character.modelSelection ?? {
+    const effectiveCharacterModelSelection = variant?.modelSelection ??
+      character.modelSelection ?? {
         selectionType: ModelSelectionType.FILTERS,
       };
 

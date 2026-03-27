@@ -9,9 +9,16 @@ import { routeTree } from "./routeTree.gen";
 export function getRouter(): ReturnType<typeof createRouter> {
   return createRouter({
     routeTree,
-    defaultPreload: "intent",
+    defaultPreload: false,
     scrollRestoration: true,
     defaultNotFoundComponent: () => null,
+    // During initial hydration, code-split route components suspend briefly
+    // while their lazy chunk loads. Without a pending component, the Suspense
+    // boundary shows nothing (blank flash). Setting a 0ms pending delay and
+    // no pending component keeps existing SSR content visible until the chunk
+    // is ready — React 18 will paint the SSR content then swap in-place.
+    defaultPendingMs: 0,
+    defaultPendingMinMs: 0,
   });
 }
 
@@ -20,3 +27,4 @@ declare module "@tanstack/react-router" {
     router: ReturnType<typeof getRouter>;
   }
 }
+// test

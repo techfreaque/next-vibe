@@ -56,6 +56,37 @@ function logRequest(
   process.stdout.write(`${line}\n`);
 }
 
+/**
+ * Decode a /_serverFn/<base64> path into a readable label.
+ * The base64 segment is a JSON object with `file` and `export` keys.
+ * e.g. { file: ".../$locale.threads.index.tsx?...", export: "loadData_createServerFn_handler" }
+ * → "/_serverFn/threads.index → loadData"
+ */
+function decodeServerFnPath(pathname: string): string {
+  if (!pathname.startsWith("/_serverFn/")) {
+    return pathname;
+  }
+  try {
+    const encoded = pathname.slice("/_serverFn/".length);
+    const json = Buffer.from(encoded, "base64").toString("utf8");
+    const parsed = JSON.parse(json) as { file?: string; export?: string };
+    // Extract route name from file path (last segment before ?tss-...)
+    const fileSegment = (parsed.file ?? "").split("?")[0];
+    const routeName = fileSegment.split("/").pop() ?? fileSegment;
+    // Strip leading $locale. and trailing .tsx
+    const cleanRoute = routeName
+      .replace(/^\$locale\./, "")
+      .replace(/\.tsx?$/, "");
+    // Simplify the export name: strip _createServerFn_handler suffix
+    const exportName = (parsed.export ?? "")
+      .replace(/_createServerFn_handler$/, "")
+      .replace(/_handler$/, "");
+    return `/_serverFn/${cleanRoute} → ${exportName}`;
+  } catch {
+    return pathname;
+  }
+}
+
 // Paths to skip logging (Vite internals, HMR, source maps, favicons)
 const SKIP_LOG_PREFIXES = [
   "/@",
@@ -89,7 +120,11 @@ function shouldSkipLog(pathname: string): boolean {
 const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
   const requestStart = Date.now();
   const url = new URL(request.url);
-  const path = `${url.pathname}${url.search ? url.search : ""}`;
+  const rawPath = `${url.pathname}${url.search ? url.search : ""}`;
+  // Use a human-readable label for /_serverFn/ requests; otherwise the full path
+  const path = url.pathname.startsWith("/_serverFn/")
+    ? decodeServerFnPath(url.pathname)
+    : rawPath;
 
   // Skip logging for Vite internals and static assets
   if (shouldSkipLog(url.pathname)) {

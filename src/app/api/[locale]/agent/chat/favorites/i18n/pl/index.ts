@@ -100,6 +100,12 @@ export const translations: typeof enTranslations = {
       },
     },
     addVariant: "Dodaj wariant",
+    deleteGroup: {
+      trigger: "Usuń wszystkie warianty",
+      confirm: "Usunąć wszystkie {{count}} warianty?",
+      cancel: "Anuluj",
+      action: "Usuń wszystkie",
+    },
     emptyState: "Nie dodałeś jeszcze żadnych ulubionych",
     tabs: {
       myFavorites: "Moje ulubione",

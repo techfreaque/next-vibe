@@ -4,7 +4,13 @@
 
 import "server-only";
 
-import type { ModelMessage, ToolCallPart, ToolResultPart } from "ai";
+import type {
+  FilePart,
+  ModelMessage,
+  TextPart,
+  ToolCallPart,
+  ToolResultPart,
+} from "ai";
 
 import type {
   ContentBlock,
@@ -134,10 +140,7 @@ export class MessageConverter {
         return { content: contentParts, role: "user" };
       }
       case ChatMessageRole.ASSISTANT: {
-        const assistantParts: Array<
-          | { type: "text"; text: string }
-          | { type: "image"; image: string | URL }
-        > = [];
+        const assistantParts: Array<TextPart | FilePart> = [];
 
         // Add text content — strip <think> blocks (kept in DB for UI but must
         // not be re-sent to AI as part of history).
@@ -163,8 +166,9 @@ export class MessageConverter {
               const base64Data = Buffer.from(buffer).toString("base64");
               const mimeType = generatedMedia.mimeType ?? "image/png";
               assistantParts.push({
-                type: "image",
-                image: `data:${mimeType};base64,${base64Data}`,
+                type: "file",
+                data: `data:${mimeType};base64,${base64Data}`,
+                mediaType: mimeType,
               });
             }
           } catch (error) {

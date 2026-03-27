@@ -312,6 +312,7 @@ export const CLI_ICONS: Record<IconKey, string> = {
   "si-google": "🔍",
   "uncensored-ai": "🤖",
   "si-anthropic": "🤖",
+  "si-bytedance": "🎵",
   "si-googlegemini": "✨",
   "si-mistralai": "🌪️",
   "si-x": "✕",

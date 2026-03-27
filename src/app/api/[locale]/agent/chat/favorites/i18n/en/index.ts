@@ -98,6 +98,12 @@ export const translations = {
       },
     },
     addVariant: "Add Variant",
+    deleteGroup: {
+      trigger: "Delete all variants",
+      confirm: "Delete all {{count}} variants?",
+      cancel: "Cancel",
+      action: "Delete all",
+    },
     emptyState: "You haven't added any favorites yet",
     tabs: {
       myFavorites: "My Favorites",

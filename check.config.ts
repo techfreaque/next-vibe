@@ -380,7 +380,7 @@ const oxlint: CheckConfig["oxlint"] = {
           "oxlint-plugin-jsx-capitalization/jsx-capitalization": [
             "error",
             {
-              excludedPaths: ["/src/packages/next-vibe-ui/web/"],
+              excludedPaths: ["/src/packages/next-vibe-ui/"],
               excludedFilePatterns: [
                 "/email.tsx",
                 ".email.tsx",

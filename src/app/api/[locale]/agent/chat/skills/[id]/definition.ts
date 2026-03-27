@@ -183,6 +183,7 @@ const { DELETE } = createEndpoint({
       }),
       ownershipType: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
+        hidden: true,
         schema: z.enum(SkillOwnershipType),
       }),
       systemPrompt: responseField(scopedTranslation, {

@@ -3,6 +3,8 @@
  * Main emails admin page that redirects to stats
  */
 
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next-vibe-ui/lib/redirect";
 
 import type { CountryLanguage } from "@/i18n/core/config";

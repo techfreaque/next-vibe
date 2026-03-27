@@ -3,6 +3,8 @@
  * Campaign performance overview
  */
 
+export const dynamic = "force-dynamic";
+
 import type React from "react";
 
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";

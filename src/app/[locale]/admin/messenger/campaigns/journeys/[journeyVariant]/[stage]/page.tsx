@@ -3,6 +3,8 @@
  * Server-rendered email preview page
  */
 
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next-vibe-ui/lib/not-found";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";

@@ -60,39 +60,11 @@ export const professionalSkill: Skill = {
     {
       id: "fast",
       variantName: "skills.professional.variants.fast" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GROK_4_FAST,
-        intelligenceRange: {
-          min: IntelligenceLevel.QUICK,
-          max: IntelligenceLevel.QUICK,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "budget",
       variantName: "skills.professional.variants.budget" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.GLM_4_7_FLASH,
-        intelligenceRange: {
-          min: IntelligenceLevel.QUICK,
-          max: IntelligenceLevel.QUICK,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

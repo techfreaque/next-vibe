@@ -58,39 +58,11 @@ export const technicalSkill: Skill = {
     {
       id: "kimi",
       variantName: "skills.technical.variants.kimi" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.KIMI_K2_5,
-        intelligenceRange: {
-          min: IntelligenceLevel.BRILLIANT,
-          max: IntelligenceLevel.BRILLIANT,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "budget",
       variantName: "skills.technical.variants.budget" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.DEEPSEEK_V32,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.OPEN,
-          max: ContentLevel.OPEN,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };

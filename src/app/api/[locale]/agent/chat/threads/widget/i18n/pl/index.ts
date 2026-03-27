@@ -109,10 +109,10 @@ export const translations: typeof enTranslations = {
         tip: "Możesz przeciągać, aby zmienić kolejność, lub dodawać kolejne warianty w dowolnym momencie.",
       },
       browseSkills: {
-        title: "Odkryj więcej umiejętności",
+        title: "Odkryj więcej skillów",
         description:
-          "Przeglądaj 40+ specjalistycznych umiejętności — od koderów i badaczy po pisarzy i doradców. Dodaj dowolną umiejętność jako ulubioną, a pojawi się tutaj.",
-        tip: "Umiejętności nadają AI konkretny cel i najlepszy model do zadania.",
+          "Przeglądaj 40+ skillów — koderzy, badacze, pisarze, doradcy i więcej. Dodaj dowolny jako ulubiony i pojawi się tutaj.",
+        tip: "Skille dają twojej AI konkretny cel i właściwy model do zadania.",
       },
       rootFolders: {
         title: "Twoje foldery czatów",

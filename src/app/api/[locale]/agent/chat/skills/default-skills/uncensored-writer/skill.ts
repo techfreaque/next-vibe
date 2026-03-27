@@ -106,39 +106,11 @@ You are a tool for creative expression. Write what is requested with skill and w
     {
       id: "smart",
       variantName: "skills.uncensoredWriter.variants.smart" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.UNCENSORED_LM_V1_2,
-        intelligenceRange: {
-          min: IntelligenceLevel.SMART,
-          max: IntelligenceLevel.SMART,
-        },
-        contentRange: {
-          min: ContentLevel.UNCENSORED,
-          max: ContentLevel.UNCENSORED,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
       isDefault: true,
     },
     {
       id: "fast",
       variantName: "skills.uncensoredWriter.variants.fast" as const,
-      modelSelection: {
-        selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ModelId.VENICE_UNCENSORED,
-        intelligenceRange: {
-          min: IntelligenceLevel.QUICK,
-          max: IntelligenceLevel.QUICK,
-        },
-        contentRange: {
-          min: ContentLevel.UNCENSORED,
-          max: ContentLevel.UNCENSORED,
-        },
-        sortBy: ModelSortField.INTELLIGENCE,
-        sortDirection: ModelSortDirection.DESC,
-      },
     },
   ],
 };
