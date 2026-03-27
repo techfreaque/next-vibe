@@ -785,6 +785,15 @@ export class AiStreamRepository {
                 error: err instanceof Error ? err.message : String(err),
                 threadId: threadResultThreadId,
               });
+              // Still emit STREAM_FINISHED so the client doesn't stay stuck in
+              // streaming/aborting state if the DB update failed.
+              wsEmit(
+                createStreamEvent.streamFinished({
+                  threadId: threadResultThreadId,
+                  reason: streamFinishReason,
+                  finalState: "idle",
+                }),
+              );
             });
         });
 

@@ -36,40 +36,49 @@ export class StreamErrorCatchHandler {
     // Note: Abort errors are handled inline in stream-execution-handler.
     // This handler only receives non-abort errors.
 
-    if (
-      error instanceof Error &&
-      isStreamAbort(error) &&
-      error.reason === AbortReason.STREAM_TIMEOUT
-    ) {
-      await TimeoutErrorHandler.handleTimeout({
-        maxDuration,
-        model,
-        threadId,
-        userId,
-        lastParentId: ctx.lastParentId,
-        lastSequenceId: ctx.lastSequenceId,
-        dbWriter: ctx.dbWriter,
-        logger,
-        t,
-      });
-
+    try {
+      if (
+        error instanceof Error &&
+        isStreamAbort(error) &&
+        error.reason === AbortReason.STREAM_TIMEOUT
+      ) {
+        await TimeoutErrorHandler.handleTimeout({
+          maxDuration,
+          model,
+          threadId,
+          userId,
+          lastParentId: ctx.lastParentId,
+          lastSequenceId: ctx.lastSequenceId,
+          dbWriter: ctx.dbWriter,
+          logger,
+          t,
+        });
+      } else {
+        await StreamErrorHandler.handleStreamError({
+          error: error instanceof Error ? error : (error as JSONValue),
+          threadId,
+          userId,
+          lastParentId: ctx.lastParentId,
+          lastSequenceId: ctx.lastSequenceId,
+          dbWriter: ctx.dbWriter,
+          logger,
+          t,
+        });
+      }
+    } catch (emitErr) {
+      // Error message emission failed (e.g. DB write error).
+      // SSE was already enqueued before the DB write, so the client likely
+      // saw the error. Log and continue so cleanup always runs.
+      logger.error(
+        "[AI Stream] Failed to emit error message during error handling",
+        {
+          error: emitErr instanceof Error ? emitErr.message : String(emitErr),
+          threadId,
+        },
+      );
+    } finally {
       await clearStreamingState(threadId, logger);
       ctx.cleanup();
-      return;
     }
-
-    await StreamErrorHandler.handleStreamError({
-      error: error instanceof Error ? error : (error as JSONValue),
-      threadId,
-      userId,
-      lastParentId: ctx.lastParentId,
-      lastSequenceId: ctx.lastSequenceId,
-      dbWriter: ctx.dbWriter,
-      logger,
-      t,
-    });
-
-    await clearStreamingState(threadId, logger);
-    ctx.cleanup();
   }
 }

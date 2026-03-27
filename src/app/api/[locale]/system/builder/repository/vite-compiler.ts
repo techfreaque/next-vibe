@@ -1487,8 +1487,8 @@ export class ViteCompiler {
       const formatted = lines
         .map((line, i) =>
           i === 0
-            ? `[${uptime}s] ${maybeColorize(line, semantic.generator)}`
-            : `${indent}${maybeColorize(line, semantic.generator)}`,
+            ? `[${uptime}s] ${maybeColorize(line, semantic.nextjs)}`
+            : `${indent}${maybeColorize(line, semantic.nextjs)}`,
         )
         .join("\n");
       process.stdout.write(`${formatted}\n`);

@@ -7,15 +7,15 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import {
   ErrorResponseTypes,
   fail,
   success,
   throwErrorResponse,
 } from "next-vibe/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { Environment, parseError } from "next-vibe/shared/utils";
-import { redirect } from "next-vibe-ui/lib/redirect";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
@@ -42,12 +42,12 @@ import { scopedTranslation as sessionScopedTranslation } from "../private/sessio
 import { SessionRepository } from "../private/session/repository";
 import { UserRepository } from "../repository";
 import type { CompleteUserType } from "../types";
-import type { UserRoleValue } from "../user-roles/enum";
 import {
   filterUserPermissionRoles,
   UserPermissionRole,
   UserRole,
 } from "../user-roles/enum";
+import type { UserRoleValue } from "../user-roles/enum";
 import { UserRolesRepository } from "../user-roles/repository";
 import { scopedTranslation } from "./i18n";
 import type {
@@ -208,7 +208,7 @@ export class AuthRepository {
     AuthRepository.pendingLeadCreations.set(dedupeKey, creationPromise);
 
     const newLeadId = await creationPromise;
-    logger.info("Created new lead for public user, cookie will be updated", {
+    logger.debug("Created new lead for public user, cookie will be updated", {
       leadId: newLeadId,
       platform,
     });
