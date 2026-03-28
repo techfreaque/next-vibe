@@ -39,7 +39,7 @@ export const IMAGE_QUALITY_VALUES = [
   "post.quality.hd",
 ] as const;
 
-/** Valid image model IDs — subset of ModelId for image generation */
+/** Valid image model IDs - subset of ModelId for image generation */
 export const IMAGE_MODEL_IDS = [
   // ModelId.DALL_E_3,
   // ModelId.GPT_IMAGE_1,

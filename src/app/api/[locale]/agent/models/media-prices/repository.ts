@@ -20,9 +20,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { CREDIT_VALUE_USD } from "@/app/api/[locale]/products/constants";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { ModelId } from "../models";
 import { ApiProvider, modelDefinitions } from "../models";
 import type { MediaPricesGetResponseOutput } from "./definition";
@@ -47,7 +47,7 @@ interface MediaModelPrice {
 }
 
 // ---------------------------------------------------------------------------
-// Replicate pricing — authenticated API
+// Replicate pricing - authenticated API
 // GET https://api.replicate.com/v1/models/{owner}/{name}
 // Returns: { latest_version: { ..., run_count, ... }, run_url, ... }
 // Pricing is in the "billing" field or via predictions API.
@@ -200,11 +200,11 @@ async function fetchReplicatePrice(
 // OpenRouter image generation pricing
 // /api/frontend/models includes pricing_json with provider-native cost fields.
 // We derive per-image USD cost using provider-specific logic:
-//   bfl:informational_output_megapixels   — USD per MP (first MP = 1 image)
-//   sourceful:cents_per_image_output      — cents per image (÷ 100)
-//   seedream:cents_per_image_output       — cents per image (÷ 100)
-//   gemini:image_output_tokens            — USD per token × 1000 tokens/image
-//   openai_responses:image_output_tokens  — USD per token × 1000 tokens/image
+//   bfl:informational_output_megapixels   - USD per MP (first MP = 1 image)
+//   sourceful:cents_per_image_output      - cents per image (÷ 100)
+//   seedream:cents_per_image_output       - cents per image (÷ 100)
+//   gemini:image_output_tokens            - USD per token × 1000 tokens/image
+//   openai_responses:image_output_tokens  - USD per token × 1000 tokens/image
 // ---------------------------------------------------------------------------
 
 interface OpenRouterFrontendModel {
@@ -296,7 +296,7 @@ async function fetchOpenRouterImagePrices(
 }
 
 // ---------------------------------------------------------------------------
-// OpenAI Images — no machine-readable pricing API
+// OpenAI Images - no machine-readable pricing API
 // Prices from https://openai.com/api/pricing (USD per image)
 // Standard quality 1024×1024. Updated manually when OpenAI changes pricing.
 // ---------------------------------------------------------------------------
@@ -306,7 +306,7 @@ const OPENAI_IMAGE_STATIC_PRICES: Record<string, number> = {
 };
 
 // ---------------------------------------------------------------------------
-// Fal.ai — no machine-readable pricing API
+// Fal.ai - no machine-readable pricing API
 // Prices from https://fal.ai/pricing
 // ---------------------------------------------------------------------------
 const FAL_AI_STATIC_PRICES: Record<string, number> = {

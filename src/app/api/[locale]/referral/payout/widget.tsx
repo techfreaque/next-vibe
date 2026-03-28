@@ -209,7 +209,12 @@ export function ReferralPayoutContainer({
 
             <Div className="pt-2 border-t space-y-3">
               <Div className="text-xs text-muted-foreground">
-                {t("payout.widget.minimumNote")}
+                {t("payout.widget.minimumNote", {
+                  minPayout: minDollars,
+                  cryptoPayoutHours: String(
+                    REFERRAL_CONFIG.CRYPTO_PAYOUT_HOURS,
+                  ),
+                })}
               </Div>
               <Button
                 onClick={handleRequestPayout}

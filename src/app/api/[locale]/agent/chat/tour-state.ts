@@ -52,7 +52,7 @@ export const useTourState = create<TourState>()(
     {
       name: "ai-chat-tour-state",
       version: 2,
-      // Only persist what's needed across refresh — not transient UI state
+      // Only persist what's needed across refresh - not transient UI state
       partialize: () => ({}),
     },
   ),

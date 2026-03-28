@@ -105,13 +105,13 @@ export const translations: typeof enTranslations = {
       companionVariants: {
         title: "Ihre Begleiter-Varianten",
         description:
-          "Ihr Begleiter hat mehrere Varianten — brilliant für tiefes Denken, smart für alltägliche Aufgaben und zensurfrei für ungefilterte Antworten. Tippen Sie auf eine Zeile, um sofort zu wechseln.",
+          "Ihr Begleiter hat mehrere Varianten - brilliant für tiefes Denken, smart für alltägliche Aufgaben und zensurfrei für ungefilterte Antworten. Tippen Sie auf eine Zeile, um sofort zu wechseln.",
         tip: "Sie können die Reihenfolge per Drag ändern oder jederzeit weitere Varianten hinzufügen.",
       },
       browseSkills: {
         title: "Weitere Skills entdecken",
         description:
-          "Entdecke 40+ Skills — von Programmierern und Forschern bis zu Autoren und Beratern. Füge einen Skill als Favorit hinzu und er erscheint direkt hier.",
+          "Entdecke 40+ Skills - von Programmierern und Forschern bis zu Autoren und Beratern. Füge einen Skill als Favorit hinzu und er erscheint direkt hier.",
         tip: "Skills geben deiner KI einen klaren Fokus und das passende Modell für die Aufgabe.",
       },
       rootFolders: {
@@ -194,9 +194,9 @@ export const translations: typeof enTranslations = {
         },
       },
       callMode: {
-        title: "Anrufmodus — die KI antwortet laut",
+        title: "Anrufmodus - die KI antwortet laut",
         description:
-          "Telefon-Symbol antippen und einfach sprechen. Die KI hört zu, antwortet laut und hält sich kurz — wie ein echtes Gespräch.",
+          "Telefon-Symbol antippen und einfach sprechen. Die KI hört zu, antwortet laut und hält sich kurz - wie ein echtes Gespräch.",
         tip: "Kein Tippen. Kein Lesen. Einfach reden.",
       },
       complete: {

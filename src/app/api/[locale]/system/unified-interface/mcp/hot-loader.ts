@@ -1,14 +1,14 @@
 /**
  * MCP Hot Loader
  * Loads route handlers and endpoint definitions fresh on every call by constructing
- * import specifiers dynamically at runtime — opaque to bundler static analysis.
+ * import specifiers dynamically at runtime - opaque to bundler static analysis.
  * Only used by the MCP server; all other platforms use the normal cached loaders.
  */
 
 import "server-only";
 
-import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import type { GenericHandlerBase } from "../shared/endpoints/route/handler";
+import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 
 /**
  * Import a route handler fresh (cache-busted) by tool name.
@@ -23,7 +23,7 @@ export async function getRouteHandlerFresh(
   if (!entry) {
     return null;
   }
-  // Construct file:// URL at runtime — bundler cannot statically trace this
+  // Construct file:// URL at runtime - bundler cannot statically trace this
   const url = `file://${entry.absPath}?t=${Date.now()}`;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const mod = await import(/* webpackIgnore: true */ /* @vite-ignore */ url);

@@ -523,14 +523,17 @@ export async function getRouteHandler(
       return (await import("@/app/api/[locale]/system/server/build/route"))
         .tools.POST as GenericHandlerBase;
     case "builder":
-      return (await import("@/app/api/[locale]/system/builder/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/route")
+      ).tools.POST as GenericHandlerBase;
     case "bundle":
-      return (await import("@/app/api/[locale]/system/builder/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/route")
+      ).tools.POST as GenericHandlerBase;
     case "c":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/vibe-check/route")
+      ).tools.POST as GenericHandlerBase;
     case "campaign-starter":
       return (
         await import("@/app/api/[locale]/leads/campaigns/campaign-starter/route")
@@ -540,7 +543,7 @@ export async function getRouteHandler(
         .tools.DELETE as GenericHandlerBase;
     case "cc":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/route")
       ).tools.POST as GenericHandlerBase;
     case "chat-downvotes-total":
       return (
@@ -601,8 +604,9 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/agent/chat/data-sources/chat-upvotes-total/route")
       ).tools.POST as GenericHandlerBase;
     case "check":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/vibe-check/route")
+      ).tools.POST as GenericHandlerBase;
     case "claude":
       return (await import("@/app/api/[locale]/agent/coding-agent/route")).tools
         .POST as GenericHandlerBase;
@@ -622,7 +626,7 @@ export async function getRouteHandler(
       ).tools.POST as GenericHandlerBase;
     case "config-create":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/route")
       ).tools.POST as GenericHandlerBase;
     case "connect-remote":
       return (
@@ -640,7 +644,7 @@ export async function getRouteHandler(
         .POST as GenericHandlerBase;
     case "create-config":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/route")
       ).tools.POST as GenericHandlerBase;
     case "credits-avg-transaction":
       return (
@@ -908,8 +912,9 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/system/db/utils/docker-operations/route")
       ).tools.POST as GenericHandlerBase;
     case "el":
-      return (await import("@/app/api/[locale]/system/check/lint/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/route")
+      ).tools.POST as GenericHandlerBase;
     case "electron":
       return (
         await import("@/app/api/[locale]/system/server/electron/start/route")
@@ -927,8 +932,9 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/system/server/electron/start/route")
       ).tools.POST as GenericHandlerBase;
     case "elint":
-      return (await import("@/app/api/[locale]/system/check/lint/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/route")
+      ).tools.POST as GenericHandlerBase;
     case "email-campaigns":
       return (
         await import("@/app/api/[locale]/leads/campaigns/email-campaigns/route")
@@ -957,8 +963,9 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/system/unified-interface/data-sources/error-logs-warnings/route")
       ).tools.POST as GenericHandlerBase;
     case "eslint":
-      return (await import("@/app/api/[locale]/system/check/lint/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/route")
+      ).tools.POST as GenericHandlerBase;
     case "execute":
       return (
         await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/route")
@@ -1045,7 +1052,7 @@ export async function getRouteHandler(
       ).tools.GET as GenericHandlerBase;
     case "gen":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/route")
       ).tools.POST as GenericHandlerBase;
     case "gen-key":
       return (
@@ -1053,61 +1060,72 @@ export async function getRouteHandler(
       ).tools.GET as GenericHandlerBase;
     case "generate":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/route")
       ).tools.POST as GenericHandlerBase;
     case "generate-all":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/route")
       ).tools.POST as GenericHandlerBase;
     case "generate-key":
       return (
         await import("@/app/api/[locale]/system/settings/generate-key/route")
       ).tools.GET as GenericHandlerBase;
     case "generate:env":
-      return (await import("@/app/api/[locale]/system/generators/env/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/env/route")
+      ).tools.POST as GenericHandlerBase;
     case "generate:expo":
       return (
         await import("@/app/api/[locale]/system/unified-interface/react-native/generate/route")
       ).tools.POST as GenericHandlerBase;
     case "generate:tanstack":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route")
       ).tools.POST as GenericHandlerBase;
     case "get-folder":
       return (
         await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/route")
       ).tools.GET as GenericHandlerBase;
     case "guard":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard-destroy":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard-start":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard-status":
-      return (await import("@/app/api/[locale]/system/guard/status/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/status/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard-stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/stop/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard:destroy":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard:remove":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard:start":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard:status":
-      return (await import("@/app/api/[locale]/system/guard/status/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/status/route")
+      ).tools.POST as GenericHandlerBase;
     case "guard:stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/stop/route")
+      ).tools.POST as GenericHandlerBase;
     case "h":
       return (await import("@/app/api/[locale]/system/help/route")).tools
         .GET as GenericHandlerBase;
@@ -1125,14 +1143,15 @@ export async function getRouteHandler(
         .PATCH as GenericHandlerBase;
     case "install":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
       ).tools.POST as GenericHandlerBase;
     case "kagi-search":
       return (await import("@/app/api/[locale]/agent/search/kagi/route")).tools
         .GET as GenericHandlerBase;
     case "l":
-      return (await import("@/app/api/[locale]/system/check/oxlint/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/route")
+      ).tools.POST as GenericHandlerBase;
     case "leads-active":
       return (
         await import("@/app/api/[locale]/leads/data-sources/leads-active/route")
@@ -1382,8 +1401,9 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/leads/tracking/engagement/route")
       ).tools.POST as GenericHandlerBase;
     case "lint":
-      return (await import("@/app/api/[locale]/system/check/oxlint/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/route")
+      ).tools.POST as GenericHandlerBase;
     case "list":
       return (await import("@/app/api/[locale]/system/help/route")).tools
         .GET as GenericHandlerBase;
@@ -1612,14 +1632,17 @@ export async function getRouteHandler(
       return (await import("@/app/api/[locale]/agent/coding-agent/route")).tools
         .POST as GenericHandlerBase;
     case "ox":
-      return (await import("@/app/api/[locale]/system/check/oxlint/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/route")
+      ).tools.POST as GenericHandlerBase;
     case "oxlint":
-      return (await import("@/app/api/[locale]/system/check/oxlint/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/route")
+      ).tools.POST as GenericHandlerBase;
     case "package":
-      return (await import("@/app/api/[locale]/system/builder/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/route")
+      ).tools.POST as GenericHandlerBase;
     case "payment_GET":
       return (await import("@/app/api/[locale]/payment/route")).tools
         .GET as GenericHandlerBase;
@@ -1901,7 +1924,7 @@ export async function getRouteHandler(
         .GET as GenericHandlerBase;
     case "setup":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
       ).tools.POST as GenericHandlerBase;
     case "setup:status":
       return (
@@ -2120,28 +2143,33 @@ export async function getRouteHandler(
       return (await import("@/app/api/[locale]/system/settings/route")).tools
         .GET as GenericHandlerBase;
     case "system_builder_POST":
-      return (await import("@/app/api/[locale]/system/builder/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_check_config_create_POST":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/route")
       ).tools.POST as GenericHandlerBase;
     case "system_check_lint_POST":
-      return (await import("@/app/api/[locale]/system/check/lint/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_check_oxlint_POST":
-      return (await import("@/app/api/[locale]/system/check/oxlint/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_check_testing_test_POST":
       return (
-        await import("@/app/api/[locale]/system/check/testing/test/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/testing/test/route")
       ).tools.POST as GenericHandlerBase;
     case "system_check_typecheck_POST":
-      return (await import("@/app/api/[locale]/system/check/typecheck/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/typecheck/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_check_vibe-check_POST":
-      return (await import("@/app/api/[locale]/system/check/vibe-check/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/vibe-check/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_db_generate_POST":
       return (await import("@/app/api/[locale]/system/db/generate/route")).tools
         .POST as GenericHandlerBase;
@@ -2169,70 +2197,76 @@ export async function getRouteHandler(
       ).tools.POST as GenericHandlerBase;
     case "system_generators_client-routes-index_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/client-routes-index/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/client-routes-index/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_email-templates_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/email-templates/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/email-templates/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_endpoint_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/endpoint/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/endpoint/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_endpoints-meta_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/endpoints-meta/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/endpoints-meta/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_env-keys_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/env-keys/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/env-keys/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_env_POST":
-      return (await import("@/app/api/[locale]/system/generators/env/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/env/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_generators_generate-all_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_generate-trpc-router_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_generate-trpc-router_validation_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_prompt-fragments_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/prompt-fragments/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/prompt-fragments/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_route-handlers_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/route-handlers/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/route-handlers/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_seeds_POST":
-      return (await import("@/app/api/[locale]/system/generators/seeds/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/seeds/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_generators_skills-index_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/skills-index/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/skills-index/route")
       ).tools.POST as GenericHandlerBase;
     case "system_generators_task-index_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/task-index/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/task-index/route")
       ).tools.POST as GenericHandlerBase;
     case "system_guard_destroy_POST":
-      return (await import("@/app/api/[locale]/system/guard/destroy/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_guard_start_POST":
-      return (await import("@/app/api/[locale]/system/guard/start/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_guard_status_POST":
-      return (await import("@/app/api/[locale]/system/guard/status/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/status/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_guard_stop_POST":
-      return (await import("@/app/api/[locale]/system/guard/stop/route")).tools
-        .POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/stop/route")
+      ).tools.POST as GenericHandlerBase;
     case "system_help_GET":
       return (await import("@/app/api/[locale]/system/help/route")).tools
         .GET as GenericHandlerBase;
@@ -2282,7 +2316,7 @@ export async function getRouteHandler(
       ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_cli_setup_install_POST":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/cli/setup/install/route")
       ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_cli_setup_status_POST":
       return (
@@ -2330,7 +2364,7 @@ export async function getRouteHandler(
       ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_tanstack-start_generate_POST":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route")
       ).tools.POST as GenericHandlerBase;
     case "system_unified-interface_tasks_complete-task_POST":
       return (
@@ -2482,11 +2516,11 @@ export async function getRouteHandler(
       ).tools.POST as GenericHandlerBase;
     case "t":
       return (
-        await import("@/app/api/[locale]/system/check/testing/test/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/testing/test/route")
       ).tools.POST as GenericHandlerBase;
     case "tanstack:generate":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/route")
       ).tools.POST as GenericHandlerBase;
     case "task-execute":
       return (
@@ -2525,11 +2559,12 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/system/unified-interface/tasks/cron/stats/route")
       ).tools.GET as GenericHandlerBase;
     case "tc":
-      return (await import("@/app/api/[locale]/system/check/typecheck/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/typecheck/route")
+      ).tools.POST as GenericHandlerBase;
     case "test":
       return (
-        await import("@/app/api/[locale]/system/check/testing/test/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/testing/test/route")
       ).tools.POST as GenericHandlerBase;
     case "toggle-sync":
       return (
@@ -2555,11 +2590,12 @@ export async function getRouteHandler(
       ).tools.POST as GenericHandlerBase;
     case "trpc-validate":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
       ).tools.POST as GenericHandlerBase;
     case "typecheck":
-      return (await import("@/app/api/[locale]/system/check/typecheck/route"))
-        .tools.POST as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/typecheck/route")
+      ).tools.POST as GenericHandlerBase;
     case "unified-runner":
       return (
         await import("@/app/api/[locale]/system/unified-interface/tasks/unified-runner/route")
@@ -2594,8 +2630,9 @@ export async function getRouteHandler(
         await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/settings/route")
       ).tools.PATCH as GenericHandlerBase;
     case "user_auth_check_GET":
-      return (await import("@/app/api/[locale]/user/auth/check/route")).tools
-        .GET as GenericHandlerBase;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/user/auth/check/route")
+      ).tools.GET as GenericHandlerBase;
     case "user_data-sources_users-active-total_POST":
       return (
         await import("@/app/api/[locale]/user/data-sources/users-active-total/route")
@@ -2794,7 +2831,7 @@ export async function getRouteHandler(
         .GET as GenericHandlerBase;
     case "validate-trpc":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/validation/route")
       ).tools.POST as GenericHandlerBase;
     case "vibe-sense-bollinger":
       return (

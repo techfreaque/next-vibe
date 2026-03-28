@@ -1,4 +1,4 @@
-// Data-tour attribute constants — no JSX/React imports so this is safe
+// Data-tour attribute constants - no JSX/React imports so this is safe
 // to import from API-layer widgets without creating circular dependencies.
 
 export const TOUR_DATA_ATTRS = {
@@ -24,7 +24,7 @@ export const TOUR_DATA_ATTRS = {
   CHAT_INPUT: "chat-input",
   SPEECH_INPUT: "speech-input",
   CALL_MODE_BUTTON: "call-mode-button",
-  // Favorites selector — post-onboarding tour steps
+  // Favorites selector - post-onboarding tour steps
   FAVORITES_COMPANION_GROUP: "favorites-companion-group",
   FAVORITES_BROWSE_SKILLS: "favorites-browse-skills",
 } as const;

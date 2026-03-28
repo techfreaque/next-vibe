@@ -251,9 +251,15 @@ export function startWebSocketServer(
     port,
     hostname,
     reusePort: true, // allow re-binding after restart without waiting for TIME_WAIT
-    idleTimeout: 255, // max value — disables effective timeout for long SSR renders
+    idleTimeout: 0, // 0 = no idle timeout; SSR renders can take >10s on cold start
 
     async fetch(req, bunServer): Promise<Response> {
+      // Disable per-request idle timeout so long SSR renders (cold module
+      // evaluation, slow DB queries) don't get killed mid-flight.
+      // The server-level idleTimeout only covers WebSocket connections;
+      // HTTP requests use a separate 10s default that must be reset here.
+      bunServer.timeout(req, 0);
+
       const url = new URL(req.url);
 
       // ── Internal broadcast endpoint - called by Next.js to emit WS events ──
@@ -351,6 +357,9 @@ export function startWebSocketServer(
       outHeaders["host"] = `127.0.0.1:${String(nextPort)}`;
       outHeaders["x-forwarded-for"] = clientIp;
       outHeaders["x-forwarded-proto"] = url.protocol.replace(":", "");
+      // Forward the original public host so Nitro builds redirect URLs using
+      // the proxy port (e.g. 3000) rather than the internal Vite port (3100).
+      outHeaders["x-forwarded-host"] = req.headers.get("host") ?? url.host;
 
       // Read body once before retry loop (body can only be consumed once)
       const bodyBuffer =
@@ -413,9 +422,10 @@ export function startWebSocketServer(
           );
 
           proxyReq.on("error", (err) => {
-            // On ECONNREFUSED Next.js is restarting - signal retry via null
             const isConnRefused =
               (err as NodeJS.ErrnoException).code === "ECONNREFUSED";
+            // On ECONNREFUSED while running - signal retry via null.
+            // While shutting down - return 502 immediately, no retry.
             if (isConnRefused && !shuttingDown) {
               lastProxyError = err.message;
               resolve(null); // null = retry
@@ -441,15 +451,16 @@ export function startWebSocketServer(
           return proxyResult;
         }
 
-        // Next.js not ready yet - wait before retrying
-        const delay = PROXY_RETRY_DELAYS[attempt] ?? 8000;
-        if (!shuttingDown) {
-          logger.warn("[Proxy] Server not ready, retrying", {
-            attempt: attempt + 1,
-            delayMs: delay,
-            path: url.pathname,
-          });
+        // Next.js not ready yet - wait before retrying (skip delay if shutting down)
+        if (shuttingDown) {
+          break;
         }
+        const delay = PROXY_RETRY_DELAYS[attempt] ?? 8000;
+        logger.warn("[Proxy] Server not ready, retrying", {
+          attempt: attempt + 1,
+          delayMs: delay,
+          path: url.pathname,
+        });
         await new Promise<void>((resolve) => {
           setTimeout(resolve, delay);
         });

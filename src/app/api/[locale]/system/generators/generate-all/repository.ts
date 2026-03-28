@@ -563,8 +563,9 @@ export class GenerateAllRepository {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              const { GenerateTanstackRoutesRepository } =
-                await import("../../unified-interface/tanstack-start/generate/repository");
+              const { GenerateTanstackRoutesRepository } = await import(
+                /* turbopackIgnore: true */ /* webpackIgnore: true */ "../../unified-interface/tanstack-start/generate/repository"
+              );
 
               const result =
                 await GenerateTanstackRoutesRepository.generateInternal();

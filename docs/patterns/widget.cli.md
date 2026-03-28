@@ -6,7 +6,7 @@ CLI widgets are **Ink-based React components** that override the default definit
 
 ## When to Write a CLI Widget
 
-**Every endpoint that returns non-trivial data or is callable from CLI/MCP gets a `widget.cli.tsx`.** The default field-driven CLI renderer outputs a raw dump of field values — acceptable only for the simplest internal tooling.
+**Every endpoint that returns non-trivial data or is callable from CLI/MCP gets a `widget.cli.tsx`.** The default field-driven CLI renderer outputs a raw dump of field values - acceptable only for the simplest internal tooling.
 
 Write a `widget.cli.tsx` for any endpoint that:
 
@@ -136,11 +136,11 @@ MyWidget.cliWidget = true as const;
 
 ### MCP rules (strict)
 
-- **No `chalk`** — ANSI codes are noise to AI agents
-- **No `terminalLink`** — hyperlinks don't render in AI context
-- **No decorative borders or padding** — wastes token budget
-- **One meaningful line per item** — AI reads line-by-line
-- **Include pagination hints as plain text** — `Page 1/3 - use page=2 for next`
+- **No `chalk`** - ANSI codes are noise to AI agents
+- **No `terminalLink`** - hyperlinks don't render in AI context
+- **No decorative borders or padding** - wastes token budget
+- **One meaningful line per item** - AI reads line-by-line
+- **Include pagination hints as plain text** - `Page 1/3 - use page=2 for next`
 - **Use `<Text wrap="end">` for multi-line blocks**
 
 ### CLI rules
@@ -172,26 +172,26 @@ const output =
       : renderListCli(value);
 ```
 
-**MCP list format** — one line per item, pipe-separated fields:
+**MCP list format** - one line per item, pipe-separated fields:
 
 ```
-SkillName — tagline • modelInfo • provider
+SkillName - tagline • modelInfo • provider
 Page 1/3 - use page=2 for next
 ```
 
-**CLI list format** — aligned columns, chalk colors, grouped by section:
+**CLI list format** - aligned columns, chalk colors, grouped by section:
 
 ```
   Skills
     name           tagline truncated to 50 chars   model
     another-skill  tagline here                     gpt-4o
 
-Page 1/3 — vibe skills --page=2
+Page 1/3 - vibe skills --page=2
 ```
 
 ### Real-world reference
 
-See `src/app/api/[locale]/agent/chat/skills/widget.cli.tsx` — the canonical example of detail/list threshold, full MCP/CLI divergence, and pagination hints.
+See `src/app/api/[locale]/agent/chat/skills/widget.cli.tsx` - the canonical example of detail/list threshold, full MCP/CLI divergence, and pagination hints.
 
 ---
 

@@ -123,7 +123,7 @@ export class WaitForTaskRepository {
           },
         );
 
-        // Suppress wakeUp revival signal in the live stream — we're delivering inline.
+        // Suppress wakeUp revival signal in the live stream - we're delivering inline.
         // The original wakeUp tool message ID is what resume-stream uses to signal;
         // adding it to suppressedWakeUpToolMessageIds makes the stream's finally block skip it.
         const originalWakeUpToolMessageId = task.wakeUpToolMessageId;
@@ -211,7 +211,7 @@ export class WaitForTaskRepository {
           },
         );
 
-        // Suppress any wakeUp signal for the original tool message — we're taking over delivery.
+        // Suppress any wakeUp signal for the original tool message - we're taking over delivery.
         // The goroutine may have already queued a wakeUp signal via publishWakeUpSignal;
         // the stream's finally block will skip it if it's in suppressedWakeUpToolMessageIds.
         const originalWakeUpMsgId = task.wakeUpToolMessageId;

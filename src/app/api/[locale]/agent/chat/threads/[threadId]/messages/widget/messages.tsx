@@ -861,7 +861,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
       const atBottom = distFromBottom < BOTTOM_THRESHOLD;
 
       if (atBottom) {
-        // Arrived at bottom — clear smooth scroll flag and re-engage sticky
+        // Arrived at bottom - clear smooth scroll flag and re-engage sticky
         smoothScrollingRef.current = false;
       }
       stickyBottomRef.current = atBottom;
@@ -925,12 +925,12 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
 
   const hasAnyMessages = activeThreadMessages.length > 0;
 
-  // Track the last scrollHeight we snapped to — only snap when content grows.
+  // Track the last scrollHeight we snapped to - only snap when content grows.
   const lastSnapScrollHeightRef = useRef<number>(0);
 
   // Sticky-bottom: after every render, if we're pinned and new content arrived, snap to bottom.
   // useLayoutEffect fires synchronously after DOM commit so scrollHeight is up to date.
-  // Only snaps when scrollHeight increases (new content) — not on every render — so manual
+  // Only snaps when scrollHeight increases (new content) - not on every render - so manual
   // scrolling near the bottom doesn't trigger a snap.
   useLayoutEffect(() => {
     const container = messagesContainerRef.current;

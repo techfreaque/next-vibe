@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Show HN: next-vibe — Der Entwurf — next-vibe Blog",
+    title: "Show HN: next-vibe - Der Entwurf - next-vibe Blog",
     description:
       "Der Hacker News Post, den wir schreiben. TypeScript-Suprematie, vereinheitlichte Oberflächen und ein Trading-Bot, der nicht handeln kann.",
     category: "Community",
@@ -25,23 +25,23 @@ export const translations: typeof enTranslations = {
     paragraph1:
       "Jedes technische Projekt fragt irgendwann: Wie stellt man sich Hacker News vor? Der Titel ist alles. Die ersten zwei Sätze entscheiden, ob jemand klickt oder scrollt.",
     paragraph2:
-      "Wir haben zwei Winkel. Beide sind wahr. Beide sind echte Teile von next-vibe. Die Frage ist, welcher auf HN härter landet — und welcher die Konversation startet, die wir tatsächlich haben wollen.",
+      "Wir haben zwei Winkel. Beide sind wahr. Beide sind echte Teile von next-vibe. Die Frage ist, welcher auf HN härter landet - und welcher die Konversation startet, die wir tatsächlich haben wollen.",
   },
   optionA: {
     badge: "Option A",
     title: "TypeScript-Suprematie",
     hnTitle:
       "Show HN: next-vibe – ein TypeScript-first Framework, wo any, unknown, object, as X und throw verboten sind",
-    body: "Die meisten TypeScript-Projekte behandeln das Typsystem als optionale Leitplanken. Wir behandeln es als tragende Struktur. Die Regel in next-vibe ist einfach: Typen müssen vollständig übereinstimmen — kein any, kein unknown, kein nacktes object, keine Typzusicherungen (as X), keine Ausnahmen. Wenn Ihre Typen falsch sind, ist die Architektur falsch.\n\nUm dies durchzusetzen, haben wir vibe check gebaut: ein Code-Qualitätstool, das Oxlint (Rust), ESLint und TypeScript-Typüberprüfung parallel ausführt.",
+    body: "Die meisten TypeScript-Projekte behandeln das Typsystem als optionale Leitplanken. Wir behandeln es als tragende Struktur. Die Regel in next-vibe ist einfach: Typen müssen vollständig übereinstimmen - kein any, kein unknown, kein nacktes object, keine Typzusicherungen (as X), keine Ausnahmen. Wenn Ihre Typen falsch sind, ist die Architektur falsch.\n\nUm dies durchzusetzen, haben wir vibe check gebaut: ein Code-Qualitätstool, das Oxlint (Rust), ESLint und TypeScript-Typüberprüfung parallel ausführt.",
     reasoning:
-      "TypeScript-Hardliner werden sofort einsteigen. Die verbotenen Muster sind konkret und umstritten. HN-Ingenieure haben Meinungen zu any und throw. Dieser Winkel lädt zu Widerspruch ein — und auf HN ist Widerspruch Engagement.",
+      "TypeScript-Hardliner werden sofort einsteigen. Die verbotenen Muster sind konkret und umstritten. HN-Ingenieure haben Meinungen zu any und throw. Dieser Winkel lädt zu Widerspruch ein - und auf HN ist Widerspruch Engagement.",
   },
   optionB: {
     badge: "Option B",
     title: "Vereinheitlichte Oberfläche",
     hnTitle:
       "Show HN: next-vibe – eine Endpoint-Definition wird Web-UI, CLI, MCP-Tool, native App, Cron-Job und Graph-Knoten",
-    body: "Ich hatte es satt, die gleiche Logik fünfmal zu schreiben. Jede Funktion brauchte ein Webformular, einen CLI-Befehl, ein MCP-Tool für KI-Agenten, manchmal einen mobilen Screen. Gleiche Validierung, gleiche i18n, gleiche Fehlerbehandlung — nur anders verkleidet.\n\nnext-vibe löst dies mit einer einzigen definition.ts pro Funktion. Sie beschreiben Ihre Felder, Zod-Schemas, Labels, Fehlertypen und Beispiele einmal.",
+    body: "Ich hatte es satt, die gleiche Logik fünfmal zu schreiben. Jede Funktion brauchte ein Webformular, einen CLI-Befehl, ein MCP-Tool für KI-Agenten, manchmal einen mobilen Screen. Gleiche Validierung, gleiche i18n, gleiche Fehlerbehandlung - nur anders verkleidet.\n\nnext-vibe löst dies mit einer einzigen definition.ts pro Funktion. Sie beschreiben Ihre Felder, Zod-Schemas, Labels, Fehlertypen und Beispiele einmal.",
     reasoning:
       "Der nachvollziehbare Schmerzpunkt: die gleiche Sache fünfmal schreiben. Die Lösung ist konkret und demonstrierbar. Der Graph-Knoten-Winkel ist neuartig. MCP + KI-Agenten-Winkel ist zeitgemäß.",
   },
@@ -85,7 +85,7 @@ export const translations: typeof enTranslations = {
     description:
       "Vibe Sense ist eine knotenbasierte Marktanalyse-Engine. Datenquellen, Indikatoren (EMA, SMA, Bollinger Bands), Evaluatoren, die Signale ausgeben, und Action-Knoten, die auf diese Signale reagieren. Keine Auftragsausführung.",
     hookForComments:
-      "Jeder Knoten im Graphen ist nur ein HTTP-Endpoint — Sie können jeden Schritt in der Pipeline curlen, ihn isoliert testen oder von einem KI-Agenten aus aufrufen. Die Graph-Engine ist ein Scheduler, keine DSL.",
+      "Jeder Knoten im Graphen ist nur ein HTTP-Endpoint - Sie können jeden Schritt in der Pipeline curlen, ihn isoliert testen oder von einem KI-Agenten aus aufrufen. Die Graph-Engine ist ein Scheduler, keine DSL.",
     whyItMatters:
       "Da jeder Knoten ein Standard-Endpoint ist, sind sie einzeln über CLI testbar, für KI-Agenten über MCP zugänglich und mit der gleichen Infra wie alles andere cachbar.",
   },
@@ -102,7 +102,7 @@ export const translations: typeof enTranslations = {
       unifiedSurface: {
         rank: "2",
         title:
-          "Vereinheitlichte Oberfläche — eine Definition, alle Oberflächen",
+          "Vereinheitlichte Oberfläche - eine Definition, alle Oberflächen",
         reason:
           "Nachvollziehbarer Schmerzpunkt. Jeder Entwickler hat das gleiche Formular fünfmal geschrieben.",
       },
@@ -129,7 +129,7 @@ export const translations: typeof enTranslations = {
   titleAlternatives: {
     title: "Alternative Titeloptionen",
     items: {
-      alt1: "Show HN: Ich habe any, unknown, object und as X aus unserer TypeScript-Codebasis verbannt — hier ist der Enforcer",
+      alt1: "Show HN: Ich habe any, unknown, object und as X aus unserer TypeScript-Codebasis verbannt - hier ist der Enforcer",
       alt2: "Show HN: next-vibe – TypeScript so streng, dass wir einen eigenen Linter schrieben, um throw zu verbannen",
       alt3: "Show HN: next-vibe – eine Endpoint-Definition, sechs Oberflächen (web/CLI/MCP/native/cron/graph)",
       alt4: "Show HN: Wir bauten eine Zeitreihen-Graph-Engine, wo jeder Knoten nur ein HTTP-Endpoint ist",

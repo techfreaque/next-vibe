@@ -357,35 +357,52 @@ export class EndpointGeneratorRepository {
       }
     }
 
+    // Routes that use process.cwd() + fs scanning - must be turbopack-ignored to
+    // prevent NFT from tracing the entire project through these imports.
+    const NFT_IGNORE_PATTERNS = [
+      /\/tanstack-start\/generate\//,
+      /\/cli\/setup\/install\//,
+      /\/generators\//,
+      /\/builder\//,
+      /\/check\//,
+      /\/guard\//,
+    ];
+    const needsTurbopackIgnore = (p: string): boolean =>
+      NFT_IGNORE_PATTERNS.some((re) => re.test(p));
+
     // Generate static-import cases (bundler-traceable) and hot-paths map entries
     const cases: string[] = [];
     const hotPathEntries: string[] = [];
     for (const path of allPaths) {
       const { importPath, absPath, method } = pathMap[path];
+      // Add turbopack/webpack ignore hints for routes that scan the filesystem
+      const ignoreComment = needsTurbopackIgnore(importPath)
+        ? "/* turbopackIgnore: true */ /* webpackIgnore: true */ "
+        : "";
       // Static import strings for bundler tracing
-      const returnWithDefault = `      return (await import("${importPath}")).default`;
-      const returnWithParen = `      return (await import("${importPath}"))`;
-      const fullLine = `      return (await import("${importPath}")).default.${method};`;
+      const returnWithDefault = `      return (await import(${ignoreComment}"${importPath}")).default`;
+      const returnWithParen = `      return (await import(${ignoreComment}"${importPath}"))`;
+      const fullLine = `      return (await import(${ignoreComment}"${importPath}")).default.${method};`;
 
       if (fullLine.length <= 80) {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
-      return (await import("${importPath}")).default.${method};`);
+      return (await import(${ignoreComment}"${importPath}")).default.${method};`);
       } else if (returnWithDefault.length <= 80) {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
-      return (await import("${importPath}")).default
+      return (await import(${ignoreComment}"${importPath}")).default
         .${method};`);
       } else if (returnWithParen.length <= 80) {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
-      return (await import("${importPath}"))
+      return (await import(${ignoreComment}"${importPath}"))
         .default.${method};`);
       } else {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (
-        await import("${importPath}")
+        await import(${ignoreComment}"${importPath}")
       ).default.${method};`);
       }
 

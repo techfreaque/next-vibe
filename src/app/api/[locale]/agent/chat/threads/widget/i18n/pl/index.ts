@@ -105,13 +105,13 @@ export const translations: typeof enTranslations = {
       companionVariants: {
         title: "Warianty twojego towarzysza",
         description:
-          "Twój towarzysz ma kilka wariantów — brilliant do głębokiego myślenia, smart do codziennych zadań i bez cenzury do niefiltrowanych odpowiedzi. Dotknij dowolny wiersz, aby natychmiast przełączyć.",
+          "Twój towarzysz ma kilka wariantów - brilliant do głębokiego myślenia, smart do codziennych zadań i bez cenzury do niefiltrowanych odpowiedzi. Dotknij dowolny wiersz, aby natychmiast przełączyć.",
         tip: "Możesz przeciągać, aby zmienić kolejność, lub dodawać kolejne warianty w dowolnym momencie.",
       },
       browseSkills: {
         title: "Odkryj więcej skillów",
         description:
-          "Przeglądaj 40+ skillów — koderzy, badacze, pisarze, doradcy i więcej. Dodaj dowolny jako ulubiony i pojawi się tutaj.",
+          "Przeglądaj 40+ skillów - koderzy, badacze, pisarze, doradcy i więcej. Dodaj dowolny jako ulubiony i pojawi się tutaj.",
         tip: "Skille dają twojej AI konkretny cel i właściwy model do zadania.",
       },
       rootFolders: {
@@ -193,9 +193,9 @@ export const translations: typeof enTranslations = {
         },
       },
       callMode: {
-        title: "Tryb rozmowy — AI odpowiada głosowo",
+        title: "Tryb rozmowy - AI odpowiada głosowo",
         description:
-          "Dotknij ikony telefonu i po prostu mów. AI słucha, odpowiada na głos i trzyma się krótko — jak prawdziwa rozmowa.",
+          "Dotknij ikony telefonu i po prostu mów. AI słucha, odpowiada na głos i trzyma się krótko - jak prawdziwa rozmowa.",
         tip: "Bez pisania. Bez czytania. Po prostu mów.",
       },
       complete: {

@@ -90,7 +90,7 @@ export interface ExternalLinkProps {
 }
 
 /**
- * ExternalLink for native — uses ExpoLink for external URLs
+ * ExternalLink for native - uses ExpoLink for external URLs
  */
 export function ExternalLink({
   className,

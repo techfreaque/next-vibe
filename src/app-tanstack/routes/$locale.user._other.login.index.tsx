@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { toNextParams } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 import { TanstackPage as Page } from "@/app/[locale]/user/(other)/login/page";
-import { TanstackPage as GroupLayout } from "@/app/[locale]/user/(other)/layout";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: { params: Record<string, string>; search: Record<string, string> }) => data)
@@ -12,10 +11,10 @@ const loadData = createServerFn({ method: "GET" })
         return tanstackLoader({ params: Promise.resolve(toNextParams(data.params)), searchParams: Promise.resolve(data.search) });
   });
 
-export const Route = createFileRoute("/$locale/user/login/")({
+export const Route = createFileRoute("/$locale/user/_other/login/")({
   staleTime: 0,
   validateSearch: (search: Record<string, string>) => search,
   loaderDeps: ({ search }) => ({ search }),
   loader: ({ params, deps: { search } }) => loadData({ data: { params: params as Record<string, string>, search } }),
-  component: () => <GroupLayout><Page {...Route.useLoaderData()} /></GroupLayout>,
+  component: () => <Page {...Route.useLoaderData()} />,
 });

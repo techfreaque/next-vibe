@@ -31,7 +31,7 @@ interface CliWidgetProps {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Display name for a skill item — includes variantName when present */
+/** Display name for a skill item - includes variantName when present */
 function skillLabel(item: SkillListItem): string {
   if (item.variantName) {
     return `${item.name} (${item.variantName})`;
@@ -78,7 +78,7 @@ function renderDetailMcp(items: SkillListItem[]): string {
 
   for (const item of items) {
     const label = skillLabel(item);
-    lines.push(`${label} — ${item.tagline}`);
+    lines.push(`${label} - ${item.tagline}`);
     lines.push(`  Model: ${item.modelInfo} (${item.modelProvider})`);
     if (item.description && item.description !== item.tagline) {
       lines.push(`  Description: ${item.description}`);
@@ -114,11 +114,11 @@ function renderListCli(data: SkillListResponseOutput): string {
     lines.push("");
   }
 
-  // Pagination (only when compact/paginated — hint is null for CLI)
+  // Pagination (only when compact/paginated - hint is null for CLI)
   if (data.currentPage && data.totalPages && data.totalPages > 1) {
     lines.push(
       chalk.dim(
-        `Page ${data.currentPage}/${data.totalPages} — vibe skills --page=${data.currentPage + 1}`,
+        `Page ${data.currentPage}/${data.totalPages} - vibe skills --page=${data.currentPage + 1}`,
       ),
     );
   }

@@ -55,7 +55,7 @@ export class ConfigCreateRepository {
 
       // Interactive mode is handled by the CLI widget (widget.cli.tsx).
       // By the time this repository runs, data already contains the resolved
-      // boolean values from the wizard — no prompts needed here.
+      // boolean values from the wizard - no prompts needed here.
 
       // Create check.config.ts with user-selected options
       const configResult = await ConfigRepositoryImpl.createDefaultCheckConfig(

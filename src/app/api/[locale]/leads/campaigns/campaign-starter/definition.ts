@@ -27,8 +27,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { CampaignStarterConfigContainer } from "./widget";
 import { scopedTranslation } from "./i18n";
+import { CampaignStarterConfigContainer } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -46,7 +46,7 @@ const { POST } = createEndpoint({
     render: CampaignStarterConfigContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      // Hidden field — browser timezone, defaulted client-side automatically
+      // Hidden field - browser timezone, defaulted client-side automatically
       timezone: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

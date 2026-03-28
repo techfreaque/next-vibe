@@ -3,11 +3,11 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title:
-      "Mein toter Trading-Bot wurde zu einer Plattform-Monitoring-Engine — next-vibe",
+      "Mein toter Trading-Bot wurde zu einer Plattform-Monitoring-Engine - next-vibe",
     description:
-      "Ich habe vor Jahren einen Trading-Bot aufgegeben. Dann erkannte ich: Seine Architektur — DataSource, Indicator, Evaluator, Action — gilt für jedes Unternehmen. Also habe ich ihn in next-vibe neu aufgebaut.",
+      "Ich habe vor Jahren einen Trading-Bot aufgegeben. Dann erkannte ich: Seine Architektur - DataSource, Indicator, Evaluator, Action - gilt für jedes Unternehmen. Also habe ich ihn in next-vibe neu aufgebaut.",
     category: "Vibe Sense",
-    imageAlt: "Vibe Sense Monitoring-Pipeline — next-vibe",
+    imageAlt: "Vibe Sense Monitoring-Pipeline - next-vibe",
     keywords:
       "vibe sense, Monitoring, Trading-Bot, Endpoints, EMA, Pipeline, next-vibe, TypeScript",
     ogTitle:
@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Vibe Sense",
     title: "Das ist deine Plattform, die sich selbst beobachtet.",
     subtitle:
-      "Ich habe vor Jahren einen Trading-Bot aufgegeben. Seine Architektur wurde zum interessantesten Teil von next-vibe. Jeder Node im Graph ist ein Endpoint — aufrufbar von der CLI, auffindbar durch KI, in deine Plattform eingebunden.",
+      "Ich habe vor Jahren einen Trading-Bot aufgegeben. Seine Architektur wurde zum interessantesten Teil von next-vibe. Jeder Node im Graph ist ein Endpoint - aufrufbar von der CLI, auffindbar durch KI, in deine Plattform eingebunden.",
     readTime: "14 Min. Lesezeit",
     date: "Architektur",
   },
@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
   insight: {
     title: "Jedes Unternehmen ist eine Zeitreihe",
     intro:
-      "In einem Trading-Bot sind die Teile einfach. Eine Datenquelle: Preisdaten, Volumen, was auch immer man liest. Ein Indikator: Moving Average, RSI, MACD — nimmt Rohdaten, produziert ein abgeleitetes Signal. Ein Evaluator: Ist der schnelle MA über dem langsamen MA? Boolean-Bedingung. Eine Aktion: Wenn der Evaluator feuert, tue etwas.",
+      "In einem Trading-Bot sind die Teile einfach. Eine Datenquelle: Preisdaten, Volumen, was auch immer man liest. Ein Indikator: Moving Average, RSI, MACD - nimmt Rohdaten, produziert ein abgeleitetes Signal. Ein Evaluator: Ist der schnelle MA über dem langsamen MA? Boolean-Bedingung. Eine Aktion: Wenn der Evaluator feuert, tue etwas.",
     realization:
       "Diese Struktur beschreibt kein Trading. Sie beschreibt jeden Geschäftsprozess, bei dem man Daten über Zeit hat, Bedingungen die einem wichtig sind, und Aktionen, die man ausführen möchte, wenn diese Bedingungen erfüllt sind.",
     examples: {
@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
       revenueAnomaly: {
         label: "Umsatzanomalien",
         description:
-          "Rückerstattungsrate steigt an einem Tag über 20% — Thea wird benachrichtigt, bevor man es im Dashboard sieht.",
+          "Rückerstattungsrate steigt an einem Tag über 20% - Thea wird benachrichtigt, bevor man es im Dashboard sieht.",
       },
     },
   },
@@ -95,12 +95,12 @@ export const translations: typeof enTranslations = {
     indicator: {
       label: "Indicator",
       description:
-        "Ein reiner, wiederverwendbarer Berechnungs-Endpoint — EMA, RSI, MACD, Bollinger Bands, clamp, delta, Fensterdurchschnitt. Kein SQL. Kein Domänenwissen. Auf jede Datenquelle anwendbar.",
+        "Ein reiner, wiederverwendbarer Berechnungs-Endpoint - EMA, RSI, MACD, Bollinger Bands, clamp, delta, Fensterdurchschnitt. Kein SQL. Kein Domänenwissen. Auf jede Datenquelle anwendbar.",
     },
     evaluator: {
       label: "Evaluator",
       description:
-        "Ein Schwellenwert oder eine Bedingung. Nimmt eine Reihe und stellt eine Frage. Liegt dieser Wert unter 0,7? Hat dieses Verhältnis 20% überschritten? Gibt ein Signal aus — ausgelöst oder nicht ausgelöst.",
+        "Ein Schwellenwert oder eine Bedingung. Nimmt eine Reihe und stellt eine Frage. Liegt dieser Wert unter 0,7? Hat dieses Verhältnis 20% überschritten? Gibt ein Signal aus - ausgelöst oder nicht ausgelöst.",
     },
     action: {
       label: "Action",
@@ -124,7 +124,7 @@ export const translations: typeof enTranslations = {
         "Jeder Vibe Sense Node ist ein Standard-Endpoint, definiert mit createEndpoint(), registriert in der gleichen Endpoint-Registry wie alles andere auf der Plattform.",
     },
     cliCaption:
-      "Der gleiche EMA-Endpoint, der als Node im Lead-Funnel-Graph lief — gleiche Definition, gleiche Validierung, gleiche Auth — standalone von der CLI aufrufbar.",
+      "Der gleiche EMA-Endpoint, der als Node im Lead-Funnel-Graph lief - gleiche Definition, gleiche Validierung, gleiche Auth - standalone von der CLI aufrufbar.",
     insight:
       "Der GLEICHE Endpoint, der ein Node in deinem Lead-Funnel-Graph ist, ist auch ein eigenständiges Tool auf 13 Plattformen.",
     keyLine: "Die Pipeline sind nur Endpoints, die Endpoints aufrufen.",
@@ -139,7 +139,7 @@ export const translations: typeof enTranslations = {
     examples: {
       alert: {
         label: "Alert",
-        description: "complete-task aufrufen — Thea nimmt es sofort entgegen.",
+        description: "complete-task aufrufen - Thea nimmt es sofort entgegen.",
       },
       campaign: {
         label: "Kampagne",
@@ -165,7 +165,7 @@ export const translations: typeof enTranslations = {
         created: {
           name: "leads.created",
           description:
-            "Abfrage der Leads nach created_at. Sparse — Stunden ohne neue Leads produzieren keinen Datenpunkt.",
+            "Abfrage der Leads nach created_at. Sparse - Stunden ohne neue Leads produzieren keinen Datenpunkt.",
         },
         converted: {
           name: "leads.converted",
@@ -203,7 +203,7 @@ export const translations: typeof enTranslations = {
     column3: {
       label: "Spalte 3: Evaluatoren",
       description:
-        "Schwellenwertbedingungen. Jeder gibt ein Signal aus — ausgelöst oder nicht ausgelöst.",
+        "Schwellenwertbedingungen. Jeder gibt ein Signal aus - ausgelöst oder nicht ausgelöst.",
       nodes: {
         leadDrop: {
           name: "eval_lead_drop",
@@ -234,7 +234,7 @@ export const translations: typeof enTranslations = {
     indicators: {
       label: "Indikatoren unter analytics/indicators/",
       description:
-        "Reine Berechnung — EMA, RSI, MACD, Bollinger Bands, clamp, delta, Fensterdurchschnitt. Kein Domänenwissen. Auf jede Datenquelle anwendbar.",
+        "Reine Berechnung - EMA, RSI, MACD, Bollinger Bands, clamp, delta, Fensterdurchschnitt. Kein Domänenwissen. Auf jede Datenquelle anwendbar.",
     },
     registration:
       "Beim Start entdeckt das Indikator-Registry beide automatisch. Datenquellen-Endpoints registrieren sich als Node-Definitionen. Man fügt eine neue Domäne hinzu, fügt data-sources/-Endpoints hinzu, exportiert graphSeeds. Sie erscheinen.",
@@ -247,7 +247,7 @@ export const translations: typeof enTranslations = {
     versioning: {
       label: "Versionierung",
       description:
-        "Graphs werden versioniert. Wenn man einen Graph bearbeitet, erstellt man eine neue Version — nie die aktive mutieren. Die neue Version ist ein Entwurf. Man promoted sie explizit. Rollback ist trivial.",
+        "Graphs werden versioniert. Wenn man einen Graph bearbeitet, erstellt man eine neue Version - nie die aktive mutieren. Die neue Version ist ein Entwurf. Man promoted sie explizit. Rollback ist trivial.",
     },
     backtest: {
       label: "Backtest",
@@ -269,7 +269,7 @@ export const translations: typeof enTranslations = {
       never: {
         label: "never",
         description:
-          "Immer live aus Inputs neu berechnet. EMA-Outputs, Verhältnisse — keine Speicherkosten. Lookback wird automatisch für den Warmup erweitert.",
+          "Immer live aus Inputs neu berechnet. EMA-Outputs, Verhältnisse - keine Speicherkosten. Lookback wird automatisch für den Warmup erweitert.",
       },
     },
   },
@@ -284,8 +284,8 @@ export const translations: typeof enTranslations = {
           "Topologische Ausführung via Graph-Walker. Multi-Resolution-Unterstützung mit automatischem Hoch-/Runterskalieren. Lookback-bewusste Bereichserweiterung.",
         versioning:
           "Versionierung, Backtest-Modus mit vollständiger Run-Historie, Signal-Persistenz als Audit-Trail.",
-        cli: "CLI-Zugang — vibe ema, vibe rsi, jeder Indikator-Endpoint, standalone aufrufbar.",
-        mcp: "MCP-Registrierung — Indikator-Endpoints erscheinen in der Tool-Liste. Thea kann Indikatoren direkt aufrufen.",
+        cli: "CLI-Zugang - vibe ema, vibe rsi, jeder Indikator-Endpoint, standalone aufrufbar.",
+        mcp: "MCP-Registrierung - Indikator-Endpoints erscheinen in der Tool-Liste. Thea kann Indikatoren direkt aufrufen.",
         seeds:
           "Seed-Graphs: 4 Lead-Domänen-Graphs, 4 Credits-Domänen-Graphs, plus Nutzerwachstums-Graphs. Alle laufen sofort auf vibe dev.",
       },
@@ -305,7 +305,7 @@ export const translations: typeof enTranslations = {
   vision: {
     title: "Was das wirklich ist",
     paragraph1:
-      "Jeder Geschäftsprozess, der beschrieben werden kann als: gegeben diese Daten, wenn diese Bedingungen erfüllt sind, tue dies — das ist ein Vibe Sense Graph. Monitoring, ja. Alerting, ja. Aber auch: automatisierte Lead-Qualifizierung, Umsatzanomalientekennung, Credit-Ökonomie-Balancierung, Marketing-Automatisierung.",
+      "Jeder Geschäftsprozess, der beschrieben werden kann als: gegeben diese Daten, wenn diese Bedingungen erfüllt sind, tue dies - das ist ein Vibe Sense Graph. Monitoring, ja. Alerting, ja. Aber auch: automatisierte Lead-Qualifizierung, Umsatzanomalientekennung, Credit-Ökonomie-Balancierung, Marketing-Automatisierung.",
     paragraph2:
       "Der Trading-Bot hatte diese Architektur richtig. Indikatoren, Evaluatoren, Aktionen, Backtest-Modus. Das, was ich falsch gemacht habe, war, ihn in Isolation zu bauen. In Octane war EMA in der Pipeline eingesperrt. In next-vibe ist EMA ein First-Class-Endpoint.",
     keyLine:

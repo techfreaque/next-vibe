@@ -52,7 +52,7 @@ export interface ExternalLinkProps {
 }
 
 /**
- * ExternalLink for TanStack — uses plain <a> for external URLs
+ * ExternalLink for TanStack - uses plain <a> for external URLs
  */
 export function ExternalLink({
   className,

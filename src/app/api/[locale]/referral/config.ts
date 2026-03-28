@@ -1,5 +1,5 @@
 /**
- * Referral program configuration — single source of truth.
+ * Referral program configuration - single source of truth.
  * Both the payout algorithm (repository.ts) and the UI (page-client.tsx)
  * derive all values from these constants.
  */

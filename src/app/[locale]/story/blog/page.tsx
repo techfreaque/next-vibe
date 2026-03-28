@@ -70,7 +70,7 @@ const VIBE_CHECK_SNIPPET = `$ vibe check src/
 
   src/api/chat/repo.ts:42
     no-explicit-any: Unexpected any.
-    Avoid \`any\` — fix the type.
+    Avoid \`any\` - fix the type.
 
   src/api/chat/repo.ts:67
     no-throw: Use fail() not throw.`;
@@ -211,7 +211,7 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
       </Div>
 
       <Div className="container mx-auto px-4 py-16 space-y-16">
-        {/* Featured post — full width hero card */}
+        {/* Featured post - full width hero card */}
         {featured !== undefined && (
           <Div>
             <Div className="flex items-center gap-2 mb-6">
@@ -265,7 +265,7 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
 
                   {/* Inline code preview */}
                   <Div className="font-mono text-xs text-emerald-400/80 bg-black/40 border border-slate-700/50 rounded-lg px-4 py-3 max-w-xl mb-6 whitespace-pre leading-relaxed">
-                    {`createEndpoint({\n  path: ["chat", "threads"],\n  // → web form, CLI command,\n  // → MCP tool, native screen,\n  // → cron job — automatically\n})`}
+                    {`createEndpoint({\n  path: ["chat", "threads"],\n  // → web form, CLI command,\n  // → MCP tool, native screen,\n  // → cron job - automatically\n})`}
                   </Div>
 
                   <Span
@@ -287,7 +287,7 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
           </Div>
 
           <Div className="grid md:grid-cols-3 gap-6">
-            {/* TypeScript post — with vibe check code snippet */}
+            {/* TypeScript post - with vibe check code snippet */}
             {gridPosts[0] !== undefined && (
               <Link
                 href={`/${locale}/story/blog/${gridPosts[0].slug}`}
@@ -332,7 +332,7 @@ export function TanstackPage({ locale }: BlogIndexPageData): JSX.Element {
               </Link>
             )}
 
-            {/* Trading bot post — with ASCII graph */}
+            {/* Trading bot post - with ASCII graph */}
             {gridPosts[1] !== undefined && (
               <Link
                 href={`/${locale}/story/blog/${gridPosts[1].slug}`}

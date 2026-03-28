@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title:
-      "Zbudowałem sprawdzacz typów, który sprawił, że AI przestało mnie okłamywać — next-vibe",
+      "Zbudowałem sprawdzacz typów, który sprawił, że AI przestało mnie okłamywać - next-vibe",
     description:
       "AI używa `any`, żeby uciec przed błędem typów. Dodaje eslint-disable. Kłamie ci w oczy. Oto jak naprawiliśmy tę pętlę sprzężenia zwrotnego z @next-vibe/checker.",
     category: "TypeScript",
@@ -24,7 +24,7 @@ export const translations: typeof enTranslations = {
   problem: {
     title: "Zepsuta pętla sprzężenia zwrotnego",
     description:
-      'Poproś Claude Code o dodanie funkcji. Robi to. Uruchom ESLint — przechodzi. Uruchom TypeScript — błędy. Poproś Claude Code o naprawienie błędów TypeScript. Robi to. Uruchom ESLint — teraz to się nie udaje. Tam i z powrotem. Trzy iteracje. AI jest pewne siebie na każdym kroku. Za każdym razem: "To jest naprawione."',
+      'Poproś Claude Code o dodanie funkcji. Robi to. Uruchom ESLint - przechodzi. Uruchom TypeScript - błędy. Poproś Claude Code o naprawienie błędów TypeScript. Robi to. Uruchom ESLint - teraz to się nie udaje. Tam i z powrotem. Trzy iteracje. AI jest pewne siebie na każdym kroku. Za każdym razem: "To jest naprawione."',
     fixLabel: "Nigdy nie było naprawione.",
     fixDescription:
       "To była gra w kreta z narzędziem, które uruchamia jeden linter na raz i nigdy nie widzi pełnego obrazu.",
@@ -41,7 +41,7 @@ export const translations: typeof enTranslations = {
       "System typów TypeScript to graf. Każdy typ przepływa od definicji do użycia. Jeśli masz funkcję, która zwraca `string`, wywołujący wie, że to string. Cały łańcuch jest sprawdzany.",
     holeInGraph: "`any` to dziura w grafie.",
     holeDescription:
-      "Zmienna typowana jako `any` mówi kompilatorowi: zatrzymaj sprawdzanie tutaj. Nie tylko dla tej zmiennej — dla wszystkiego, co dotyka tej zmiennej. Błąd nie pojawia się przy `any`. Pojawia się trzy pliki dalej, gdy niezwiązany refactoring psuje założenie, które nigdy nie było egzekwowane.",
+      "Zmienna typowana jako `any` mówi kompilatorowi: zatrzymaj sprawdzanie tutaj. Nie tylko dla tej zmiennej - dla wszystkiego, co dotyka tej zmiennej. Błąd nie pojawia się przy `any`. Pojawia się trzy pliki dalej, gdy niezwiązany refactoring psuje założenie, które nigdy nie było egzekwowane.",
     zeroErrors:
       "Zero błędów TypeScript nie znaczy nic, jeśli masz 47 niezweryfikowanych użyć `any`.",
     zeroErrorsDescription:
@@ -71,13 +71,13 @@ export const translations: typeof enTranslations = {
     eslintDescription:
       "Rzeczy, których Oxlint jeszcze nie robi: lint haków React, reguły kompilatora React, sortowanie importów.",
     tsDescription:
-      "Pełne sprawdzanie typów. Nie tylko plik, który edytujesz — cały graf.",
+      "Pełne sprawdzanie typów. Nie tylko plik, który edytujesz - cały graf.",
     parallelNote:
       "Wszystkie trzy działają równolegle. Otrzymujesz jedną ujednoliconą listę błędów. Naprawiasz, dopóki nie jest czysto.",
     timingNote:
-      "Na tej bazie kodu — 4400 plików — pełne TypeScript zajmuje około 12 sekund. Oxlint jest poniżej sekundy. ESLint to kilka sekund. Równoległość sprowadza to do 12.",
+      "Na tej bazie kodu - 4400 plików - pełne TypeScript zajmuje około 12 sekund. Oxlint jest poniżej sekundy. ESLint to kilka sekund. Równoległość sprowadza to do 12.",
     mcpNote:
-      "Udostępnia również polecenie `vibe-check mcp`, które uruchamia serwer MCP z narzędziem `check`. AI nie uruchamia polecenia powłoki — wywołuje narzędzie, które zwraca ustrukturyzowane dane błędów. Paginacja wbudowana. Filtrowanie według ścieżki.",
+      "Udostępnia również polecenie `vibe-check mcp`, które uruchamia serwer MCP z narzędziem `check`. AI nie uruchamia polecenia powłoki - wywołuje narzędzie, które zwraca ustrukturyzowane dane błędów. Paginacja wbudowana. Filtrowanie według ścieżki.",
     architectureTitle: "Architektura sprawdzacza",
     architectureSubtitle:
       "Trzy narzędzia działają równolegle, jedna ujednolicona lista błędów",
@@ -104,7 +104,7 @@ export const translations: typeof enTranslations = {
       "\"Zastąp 'unknown' istniejącym typowanym interfejsem. Dostosuj się do typów w bazie kodu, zamiast konwertować lub odtwarzać.\" To powstrzymuje Claude Code przed pisaniem generycznych furtek typowych.",
     objectBanTitle: "nagi typ `object`",
     objectBanDescription:
-      "`object` jest prawie zawsze błędny. Albo znasz kształt — napisz interfejs — albo masz `Record<string, SomeType>`. Surowy `object` to sygnał, że AI się poddało.",
+      "`object` jest prawie zawsze błędny. Albo znasz kształt - napisz interfejs - albo masz `Record<string, SomeType>`. Surowy `object` to sygnał, że AI się poddało.",
     bannedPatternsTitle: "Zakazane wzorce",
     bannedPatternsSubtitle:
       "Każdy zakazany wzorzec jest wykrywany podczas sprawdzania. Komunikat o błędzie mówi AI dokładnie, co zamiast tego zrobić.",
@@ -115,19 +115,19 @@ export const translations: typeof enTranslations = {
     title: "Demo na żywo: wzorzec 3 rund",
     subtitle:
       "Obserwuj, jak Claude Code trafia na sprawdzacz trzy razy przed znalezieniem właściwego typu",
-    round1Title: "Runda 1 — AI pisze `any`",
+    round1Title: "Runda 1 - AI pisze `any`",
     round1Description:
-      'Zapytaj Claude Code: "Napisz funkcję pomocniczą, która przyjmuje surowy obiekt odpowiedzi API i wyciąga pole danych. Odpowiedź może mieć różne kształty — użyj whatever type makes this work."',
+      'Zapytaj Claude Code: "Napisz funkcję pomocniczą, która przyjmuje surowy obiekt odpowiedzi API i wyciąga pole danych. Odpowiedź może mieć różne kształty - użyj whatever type makes this work."',
     round1Result: "Claude Code pisze proste rozwiązanie:",
     round1Error:
       "2 błędy znalezione. Oba `any`. Claude Code może to zobaczyć przez narzędzie MCP.",
-    round2Title: "Runda 2 — AI próbuje `unknown`",
+    round2Title: "Runda 2 - AI próbuje `unknown`",
     round2Description:
       "Obserwuj, co robi dalej. To jest ważna część. Próbuje następnej drogi ucieczki:",
     round2Result: "Sprawdzacz zna ten trik.",
     round2Error:
       "3 błędy. `unknown` też jest zakazane. Komunikat o błędzie mówi Claude Code dokładnie, co zamiast tego zrobić: znajdź istniejący typowany interfejs.",
-    round3Title: "Runda 3 — AI znajduje prawdziwy typ",
+    round3Title: "Runda 3 - AI znajduje prawdziwy typ",
     round3Description:
       "Teraz Claude Code robi to, co powinno zrobić jako pierwsze. Patrzy, jak istniejące odpowiedzi API są typowane w tej bazie kodu. Znajduje `ResponseType<T>`.",
     round3Result: "Zero błędów. I funkcja jest teraz faktycznie poprawna.",
@@ -138,7 +138,7 @@ export const translations: typeof enTranslations = {
   },
   endpoint: {
     title: "Połączenie z endpointem",
-    subtitle: "Jeden schemat Zod — czterech konsumentów poniżej",
+    subtitle: "Jeden schemat Zod - czterech konsumentów poniżej",
     description:
       "Każdy endpoint ma plik definicji. Ten plik zawiera jeden schemat Zod dla żądania i jeden dla odpowiedzi.",
     schemaBecomes:
@@ -153,14 +153,14 @@ export const translations: typeof enTranslations = {
     oneSchemaSolution:
       "Gdy jest jeden schemat, nie ma nic do synchronizowania.",
     typecheckedNote:
-      "I ponieważ sprawdzacz TypeScript też na tym działa — jeśli zmienisz schemat w sposób, który psuje wnioskowany typ poniżej, dostajesz błąd kompilatora. Schemat narzędzia AI jest sprawdzany typowo. Flagi CLI są sprawdzane typowo. Hook React jest sprawdzany typowo.",
+      "I ponieważ sprawdzacz TypeScript też na tym działa - jeśli zmienisz schemat w sposób, który psuje wnioskowany typ poniżej, dostajesz błąd kompilatora. Schemat narzędzia AI jest sprawdzany typowo. Flagi CLI są sprawdzane typowo. Hook React jest sprawdzany typowo.",
     statsTitle: "Ta baza kodu w liczbach",
     stat245: "245 endpointów",
     stat0any: "Zero `any`",
     stat0unknown: "Zero rzutowań `unknown`",
     stat0tsExpect: "Zero `@ts-expect-error`",
     statNote: "Nie przez konwencję. Przez sprawdzacz.",
-    diagramTitle: "Jeden schemat Zod — czterech konsumentów",
+    diagramTitle: "Jeden schemat Zod - czterech konsumentów",
     diagramSubtitle:
       "Zmień schemat raz, wszystko aktualizuje się automatycznie",
     diagramSource: "definition.ts (schemat Zod)",
@@ -176,7 +176,7 @@ export const translations: typeof enTranslations = {
     title: "Zainstaluj @next-vibe/checker",
     subtitle: "Działa na każdym projekcie TypeScript. Nie tylko next-vibe.",
     installDescription:
-      "Sprawdzacz jest dostępny jako samodzielny pakiet npm. Działa na każdym projekcie TypeScript — nie tylko NextVibe. Nie potrzebujesz żadnej innej części frameworka.",
+      "Sprawdzacz jest dostępny jako samodzielny pakiet npm. Działa na każdym projekcie TypeScript - nie tylko NextVibe. Nie potrzebujesz żadnej innej części frameworka.",
     thenRun: "Następnie uruchom:",
     mcpTitle: "Integracja MCP",
     mcpDescription:

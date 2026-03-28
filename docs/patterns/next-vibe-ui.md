@@ -10,7 +10,7 @@
 
 ### UI Components
 
-Import from `next-vibe-ui/ui/*` — never from `next/image`, `next/link`, or framework-specific component libraries.
+Import from `next-vibe-ui/ui/*` - never from `next/image`, `next/link`, or framework-specific component libraries.
 
 | Import                           | Web                      | Native               | TanStack                      |
 | -------------------------------- | ------------------------ | -------------------- | ----------------------------- |
@@ -27,7 +27,7 @@ Import from `next-vibe-ui/ui/*` — never from `next/image`, `next/link`, or fra
 
 ### Navigation & Routing
 
-Import from `next-vibe-ui/hooks/*` — never from `next/navigation` directly.
+Import from `next-vibe-ui/hooks/*` - never from `next/navigation` directly.
 
 | Import                              | Web                             | Native            | TanStack                 |
 | ----------------------------------- | ------------------------------- | ----------------- | ------------------------ |
@@ -36,7 +36,7 @@ Import from `next-vibe-ui/hooks/*` — never from `next/navigation` directly.
 
 ### Server Utilities
 
-Import from `next-vibe-ui/lib/*` — never from `next/headers`, `next/navigation` (server), or `next/server` directly.
+Import from `next-vibe-ui/lib/*` - never from `next/headers`, `next/navigation` (server), or `next/server` directly.
 
 | Import                              | Web                                             | TanStack                          | Native              |
 | ----------------------------------- | ----------------------------------------------- | --------------------------------- | ------------------- |
@@ -52,7 +52,7 @@ Import from `next-vibe-ui/lib/*` — never from `next/headers`, `next/navigation
 ## Usage Examples
 
 ```typescript
-// ✅ Always — platform-agnostic
+// ✅ Always - platform-agnostic
 import { Link } from "next-vibe-ui/ui/link";
 import { Button } from "next-vibe-ui/ui/button";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
@@ -60,7 +60,7 @@ import { cookies, headers } from "next-vibe-ui/lib/headers";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { storage } from "next-vibe-ui/lib/storage";
 
-// ❌ Never — framework-specific
+// ❌ Never - framework-specific
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cookies } from "next/headers";
@@ -76,13 +76,13 @@ import { Link } from "@tanstack/react-router";
 Use `"server-only"` (not the bare string) to prevent server modules from leaking into client bundles. On TanStack, this is shimmed to check `import.meta.env.SSR`.
 
 ```typescript
-import "server-only"; // ✅ — works on Next.js and TanStack
+import "server-only"; // ✅ - works on Next.js and TanStack
 ```
 
 Never use:
 
 ```typescript
-if (typeof window === "undefined") { ... } // ❌ — fragile, not tree-shakeable
+if (typeof window === "undefined") { ... } // ❌ - fragile, not tree-shakeable
 ```
 
 ---
@@ -96,9 +96,9 @@ Use `next-vibe-ui/ui/theme-provider` for theme wrapping and `useThemeToggle()` f
 ## Tailwind & Styles
 
 - Global CSS lives in `src/packages/next-vibe-ui/globals.css` (Tailwind v4 + custom theme tokens)
-- Use `className` props for all styling — no inline `style` unless doing dynamic values
+- Use `className` props for all styling - no inline `style` unless doing dynamic values
 - `next-vibe-ui/ui/div` and `next-vibe-ui/ui/span` resolve to `<View>`/`<Text>` on native and accept `className` via NativeWind
-- Never use `style={{ ... }}` for static styles — always Tailwind classes
+- Never use `style={{ ... }}` for static styles - always Tailwind classes
 
 ---
 
@@ -106,7 +106,7 @@ Use `next-vibe-ui/ui/theme-provider` for theme wrapping and `useThemeToggle()` f
 
 When writing `widget.tsx` components that render on native:
 
-- Use `next-vibe-ui/ui/*` components — they resolve to the correct native primitives
+- Use `next-vibe-ui/ui/*` components - they resolve to the correct native primitives
 - For native-only platform detection use `platform-helpers`:
 
 ```typescript

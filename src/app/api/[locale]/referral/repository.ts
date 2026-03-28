@@ -16,11 +16,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { CreditsT } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { REFERRAL_CONFIG } from "./config";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { REFERRAL_CONFIG } from "./config";
 
 import type {
   CodesListGetResponseOutput,
@@ -84,7 +84,7 @@ interface PayoutRequestResult {
  * Referral Repository Implementation
  */
 export class ReferralRepository {
-  // All commission config lives in ./config.ts — imported as REFERRAL_CONFIG
+  // All commission config lives in ./config.ts - imported as REFERRAL_CONFIG
   /**
    * Create a new referral code
    */
@@ -122,7 +122,9 @@ export class ReferralRepository {
         })
         .returning();
       return success({
-        successMessage: t("response.success"),
+        successMessage: t("response.success", {
+          directPct: `${Math.round(REFERRAL_CONFIG.DIRECT_PERCENTAGE * 100)}%`,
+        }),
         formAlert: undefined,
         fieldsGrid: undefined,
         submitRow: undefined,
@@ -950,7 +952,9 @@ export class ReferralRepository {
       // Validate minimum amount
       if (amountCents < REFERRAL_CONFIG.MIN_PAYOUT_CENTS) {
         return fail({
-          message: t("payout.errors.minimumAmount"),
+          message: t("payout.errors.minimumAmount", {
+            minPayout: `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`,
+          }),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }

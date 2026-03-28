@@ -32,7 +32,7 @@ import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";
 
-export const DEV_WATCHER_TASK_NAME = "devWatcher.name" as const;
+export { DEV_WATCHER_TASK_NAME } from "./constants";
 
 /**
  * Development File Watcher Task Runner
@@ -164,8 +164,9 @@ const startSmartFileWatcher = async (
         (async (): Promise<void> => {
           const start = Date.now();
           try {
-            const { GenerateTanstackRoutesRepository } =
-              await import("../../tanstack-start/generate/repository");
+            const { GenerateTanstackRoutesRepository } = await import(
+              /* turbopackIgnore: true */ /* webpackIgnore: true */ "../../tanstack-start/generate/repository"
+            );
             const result =
               await GenerateTanstackRoutesRepository.generateInternal();
             const ms = Date.now() - start;

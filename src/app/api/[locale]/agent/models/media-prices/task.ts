@@ -1,7 +1,7 @@
 /**
  * Media Model Prices Update Task
  * Fetches live prices from provider APIs and updates models.ts.
- * Dev-only — runs once a week.
+ * Dev-only - runs once a week.
  */
 
 import "server-only";

@@ -2,7 +2,7 @@
  * OpenCode Provider Config
  *
  * batch:       `opencode run "<prompt>" [--model <id>]`
- * interactive: `opencode` (launches TUI — cannot receive a prompt via args)
+ * interactive: `opencode` (launches TUI - cannot receive a prompt via args)
  */
 
 import "server-only";

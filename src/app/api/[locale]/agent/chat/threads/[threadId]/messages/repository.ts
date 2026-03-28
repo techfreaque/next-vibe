@@ -33,8 +33,8 @@ import {
 } from "../../../db";
 import {
   ChatMessageRole,
-  type ChatMessageRoleDB,
   ThreadStatusDB,
+  type ChatMessageRoleDB,
 } from "../../../enum";
 import {
   canPostInThread,
@@ -834,7 +834,7 @@ export class MessagesRepository {
     try {
       const now = new Date();
 
-      // Ensure thread exists — for Mode A (image/audio) the client pre-creates the
+      // Ensure thread exists - for Mode A (image/audio) the client pre-creates the
       // thread optimistically but the DB row may not exist yet when we get here.
       const [existingThread] = await db
         .select({ id: chatThreads.id })

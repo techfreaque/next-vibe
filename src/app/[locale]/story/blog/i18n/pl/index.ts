@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Dogłębne analizy architektury, decyzji i pomysłów stojących za next-vibe i unbottled.ai.",
     meta: {
-      title: "Blog — next-vibe",
+      title: "Blog - next-vibe",
       description:
         "Głębokie nurkowania w inżynierię, decyzje architektoniczne i pomysły za next-vibe i unbottled.ai.",
       category: "Blog",
@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
       title: "Jedna baza kodu. 13 platform. Zero kompromisów.",
       category: "Architektura",
       excerpt:
-        "Jedna definicja endpointu. Formularz web, polecenie CLI, narzędzie MCP, ekran natywny, zadanie cron — jednocześnie. Oto jak to działa.",
+        "Jedna definicja endpointu. Formularz web, polecenie CLI, narzędzie MCP, ekran natywny, zadanie cron - jednocześnie. Oto jak to działa.",
       readTime: "12 min czytania",
     },
     typeChecker: {

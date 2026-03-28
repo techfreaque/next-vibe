@@ -16,7 +16,7 @@ function ThemeCookieSync(): null {
       return;
     }
     // SameSite=Lax; no Secure required (works on http localhost too).
-    // Max-Age=2147483647 ≈ 68 years — effectively non-expiring.
+    // Max-Age=2147483647 ≈ 68 years - effectively non-expiring.
     document.cookie = `${THEME_COOKIE_NAME}=${resolvedTheme};path=/;max-age=2147483647;SameSite=Lax`;
   }, [resolvedTheme]);
   return null;

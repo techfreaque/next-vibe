@@ -240,7 +240,7 @@ export function TanstackPage({ locale }: HackernewsPageData): JSX.Element {
 
   return (
     <Div className="min-h-screen bg-[#f6f6ef] dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      {/* Hero — HN styled */}
+      {/* Hero - HN styled */}
       <Div className="bg-orange-500 border-b border-orange-600">
         <Div className="container mx-auto px-4 py-3 max-w-5xl">
           <Div className="flex items-center justify-between">

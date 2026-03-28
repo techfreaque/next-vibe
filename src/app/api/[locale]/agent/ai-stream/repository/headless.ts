@@ -300,7 +300,7 @@ export async function runHeadlessAiStream(
       );
       if (skillResult.success) {
         const variants = skillResult.data.variants;
-        // No variantId known here — use the default variant
+        // No variantId known here - use the default variant
         const defaultVariant = variants
           ? (variants.find((v) => v.isDefault) ?? variants[0])
           : null;

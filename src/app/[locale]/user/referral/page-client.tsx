@@ -18,13 +18,11 @@ import { Gift } from "next-vibe-ui/ui/icons/Gift";
 import { Link2 } from "next-vibe-ui/ui/icons/Link2";
 import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
-import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Link } from "next-vibe-ui/ui/link";
-import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -56,7 +54,6 @@ function CommissionTable({
 }): JSX.Element {
   return (
     <Div className="overflow-hidden rounded-xl border">
-      {/* Header */}
       <Div className="grid grid-cols-3 bg-muted/60 px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
         <Span>{t("commissionTable.colLevel")}</Span>
         <Span>{t("commissionTable.colCut")}</Span>
@@ -92,11 +89,11 @@ function CommissionTable({
             </Span>
           </Div>
           <Div
-            className={`flex items-center ${index === 0 ? "text-violet-600 dark:text-violet-400" : "text-foreground"}`}
+            className={`flex items-center gap-2 ${index === 0 ? "text-violet-600 dark:text-violet-400" : "text-foreground"}`}
           >
             {row.pct}
             {index === 0 && (
-              <Badge className="ml-2 text-xs bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 border-0">
+              <Badge className="text-xs bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 border-0">
                 {t("commissionTable.alwaysYours")}
               </Badge>
             )}
@@ -136,11 +133,11 @@ function HowItWorksSteps({
   ];
 
   return (
-    <Div className="grid gap-4 sm:grid-cols-3">
+    <Div className="grid gap-6 sm:grid-cols-3">
       {steps.map((step, i) => (
-        <Div key={i} className="flex flex-col items-start gap-3">
-          <Div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-900/30">
-            <step.icon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+        <Div key={i} className="flex gap-4">
+          <Div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-100 dark:bg-violet-900/30 mt-0.5">
+            <step.icon className="h-4 w-4 text-violet-600 dark:text-violet-400" />
           </Div>
           <Div>
             <Div className="font-semibold text-sm mb-1">{step.title}</Div>
@@ -167,10 +164,9 @@ export function ReferralPageClient({
 
   return (
     <Div className="w-full min-h-screen">
-      {/* Background */}
       <Div className="absolute inset-0 bg-gradient-to-b from-violet-500/8 via-background to-background -z-10" />
 
-      <Div className="container px-4 md:px-6 py-8 md:py-12 max-w-5xl mx-auto">
+      <Div className="container px-4 md:px-6 py-8 md:py-12 max-w-4xl mx-auto">
         {/* Back Button */}
         <Link
           href={`/${locale}/threads`}
@@ -181,7 +177,7 @@ export function ReferralPageClient({
         </Link>
 
         {/* ── HERO ── */}
-        <Div className="mb-14">
+        <Div className="mb-12">
           <Badge variant="secondary" className="mb-4 gap-1.5 text-xs">
             <Gift className="h-3.5 w-3.5" />
             {t("tagline")}
@@ -193,52 +189,53 @@ export function ReferralPageClient({
             {t("description", { appName: configTranslations.appName, ...p })}
           </P>
 
-          {/* Big number callout */}
-          <Div className="inline-flex items-center gap-4 px-6 py-4 rounded-2xl bg-violet-600 text-white shadow-lg shadow-violet-500/20">
-            <Div>
-              <Div className="text-5xl font-black tracking-tighter">
+          {/* Stats row */}
+          <Div className="flex flex-wrap gap-3">
+            <Div className="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-violet-600 text-white shadow-lg shadow-violet-500/20">
+              <Div className="text-4xl font-black tracking-tighter">
                 {p.directPct}
               </Div>
-              <Div className="text-violet-200 text-sm mt-0.5">
-                {t("commissionTable.heroGuarantee")}
+              <Div>
+                <Div className="text-sm font-medium leading-tight">
+                  {t("commissionTable.heroLabel")}
+                </Div>
+                <Div className="text-xs text-violet-200 mt-0.5">
+                  {t("commissionTable.heroSub")}
+                </Div>
               </Div>
             </Div>
-            <Separator orientation="vertical" className="h-12 bg-violet-400" />
-            <Div className="text-sm text-violet-100 max-w-[180px] leading-snug">
-              {t("commissionTable.heroNote")}
+            <Div className="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-muted/80 border">
+              <Div className="text-4xl font-black tracking-tighter text-foreground">
+                {p.totalPct}
+              </Div>
+              <Div>
+                <Div className="text-sm font-medium leading-tight text-foreground">
+                  {t("commission.totalTitle")}
+                </Div>
+                <Div className="text-xs text-muted-foreground mt-0.5">
+                  {t("commission.totalDesc")}
+                </Div>
+              </Div>
             </Div>
           </Div>
         </Div>
 
         {/* ── COMMISSION BREAKDOWN ── */}
-        <Div className="mb-14">
+        <Div className="mb-12">
           <Div className="flex items-center gap-3 mb-2">
             <TrendingUp className="h-5 w-5 text-violet-500" />
             <H2 className="text-xl font-bold">{t("commission.title")}</H2>
           </Div>
-          <P className="text-muted-foreground text-sm mb-6 max-w-2xl">
+          <P className="text-muted-foreground text-sm mb-5 max-w-xl">
             {t("commission.subtitle", p)}
           </P>
 
           <CommissionTable t={t} rows={commissionRows} p={p} />
-
-          {/* No-penalty callout */}
-          <Div className="mt-4 flex items-start gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
-            <Shield className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-            <Div>
-              <Div className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
-                {t("commission.noPenalty")}
-              </Div>
-              <Div className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5">
-                {t("commission.noPenaltyNote", p)}
-              </Div>
-            </Div>
-          </Div>
         </Div>
 
         {/* ── HOW IT WORKS ── */}
-        <Div className="mb-14">
-          <Div className="flex items-center gap-3 mb-6">
+        <Div className="mb-12">
+          <Div className="flex items-center gap-3 mb-5">
             <Sparkles className="h-5 w-5 text-violet-500" />
             <H2 className="text-xl font-bold">{t("howItWorks.title")}</H2>
           </Div>
@@ -249,7 +246,7 @@ export function ReferralPageClient({
         {isAuthenticated ? (
           <>
             {/* Stats */}
-            <Div className="mb-10">
+            <Div className="mb-8">
               <H2 className="text-xl font-semibold mb-4">
                 {t("overview.title")}
               </H2>
@@ -261,7 +258,7 @@ export function ReferralPageClient({
             </Div>
 
             {/* Earnings / Payout */}
-            <Div className="mb-10">
+            <Div className="mb-8">
               <EndpointsPage
                 endpoint={referralPayoutDefinition}
                 user={user}
@@ -270,7 +267,7 @@ export function ReferralPageClient({
             </Div>
 
             {/* Create New Code */}
-            <Card className="mb-8">
+            <Card className="mb-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="h-5 w-5" />
@@ -309,18 +306,17 @@ export function ReferralPageClient({
           /* ── NOT AUTHENTICATED ── */
           <Card className="border-violet-200 dark:border-violet-800 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30">
             <CardContent className="pt-10 pb-10">
-              <Div className="text-center space-y-6 max-w-md mx-auto">
-                <Div className="mx-auto w-16 h-16 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
-                  <DollarSign className="h-8 w-8 text-violet-600 dark:text-violet-400" />
+              <Div className="text-center space-y-6 max-w-sm mx-auto">
+                <Div className="mx-auto w-14 h-14 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
+                  <DollarSign className="h-7 w-7 text-violet-600 dark:text-violet-400" />
                 </Div>
                 <Div className="space-y-2">
                   <H3 className="text-xl font-semibold">{t("cta.title")}</H3>
-                  <P className="text-muted-foreground">
+                  <P className="text-muted-foreground text-sm">
                     {t("cta.description", p)}
                   </P>
                 </Div>
 
-                {/* Quick pitch bullets */}
                 <Div className="text-left space-y-2">
                   {[t("cta.pitch1", p), t("cta.pitch2"), t("cta.pitch3")].map(
                     (pitch, i) => (

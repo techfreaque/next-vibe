@@ -3,7 +3,7 @@ export const translations = {
     title: "One Codebase. 13 Platforms. Zero Compromises.",
     category: "Architecture",
     description:
-      "How the Unified Surface principle turns three files into a web app, CLI command, MCP tool, native screen, and cron job — automatically.",
+      "How the Unified Surface principle turns three files into a web app, CLI command, MCP tool, native screen, and cron job - automatically.",
     imageAlt: "next-vibe Unified Surface Architecture",
     keywords:
       "next-vibe, unified surface, endpoint pattern, MCP, CLI, TypeScript, SaaS framework, full-stack",
@@ -17,7 +17,7 @@ export const translations = {
     eyebrow: "The Unified Surface Principle",
     title: "One Codebase. 13 Platforms. Zero Compromises.",
     subtitle:
-      "How three files become a web form, CLI command, MCP tool, native screen, and automated job — simultaneously.",
+      "How three files become a web form, CLI command, MCP tool, native screen, and automated job - simultaneously.",
     fileBarLabel: "definition.ts → web · cli · mcp · native · cron · 10 more",
     theaCardTitle: "Who is Thea?",
     allowedRolesLabel: "allowedRoles: [...]",
@@ -31,9 +31,9 @@ export const translations = {
   intro: {
     hook: "5,802 TypeScript files. ~2.1 million lines. Zero `any`. Zero runtime type errors. One pattern. Repeated 374 times.",
     para1:
-      "That's the codebase behind unbottled.ai — and the framework that powers it, next-vibe. The same architecture runs a web app, a mobile app, a CLI, an AI agent interface, an MCP server, a cron system, a websocket event bus, and a live dataflow engine.",
+      "That's the codebase behind unbottled.ai - and the framework that powers it, next-vibe. The same architecture runs a web app, a mobile app, a CLI, an AI agent interface, an MCP server, a cron system, a websocket event bus, and a live dataflow engine.",
     para2:
-      "The pattern is called the Unified Surface. Here's what it is, how it works, and why — once you see it — you'll find it hard to go back.",
+      "The pattern is called the Unified Surface. Here's what it is, how it works, and why - once you see it - you'll find it hard to go back.",
   },
 
   fileTreeSection: {
@@ -63,7 +63,7 @@ export const translations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Auto-generated from the definition — no JSX written",
+        description: "Auto-generated from the definition - no JSX written",
       },
       cli: {
         label: "CLI",
@@ -107,7 +107,7 @@ export const translations = {
       },
       vibeBoard: {
         label: "Vibe Sense Node",
-        description: "Node in a live dataflow graph — same endpoint",
+        description: "Node in a live dataflow graph - same endpoint",
       },
     },
   },
@@ -118,7 +118,7 @@ export const translations = {
   platformMarkersSection: {
     title: "Platform access is one enum array",
     para1:
-      "You don't write separate permission layers for each platform. Platform access is declared in the definition itself — one enum array that every platform reads natively at runtime.",
+      "You don't write separate permission layers for each platform. Platform access is declared in the definition itself - one enum array that every platform reads natively at runtime.",
     codeComment: "// This single array controls where the feature appears",
     cliOff: "  CLI_OFF,         // blocks the CLI",
     mcpVisible: "  MCP_VISIBLE,     // opts into the MCP tool list",
@@ -136,16 +136,16 @@ export const translations = {
     subtitle:
       "Instead of explaining the pattern abstractly, let me show you what it looks like in practice.",
     theaIntro:
-      "Thea is the AI admin for this platform. She runs on production 24/7, operating through the exact same endpoint contracts as every user — same validation, same permissions, no backdoor. And she can delegate work to a local machine.",
+      "Thea is the AI admin for this platform. She runs on production 24/7, operating through the exact same endpoint contracts as every user - same validation, same permissions, no backdoor. And she can delegate work to a local machine.",
     demoStory:
-      "I asked Thea to build a new endpoint — explain-to-my-boss — using Claude Code running on my PC. You give it a technical decision. It gives you a non-technical justification your manager will actually believe. Every developer has needed this.",
+      "I asked Thea to build a new endpoint - explain-to-my-boss - using Claude Code running on my PC. You give it a technical decision. It gives you a non-technical justification your manager will actually believe. Every developer has needed this.",
 
     flow: {
       step1: {
         actor: "You",
         label: "Ask Thea",
         description:
-          "Type the task in the chat — two input fields, one AI-generated response, all platforms, MCP_VISIBLE, custom React and CLI widgets.",
+          "Type the task in the chat - two input fields, one AI-generated response, all platforms, MCP_VISIBLE, custom React and CLI widgets.",
       },
       step2: {
         actor: "Thea",
@@ -189,25 +189,25 @@ export const translations = {
     proofPara:
       "Once Claude Code called complete-task, three things existed that didn't five minutes before:",
     proof1:
-      "A custom React widget — dramatic heading, animated gradient on the AI output, a fake corporate alignment score.",
+      "A custom React widget - dramatic heading, animated gradient on the AI output, a fake corporate alignment score.",
     proof2:
-      "A CLI widget — ASCII banner, spinner while the AI thinks, the justification printed line by line in green.",
+      "A CLI widget - ASCII banner, spinner while the AI thinks, the justification printed line by line in green.",
     proof3:
-      "An MCP tool — explain-to-my-boss_POST — because MCP_VISIBLE was in the definition. Claude Desktop can now explain your decisions to your boss on your behalf.",
+      "An MCP tool - explain-to-my-boss_POST - because MCP_VISIBLE was in the definition. Claude Desktop can now explain your decisions to your boss on your behalf.",
     proofClosing:
       "One definition. Five files total. Three completely different UIs. The endpoint contract didn't change. Only the presentation layer did.",
   },
 
   underTheHoodSection: {
     title: "Under the hood",
-    definitionTitle: "definition.ts — the living contract",
+    definitionTitle: "definition.ts - the living contract",
     definitionPara:
-      "The definition is not a code generator. It's a living contract that every platform reads natively at runtime. Change it — everything updates. Delete the folder — nothing breaks downstream. There's no generated code to clean up.",
-    repositoryTitle: "repository.ts — no throw, ever",
+      "The definition is not a code generator. It's a living contract that every platform reads natively at runtime. Change it - everything updates. Delete the folder - nothing breaks downstream. There's no generated code to clean up.",
+    repositoryTitle: "repository.ts - no throw, ever",
     repositoryPara:
-      "Repository functions never throw. Errors propagate as data — typed, explicit, and catchable by the caller. The AI can reason about failure paths. No surprise exceptions.",
-    repositoryCodeComment: "// Returns ResponseType<T> — never throws",
-    routeTitle: "route.ts — four lines",
+      "Repository functions never throw. Errors propagate as data - typed, explicit, and catchable by the caller. The AI can reason about failure paths. No surprise exceptions.",
+    repositoryCodeComment: "// Returns ResponseType<T> - never throws",
+    routeTitle: "route.ts - four lines",
     routePara:
       "route.ts is four lines. endpointsHandler handles validation, auth, logging, and exposure to all 13 platforms. That's the entire bridge.",
     statsTitle: "The numbers",
@@ -217,7 +217,7 @@ export const translations = {
     statAnyDetail: "Enforced at build time, not convention",
     statLanguages: "Three languages",
     statLanguagesDetail:
-      'Compile-time checked — t("typo.here") is a compiler error',
+      'Compile-time checked - t("typo.here") is a compiler error',
     statsClosing: "That's not convention. It's enforced at build time.",
   },
 
@@ -227,16 +227,16 @@ export const translations = {
     eyebrow: "Coming up in Video 2",
     title: "Vibe Sense: The pipeline is the platform",
     description:
-      "Every node in a Vibe Sense graph is a regular next-vibe endpoint. The same createEndpoint(). The same 3-file structure. An EMA indicator is an endpoint. A threshold evaluator is an endpoint. And because it's an endpoint — you can call it from the CLI, from the AI, from anywhere.",
+      "Every node in a Vibe Sense graph is a regular next-vibe endpoint. The same createEndpoint(). The same 3-file structure. An EMA indicator is an endpoint. A threshold evaluator is an endpoint. And because it's an endpoint - you can call it from the CLI, from the AI, from anywhere.",
     calloutLine: "The pipeline is the platform.",
     teaser:
       "Vibe Sense is just... more endpoints. The same thing, applied to time series data. Lead funnels. Credit economy. User growth. Your platform watching itself.",
-    cta: "Read: Vibe Sense — The Third Layer",
+    cta: "Read: Vibe Sense - The Third Layer",
   },
 
   closing: {
     title: "Define it once. It exists everywhere.",
-    para: "WordPress gave everyone the power to publish. next-vibe gives you the power to build platforms that work on web, mobile, CLI, AI agents, and automation — that watch themselves, reason about their own data, and act on what they find.",
+    para: "WordPress gave everyone the power to publish. next-vibe gives you the power to build platforms that work on web, mobile, CLI, AI agents, and automation - that watch themselves, reason about their own data, and act on what they find.",
     cta: "Star next-vibe on GitHub",
     ctaLink: "https://github.com/techfreaque/next-vibe",
   },

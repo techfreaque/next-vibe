@@ -271,7 +271,7 @@ export const translations: typeof enTranslations = {
     perRunBudget:
       "~{{perRunBudget}} Leads/Lauf · {{totalRunsPerWeek}} Läufe/Woche",
     perRunBudgetFractional:
-      "{{exactBudget}}/Lauf · {{totalRunsPerWeek}} Läufe/Woche (gebrochen — akkumuliert über Läufe)",
+      "{{exactBudget}}/Lauf · {{totalRunsPerWeek}} Läufe/Woche (gebrochen - akkumuliert über Läufe)",
     perRunBudgetZeroHint:
       "— Leads/Woche erhöhen oder Zeitplanfrequenz reduzieren",
     sections: {

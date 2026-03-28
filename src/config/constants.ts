@@ -8,7 +8,7 @@ export const LOCALE_COOKIE_NAME = "locale";
  * Used to scope cookies so different local projects on different ports
  * don't clobber each other's sessions.
  *
- * In production NODE_ENV the suffix is always empty — production servers
+ * In production NODE_ENV the suffix is always empty - production servers
  * don't expose a port in the public URL.
  *
  * Port 80 and 443 map to the standard HTTP/HTTPS defaults and need no suffix.
@@ -54,7 +54,7 @@ export const AUTH_TOKEN_COOKIE_NAME = `token${PORT_SUFFIX}`;
 export const RESET_TOKEN_EXPIRY = 4; // hours
 
 /**
- * CSRF double-submit cookie name — port-scoped like the auth cookies so
+ * CSRF double-submit cookie name - port-scoped like the auth cookies so
  * two projects running on different ports don't mix up CSRF tokens.
  * Non-HttpOnly so JS can read and echo it as the X-CSRF-Token header.
  * The server validates header === cookie to confirm the request originated

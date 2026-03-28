@@ -1,11 +1,11 @@
 /**
- * Widget chunk preloader — no "use client" directive so Vite does NOT strip
+ * Widget chunk preloader - no "use client" directive so Vite does NOT strip
  * this module at the client boundary. Exported preloadAllWidgets() is safe to
  * call from client.tsx before hydrateRoot().
  *
  * The eagerImport() calls fire at module-eval time, starting all dynamic
  * imports immediately. preloadAllWidgets() awaits them so hydrateRoot sees
- * fully-resolved components in createWidget() — no Suspense, no CLS.
+ * fully-resolved components in createWidget() - no Suspense, no CLS.
  */
 
 // oxlint-disable-next-line typescript/no-explicit-any

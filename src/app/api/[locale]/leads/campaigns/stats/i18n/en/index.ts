@@ -85,7 +85,7 @@ export const translations = {
     activeCampaigns: "Active Campaigns",
     sendPerformance: "Send Performance",
     perRunBudget: "~{{perRunBudget}}/run · {{totalRunsPerWeek}} runs/week",
-    perRunBudgetZero: "0/run — increase quota or reduce frequency",
+    perRunBudgetZero: "0/run - increase quota or reduce frequency",
     accumulator: "next lead: {{pct}}%",
     cronHealth: {
       title: "Cron Health",

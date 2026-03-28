@@ -16,7 +16,7 @@ export function getRouter(): ReturnType<typeof createRouter> {
     // while their lazy chunk loads. Without a pending component, the Suspense
     // boundary shows nothing (blank flash). Setting a 0ms pending delay and
     // no pending component keeps existing SSR content visible until the chunk
-    // is ready — React 18 will paint the SSR content then swap in-place.
+    // is ready - React 18 will paint the SSR content then swap in-place.
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
   });

@@ -1,5 +1,5 @@
-import { Twitter as LucideTwitter } from "lucide-react";
+import { SiX as ReactSimpleIcon } from "@icons-pack/react-simple-icons";
 
 import { type IconComponent } from "../../lib/helper";
 
-export const Twitter: IconComponent = LucideTwitter;
+export const Twitter: IconComponent = ReactSimpleIcon;

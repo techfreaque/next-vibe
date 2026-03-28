@@ -6,7 +6,7 @@ Comprehensive guide to the `widget.tsx` / `widget/` folder pattern for custom UI
 
 **Every endpoint gets a widget. No exceptions.**
 
-The auto-rendered form is a fallback for internal/admin tooling only. Any endpoint a user or AI agent will actually interact with needs a custom widget — because the default renderer produces a generic form that ignores layout, context, and platform.
+The auto-rendered form is a fallback for internal/admin tooling only. Any endpoint a user or AI agent will actually interact with needs a custom widget - because the default renderer produces a generic form that ignores layout, context, and platform.
 
 The only valid reason to skip a widget is a purely internal endpoint that will never be seen by a human or AI agent and has trivially obvious fields (e.g. a raw admin toggle with one boolean input and a success message). When in doubt, write the widget.
 
@@ -17,7 +17,7 @@ The widget lives alongside the endpoint's `definition.ts`, in one of two forms:
 | Simple     | `widget.tsx` (single file)                      | One main component, fits in <1000 lines |
 | Complex    | `widget/` folder with `widget/widget.tsx` entry | Multiple sub-components, complex layout |
 
-A `widget.cli.tsx` should accompany every endpoint that returns non-trivial data or is callable from CLI/MCP — see [widget.cli.md](widget.cli.md).
+A `widget.cli.tsx` should accompany every endpoint that returns non-trivial data or is callable from CLI/MCP - see [widget.cli.md](widget.cli.md).
 
 ## Fundamental Rules
 
@@ -321,7 +321,7 @@ export function MyCustomWidget({ field }: CustomWidgetProps): JSX.Element {
 
 ## Web vs Native Platform Divergence
 
-`widget.tsx` renders on both web (`Platform.NEXT_PAGE`) and React Native. Use `useWidgetPlatform()` to branch when the two surfaces need different UI — don't try to make one layout work everywhere by force.
+`widget.tsx` renders on both web (`Platform.NEXT_PAGE`) and React Native. Use `useWidgetPlatform()` to branch when the two surfaces need different UI - don't try to make one layout work everywhere by force.
 
 ```typescript
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -375,8 +375,8 @@ import {
 
 **Rules:**
 
-- Never import React Native modules unconditionally in `widget.tsx` — they crash on web
-- Use `next-vibe-ui/ui/*` components — they are platform-aware and resolve to the correct implementation automatically
+- Never import React Native modules unconditionally in `widget.tsx` - they crash on web
+- Use `next-vibe-ui/ui/*` components - they are platform-aware and resolve to the correct implementation automatically
 - Keep native branches touch-friendly: larger tap targets, no hover-only interactions, stacked layouts over grids
 
 ## Dialog Wrapper Pattern
@@ -531,7 +531,7 @@ Skipping `widget.tsx` is only acceptable when ALL of the following are true:
 
 When you skip a widget, you still need a `widget.cli.tsx` if the endpoint is callable from CLI or MCP and returns structured data.
 
-The auto-renderer exists as a fallback for prototyping and internal tools — not as the default for real endpoints.
+The auto-renderer exists as a fallback for prototyping and internal tools - not as the default for real endpoints.
 
 ## Violations
 

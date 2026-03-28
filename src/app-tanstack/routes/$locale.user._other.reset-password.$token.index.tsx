@@ -1,19 +1,18 @@
-// AUTO-GENERATED from src/app/[locale]/user/(other)/reset-password/page.tsx. Add "use custom" to this file to preserve customizations.
+// AUTO-GENERATED from src/app/[locale]/user/(other)/reset-password/[token]/page.tsx. Add "use custom" to this file to preserve customizations.
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { toNextParams } from "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
-import { TanstackPage as Page } from "@/app/[locale]/user/(other)/reset-password/page";
-import { TanstackPage as GroupLayout } from "@/app/[locale]/user/(other)/layout";
+import { TanstackPage as Page } from "@/app/[locale]/user/(other)/reset-password/[token]/page";
 
 const loadData = createServerFn({ method: "GET" })
   .inputValidator((data: Record<string, string>) => data)
   .handler(async ({ data }) => {
-    const { tanstackLoader } = await import("@/app/[locale]/user/(other)/reset-password/page");
+    const { tanstackLoader } = await import("@/app/[locale]/user/(other)/reset-password/[token]/page");
         return tanstackLoader({ params: Promise.resolve(toNextParams(data)) });
   });
 
-export const Route = createFileRoute("/$locale/user/reset-password/")({
+export const Route = createFileRoute("/$locale/user/_other/reset-password/$token/")({
   staleTime: 0,
   loader: ({ params }) => loadData({ data: params as Record<string, string> }),
-  component: () => <GroupLayout><Page {...Route.useLoaderData()} /></GroupLayout>,
+  component: () => <Page {...Route.useLoaderData()} />,
 });

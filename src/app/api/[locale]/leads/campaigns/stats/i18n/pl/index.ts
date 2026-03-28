@@ -85,7 +85,7 @@ export const translations = {
     perRunBudget:
       "~{{perRunBudget}}/uruchomienie · {{totalRunsPerWeek}} uruchomień/tydz.",
     perRunBudgetZero:
-      "0/uruchomienie — zwiększ kontyngent lub zmniejsz częstotliwość",
+      "0/uruchomienie - zwiększ kontyngent lub zmniejsz częstotliwość",
     accumulator: "następny lead: {{pct}}%",
     cronHealth: {
       title: "Zdrowie Crona",

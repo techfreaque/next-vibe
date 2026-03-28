@@ -13,6 +13,7 @@ import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import { REFERRAL_CONFIG } from "../config";
 import type definition from "./definition";
 import type { StatsGetResponseOutput } from "./definition";
 
@@ -144,7 +145,9 @@ export function ReferralStatsContainer({
             ? "text-violet-600 dark:text-violet-400"
             : "text-amber-600 dark:text-amber-400"
         }
-        description={t(stats.availableCreditsDescription)}
+        description={t(stats.availableCreditsDescription, {
+          minPayout: `$${(REFERRAL_CONFIG.MIN_PAYOUT_CENTS / 100).toFixed(2)}`,
+        })}
         formatAsDollars
       />
     </Div>

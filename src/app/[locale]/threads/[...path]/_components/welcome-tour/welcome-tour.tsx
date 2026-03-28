@@ -33,8 +33,8 @@ import {
 } from "./tour-config";
 
 // Step indices
-const MODEL_SELECTOR_STEP_INDEX = 1; // "Choose Your AI Companion" — clicks open selector
-const BROWSE_SKILLS_STEP_INDEX = 3; // Shown inside open selector — browse skills button
+const MODEL_SELECTOR_STEP_INDEX = 1; // "Choose Your AI Companion" - clicks open selector
+const BROWSE_SKILLS_STEP_INDEX = 3; // Shown inside open selector - browse skills button
 
 interface WelcomeTourProps {
   isAuthenticated: boolean;
@@ -329,7 +329,7 @@ export function WelcomeTour({
             setRun(false);
             setModelSelectorOpen(true);
 
-            // Don't advance — onboardingComplete effect will resume tour
+            // Don't advance - onboardingComplete effect will resume tour
             return;
           }
 
@@ -406,7 +406,7 @@ export function WelcomeTour({
             }
           }
 
-          // Going back to model selector step — reopen the selector
+          // Going back to model selector step - reopen the selector
           if (prevIndex === MODEL_SELECTOR_STEP_INDEX) {
             setModelSelectorOpen(true);
           }

@@ -17,13 +17,13 @@ import { Folder } from "next-vibe-ui/ui/icons/Folder";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Layers } from "next-vibe-ui/ui/icons/Layers";
 import { Lightbulb } from "next-vibe-ui/ui/icons/Lightbulb";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
-import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
-import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
@@ -88,7 +88,7 @@ const ARCH_NODE_COLORS: Record<string, string> = {
 };
 
 /**
- * Architecture flow node — label and description passed as translated strings
+ * Architecture flow node - label and description passed as translated strings
  */
 function ArchNode({
   label,
@@ -118,7 +118,7 @@ function ArchNode({
 }
 
 /**
- * A styled code block for terminal/code snippets — uses Pre and Span from next-vibe-ui
+ * A styled code block for terminal/code snippets - uses Pre and Span from next-vibe-ui
  */
 function CodeBlock({
   children,
@@ -149,7 +149,7 @@ function CodeBlock({
 }
 
 /**
- * A file tree node — indentation via className padding levels
+ * A file tree node - indentation via className padding levels
  */
 function FileTreeItem({
   name,
@@ -212,7 +212,7 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
     <Div className="min-h-screen bg-gray-950 text-gray-100">
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <Div className="relative overflow-hidden bg-gray-950 border-b border-gray-800">
-        {/* Ambient grid — bg-image via className only, no style prop */}
+        {/* Ambient grid - bg-image via className only, no style prop */}
         <Div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(0,255,128,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,128,0.15)_1px,transparent_1px)] bg-[size:48px_48px]" />
         <Div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 

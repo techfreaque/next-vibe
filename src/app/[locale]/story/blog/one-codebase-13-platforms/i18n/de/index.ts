@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Eine Codebase. 13 Plattformen. Null Kompromisse.",
     category: "Architektur",
     description:
-      "Wie das Unified Surface-Prinzip drei Dateien in eine Web-App, CLI-Befehl, MCP-Tool, nativen Screen und Cron-Job verwandelt — automatisch.",
+      "Wie das Unified Surface-Prinzip drei Dateien in eine Web-App, CLI-Befehl, MCP-Tool, nativen Screen und Cron-Job verwandelt - automatisch.",
     imageAlt: "next-vibe Unified Surface Architektur",
     keywords:
       "next-vibe, unified surface, endpoint pattern, MCP, CLI, TypeScript, SaaS Framework, Full-Stack",
@@ -34,9 +34,9 @@ export const translations: typeof enTranslations = {
   intro: {
     hook: "5.802 TypeScript-Dateien. ~2,1 Millionen Zeilen. Null `any`. Null Runtime-Typfehler. Ein Pattern. 374 Mal wiederholt.",
     para1:
-      "Das ist die Codebase hinter unbottled.ai — und das Framework dahinter, next-vibe. Die gleiche Architektur betreibt eine Web-App, eine Mobile-App, eine CLI, ein KI-Agent-Interface, einen MCP-Server, ein Cron-System, einen WebSocket-Event-Bus und eine Live-Datenflussgine.",
+      "Das ist die Codebase hinter unbottled.ai - und das Framework dahinter, next-vibe. Die gleiche Architektur betreibt eine Web-App, eine Mobile-App, eine CLI, ein KI-Agent-Interface, einen MCP-Server, ein Cron-System, einen WebSocket-Event-Bus und eine Live-Datenflussgine.",
     para2:
-      "Das Pattern heißt Unified Surface. Hier ist, was es ist, wie es funktioniert, und warum du es schwer findest, zurückzugehen — sobald du es einmal gesehen hast.",
+      "Das Pattern heißt Unified Surface. Hier ist, was es ist, wie es funktioniert, und warum du es schwer findest, zurückzugehen - sobald du es einmal gesehen hast.",
   },
 
   fileTreeSection: {
@@ -66,7 +66,7 @@ export const translations: typeof enTranslations = {
       },
       reactUi: {
         label: "React UI",
-        description: "Auto-generiert aus der Definition — kein JSX geschrieben",
+        description: "Auto-generiert aus der Definition - kein JSX geschrieben",
       },
       cli: {
         label: "CLI",
@@ -111,7 +111,7 @@ export const translations: typeof enTranslations = {
       },
       vibeBoard: {
         label: "Vibe Sense Node",
-        description: "Node in einem Live-Datenflussgraphen — gleicher Endpoint",
+        description: "Node in einem Live-Datenflussgraphen - gleicher Endpoint",
       },
     },
   },
@@ -122,7 +122,7 @@ export const translations: typeof enTranslations = {
   platformMarkersSection: {
     title: "Plattformzugriff ist ein Enum-Array",
     para1:
-      "Du schreibst keine separaten Berechtigungsschichten für jede Plattform. Plattformzugriff wird in der Definition selbst deklariert — ein Enum-Array, das jede Plattform nativ zur Laufzeit liest.",
+      "Du schreibst keine separaten Berechtigungsschichten für jede Plattform. Plattformzugriff wird in der Definition selbst deklariert - ein Enum-Array, das jede Plattform nativ zur Laufzeit liest.",
     codeComment: "// Dieses einzelne Array steuert, wo das Feature erscheint",
     cliOff: "  CLI_OFF,         // blockiert die CLI",
     mcpVisible: "  MCP_VISIBLE,     // opt-in für die MCP-Tool-Liste",
@@ -140,16 +140,16 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Statt das Pattern abstrakt zu erklären, lass mich zeigen, wie es in der Praxis aussieht.",
     theaIntro:
-      "Thea ist die KI-Admin dieser Plattform. Sie läuft 24/7 auf der Produktion und operiert über die gleichen Endpoint-Verträge wie jeder Benutzer — gleiche Validierung, gleiche Berechtigungen, keine Hintertür. Und sie kann Arbeit an eine lokale Maschine delegieren.",
+      "Thea ist die KI-Admin dieser Plattform. Sie läuft 24/7 auf der Produktion und operiert über die gleichen Endpoint-Verträge wie jeder Benutzer - gleiche Validierung, gleiche Berechtigungen, keine Hintertür. Und sie kann Arbeit an eine lokale Maschine delegieren.",
     demoStory:
-      "Ich bat Thea, einen neuen Endpoint zu bauen — explain-to-my-boss — mit Claude Code auf meinem PC. Du gibst eine technische Entscheidung ein. Es gibt dir eine nicht-technische Begründung, die dein Manager tatsächlich glauben wird. Jeder Entwickler hat das gebraucht.",
+      "Ich bat Thea, einen neuen Endpoint zu bauen - explain-to-my-boss - mit Claude Code auf meinem PC. Du gibst eine technische Entscheidung ein. Es gibt dir eine nicht-technische Begründung, die dein Manager tatsächlich glauben wird. Jeder Entwickler hat das gebraucht.",
 
     flow: {
       step1: {
         actor: "Du",
         label: "Frag Thea",
         description:
-          "Tippe die Aufgabe in den Chat — zwei Eingabefelder, eine KI-generierte Antwort, alle Plattformen, MCP_VISIBLE, benutzerdefinierte React- und CLI-Widgets.",
+          "Tippe die Aufgabe in den Chat - zwei Eingabefelder, eine KI-generierte Antwort, alle Plattformen, MCP_VISIBLE, benutzerdefinierte React- und CLI-Widgets.",
       },
       step2: {
         actor: "Thea",
@@ -193,25 +193,25 @@ export const translations: typeof enTranslations = {
     proofPara:
       "Sobald Claude Code complete-task aufrief, existierten drei Dinge, die fünf Minuten zuvor nicht existierten:",
     proof1:
-      "Ein benutzerdefiniertes React-Widget — dramatische Überschrift, animierter Gradient auf dem KI-Output, ein gefälschter Corporate-Alignment-Score.",
+      "Ein benutzerdefiniertes React-Widget - dramatische Überschrift, animierter Gradient auf dem KI-Output, ein gefälschter Corporate-Alignment-Score.",
     proof2:
-      "Ein CLI-Widget — ASCII-Banner, Spinner während die KI nachdenkt, die Begründung zeilenweise in Grün gedruckt.",
+      "Ein CLI-Widget - ASCII-Banner, Spinner während die KI nachdenkt, die Begründung zeilenweise in Grün gedruckt.",
     proof3:
-      "Ein MCP-Tool — explain-to-my-boss_POST — weil MCP_VISIBLE in der Definition stand. Claude Desktop kann jetzt deine Entscheidungen deinem Chef erklären.",
+      "Ein MCP-Tool - explain-to-my-boss_POST - weil MCP_VISIBLE in der Definition stand. Claude Desktop kann jetzt deine Entscheidungen deinem Chef erklären.",
     proofClosing:
       "Eine Definition. Fünf Dateien insgesamt. Drei komplett verschiedene UIs. Der Endpoint-Vertrag änderte sich nicht. Nur die Präsentationsschicht.",
   },
 
   underTheHoodSection: {
     title: "Unter der Haube",
-    definitionTitle: "definition.ts — der lebende Vertrag",
+    definitionTitle: "definition.ts - der lebende Vertrag",
     definitionPara:
-      "Die Definition ist kein Code-Generator. Sie ist ein lebender Vertrag, den jede Plattform nativ zur Laufzeit liest. Ändere sie — alles wird aktualisiert. Lösch den Ordner — nichts bricht nachgelagert. Es gibt keinen generierten Code zum Aufräumen.",
-    repositoryTitle: "repository.ts — niemals throw",
+      "Die Definition ist kein Code-Generator. Sie ist ein lebender Vertrag, den jede Plattform nativ zur Laufzeit liest. Ändere sie - alles wird aktualisiert. Lösch den Ordner - nichts bricht nachgelagert. Es gibt keinen generierten Code zum Aufräumen.",
+    repositoryTitle: "repository.ts - niemals throw",
     repositoryPara:
-      "Repository-Funktionen werfen nie. Fehler propagieren als Daten — typisiert, explizit und für den Aufrufer fangbar. Die KI kann über Fehlerpfade nachdenken. Keine überraschenden Exceptions.",
-    repositoryCodeComment: "// Gibt ResponseType<T> zurück — wirft niemals",
-    routeTitle: "route.ts — vier Zeilen",
+      "Repository-Funktionen werfen nie. Fehler propagieren als Daten - typisiert, explizit und für den Aufrufer fangbar. Die KI kann über Fehlerpfade nachdenken. Keine überraschenden Exceptions.",
+    repositoryCodeComment: "// Gibt ResponseType<T> zurück - wirft niemals",
+    routeTitle: "route.ts - vier Zeilen",
     routePara:
       "route.ts ist vier Zeilen. endpointsHandler kümmert sich um Validierung, Authentifizierung, Logging und Exposition für alle 13 Plattformen. Das ist die gesamte Brücke.",
     statsTitle: "Die Zahlen",
@@ -221,7 +221,7 @@ export const translations: typeof enTranslations = {
     statAnyDetail: "Zur Build-Zeit erzwungen, keine Konvention",
     statLanguages: "Drei Sprachen",
     statLanguagesDetail:
-      'Compile-Zeit-geprüft — t("typo.here") ist ein Compiler-Fehler',
+      'Compile-Zeit-geprüft - t("typo.here") ist ein Compiler-Fehler',
     statsClosing: "Das ist keine Konvention. Es wird zur Build-Zeit erzwungen.",
   },
 
@@ -231,16 +231,16 @@ export const translations: typeof enTranslations = {
     eyebrow: "Als nächstes in Video 2",
     title: "Vibe Sense: Die Pipeline ist die Plattform",
     description:
-      "Jeder Node in einem Vibe-Sense-Graphen ist ein regulärer next-vibe-Endpoint. Das gleiche createEndpoint(). Die gleiche 3-Datei-Struktur. Ein EMA-Indikator ist ein Endpoint. Ein Schwellenwert-Evaluator ist ein Endpoint. Und weil es ein Endpoint ist — kannst du ihn von der CLI, von der KI, von überall aufrufen.",
+      "Jeder Node in einem Vibe-Sense-Graphen ist ein regulärer next-vibe-Endpoint. Das gleiche createEndpoint(). Die gleiche 3-Datei-Struktur. Ein EMA-Indikator ist ein Endpoint. Ein Schwellenwert-Evaluator ist ein Endpoint. Und weil es ein Endpoint ist - kannst du ihn von der CLI, von der KI, von überall aufrufen.",
     calloutLine: "Die Pipeline ist die Plattform.",
     teaser:
       "Vibe Sense ist einfach... mehr Endpoints. Das gleiche Prinzip, angewendet auf Zeitreihendaten. Lead-Funnels. Kreditwirtschaft. Benutzerwachstum. Deine Plattform beobachtet sich selbst.",
-    cta: "Lesen: Vibe Sense — Die dritte Schicht",
+    cta: "Lesen: Vibe Sense - Die dritte Schicht",
   },
 
   closing: {
     title: "Definiere es einmal. Es existiert überall.",
-    para: "WordPress gab jedem die Macht zu publizieren. next-vibe gibt dir die Macht, Plattformen zu bauen, die auf Web, Mobile, CLI, KI-Agenten und Automation funktionieren — die sich selbst beobachten, über ihre eigenen Daten nachdenken und danach handeln.",
+    para: "WordPress gab jedem die Macht zu publizieren. next-vibe gibt dir die Macht, Plattformen zu bauen, die auf Web, Mobile, CLI, KI-Agenten und Automation funktionieren - die sich selbst beobachten, über ihre eigenen Daten nachdenken und danach handeln.",
     cta: "next-vibe auf GitHub mit Stern versehen",
     ctaLink: "https://github.com/techfreaque/next-vibe",
   },

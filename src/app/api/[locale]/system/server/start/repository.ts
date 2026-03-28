@@ -38,6 +38,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
+import { ServerFramework } from "../enum";
 import {
   cleanupPidFile,
   isPortOwnedByUs,
@@ -45,7 +46,6 @@ import {
   VIBE_START_PID_FILE,
   writePidFile,
 } from "../pid";
-import { ServerFramework } from "../enum";
 import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
@@ -720,7 +720,7 @@ export class ServerStartRepository {
       }
     }
 
-    // Still alive — force kill
+    // Still alive - force kill
     try {
       process.kill(pidOnPort, "SIGKILL");
     } catch {

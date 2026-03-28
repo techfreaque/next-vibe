@@ -102,6 +102,10 @@ const nextConfig: NextConfig = {
       "src/app/api/**/cli/setup/install/**": {
         loaders: ["ignore-loader"],
       },
+      // TanStack route generator scans the filesystem - causes full project NFT trace
+      "src/app/api/**/tanstack-start/generate/**": {
+        loaders: ["ignore-loader"],
+      },
       "src/app-native/**": {
         loaders: ["ignore-loader"],
       },
@@ -157,7 +161,7 @@ const nextConfig: NextConfig = {
     if (isServer) {
       config.module.rules.push(
         {
-          test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize|cli[\\/]setup[\\/]install)[\\/]/,
+          test: /[\\/]src[\\/]app[\\/]api[\\/].*[\\/](builder|launchpad|release-tool|guard|check|generators|electron[\\/]build|translations[\\/]reorganize|cli[\\/]setup[\\/]install|tanstack-start[\\/]generate)[\\/]/,
           loader: "null-loader",
         },
         // CLI/MCP renderers use React hooks - stub them out for server builds

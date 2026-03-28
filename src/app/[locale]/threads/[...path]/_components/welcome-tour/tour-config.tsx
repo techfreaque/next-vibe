@@ -7,8 +7,8 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { Step } from "react-joyride";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import {
   ProductIds,
   productsRepository,
@@ -226,7 +226,7 @@ export const getTourSteps = (
       blockTargetInteraction: false,
     },
     // NOTE: After step 4, tour continues to sidebar steps.
-    // The selector stays open — user can close it manually or proceed.
+    // The selector stays open - user can close it manually or proceed.
     {
       target: getTourSelector(TOUR_DATA_ATTRS.ROOT_FOLDERS),
       content: (

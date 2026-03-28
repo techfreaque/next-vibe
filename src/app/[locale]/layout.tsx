@@ -11,8 +11,7 @@ import { Outlet } from "next-vibe-ui/ui/outlet";
 import { Script } from "next-vibe-ui/ui/script";
 import { Scripts } from "next-vibe-ui/ui/scripts";
 import type { JSX, ReactNode } from "react";
-
-import { getCookie } from "@tanstack/react-start/server";
+import { cookies } from "next-vibe-ui/lib/headers";
 
 import { configScopedTranslation } from "@/config/i18n";
 import { envClient } from "@/config/env-client";
@@ -110,7 +109,7 @@ export async function tanstackLoader({
       ],
     },
   };
-  const themeCookie = getCookie("theme");
+  const themeCookie = (await cookies()).get("theme")?.value;
   const theme: "light" | "dark" = themeCookie === "dark" ? "dark" : "light";
 
   return { locale, structuredData, theme };

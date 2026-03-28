@@ -773,7 +773,7 @@ export class CampaignStarterRepository {
     logger: EndpointLogger,
     platform?: string,
   ): Promise<ResponseType<CampaignStarterPostResponseOutput>> {
-    // When called as a cron task, skip config update — use existing DB config instead
+    // When called as a cron task, skip config update - use existing DB config instead
     if (platform !== Platform.CRON) {
       const saveResult = await CampaignStarterRepository.updateConfig(
         data,
@@ -1005,7 +1005,7 @@ export class CampaignStarterRepository {
       }
     }
 
-    // Persist updated fractional accumulators (skip on dry run — don't mutate state)
+    // Persist updated fractional accumulators (skip on dry run - don't mutate state)
     if (!config.dryRun) {
       await db
         .update(campaignStarterConfigs)

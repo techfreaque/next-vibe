@@ -1314,7 +1314,7 @@ export function ModelSelector({
             : "flex flex-col gap-4 border rounded-lg p-4"
         }
       >
-        {/* Type tabs — Chat / Image / Audio */}
+        {/* Type tabs - Chat / Image / Audio */}
         {!compact && availableTypes.length > 1 && (
           <Div className="flex items-center gap-1 p-0.5 bg-muted/40 rounded-lg">
             {availableTypes.map((type) => (
@@ -1426,7 +1426,7 @@ export function ModelSelector({
           </Div>
         )}
 
-        {/* Filters + Sort rows — only for text/chat models */}
+        {/* Filters + Sort rows - only for text/chat models */}
         {modelTypeTab === "text" && (
           <Div className="flex flex-col gap-2">
             {/* Row 1: Filters */}
@@ -1559,7 +1559,7 @@ export function ModelSelector({
 
             {/* Row 2: Sort */}
             <Div className="flex items-center gap-2 flex-wrap">
-              {/* Sort popover — already rendered above, move trigger here */}
+              {/* Sort popover - already rendered above, move trigger here */}
               <Popover open={sortOpen} onOpenChange={setSortOpen}>
                 <PopoverTrigger asChild>
                   <Button

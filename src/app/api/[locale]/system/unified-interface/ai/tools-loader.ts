@@ -292,7 +292,7 @@ function createToolFromEndpoint(
           );
 
           // Propagate waitingForRemoteResult back to the shared streamContext.
-          // perCallStreamContext is a copy — mutations to it don't affect the original.
+          // perCallStreamContext is a copy - mutations to it don't affect the original.
           // stream-part-handler checks context.streamContext.waitingForRemoteResult to
           // decide whether to abort the stream at the tool-result event.
           if (

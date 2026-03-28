@@ -344,7 +344,7 @@ export class ResumeStreamRepository {
             };
 
             // Idempotency: check if a deferred message already exists for this tool call.
-            // wakeUp never modifies the original — deferred existence is the authoritative check.
+            // wakeUp never modifies the original - deferred existence is the authoritative check.
             const originalToolCallId = toolCall.toolCallId;
             const [existingDeferred] = await db
               .select({
@@ -972,7 +972,7 @@ export class ResumeStreamRepository {
                     )
                     .catch(() => undefined);
 
-                  // Cleanup cron tasks — only on success. On failure, leave the cron task
+                  // Cleanup cron tasks - only on success. On failure, leave the cron task
                   // intact so the cron pulse can retry the revival with fresh code.
                   // Stale MCP module caches may fail direct-fire revival and delete the
                   // task prematurely; keeping it alive here ensures the cron path recovers.

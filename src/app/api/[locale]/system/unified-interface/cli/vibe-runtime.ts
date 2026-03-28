@@ -10,7 +10,7 @@ try {
   const subcmd = process.argv[2] ?? "cli";
   writeFileSync("/proc/self/comm", `vibe-${subcmd}`.slice(0, 15));
 } catch {
-  // Non-Linux or permission denied — ignore
+  // Non-Linux or permission denied - ignore
 }
 
 // Register Bun plugin for CLI widget overrides BEFORE any other imports.

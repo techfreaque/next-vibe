@@ -461,7 +461,7 @@ export async function runCodingAgent(
     });
   }
 
-  // Path 3: CLI/cron — no revival
+  // Path 3: CLI/cron - no revival
   logger.info("Interactive (CLI/cron): spawning detached, no revival");
   const terminal = detectTerminal(logger);
   if (terminal) {

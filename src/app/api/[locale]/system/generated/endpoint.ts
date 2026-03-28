@@ -466,14 +466,16 @@ export async function getEndpoint(
       return (await import("@/app/api/[locale]/system/server/build/definition"))
         .default.POST;
     case "builder":
-      return (await import("@/app/api/[locale]/system/builder/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/definition")
+      ).default.POST;
     case "bundle":
-      return (await import("@/app/api/[locale]/system/builder/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/definition")
+      ).default.POST;
     case "c":
       return (
-        await import("@/app/api/[locale]/system/check/vibe-check/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/vibe-check/definition")
       ).default.POST;
     case "campaign-starter":
       return (
@@ -484,7 +486,7 @@ export async function getEndpoint(
         .default.DELETE;
     case "cc":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/definition")
       ).default.POST;
     case "chat-downvotes-total":
       return (
@@ -546,7 +548,7 @@ export async function getEndpoint(
       ).default.POST;
     case "check":
       return (
-        await import("@/app/api/[locale]/system/check/vibe-check/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/vibe-check/definition")
       ).default.POST;
     case "claude":
       return (await import("@/app/api/[locale]/agent/coding-agent/definition"))
@@ -567,7 +569,7 @@ export async function getEndpoint(
       ).default.POST;
     case "config-create":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/definition")
       ).default.POST;
     case "connect-remote":
       return (
@@ -585,7 +587,7 @@ export async function getEndpoint(
         .POST;
     case "create-config":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/definition")
       ).default.POST;
     case "credits-avg-transaction":
       return (
@@ -853,8 +855,9 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/system/db/utils/docker-operations/definition")
       ).default.POST;
     case "el":
-      return (await import("@/app/api/[locale]/system/check/lint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/definition")
+      ).default.POST;
     case "electron":
       return (
         await import("@/app/api/[locale]/system/server/electron/start/definition")
@@ -872,8 +875,9 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/system/server/electron/start/definition")
       ).default.POST;
     case "elint":
-      return (await import("@/app/api/[locale]/system/check/lint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/definition")
+      ).default.POST;
     case "email-campaigns":
       return (
         await import("@/app/api/[locale]/leads/campaigns/email-campaigns/definition")
@@ -903,8 +907,9 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/system/unified-interface/data-sources/error-logs-warnings/definition")
       ).default.POST;
     case "eslint":
-      return (await import("@/app/api/[locale]/system/check/lint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/definition")
+      ).default.POST;
     case "execute":
       return (
         await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/definition")
@@ -995,7 +1000,7 @@ export async function getEndpoint(
       ).default.GET;
     case "gen":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/definition")
       ).default.POST;
     case "gen-key":
       return (
@@ -1003,11 +1008,11 @@ export async function getEndpoint(
       ).default.GET;
     case "generate":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/definition")
       ).default.POST;
     case "generate-all":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/definition")
       ).default.POST;
     case "generate-key":
       return (
@@ -1015,7 +1020,7 @@ export async function getEndpoint(
       ).default.GET;
     case "generate:env":
       return (
-        await import("@/app/api/[locale]/system/generators/env/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/env/definition")
       ).default.POST;
     case "generate:expo":
       return (
@@ -1023,45 +1028,52 @@ export async function getEndpoint(
       ).default.POST;
     case "generate:tanstack":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
       ).default.POST;
     case "get-folder":
       return (
         await import("@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition")
       ).default.GET;
     case "guard":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/definition")
+      ).default.POST;
     case "guard-destroy":
       return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/definition")
       ).default.POST;
     case "guard-start":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/definition")
+      ).default.POST;
     case "guard-status":
-      return (await import("@/app/api/[locale]/system/guard/status/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/status/definition")
+      ).default.POST;
     case "guard-stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/stop/definition")
+      ).default.POST;
     case "guard:destroy":
       return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/definition")
       ).default.POST;
     case "guard:remove":
       return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/definition")
       ).default.POST;
     case "guard:start":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/definition")
+      ).default.POST;
     case "guard:status":
-      return (await import("@/app/api/[locale]/system/guard/status/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/status/definition")
+      ).default.POST;
     case "guard:stop":
-      return (await import("@/app/api/[locale]/system/guard/stop/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/stop/definition")
+      ).default.POST;
     case "h":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .GET;
@@ -1080,14 +1092,15 @@ export async function getEndpoint(
         .default.PATCH;
     case "install":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "kagi-search":
       return (await import("@/app/api/[locale]/agent/search/kagi/definition"))
         .default.GET;
     case "l":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/definition")
+      ).default.POST;
     case "leads-active":
       return (
         await import("@/app/api/[locale]/leads/data-sources/leads-active/definition")
@@ -1342,8 +1355,9 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/leads/tracking/engagement/definition")
       ).default.POST;
     case "lint":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/definition")
+      ).default.POST;
     case "list":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .GET;
@@ -1586,14 +1600,17 @@ export async function getEndpoint(
       return (await import("@/app/api/[locale]/agent/coding-agent/definition"))
         .default.POST;
     case "ox":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/definition")
+      ).default.POST;
     case "oxlint":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/definition")
+      ).default.POST;
     case "package":
-      return (await import("@/app/api/[locale]/system/builder/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/definition")
+      ).default.POST;
     case "payment_GET":
       return (await import("@/app/api/[locale]/payment/definition")).default
         .GET;
@@ -1883,7 +1900,7 @@ export async function getEndpoint(
         .default.GET;
     case "setup":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "setup:status":
       return (
@@ -2115,29 +2132,32 @@ export async function getEndpoint(
       return (await import("@/app/api/[locale]/system/settings/definition"))
         .default.GET;
     case "system_builder_POST":
-      return (await import("@/app/api/[locale]/system/builder/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/builder/definition")
+      ).default.POST;
     case "system_check_config_create_POST":
       return (
-        await import("@/app/api/[locale]/system/check/config/create/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/config/create/definition")
       ).default.POST;
     case "system_check_lint_POST":
-      return (await import("@/app/api/[locale]/system/check/lint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/lint/definition")
+      ).default.POST;
     case "system_check_oxlint_POST":
-      return (await import("@/app/api/[locale]/system/check/oxlint/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/oxlint/definition")
+      ).default.POST;
     case "system_check_test_POST":
       return (
-        await import("@/app/api/[locale]/system/check/testing/test/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/testing/test/definition")
       ).default.POST;
     case "system_check_typecheck_POST":
       return (
-        await import("@/app/api/[locale]/system/check/typecheck/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/typecheck/definition")
       ).default.POST;
     case "system_check_vibe-check_POST":
       return (
-        await import("@/app/api/[locale]/system/check/vibe-check/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/vibe-check/definition")
       ).default.POST;
     case "system_db_generate_POST":
       return (await import("@/app/api/[locale]/system/db/generate/definition"))
@@ -2166,69 +2186,72 @@ export async function getEndpoint(
       ).default.POST;
     case "system_generators_client-routes-index_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/client-routes-index/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/client-routes-index/definition")
       ).default.POST;
     case "system_generators_email-templates_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/email-templates/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/email-templates/definition")
       ).default.POST;
     case "system_generators_endpoint_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/endpoint/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/endpoint/definition")
       ).default.POST;
     case "system_generators_endpoints-meta_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/endpoints-meta/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/endpoints-meta/definition")
       ).default.POST;
     case "system_generators_env-keys_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/env-keys/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/env-keys/definition")
       ).default.POST;
     case "system_generators_env_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/env/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/env/definition")
       ).default.POST;
     case "system_generators_generate-all_codegen_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-all/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-all/definition")
       ).default.POST;
     case "system_generators_generate-trpc-router_validation_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition")
       ).default.POST;
     case "system_generators_prompt-fragments_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/prompt-fragments/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/prompt-fragments/definition")
       ).default.POST;
     case "system_generators_route-handlers_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/route-handlers/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/route-handlers/definition")
       ).default.POST;
     case "system_generators_seeds_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/seeds/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/seeds/definition")
       ).default.POST;
     case "system_generators_skills-index_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/skills-index/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/skills-index/definition")
       ).default.POST;
     case "system_generators_task-index_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/task-index/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/task-index/definition")
       ).default.POST;
     case "system_guard_destroy_POST":
       return (
-        await import("@/app/api/[locale]/system/guard/destroy/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/destroy/definition")
       ).default.POST;
     case "system_guard_start_POST":
-      return (await import("@/app/api/[locale]/system/guard/start/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/start/definition")
+      ).default.POST;
     case "system_guard_status_POST":
-      return (await import("@/app/api/[locale]/system/guard/status/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/status/definition")
+      ).default.POST;
     case "system_guard_stop_POST":
-      return (await import("@/app/api/[locale]/system/guard/stop/definition"))
-        .default.POST;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/guard/stop/definition")
+      ).default.POST;
     case "system_help_GET":
       return (await import("@/app/api/[locale]/system/help/definition")).default
         .GET;
@@ -2292,11 +2315,11 @@ export async function getEndpoint(
       ).default.POST;
     case "system_side-tasks_generators_generate-trpc-router_POST":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/definition")
       ).default.POST;
     case "system_tanstack-start_generate_POST":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
       ).default.POST;
     case "system_unified-interface_ai_execute-tool_POST":
       return (
@@ -2304,7 +2327,7 @@ export async function getEndpoint(
       ).default.POST;
     case "system_unified-interface_cli_setup_install_POST":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/cli/setup/install/definition")
       ).default.POST;
     case "system_unified-interface_data-sources_cron-executions-failed_POST":
       return (
@@ -2568,11 +2591,11 @@ export async function getEndpoint(
       ).default.POST;
     case "t":
       return (
-        await import("@/app/api/[locale]/system/check/testing/test/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/testing/test/definition")
       ).default.POST;
     case "tanstack:generate":
       return (
-        await import("@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/unified-interface/tanstack-start/generate/definition")
       ).default.POST;
     case "task-execute":
       return (
@@ -2612,11 +2635,11 @@ export async function getEndpoint(
       ).default.GET;
     case "tc":
       return (
-        await import("@/app/api/[locale]/system/check/typecheck/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/typecheck/definition")
       ).default.POST;
     case "test":
       return (
-        await import("@/app/api/[locale]/system/check/testing/test/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/testing/test/definition")
       ).default.POST;
     case "toggle-sync":
       return (
@@ -2642,11 +2665,11 @@ export async function getEndpoint(
       ).default.POST;
     case "trpc-validate":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition")
       ).default.POST;
     case "typecheck":
       return (
-        await import("@/app/api/[locale]/system/check/typecheck/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/check/typecheck/definition")
       ).default.POST;
     case "unified-runner":
       return (
@@ -2684,8 +2707,9 @@ export async function getEndpoint(
         await import("@/app/api/[locale]/system/unified-interface/tasks/task-sync/settings/definition")
       ).default.PATCH;
     case "user_auth_check_GET":
-      return (await import("@/app/api/[locale]/user/auth/check/definition"))
-        .default.GET;
+      return (
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/user/auth/check/definition")
+      ).default.GET;
     case "user_data-sources_users-active-total_POST":
       return (
         await import("@/app/api/[locale]/user/data-sources/users-active-total/definition")
@@ -2892,7 +2916,7 @@ export async function getEndpoint(
         .GET;
     case "validate-trpc":
       return (
-        await import("@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition")
+        await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ "@/app/api/[locale]/system/generators/generate-trpc-router/validation/definition")
       ).default.POST;
     case "vibe-sense-bollinger":
       return (

@@ -202,7 +202,7 @@ export function cleanupPidFile(pidFile: string): void {
 
 /**
  * Returns true if any process is currently bound to the given TCP port.
- * Non-destructive — does not kill anything.
+ * Non-destructive - does not kill anything.
  */
 export function isPortInUse(port: number): boolean {
   try {
@@ -215,7 +215,7 @@ export function isPortInUse(port: number): boolean {
 
 /**
  * Returns true if the process occupying `port` is recorded in our PID file
- * (i.e. it belongs to this project instance — we can safely kill it).
+ * (i.e. it belongs to this project instance - we can safely kill it).
  */
 export function isPortOwnedByUs(port: number, pidFile: string): boolean {
   let pidOnPort: number | undefined;

@@ -249,7 +249,7 @@ export const translations = {
     updatedAt: "Updated At",
     referralCode: "Referral Code",
     success:
-      "🎉 Your referral code is ready! Copy the link below and start earning {{directPct}} commission on every subscription — plus bonus earnings from their referrals.",
+      "🎉 Your referral code is ready! Copy the link below and start earning {{directPct}} commission on every subscription - plus bonus earnings from their referrals.",
     message: "Message",
   },
 

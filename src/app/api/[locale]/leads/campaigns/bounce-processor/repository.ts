@@ -371,7 +371,7 @@ export class BounceProcessorRepository {
     platform?: string,
   ): Promise<ResponseType<BounceProcessorPostResponseOutput>> {
     try {
-      // When called as a cron task, skip config update — use existing DB config instead
+      // When called as a cron task, skip config update - use existing DB config instead
       if (platform === Platform.CRON) {
         const configResult = await BounceProcessorRepository.getConfig(
           user,

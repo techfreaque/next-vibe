@@ -37,10 +37,10 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-attrs";
 import {
-  useChatInputStore,
-  ImageSize,
   ImageQuality,
+  ImageSize,
   MusicDuration,
+  useChatInputStore,
 } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/input-store";
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
 import { useAIStream } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-ai-stream";
@@ -321,7 +321,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // isImageModel/isAudioModel: pure generator (modelType = primary UI mode)
   const isImageModel = currentModel?.modelType === "image";
   const isAudioModel = currentModel?.modelType === "audio";
-  // isGenerativeModel: pure generator — no streaming conversation, hides voice/call mode
+  // isGenerativeModel: pure generator - no streaming conversation, hides voice/call mode
   const isGenerativeModel = isImageModel || isAudioModel;
   // Feature-flag driven UI: use capability flags instead of modelType for these
   const hasImageOutputSettings =
@@ -570,7 +570,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         </Div>
       )}
 
-      {/* Generation settings row — only for models that accept size/quality params */}
+      {/* Generation settings row - only for models that accept size/quality params */}
       {hasImageOutputSettings && (
         <Div className="flex items-center gap-2 mb-2 flex-wrap">
           <Select value={imageSize} onValueChange={setImageSize}>

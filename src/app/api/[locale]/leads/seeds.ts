@@ -33,9 +33,9 @@ import {
 
 /**
  * Controls what gets seeded in the dev environment:
- * - "none"           — only journey variants; no lead data
- * - "random"         — random leads with mixed statuses/stages (like it was before)
- * - "campaign_ready" — imported leads in NEW status / NOT_STARTED stage, ready to run a campaign
+ * - "none"           - only journey variants; no lead data
+ * - "random"         - random leads with mixed statuses/stages (like it was before)
+ * - "campaign_ready" - imported leads in NEW status / NOT_STARTED stage, ready to run a campaign
  */
 const SEED_MODE: "none" | "random" | "campaign_ready" = "random";
 

@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Tiefe Einblicke in die Architektur, Entscheidungen und Ideen hinter next-vibe und unbottled.ai.",
     meta: {
-      title: "Blog — next-vibe",
+      title: "Blog - next-vibe",
       description:
         "Engineering-Deep-Dives, Architekturentscheidungen und die Ideen hinter next-vibe und unbottled.ai.",
       category: "Blog",

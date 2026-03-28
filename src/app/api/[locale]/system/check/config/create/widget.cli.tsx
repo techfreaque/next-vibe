@@ -5,7 +5,7 @@
  *   - interactive=true (default for CLI): step-by-step yes/no wizard via Ink
  *   - interactive=false (non-interactive / MCP): plain submission, then result display
  *
- * Interactive flow is driven entirely here in the widget — the repository
+ * Interactive flow is driven entirely here in the widget - the repository
  * receives final resolved boolean values and never runs @inquirer/prompts.
  */
 

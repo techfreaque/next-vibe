@@ -141,7 +141,7 @@ export class MessageConverter {
       case ChatMessageRole.ASSISTANT: {
         const assistantParts: Array<TextPart | FilePart> = [];
 
-        // Add text content — strip <think> blocks (kept in DB for UI but must
+        // Add text content - strip <think> blocks (kept in DB for UI but must
         // not be re-sent to AI as part of history).
         if (message.content?.trim()) {
           const strippedContent = message.content

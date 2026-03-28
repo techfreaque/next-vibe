@@ -2,18 +2,17 @@ export const translations = {
   backToChat: "Powrót do czatu",
   title: "Zarabiaj prawdziwe pieniądze z {{appName}}",
   description:
-    "Polecaj {{appName}} i otrzymuj zapłatę. Zawsze zarabiasz {{directPct}} od każdej subskrypcji osób, które polecisz — bez względu na to, kto Cię polecił.",
+    "Polecaj {{appName}} i otrzymuj zapłatę. Zarabiaj {{directPct}} od każdej subskrypcji, którą polecisz - plus zarobki bonusowe, gdy Twoje polecenia polecają innych.",
   tagline: "Program Partnerski",
 
   hero: {
-    directEarning: "Zawsze zarabiasz",
+    directEarning: "Zarabiasz",
     directLabel: "od każdej subskrypcji",
     directNote: "od osób, które bezpośrednio polecasz",
-    bonusEarning: "Plus zarobki bonusowe",
-    bonusNote:
-      "gdy Twoje polecenia polecają innych (do {{maxUplineLevels}} poziomów głębokości)",
+    bonusEarning: "Plus bonus z ich poleceń",
+    bonusNote: "Zarabiaj udział do {{maxUplineLevels}} poziomów głębokości",
     example:
-      "Przykład: ktoś płaci {{examplePrice}}/miesiąc → Ty dostajesz {{exampleDirectEarning}} każdego miesiąca",
+      "Przykład: plan {{examplePrice}}/mies. → Ty dostajesz {{exampleDirectEarning}} każdego miesiąca",
   },
 
   commissionTable: {
@@ -21,41 +20,38 @@ export const translations = {
     colCut: "Twój udział",
     colExample: "Przykład (plan {{examplePrice}}/mies.)",
     alwaysYours: "zawsze Twoje",
-    heroGuarantee: "gwarantowane Tobie, zawsze",
-    heroNote:
-      "Od każdej płatności subskrypcji od osób, które polecasz — bez dzielenia się z własnym polecającym",
+    heroLabel: "za subskrypcję",
+    heroSub: "Cyklicznie. Na zawsze.",
     whoLabels: [
       "Osoby, które polecasz",
       "Ich polecenia",
       "Polecenia poziomu 3",
       "Polecenia poziomu 4",
       "Polecenia poziomu 5",
+      "Polecenia poziomu 6",
     ],
   },
 
   commission: {
     title: "Ile zarabiasz?",
     subtitle:
-      "Twoje {{directPct}} zawsze należy do Ciebie — bez dzielenia się z własnym polecającym. Twoja własna historia nie wpływa na Twoje zarobki.",
-    directTitle: "Twój bezpośredni udział",
+      "Twoje {{directPct}} pochodzi z każdej płatności subskrypcji - cyklicznie, co miesiąc.",
+    directTitle: "Bezpośrednia prowizja",
     directAmount: "Zawsze {{directPct}}",
     directDesc:
-      "Za każdym razem, gdy osoba przez Ciebie polecona płaci, otrzymujesz {{directPct}} tej płatności. Natychmiast. Za każdym razem.",
+      "Za każdym razem, gdy osoba przez Ciebie polecona płaci, otrzymujesz {{directPct}}. Natychmiast. Co miesiąc.",
     bonusTitle: "Bonus z Twojej sieci",
     bonusAmount: "Do {{uplinePct}} więcej",
     bonusDesc:
-      "Gdy Twoje polecenia polecają innych, też zarabiasz — {{level2Pct}} od poziomu 2, {{level3Pct}} od poziomu 3 itd.",
-    totalTitle: "Łącznie możesz zarobić",
+      "Gdy Twoje polecenia polecają innych, też zarabiasz - {{level2Pct}} od poziomu 2, {{level3Pct}} od poziomu 3 itd.",
+    totalTitle: "Łączny potencjał",
     totalAmount: "Do {{totalPct}}",
     totalDesc: "Jeśli Twoje polecenia też polecają innych",
     levelsTitle: "Podział na poziomy",
-    level1: "Polecasz kogoś → zarabiasz {{directPct}} ich płatności",
-    level2: "Oni polecają kogoś → zarabiasz {{level2Pct}}",
-    level3: "Ci ludzie polecają → zarabiasz {{level3Pct}}",
+    level1: "Polecasz kogoś → {{directPct}} ich płatności",
+    level2: "Oni polecają kogoś → {{level2Pct}}",
+    level3: "Ci ludzie polecają → {{level3Pct}}",
     level4: "I tak dalej... do {{maxUplineLevels}} poziomów",
-    noPenalty: "Bycie polecanym nie zmniejsza Twoich zarobków",
-    noPenaltyNote:
-      "Nawet jeśli ktoś Cię polecił, Twoje {{directPct}} jest całkowicie oddzielne i chronione.",
   },
 
   overview: {
@@ -68,10 +64,10 @@ export const translations = {
     title: "Jak to działa",
     step1Title: "Utwórz kod polecający",
     step1Body:
-      "Generuj unikalne kody dla różnych odbiorców — znajomych, social media czy kampanii.",
+      "Generuj unikalne kody dla różnych odbiorców - znajomych, social media czy kampanii.",
     step2Title: "Udostępnij link",
     step2Body:
-      "Gdy ktoś zarejestruje się przez Twój link i subskrybuje, zarabiasz {{directPct}} od każdej jego płatności — cyklicznie.",
+      "Gdy ktoś zarejestruje się przez Twój link i subskrybuje, zarabiasz {{directPct}} od każdej jego płatności - cyklicznie.",
     step3Title: "Odbierz wypłatę",
     step3Body:
       "Zarobki trafiają natychmiast na Twoje konto. Wydaj je na czaty AI lub wypłać w BTC/USDC.",
@@ -114,12 +110,12 @@ export const translations = {
   cta: {
     title: "Zacznij zarabiać już dziś",
     description:
-      "Utwórz konto lub zaloguj się, aby wygenerować swoje kody polecające i zarabiać {{directPct}} prowizji od każdej subskrypcji — na zawsze.",
+      "Utwórz konto lub zaloguj się, aby wygenerować swoje kody polecające i zarabiać {{directPct}} prowizji od każdej subskrypcji - na zawsze.",
     signUp: "Utwórz konto",
     logIn: "Zaloguj się",
     pitch1: "{{directPct}} od każdej płatności Twoich poleceń",
     pitch2: "Zarobki bonusowe z wielopoziomowych poleceń",
-    pitch3: "Natychmiastowe wypłaty — jako kredyty lub krypto",
+    pitch3: "Natychmiastowe wypłaty - jako kredyty lub krypto",
   },
   payout: {
     title: "Wypłać zarobki",
@@ -130,6 +126,6 @@ export const translations = {
     cryptoPayout: "Wypłata w kryptowalucie",
     cryptoPayoutDesc: "Poproś o wypłatę w BTC lub USDC na swój portfel.",
     minimumNote:
-      "Minimalna wypłata: {{minPayout}}. Wypłaty krypto są przetwarzane w ciągu 48 godzin od zatwierdzenia.",
+      "Minimalna wypłata: {{minPayout}}. Wypłaty krypto są przetwarzane w ciągu {{cryptoPayoutHours}} godzin od zatwierdzenia.",
   },
 };

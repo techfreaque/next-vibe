@@ -303,36 +303,53 @@ export class RouteHandlersGeneratorRepository {
     // Sort paths for consistent output
     allPaths.sort();
 
+    // Routes that use process.cwd() + fs scanning - must be turbopack-ignored to
+    // prevent NFT from tracing the entire project through these imports.
+    const NFT_IGNORE_PATTERNS = [
+      /\/tanstack-start\/generate\//,
+      /\/cli\/setup\/install\//,
+      /\/generators\//,
+      /\/builder\//,
+      /\/check\//,
+      /\/guard\//,
+    ];
+    const needsTurbopackIgnore = (p: string): boolean =>
+      NFT_IGNORE_PATTERNS.some((re) => re.test(p));
+
     // Generate static-import cases (bundler-traceable)
     const cases: string[] = [];
     // Also build the hot-paths map: toolName -> { absPath, method }
     const hotPathEntries: string[] = [];
     for (const path of allPaths) {
       const { importPath, absPath, method } = pathMap[path];
+      // Add turbopack/webpack ignore hints for routes that scan the filesystem
+      const ignoreComment = needsTurbopackIgnore(importPath)
+        ? "/* turbopackIgnore: true */ /* webpackIgnore: true */ "
+        : "";
       // Static import strings for bundler tracing
-      const returnWithTools = `      return (await import("${importPath}")).tools`;
-      const returnWithParen = `      return (await import("${importPath}"))`;
-      const fullLine = `      return (await import("${importPath}")).tools.${method} as GenericHandlerBase;`;
+      const returnWithTools = `      return (await import(${ignoreComment}"${importPath}")).tools`;
+      const returnWithParen = `      return (await import(${ignoreComment}"${importPath}"))`;
+      const fullLine = `      return (await import(${ignoreComment}"${importPath}")).tools.${method} as GenericHandlerBase;`;
 
       if (fullLine.length <= 80) {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
-      return (await import("${importPath}")).tools.${method} as GenericHandlerBase;`);
+      return (await import(${ignoreComment}"${importPath}")).tools.${method} as GenericHandlerBase;`);
       } else if (returnWithTools.length <= 80) {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
-      return (await import("${importPath}")).tools
+      return (await import(${ignoreComment}"${importPath}")).tools
         .${method} as GenericHandlerBase;`);
       } else if (returnWithParen.length <= 80) {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
-      return (await import("${importPath}"))
+      return (await import(${ignoreComment}"${importPath}"))
         .tools.${method} as GenericHandlerBase;`);
       } else {
         // eslint-disable-next-line i18next/no-literal-string
         cases.push(`    case "${path}":
       return (
-        await import("${importPath}")
+        await import(${ignoreComment}"${importPath}")
       ).tools.${method} as GenericHandlerBase;`);
       }
 

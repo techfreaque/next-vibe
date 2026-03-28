@@ -103,13 +103,13 @@ export const translations = {
       companionVariants: {
         title: "Your Companion Variants",
         description:
-          "Your companion comes in multiple variants — brilliant for deep thinking, smart for everyday tasks, and uncensored for unfiltered responses. Tap any row to switch instantly.",
+          "Your companion comes in multiple variants - brilliant for deep thinking, smart for everyday tasks, and uncensored for unfiltered responses. Tap any row to switch instantly.",
         tip: "You can drag to reorder or add more variants anytime.",
       },
       browseSkills: {
         title: "Discover More Skills",
         description:
-          "Explore 40+ skills — coders, researchers, writers, advisors and more. Add one as a favorite and it shows up right here.",
+          "Explore 40+ skills - coders, researchers, writers, advisors and more. Add one as a favorite and it shows up right here.",
         tip: "Skills give your AI a clear focus and the right model for the job.",
       },
       rootFolders: {
@@ -190,9 +190,9 @@ export const translations = {
         },
       },
       callMode: {
-        title: "Call Mode — AI Talks Back",
+        title: "Call Mode - AI Talks Back",
         description:
-          "Tap the phone button and just speak. The AI listens, answers out loud, and keeps it short — like a real conversation.",
+          "Tap the phone button and just speak. The AI listens, answers out loud, and keeps it short - like a real conversation.",
         tip: "No typing. No reading. Just talk.",
       },
       complete: {

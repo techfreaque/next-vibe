@@ -4,7 +4,7 @@ export const translations = {
     subtitle:
       "Deep dives into the architecture, decisions, and ideas behind next-vibe and unbottled.ai.",
     meta: {
-      title: "Blog — next-vibe",
+      title: "Blog - next-vibe",
       description:
         "Engineering deep dives, architecture decisions, and the ideas behind next-vibe and unbottled.ai.",
       category: "Blog",
@@ -18,7 +18,7 @@ export const translations = {
       title: "One codebase. 13 platforms. Zero compromises.",
       category: "Architecture",
       excerpt:
-        "One endpoint definition. Web form, CLI command, MCP tool, native screen, cron job — simultaneously. Here's how it works.",
+        "One endpoint definition. Web form, CLI command, MCP tool, native screen, cron job - simultaneously. Here's how it works.",
       readTime: "12 min read",
     },
     typeChecker: {

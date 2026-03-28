@@ -435,33 +435,40 @@ export class MCPRegistry {
   ): MCPToolCallResult {
     const { t } = mcpScopedTranslation.scopedT(locale);
 
-    if (
-      result.success &&
-      result.data &&
-      typeof result.data === "object" &&
-      "__isContentResponse" in result.data &&
-      "content" in result.data &&
-      Array.isArray(result.data.content)
-    ) {
-      // ContentResponse: return content blocks directly (text + images)
-      const content = result.data.content as ContentBlock[];
-      logger.debug(
-        "[MCP Registry] ContentResponse with native content blocks",
-        {
-          toolName,
-          blockCount: content.length,
-        },
-      );
-      return {
-        content,
-        isError: false,
-      };
-    }
-
     if (result.success && result.data) {
+      // Unwrap execute-tool's { result: ... } wrapper - MCP receives data directly,
+      // not nested inside a `result` key. Any other single-key { result: X } wrapper
+      // from intermediary endpoints is also unwrapped.
+      let data: TData = result.data;
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "result" in data &&
+        Object.keys(data).length === 1
+      ) {
+        data = (data as Record<string, TData>)["result"] as TData;
+      }
+
+      // ContentResponse (e.g. screenshots): return content blocks directly.
+      // May appear at the top level or inside an unwrapped execute-tool wrapper.
+      if (
+        typeof data === "object" &&
+        data !== null &&
+        "__isContentResponse" in data &&
+        "content" in data &&
+        Array.isArray((data as Record<string, ContentBlock[]>).content)
+      ) {
+        const content = (data as Record<string, ContentBlock[]>).content;
+        logger.debug(
+          "[MCP Registry] ContentResponse with native content blocks",
+          { toolName, blockCount: content.length },
+        );
+        return { content, isError: false };
+      }
+
       // Format successful response using endpoint renderer if available
       const formattedData = McpResultFormatter.formatSuccess(
-        result.data,
+        data as Parameters<typeof McpResultFormatter.formatSuccess>[0],
         endpoint,
         locale,
         logger,
@@ -472,7 +479,8 @@ export class MCPRegistry {
         formattedDataLength: formattedData.length,
         formattedDataPreview: formattedData.slice(0, 200),
         hasEndpoint: !!endpoint,
-        dataKeys: Object.keys(result.data),
+        dataKeys:
+          typeof data === "object" && data !== null ? Object.keys(data) : [],
       });
 
       return {

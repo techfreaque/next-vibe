@@ -33,7 +33,7 @@ interface WidgetRendererProps {
 }
 
 /**
- * WidgetRenderer wrapper — same props, no lazy loading.
+ * WidgetRenderer wrapper - same props, no lazy loading.
  */
 export function LazyWidgetRenderer(
   props: WidgetRendererProps,

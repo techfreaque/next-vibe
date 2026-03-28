@@ -45,7 +45,7 @@ function parseCronFrequencyMinutes(schedule: string): number {
         return n;
       }
     }
-    // Handle single numeric minute — runs once per hour
+    // Handle single numeric minute - runs once per hour
     if (minutePart && /^\d+$/.test(minutePart)) {
       return 60;
     }

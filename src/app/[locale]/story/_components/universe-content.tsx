@@ -31,51 +31,91 @@ interface UniverseContentProps {
   onSideChange: (side: ActiveSide) => void;
 }
 
-interface TabButtonProps {
+interface TabCardProps {
   active: boolean;
   onClick: () => void;
   label: string;
   sublabel: string;
+  desc: string;
   variant: "violet" | "cyan";
 }
 
-const VIOLET_ACTIVE =
-  "bg-violet-600 hover:bg-violet-500 text-white shadow-violet-900/30 shadow-md border-0";
-const VIOLET_INACTIVE =
-  "text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted";
-const CYAN_ACTIVE =
-  "bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-900/30 shadow-md border-0";
-
-function TabButton({
+function TabCard({
   active,
   onClick,
   label,
   sublabel,
+  desc,
   variant,
-}: TabButtonProps): JSX.Element {
-  const dotClass = variant === "violet" ? "bg-violet-400" : "bg-cyan-400";
-  const activeClass = variant === "violet" ? VIOLET_ACTIVE : CYAN_ACTIVE;
-
+}: TabCardProps): JSX.Element {
+  const isViolet = variant === "violet";
   return (
     <Button
-      variant={active ? "default" : "ghost"}
-      size="sm"
+      variant="ghost"
       onClick={onClick}
       className={cn(
-        "rounded-full flex items-center gap-2 px-5",
-        active ? activeClass : VIOLET_INACTIVE,
+        "relative flex-1 h-auto text-left rounded-2xl px-6 py-5 border transition-all duration-300 flex-col items-start",
+        active
+          ? isViolet
+            ? "bg-violet-950/80 border-violet-500/60 shadow-lg shadow-violet-900/30 hover:bg-violet-950/80"
+            : "bg-cyan-950/80 border-cyan-500/60 shadow-lg shadow-cyan-900/30 hover:bg-cyan-950/80"
+          : "bg-muted/30 border-border/40 hover:border-border hover:bg-muted/50",
       )}
     >
-      <Span className={cn("w-2 h-2 rounded-full shrink-0", dotClass)} />
-      <Span className="font-semibold">{label}</Span>
-      <Span
+      {active && (
+        <Div
+          className={cn(
+            "absolute inset-0 rounded-2xl pointer-events-none",
+            isViolet
+              ? "bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(167,80,255,0.15)_0%,transparent_70%)]"
+              : "bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(6,182,212,0.12)_0%,transparent_70%)]",
+          )}
+        />
+      )}
+      <Div className="flex items-center gap-2 mb-1.5">
+        <Span
+          className={cn(
+            "w-2.5 h-2.5 rounded-full shrink-0",
+            isViolet ? "bg-violet-400" : "bg-cyan-400",
+          )}
+        />
+        <Span
+          className={cn(
+            "font-black text-lg tracking-tight",
+            active
+              ? isViolet
+                ? "text-violet-100"
+                : "text-cyan-100"
+              : "text-muted-foreground",
+          )}
+        >
+          {label}
+        </Span>
+        <Span
+          className={cn(
+            "text-xs font-medium px-2 py-0.5 rounded-full border",
+            active
+              ? isViolet
+                ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
+                : "bg-cyan-500/20 border-cyan-500/40 text-cyan-300"
+              : "bg-muted border-border text-muted-foreground",
+          )}
+        >
+          {sublabel}
+        </Span>
+      </Div>
+      <P
         className={cn(
-          "text-xs opacity-70 hidden sm:inline",
-          active ? "text-white/80" : "text-muted-foreground",
+          "text-sm leading-relaxed m-0",
+          active
+            ? isViolet
+              ? "text-violet-200/70"
+              : "text-cyan-200/70"
+            : "text-muted-foreground/60",
         )}
       >
-        {sublabel}
-      </Span>
+        {desc}
+      </P>
     </Button>
   );
 }
@@ -102,30 +142,27 @@ export function UniverseContent({
 
   return (
     <Div id="universe-content" className="relative">
-      {/* Tab switcher bar */}
-      <Div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border/50 shadow-sm">
-        <Div className="container px-4 md:px-6 py-3 flex items-center justify-between gap-4">
-          <Div className="flex items-center gap-2">
-            <TabButton
+      {/* Tab switcher */}
+      <Div className="sticky top-0 z-30 bg-background/90 backdrop-blur-lg border-b border-border/50">
+        <Div className="container px-4 md:px-6 py-4">
+          <Div className="flex gap-3">
+            <TabCard
               active={current === "unbottled"}
               onClick={() => handleSwitch("unbottled")}
               label={t("home.splitHero.tab.unbottled")}
               sublabel={t("home.splitHero.tab.unbottledSub")}
+              desc={t("home.splitHero.tab.unbottledDesc")}
               variant="violet"
             />
-            <TabButton
+            <TabCard
               active={current === "nextvibe"}
               onClick={() => handleSwitch("nextvibe")}
               label={t("home.splitHero.tab.nextvibe")}
               sublabel={t("home.splitHero.tab.nextvibeSub")}
+              desc={t("home.splitHero.tab.nextvibeDesc")}
               variant="cyan"
             />
           </Div>
-          <P className="text-xs text-muted-foreground hidden md:block">
-            {current === "unbottled"
-              ? t("home.splitHero.tab.unbottledDesc")
-              : t("home.splitHero.tab.nextvibeDesc")}
-          </P>
         </Div>
       </Div>
 

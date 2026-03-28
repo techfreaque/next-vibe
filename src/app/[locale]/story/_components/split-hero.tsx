@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "next-vibe-ui/ui/button";
 import { Br } from "next-vibe-ui/ui/br";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
 import { Bot } from "next-vibe-ui/ui/icons/Bot";
@@ -74,40 +74,13 @@ export function SplitHero({
   onSideChange,
 }: SplitHeroProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const [hovered, setHovered] = useState<ActiveSide>(null);
   const [locked, setLocked] = useState<ActiveSide>(null);
-
-  const active = locked ?? hovered;
-
-  function handleHover(side: ActiveSide): void {
-    setHovered(side);
-  }
-
-  function handleLeave(): void {
-    setHovered(null);
-  }
 
   function handleClick(side: ActiveSide): void {
     const next = locked === side ? null : side;
     setLocked(next);
     onSideChange?.(next);
   }
-
-  const unbottledActive = active === "unbottled";
-  const nextvibeActive = active === "nextvibe";
-  const unbottledCompressed = active === "nextvibe";
-  const nextvibeCompressed = active === "unbottled";
-
-  const unbottledWidth = unbottledActive
-    ? "65%"
-    : unbottledCompressed
-      ? "35%"
-      : "50%";
-  const nextvibeWidth = nextvibeActive
-    ? "65%"
-    : nextvibeCompressed
-      ? "35%"
-      : "50%";
 
   const unbottledPills = [
     {
@@ -133,12 +106,10 @@ export function SplitHero({
 
   return (
     <Div className="relative flex flex-col md:flex-row min-h-screen">
-      {/* ── Divider — positioned absolutely in the container, tracks left panel width ── */}
-      <MotionDiv
+      {/* ── Divider - positioned absolutely in the container, tracks left panel width ── */}
+      <Div
         className="absolute inset-y-0 z-20 hidden md:flex flex-col items-center justify-center pointer-events-none -translate-x-1/2"
-        initial={{ left: "50%" }}
-        animate={{ left: unbottledWidth }}
-        transition={{ type: "spring", stiffness: 180, damping: 28 }}
+        style={{ left: "50%" }}
       >
         <Div className="w-px flex-1 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
         <Div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center shadow-xl my-3 shrink-0">
@@ -147,43 +118,31 @@ export function SplitHero({
           </Span>
         </Div>
         <Div className="w-px flex-1 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
-      </MotionDiv>
+      </Div>
 
-      {/* ── LEFT: unbottled.ai — desktop ── */}
-      <MotionDiv
+      {/* ── LEFT: unbottled.ai - desktop ── */}
+      <Div
         className="relative min-h-screen flex-col justify-center overflow-hidden cursor-pointer bg-[#0d0014] hidden md:flex"
-        initial={{ width: "50%" }}
-        animate={{ width: unbottledWidth }}
-        transition={{ type: "spring", stiffness: 180, damping: 28 }}
-        onMouseEnter={() => handleHover("unbottled")}
-        onMouseLeave={handleLeave}
+        style={{ width: "50%" }}
         onClick={() => handleClick("unbottled")}
       >
         <Div
           style={{
             ...UNBOTTLED_GLOW_STYLE,
-            opacity: unbottledActive ? 1 : 0.4,
-            transition: "opacity 700ms",
+            opacity: 0.4,
             pointerEvents: "none",
           }}
         />
         <Div style={{ ...UNBOTTLED_GRID_STYLE, pointerEvents: "none" }} />
         <UnbottledContent
           locale={locale}
-          compressed={unbottledCompressed}
+          compressed={false}
           pills={unbottledPills}
           t={t}
         />
-        {!unbottledActive && !unbottledCompressed && (
-          <Div className="absolute bottom-8 left-0 right-0 flex justify-center opacity-40 pointer-events-none">
-            <P className="text-violet-300 text-xs tracking-widest uppercase">
-              {t("home.splitHero.clickToExplore")}
-            </P>
-          </Div>
-        )}
-      </MotionDiv>
+      </Div>
 
-      {/* ── LEFT: unbottled.ai — mobile ── */}
+      {/* ── LEFT: unbottled.ai - mobile ── */}
       <Div className="md:hidden relative min-h-[60vh] flex flex-col justify-center overflow-hidden bg-[#0d0014]">
         <Div
           style={{
@@ -201,7 +160,7 @@ export function SplitHero({
         />
       </Div>
 
-      {/* Mobile OR divider — between the two stacked panels */}
+      {/* Mobile OR divider - between the two stacked panels */}
       <Div className="md:hidden w-full flex items-center gap-4 px-8 py-4 bg-background/50">
         <Div className="flex-1 h-px bg-border" />
         <Span className="text-[10px] font-bold text-muted-foreground tracking-wider">
@@ -210,21 +169,16 @@ export function SplitHero({
         <Div className="flex-1 h-px bg-border" />
       </Div>
 
-      {/* ── RIGHT: next-vibe — desktop ── */}
-      <MotionDiv
+      {/* ── RIGHT: next-vibe - desktop ── */}
+      <Div
         className="relative min-h-screen flex-col justify-center overflow-hidden cursor-pointer bg-[#020c1b] hidden md:flex"
-        initial={{ width: "50%" }}
-        animate={{ width: nextvibeWidth }}
-        transition={{ type: "spring", stiffness: 180, damping: 28 }}
-        onMouseEnter={() => handleHover("nextvibe")}
-        onMouseLeave={handleLeave}
+        style={{ width: "50%" }}
         onClick={() => handleClick("nextvibe")}
       >
         <Div
           style={{
             ...NEXTVIBE_GLOW_STYLE,
-            opacity: nextvibeActive ? 1 : 0.4,
-            transition: "opacity 700ms",
+            opacity: 0.4,
             pointerEvents: "none",
           }}
         />
@@ -232,20 +186,13 @@ export function SplitHero({
         <NextVibeContent
           locale={locale}
           totalToolCount={totalToolCount}
-          compressed={nextvibeCompressed}
+          compressed={false}
           pills={nextvibePills}
           t={t}
         />
-        {!nextvibeActive && !nextvibeCompressed && (
-          <Div className="absolute bottom-8 left-0 right-0 flex justify-center opacity-40 pointer-events-none">
-            <P className="text-cyan-300 text-xs tracking-widest uppercase">
-              {t("home.splitHero.clickToExplore")}
-            </P>
-          </Div>
-        )}
-      </MotionDiv>
+      </Div>
 
-      {/* ── RIGHT: next-vibe — mobile ── */}
+      {/* ── RIGHT: next-vibe - mobile ── */}
       <Div className="md:hidden relative min-h-[60vh] flex flex-col justify-center overflow-hidden bg-[#020c1b]">
         <Div
           style={{

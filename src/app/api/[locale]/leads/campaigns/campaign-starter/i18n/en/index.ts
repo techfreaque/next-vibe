@@ -262,7 +262,7 @@ export const translations = {
     perRunBudget:
       "~{{perRunBudget}} leads/run · {{totalRunsPerWeek}} runs/week",
     perRunBudgetFractional:
-      "{{exactBudget}}/run · {{totalRunsPerWeek}} runs/week (fractional — accumulates across runs)",
+      "{{exactBudget}}/run · {{totalRunsPerWeek}} runs/week (fractional - accumulates across runs)",
     perRunBudgetZeroHint: "— increase leads/week or reduce schedule frequency",
     sections: {
       general: "General",

@@ -1,6 +1,5 @@
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 
-import { STANDARD_MARKUP_PERCENTAGE } from "../../products/constants";
 import {
   ContentLevel,
   type ContentLevelValue,
@@ -104,29 +103,29 @@ export enum ModelId {
   CLAUDE_CODE_OPUS = "claude-code-opus",
 
   // Image generation models
-  // DALL_E_3 = "dall-e-3",
-  // GPT_IMAGE_1 = "gpt-image-1",
-  // FLUX_SCHNELL = "flux-schnell",
-  // FLUX_PRO = "flux-pro",
-  // SDXL = "sdxl",
-  // FLUX_2_MAX = "flux-2-max",
-  // FLUX_2_KLEIN_4B = "flux-2-klein-4b",
-  // RIVERFLOW_V2_PRO = "riverflow-v2-pro",
-  // RIVERFLOW_V2_FAST = "riverflow-v2-fast",
-  // RIVERFLOW_V2_MAX_PREVIEW = "riverflow-v2-max-preview",
-  // RIVERFLOW_V2_STANDARD_PREVIEW = "riverflow-v2-standard-preview",
-  // RIVERFLOW_V2_FAST_PREVIEW = "riverflow-v2-fast-preview",
-  // FLUX_2_FLEX = "flux-2-flex",
-  // FLUX_2_PRO = "flux-2-pro",
+  DALL_E_3 = "dall-e-3",
+  GPT_IMAGE_1 = "gpt-image-1",
+  FLUX_SCHNELL = "flux-schnell",
+  FLUX_PRO = "flux-pro",
+  SDXL = "sdxl",
+  FLUX_2_MAX = "flux-2-max",
+  FLUX_2_KLEIN_4B = "flux-2-klein-4b",
+  RIVERFLOW_V2_PRO = "riverflow-v2-pro",
+  RIVERFLOW_V2_FAST = "riverflow-v2-fast",
+  RIVERFLOW_V2_MAX_PREVIEW = "riverflow-v2-max-preview",
+  RIVERFLOW_V2_STANDARD_PREVIEW = "riverflow-v2-standard-preview",
+  RIVERFLOW_V2_FAST_PREVIEW = "riverflow-v2-fast-preview",
+  FLUX_2_FLEX = "flux-2-flex",
+  FLUX_2_PRO = "flux-2-pro",
   GEMINI_3_PRO_IMAGE_PREVIEW = "gemini-3-pro-image-preview",
-  // GPT_5_IMAGE_MINI = "gpt-5-image-mini",
-  // GPT_5_IMAGE = "gpt-5-image",
-  // SEEDREAM_4_5 = "seedream-4.5",
+  GPT_5_IMAGE_MINI = "gpt-5-image-mini",
+  GPT_5_IMAGE = "gpt-5-image",
+  SEEDREAM_4_5 = "seedream-4.5",
 
   // Music generation models
-  // MUSICGEN_STEREO = "musicgen-stereo",
-  // STABLE_AUDIO = "stable-audio",
-  // UDIO_V2 = "udio-v2",
+  MUSICGEN_STEREO = "musicgen-stereo",
+  STABLE_AUDIO = "stable-audio",
+  UDIO_V2 = "udio-v2",
 }
 
 /**
@@ -2077,7 +2076,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       imageInput: true,
       imageOutput: true,
     },
-    // modelType omitted (defaults to "text") — primary UI mode is chat (no size/quality dropdowns).
+    // modelType omitted (defaults to "text") - primary UI mode is chat (no size/quality dropdowns).
     // modelTypes includes "image" so this model appears in both the Chat and Image tabs.
     modelTypes: ["text", "image"],
   },
@@ -2368,423 +2367,423 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
   // IMAGE GENERATION MODELS
   // =============================================
 
-  // [ModelId.DALL_E_3]: {
-  //   name: "DALL-E 3",
-  //   by: "openAI",
-  //   description: "chat.models.descriptions.dallE3",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "si-openai",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.DALL_E_3,
-  //       apiProvider: ApiProvider.OPENAI_IMAGES,
-  //       providerModel: "dall-e-3",
-  //       creditCostPerImage: 4, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.MAINSTREAM,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.GPT_IMAGE_1]: {
-  //   name: "GPT-Image-1",
-  //   by: "openAI",
-  //   description: "chat.models.descriptions.gptImage1",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "si-openai",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.GPT_IMAGE_1,
-  //       apiProvider: ApiProvider.OPENAI_IMAGES,
-  //       providerModel: "gpt-image-1",
-  //       creditCostPerImage: 2,
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.MAINSTREAM,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.FLUX_SCHNELL]: {
-  //   name: "Flux Schnell",
-  //   by: "blackForestLabs",
-  //   description: "chat.models.descriptions.fluxSchnell",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.FLUX_SCHNELL,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "black-forest-labs/flux-schnell",
-  //       creditCostPerImage: 0.3, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.FLUX_PRO]: {
-  //   name: "Flux Pro",
-  //   by: "blackForestLabs",
-  //   description: "chat.models.descriptions.fluxPro",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.FLUX_PRO,
-  //       apiProvider: ApiProvider.REPLICATE,
-  //       providerModel: "black-forest-labs/flux-1.1-pro",
-  //       creditCostPerImage: 4, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.SMART,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.SDXL]: {
-  //   name: "Stable Diffusion XL",
-  //   by: "stabilityAI",
-  //   description: "chat.models.descriptions.sdxl",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.SDXL,
-  //       apiProvider: ApiProvider.REPLICATE,
-  //       providerModel: "stability-ai/sdxl",
-  //       creditCostPerImage: 0.44, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
+  [ModelId.DALL_E_3]: {
+    name: "DALL-E 3",
+    by: "openAI",
+    description: "chat.models.descriptions.dallE3",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-openai",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.DALL_E_3,
+        apiProvider: ApiProvider.OPENAI_IMAGES,
+        providerModel: "dall-e-3",
+        creditCostPerImage: 4, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.GPT_IMAGE_1]: {
+    name: "GPT-Image-1",
+    by: "openAI",
+    description: "chat.models.descriptions.gptImage1",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "si-openai",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.GPT_IMAGE_1,
+        apiProvider: ApiProvider.OPENAI_IMAGES,
+        providerModel: "gpt-image-1",
+        creditCostPerImage: 2,
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.FLUX_SCHNELL]: {
+    name: "Flux Schnell",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.fluxSchnell",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_SCHNELL,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux-schnell",
+        creditCostPerImage: 0.3, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.FLUX_PRO]: {
+    name: "Flux Pro",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.fluxPro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_PRO,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "black-forest-labs/flux-1.1-pro",
+        creditCostPerImage: 4, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.SDXL]: {
+    name: "Stable Diffusion XL",
+    by: "stabilityAI",
+    description: "chat.models.descriptions.sdxl",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.SDXL,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "stability-ai/sdxl",
+        creditCostPerImage: 0.44, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
 
-  // [ModelId.FLUX_2_MAX]: {
-  //   name: "FLUX.2 Max",
-  //   by: "blackForestLabs",
-  //   description: "chat.models.descriptions.flux2Max",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.FLUX_2_MAX,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "black-forest-labs/flux.2-max",
-  //       creditCostPerImage: 7, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.SMART,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.FLUX_2_KLEIN_4B]: {
-  //   name: "FLUX.2 Klein 4B",
-  //   by: "blackForestLabs",
-  //   description: "chat.models.descriptions.flux2Klein4b",
-  //   parameterCount: 4,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.FLUX_2_KLEIN_4B,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "black-forest-labs/flux.2-klein-4b",
-  //       creditCostPerImage: 1.4, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.RIVERFLOW_V2_PRO]: {
-  //   name: "Riverflow V2 Pro",
-  //   by: "sourceful",
-  //   description: "chat.models.descriptions.riverflowV2Pro",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.RIVERFLOW_V2_PRO,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "sourceful/riverflow-v2-pro",
-  //       creditCostPerImage: 15, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.SMART,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.RIVERFLOW_V2_FAST]: {
-  //   name: "Riverflow V2 Fast",
-  //   by: "sourceful",
-  //   description: "chat.models.descriptions.riverflowV2Fast",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.RIVERFLOW_V2_FAST,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "sourceful/riverflow-v2-fast",
-  //       creditCostPerImage: 2, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.RIVERFLOW_V2_MAX_PREVIEW]: {
-  //   name: "Riverflow V2 Max Preview",
-  //   by: "sourceful",
-  //   description: "chat.models.descriptions.riverflowV2MaxPreview",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.RIVERFLOW_V2_MAX_PREVIEW,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "sourceful/riverflow-v2-max-preview",
-  //       creditCostPerImage: 7.5, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.SMART,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.RIVERFLOW_V2_STANDARD_PREVIEW]: {
-  //   name: "Riverflow V2 Standard Preview",
-  //   by: "sourceful",
-  //   description: "chat.models.descriptions.riverflowV2StandardPreview",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "sourceful/riverflow-v2-standard-preview",
-  //       creditCostPerImage: 3.5, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.RIVERFLOW_V2_FAST_PREVIEW]: {
-  //   name: "Riverflow V2 Fast Preview",
-  //   by: "sourceful",
-  //   description: "chat.models.descriptions.riverflowV2FastPreview",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.RIVERFLOW_V2_FAST_PREVIEW,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "sourceful/riverflow-v2-fast-preview",
-  //       creditCostPerImage: 3, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.FLUX_2_FLEX]: {
-  //   name: "FLUX.2 Flex",
-  //   by: "blackForestLabs",
-  //   description: "chat.models.descriptions.flux2Flex",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.FLUX_2_FLEX,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "black-forest-labs/flux.2-flex",
-  //       creditCostPerImage: 6, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.SMART,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
-  // [ModelId.FLUX_2_PRO]: {
-  //   name: "FLUX.2 Pro",
-  //   by: "blackForestLabs",
-  //   description: "chat.models.descriptions.flux2Pro",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.FLUX_2_PRO,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "black-forest-labs/flux.2-pro",
-  //       creditCostPerImage: 3, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.SMART,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
+  [ModelId.FLUX_2_MAX]: {
+    name: "FLUX.2 Max",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Max",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_MAX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-max",
+        creditCostPerImage: 7, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.FLUX_2_KLEIN_4B]: {
+    name: "FLUX.2 Klein 4B",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Klein4b",
+    parameterCount: 4,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_KLEIN_4B,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-klein-4b",
+        creditCostPerImage: 1.4, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_PRO]: {
+    name: "Riverflow V2 Pro",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2Pro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-pro",
+        creditCostPerImage: 15, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_FAST]: {
+    name: "Riverflow V2 Fast",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2Fast",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_FAST,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-fast",
+        creditCostPerImage: 2, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_MAX_PREVIEW]: {
+    name: "Riverflow V2 Max Preview",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2MaxPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_MAX_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-max-preview",
+        creditCostPerImage: 7.5, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_STANDARD_PREVIEW]: {
+    name: "Riverflow V2 Standard Preview",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2StandardPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_STANDARD_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-standard-preview",
+        creditCostPerImage: 3.5, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.RIVERFLOW_V2_FAST_PREVIEW]: {
+    name: "Riverflow V2 Fast Preview",
+    by: "sourceful",
+    description: "chat.models.descriptions.riverflowV2FastPreview",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.RIVERFLOW_V2_FAST_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "sourceful/riverflow-v2-fast-preview",
+        creditCostPerImage: 3, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.FLUX_2_FLEX]: {
+    name: "FLUX.2 Flex",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Flex",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_FLEX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-flex",
+        creditCostPerImage: 6, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
+  [ModelId.FLUX_2_PRO]: {
+    name: "FLUX.2 Pro",
+    by: "blackForestLabs",
+    description: "chat.models.descriptions.flux2Pro",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.FLUX_2_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "black-forest-labs/flux.2-pro",
+        creditCostPerImage: 3, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
   [ModelId.GEMINI_3_PRO_IMAGE_PREVIEW]: {
     name: "Gemini 3 Pro Image Preview",
     by: "google",
@@ -2792,7 +2791,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     parameterCount: undefined,
     contextWindow: 65536,
     icon: "si-googlegemini",
-    // modelType intentionally omitted (defaults to "text") — multimodal chat model,
+    // modelType intentionally omitted (defaults to "text") - multimodal chat model,
     // not a pure image generator. Routes through stream; imageOutput: true drives
     // the modalities passed to OpenRouter.
     providers: [
@@ -2818,197 +2817,197 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       imageInput: true,
       imageOutput: true,
     },
-    // modelType omitted (defaults to "text") — primary UI mode is chat.
+    // modelType omitted (defaults to "text") - primary UI mode is chat.
     // modelTypes includes "image" so this model appears in both the Chat and Image tabs.
     modelTypes: ["text", "image"],
   },
-  // [ModelId.GPT_5_IMAGE_MINI]: {
-  //   name: "GPT-5 Image Mini",
-  //   by: "openAI",
-  //   description: "chat.models.descriptions.gpt5ImageMini",
-  //   parameterCount: undefined,
-  //   contextWindow: 400000,
-  //   icon: "si-openai",
-  //   // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
-  //   // modelTypes includes "image" so it appears in both Chat and Image tabs.
-  //   providers: [
-  //     {
-  //       id: ModelId.GPT_5_IMAGE_MINI,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "openai/gpt-5-image-mini",
-  //       creditCostPerImage: 0.8, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.FAST,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.MAINSTREAM,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageInput: true,
-  //     imageOutput: true,
-  //   },
-  //   modelTypes: ["text", "image"],
-  // },
-  // [ModelId.GPT_5_IMAGE]: {
-  //   name: "GPT-5 Image",
-  //   by: "openAI",
-  //   description: "chat.models.descriptions.gpt5Image",
-  //   parameterCount: undefined,
-  //   contextWindow: 400000,
-  //   icon: "si-openai",
-  //   // modelType omitted (defaults to "text") — chat-style multimodal model via OpenRouter.
-  //   // modelTypes includes "image" so it appears in both Chat and Image tabs.
-  //   providers: [
-  //     {
-  //       id: ModelId.GPT_5_IMAGE,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "openai/gpt-5-image",
-  //       creditCostPerImage: 4, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [
-  //     ModelUtility.IMAGE_GEN,
-  //     ModelUtility.CREATIVE,
-  //     ModelUtility.SMART,
-  //   ],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.MAINSTREAM,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageInput: true,
-  //     imageOutput: true,
-  //   },
-  //   modelTypes: ["text", "image"],
-  // },
-  // [ModelId.SEEDREAM_4_5]: {
-  //   name: "Seedream 4.5",
-  //   by: "byteDanceSeed",
-  //   description: "chat.models.descriptions.seedream45",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "image",
-  //   modelType: "image",
-  //   providers: [
-  //     {
-  //       id: ModelId.SEEDREAM_4_5,
-  //       apiProvider: ApiProvider.OPENROUTER,
-  //       providerModel: "bytedance-seed/seedream-4.5",
-  //       creditCostPerImage: 4, // updated by media-prices updater
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.FAST,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     imageOutput: true,
-  //     imageOutputSettings: true,
-  //   },
-  // },
+  [ModelId.GPT_5_IMAGE_MINI]: {
+    name: "GPT-5 Image Mini",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt5ImageMini",
+    parameterCount: undefined,
+    contextWindow: 400000,
+    icon: "si-openai",
+    // modelType omitted (defaults to "text") - chat-style multimodal model via OpenRouter.
+    // modelTypes includes "image" so it appears in both Chat and Image tabs.
+    providers: [
+      {
+        id: ModelId.GPT_5_IMAGE_MINI,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-image-mini",
+        creditCostPerImage: 0.8, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageInput: true,
+      imageOutput: true,
+    },
+    modelTypes: ["text", "image"],
+  },
+  [ModelId.GPT_5_IMAGE]: {
+    name: "GPT-5 Image",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt5Image",
+    parameterCount: undefined,
+    contextWindow: 400000,
+    icon: "si-openai",
+    // modelType omitted (defaults to "text") - chat-style multimodal model via OpenRouter.
+    // modelTypes includes "image" so it appears in both Chat and Image tabs.
+    providers: [
+      {
+        id: ModelId.GPT_5_IMAGE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-image",
+        creditCostPerImage: 4, // updated by media-prices updater
+      },
+    ],
+    utilities: [
+      ModelUtility.IMAGE_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.SMART,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageInput: true,
+      imageOutput: true,
+    },
+    modelTypes: ["text", "image"],
+  },
+  [ModelId.SEEDREAM_4_5]: {
+    name: "Seedream 4.5",
+    by: "byteDanceSeed",
+    description: "chat.models.descriptions.seedream45",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    modelType: "image",
+    providers: [
+      {
+        id: ModelId.SEEDREAM_4_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "bytedance-seed/seedream-4.5",
+        creditCostPerImage: 4, // updated by media-prices updater
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      imageOutput: true,
+      imageOutputSettings: true,
+    },
+  },
 
-  // // =============================================
+  // =============================================
   // MUSIC GENERATION MODELS
   // =============================================
 
-  // [ModelId.MUSICGEN_STEREO]: {
-  //   name: "MusicGen Stereo",
-  //   by: "meta",
-  //   description: "chat.models.descriptions.musicgenStereo",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "music",
-  //   modelType: "audio",
-  //   providers: [
-  //     {
-  //       id: ModelId.MUSICGEN_STEREO,
-  //       apiProvider: ApiProvider.REPLICATE,
-  //       providerModel: "meta/musicgen",
-  //       creditCostPerClip: 5.4, // updated by media-prices updater
-  //       defaultDurationSeconds: 8,
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.QUICK,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     audioOutput: true,
-  //   },
-  // },
+  [ModelId.MUSICGEN_STEREO]: {
+    name: "MusicGen Stereo",
+    by: "meta",
+    description: "chat.models.descriptions.musicgenStereo",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.MUSICGEN_STEREO,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "meta/musicgen",
+        creditCostPerClip: 5.4, // updated by media-prices updater
+        defaultDurationSeconds: 8,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      audioOutput: true,
+    },
+  },
 
-  // [ModelId.STABLE_AUDIO]: {
-  //   name: "Stable Audio",
-  //   by: "stabilityAI",
-  //   description: "chat.models.descriptions.stableAudio",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "music",
-  //   modelType: "audio",
-  //   providers: [
-  //     {
-  //       id: ModelId.STABLE_AUDIO,
-  //       apiProvider: ApiProvider.REPLICATE,
-  //       providerModel: "stability-ai/stable-audio",
-  //       creditCostPerClip: 26, // updated by media-prices updater
-  //       defaultDurationSeconds: 20,
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.BALANCED,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     audioOutput: true,
-  //   },
-  // },
+  [ModelId.STABLE_AUDIO]: {
+    name: "Stable Audio",
+    by: "stabilityAI",
+    description: "chat.models.descriptions.stableAudio",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.STABLE_AUDIO,
+        apiProvider: ApiProvider.REPLICATE,
+        providerModel: "stability-ai/stable-audio",
+        creditCostPerClip: 26, // updated by media-prices updater
+        defaultDurationSeconds: 20,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      audioOutput: true,
+    },
+  },
 
-  // [ModelId.UDIO_V2]: {
-  //   name: "Udio v2",
-  //   by: "udio",
-  //   description: "chat.models.descriptions.udioV2",
-  //   parameterCount: undefined,
-  //   contextWindow: 0,
-  //   icon: "music",
-  //   modelType: "audio",
-  //   providers: [
-  //     {
-  //       id: ModelId.UDIO_V2,
-  //       apiProvider: ApiProvider.FAL_AI,
-  //       providerModel: "fal-ai/udio",
-  //       creditCostPerClip: 5, // updated by media-prices updater
-  //       defaultDurationSeconds: 30,
-  //     },
-  //   ],
-  //   utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
-  //   supportsTools: false,
-  //   intelligence: IntelligenceLevel.SMART,
-  //   speed: SpeedLevel.THOROUGH,
-  //   content: ContentLevel.OPEN,
-  //   features: {
-  //     ...defaultFeatures,
-  //     streaming: false,
-  //     audioOutput: true,
-  //   },
-  // },
+  [ModelId.UDIO_V2]: {
+    name: "Udio v2",
+    by: "udio",
+    description: "chat.models.descriptions.udioV2",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "music",
+    modelType: "audio",
+    providers: [
+      {
+        id: ModelId.UDIO_V2,
+        apiProvider: ApiProvider.FAL_AI,
+        providerModel: "fal-ai/udio",
+        creditCostPerClip: 5, // updated by media-prices updater
+        defaultDurationSeconds: 30,
+      },
+    ],
+    utilities: [ModelUtility.MUSIC_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      audioOutput: true,
+    },
+  },
 };
 /* eslint-enable i18next/no-literal-string */
 

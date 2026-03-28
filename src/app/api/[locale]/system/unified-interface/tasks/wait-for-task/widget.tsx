@@ -2,7 +2,7 @@
  * WaitForTask Widget
  *
  * Renders the target endpoint (originalToolName) with its args and result,
- * exactly like ExecuteToolWidget — but reads from wait-for-task's response fields
+ * exactly like ExecuteToolWidget - but reads from wait-for-task's response fields
  * (originalToolName, originalArgs, result) instead of execute-tool's input/result.
  *
  * The ToolCallRenderer shows distinct "Waiting" / "Complete (wait-for)" badges
@@ -17,6 +17,7 @@ import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
@@ -28,7 +29,6 @@ import {
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 
 import type definition from "./definition";
 import type { WaitForTaskResponseOutput } from "./definition";

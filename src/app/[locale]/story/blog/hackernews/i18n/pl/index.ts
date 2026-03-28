@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Show HN: next-vibe — Szkic — Blog next-vibe",
+    title: "Show HN: next-vibe - Szkic - Blog next-vibe",
     description:
       "Post na Hacker News, który piszemy. Supremacja TypeScript, zunifikowane powierzchnie i bot tradingowy, który nie może handlować.",
     category: "Społeczność",
@@ -25,23 +25,23 @@ export const translations: typeof enTranslations = {
     paragraph1:
       "Każdy projekt techniczny w końcu pyta: jak przedstawić się Hacker News? Tytuł jest wszystkim. Pierwsze dwa zdania decydują, czy ktoś kliknie, czy przewinie.",
     paragraph2:
-      "Mamy dwa kąty. Oba są prawdziwe. Oba są prawdziwymi częściami next-vibe. Pytanie brzmi, który mocniej ląduje na HN — i który rozpoczyna rozmowę, którą naprawdę chcemy przeprowadzić.",
+      "Mamy dwa kąty. Oba są prawdziwe. Oba są prawdziwymi częściami next-vibe. Pytanie brzmi, który mocniej ląduje na HN - i który rozpoczyna rozmowę, którą naprawdę chcemy przeprowadzić.",
   },
   optionA: {
     badge: "Opcja A",
     title: "Supremacja TypeScript",
     hnTitle:
       "Show HN: next-vibe – framework TypeScript-first, gdzie any, unknown, object, as X i throw są zakazane",
-    body: "Większość projektów TypeScript traktuje system typów jako opcjonalne zabezpieczenia. My traktujemy go jako strukturę nośną. Reguła w next-vibe jest prosta: typy muszą być całkowicie zgodne — żadnego any, żadnego unknown, żadnego gołego object, żadnych asercji typów (as X), żadnych wyjątków. Jeśli twoje typy są błędne, architektura jest błędna.\n\nAby to wyegzekwować, zbudowaliśmy vibe check: narzędzie jakości kodu, które uruchamia Oxlint (Rust), ESLint i sprawdzanie typów TypeScript równolegle.",
+    body: "Większość projektów TypeScript traktuje system typów jako opcjonalne zabezpieczenia. My traktujemy go jako strukturę nośną. Reguła w next-vibe jest prosta: typy muszą być całkowicie zgodne - żadnego any, żadnego unknown, żadnego gołego object, żadnych asercji typów (as X), żadnych wyjątków. Jeśli twoje typy są błędne, architektura jest błędna.\n\nAby to wyegzekwować, zbudowaliśmy vibe check: narzędzie jakości kodu, które uruchamia Oxlint (Rust), ESLint i sprawdzanie typów TypeScript równolegle.",
     reasoning:
-      "Hardkorowi użytkownicy TypeScript zaangażują się natychmiast. Zakazane wzorce są konkretne i kontrowersyjne. Inżynierowie HN mają opinie na temat any i throw. Ten kąt zaprasza do sprzeciwu — a na HN sprzeciw to zaangażowanie.",
+      "Hardkorowi użytkownicy TypeScript zaangażują się natychmiast. Zakazane wzorce są konkretne i kontrowersyjne. Inżynierowie HN mają opinie na temat any i throw. Ten kąt zaprasza do sprzeciwu - a na HN sprzeciw to zaangażowanie.",
   },
   optionB: {
     badge: "Opcja B",
     title: "Zunifikowana powierzchnia",
     hnTitle:
       "Show HN: next-vibe – jedna definicja endpointu staje się web UI, CLI, narzędziem MCP, natywną aplikacją, zadaniem cron i węzłem grafu",
-    body: "Znudziło mi się pisanie tej samej logiki pięć razy. Każda funkcja potrzebowała formularza web, polecenia CLI, narzędzia MCP dla agentów AI, czasem ekranu mobilnego. Ta sama walidacja, to samo i18n, ta sama obsługa błędów — tylko inaczej ubrana.\n\nnext-vibe rozwiązuje to za pomocą jednego pliku definition.ts na funkcję. Opisujesz pola, schematy Zod, etykiety, typy błędów i przykłady raz.",
+    body: "Znudziło mi się pisanie tej samej logiki pięć razy. Każda funkcja potrzebowała formularza web, polecenia CLI, narzędzia MCP dla agentów AI, czasem ekranu mobilnego. Ta sama walidacja, to samo i18n, ta sama obsługa błędów - tylko inaczej ubrana.\n\nnext-vibe rozwiązuje to za pomocą jednego pliku definition.ts na funkcję. Opisujesz pola, schematy Zod, etykiety, typy błędów i przykłady raz.",
     reasoning:
       "Ból, z którym można się utożsamić: pisanie tej samej rzeczy pięć razy. Rozwiązanie jest konkretne i możliwe do demonstracji. Kąt węzła grafu jest nowatorski. Kąt MCP + agentów AI jest aktualny.",
   },
@@ -85,7 +85,7 @@ export const translations: typeof enTranslations = {
     description:
       "Vibe Sense to węzłowy silnik analityki rynkowej. Źródła danych, wskaźniki (EMA, SMA, Wstęgi Bollingera), ewaluatory emitujące sygnały i węzły akcji reagujące na te sygnały. Bez wykonywania zleceń.",
     hookForComments:
-      "Każdy węzeł w grafie to tylko endpoint HTTP — możesz zrobić curl do dowolnego kroku w potoku, testować go w izolacji lub wywoływać z agenta AI. Silnik grafu to harmonogramista, nie DSL.",
+      "Każdy węzeł w grafie to tylko endpoint HTTP - możesz zrobić curl do dowolnego kroku w potoku, testować go w izolacji lub wywoływać z agenta AI. Silnik grafu to harmonogramista, nie DSL.",
     whyItMatters:
       "Ponieważ każdy węzeł to standardowy endpoint, są one indywidualnie testowalne przez CLI, dostępne dla agentów AI przez MCP i buforowane z tą samą infrastrukturą co wszystko inne.",
   },
@@ -103,7 +103,7 @@ export const translations: typeof enTranslations = {
       unifiedSurface: {
         rank: "2",
         title:
-          "Zunifikowana powierzchnia — jedna definicja, wszystkie powierzchnie",
+          "Zunifikowana powierzchnia - jedna definicja, wszystkie powierzchnie",
         reason:
           "Ból, z którym można się utożsamić. Każdy developer pisał ten sam formularz pięć razy.",
       },
@@ -130,7 +130,7 @@ export const translations: typeof enTranslations = {
   titleAlternatives: {
     title: "Alternatywne opcje tytułu",
     items: {
-      alt1: "Show HN: Zakazałem any, unknown, object i as X w naszej bazie kodu TypeScript — oto egzekutor",
+      alt1: "Show HN: Zakazałem any, unknown, object i as X w naszej bazie kodu TypeScript - oto egzekutor",
       alt2: "Show HN: next-vibe – TypeScript tak rygorystyczny, że napisaliśmy własny linter zakazujący throw",
       alt3: "Show HN: next-vibe – jedna definicja endpointu, sześć powierzchni (web/CLI/MCP/native/cron/graph)",
       alt4: "Show HN: Zbudowaliśmy silnik grafu szeregów czasowych, gdzie każdy węzeł to tylko endpoint HTTP",

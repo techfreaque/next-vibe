@@ -1,5 +1,5 @@
-import { Youtube as LucideYoutube } from "lucide-react";
+import { SiYoutube as ReactSimpleIcon } from "@icons-pack/react-simple-icons";
 
 import { type IconComponent } from "../../lib/helper";
 
-export const Youtube: IconComponent = LucideYoutube;
+export const Youtube: IconComponent = ReactSimpleIcon;

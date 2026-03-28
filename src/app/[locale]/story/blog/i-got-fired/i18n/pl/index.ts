@@ -3,11 +3,11 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title:
-      "Zostałem zwolniony. To jest to, co zamiast tego zbudowałem. — next-vibe",
+      "Zostałem zwolniony. To jest to, co zamiast tego zbudowałem. - next-vibe",
     description:
       "Sfederowany silnik widżetów zbudowany w pracy, której już nie ma. Teraz każdy endpoint next-vibe można osadzić wszędzie w dwóch tagach script.",
     category: "VibeFrame",
-    imageAlt: "VibeFrame — Sfederowany Silnik Widżetów",
+    imageAlt: "VibeFrame - Sfederowany Silnik Widżetów",
     keywords:
       "VibeFrame, sfederowane widżety, iframe, postMessage, next-vibe, osadzalny, TypeScript",
   },
@@ -24,16 +24,16 @@ export const translations: typeof enTranslations = {
   origin: {
     title: "Historia powstania",
     paragraph1:
-      "Spędziłem trzy miesiące budując coś w swojej codziennej pracy, czego nigdy nie mogłem nikomu pokazać. Baza kodu, nad którą pracowałem, była katastrofą. Za każdym razem, gdy musieliśmy osadzić widżet zewnętrzny — formularz, bąbelek czatu, panel pulpitu nawigacyjnego — była ta sama historia.",
+      "Spędziłem trzy miesiące budując coś w swojej codziennej pracy, czego nigdy nie mogłem nikomu pokazać. Baza kodu, nad którą pracowałem, była katastrofą. Za każdym razem, gdy musieliśmy osadzić widżet zewnętrzny - formularz, bąbelek czatu, panel pulpitu nawigacyjnego - była ta sama historia.",
     paragraph2:
-      "Zbudowałem alternatywę. Lekki sfederowany silnik widżetów, który mógł bezpiecznie osadzać wszystko — każdy formularz, każde UI, każde narzędzie — w sandboxowanym iframe na dowolnej stronie. Właściwy protokół postMessage. Brak wspólnego stanu między hostem a widżetem. System wyzwalaczy, tryby wyświetlania, cały zestaw.",
+      "Zbudowałem alternatywę. Lekki sfederowany silnik widżetów, który mógł bezpiecznie osadzać wszystko - każdy formularz, każde UI, każde narzędzie - w sandboxowanym iframe na dowolnej stronie. Właściwy protokół postMessage. Brak wspólnego stanu między hostem a widżetem. System wyzwalaczy, tryby wyświetlania, cały zestaw.",
     paragraph3:
       "Miałem właśnie pokazać to mojemu zespołowi. Potem zostałem zwolniony. Baza kodu leżała martwa na moim dysku przez miesiące. Potem zdałem sobie sprawę: ta architektura była dokładnie tym, czego potrzebował next-vibe.",
   },
   problem: {
     title: "Problem z tagami script",
     paragraph1:
-      "Gdy osadzasz treści zewnętrzne za pomocą nagiego tagu script, nie masz sandboxa. Ten skrypt ma pełny dostęp do strony — DOM, ciasteczka, localStorage, nasłuchiwacze zdarzeń, wszystko.",
+      "Gdy osadzasz treści zewnętrzne za pomocą nagiego tagu script, nie masz sandboxa. Ten skrypt ma pełny dostęp do strony - DOM, ciasteczka, localStorage, nasłuchiwacze zdarzeń, wszystko.",
     paragraph2:
       "Standardową bezpieczną alternatywą jest iframe. Ale iframe domyślnie nie komunikuje się ze stroną nadrzędną. Zdarzenia zmiany rozmiaru nie bąbelkują. Przesyłanie formularzy nie propaguje. Kończysz z głupim izolowanym pudełkiem, które nie może nic powiedzieć swojemu rodzicowi.",
     bridgeTitle: "To, czego naprawdę potrzebujesz, to most.",
@@ -77,15 +77,15 @@ export const translations: typeof enTranslations = {
     },
     triggersTitle: "Siedem typów wyzwalaczy",
     triggers: {
-      immediate: "Natychmiastowy — montuje się, gdy tylko strona się ładuje",
+      immediate: "Natychmiastowy - montuje się, gdy tylko strona się ładuje",
       scroll:
-        "Przewijanie — uruchamia się gdy użytkownik przewinął procent strony",
-      time: "Czas — uruchamia się po N milisekundach",
+        "Przewijanie - uruchamia się gdy użytkownik przewinął procent strony",
+      time: "Czas - uruchamia się po N milisekundach",
       exitIntent:
-        "Zamiar wyjścia — uruchamia się gdy mysz opuszcza viewport przez górę",
-      click: "Kliknięcie — uruchamia się gdy kliknięto określony element",
-      hover: "Najechanie — uruchamia się przy wejściu myszy na selektor",
-      viewport: "Viewport — uruchamia się na podstawie rozmiaru ekranu",
+        "Zamiar wyjścia - uruchamia się gdy mysz opuszcza viewport przez górę",
+      click: "Kliknięcie - uruchamia się gdy kliknięto określony element",
+      hover: "Najechanie - uruchamia się przy wejściu myszy na selektor",
+      viewport: "Viewport - uruchamia się na podstawie rozmiaru ekranu",
     },
     frequencyTitle: "Częstotliwość wyświetlania",
     frequency:
@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
     paragraph1:
       "Gdy przeniosłem VibeFrame do next-vibe, zdałem sobie sprawę, że nie tylko formularze stały się osadzalne. UI każdego endpointu jest osadzalna. Włącznie z wizualizacjami wykresów Vibe Sense.",
     paragraph2:
-      "Wykres lejka leadów na żywo z platformy — z prawdziwymi danymi, wskaźnikami na żywo — renderowany jako widżet na zewnętrznej stronie. To nie jest zrzut ekranu. To nie są eksporty statyczne. Dane się odświeżają. Wykres reaguje.",
+      "Wykres lejka leadów na żywo z platformy - z prawdziwymi danymi, wskaźnikami na żywo - renderowany jako widżet na zewnętrznej stronie. To nie jest zrzut ekranu. To nie są eksporty statyczne. Dane się odświeżają. Wykres reaguje.",
     paragraph3:
       "Architektura, którą zbudowałem do bezpiecznego osadzania widżetów zewnętrznych, okazała się również architekturą nadającą każdemu endpointowi publiczną obecność iframe. To właśnie w tym tkwi sens budowania właściwej abstrakcji. Robi więcej niż planowałeś.",
   },
@@ -141,9 +141,9 @@ export const translations: typeof enTranslations = {
   close: {
     title: "Co te dwie rzeczy mają wspólnego",
     vibeFrame:
-      "VibeFrame sprawia, że platforma jest osadzalna wszędzie. Każdy endpoint, każdy widżet, każde UI — dwa tagi script i jest na każdej stronie. Obecność platformy wykracza poza jej własną domenę.",
+      "VibeFrame sprawia, że platforma jest osadzalna wszędzie. Każdy endpoint, każdy widżet, każde UI - dwa tagi script i jest na każdej stronie. Obecność platformy wykracza poza jej własną domenę.",
     skills:
-      "Skille sprawiają, że platforma jest komponowalna. Każde zadanie rozumowania, każda domena możliwości — przekieruj do właściwego skilla, uzyskaj właściwy model z właściwymi narzędziami.",
+      "Skille sprawiają, że platforma jest komponowalna. Każde zadanie rozumowania, każda domena możliwości - przekieruj do właściwego skilla, uzyskaj właściwy model z właściwymi narzędziami.",
     together:
       "Razem: twoja platforma może pojawiać się wszędzie i rozumować o wszystkim.",
     finalLine:

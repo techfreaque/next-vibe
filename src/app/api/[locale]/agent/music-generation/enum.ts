@@ -34,7 +34,7 @@ export const MUSIC_DURATION_SECONDS: Record<string, number> = {
   [MusicDuration.LONG]: 30,
 };
 
-/** Valid music model IDs — subset of ModelId for music generation */
+/** Valid music model IDs - subset of ModelId for music generation */
 export const MUSIC_MODEL_IDS = [
   // ModelId.MUSICGEN_STEREO,
   // ModelId.STABLE_AUDIO,

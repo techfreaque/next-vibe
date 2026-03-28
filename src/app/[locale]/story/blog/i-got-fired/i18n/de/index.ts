@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Ich wurde gefeuert. Das habe ich stattdessen gebaut. — next-vibe",
+    title: "Ich wurde gefeuert. Das habe ich stattdessen gebaut. - next-vibe",
     description:
       "Eine föderierte Widget-Engine, gebaut bei einem Job, den es nicht mehr gibt. Jetzt ist jeder next-vibe-Endpoint in zwei Script-Tags einbettbar.",
     category: "VibeFrame",
-    imageAlt: "VibeFrame — Föderierte Widget-Engine",
+    imageAlt: "VibeFrame - Föderierte Widget-Engine",
     keywords:
       "VibeFrame, föderierte Widgets, iframe, postMessage, next-vibe, einbettbar, TypeScript",
   },
@@ -22,16 +22,16 @@ export const translations: typeof enTranslations = {
   origin: {
     title: "Die Entstehungsgeschichte",
     paragraph1:
-      "Ich verbrachte drei Monate damit, bei meinem Tagesjob etwas zu bauen, das ich niemandem zeigen durfte. Die Codebasis, an der ich arbeitete, war ein Desaster. Jedes Mal, wenn wir ein Drittanbieter-Widget einbetten mussten — ein Formular, eine Chat-Blase, ein Dashboard-Panel — war es die gleiche Geschichte.",
+      "Ich verbrachte drei Monate damit, bei meinem Tagesjob etwas zu bauen, das ich niemandem zeigen durfte. Die Codebasis, an der ich arbeitete, war ein Desaster. Jedes Mal, wenn wir ein Drittanbieter-Widget einbetten mussten - ein Formular, eine Chat-Blase, ein Dashboard-Panel - war es die gleiche Geschichte.",
     paragraph2:
-      "Ich baute eine Alternative. Eine leichtgewichtige föderierte Widget-Engine, die alles sicher einbetten konnte — jedes Formular, jede UI, jedes Tool — in einem Sandbox-iframe auf jeder Seite. Richtiges postMessage-Protokoll. Kein gemeinsamer Zustand zwischen Host und Widget. Trigger-System, Anzeigemodi, das volle Programm.",
+      "Ich baute eine Alternative. Eine leichtgewichtige föderierte Widget-Engine, die alles sicher einbetten konnte - jedes Formular, jede UI, jedes Tool - in einem Sandbox-iframe auf jeder Seite. Richtiges postMessage-Protokoll. Kein gemeinsamer Zustand zwischen Host und Widget. Trigger-System, Anzeigemodi, das volle Programm.",
     paragraph3:
       "Ich wollte es meinem Team zeigen. Dann wurde ich gefeuert. Die Codebasis lag monatelang tot auf meiner Festplatte. Dann erkannte ich: Die Architektur war genau das, was next-vibe brauchte.",
   },
   problem: {
     title: "Das Problem mit Script-Tags",
     paragraph1:
-      "Wenn Sie Drittanbieter-Inhalte mit einem nackten Script-Tag einbetten, haben Sie keine Sandbox. Dieses Skript hat vollen Zugriff auf die Seite — das DOM, Cookies, localStorage, Event-Listener, alles.",
+      "Wenn Sie Drittanbieter-Inhalte mit einem nackten Script-Tag einbetten, haben Sie keine Sandbox. Dieses Skript hat vollen Zugriff auf die Seite - das DOM, Cookies, localStorage, Event-Listener, alles.",
     paragraph2:
       "Die sichere Standardalternative ist ein iframe. Aber iframes kommunizieren standardmäßig nicht mit der Elternseite. Resize-Events bubblen nicht. Formularübermittlungen propagieren nicht. Sie enden mit einer dummen isolierten Box, die ihrem Elternteil nichts sagen kann.",
     bridgeTitle: "Was Sie wirklich brauchen, ist eine Brücke.",
@@ -75,16 +75,16 @@ export const translations: typeof enTranslations = {
     },
     triggersTitle: "Sieben Auslöser-Typen",
     triggers: {
-      immediate: "Sofort — wird geladen, sobald die Seite lädt",
+      immediate: "Sofort - wird geladen, sobald die Seite lädt",
       scroll:
-        "Scroll — wird ausgelöst, wenn der Nutzer einen Prozentsatz der Seite gescrollt hat",
-      time: "Zeit — wird nach N Millisekunden ausgelöst",
+        "Scroll - wird ausgelöst, wenn der Nutzer einen Prozentsatz der Seite gescrollt hat",
+      time: "Zeit - wird nach N Millisekunden ausgelöst",
       exitIntent:
-        "Exit Intent — wird ausgelöst, wenn die Maus den Viewport nach oben verlässt",
+        "Exit Intent - wird ausgelöst, wenn die Maus den Viewport nach oben verlässt",
       click:
-        "Klick — wird ausgelöst, wenn ein bestimmtes Element geklickt wird",
-      hover: "Hover — wird beim Mouseover eines Selektors ausgelöst",
-      viewport: "Viewport — wird basierend auf der Bildschirmgröße ausgelöst",
+        "Klick - wird ausgelöst, wenn ein bestimmtes Element geklickt wird",
+      hover: "Hover - wird beim Mouseover eines Selektors ausgelöst",
+      viewport: "Viewport - wird basierend auf der Bildschirmgröße ausgelöst",
     },
     frequencyTitle: "Anzeigehäufigkeit",
     frequency:
@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
     paragraph1:
       "Als ich VibeFrame in next-vibe portierte, erkannte ich, dass nicht nur Formulare einbettbar wurden. Die UI jedes Endpoints ist einbettbar. Einschließlich Vibe Sense Graph-Visualisierungen.",
     paragraph2:
-      "Ein Live-Lead-Funnel-Graph von der Plattform — mit echten Daten, Live-Indikatoren — als Widget auf einer externen Seite gerendert. Das ist kein Screenshot. Das sind keine statischen Exporte. Die Daten aktualisieren sich. Der Graph reagiert.",
+      "Ein Live-Lead-Funnel-Graph von der Plattform - mit echten Daten, Live-Indikatoren - als Widget auf einer externen Seite gerendert. Das ist kein Screenshot. Das sind keine statischen Exporte. Die Daten aktualisieren sich. Der Graph reagiert.",
     paragraph3:
       "Die Architektur, die ich gebaut habe, um Drittanbieter-Widgets sicher einzubetten, erwies sich auch als Architektur, um jedem Endpoint eine öffentlich zugängliche iframe-Präsenz zu geben. Das ist das Ding mit dem Aufbau der richtigen Abstraktion. Sie tut mehr als geplant.",
   },
@@ -141,9 +141,9 @@ export const translations: typeof enTranslations = {
   close: {
     title: "Was diese zwei Dinge gemeinsam haben",
     vibeFrame:
-      "VibeFrame macht die Plattform überall einbettbar. Jeder Endpoint, jedes Widget, jede UI — zwei Script-Tags, und es ist auf jeder Website. Die Präsenz der Plattform erstreckt sich über ihre eigene Domain hinaus.",
+      "VibeFrame macht die Plattform überall einbettbar. Jeder Endpoint, jedes Widget, jede UI - zwei Script-Tags, und es ist auf jeder Website. Die Präsenz der Plattform erstreckt sich über ihre eigene Domain hinaus.",
     skills:
-      "Skills machen die Plattform kompositionsfähig. Jede Reasoning-Aufgabe, jede Fähigkeitsdomäne — zum richtigen Skill routen, das richtige Modell mit den richtigen Tools bekommen.",
+      "Skills machen die Plattform kompositionsfähig. Jede Reasoning-Aufgabe, jede Fähigkeitsdomäne - zum richtigen Skill routen, das richtige Modell mit den richtigen Tools bekommen.",
     together:
       "Zusammen: Ihre Plattform kann überall erscheinen und über alles nachdenken.",
     finalLine:

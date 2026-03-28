@@ -270,7 +270,7 @@ export const translations: typeof enTranslations = {
     perRunBudget:
       "~{{perRunBudget}} leadów/uruchomienie · {{totalRunsPerWeek}} uruchomień/tydzień",
     perRunBudgetFractional:
-      "{{exactBudget}}/uruchomienie · {{totalRunsPerWeek}} uruchomień/tydz. (ułamkowe — akumuluje między uruchomieniami)",
+      "{{exactBudget}}/uruchomienie · {{totalRunsPerWeek}} uruchomień/tydz. (ułamkowe - akumuluje między uruchomieniami)",
     perRunBudgetZeroHint:
       "— zwiększ liczbę leadów/tydzień lub zmniejsz częstotliwość harmonogramu",
     sections: {

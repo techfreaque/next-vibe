@@ -1,10 +1,10 @@
 export const translations = {
   meta: {
-    title: "I got fired. This is what I built instead. — next-vibe",
+    title: "I got fired. This is what I built instead. - next-vibe",
     description:
       "A federated widget engine built at a job that no longer exists. Now any next-vibe endpoint is embeddable anywhere in two script tags.",
     category: "VibeFrame",
-    imageAlt: "VibeFrame — Federated Widget Engine",
+    imageAlt: "VibeFrame - Federated Widget Engine",
     keywords:
       "VibeFrame, federated widgets, iframe, postMessage, next-vibe, embeddable, TypeScript",
   },
@@ -20,16 +20,16 @@ export const translations = {
   origin: {
     title: "The origin story",
     paragraph1:
-      "I spent three months building something at my day job that I never got to show anyone. The codebase I was working in was a disaster. Every time we needed to embed a third-party widget — a form, a chat bubble, a dashboard panel — it was the same story. Someone drops a script tag in a page, it starts reading cookies, intercepting clicks, injecting DOM nodes wherever it wants. No sandbox. No isolation. And when it breaks, good luck figuring out why.",
+      "I spent three months building something at my day job that I never got to show anyone. The codebase I was working in was a disaster. Every time we needed to embed a third-party widget - a form, a chat bubble, a dashboard panel - it was the same story. Someone drops a script tag in a page, it starts reading cookies, intercepting clicks, injecting DOM nodes wherever it wants. No sandbox. No isolation. And when it breaks, good luck figuring out why.",
     paragraph2:
-      "I built an alternative. A lightweight federated widget engine that could safely embed anything — any form, any UI, any tool — in a sandboxed iframe on any page. Proper postMessage protocol. No shared state between host and widget. Trigger system, display modes, the whole thing.",
+      "I built an alternative. A lightweight federated widget engine that could safely embed anything - any form, any UI, any tool - in a sandboxed iframe on any page. Proper postMessage protocol. No shared state between host and widget. Trigger system, display modes, the whole thing.",
     paragraph3:
       "I was about to show it to my team. Then I got fired. The codebase sat dead on my hard drive for months. Then I realized: the architecture was exactly what next-vibe needed.",
   },
   problem: {
     title: "The problem with script tags",
     paragraph1:
-      "When you embed third-party content with a bare script tag, you have no sandbox. That script has full access to the page — the DOM, cookies, localStorage, event listeners, everything. If that script is buggy, your page breaks. If it's malicious, your users are exposed.",
+      "When you embed third-party content with a bare script tag, you have no sandbox. That script has full access to the page - the DOM, cookies, localStorage, event listeners, everything. If that script is buggy, your page breaks. If it's malicious, your users are exposed.",
     paragraph2:
       "The standard safe alternative is an iframe. But iframes do not communicate with the parent page by default. Resize events do not bubble. Form submissions do not propagate. The host page cannot inject data. You end up with a dumb isolated box that cannot tell its parent anything.",
     bridgeTitle: "What you actually need is a bridge.",
@@ -72,15 +72,15 @@ export const translations = {
     },
     triggersTitle: "Seven trigger types",
     triggers: {
-      immediate: "Immediate — mounts as soon as the page loads",
+      immediate: "Immediate - mounts as soon as the page loads",
       scroll:
-        "Scroll — fires when the user has scrolled a percentage of the page",
-      time: "Time — fires after N milliseconds",
+        "Scroll - fires when the user has scrolled a percentage of the page",
+      time: "Time - fires after N milliseconds",
       exitIntent:
-        "Exit intent — fires when the mouse leaves the viewport through the top",
-      click: "Click — fires when a specific element is clicked",
-      hover: "Hover — fires on mouse enter of a selector",
-      viewport: "Viewport — fires based on screen size",
+        "Exit intent - fires when the mouse leaves the viewport through the top",
+      click: "Click - fires when a specific element is clicked",
+      hover: "Hover - fires on mouse enter of a selector",
+      viewport: "Viewport - fires based on screen size",
     },
     frequencyTitle: "Display frequency",
     frequency:
@@ -100,7 +100,7 @@ export const translations = {
     paragraph1:
       "When I ported VibeFrame into next-vibe, I realized it was not just forms that became embeddable. Any endpoint's UI is embeddable. Including Vibe Sense graph visualizations.",
     paragraph2:
-      "A live lead funnel graph from the platform — with real data, live indicators — rendering as a widget on an external page. This is not a screenshot. It is not a static export. The data refreshes. The graph reacts.",
+      "A live lead funnel graph from the platform - with real data, live indicators - rendering as a widget on an external page. This is not a screenshot. It is not a static export. The data refreshes. The graph reacts.",
     paragraph3:
       "The architecture that I built to safely embed third-party widgets turned out to also be the architecture for giving every endpoint a public-facing iframe presence. That is the thing about building the right abstraction. It does more than you planned.",
   },
@@ -135,9 +135,9 @@ export const translations = {
   close: {
     title: "What these two things have in common",
     vibeFrame:
-      "VibeFrame makes the platform embeddable anywhere. Any endpoint, any widget, any UI — two script tags, it is on any website. The platform's presence extends beyond its own domain.",
+      "VibeFrame makes the platform embeddable anywhere. Any endpoint, any widget, any UI - two script tags, it is on any website. The platform's presence extends beyond its own domain.",
     skills:
-      "Skills make the platform composable. Any reasoning task, any capability domain — route to the right skill, get the right model with the right tools. The platform's intelligence extends beyond a single conversation thread.",
+      "Skills make the platform composable. Any reasoning task, any capability domain - route to the right skill, get the right model with the right tools. The platform's intelligence extends beyond a single conversation thread.",
     together:
       "Together: your platform can appear anywhere and reason about anything.",
     finalLine:

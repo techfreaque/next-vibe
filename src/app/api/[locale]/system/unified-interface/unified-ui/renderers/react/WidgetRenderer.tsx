@@ -169,7 +169,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
         return <></>;
       }
 
-      // Custom widgets may be React.lazy — wrap in Suspense scoped to this widget only.
+      // Custom widgets may be React.lazy - wrap in Suspense scoped to this widget only.
       return (
         <Suspense fallback={null}>
           <CustomRender
@@ -421,7 +421,7 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(
 /**
  * Render a widget from the eager-import cache (lives in widget-preloader.ts,
  * outside "use client" so Vite does not strip it).
- * Renders synchronously if the chunk is resolved — no Suspense, no SSR
+ * Renders synchronously if the chunk is resolved - no Suspense, no SSR
  * streaming boundary, no flash.
  */
 function createWidget<TEndpoint extends CreateApiEndpointAny>(
@@ -437,7 +437,7 @@ function createWidget<TEndpoint extends CreateApiEndpointAny>(
     >
   >,
 ): JSX.Element {
-  // resolvedCache is imported from widget-preloader (no "use client" — not stripped)
+  // resolvedCache is imported from widget-preloader (no "use client" - not stripped)
   const Widget = resolvedCache.get(key);
   if (!Widget) {
     return <></>;

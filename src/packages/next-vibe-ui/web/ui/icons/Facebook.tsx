@@ -1,5 +1,5 @@
-import { Facebook as LucideFacebook } from "lucide-react";
+import { SiFacebook as ReactSimpleIcon } from "@icons-pack/react-simple-icons";
 
 import { type IconComponent } from "../../lib/helper";
 
-export const Facebook: IconComponent = LucideFacebook;
+export const Facebook: IconComponent = ReactSimpleIcon;

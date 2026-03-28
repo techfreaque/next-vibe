@@ -53,21 +53,23 @@ interface GenerationResult {
 }
 
 export class GenerateTanstackRoutesRepository {
-  private static readonly PROJECT_ROOT: string = process.cwd();
+  // Lazy getters - evaluated at call time, not module parse time.
+  // This prevents Turbopack's NFT tracer from following process.cwd() during
+  // the static analysis phase and tracing the entire project.
+  private static get PROJECT_ROOT(): string {
+    return process.cwd();
+  }
   /** UI source dir: page.tsx + layout.tsx */
-  private static readonly UI_DIR: string = join(
-    GenerateTanstackRoutesRepository.PROJECT_ROOT,
-    "src/app/[locale]",
-  );
+  private static get UI_DIR(): string {
+    return join(GenerateTanstackRoutesRepository.PROJECT_ROOT, "src/app/[locale]");
+  }
   /** API source dir: route.ts */
-  private static readonly API_DIR: string = join(
-    GenerateTanstackRoutesRepository.PROJECT_ROOT,
-    "src/app/api/[locale]",
-  );
-  private static readonly ROUTES_DIR: string = join(
-    GenerateTanstackRoutesRepository.PROJECT_ROOT,
-    "src/app-tanstack/routes",
-  );
+  private static get API_DIR(): string {
+    return join(GenerateTanstackRoutesRepository.PROJECT_ROOT, "src/app/api/[locale]");
+  }
+  private static get ROUTES_DIR(): string {
+    return join(GenerateTanstackRoutesRepository.PROJECT_ROOT, "src/app-tanstack/routes");
+  }
   private static readonly WRAPPER_IMPORT: string =
     "@/app/api/[locale]/system/unified-interface/tanstack-start/nextjs-compat-wrapper";
 
@@ -169,8 +171,9 @@ export class GenerateTanstackRoutesRepository {
         )
       : [];
 
-    // Generate layout files - track written flat names to skip duplicate route groups
-    const writtenLayoutNames = new Set<string>();
+    // Generate layout files.
+    // Route groups like (other) map to pathless TanStack layout segments (_other),
+    // so each layout gets a unique flat name — no deduplication needed.
     for (const relPath of allLayouts) {
       const dir = dirname(relPath);
       // Root layout (dir === ".") is handled by __root.tsx - skip it here
@@ -183,17 +186,6 @@ export class GenerateTanstackRoutesRepository {
         result.skipped.push(relPath);
         continue;
       }
-      // Skip if this dir (after route group stripping) maps to an already-written flat name
-      const { flatName } = GenerateTanstackRoutesRepository.buildPaths(
-        dir,
-        GenerateTanstackRoutesRepository.UI_DIR,
-        "layout",
-      );
-      if (writtenLayoutNames.has(flatName)) {
-        result.skipped.push(relPath);
-        continue;
-      }
-      writtenLayoutNames.add(flatName);
       try {
         const outFile = GenerateTanstackRoutesRepository.emitLayoutFile(
           dir,
@@ -221,7 +213,6 @@ export class GenerateTanstackRoutesRepository {
           dir,
           srcFile,
           GenerateTanstackRoutesRepository.UI_DIR,
-          writtenLayoutNames,
         );
         if (outFile) {
           result.created.push(outFile);
@@ -462,7 +453,6 @@ export class GenerateTanstackRoutesRepository {
     dir: string,
     srcFile: string,
     sourceDir: string,
-    writtenLayoutNames: Set<string> = new Set(),
   ): string | null {
     // Detect catch-all segment - Next.js [...name] maps to TanStack splat ($)
     const catchAllName =
@@ -497,14 +487,6 @@ export class GenerateTanstackRoutesRepository {
     const hasSearch =
       GenerateTanstackRoutesRepository.hasSearchParamsInLoader(srcFile);
 
-    // Detect a skipped route-group layout that should wrap this page inline
-    const skippedGroupLayoutImport =
-      GenerateTanstackRoutesRepository.findSkippedGroupLayout(
-        dir,
-        sourceDir,
-        writtenLayoutNames,
-      );
-
     const lines = [
       `// AUTO-GENERATED from ${srcRelative}. Add "use custom" to this file to preserve customizations.`,
       `import { createFileRoute } from "@tanstack/react-router";`,
@@ -512,12 +494,6 @@ export class GenerateTanstackRoutesRepository {
       `import { toNextParams } from "${GenerateTanstackRoutesRepository.WRAPPER_IMPORT}";`,
       `import { TanstackPage as Page } from "${importPath}";`,
     ];
-
-    if (skippedGroupLayoutImport) {
-      lines.push(
-        `import { TanstackPage as GroupLayout } from "${skippedGroupLayoutImport}";`,
-      );
-    }
 
     if (catchAllName) {
       // Splat route: params contains _splat (the joined path after the prefix)
@@ -547,9 +523,7 @@ export class GenerateTanstackRoutesRepository {
         ``,
       );
 
-      const componentFn = skippedGroupLayoutImport
-        ? `() => <GroupLayout><Page {...Route.useLoaderData()} /></GroupLayout>`
-        : `() => <Page {...Route.useLoaderData()} />`;
+      const componentFn = `() => <Page {...Route.useLoaderData()} />`;
 
       if (hasSearch) {
         lines.push(
@@ -592,9 +566,7 @@ export class GenerateTanstackRoutesRepository {
         ``,
       );
 
-      const componentFn = skippedGroupLayoutImport
-        ? `() => <GroupLayout><Page {...Route.useLoaderData()} /></GroupLayout>`
-        : `() => <Page {...Route.useLoaderData()} />`;
+      const componentFn = `() => <Page {...Route.useLoaderData()} />`;
 
       if (hasSearch) {
         lines.push(
@@ -694,8 +666,7 @@ export class GenerateTanstackRoutesRepository {
       .flatMap((s) =>
         s.includes(".") && !s.startsWith("[") ? s.split(".") : [s],
       )
-      .map((s) => GenerateTanstackRoutesRepository.convertSegment(s))
-      .filter((s): s is string => s !== null);
+      .map((s) => GenerateTanstackRoutesRepository.convertSegment(s));
 
     const urlSegments = tsSegments.join("/");
     let routePath: string;
@@ -754,16 +725,20 @@ export class GenerateTanstackRoutesRepository {
 
   /**
    * Convert a single Next.js path segment to a TanStack path segment.
-   * Returns null for route groups - they have no URL representation.
+   *
+   * Route groups like `(other)` become pathless layout segments `_other`.
+   * TanStack pathless routes use a leading `_` — they wrap children without
+   * adding a URL segment, exactly mirroring Next.js route group behaviour.
+   *
    * [locale] is NOT stripped here - it becomes $locale in the route path.
    * Discovery already starts inside the [locale] folder, so [locale] only
    * appears if a segment literally named "[locale]" exists deeper in the tree
    * (shouldn't happen, but handled gracefully via the dynamic segment rule).
    */
-  private static convertSegment(segment: string): string | null {
-    // Strip route groups like (group)
+  private static convertSegment(segment: string): string {
+    // Route groups like (other) → pathless layout segment _other
     if (segment.startsWith("(") && segment.endsWith(")")) {
-      return null;
+      return `_${segment.slice(1, -1)}`;
     }
     const catchAll = /^\[\.\.\.(.+)\]$/.exec(segment);
     if (catchAll) {
@@ -785,48 +760,6 @@ export class GenerateTanstackRoutesRepository {
       const m = /^\[\.\.\.(.+)\]$/.exec(segment);
       if (m) {
         return m[1];
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Find a route-group layout that was skipped because its flat name collided
-   * with a sibling (non-group) layout. Returns the import path of that layout,
-   * or null if no such layout exists.
-   *
-   * For example, given dir = "user/(other)/login", this checks if
-   * "user/(other)/layout.tsx" exists and would have been skipped because
-   * "user/layout.tsx" already wrote the flat name "$locale.user".
-   */
-  private static findSkippedGroupLayout(
-    dir: string,
-    sourceDir: string,
-    writtenLayoutNames: Set<string>,
-  ): string | null {
-    const segments = dir === "." ? [] : dir.split("/");
-    // Walk from innermost to outermost ancestor looking for a route group with a layout
-    for (let i = segments.length - 1; i >= 0; i--) {
-      const seg = segments[i];
-      if (!seg.startsWith("(") || !seg.endsWith(")")) {
-        continue;
-      }
-      // Found a route group ancestor - check if it has a layout.tsx
-      const groupDir = segments.slice(0, i + 1).join("/");
-      const layoutFile = join(sourceDir, groupDir, "layout.tsx");
-      if (!existsSync(layoutFile)) {
-        continue;
-      }
-      // Compute what flat name this layout would have had
-      const { flatName, importPath } =
-        GenerateTanstackRoutesRepository.buildPaths(
-          groupDir,
-          sourceDir,
-          "layout",
-        );
-      // If this flat name was already taken, this layout was skipped
-      if (writtenLayoutNames.has(flatName)) {
-        return importPath;
       }
     }
     return null;
@@ -873,7 +806,7 @@ export class GenerateTanstackRoutesRepository {
         continue;
       }
       // Delete auto-generated files, but preserve any that have a "use custom"
-      // directive — those are user-customized overrides of the generated file.
+      // directive - those are user-customized overrides of the generated file.
       try {
         const content = readFileSync(fullPath, "utf-8");
         if (!content.startsWith("// AUTO-GENERATED")) {

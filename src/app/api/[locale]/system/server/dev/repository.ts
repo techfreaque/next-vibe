@@ -40,7 +40,8 @@ import { scopedTranslation as dockerScopedTranslation } from "../../db/utils/doc
 import { DockerOperationsRepository } from "../../db/utils/docker-operations/repository";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { DbUtilsRepository } from "../../db/utils/repository";
-import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
+import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/constants";
+import { ServerFramework } from "../enum";
 import {
   addPidToFile,
   cleanupPidFile,
@@ -49,7 +50,6 @@ import {
   VIBE_DEV_PID_FILE,
   writePidFile,
 } from "../pid";
-import { ServerFramework } from "../enum";
 import type { DevRequestOutput } from "./definition";
 
 /**
@@ -105,36 +105,6 @@ export class DevRepository {
 
   private static runningProcesses: Map<string, ChildProcess> = new Map();
   private static shuttingDown = false;
-
-  static {
-    // Set up clean exit handlers for crashes only
-    DevRepository.setupExitHandlers();
-  }
-
-  private static setupExitHandlers(): void {
-    // Swallow crashes in dev - log and continue rather than killing the whole server
-
-    // Handle uncaught exceptions
-    process.on("uncaughtException", (error) => {
-      // eslint-disable-next-line i18next/no-literal-string
-      process.stderr.write(
-        `\n⚠️  Uncaught exception (dev server continuing): ${error.message}\n${error.stack || ""}\n`,
-      );
-      // Do NOT exit - dev server should survive transient errors
-    });
-
-    // Handle unhandled promise rejections
-    process.on("unhandledRejection", (reason) => {
-      const errorMsg =
-        reason instanceof Error ? reason.message : String(reason);
-      const stack = reason instanceof Error ? reason.stack : "";
-      // eslint-disable-next-line i18next/no-literal-string
-      process.stderr.write(
-        `\n⚠️  Unhandled promise rejection (dev server continuing): ${errorMsg}\n${stack || ""}\n`,
-      );
-      // Do NOT exit - dev server should survive transient errors
-    });
-  }
 
   /**
    * Perform hard database reset: stop containers, delete data, restart
@@ -737,7 +707,12 @@ export class DevRepository {
       }
     };
 
+    let shutdownCalled = false;
     const shutdown = (code: number, message?: string): void => {
+      if (shutdownCalled) {
+        return;
+      }
+      shutdownCalled = true;
       DevRepository.shuttingDown = true;
       restoreTty();
       if (message) {
@@ -747,14 +722,15 @@ export class DevRepository {
       shutdownController?.abort();
       // Stop Bun WS server (may be undefined if still in Vite startup for TanStack mode)
       wsHandle?.stop();
-      // Kill Next.js child process (current one tracked in runningProcesses)
+      // Send SIGINT to Next.js so it does its own graceful cleanup (same signal as Ctrl+C).
+      // The child may have already received SIGINT from the OS (same process group) - that's fine.
       const currentNext = DevRepository.runningProcesses.get("next");
       if (currentNext && !currentNext.killed) {
         currentNext.stdout?.unpipe();
         currentNext.stderr?.unpipe();
         currentNext.stdout?.destroy();
         currentNext.stderr?.destroy();
-        currentNext.kill("SIGTERM");
+        currentNext.kill("SIGINT");
       }
       cleanupPidFile(VIBE_DEV_PID_FILE);
       // Close Vite dev server (TanStack mode) then exit.
@@ -964,11 +940,7 @@ export class DevRepository {
       });
     }
 
-    // --- Spawn Next.js with auto-restart on crash ---
-    const MAX_RESTARTS = 10;
-    const RESTART_BACKOFF_MS = [1000, 2000, 4000, 8000, 15000]; // exponential, capped
-    let restartCount = 0;
-
+    // --- Spawn Next.js ---
     const spawnNext = (): void => {
       if (DevRepository.shuttingDown) {
         return;
@@ -1042,38 +1014,20 @@ export class DevRepository {
         DevRepository.runningProcesses.delete("next");
 
         if (DevRepository.shuttingDown) {
-          return; // Intentional shutdown - don't restart
+          return; // Intentional shutdown
         }
 
         if (code === 0) {
-          // Clean exit (e.g. intentional stop) - don't restart
           logger.info("Next.js exited cleanly");
+          shutdown(0);
           return;
         }
 
-        restartCount++;
-        if (restartCount > MAX_RESTARTS) {
-          process.stderr.write(
-            // eslint-disable-next-line i18next/no-literal-string
-            `\n❌ Next.js crashed ${String(MAX_RESTARTS)} times - giving up\n`,
-          );
-          shutdown(1);
-          return;
-        }
-
-        const backoffMs =
-          RESTART_BACKOFF_MS[
-            Math.min(restartCount - 1, RESTART_BACKOFF_MS.length - 1)
-          ] ?? 15000;
         process.stderr.write(
           // eslint-disable-next-line i18next/no-literal-string
-          `\n⚠️  Next.js exited (code ${String(code)}), restarting in ${String(backoffMs / 1000)}s… (attempt ${String(restartCount)}/${String(MAX_RESTARTS)})\n`,
+          `\n❌ Next.js exited (code ${String(code)})\n`,
         );
-
-        // Kill anything still on the port before restarting
-        DevRepository.killProcessOnPort(nextPort, logger);
-
-        setTimeout(spawnNext, backoffMs);
+        shutdown(1);
       });
     };
 
@@ -1246,7 +1200,7 @@ export class DevRepository {
       }
     }
 
-    // Still alive — force kill
+    // Still alive - force kill
     try {
       process.kill(pidOnPort, "SIGKILL");
     } catch {

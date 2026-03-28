@@ -397,7 +397,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
 
   return (
     <Div className="min-h-screen bg-gray-950 text-gray-100">
-      {/* Hero — dark/red danger theme */}
+      {/* Hero - dark/red danger theme */}
       <Div className="relative bg-linear-to-br from-gray-950 via-red-950/30 to-gray-950 border-b border-red-900/30">
         <Div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-transparent to-transparent" />
         <Div className="container mx-auto px-4 py-20 relative z-10 max-w-4xl">
